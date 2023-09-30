@@ -1,0 +1,15 @@
+/*/target/
+target/
+output/
+.DS_STORE
+.idea_modules
+.idea
+.vscode/
+out/
+/.bloop/
+/.metals/
+mill.iml
+.bsp/
+bsp.log
+lowered.hnir
+.dotty-ide*
