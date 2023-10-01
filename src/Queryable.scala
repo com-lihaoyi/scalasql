@@ -9,15 +9,6 @@ trait Queryable[T, V]{
 }
 
 object Queryable{
-  implicit def containerQr[E[_] <: Expr[_], V[_[_]] <: Product](implicit valueReader0: Reader[V[Val]],
-                                                     queryWriter0: Writer[V[E]]): Queryable[V[E], V[Val]] = {
-    new Queryable[V[E], V[Val]] {
-      def toTables(t: V[E]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[E[_]]).flatMap(_.toTables).toSet
-      def valueReader = valueReader0
-      def queryWriter = queryWriter0
-    }
-  }
-
   implicit def exprQr[E[_] <: Expr[_], T](implicit valueReader0: Reader[T],
                                           queryWriter0: Writer[E[T]]): Queryable[E[T], T] = {
     new Queryable[E[T], T] {

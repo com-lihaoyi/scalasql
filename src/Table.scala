@@ -10,8 +10,14 @@ abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) exten
 
   def initMetadata[V[_[_]] <: Product](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def valueReader: Reader[V[Val]] = metadata.valueReader
-  implicit def queryWriter[E[_] <: Atomic[_]]: Writer[V[E]] = metadata.queryWriter.asInstanceOf[Writer[V[E]]]
+  implicit def containerQr[E[_] <: Atomic[_]]: Queryable[V[E], V[Val]] = {
+    new Queryable[V[E], V[Val]] {
+      def toTables(t: V[E]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[E[_]]).flatMap(_.toTables).toSet
+      def valueReader = metadata.valueReader
+      def queryWriter = metadata.queryWriter.asInstanceOf[Writer[V[E]]]
+    }
+  }
+
   def query = metadata.query
 }
 
