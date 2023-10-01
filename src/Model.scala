@@ -14,7 +14,6 @@ object Atomic{
   }
 }
 
-
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table0) extends Atomic[T]{
   def toSqlExpr = table.tableName + "." + name.value
@@ -24,7 +23,4 @@ object Column{
   implicit def columnW[T]: upickle.default.Writer[Column[T]] = {
     upickle.default.writer[String].comap[Column[T]](_.toSqlExpr)
   }
-}
-object Types{
-  type Id[T] = T
 }

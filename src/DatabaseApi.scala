@@ -1,7 +1,6 @@
 package usql
 
 import java.sql.{ResultSet, Statement}
-import Types.Id
 import upickle.default.{Reader, Writer}
 
 trait QueryRunnable[T, V]{
@@ -11,9 +10,9 @@ trait QueryRunnable[T, V]{
 }
 
 object QueryRunnable{
-  implicit def containerQr[E[_] <: Expr[_], V[_[_]]](implicit valueReader0: Reader[V[Id]],
-                                                     queryWriter0: Writer[V[E]]): QueryRunnable[V[E], V[Id]] = {
-    new QueryRunnable[V[E], V[Id]] {
+  implicit def containerQr[E[_] <: Expr[_], V[_[_]]](implicit valueReader0: Reader[V[Val]],
+                                                     queryWriter0: Writer[V[E]]): QueryRunnable[V[E], V[Val]] = {
+    new QueryRunnable[V[E], V[Val]] {
       def valueReader = valueReader0
       def queryWriter = queryWriter0
       def primitive = false
