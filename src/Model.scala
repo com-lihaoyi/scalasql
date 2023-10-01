@@ -10,12 +10,12 @@ object Atomic{
   }
   def apply[T](x: T) = new Atomic[T] {
     override def toSqlExpr: String = x.toString
-    override def toTables: Set[Table0] = Set()
+    override def toTables: Set[Table.Base] = Set()
   }
 }
 
 case class Column[T]()(implicit val name: sourcecode.Name,
-                       val table: Table0) extends Atomic[T]{
+                       val table: Table.Base) extends Atomic[T]{
   def toSqlExpr = table.tableName + "." + name.value
   def toTables = Set(table)
 }

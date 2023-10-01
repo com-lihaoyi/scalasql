@@ -12,7 +12,7 @@ case class Country[T[_]](code: T[String],
 object Country extends Table[Country]() {
   val code = Column[String]()
 
-  def metadata = initMetadata()
+  val metadata = initMetadata()
 }
 
 object MainTests extends TestSuite {
@@ -73,6 +73,16 @@ object MainTests extends TestSuite {
       )
 
       val expected = expected0.map(_.name())
+      assert(res == expected)
+    }
+    test("tuple") {
+      val res = db.run(
+        Country.query
+          .filter(c => c.indep_year === 1965)
+          .map(c => (c.name, c.code))
+      )
+
+      val expected = expected0.map(t => (t.name(), t.code()))
       assert(res == expected)
     }
   }
