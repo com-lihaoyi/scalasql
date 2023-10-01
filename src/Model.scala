@@ -2,8 +2,6 @@ package usql
 
 import usql.Types.Id
 
-import java.sql.ResultSet
-
 trait Atomic[T] extends Expr[T]{
   def toSqlExpr: String
   def toAtomics: Seq[Atomic[_]] = Seq(this)

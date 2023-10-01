@@ -30,11 +30,45 @@ object MainTests extends TestSuite {
   db.runRaw(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
   def tests = Tests {
-    test("simple") {
+    test("filter") {
       val query = Query(Country.*).filter(c => c.indep_year === 1965)
       pprint.log(query.toSqlQuery)
       val res = db.run(query)
-      pprint.log(res)
+      val expected = Seq(
+        Country[Id](
+          code = "GMB",
+          name = "Gambia",
+          continent = "Africa",
+          region = "Western Africa",
+          surface_area = 11295,
+          indep_year = 1965
+        ),
+        Country[Id](
+          code = "MDV",
+          name = "Maldives",
+          continent = "Asia",
+          region = "Southern and Central Asia",
+          surface_area = 298,
+          indep_year = 1965
+        ),
+        Country[Id](
+          code = "SGP",
+          name = "Singapore",
+          continent = "Asia",
+          region = "Southeast Asia",
+          surface_area = 618,
+          indep_year = 1965
+        )
+      )
+
+      assert(res == expected)
+    }
+    test("map") {
+      val query = Query(Country.*).filter(c => c.indep_year === 1965).map(_.name)
+      pprint.log(query.toSqlQuery)
+      val res = db.run(query)
+      val expected = Seq[String]("Gambia", "Maldives", "Singapore")
+      assert(res == expected)
     }
   }
 }

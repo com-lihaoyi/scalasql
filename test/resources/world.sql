@@ -1,36 +1,36 @@
 CREATE TABLE country (
-  code char(3) NOT NULL DEFAULT '',
-  name char(52) NOT NULL DEFAULT '',
-  continent char(20) NOT NULL DEFAULT 'Asia',
-  region char(26) NOT NULL DEFAULT '',
+  code varchar NOT NULL DEFAULT '',
+  name varchar NOT NULL DEFAULT '',
+  continent varchar NOT NULL DEFAULT 'Asia',
+  region varchar NOT NULL DEFAULT '',
   surface_area float NOT NULL DEFAULT '0.00',
   indep_year smallint DEFAULT NULL,
   population int NOT NULL DEFAULT '0',
   life_expectency float DEFAULT NULL,
   gnp float DEFAULT NULL,
   gnp_old float DEFAULT NULL,
-  local_name char(45) NOT NULL DEFAULT '',
-  government_form char(45) NOT NULL DEFAULT '',
-  head_of_state char(60) DEFAULT NULL,
+  local_name varchar NOT NULL DEFAULT '',
+  government_form varchar NOT NULL DEFAULT '',
+  head_of_state varchar DEFAULT NULL,
   capital int DEFAULT NULL,
-  code2 char(2) NOT NULL DEFAULT '',
+  code2 varchar NOT NULL DEFAULT '',
   PRIMARY KEY (code)
 );
 
 CREATE TABLE city (
   id int NOT NULL,
-  name char(35) NOT NULL DEFAULT '',
-  country_code char(3) NOT NULL DEFAULT '',
-  district char(20) NOT NULL DEFAULT '',
+  name varchar NOT NULL DEFAULT '',
+  country_code varchar NOT NULL DEFAULT '',
+  district varchar NOT NULL DEFAULT '',
   population int NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   CONSTRAINT city_ibfk_1 FOREIGN KEY (country_code) REFERENCES country (code)
 );
 
 CREATE TABLE country_language (
-  country_code char(3) NOT NULL DEFAULT '',
-  language char(30) NOT NULL DEFAULT '',
-  is_official char(1) NOT NULL DEFAULT 'F',
+  country_code varchar NOT NULL DEFAULT '',
+  language varchar NOT NULL DEFAULT '',
+  is_official varchar NOT NULL DEFAULT 'F',
   percentage float NOT NULL DEFAULT '0.0',
   PRIMARY KEY (country_code,language),
   CONSTRAINT country_language_ibfk_1 FOREIGN KEY (country_code) REFERENCES country (code)
