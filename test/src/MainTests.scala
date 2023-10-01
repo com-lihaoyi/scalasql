@@ -19,7 +19,7 @@ object Country extends Table[Country]() {
   val surface_area = Column[Int]()
   val indep_year = Column[Int]()
 
-  def * = Country(code, name, continent, region, surface_area, indep_year)
+  def * = Query(Country(code, name, continent, region, surface_area, indep_year))
 
   implicit def valueReader: upickle.default.Reader[Country[Id]] = upickle.default.macroR
   implicit def queryWriter: upickle.default.Writer[Country[Atomic]] = upickle.default.macroW
@@ -27,14 +27,13 @@ object Country extends Table[Country]() {
 }
 
 object MainTests extends TestSuite {
-  Class.forName("org.h2.Driver")
+
   val db = new DatabaseApi(java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""))
   db.runRaw(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
   def tests = Tests {
     test("filter") {
-      val query = Query(Country.*).filter(c => c.indep_year === 1965)
-      val res = db.run(query)
+      val res = db.run(Country.*.filter(c => c.indep_year === 1965))
       val expected = Seq(
         Country[Id](
           code = "GMB",
@@ -65,8 +64,11 @@ object MainTests extends TestSuite {
       assert(res == expected)
     }
     test("map") {
-      val query = Query(Country.*).filter(c => c.indep_year === 1965).map(c => c.copy(surface_area = c.surface_area * 0))
-      val res = db.run(query)
+      val res = db.run(
+        Country.*
+          .filter(c => c.indep_year === 1965)
+          .map(c => c.copy(surface_area = c.surface_area * 0))
+      )
       val expected = Seq(
         Country[Id](
           code = "GMB",
@@ -97,8 +99,11 @@ object MainTests extends TestSuite {
       assert(res == expected)
     }
     test("primitive") {
-      val query = Query(Country.*).filter(c => c.indep_year === 1965).map(_.name)
-      val res = db.run(query)
+      val res = db.run(
+        Country.*
+          .filter(c => c.indep_year === 1965)
+          .map(_.name)
+      )
       val expected = Seq[String]("Gambia", "Maldives", "Singapore")
       assert(res == expected)
     }
