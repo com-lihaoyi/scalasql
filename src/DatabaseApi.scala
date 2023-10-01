@@ -41,9 +41,9 @@ class DatabaseApi(connection: java.sql.Connection) {
 
     val statement: Statement = connection.createStatement()
 
-    val exprStr = FlatJson.flatten(upickle.default.writeJs(query.expr)(qr.queryWriter))
-      .map{case (k, v) => s"""$v as $k"""}
-      .mkString(", ")
+    val jsonQuery = upickle.default.writeJs(query.expr)(qr.queryWriter)
+    val flatQuery = FlatJson.flatten(jsonQuery)
+    val exprStr = flatQuery.map{case (k, v) => s"""$v as $k"""}.mkString(", ")
 
     val queryStr = query.toSqlQuery(exprStr)
     val resultSet: ResultSet = statement.executeQuery(queryStr)
@@ -60,7 +60,6 @@ class DatabaseApi(connection: java.sql.Connection) {
 
         val json = FlatJson.unflatten(kvs.toSeq)
 
-        pprint.log(json.render(4))
         res.append(upickle.default.read[V](json)(qr.valueReader))
       }
     } finally {

@@ -6,7 +6,7 @@ package usql
 object FlatJson {
 
   val delimiter = "__"
-  val basePrefix = ""
+  val basePrefix = "res"
   def flatten(x: ujson.Value) = flatten0(x, basePrefix)
   def flatten0(x: ujson.Value, prefix: String): Seq[(String, String)] = {
     x match {
