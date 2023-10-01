@@ -1,5 +1,10 @@
 package usql
 
+case class Query[T](expr: T, filter: Seq[Expr[Boolean]] = Nil) {
+  def map[V](f: T => V): Query[V] = Query(f(expr), filter)
+  def filter(f: T => Expr[Boolean]): Query[T] = Query(expr, filter ++ Seq(f(expr)))
+}
+
 trait Expr[T] {
   def toAtomics: Seq[Atomic[_]]
   def toTables: Set[Table.Base]
@@ -24,16 +29,10 @@ case class Column[T]()(implicit val name: sourcecode.Name,
   def toSqlExpr = table.tableName + "." + name.value
   def toTables = Set(table)
 }
+
 object Column{
   implicit def columnW[T]: upickle.default.Writer[Column[T]] = {
     upickle.default.writer[String].comap[Column[T]](_.toSqlExpr)
   }
-}
-
-case class Query[T](expr: T, filter: Seq[Expr[Boolean]] = Nil) {
-
-  def map[V](f: T => V): Query[V] = Query(f(expr), filter)
-  def filter(f: T => Expr[Boolean]): Query[T] = Query(expr, filter ++ Seq(f(expr)))
-
 }
 
