@@ -18,4 +18,3 @@ object Val{
   implicit def apply[T](value: T): Val[T] = new Val(value)
   implicit def reader[T: Reader]: Reader[Val[T]] = upickle.default.reader[T].map(Val(_))
 }
-

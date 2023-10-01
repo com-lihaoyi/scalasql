@@ -10,16 +10,25 @@ class DatabaseApi(connection: java.sql.Connection) {
     finally statement.close()
   }
 
+  def toSqlQuery(query: Query[_], jsonQuery: ujson.Value, tableNames: Seq[String]): String = {
+    val flatQuery = FlatJson.flatten(jsonQuery)
+    val exprStr = flatQuery.map { case (k, v) => s"""$v as $k""" }.mkString(", ")
+
+    val tables = tableNames.mkString(", ")
+    val filtersOpt =
+      if (query.filter.isEmpty) ""
+      else " WHERE " + query.filter.flatMap(_.toAtomics).map(_.toSqlExpr).mkString(" AND ")
+
+    s"SELECT $exprStr FROM $tables$filtersOpt"
+  }
+
   def run[T, V](query: Query[T])
-               (implicit qr: QueryRunnable[T, V]) = {
+               (implicit qr: Queryable[T, V]) = {
 
     val statement: Statement = connection.createStatement()
-
     val jsonQuery = upickle.default.writeJs(query.expr)(qr.queryWriter)
-    val flatQuery = FlatJson.flatten(jsonQuery)
-    val exprStr = flatQuery.map{case (k, v) => s"""$v as $k"""}.mkString(", ")
 
-    val queryStr = query.toSqlQuery(exprStr)
+    val queryStr = toSqlQuery(query, jsonQuery, qr.toTables(query.expr).map(_.tableName).toSeq)
     val resultSet: ResultSet = statement.executeQuery(queryStr)
 
     val res = collection.mutable.Buffer.empty[V]

@@ -1,5 +1,10 @@
 package usql
 
+trait Expr[T] {
+  def toAtomics: Seq[Atomic[_]]
+  def toTables: Set[Table.Base]
+}
+
 trait Atomic[T] extends Expr[T]{
   def toSqlExpr: String
   def toAtomics: Seq[Atomic[_]] = Seq(this)
@@ -24,3 +29,11 @@ object Column{
     upickle.default.writer[String].comap[Column[T]](_.toSqlExpr)
   }
 }
+
+case class Query[T](expr: T, filter: Seq[Expr[Boolean]] = Nil) {
+
+  def map[V](f: T => V): Query[V] = Query(f(expr), filter)
+  def filter(f: T => Expr[Boolean]): Query[T] = Query(expr, filter ++ Seq(f(expr)))
+
+}
+

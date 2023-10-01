@@ -1,27 +1,40 @@
 package usql
 
-trait Queryable[T] {
-  def toAtomics(t: T): Seq[Atomic[_]]
+import upickle.default.{Reader, Writer}
+
+trait Queryable[T, V]{
   def toTables(t: T): Set[Table.Base]
+  def valueReader: Reader[V]
+  def queryWriter: Writer[T]
 }
 
 object Queryable{
-  implicit def exprQueryable[V <: Expr[_]]: Queryable[V] = new Queryable[V] {
-    def toAtomics(t: V): Seq[Atomic[_]] = t.toAtomics
-    def toTables(t: V): Set[Table.Base] = t.toTables
+  implicit def containerQr[E[_] <: Expr[_], V[_[_]] <: Product](implicit valueReader0: Reader[V[Val]],
+                                                     queryWriter0: Writer[V[E]]): Queryable[V[E], V[Val]] = {
+    new Queryable[V[E], V[Val]] {
+      def toTables(t: V[E]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[E[_]]).flatMap(_.toTables).toSet
+      def valueReader = valueReader0
+      def queryWriter = queryWriter0
+    }
   }
 
-  implicit def tuple2Queryable[T <: Expr[_], V <: Expr[_]]: Queryable[(T, V)] = new Queryable[(T, V)] {
-    def toAtomics(t: (T, V)): Seq[Atomic[_]] = t._1.toAtomics ++ t._2.toAtomics
-    def toTables(t: (T, V)): Set[Table.Base] = t._1.toTables ++ t._2.toTables
+  implicit def exprQr[E[_] <: Expr[_], T](implicit valueReader0: Reader[T],
+                                          queryWriter0: Writer[E[T]]): Queryable[E[T], T] = {
+    new Queryable[E[T], T] {
+      def toTables(t: E[T]): Set[Table.Base] = t.toTables
+      def valueReader = valueReader0
+      def queryWriter = queryWriter0
+    }
   }
-}
 
-trait Expr[T] {
-  def toAtomics: Seq[Atomic[_]]
-  def toTables: Set[Table.Base]
-}
-
-object Expr{
-
+  implicit def tuple2Qr[E[_] <: Expr[_], T, V](implicit valueReader0: Reader[T],
+                                               queryWriter0: Writer[E[T]],
+                                               valueReader02: Reader[V],
+                                               queryWriter02: Writer[E[V]]): Queryable[(E[T], E[V]), (T, V)] = {
+    new Queryable[(E[T], E[V]), (T, V)] {
+      def toTables(t: (E[T], E[V])): Set[Table.Base] = t._1.toTables ++ t._2.toTables
+      def valueReader = upickle.default.Tuple2Reader(valueReader0, valueReader02)
+      def queryWriter = upickle.default.Tuple2Writer(queryWriter0, queryWriter02)
+    }
+  }
 }
