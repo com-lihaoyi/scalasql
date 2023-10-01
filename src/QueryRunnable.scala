@@ -5,7 +5,6 @@ import upickle.default.{Reader, Writer}
 trait QueryRunnable[T, V]{
   def valueReader: Reader[V]
   def queryWriter: Writer[T]
-  def primitive: Boolean
 }
 
 object QueryRunnable{
@@ -14,7 +13,6 @@ object QueryRunnable{
     new QueryRunnable[V[E], V[Val]] {
       def valueReader = valueReader0
       def queryWriter = queryWriter0
-      def primitive = false
     }
   }
 
@@ -23,7 +21,6 @@ object QueryRunnable{
     new QueryRunnable[E[T], T] {
       def valueReader = valueReader0
       def queryWriter = queryWriter0
-      def primitive = true
     }
   }
 
@@ -34,7 +31,6 @@ object QueryRunnable{
     new QueryRunnable[(E[T], E[V]), (T, V)] {
       def valueReader = upickle.default.Tuple2Reader(valueReader0, valueReader02)
       def queryWriter = upickle.default.Tuple2Writer(queryWriter0, queryWriter02)
-      def primitive = true
     }
   }
 }
