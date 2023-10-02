@@ -14,44 +14,28 @@ object Queryable{
                      val valueReader: Reader[V]) extends Queryable[T, V]{
     def toTables(t: T) = toTables0(t)
   }
+
   implicit def exprQr[T](implicit valueReader0: Reader[T],
-                                          queryWriter0: Writer[Expr[T]]): Queryable[Expr[T], T] = {
+                         queryWriter0: Writer[Expr[T]]): Queryable[Expr[T], T] = {
     new Queryable.Simple[Expr[T], T](_.toTables, queryWriter0, valueReader0)
   }
 
-  implicit def tuple2Qr[T, V](implicit valueReader0: Reader[(T, V)],
-                                               queryWriter0: Writer[(Expr[T], Expr[V])]): Queryable[(Expr[T], Expr[V]), (T, V)] = {
-    new Queryable.Simple[(Expr[T], Expr[V]), (T, V)](t => t._1.toTables ++ t._2.toTables, queryWriter0, valueReader0)
-  }
-
-  implicit def tuple3Qr[T, V, U](implicit valueReader0: Reader[(T, V, U)],
-                                                  queryWriter0: Writer[(Expr[T], Expr[V], Expr[U])]): Queryable[(Expr[T], Expr[V], Expr[U]), (T, V, U)] = {
-    new Queryable.Simple[(Expr[T], Expr[V], Expr[U]), (T, V, U)](
-      t => t._1.toTables ++ t._2.toTables ++ t._3.toTables,
-      queryWriter0,
-      valueReader0
+  implicit def tuple2Qr[E1, E2, T1, T2](implicit q1: Queryable[E1, T1],
+                                        q2: Queryable[E2, T2]): Queryable[(E1, E2), (T1, T2)] = {
+    new Queryable.Simple[(E1, E2), (T1, T2)](
+      t => q1.toTables(t._1) ++ q2.toTables(t._2),
+      OptionPickler.Tuple2Writer(q1.queryWriter, q2.queryWriter),
+      OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader),
     )
   }
 
-  implicit def tuple2Qr2[
-    T1[_[_]] <: Product,
-    T2[_[_]] <: Product
-  ](
-    implicit q1: Queryable[T1[Expr], T1[Val]],
-    q2: Queryable[T2[Expr], T2[Val]]
-  ): Queryable[(T1[Expr], T2[Expr]), (T1[Val], T2[Val])] = {
-    new Queryable[(T1[Expr], T2[Expr]), (T1[Val], T2[Val])]{
-      def toTables(t: (T1[Expr], T2[Expr])): Set[Table.Base] = q1.toTables(t._1) ++ q2.toTables(t._2)
-
-      def valueReader: OptionPickler.Reader[(T1[Val], T2[Val])] = {
-        OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader)
-      }
-
-      def queryWriter: OptionPickler.Writer[(T1[Expr], T2[Expr])] = {
-
-        OptionPickler.Tuple2Writer(q1.queryWriter, q2.queryWriter)
-      }
-    }
-
+  implicit def tuple3Qr[E1, E2, E3, T1, T2, T3](implicit q1: Queryable[E1, T1],
+                                                q2: Queryable[E2, T2],
+                                                q3: Queryable[E3, T3]): Queryable[(E1, E2, E3), (T1, T2, T3)] = {
+    new Queryable.Simple[(E1, E2, E3), (T1, T2, T3)](
+      t => q1.toTables(t._1) ++ q2.toTables(t._2) ++ q3.toTables(t._3),
+      OptionPickler.Tuple3Writer(q1.queryWriter, q2.queryWriter, q3.queryWriter),
+      OptionPickler.Tuple3Reader(q1.valueReader, q2.valueReader, q3.valueReader),
+    )
   }
 }
