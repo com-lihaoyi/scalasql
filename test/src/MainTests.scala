@@ -157,6 +157,7 @@ object MainTests extends TestSuite {
 
       assert(res == expected)
     }
+
     test("countryLanguage") {
       val res = db.run(CountryLanguage.query).take(5)
       val expected = Seq[CountryLanguage[Val]](
@@ -191,6 +192,7 @@ object MainTests extends TestSuite {
           percentage = 0.9,
         )
       )
+
       assert(res == expected)
     }
 
@@ -206,8 +208,10 @@ object MainTests extends TestSuite {
             population = 4017733,
           )
         )
+
         assert(res == expected)
       }
+
       test("singleId") {
         val res = db.run(City.query.filter(_.id === 3208))
         val expected = Seq[City[Val]](
@@ -219,8 +223,10 @@ object MainTests extends TestSuite {
             population = 4017733,
           )
         )
+
         assert(res == expected)
       }
+
       test("singlePopulation") {
         val res = db.run(City.query.filter(_.population > 9000000)).take(5)
         val expected = Seq[City[Val]](
@@ -294,10 +300,12 @@ object MainTests extends TestSuite {
             population = 5286800,
           )
         )
+
         test("combined") {
           val res = db.run(City.query.filter(c => c.population > 5000000 && c.countryCode === "CHN")).take(5)
           assert(res == expected)
         }
+
         test("separate") {
           val res = db.run(City.query.filter(_.population > 5000000).filter(_.countryCode === "CHN")).take(5)
           assert(res == expected)
@@ -325,6 +333,7 @@ object MainTests extends TestSuite {
 
         assert(res == expected)
       }
+
       test("tuple3"){
         val res = db.run(Country.query.map(c => (c.name, c.continent, c.population))).take(5)
         val expected = Seq(
@@ -334,6 +343,13 @@ object MainTests extends TestSuite {
           ("Anguilla", "North America", 8000),
           ("Albania", "Europe", 3401200)
         )
+
+        assert(res == expected)
+      }
+
+      test("interpolateInMap"){
+        val res = db.run(Country.query.filter(_.name === "Singapore").map(c => c.population * 2))
+        val expected = Seq(7134000)
         assert(res == expected)
       }
 
@@ -381,6 +397,7 @@ object MainTests extends TestSuite {
             )
           )
         )
+
         assert(res == expected)
       }
 
@@ -391,6 +408,7 @@ object MainTests extends TestSuite {
             .filter { case (city, country) => country.name === "Malaysia" }
             .map{case (city, country) => (city.name, country.name)}
         )
+
         val expected = Seq(
           ("Kuala Lumpur", "Malaysia"),
           ("Ipoh", "Malaysia"),
@@ -411,6 +429,7 @@ object MainTests extends TestSuite {
           ("Sungai Petani", "Malaysia"),
           ("Shah Alam", "Malaysia")
         )
+
         assert(res == expected)
       }
     }

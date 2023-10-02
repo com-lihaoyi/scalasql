@@ -2,6 +2,7 @@ package usql
 
 import java.sql.{ResultSet, Statement}
 import scala.util.DynamicVariable
+import SqlString.SqlStringSyntax
 
 object DatabaseApi{
   val tableNameMapper = new DynamicVariable[String => String](identity)
@@ -18,26 +19,41 @@ class DatabaseApi(connection: java.sql.Connection,
     finally statement.close()
   }
 
-  def toSqlQuery(query: Query[_], jsonQuery: ujson.Value, tableNames: Seq[String]): String = {
+  def toSqlQuery(query: Query[_], jsonQuery: ujson.Value, tableNames: Seq[String]): SqlString = {
     val flatQuery = FlatJson.flatten(jsonQuery)
-    val exprStr = flatQuery.map { case (k, v) => s"""$v as ${tableNameMapper(k)}""" }.mkString(", ")
+    val exprStr = SqlString.join(
+      flatQuery.map {
+        case (k, v) => v ++ usql" as " ++ SqlString.raw(tableNameMapper(k))
+      },
+      usql", "
+    )
 
-    val tables = tableNames.mkString(", ")
+    val tables = SqlString.join(tableNames.map(SqlString.raw), usql", ")
     val filtersOpt =
-      if (query.filters.isEmpty) ""
-      else " WHERE " + query.filters.flatMap(_.toAtomics).map(_.toSqlExpr).mkString(" AND ")
+      if (query.filters.isEmpty) usql""
+      else {
+        val clauses = SqlString.join(
+          query
+            .filters
+            .flatMap(_.toAtomics)
+            .map(_.toSqlExpr),
+          usql" AND "
+        )
 
-    s"SELECT $exprStr FROM $tables$filtersOpt"
+        usql" WHERE " ++ clauses
+      }
+
+    usql"SELECT " ++ exprStr ++ usql" FROM " ++ tables ++ filtersOpt
   }
 
   def run[T, V](query: Query[T])
                (implicit qr: Queryable[T, V]) = {
     DatabaseApi.columnNameMapper.withValue(columnNameMapper) {
       DatabaseApi.tableNameMapper.withValue(tableNameMapper) {
-        val statement: Statement = connection.createStatement()
+
         val jsonQuery = OptionPickler.writeJs(query.expr)(qr.queryWriter)
 
-        val queryStr = toSqlQuery(
+        val querySqlStr = toSqlQuery(
           query,
           jsonQuery,
           (
@@ -46,7 +62,20 @@ class DatabaseApi(connection: java.sql.Connection,
           ).map(t => tableNameMapper(t.tableName)).distinct
         )
 
-        val resultSet: ResultSet = statement.executeQuery(queryStr)
+        val queryStr = querySqlStr.queryParts.mkString("?")
+
+        val statement = connection.prepareStatement(queryStr)
+
+        for((p, n) <- querySqlStr.params.zipWithIndex){
+          p match{
+            case Interp.StringInterp(s) => statement.setString(n + 1, s)
+            case Interp.IntInterp(i) => statement.setInt(n + 1, i)
+            case Interp.DoubleInterp(d) => statement.setDouble(n + 1, d)
+            case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
+          }
+        }
+
+        val resultSet: ResultSet = statement.executeQuery()
 
         val res = collection.mutable.Buffer.empty[V]
         try {
@@ -61,6 +90,7 @@ class DatabaseApi(connection: java.sql.Connection,
               }
               kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
             }
+
 
             val json = FlatJson.unflatten(kvs.toSeq)
             def unMapJson(j: ujson.Value): ujson.Value = j match{
