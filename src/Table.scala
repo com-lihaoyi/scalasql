@@ -3,7 +3,7 @@ import scala.language.experimental.macros
 import upickle.default.{Reader, Writer}
 
 abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) extends Table.Base {
-  val tableName = name.value.toLowerCase
+  val tableName = name.value
   implicit def self: Table[V] = this
 
   def metadata: Table.Metadata[V]

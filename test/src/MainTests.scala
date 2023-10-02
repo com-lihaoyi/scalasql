@@ -6,8 +6,17 @@ case class Country[T[_]](code: T[String],
                          name: T[String],
                          continent: T[String],
                          region: T[String],
-                         surface_area: T[Int],
-                         indep_year: T[Int])
+                         surfaceArea: T[Int],
+                         indepYear: T[Int],
+                         population: T[Int],/*
+                         life_expectancy: T[Option[Double]],
+                         gnp: T[Option[scala.math.BigDecimal]],
+                         gnpold: T[Option[scala.math.BigDecimal]],
+                         local_name: T[String],
+                         government_form: T[String],
+                         headOfState: T[Option[String]],
+                         capital: T[Option[Int]],
+                         code2: T[String]*/)
 
 object Country extends Table[Country]() {
   val code = Column[String]()
@@ -15,75 +24,280 @@ object Country extends Table[Country]() {
   val metadata = initMetadata()
 }
 
-object MainTests extends TestSuite {
+case class City[T[_]](id: T[Int],
+                      name: T[String],
+                      countryCode: T[String],
+                      district: T[String],
+                      population: T[Int])
 
-  val db = new DatabaseApi(java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""))
+object City extends Table[City]() {
+  val metadata = initMetadata()
+}
+
+case class CountryLanguage[T[_]](countryCode: T[String],
+                                 language: T[String],
+                                 isOfficial: T[Boolean],
+                                 percentage: T[Double])
+
+object CountryLanguage extends Table[CountryLanguage]() {
+  val metadata = initMetadata()
+}
+
+object MainTests extends TestSuite {
+  def camelToSnake(s: String) = {
+    s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
+  }
+
+  def snakeToCamel(s: String) = {
+    val res = s.split("_", -1).map(x => s"${x(0).toUpper}${x.drop(1)}").mkString
+    s"${s(0).toLower}${res.drop(1)}"
+  }
+  val db = new DatabaseApi(
+    java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""),
+    tableNameMapper = camelToSnake,
+    tableNameUnMapper = snakeToCamel,
+    columnNameMapper = camelToSnake,
+    columnNameUnMapper = snakeToCamel
+  )
   db.runRaw(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
-  val expected0 = Seq[Country[Val]](
-    Country(
-      code = "GMB",
-      name = "Gambia",
-      continent = "Africa",
-      region = "Western Africa",
-      surface_area = 11295,
-      indep_year = 1965
-    ),
-    Country(
-      code = "MDV",
-      name = "Maldives",
-      continent = "Asia",
-      region = "Southern and Central Asia",
-      surface_area = 298,
-      indep_year = 1965
-    ),
-    Country(
-      code = "SGP",
-      name = "Singapore",
-      continent = "Asia",
-      region = "Southeast Asia",
-      surface_area = 618,
-      indep_year = 1965
-    )
-  )
-
   def tests = Tests {
-    test("filter") {
-      val res = db.run(Country.query.filter(c => c.indep_year === 1965))
-      val expected = expected0
+
+    // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
+    test("city") {
+      val res = db.run(City.query).take(5)
+
+      val expected = Seq[City[Val]](
+        City(
+          id = 1,
+          name = "Kabul",
+          countryCode = "AFG",
+          district = "Kabol",
+          population = 1780000
+        ),
+        City(
+          id = 2,
+          name = "Qandahar",
+          countryCode = "AFG",
+          district = "Qandahar",
+          population = 237500
+        ),
+        City(
+          id = 3,
+          name = "Herat",
+          countryCode = "AFG",
+          district = "Herat",
+          population = 186800
+        ),
+        City(
+          id = 4,
+          name = "Mazar-e-Sharif",
+          countryCode = "AFG",
+          district = "Balkh",
+          population = 127800
+        ),
+        City(
+          id = 5,
+          name = "Amsterdam",
+          countryCode = "NLD",
+          district = "Noord-Holland",
+          population = 731200
+        ),
+      )
+
+      assert(res == expected)
+    }
+//    test("country") {
+//      // Fails because some indep_years are nullable
+//      val res = db.run(Country.query).take(2)
+//      pprint.log(res)
+//    }
+    test("countryLanguage") {
+      val res = db.run(CountryLanguage.query).take(5)
+      val expected = Seq[CountryLanguage[Val]](
+        CountryLanguage(
+          countryCode = "ABW",
+          language = "Dutch",
+          isOfficial = true,
+          percentage = 5.3,
+        ),
+        CountryLanguage(
+          countryCode = "ABW",
+          language = "English",
+          isOfficial = false,
+          percentage = 9.5,
+        ),
+        CountryLanguage(
+          countryCode = "ABW",
+          language = "Papiamento",
+          isOfficial = false,
+          percentage = 76.7,
+        ),
+        CountryLanguage(
+          countryCode = "ABW",
+          language = "Spanish",
+          isOfficial = false,
+          percentage = 7.4,
+        ),
+        CountryLanguage(
+          countryCode = "AFG",
+          language = "Balochi",
+          isOfficial = false,
+          percentage = 0.9,
+        )
+      )
       assert(res == expected)
     }
 
-    test("map") {
-      val res = db.run(
-        Country.query
-          .filter(c => c.indep_year === 1965)
-          .map(c => c.copy(surface_area = c.surface_area * 2))
-      )
+    test("queryFilter") {
+      test("singleName") {
+        val res = db.run(City.query.filter(_.name === "Singapore"))
+        val expected = Seq[City[Val]](
+          City(
+            id = 3208,
+            name = "Singapore",
+            countryCode = "SGP",
+            district = "�",
+            population = 4017733,
+          )
+        )
+        assert(res == expected)
+      }
+      test("singleId") {
+        val res = db.run(City.query.filter(_.id === 3208))
+        val expected = Seq[City[Val]](
+          City(
+            id = 3208,
+            name = "Singapore",
+            countryCode = "SGP",
+            district = "�",
+            population = 4017733,
+          )
+        )
+        assert(res == expected)
+      }
+      test("singlePopulation") {
+        val res = db.run(City.query.filter(_.population > 9000000)).take(5)
+        val expected = Seq[City[Val]](
+          City(
+            id = 206,
+            name = "S�o Paulo",
+            countryCode = "BRA",
+            district = "S�o Paulo",
+            population = 9968485,
+          ),
+          City(
+            id = 939,
+            name = "Jakarta",
+            countryCode = "IDN",
+            district = "Jakarta Raya",
+            population = 9604900,
+          ),
+          City(
+            id = 1024,
+            name = "Mumbai (Bombay)",
+            countryCode = "IND",
+            district = "Maharashtra",
+            population = 10500000,
+          ),
+          City(
+            id = 1890,
+            name = "Shanghai",
+            countryCode = "CHN",
+            district = "Shanghai",
+            population = 9696300,
+          ),
+          City(
+            id = 2331,
+            name = "Seoul",
+            countryCode = "KOR",
+            district = "Seoul",
+            population = 9981619,
+          )
+        )
+        assert(res == expected)
+      }
 
-      val expected = expected0.map(c => c.copy[Val](surface_area = c.surface_area() * 2))
-      assert(res == expected)
+      test("multiple") {
+        val expected = Seq[City[Val]](
+          City(
+            id = 1890,
+            name = "Shanghai",
+            countryCode = "CHN",
+            district = "Shanghai",
+            population = 9696300,
+          ),
+          City(
+            id = 1891,
+            name = "Peking",
+            countryCode = "CHN",
+            district = "Peking",
+            population = 7472000,
+          ),
+          City(
+            id = 1892,
+            name = "Chongqing",
+            countryCode = "CHN",
+            district = "Chongqing",
+            population = 6351600,
+          ),
+          City(
+            id = 1893,
+            name = "Tianjin",
+            countryCode = "CHN",
+            district = "Tianjin",
+            population = 5286800,
+          )
+        )
+        test("combined") {
+          val res = db.run(City.query.filter(c => c.population > 5000000 && c.countryCode === "CHN")).take(5)
+          assert(res == expected)
+        }
+        test("separate") {
+          val res = db.run(City.query.filter(_.population > 5000000).filter(_.countryCode === "CHN")).take(5)
+          assert(res == expected)
+        }
+      }
     }
 
-    test("primitive") {
-      val res = db.run(
-        Country.query
-          .filter(c => c.indep_year === 1965)
-          .map(_.name)
-      )
+    test("lifting"){
+      def find(cityId: Int) = db.run(City.query.filter(_.id === cityId))
 
-      val expected = expected0.map(_.name())
-      assert(res == expected)
+      assert(find(3208) == List(City[Val](3208, "Singapore", "SGP", "�", 4017733)))
+      assert(find(3209) == List(City[Val](3209, "Bratislava", "SVK", "Bratislava", 448292)))
     }
-    test("tuple") {
-      val res = db.run(
-        Country.query
-          .filter(c => c.indep_year === 1965)
-          .map(c => (c.name, c.code))
-      )
 
-      val expected = expected0.map(t => (t.name(), t.code()))
-      assert(res == expected)
+    test("mapping"){
+      test("tuple2") {
+        val res = db.run(Country.query.map(c => (c.name, c.continent))).take(5)
+        val expected = Seq(
+          ("Aruba", "North America"),
+          ("Afghanistan", "Asia"),
+          ("Angola", "Africa"),
+          ("Anguilla", "North America"),
+          ("Albania", "Europe")
+        )
+
+        assert(res == expected)
+      }
+      test("tuple3"){
+        val res = db.run(Country.query.map(c => (c.name, c.continent, c.population))).take(5)
+        val expected = Seq(
+          ("Aruba", "North America", 103000),
+          ("Afghanistan", "Asia", 22720000),
+          ("Angola", "Africa", 12878000),
+          ("Anguilla", "North America", 8000),
+          ("Albania", "Europe", 3401200)
+        )
+        assert(res == expected)
+      }
+
+      test("filterMap"){
+        def findName(cityId: Int) = db.run(City.query.filter(_.id === cityId).map(_.name))
+
+        assert(findName(3208) == List("Singapore"))
+        assert(findName(3209) == List("Bratislava"))
+      }
     }
   }
 }

@@ -26,7 +26,7 @@ object Atomic{
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) extends Atomic[T]{
-  def toSqlExpr = table.tableName + "." + name.value
+  def toSqlExpr = DatabaseApi.tableNameMapper.value(table.tableName) + "." + DatabaseApi.columnNameMapper.value(name.value)
   def toTables = Set(table)
 }
 

@@ -15,8 +15,22 @@ trait ExprIntOps {
 
       def toTables = v.toTables
     }
+  }
+  implicit class ExprOps0(v: Expr[_]) {
     def ===(x: Int): Atomic[Boolean] = new Atomic[Boolean] {
       def toSqlExpr: String = s"${v.asInstanceOf[Atomic[_]].toSqlExpr} = $x"
+
+      def toTables = v.toTables
+    }
+    def ===(x: String): Atomic[Boolean] = new Atomic[Boolean] {
+      def toSqlExpr: String = s"${v.asInstanceOf[Atomic[_]].toSqlExpr} = '$x'"
+
+      def toTables = v.toTables
+    }
+  }
+  implicit class ExprBooleanOps0(v: Expr[Boolean]) {
+    def &&(x: Expr[Boolean]): Atomic[Boolean] = new Atomic[Boolean] {
+      def toSqlExpr: String = s"${v.asInstanceOf[Atomic[_]].toSqlExpr} AND ${x.asInstanceOf[Atomic[_]].toSqlExpr}"
 
       def toTables = v.toTables
     }

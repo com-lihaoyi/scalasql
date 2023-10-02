@@ -28,4 +28,16 @@ object Queryable{
       def queryWriter = upickle.default.Tuple2Writer(queryWriter0, queryWriter02)
     }
   }
+  implicit def tuple3Qr[E[_] <: Expr[_], T, V, U](implicit valueReader0: Reader[T],
+                                                  queryWriter0: Writer[E[T]],
+                                                  valueReader02: Reader[V],
+                                                  queryWriter02: Writer[E[V]],
+                                                  valueReader03: Reader[U],
+                                                  queryWriter03: Writer[E[U]]): Queryable[(E[T], E[V], E[U]), (T, V, U)] = {
+    new Queryable[(E[T], E[V], E[U]), (T, V, U)] {
+      def toTables(t: (E[T], E[V], E[U])): Set[Table.Base] = t._1.toTables ++ t._2.toTables ++ t._3.toTables
+      def valueReader = upickle.default.Tuple3Reader(valueReader0, valueReader02, valueReader03)
+      def queryWriter = upickle.default.Tuple3Writer(queryWriter0, queryWriter02, queryWriter03)
+    }
+  }
 }
