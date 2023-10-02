@@ -352,6 +352,11 @@ object MainTests extends TestSuite {
         val expected = Seq(7134000)
         assert(res == expected)
       }
+      test("interpolateInMap2"){
+        val res = db.run(Country.query.filter(_.name === "Singapore").map(c => (c.name, c.population * 2)))
+        val expected = Seq(("Singapore", 7134000))
+        assert(res == expected)
+      }
 
       test("filterMap"){
         def findName(cityId: Int) = db.run(City.query.filter(_.id === cityId).map(_.name))

@@ -18,16 +18,17 @@ abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) exten
     }
   }
 
-  def query = metadata.query
+  def query: Query[V[Atomic]] = metadata.query
 }
 
 object Table{
   trait Base {
     def tableName: String
   }
+
   class Metadata[V[_[_]]](val valueReader: Reader[V[Val]],
                           val queryWriter: Writer[V[Atomic]],
-                          val query: Query[V[Column]])
+                          val query: Query[V[Atomic]])
 
   object Metadata{
     private trait Dummy[T[_]] extends Product
