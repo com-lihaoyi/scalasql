@@ -35,7 +35,6 @@ class DatabaseApi(connection: java.sql.Connection,
         val clauses = SqlString.join(
           query
             .filters
-            .flatMap(_.toAtomics)
             .map(_.toSqlExpr),
           usql" AND "
         )
@@ -58,7 +57,7 @@ class DatabaseApi(connection: java.sql.Connection,
           jsonQuery,
           (
             qr.toTables(query.expr).toSeq ++
-            query.filters.map(_.asInstanceOf[Atomic[Boolean]]).flatMap(_.toTables)
+            query.filters.flatMap(_.toTables)
           ).map(t => tableNameMapper(t.tableName)).distinct
         )
 

@@ -10,15 +10,15 @@ abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) exten
 
   def initMetadata[V[_[_]] <: Product](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def containerQr[E[_] <: Atomic[_]]: Queryable[V[E], V[Val]] = {
-    new Queryable[V[E], V[Val]] {
-      def toTables(t: V[E]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[E[_]]).flatMap(_.toTables).toSet
+  implicit def containerQr: Queryable[V[Expr], V[Val]] = {
+    new Queryable[V[Expr], V[Val]] {
+      def toTables(t: V[Expr]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[Expr[_]]).flatMap(_.toTables).toSet
       def valueReader = metadata.valueReader
-      def queryWriter = metadata.queryWriter.asInstanceOf[Writer[V[E]]]
+      def queryWriter = metadata.queryWriter.asInstanceOf[Writer[V[Expr]]]
     }
   }
 
-  def query: Query[V[Atomic]] = metadata.query
+  def query: Query[V[Expr]] = metadata.query
 }
 
 object Table{
@@ -27,8 +27,8 @@ object Table{
   }
 
   class Metadata[V[_[_]]](val valueReader: Reader[V[Val]],
-                          val queryWriter: Writer[V[Atomic]],
-                          val query: Query[V[Atomic]])
+                          val queryWriter: Writer[V[Expr]],
+                          val query: Query[V[Expr]])
 
   object Metadata{
     private trait Dummy[T[_]] extends Product
@@ -42,9 +42,9 @@ object Table{
       val queryParams = for(applyParam <- applyParameters) yield {
         val name = applyParam.name
         if (c.prefix.actualType.member(name) != NoSymbol){
-          q"${c.prefix}.${TermName(name.toString)}"
+          q"${c.prefix}.${TermName(name.toString)}.expr"
         }else{
-          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix})"
+          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr"
         }
       }
 
