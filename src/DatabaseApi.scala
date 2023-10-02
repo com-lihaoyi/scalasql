@@ -24,8 +24,8 @@ class DatabaseApi(connection: java.sql.Connection,
 
     val tables = tableNames.mkString(", ")
     val filtersOpt =
-      if (query.filter.isEmpty) ""
-      else " WHERE " + query.filter.flatMap(_.toAtomics).map(_.toSqlExpr).mkString(" AND ")
+      if (query.filters.isEmpty) ""
+      else " WHERE " + query.filters.flatMap(_.toAtomics).map(_.toSqlExpr).mkString(" AND ")
 
     s"SELECT $exprStr FROM $tables$filtersOpt"
   }
@@ -40,7 +40,10 @@ class DatabaseApi(connection: java.sql.Connection,
         val queryStr = toSqlQuery(
           query,
           jsonQuery,
-          qr.toTables(query.expr).map(t => tableNameMapper(t.tableName)).toSeq
+          (
+            qr.toTables(query.expr).toSeq ++
+            query.filters.map(_.asInstanceOf[Atomic[Boolean]]).flatMap(_.toTables)
+          ).map(t => tableNameMapper(t.tableName)).distinct
         )
 
         val resultSet: ResultSet = statement.executeQuery(queryStr)
@@ -60,14 +63,13 @@ class DatabaseApi(connection: java.sql.Connection,
             }
 
             val json = FlatJson.unflatten(kvs.toSeq)
-
             def unMapJson(j: ujson.Value): ujson.Value = j match{
               case ujson.Obj(kvs) => ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
+              case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
               case j => j
             }
 
             val unMappedJson = unMapJson(json)
-
             res.append(OptionPickler.read[V](unMappedJson)(qr.valueReader))
           }
         } finally {

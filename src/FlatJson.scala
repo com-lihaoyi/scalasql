@@ -24,24 +24,34 @@ object FlatJson {
     val root: ujson.Value = ujson.Obj()
 
     for ((k, v) <- kvs) {
-      val segments = k.split(delimiter).map(s => (s, s.forall(_.isDigit)))
+
+      val segments = k.split(delimiter)
       var current = root
 
-      for (Array((s, isDigit), (nextS, nextIsDigit)) <- segments.sliding(2)) {
-        def nextContainer0 = if (nextIsDigit) ujson.Arr() else ujson.Obj()
-        val nextContainer = if (isDigit) {
-          assert(s.toInt == current.arr.length)
-          current.arr.append(nextContainer0)
-          nextContainer0
+      var (prevS, prevIsDigit) = (segments.head, segments.head.forall(_.isDigit))
+      for (i <- Range(1, segments.size)) {
+        val nextS = segments(i)
+        val nextIsDigit = nextS.forall(_.isDigit)
+        lazy val nextContainer0 = if (nextIsDigit) ujson.Arr() else ujson.Obj()
+        val nextContainer = if (prevIsDigit) {
+          val d = prevS.toInt
+          val currArrLen = current.arr.length
+          if (d == currArrLen) {
+            current.arr.append(nextContainer0)
+            nextContainer0
+          } else if (d < currArrLen) current(d)
+          else ???
         } else {
-          current.obj.getOrElseUpdate(s, nextContainer0)
+          current.obj.getOrElseUpdate(prevS, nextContainer0)
         }
+        prevS = nextS
+        prevIsDigit = nextIsDigit
         current = nextContainer
       }
 
-      val (lastS, lastIsDigit) = segments.last
+      val lastS = segments.last
 
-      if (lastIsDigit) current.arr.append(v)
+      if (lastS.forall(_.isDigit)) current.arr.append(v)
       else current(lastS) = v
     }
 

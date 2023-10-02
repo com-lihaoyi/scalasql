@@ -32,4 +32,27 @@ object Queryable{
       valueReader0
     )
   }
+
+  implicit def tuple2Qr2[
+    E[_] <: Expr[_],
+    T1[_[_]] <: Product,
+    T2[_[_]] <: Product
+  ](
+    implicit q1: Queryable[T1[E], T1[Val]],
+    q2: Queryable[T2[E], T2[Val]]
+  ): Queryable[(T1[E], T2[E]), (T1[Val], T2[Val])] = {
+    new Queryable[(T1[E], T2[E]), (T1[Val], T2[Val])]{
+      def toTables(t: (T1[E], T2[E])): Set[Table.Base] = q1.toTables(t._1) ++ q2.toTables(t._2)
+
+      def valueReader: OptionPickler.Reader[(T1[Val], T2[Val])] = {
+        OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader)
+      }
+
+      def queryWriter: OptionPickler.Writer[(T1[E], T2[E])] = {
+
+        OptionPickler.Tuple2Writer(q1.queryWriter, q2.queryWriter)
+      }
+    }
+
+  }
 }

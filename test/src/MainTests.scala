@@ -49,8 +49,17 @@ object MainTests extends TestSuite {
   }
 
   def snakeToCamel(s: String) = {
-    val res = s.split("_", -1).map(x => s"${x(0).toUpper}${x.drop(1)}").mkString
-    s"${s(0).toLower}${res.drop(1)}"
+    val out = new StringBuilder()
+    val chunks = s.split("_", -1)
+    for(i <- Range(0, chunks.length)){
+      val chunk = chunks(i)
+      if (i == 0) out.append(chunk)
+      else{
+        out.append(chunk(0).toUpper)
+        out.append(chunk.drop(1))
+      }
+    }
+    out.toString()
   }
   val db = new DatabaseApi(
     java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""),
@@ -333,6 +342,76 @@ object MainTests extends TestSuite {
 
         assert(findName(3208) == List("Singapore"))
         assert(findName(3209) == List("Bratislava"))
+      }
+    }
+
+    test("joins"){
+      test {
+        val res = db.run(
+          City.query
+            .join(Country.query)(_.countryCode === _.code)
+            .filter { case (city, country) => country.name === "Aruba" }
+        )
+
+        val expected = Seq[(City[Val], Country[Val])](
+          (
+            City(
+              id = 129,
+              name = "Oranjestad",
+              countryCode = "ABW",
+              district = "�",
+              population = 29034
+            ),
+            Country(
+              code = "ABW",
+              name = "Aruba",
+              continent = "North America",
+              region = "Caribbean",
+              surfaceArea = 193,
+              indepYear = None,
+              population = 103000,
+              lifeExpectancy = Some(78.4),
+              gnp = Some(BigDecimal(828.0)),
+              gnpOld = Some(BigDecimal(793.0)),
+              localName = "Aruba",
+              governmentForm = "Nonmetropolitan Territory of The Netherlands",
+              headOfState = Some("Beatrix"),
+              capital = Some(129),
+              code2 = "AW"
+            )
+          )
+        )
+        assert(res == expected)
+      }
+
+      test{
+        val res = db.run(
+          City.query
+            .join(Country.query)(_.countryCode === _.code)
+            .filter { case (city, country) => country.name === "Malaysia" }
+            .map{case (city, country) => (city.name, country.name)}
+        )
+        val expected = Seq(
+          ("Kuala Lumpur", "Malaysia"),
+          ("Ipoh", "Malaysia"),
+          ("Johor Baharu", "Malaysia"),
+          ("Petaling Jaya", "Malaysia"),
+          ("Kelang", "Malaysia"),
+          ("Kuala Terengganu", "Malaysia"),
+          ("Pinang", "Malaysia"),
+          ("Kota Bharu", "Malaysia"),
+          ("Kuantan", "Malaysia"),
+          ("Taiping", "Malaysia"),
+          ("Seremban", "Malaysia"),
+          ("Kuching", "Malaysia"),
+          ("Sibu", "Malaysia"),
+          ("Sandakan", "Malaysia"),
+          ("Alor Setar", "Malaysia"),
+          ("Selayang Baru", "Malaysia"),
+          ("Sungai Petani", "Malaysia"),
+          ("Shah Alam", "Malaysia")
+        )
+        assert(res == expected)
       }
     }
   }
