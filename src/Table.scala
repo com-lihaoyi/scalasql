@@ -14,7 +14,7 @@ abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) exten
     new Queryable[V[Expr], V[Val]] {
       def toTables(t: V[Expr]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[Expr[_]]).flatMap(_.toTables).toSet
       def valueReader = metadata.valueReader
-      def queryWriter = metadata.queryWriter.asInstanceOf[Writer[V[Expr]]]
+      def queryWriter = metadata.queryWriter
     }
   }
 
