@@ -6,7 +6,7 @@ CREATE TABLE country (
   surface_area float NOT NULL DEFAULT '0.00',
   indep_year smallint DEFAULT NULL,
   population int NOT NULL DEFAULT '0',
-  life_expectency float DEFAULT NULL,
+  life_expectancy float DEFAULT NULL,
   gnp float DEFAULT NULL,
   gnp_old float DEFAULT NULL,
   local_name varchar NOT NULL DEFAULT '',

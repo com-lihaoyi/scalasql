@@ -19,8 +19,8 @@ object FlatJson {
     }
   }
 
-  def unflatten(kvs: Seq[(String, String)]): ujson.Value = unflatten0(kvs)(basePrefix)
-  def unflatten0(kvs: Seq[(String, String)]): ujson.Value = {
+  def unflatten(kvs: Seq[(String, ujson.Value)]): ujson.Value = unflatten0(kvs)(basePrefix)
+  def unflatten0(kvs: Seq[(String, ujson.Value)]): ujson.Value = {
     val root: ujson.Value = ujson.Obj()
 
     for ((k, v) <- kvs) {

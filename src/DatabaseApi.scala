@@ -35,7 +35,7 @@ class DatabaseApi(connection: java.sql.Connection,
     DatabaseApi.columnNameMapper.withValue(columnNameMapper) {
       DatabaseApi.tableNameMapper.withValue(tableNameMapper) {
         val statement: Statement = connection.createStatement()
-        val jsonQuery = upickle.default.writeJs(query.expr)(qr.queryWriter)
+        val jsonQuery = OptionPickler.writeJs(query.expr)(qr.queryWriter)
 
         val queryStr = toSqlQuery(
           query,
@@ -48,11 +48,15 @@ class DatabaseApi(connection: java.sql.Connection,
         val res = collection.mutable.Buffer.empty[V]
         try {
           while (resultSet.next()) {
-            val kvs = collection.mutable.Buffer.empty[(String, String)]
+            val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
             val meta = resultSet.getMetaData
 
             for (i <- Range(0, meta.getColumnCount)) {
-              kvs.append((meta.getColumnLabel(i + 1).toLowerCase, resultSet.getString(i + 1)))
+              val v = resultSet.getString(i + 1) match{
+                case null => ujson.Null
+                case s => ujson.Str(s)
+              }
+              kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
             }
 
             val json = FlatJson.unflatten(kvs.toSeq)
@@ -64,7 +68,7 @@ class DatabaseApi(connection: java.sql.Connection,
 
             val unMappedJson = unMapJson(json)
 
-            res.append(upickle.default.read[V](unMappedJson)(qr.valueReader))
+            res.append(OptionPickler.read[V](unMappedJson)(qr.valueReader))
           }
         } finally {
           resultSet.close()

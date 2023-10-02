@@ -15,8 +15,8 @@ trait Atomic[T] extends Expr[T]{
   def toAtomics: Seq[Atomic[_]] = Seq(this)
 }
 object Atomic{
-  implicit def atomicW[T]: upickle.default.Writer[Atomic[T]] = {
-    upickle.default.writer[String].comap[Atomic[T]](_.toSqlExpr)
+  implicit def atomicW[T]: OptionPickler.Writer[Atomic[T]] = {
+    OptionPickler.writer[String].comap[Atomic[T]](_.toSqlExpr)
   }
   def apply[T](x: T) = new Atomic[T] {
     override def toSqlExpr: String = x.toString
@@ -31,8 +31,8 @@ case class Column[T]()(implicit val name: sourcecode.Name,
 }
 
 object Column{
-  implicit def columnW[T]: upickle.default.Writer[Column[T]] = {
-    upickle.default.writer[String].comap[Column[T]](_.toSqlExpr)
+  implicit def columnW[T]: OptionPickler.Writer[Column[T]] = {
+    OptionPickler.writer[String].comap[Column[T]](_.toSqlExpr)
   }
 }
 

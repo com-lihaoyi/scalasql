@@ -1,6 +1,6 @@
 package usql
 import scala.language.experimental.macros
-import upickle.default.{Reader, Writer}
+import OptionPickler.{Reader, Writer}
 
 abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) extends Table.Base {
   val tableName = name.value
@@ -50,8 +50,8 @@ object Table{
       c.Expr[Metadata[V]](
         q"""
         new _root_.usql.Table.Metadata[$wtt](
-          _root_.upickle.default.macroR,
-          _root_.upickle.default.macroW,
+          _root_.usql.OptionPickler.macroR,
+          _root_.usql.OptionPickler.macroW,
           _root_.usql.Query(new $wtt(..$queryParams))
         )
        """

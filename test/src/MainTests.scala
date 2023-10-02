@@ -7,16 +7,16 @@ case class Country[T[_]](code: T[String],
                          continent: T[String],
                          region: T[String],
                          surfaceArea: T[Int],
-                         indepYear: T[Int],
-                         population: T[Int],/*
-                         life_expectancy: T[Option[Double]],
+                         indepYear: T[Option[Int]],
+                         population: T[Int],
+                         lifeExpectancy: T[Option[Double]],
                          gnp: T[Option[scala.math.BigDecimal]],
-                         gnpold: T[Option[scala.math.BigDecimal]],
-                         local_name: T[String],
-                         government_form: T[String],
+                         gnpOld: T[Option[scala.math.BigDecimal]],
+                         localName: T[String],
+                         governmentForm: T[String],
                          headOfState: T[Option[String]],
                          capital: T[Option[Int]],
-                         code2: T[String]*/)
+                         code2: T[String])
 
 object Country extends Table[Country]() {
   val code = Column[String]()
@@ -107,11 +107,47 @@ object MainTests extends TestSuite {
 
       assert(res == expected)
     }
-//    test("country") {
-//      // Fails because some indep_years are nullable
-//      val res = db.run(Country.query).take(2)
-//      pprint.log(res)
-//    }
+    test("country") {
+      val res = db.run(Country.query).take(2)
+      val expected = Seq[Country[Val]](
+        Country(
+          code = "ABW",
+          name = "Aruba",
+          continent = "North America",
+          region = "Caribbean",
+          surfaceArea = 193,
+          indepYear = None,
+          population = 103000,
+          lifeExpectancy = Some(78.4),
+          gnp = Some(BigDecimal(828.0)),
+          gnpOld = Some(BigDecimal(793.0)),
+          localName = "Aruba",
+          governmentForm = "Nonmetropolitan Territory of The Netherlands",
+          headOfState = Some("Beatrix"),
+          capital = Some(129),
+          code2 = "AW"
+        ),
+        Country(
+          code = "AFG",
+          name = "Afghanistan",
+          continent = "Asia",
+          region = "Southern and Central Asia",
+          surfaceArea = 652090,
+          indepYear = Some(1919),
+          population = 22720000,
+          lifeExpectancy = Some(45.9),
+          gnp = Some(BigDecimal(5976.0)),
+          gnpOld = None,
+          localName = "Afganistan/Afqanestan",
+          governmentForm = "Islamic Emirate",
+          headOfState = Some("Mohammad Omar"),
+          capital = Some(1),
+          code2 = "AF"
+        )
+      )
+
+      assert(res == expected)
+    }
     test("countryLanguage") {
       val res = db.run(CountryLanguage.query).take(5)
       val expected = Seq[CountryLanguage[Val]](

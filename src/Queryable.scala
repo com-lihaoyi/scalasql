@@ -1,6 +1,6 @@
 package usql
 
-import upickle.default.{Reader, Writer}
+import OptionPickler.{Reader, Writer}
 
 trait Queryable[T, V]{
   def toTables(t: T): Set[Table.Base]
