@@ -79,14 +79,11 @@ class DatabaseApi(connection: java.sql.Connection,
 
         val jsonQuery = OptionPickler.writeJs(query.expr)(qr.queryWriter)
 
-        val querySqlStr = toSqlQuery(
-          query,
-          jsonQuery,
-          (
-            qr.toTables(query.expr).toSeq ++
-            query.where.toSeq.flatMap(_.toTables)
-          ).map(t => tableNameMapper(t.tableName)).distinct
-        )
+        val tables = (qr.toTables(query.expr).toSeq ++ query.where.toSeq.flatMap(_.toTables))
+          .map(t => tableNameMapper(t.tableName))
+          .distinct
+
+        val querySqlStr = toSqlQuery(query, jsonQuery, tables)
 
         val queryStr = querySqlStr.queryParts.mkString("?")
 

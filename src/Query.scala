@@ -13,6 +13,19 @@ case class Query[T](expr: T,
   def map[V](f: T => V): Query[V] = {
     copy(expr = f(expr))
   }
+  def flatMap[V](f: T => Query[V]): Query[V] = {
+    val other = f(expr)
+    Query(
+      other.expr,
+      from,
+      joins,
+      where ++ other.where,
+      groupBy,
+      orderBy,
+      limit,
+      offset
+    )
+  }
 
   def filter(f: T => Expr[Boolean]): Query[T] = {
     copy(where = Seq(f(expr)) ++ where)

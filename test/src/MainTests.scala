@@ -481,5 +481,57 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
     }
+    test("flatMap"){
+      test {
+        val res = db.run(
+          City.query
+            .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+            .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
+              cityCountryCode === countryCode && countryName === "Aruba"
+            }
+            .map{ case (cityCountryCode, countryCode, countryName, cityName) => (cityName, countryCode) }
+        )
+
+        val expected = Seq(
+          ("Oranjestad", "ABW"),
+        )
+
+        assert(res == expected)
+      }
+
+      test{
+        val res = db.run(
+          City.query
+            .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+            .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
+              cityCountryCode === countryCode && countryName === "Malaysia"
+            }
+            .map { case (cityCountryCode, countryCode, countryName, cityName) => (countryCode, cityName) }
+        )
+
+        val expected = Seq(
+          ("MYS", "Kuala Lumpur"),
+          ("MYS", "Ipoh"),
+          ("MYS", "Johor Baharu"),
+          ("MYS", "Petaling Jaya"),
+          ("MYS", "Kelang"),
+          ("MYS", "Kuala Terengganu"),
+          ("MYS", "Pinang"),
+          ("MYS", "Kota Bharu"),
+          ("MYS", "Kuantan"),
+          ("MYS", "Taiping"),
+          ("MYS", "Seremban"),
+          ("MYS", "Kuching"),
+          ("MYS", "Sibu"),
+          ("MYS", "Sandakan"),
+          ("MYS", "Alor Setar"),
+          ("MYS", "Selayang Baru"),
+          ("MYS", "Sungai Petani"),
+          ("MYS", "Shah Alam")
+        )
+
+        assert(res == expected)
+      }
+    }
   }
 }

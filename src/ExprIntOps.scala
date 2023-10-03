@@ -32,14 +32,14 @@ trait ExprIntOps {
     def ===(x: Expr[_]): Expr[Boolean] = new Expr[Boolean] {
       def toSqlExpr: SqlString = v.toSqlExpr ++ usql" = " ++ x.toSqlExpr
 
-      def toTables = v.toTables
+      def toTables = v.toTables ++ x.toTables
     }
   }
   implicit class ExprBooleanOps0(v: Expr[Boolean]) {
     def &&(x: Expr[Boolean]): Expr[Boolean] = new Expr[Boolean] {
       def toSqlExpr: SqlString = v.toSqlExpr ++ usql" AND " ++ x.toSqlExpr
 
-      def toTables = v.toTables
+      def toTables = v.toTables ++ x.toTables
     }
   }
 }
