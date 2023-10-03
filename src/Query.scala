@@ -2,11 +2,76 @@ package usql
 
 import usql.SqlString.SqlStringSyntax
 
-case class Query[T](expr: T, filters: Seq[Expr[Boolean]] = Nil) {
-  def map[V](f: T => V): Query[V] = Query(f(expr), filters)
-  def filter(f: T => Expr[Boolean]): Query[T] = Query(expr, filters ++ Seq(f(expr)))
+case class Query[T](expr: T,
+                    joins: Seq[Query.Join],
+                    where: Seq[Expr[_]],
+                    groupBy: Option[Query.GroupBy],
+                    having: Option[Expr[_]],
+                    orderBy: Option[Query.OrderBy],
+                    limit: Option[Int],
+                    offset: Option[Int]) extends Query.From{
+  def map[V](f: T => V): Query[V] = {
+    copy(expr = f(expr))
+//    else ???
+//    ???
+  }
+
+  def filter(f: T => Expr[Boolean]): Query[T] = {
+//    if ()
+    copy(where = Seq(f(expr)) ++ where)
+//    ???
+  }
+
+  def sortBy(f: T => Expr[_]) = {
+//    if (sortBy)
+    ???
+  }
+
+  def drop(n: Int) = copy(offset = Some(n))
+
+  def take(n: Int) = copy(limit = Some(n))
+
   def join[V](other: Query[V])(on: (T, V) => Expr[Boolean]): Query[(T, V)] =
-    Query((expr, other.expr), Seq(on(expr, other.expr)) ++ filters ++ other.filters)
+    Query(
+      (expr, other.expr),
+      joins,
+      Seq(on(expr, other.expr)) ++ where ++ other.where,
+      groupBy,
+      having,
+      orderBy,
+      limit,
+      offset
+    )
+//  ???
+}
+
+object Query {
+  def fromTable[T](e: T, table: usql.Table.Base) = {
+    Query(e, Nil, Nil, None, None, None, None, None)
+  }
+
+  case class OrderBy(expr: Expr[_],
+                     ascDesc: Option[AscDesc],
+                     nulls: Option[Nulls])
+
+  sealed trait AscDesc
+  object AscDesc {
+    case object Asc extends AscDesc
+    case object Desc extends AscDesc
+  }
+
+  sealed trait Nulls
+  object Nulls {
+    case object First extends Nulls
+    case object Last extends Nulls
+  }
+
+
+  sealed trait From
+  case class Table(t: usql.Table.Base) extends From
+  case class GroupBy(expr: Expr[_], having: Option[Expr[_]])
+
+  case class Join(from: From, as: Option[String], on: Option[Expr[_]])
 }
 
 trait Expr[T] {

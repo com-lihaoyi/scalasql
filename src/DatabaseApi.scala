@@ -30,12 +30,13 @@ class DatabaseApi(connection: java.sql.Connection,
 
     val tables = SqlString.join(tableNames.map(SqlString.raw), usql", ")
     val filtersOpt =
-      if (query.filters.isEmpty) usql""
+      if (query.where.isEmpty) usql""
       else {
         val clauses = SqlString.join(
           query
-            .filters
-            .map(_.toSqlExpr),
+            .where
+            .map(_.toSqlExpr)
+            .toSeq,
           usql" AND "
         )
 
@@ -57,7 +58,7 @@ class DatabaseApi(connection: java.sql.Connection,
           jsonQuery,
           (
             qr.toTables(query.expr).toSeq ++
-            query.filters.flatMap(_.toTables)
+            query.where.toSeq.flatMap(_.toTables)
           ).map(t => tableNameMapper(t.tableName)).distinct
         )
 

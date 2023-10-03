@@ -53,7 +53,7 @@ object Table{
         new _root_.usql.Table.Metadata[$wtt](
           _root_.usql.OptionPickler.macroR,
           _root_.usql.OptionPickler.macroW,
-          _root_.usql.Query(new $wtt(..$queryParams))
+          _root_.usql.Query.fromTable(new $wtt(..$queryParams), ${c.prefix})
         )
        """
       )
