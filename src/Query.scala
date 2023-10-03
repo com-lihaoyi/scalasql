@@ -2,6 +2,19 @@ package usql
 
 import usql.SqlString.SqlStringSyntax
 
+/**
+ * Models the various components of a SQL query:
+ *
+ * {{{
+ *  SELECT DISTINCT column, AGG_FUNC(column_or_expression), …
+ *  FROM mytable
+ *  JOIN another_table ON mytable.column = another_table.column
+ *  WHERE constraint_expression
+ *  GROUP BY column HAVING constraint_expression
+ *  ORDER BY column ASC/DESC
+ *  LIMIT count OFFSET COUNT;
+ * }}}
+ */
 case class Query[T](expr: T,
                     from: Query.From,
                     joins: Seq[Query.Join],
