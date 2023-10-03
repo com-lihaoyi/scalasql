@@ -7,7 +7,6 @@ case class Query[T](expr: T,
                     joins: Seq[Query.Join],
                     where: Seq[Expr[_]],
                     groupBy: Option[Query.GroupBy],
-                    having: Option[Expr[_]],
                     orderBy: Option[Query.OrderBy],
                     limit: Option[Int],
                     offset: Option[Int]) extends Query.From{
@@ -40,7 +39,6 @@ case class Query[T](expr: T,
       joins,
       Seq(on(expr, other.expr)) ++ where ++ other.where,
       groupBy,
-      having,
       orderBy,
       limit,
       offset
@@ -49,7 +47,7 @@ case class Query[T](expr: T,
 
 object Query {
   def fromTable[T](e: T, table: usql.Table.Base) = {
-    Query(e, Table(table), Nil, Nil, None, None, None, None, None)
+    Query(e, Table(table), Nil, Nil, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],
