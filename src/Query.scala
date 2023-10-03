@@ -3,6 +3,7 @@ package usql
 import usql.SqlString.SqlStringSyntax
 
 case class Query[T](expr: T,
+                    from: Query.From,
                     joins: Seq[Query.Join],
                     where: Seq[Expr[_]],
                     groupBy: Option[Query.GroupBy],
@@ -12,20 +13,21 @@ case class Query[T](expr: T,
                     offset: Option[Int]) extends Query.From{
   def map[V](f: T => V): Query[V] = {
     copy(expr = f(expr))
-//    else ???
-//    ???
   }
 
   def filter(f: T => Expr[Boolean]): Query[T] = {
-//    if ()
     copy(where = Seq(f(expr)) ++ where)
-//    ???
   }
 
   def sortBy(f: T => Expr[_]) = {
-//    if (sortBy)
-    ???
+    copy(orderBy = Some(Query.OrderBy(f(expr), None, None)))
   }
+
+  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(Query.AscDesc.Asc))))
+  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(Query.AscDesc.Desc))))
+
+  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Query.Nulls.First))))
+  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Query.Nulls.Last))))
 
   def drop(n: Int) = copy(offset = Some(n))
 
@@ -34,6 +36,7 @@ case class Query[T](expr: T,
   def join[V](other: Query[V])(on: (T, V) => Expr[Boolean]): Query[(T, V)] =
     Query(
       (expr, other.expr),
+      from,
       joins,
       Seq(on(expr, other.expr)) ++ where ++ other.where,
       groupBy,
@@ -42,12 +45,11 @@ case class Query[T](expr: T,
       limit,
       offset
     )
-//  ???
 }
 
 object Query {
   def fromTable[T](e: T, table: usql.Table.Base) = {
-    Query(e, Nil, Nil, None, None, None, None, None)
+    Query(e, Table(table), Nil, Nil, None, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],

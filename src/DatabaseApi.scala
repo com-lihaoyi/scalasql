@@ -13,6 +13,7 @@ class DatabaseApi(connection: java.sql.Connection,
                   tableNameUnMapper: String => String = identity,
                   columnNameMapper: String => String = identity,
                   columnNameUnMapper: String => String = identity) {
+
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
     try statement.execute(sql)
@@ -43,7 +44,32 @@ class DatabaseApi(connection: java.sql.Connection,
         usql" WHERE " ++ clauses
       }
 
-    usql"SELECT " ++ exprStr ++ usql" FROM " ++ tables ++ filtersOpt
+    val sortOpt = query.orderBy match{
+      case None => usql""
+      case Some(orderBy) =>
+        val ascDesc = orderBy.ascDesc match{
+          case None => usql""
+          case Some(Query.AscDesc.Asc) => usql" ASC"
+          case Some(Query.AscDesc.Desc) => usql" DESC"
+        }
+        val nulls = orderBy.nulls match{
+          case None => usql""
+          case Some(Query.Nulls.First) => usql" NULLS FIRST"
+          case Some(Query.Nulls.Last) => usql" NULLS LAST"
+        }
+        usql" ORDER BY " ++ orderBy.expr.toSqlExpr ++ ascDesc ++ nulls
+    }
+
+    val limitOpt = query.limit match{
+      case None => usql""
+      case Some(limit) => usql" LIMIT " ++ SqlString.raw(limit.toString)
+    }
+    val offsetOpt = query.offset match{
+      case None => usql""
+      case Some(offset) => usql" OFFSET " ++ SqlString.raw(offset.toString)
+    }
+
+    usql"SELECT " ++ exprStr ++ usql" FROM " ++ tables ++ filtersOpt ++ sortOpt ++ limitOpt ++ offsetOpt
   }
 
   def run[T, V](query: Query[T])

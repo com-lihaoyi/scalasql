@@ -385,6 +385,30 @@ object MainTests extends TestSuite {
       }
     }
 
+    test("sortLimitOffset"){
+      val res = db.run(City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population)))
+      val expected = Seq(
+        ("Karachi", 9269265),
+        ("Istanbul", 8787958),
+        ("Ciudad de M�xico", 8591309),
+        ("Moscow", 8389200),
+        ("New York", 8008278)
+      )
+      assert(res == expected)
+    }
+
+    test("sortLimitOffset2"){
+      val res = db.run(City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population)))
+      val expected = Seq(
+        ("Adamstown", 42),
+        ("West Island", 167),
+        ("Fakaofo", 300),
+        ("Citt� del Vaticano", 455),
+        ("Bantam", 503)
+      )
+      assert(res == expected)
+    }
+
     test("joins"){
       test {
         val res = db.run(
