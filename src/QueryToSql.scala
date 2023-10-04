@@ -21,11 +21,11 @@ object QueryToSql {
   }
 
   def toSqlQuery0[T, V](query: Query[T], qr: Queryable[T, V]): SqlStr = {
-    val froms = Seq(query.from) ++ query.joins.map(_.from)
-    val namedFroms = froms.zipWithIndex.map {
+    val namedFroms = (query.from ++ query.joins.flatMap(_.from).map(_.from)).zipWithIndex.map {
       case (t: Query.TableRef, i) => (t, tableNameMapper.value(t.value.tableName) + i)
       case (s: Query.SubqueryRef[_], i) => (s, "subquery" + i)
     }
+    val namedFromsMap = namedFroms.toMap
 
     QueryToSql.fromNaming.withValue(namedFroms.toMap) {
       val jsonQuery = OptionPickler.writeJs(query.expr)(qr.queryWriter)
@@ -38,20 +38,30 @@ object QueryToSql {
         usql", "
       )
 
-      val tables = SqlStr.join(
-        namedFroms.map {
-          case (t: Query.TableRef, name) =>
-            SqlStr.raw(tableNameMapper.value(t.value.tableName)) + usql" " + SqlStr.raw(name)
-
-          case (t: Query.SubqueryRef[_], name) =>
-            toSqlQuery0(t.value, t.qr) + usql" " + SqlStr.raw(name)
-        },
-        usql", "
-      )
-
       def optional[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
 
       def optionalSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else usql""
+
+      def selectable(t: Query.From) = t match{
+        case t: Query.TableRef =>
+          SqlStr.raw(tableNameMapper.value(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t))
+
+        case t: Query.SubqueryRef[_] =>
+          toSqlQuery0(t.value, t.qr) + usql" " + SqlStr.raw(namedFromsMap(t))
+      }
+      val tables = SqlStr.join(query.from.map(selectable), usql", ")
+
+      val joins = SqlStr.join(
+        query.joins.map{join =>
+          optional(join.prefix)(s => usql" " + SqlStr.raw(s) + usql" ") +
+            usql" JOIN " +
+            SqlStr.join(
+              join.from.map{ jf =>
+                selectable(jf.from) + optional(jf.on)(on => usql" ON " + on.toSqlExpr)
+              }
+            )
+        }
+      )
 
       val filtersOpt = optionalSeq(query.where) { where =>
         usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
@@ -81,7 +91,7 @@ object QueryToSql {
         usql" OFFSET " + SqlStr.raw(offset.toString)
       }
 
-      usql"SELECT " + exprStr + usql" FROM " + tables + filtersOpt + sortOpt + limitOpt + offsetOpt
+      usql"SELECT " + exprStr + usql" FROM " + tables + joins + filtersOpt + sortOpt + limitOpt + offsetOpt
     }
   }
 

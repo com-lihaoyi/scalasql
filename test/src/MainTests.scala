@@ -651,7 +651,7 @@ object MainTests extends TestSuite {
     test("joins"){
       test {
         val query = City.query
-          .join(Country.query)(_.countryCode === _.code)
+          .joinOn(Country.query)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Aruba" }
         val sql = db.toSqlQuery(query)
         assert(
@@ -679,11 +679,10 @@ object MainTests extends TestSuite {
             country1.capital as res__1__capital,
             country1.code2 as res__1__code2
           FROM
-            city city0,
-            country country1
+            city city0
+            JOIN country country1 ON city0.country_code = country1.code
           WHERE
-            city0.country_code = country1.code
-            AND country1.name = ?
+            country1.name = ?
           """.trim.replaceAll("\\s+", " ")
         )
 
@@ -723,7 +722,7 @@ object MainTests extends TestSuite {
 
       test{
         val query = City.query
-          .join(Country.query)(_.countryCode === _.code)
+          .joinOn(Country.query)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Malaysia" }
           .map { case (city, country) => (city.name, country.name) }
 
@@ -732,13 +731,11 @@ object MainTests extends TestSuite {
           sql ==
           """
           SELECT
-              city0.name as res__0,
-              country1.name as res__1
-          FROM
-            city city0,
-            country country1
-          WHERE city0.country_code = country1.code
-          AND country1.name = ?
+            city0.name as res__0,
+            country1.name as res__1
+          FROM city city0
+          JOIN country country1 ON city0.country_code = country1.code
+          WHERE country1.name = ?
           """.trim.replaceAll("\\s+", " ")
         )
 

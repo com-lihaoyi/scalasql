@@ -1,6 +1,7 @@
 package usql
 
 import usql.SqlStr.SqlStringSyntax
+import Query._
 
 /**
  * Models the various components of a SQL query:
@@ -14,30 +15,40 @@ import usql.SqlStr.SqlStringSyntax
  *  ORDER BY column ASC/DESC
  *  LIMIT count OFFSET COUNT;
  * }}}
+ *
+ * Good syntax reference:
+ *
+ * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
+ *
  */
 case class Query[T](expr: T,
-                    from: Query.From,
-                    joins: Seq[Query.Join],
+                    from: Seq[From],
+                    joins: Seq[Join],
                     where: Seq[Expr[_]],
-                    groupBy: Option[Query.GroupBy],
-                    orderBy: Option[Query.OrderBy],
+                    groupBy: Option[GroupBy],
+                    orderBy: Option[OrderBy],
                     limit: Option[Int],
-                    offset: Option[Int]) extends Query.From{
+                    offset: Option[Int]) extends From{
+  
   def map[V](f: T => V): Query[V] = {
     copy(expr = f(expr))
   }
   def flatMap[V](f: T => Query[V]): Query[V] = {
     val other = f(expr)
-    Query(
-      other.expr,
-      from,
-      joins ++ Seq(Query.Join(other.from, None, None)),
-      where ++ other.where,
-      groupBy,
-      orderBy,
-      limit,
-      offset
-    )
+    if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty) {
+      Query(
+        other.expr,
+        from ++ other.from,
+        joins ++ other.joins,
+        where ++ other.where,
+        groupBy,
+        orderBy,
+        limit,
+        offset
+      )
+    }else{
+      ???
+    }
   }
 
   def filter(f: T => Expr[Boolean]): Query[T] = {
@@ -45,35 +56,58 @@ case class Query[T](expr: T,
   }
 
   def sortBy(f: T => Expr[_]) = {
-    copy(orderBy = Some(Query.OrderBy(f(expr), None, None)))
+    copy(orderBy = Some(OrderBy(f(expr), None, None)))
   }
 
-  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(Query.AscDesc.Asc))))
-  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(Query.AscDesc.Desc))))
+  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
+  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Desc))))
 
-  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Query.Nulls.First))))
-  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Query.Nulls.Last))))
+  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
+  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
   def drop(n: Int) = copy(offset = Some(n))
 
   def take(n: Int) = copy(limit = Some(n))
 
-  def join[V](other: Query[V])(on: (T, V) => Expr[Boolean]): Query[(T, V)] =
-    Query(
-      (expr, other.expr),
-      from,
-      joins ++ Seq(Query.Join(other.from, None, None)),
-      Seq(on(expr, other.expr)) ++ where ++ other.where,
-      groupBy,
-      orderBy,
-      limit,
-      offset
-    )
+  def join[V](other: Query[V]): Query[(T, V)] = join0(other, None)
+  def joinOn[V](other: Query[V])(on: (T, V) => Expr[Boolean]): Query[(T, V)] = join0(other, Some(on))
+  def join0[V](other: Query[V],
+               on: Option[(T, V) => Expr[Boolean]]): Query[(T, V)] = {
+
+    if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty){
+      val newJoinFrom =
+        other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))
+
+      Query(
+        (expr, other.expr),
+        from,
+        joins ++ Seq(Join(None, newJoinFrom)),
+        where ++ other.where,
+        groupBy,
+        orderBy,
+        limit,
+        offset
+      )
+    }else {
+      ???
+//      Query(
+//        (expr, other.expr),
+//        from,
+//        joins ++ Seq(Join(None, JoinFrom(new SubqueryRef(other, ), on.map(_(expr, other.expr))))),
+//        where,
+//        groupBy,
+//        orderBy,
+//        limit,
+//        offset
+//      )
+    }
+
+  }
 }
 
 object Query {
-  def fromTable[T](e: T, table: usql.Query.TableRef) = {
-    Query(e, table, Nil, Nil, None, None, None, None)
+  def fromTable[T](e: T, table: TableRef) = {
+    Query(e, Seq(table), Nil, Nil, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],
@@ -98,7 +132,9 @@ object Query {
 
   case class GroupBy(expr: Expr[_], having: Option[Expr[_]])
 
-  case class Join(from: From, as: Option[String], on: Option[Expr[_]])
+  case class Join(prefix: Option[String], from: Seq[JoinFrom])
+
+  case class JoinFrom(from: From, on: Option[Expr[_]])
 }
 
 trait Expr[T] {
@@ -117,7 +153,7 @@ object Expr{
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
-  def expr(tableRef: Query.TableRef): Expr[T] = new Expr[T] {
+  def expr(tableRef: TableRef): Expr[T] = new Expr[T] {
     def toSqlExpr = {
       SqlStr.raw(QueryToSql.fromNaming.value(tableRef)) +
         usql"." +

@@ -19,7 +19,7 @@ object SqlStr {
     def usql(args: Interp*) = new SqlStr(sc.parts, args, ())
   }
 
-  def join(strs: Seq[SqlStr], sep: SqlStr): SqlStr = {
+  def join(strs: Seq[SqlStr], sep: SqlStr = usql""): SqlStr = {
     if (strs.isEmpty) usql""
     else strs.reduce(_ + sep + _)
   }
