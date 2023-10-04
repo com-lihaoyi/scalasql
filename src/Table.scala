@@ -36,14 +36,15 @@ object Table{
                                      (implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
       import c.universe._
 
+      val tableRef = TermName(c.freshName("tableRef"))
       val applyParameters = c.prefix.actualType.member(TermName("apply")).info.paramLists.head
 
       val queryParams = for(applyParam <- applyParameters) yield {
         val name = applyParam.name
         if (c.prefix.actualType.member(name) != NoSymbol){
-          q"${c.prefix}.${TermName(name.toString)}.expr(tableRef)"
+          q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
         }else{
-          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr(tableRef)"
+          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 
@@ -53,8 +54,8 @@ object Table{
           _root_.usql.OptionPickler.macroR,
           _root_.usql.OptionPickler.macroW,
           () => {
-            val tableRef = new usql.Query.TableRef(this)
-            _root_.usql.Query.fromTable(new $wtt(..$queryParams), tableRef)
+            val $tableRef = new usql.Query.TableRef(this)
+            _root_.usql.Query.fromTable(new $wtt(..$queryParams), $tableRef)
           }
         )
        """
