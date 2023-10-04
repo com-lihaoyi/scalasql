@@ -15,17 +15,17 @@ class DatabaseApi(connection: java.sql.Connection,
   }
 
   def toSqlQuery[T, V](query: Query[T])
-                      (implicit qr: Queryable[T, V]) = {
+                      (implicit qr: Queryable[T, V]): String = {
     toSqlQuery0(query).queryParts.mkString("?")
   }
 
   def toSqlQuery0[T, V](query: Query[T])
-                       (implicit qr: Queryable[T, V]) = {
+                       (implicit qr: Queryable[T, V]): SqlStr = {
     QueryToSql.toSqlQuery(query, qr, tableNameMapper, columnNameMapper)
   }
 
   def run[T, V](query: Query[T])
-               (implicit qr: Queryable[T, V]) = {
+               (implicit qr: Queryable[T, V]): Seq[V] = {
 
     val querySqlStr = toSqlQuery0(query)
 
@@ -71,6 +71,6 @@ class DatabaseApi(connection: java.sql.Connection,
       statement.close()
     }
 
-    res
+    res.toSeq
   }
 }

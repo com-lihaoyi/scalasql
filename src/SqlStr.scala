@@ -1,5 +1,9 @@
 package usql
 
+/**
+ * Represents a SQL query with interpolated `?`s expressions and the associated
+ * interpolated values, of type [[Interp]]
+ */
 case class SqlStr(queryParts: Seq[String], params: Seq[Interp], $sqlString: Unit) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head)  ++ other.queryParts.tail,
