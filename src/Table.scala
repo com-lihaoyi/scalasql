@@ -12,13 +12,12 @@ abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) exten
 
   implicit def containerQr: Queryable[V[Expr], V[Val]] = {
     new Queryable[V[Expr], V[Val]] {
-      def toTables(t: V[Expr]): Set[Table.Base] = t.productIterator.map(_.asInstanceOf[Expr[_]]).flatMap(_.toTables).toSet
       def valueReader = metadata.valueReader
       def queryWriter = metadata.queryWriter
     }
   }
 
-  def query: Query[V[Expr]] = metadata.query
+  def query: Query[V[Expr]] = metadata.query()
 }
 
 object Table{
@@ -28,7 +27,7 @@ object Table{
 
   class Metadata[V[_[_]]](val valueReader: Reader[V[Val]],
                           val queryWriter: Writer[V[Expr]],
-                          val query: Query[V[Expr]])
+                          val query: () => Query[V[Expr]])
 
   object Metadata{
     private trait Dummy[T[_]] extends Product
@@ -42,9 +41,9 @@ object Table{
       val queryParams = for(applyParam <- applyParameters) yield {
         val name = applyParam.name
         if (c.prefix.actualType.member(name) != NoSymbol){
-          q"${c.prefix}.${TermName(name.toString)}.expr"
+          q"${c.prefix}.${TermName(name.toString)}.expr(tableRef)"
         }else{
-          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr"
+          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr(tableRef)"
         }
       }
 
@@ -53,7 +52,10 @@ object Table{
         new _root_.usql.Table.Metadata[$wtt](
           _root_.usql.OptionPickler.macroR,
           _root_.usql.OptionPickler.macroW,
-          _root_.usql.Query.fromTable(new $wtt(..$queryParams), ${c.prefix})
+          () => {
+            val tableRef = new usql.Query.TableRef(this)
+            _root_.usql.Query.fromTable(new $wtt(..$queryParams), tableRef)
+          }
         )
        """
       )

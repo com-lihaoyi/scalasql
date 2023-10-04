@@ -31,7 +31,7 @@ case class Query[T](expr: T,
     Query(
       other.expr,
       from,
-      joins,
+      joins ++ Seq(Query.Join(other.from, None, None)),
       where ++ other.where,
       groupBy,
       orderBy,
@@ -62,7 +62,7 @@ case class Query[T](expr: T,
     Query(
       (expr, other.expr),
       from,
-      joins,
+      joins ++ Seq(Query.Join(other.from, None, None)),
       Seq(on(expr, other.expr)) ++ where ++ other.where,
       groupBy,
       orderBy,
@@ -72,8 +72,8 @@ case class Query[T](expr: T,
 }
 
 object Query {
-  def fromTable[T](e: T, table: usql.Table.Base) = {
-    Query(e, Table(table), Nil, Nil, None, None, None, None)
+  def fromTable[T](e: T, table: usql.Query.TableRef) = {
+    Query(e, table, Nil, Nil, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],
@@ -92,9 +92,10 @@ object Query {
     case object Last extends Nulls
   }
 
-
   sealed trait From
-  case class Table(t: usql.Table.Base) extends From
+  class TableRef(val value: Table.Base) extends From
+  class SubqueryRef[T](val value: Query[T], val qr: Queryable[T, _]) extends From
+
   case class GroupBy(expr: Expr[_], having: Option[Expr[_]])
 
   case class Join(from: From, as: Option[String], on: Option[Expr[_]])
@@ -109,6 +110,7 @@ object Expr{
   implicit def exprW[T]: OptionPickler.Writer[Expr[T]] = {
     OptionPickler.writer[SqlString].comap[Expr[T]](_.toSqlExpr)
   }
+
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
     override def toSqlExpr: SqlString = new SqlString(Seq("", ""), Seq(conv(x)), ())
     override def toTables: Set[Table.Base] = Set()
@@ -117,19 +119,13 @@ object Expr{
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
-  def expr: Expr[T] = new Expr[T] {
-    def toSqlExpr =
-      SqlString.raw(DatabaseApi.tableNameMapper.value(table.tableName)) ++
-        usql"." ++
+  def expr(tableRef: Query.TableRef): Expr[T] = new Expr[T] {
+    def toSqlExpr = {
+      SqlString.raw(DatabaseApi.fromNaming.value(tableRef)) +
+        usql"." +
         SqlString.raw(DatabaseApi.columnNameMapper.value(name.value))
+    }
 
     def toTables = Set(table)
   }
 }
-
-object Column{
-  implicit def columnW[T]: OptionPickler.Writer[Column[T]] = {
-    OptionPickler.writer[SqlString].comap[Column[T]](_.expr.toSqlExpr)
-  }
-}
-

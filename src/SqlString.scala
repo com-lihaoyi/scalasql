@@ -1,7 +1,7 @@
 package usql
 
 case class SqlString(queryParts: Seq[String], params: Seq[Interp], $sqlString: Unit) {
-  def ++(other: SqlString) = new SqlString(
+  def +(other: SqlString) = new SqlString(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head)  ++ other.queryParts.tail,
     params ++ other.params,
     ()
@@ -16,7 +16,7 @@ object SqlString {
 
   def join(strs: Seq[SqlString], sep: SqlString): SqlString = {
     if (strs.isEmpty) usql""
-    else strs.reduce(_ ++ sep ++ _)
+    else strs.reduce(_ + sep + _)
   }
   def raw(s: String) = new SqlString(Seq(s), Nil, ())
 }
