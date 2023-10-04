@@ -1,6 +1,6 @@
 package usql
 
-import usql.SqlString.SqlStringSyntax
+import usql.SqlStr.SqlStringSyntax
 
 /**
  * Models the various components of a SQL query:
@@ -102,18 +102,16 @@ object Query {
 }
 
 trait Expr[T] {
-  def toSqlExpr: SqlString
-  def toTables: Set[Table.Base]
+  def toSqlExpr: SqlStr
 }
 
 object Expr{
   implicit def exprW[T]: OptionPickler.Writer[Expr[T]] = {
-    OptionPickler.writer[SqlString].comap[Expr[T]](_.toSqlExpr)
+    OptionPickler.writer[SqlStr].comap[Expr[T]](_.toSqlExpr)
   }
 
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
-    override def toSqlExpr: SqlString = new SqlString(Seq("", ""), Seq(conv(x)), ())
-    override def toTables: Set[Table.Base] = Set()
+    override def toSqlExpr: SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
   }
 }
 
@@ -121,11 +119,9 @@ case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
   def expr(tableRef: Query.TableRef): Expr[T] = new Expr[T] {
     def toSqlExpr = {
-      SqlString.raw(DatabaseApi.fromNaming.value(tableRef)) +
+      SqlStr.raw(QueryToSql.fromNaming.value(tableRef)) +
         usql"." +
-        SqlString.raw(DatabaseApi.columnNameMapper.value(name.value))
+        SqlStr.raw(QueryToSql.columnNameMapper.value(name.value))
     }
-
-    def toTables = Set(table)
   }
 }

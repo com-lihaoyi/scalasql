@@ -8,15 +8,15 @@ object FlatJson {
   val delimiter = "__"
   val basePrefix = "res"
 
-  def flatten(x: ujson.Value): Seq[(String, SqlString)] = flatten0(x, basePrefix)
-  def flatten0(x: ujson.Value, prefix: String): Seq[(String, SqlString)] = {
+  def flatten(x: ujson.Value): Seq[(String, SqlStr)] = flatten0(x, basePrefix)
+  def flatten0(x: ujson.Value, prefix: String): Seq[(String, SqlStr)] = {
     x match {
       case ujson.Obj(kvs) =>
-        if (kvs.contains("$sqlString")) Seq(prefix -> OptionPickler.read[SqlString](x))
+        if (kvs.contains("$sqlString")) Seq(prefix -> OptionPickler.read[SqlStr](x))
         else kvs.toSeq.flatMap { case (k, v) => flatten0(v, prefix + delimiter + k) }
       case ujson.Arr(vs) =>
         vs.zipWithIndex.toSeq.flatMap { case (v, i) => flatten0(v, prefix + delimiter + i) }
-      case ujson.Str(s) => Seq(prefix -> SqlString.raw(s))
+      case ujson.Str(s) => Seq(prefix -> SqlStr.raw(s))
     }
   }
 

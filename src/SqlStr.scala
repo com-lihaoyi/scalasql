@@ -1,24 +1,26 @@
 package usql
 
-case class SqlString(queryParts: Seq[String], params: Seq[Interp], $sqlString: Unit) {
-  def +(other: SqlString) = new SqlString(
+case class SqlStr(queryParts: Seq[String], params: Seq[Interp], $sqlString: Unit) {
+  def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head)  ++ other.queryParts.tail,
     params ++ other.params,
     ()
   )
 }
-object SqlString {
-  implicit def writer: OptionPickler.ReadWriter[SqlString] = OptionPickler.macroRW
+
+object SqlStr {
+  implicit def writer: OptionPickler.ReadWriter[SqlStr] = OptionPickler.macroRW
 
   implicit class SqlStringSyntax(sc: StringContext) {
-    def usql(args: Interp*) = new SqlString(sc.parts, args, ())
+    def usql(args: Interp*) = new SqlStr(sc.parts, args, ())
   }
 
-  def join(strs: Seq[SqlString], sep: SqlString): SqlString = {
+  def join(strs: Seq[SqlStr], sep: SqlStr): SqlStr = {
     if (strs.isEmpty) usql""
     else strs.reduce(_ + sep + _)
   }
-  def raw(s: String) = new SqlString(Seq(s), Nil, ())
+
+  def raw(s: String) = new SqlStr(Seq(s), Nil, ())
 }
 
 sealed trait Interp
