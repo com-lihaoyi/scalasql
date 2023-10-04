@@ -14,10 +14,20 @@ class DatabaseApi(connection: java.sql.Connection,
     finally statement.close()
   }
 
+  def toSqlQuery[T, V](query: Query[T])
+                      (implicit qr: Queryable[T, V]) = {
+    toSqlQuery0(query).queryParts.mkString("?")
+  }
+
+  def toSqlQuery0[T, V](query: Query[T])
+                       (implicit qr: Queryable[T, V]) = {
+    QueryToSql.toSqlQuery(query, qr, tableNameMapper, columnNameMapper)
+  }
+
   def run[T, V](query: Query[T])
                (implicit qr: Queryable[T, V]) = {
 
-    val querySqlStr = QueryToSql.toSqlQuery(query, qr, tableNameMapper, columnNameMapper)
+    val querySqlStr = toSqlQuery0(query)
 
     val queryStr = querySqlStr.queryParts.mkString("?")
 

@@ -74,7 +74,23 @@ object MainTests extends TestSuite {
 
     // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
     test("city") {
-      val res = db.run(City.query).take(5)
+      val query = City.query
+      val sql = db.toSqlQuery(query)
+      assert(
+        sql ==
+        """
+        SELECT
+          city0.id as res__id,
+          city0.name as res__name,
+          city0.country_code as res__country_code,
+          city0.district as res__district,
+          city0.population as res__population
+        FROM city city0
+        """.trim.replaceAll("\\s+", " ")
+      )
+
+      val res = db.run(query).take(5)
+
 
       val expected = Seq[City[Val]](
         City(
@@ -117,6 +133,32 @@ object MainTests extends TestSuite {
       assert(res == expected)
     }
     test("country") {
+      val query = Country.query
+      val sql = db.toSqlQuery(query)
+
+      assert(
+        sql ==
+        """
+        SELECT
+          country0.code as res__code,
+          country0.name as res__name,
+          country0.continent as res__continent,
+          country0.region as res__region,
+          country0.surface_area as res__surface_area,
+          country0.indep_year as res__indep_year,
+          country0.population as res__population,
+          country0.life_expectancy as res__life_expectancy,
+          country0.gnp as res__gnp,
+          country0.gnp_old as res__gnp_old,
+          country0.local_name as res__local_name,
+          country0.government_form as res__government_form,
+          country0.head_of_state as res__head_of_state,
+          country0.capital as res__capital,
+          country0.code2 as res__code2
+        FROM country country0
+        """.trim.replaceAll("\\s+", " ")
+      )
+
       val res = db.run(Country.query).take(2)
       val expected = Seq[Country[Val]](
         Country(
@@ -159,7 +201,21 @@ object MainTests extends TestSuite {
     }
 
     test("countryLanguage") {
-      val res = db.run(CountryLanguage.query).take(5)
+      val query = CountryLanguage.query
+      val sql = db.toSqlQuery(query)
+      assert(
+        sql ==
+        """
+        SELECT
+          country_language0.country_code as res__country_code,
+          country_language0.language as res__language,
+          country_language0.is_official as res__is_official,
+          country_language0.percentage as res__percentage
+        FROM country_language country_language0
+        """.trim.replaceAll("\\s+", " ")
+      )
+
+      val res = db.run(query).take(5)
       val expected = Seq[CountryLanguage[Val]](
         CountryLanguage(
           countryCode = "ABW",
@@ -198,7 +254,23 @@ object MainTests extends TestSuite {
 
     test("queryFilter") {
       test("singleName") {
-        val res = db.run(City.query.filter(_.name === "Singapore"))
+        val query = City.query.filter(_.name === "Singapore")
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.id as res__id,
+            city0.name as res__name,
+            city0.country_code as res__country_code,
+            city0.district as res__district,
+            city0.population as res__population
+          FROM city city0
+          WHERE city0.name = ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
         val expected = Seq[City[Val]](
           City(
             id = 3208,
@@ -213,7 +285,23 @@ object MainTests extends TestSuite {
       }
 
       test("singleId") {
-        val res = db.run(City.query.filter(_.id === 3208))
+        val query = City.query.filter(_.id === 3208)
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.id as res__id,
+            city0.name as res__name,
+            city0.country_code as res__country_code,
+            city0.district as res__district,
+            city0.population as res__population
+          FROM city city0
+          WHERE city0.id = ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
         val expected = Seq[City[Val]](
           City(
             id = 3208,
@@ -228,7 +316,23 @@ object MainTests extends TestSuite {
       }
 
       test("singlePopulation") {
-        val res = db.run(City.query.filter(_.population > 9000000)).take(5)
+        val query = City.query.filter(_.population > 9000000)
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.id as res__id,
+            city0.name as res__name,
+            city0.country_code as res__country_code,
+            city0.district as res__district,
+            city0.population as res__population
+          FROM city city0
+          WHERE city0.population > ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query).take(5)
         val expected = Seq[City[Val]](
           City(
             id = 206,
@@ -302,12 +406,48 @@ object MainTests extends TestSuite {
         )
 
         test("combined") {
-          val res = db.run(City.query.filter(c => c.population > 5000000 && c.countryCode === "CHN")).take(5)
+          val query = City.query.filter(c => c.population > 5000000 && c.countryCode === "CHN")
+          val sql = db.toSqlQuery(query)
+          assert(
+            sql ==
+            """
+            SELECT
+              city0.id as res__id,
+              city0.name as res__name,
+              city0.country_code as res__country_code,
+              city0.district as res__district,
+              city0.population as res__population
+            FROM city city0
+            WHERE
+              city0.population > ?
+              AND city0.country_code = ?
+            """.trim.replaceAll("\\s+", " ")
+          )
+
+          val res = db.run(query).take(5)
           assert(res == expected)
         }
 
         test("separate") {
-          val res = db.run(City.query.filter(_.population > 5000000).filter(_.countryCode === "CHN")).take(5)
+          val query = City.query.filter(_.population > 5000000).filter(_.countryCode === "CHN")
+          val sql = db.toSqlQuery(query)
+          assert(
+            sql ==
+              """
+            SELECT
+              city0.id as res__id,
+              city0.name as res__name,
+              city0.country_code as res__country_code,
+              city0.district as res__district,
+              city0.population as res__population
+            FROM city city0
+            WHERE
+              city0.population > ?
+              AND city0.country_code = ?
+            """.trim.replaceAll("\\s+", " ")
+          )
+
+          val res = db.run(query).take(5)
           assert(res == expected)
         }
       }
@@ -322,7 +462,19 @@ object MainTests extends TestSuite {
 
     test("mapping"){
       test("tuple2") {
-        val res = db.run(Country.query.map(c => (c.name, c.continent))).take(5)
+        val query = Country.query.map(c => (c.name, c.continent))
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country0.name as res__0,
+            country0.continent as res__1
+          FROM country country0
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query).take(5)
         val expected = Seq(
           ("Aruba", "North America"),
           ("Afghanistan", "Asia"),
@@ -335,7 +487,20 @@ object MainTests extends TestSuite {
       }
 
       test("tuple3"){
-        val res = db.run(Country.query.map(c => (c.name, c.continent, c.population))).take(5)
+        val query = Country.query.map(c => (c.name, c.continent, c.population))
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country0.name as res__0,
+            country0.continent as res__1,
+            country0.population as res__2
+          FROM country country0
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query).take(5)
         val expected = Seq(
           ("Aruba", "North America", 103000),
           ("Afghanistan", "Asia", 22720000),
@@ -348,19 +513,64 @@ object MainTests extends TestSuite {
       }
 
       test("interpolateInMap"){
-        val res = db.run(Country.query.filter(_.name === "Singapore").map(c => c.population * 2))
+        val query = Country.query.filter(_.name === "Singapore").map(c => c.population * 2)
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country0.population * ? as res
+          FROM country country0
+          WHERE country0.name = ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
         val expected = Seq(7134000)
         assert(res == expected)
       }
 
       test("interpolateInMap2"){
-        val res = db.run(Country.query.filter(_.name === "Singapore").map(c => (c.name, c.population * 2)))
+        val query = Country.query.filter(_.name === "Singapore").map(c => (c.name, c.population * 2))
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country0.name as res__0,
+            country0.population * ? as res__1
+          FROM country country0
+          WHERE country0.name = ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
         val expected = Seq(("Singapore", 7134000))
         assert(res == expected)
       }
 
       test("heterogenousTuple"){
-        val res = db.run(City.query.filter(_.name === "Singapore").map(c => (c, c.name, c.population * 2)))
+        val query = City.query.filter(_.name === "Singapore").map(c => (c, c.name, c.population * 2))
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.id as res__0__id,
+            city0.name as res__0__name,
+            city0.country_code as res__0__country_code,
+            city0.district as res__0__district,
+            city0.population as res__0__population,
+            city0.name as res__1,
+            city0.population * ? as res__2
+          FROM
+            city city0
+          WHERE
+            city0.name = ?
+          """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
         val expected = Seq(
           (
             City[Val](
@@ -386,7 +596,22 @@ object MainTests extends TestSuite {
     }
 
     test("sortLimitOffset"){
-      val res = db.run(City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population)))
+      val query = City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population))
+      val sql = db.toSqlQuery(query)
+
+      assert(
+        sql ==
+        """
+        SELECT
+          city0.name as res__0,
+          city0.population as res__1
+        FROM city city0
+        ORDER BY city0.population DESC
+        LIMIT 5 OFFSET 5
+        """.trim.replaceAll("\\s+", " ")
+      )
+
+      val res = db.run(query)
       val expected = Seq(
         ("Karachi", 9269265),
         ("Istanbul", 8787958),
@@ -398,7 +623,21 @@ object MainTests extends TestSuite {
     }
 
     test("sortLimitOffset2"){
-      val res = db.run(City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population)))
+      val query = City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population))
+      val sql = db.toSqlQuery(query)
+      assert(
+        sql ==
+        """
+        SELECT
+          city0.name as res__0,
+          city0.population as res__1
+        FROM city city0
+        ORDER BY city0.population ASC
+        LIMIT 5
+        """.trim.replaceAll("\\s+", " ")
+      )
+
+      val res = db.run(query)
       val expected = Seq(
         ("Adamstown", 42),
         ("West Island", 167),
@@ -411,11 +650,44 @@ object MainTests extends TestSuite {
 
     test("joins"){
       test {
-        val res = db.run(
-          City.query
-            .join(Country.query)(_.countryCode === _.code)
-            .filter { case (city, country) => country.name === "Aruba" }
+        val query = City.query
+          .join(Country.query)(_.countryCode === _.code)
+          .filter { case (city, country) => country.name === "Aruba" }
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.id as res__0__id,
+            city0.name as res__0__name,
+            city0.country_code as res__0__country_code,
+            city0.district as res__0__district,
+            city0.population as res__0__population,
+            country1.code as res__1__code,
+            country1.name as res__1__name,
+            country1.continent as res__1__continent,
+            country1.region as res__1__region,
+            country1.surface_area as res__1__surface_area,
+            country1.indep_year as res__1__indep_year,
+            country1.population as res__1__population,
+            country1.life_expectancy as res__1__life_expectancy,
+            country1.gnp as res__1__gnp,
+            country1.gnp_old as res__1__gnp_old,
+            country1.local_name as res__1__local_name,
+            country1.government_form as res__1__government_form,
+            country1.head_of_state as res__1__head_of_state,
+            country1.capital as res__1__capital,
+            country1.code2 as res__1__code2
+          FROM
+            city city0,
+            country country1
+          WHERE
+            city0.country_code = country1.code
+            AND country1.name = ?
+          """.trim.replaceAll("\\s+", " ")
         )
+
+        val res = db.run(query)
 
         val expected = Seq[(City[Val], Country[Val])](
           (
@@ -450,12 +722,27 @@ object MainTests extends TestSuite {
       }
 
       test{
-        val res = db.run(
-          City.query
-            .join(Country.query)(_.countryCode === _.code)
-            .filter { case (city, country) => country.name === "Malaysia" }
-            .map{case (city, country) => (city.name, country.name)}
+        val query = City.query
+          .join(Country.query)(_.countryCode === _.code)
+          .filter { case (city, country) => country.name === "Malaysia" }
+          .map { case (city, country) => (city.name, country.name) }
+
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+              city0.name as res__0,
+              country1.name as res__1
+          FROM
+            city city0,
+            country country1
+          WHERE city0.country_code = country1.code
+          AND country1.name = ?
+          """.trim.replaceAll("\\s+", " ")
         )
+
+        val res = db.run(query)
 
         val expected = Seq(
           ("Kuala Lumpur", "Malaysia"),
@@ -483,14 +770,30 @@ object MainTests extends TestSuite {
     }
     test("flatMap"){
       test {
-        val res = db.run(
-          City.query
-            .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
-            .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
-              cityCountryCode === countryCode && countryName === "Aruba"
-            }
-            .map{ case (cityCountryCode, countryCode, countryName, cityName) => (cityName, countryCode) }
+        val query = City.query
+          .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+          .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
+            cityCountryCode === countryCode && countryName === "Aruba"
+          }
+          .map { case (cityCountryCode, countryCode, countryName, cityName) => (cityName, countryCode) }
+
+        val sql = db.toSqlQuery(query)
+
+        assert(
+          sql ==
+          """
+          SELECT
+            city0.name as res__0,
+            country1.code as res__1
+          FROM
+            city city0,
+            country country1
+          WHERE city0.country_code = country1.code
+          AND country1.name = ?
+          """.trim.replaceAll("\\s+", " ")
         )
+
+        val res = db.run(query)
 
         val expected = Seq(
           ("Oranjestad", "ABW"),
@@ -500,14 +803,27 @@ object MainTests extends TestSuite {
       }
 
       test{
-        val res = db.run(
-          City.query
-            .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
-            .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
-              cityCountryCode === countryCode && countryName === "Malaysia"
-            }
-            .map { case (cityCountryCode, countryCode, countryName, cityName) => (countryCode, cityName) }
+        val query = City.query
+          .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+          .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
+            cityCountryCode === countryCode && countryName === "Malaysia"
+          }
+          .map { case (cityCountryCode, countryCode, countryName, cityName) => (countryCode, cityName) }
+
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country1.code as res__0,
+            city0.name as res__1
+          FROM city city0, country country1
+          WHERE city0.country_code = country1.code
+          AND country1.name = ?
+          """.trim.replaceAll("\\s+", " ")
         )
+
+        val res = db.run(query)
 
         val expected = Seq(
           ("MYS", "Kuala Lumpur"),

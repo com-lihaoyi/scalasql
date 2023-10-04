@@ -41,7 +41,7 @@ case class Query[T](expr: T,
   }
 
   def filter(f: T => Expr[Boolean]): Query[T] = {
-    copy(where = Seq(f(expr)) ++ where)
+    copy(where = where ++ Seq(f(expr)))
   }
 
   def sortBy(f: T => Expr[_]) = {
