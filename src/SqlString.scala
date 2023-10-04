@@ -31,11 +31,11 @@ object Interp{
   case class IntInterp(i: Int) extends Interp
   implicit def intWriter: OptionPickler.ReadWriter[IntInterp] = OptionPickler.macroRW
 
-  implicit def doubleInterp(d: Double) = DoubleInterp(d)
+  implicit def doubleInterp(d: Double): Interp = DoubleInterp(d)
   case class DoubleInterp(d: Double) extends Interp
   implicit def doubleWriter: OptionPickler.ReadWriter[DoubleInterp] = OptionPickler.macroRW
 
-  implicit def booleanInterp(b: Boolean) = BooleanInterp(b)
+  implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
   case class BooleanInterp(b: Boolean) extends Interp
   implicit def booleanWriter: OptionPickler.ReadWriter[BooleanInterp] = OptionPickler.macroRW
 
