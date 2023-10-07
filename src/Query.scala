@@ -76,7 +76,7 @@ case class Query[T](expr: T,
 
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n))
 
-  def take(n: Int) = copy(limit = Some(math.min(limit.getOrElse(Int.MaxValue), n)))
+  def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   def join[V](other: Query[V])
              (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, None)
