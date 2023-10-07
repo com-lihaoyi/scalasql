@@ -48,7 +48,7 @@ object QueryToSql {
           vs._1.map { case (e, s) => (e, SqlStr.raw(namedFromsMap(k)) + usql"." + s) }
         }
       ) {
-        val jsonQuery = qr.queryWriter.flatten(query.expr)
+        val jsonQuery = qr.walk(query.expr)
 
         val flatQuery = FlatJson.flatten(jsonQuery)
         val exprStr = SqlStr.join(
