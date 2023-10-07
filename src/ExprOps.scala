@@ -2,8 +2,8 @@ package usql
 
 import usql.SqlStr.SqlStringSyntax
 
-object ExprIntOps extends ExprIntOps
-trait ExprIntOps {
+object ExprOps extends ExprOps
+trait ExprOps {
   implicit class ExprIntOps0(v: Expr[Int]) {
     def *(x: Int): Expr[Int] = Expr { implicit ctx => v.toSqlExpr + usql" * $x" }
     def >(x: Int): Expr[Boolean] = Expr { implicit ctx => v.toSqlExpr + usql" > $x" }

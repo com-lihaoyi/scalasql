@@ -1,7 +1,7 @@
 package usql
 
 import mainargs.{ParserForMethods, main}
-import ExprIntOps._
+import ExprOps._
 
 
 object Main {

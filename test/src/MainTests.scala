@@ -1,6 +1,6 @@
 package usql
 import utest._
-import ExprIntOps._
+import ExprOps._
 
 case class Country[T[_]](code: T[String],
                          name: T[String],
