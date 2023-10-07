@@ -848,20 +848,22 @@ object MainTests extends TestSuite {
     }
 
     test("subquery") {
-      val query = CountryLanguage.query
-        .joinOn(Country.query.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
-        .map { case (language, country) => (language.language, country.name) }
+      test("join") {
+        val query = CountryLanguage.query
+          .joinOn(Country.query.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
+          .map { case (language, country) => (language.language, country.name) }
 
-      val sql = db.toSqlQuery(query)
-      assert(
-        sql ==
-        """
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+            """
         SELECT
           country_language0.language as res__0,
           subquery1.res__name as res__1
         FROM
           country_language country_language0
-        JOIN (SELECT
+        JOIN
+          (SELECT
             country0.code as res__code,
             country0.name as res__name,
             country0.continent as res__continent,
@@ -885,37 +887,169 @@ object MainTests extends TestSuite {
             2) subquery1
         ON country_language0.country_code = subquery1.res__code
         """.trim.replaceAll("\\s+", " ")
-      )
+        )
 
-      val res = db.run(query)
-      val expected = Seq(
-        ("Chinese", "China"),
-        ("Dong", "China"),
-        ("Hui", "China"),
-        ("Mant�u", "China"),
-        ("Miao", "China"),
-        ("Mongolian", "China"),
-        ("Puyi", "China"),
-        ("Tibetan", "China"),
-        ("Tujia", "China"),
-        ("Uighur", "China"),
-        ("Yi", "China"),
-        ("Zhuang", "China"),
-        ("Asami", "India"),
-        ("Bengali", "India"),
-        ("Gujarati", "India"),
-        ("Hindi", "India"),
-        ("Kannada", "India"),
-        ("Malajalam", "India"),
-        ("Marathi", "India"),
-        ("Orija", "India"),
-        ("Punjabi", "India"),
-        ("Tamil", "India"),
-        ("Telugu", "India"),
-        ("Urdu", "India")
-      )
+        val res = db.run(query)
+        val expected = Seq(
+          ("Chinese", "China"),
+          ("Dong", "China"),
+          ("Hui", "China"),
+          ("Mant�u", "China"),
+          ("Miao", "China"),
+          ("Mongolian", "China"),
+          ("Puyi", "China"),
+          ("Tibetan", "China"),
+          ("Tujia", "China"),
+          ("Uighur", "China"),
+          ("Yi", "China"),
+          ("Zhuang", "China"),
+          ("Asami", "India"),
+          ("Bengali", "India"),
+          ("Gujarati", "India"),
+          ("Hindi", "India"),
+          ("Kannada", "India"),
+          ("Malajalam", "India"),
+          ("Marathi", "India"),
+          ("Orija", "India"),
+          ("Punjabi", "India"),
+          ("Tamil", "India"),
+          ("Telugu", "India"),
+          ("Urdu", "India")
+        )
 
-      assert(res == expected)
+        assert(res == expected)
+      }
+      test("from") {
+        val query = Country.query.sortBy(_.population).desc.take(2)
+          .joinOn(CountryLanguage.query)(_.code === _.countryCode)
+          .map { case (country, language) => (language.language, country.name) }
+
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            country_language1.language as res__0,
+            subquery0.res__name as res__1
+          FROM
+            (SELECT
+              country0.code as res__code,
+              country0.name as res__name,
+              country0.continent as res__continent,
+              country0.region as res__region,
+              country0.surface_area as res__surface_area,
+              country0.indep_year as res__indep_year,
+              country0.population as res__population,
+              country0.life_expectancy as res__life_expectancy,
+              country0.gnp as res__gnp,
+              country0.gnp_old as res__gnp_old,
+              country0.local_name as res__local_name,
+              country0.government_form as res__government_form,
+              country0.head_of_state as res__head_of_state,
+              country0.capital as res__capital,
+              country0.code2 as res__code2
+            FROM
+              country country0
+            ORDER BY
+              country0.population DESC
+            LIMIT
+              2) subquery0
+            JOIN country_language country_language1 ON subquery0.res__code = country_language1.country_code
+        """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
+        val expected = List(
+          ("Chinese", "China"),
+          ("Dong", "China"),
+          ("Hui", "China"),
+          ("Mant�u", "China"),
+          ("Miao", "China"),
+          ("Mongolian", "China"),
+          ("Puyi", "China"),
+          ("Tibetan", "China"),
+          ("Tujia", "China"),
+          ("Uighur", "China"),
+          ("Yi", "China"),
+          ("Zhuang", "China"),
+          ("Asami", "India"),
+          ("Bengali", "India"),
+          ("Gujarati", "India"),
+          ("Hindi", "India"),
+          ("Kannada", "India"),
+          ("Malajalam", "India"),
+          ("Marathi", "India"),
+          ("Orija", "India"),
+          ("Punjabi", "India"),
+          ("Tamil", "India"),
+          ("Telugu", "India"),
+          ("Urdu", "India")
+        )
+
+        assert(res == expected)
+      }
+      test("fromAndJoin") {
+        val query = Country.query.sortBy(_.population).desc.take(2)
+          .joinOn(City.query.sortBy(_.population).desc.take(20))(_.code === _.countryCode)
+          .map { case (country, city) => (country.name, city.name) }
+
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            subquery0.res__name as res__0,
+            subquery1.res__name as res__1
+          FROM
+            (SELECT
+                country0.code as res__code,
+                country0.name as res__name,
+                country0.continent as res__continent,
+                country0.region as res__region,
+                country0.surface_area as res__surface_area,
+                country0.indep_year as res__indep_year,
+                country0.population as res__population,
+                country0.life_expectancy as res__life_expectancy,
+                country0.gnp as res__gnp,
+                country0.gnp_old as res__gnp_old,
+                country0.local_name as res__local_name,
+                country0.government_form as res__government_form,
+                country0.head_of_state as res__head_of_state,
+                country0.capital as res__capital,
+                country0.code2 as res__code2
+              FROM country country0
+              ORDER BY country0.population DESC
+              LIMIT 2) subquery0
+          JOIN (SELECT
+              city0.id as res__id,
+              city0.name as res__name,
+              city0.country_code as res__country_code,
+              city0.district as res__district,
+              city0.population as res__population
+            FROM
+              city city0
+            ORDER BY
+              city0.population DESC
+            LIMIT
+              20) subquery1
+          ON subquery0.res__code = subquery1.res__country_code
+
+        """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
+        val expected = List(
+          ("India", "Mumbai (Bombay)"),
+          ("China", "Shanghai"),
+          ("China", "Peking"),
+          ("India", "Delhi"),
+          ("China", "Chongqing")
+        )
+
+        assert(res == expected)
+      }
     }
   }
+
 }
+

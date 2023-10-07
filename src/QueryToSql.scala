@@ -105,7 +105,7 @@ object QueryToSql {
         }
 
         val jsonQueryMap = jsonQuery
-          .map{case (k, v) => (v, SqlStr.raw(("res" +: k).mkString("__")))}
+          .map{case (k, v) => (v, SqlStr.raw(("res" +: k).map(columnNameMapper.value).mkString("__")))}
           .toMap
 
         (

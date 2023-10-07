@@ -28,15 +28,16 @@ case class Query[T](expr: T,
                     groupBy: Option[GroupBy],
                     orderBy: Option[OrderBy],
                     limit: Option[Int],
-                    offset: Option[Int]) extends From{
+                    offset: Option[Int])
+                   (implicit qr: Queryable[T, _]) extends From{
 
   def subquery(implicit qr: Queryable[T, _]) = new SubqueryRef[T](this, qr)
 
-  def map[V](f: T => V): Query[V] = {
+  def map[V](f: T => V)(implicit qr: Queryable[V, _]): Query[V] = {
     copy(expr = f(expr))
   }
 
-  def flatMap[V](f: T => Query[V]): Query[V] = {
+  def flatMap[V](f: T => Query[V])(implicit qr: Queryable[V, _]): Query[V] = {
     val other = f(expr)
     if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty) {
       Query(
@@ -81,37 +82,37 @@ case class Query[T](expr: T,
 
   def join0[V](other: Query[V],
                on: Option[(T, V) => Expr[Boolean]])
-              (implicit qr: Queryable[V, _]): Query[(T, V)] = {
+              (implicit joinQr: Queryable[V, _]): Query[(T, V)] = {
 
-    if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty){
-      Query(
-        (expr, other.expr),
-        from,
-        joins ++ Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr)))))),
-        where ++ other.where,
-        groupBy,
-        orderBy,
-        limit,
-        offset
-      )
-    }else {
-      Query(
-        (expr, other.expr),
-        from,
-        joins ++ Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, qr), on.map(_(expr, other.expr)))))),
-        where,
-        groupBy,
-        orderBy,
-        limit,
-        offset
-      )
-    }
+    val thisTrivial =
+      this.groupBy.isEmpty &&
+      this.orderBy.isEmpty &&
+      this.limit.isEmpty &&
+      this.offset.isEmpty
 
+    val otherTrivial =
+      other.groupBy.isEmpty &&
+      other.orderBy.isEmpty &&
+      other.limit.isEmpty &&
+      other.offset.isEmpty
+
+    Query(
+      expr = (expr, other.expr),
+      from = if (thisTrivial) from else Seq(new SubqueryRef(this, qr)),
+      joins = (if (thisTrivial) joins else Nil) ++
+        (if (otherTrivial) Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))))
+        else Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
+      where = (if (thisTrivial) where else Nil) ++ (if (otherTrivial) other.where else Nil),
+      groupBy = if (thisTrivial) groupBy else None,
+      orderBy = if (thisTrivial) orderBy else None,
+      limit = if (thisTrivial) limit else None,
+      offset = if (thisTrivial) offset else None
+    )
   }
 }
 
 object Query {
-  def fromTable[T](e: T, table: TableRef) = {
+  def fromTable[T](e: T, table: TableRef)(implicit qr: Queryable[T, _]) = {
     Query(e, Seq(table), Nil, Nil, None, None, None, None)
   }
 
@@ -183,22 +184,35 @@ object ExprFlattener{
       }
     }
   }
-  implicit def Tuple2Flattener[T, V](implicit f1: ExprFlattener[T], f2: ExprFlattener[V]) = {
-    new ExprFlattener[(T, V)] {
-      def flatten(t: (T, V)): Seq[(List[String], Expr[_])] = {
+  implicit def Tuple2Flattener[T1, T2](implicit f1: ExprFlattener[T1], f2: ExprFlattener[T2]) = {
+    new ExprFlattener[(T1, T2)] {
+      def flatten(t: (T1, T2)): Seq[(List[String], Expr[_])] = {
         f1.flatten(t._1).map{case (k, v) => ("0" +: k, v)} ++
         f2.flatten(t._2).map{case (k, v) => ("1" +: k, v)}
       }
     }
   }
-  implicit def Tuple3Flattener[T, V, U](implicit f1: ExprFlattener[T],
-                                        f2: ExprFlattener[V],
-                                        f3: ExprFlattener[U]) = {
-    new ExprFlattener[(T, V, U)] {
-      def flatten(t: (T, V, U)): Seq[(List[String], Expr[_])] = {
+  implicit def Tuple3Flattener[T1, T2, T3](implicit f1: ExprFlattener[T1],
+                                           f2: ExprFlattener[T2],
+                                           f3: ExprFlattener[T3]) = {
+    new ExprFlattener[(T1, T2, T3)] {
+      def flatten(t: (T1, T2, T3)): Seq[(List[String], Expr[_])] = {
         f1.flatten(t._1).map{case (k, v) => ("0" +: k, v)} ++
         f2.flatten(t._2).map{case (k, v) => ("1" +: k, v)} ++
         f3.flatten(t._3).map{case (k, v) => ("2" +: k, v)}
+      }
+    }
+  }
+  implicit def Tuple4Flattener[T1, T2, T3, T4](implicit f1: ExprFlattener[T1],
+                                               f2: ExprFlattener[T2],
+                                               f3: ExprFlattener[T3],
+                                               f4: ExprFlattener[T4]) = {
+    new ExprFlattener[(T1, T2, T3, T4)] {
+      def flatten(t: (T1, T2, T3, T4)): Seq[(List[String], Expr[_])] = {
+        f1.flatten(t._1).map{case (k, v) => ("0" +: k, v)} ++
+        f2.flatten(t._2).map{case (k, v) => ("1" +: k, v)} ++
+        f3.flatten(t._3).map{case (k, v) => ("2" +: k, v)} ++
+        f4.flatten(t._4).map{case (k, v) => ("3" +: k, v)}
       }
     }
   }

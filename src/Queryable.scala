@@ -37,4 +37,14 @@ object Queryable{
       OptionPickler.Tuple3Reader(q1.valueReader, q2.valueReader, q3.valueReader),
     )
   }
+
+  implicit def tuple4Qr[Q1, Q2, Q3, Q4, V1, V2, V3, V4](implicit q1: Queryable[Q1, V1],
+                                                        q2: Queryable[Q2, V2],
+                                                        q3: Queryable[Q3, V3],
+                                                        q4: Queryable[Q4, V4]): Queryable[(Q1, Q2, Q3, Q4), (V1, V2, V3, V4)] = {
+    new Queryable.Simple[(Q1, Q2, Q3, Q4), (V1, V2, V3, V4)](
+      ExprFlattener.Tuple4Flattener(q1.queryWriter, q2.queryWriter, q3.queryWriter, q4.queryWriter),
+      OptionPickler.Tuple4Reader(q1.valueReader, q2.valueReader, q3.valueReader, q4.valueReader),
+    )
+  }
 }
