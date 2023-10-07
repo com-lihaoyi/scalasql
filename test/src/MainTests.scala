@@ -848,44 +848,71 @@ object MainTests extends TestSuite {
     }
 
     test("subquery") {
-      val query = City.query
-        .join(Country.query.sortBy(_.population).asc.take(5))
-        .map { case (city, country) => (city.name, country.name) }
+      val query = CountryLanguage.query
+        .joinOn(Country.query.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
+        .map { case (language, country) => (language.language, country.name) }
 
       val sql = db.toSqlQuery(query)
       assert(
         sql ==
-          """
+        """
         SELECT
-          country1.code as res__0,
-          city0.name as res__1
-        FROM city city0, country country1
-        WHERE city0.country_code = country1.code
-        AND country1.name = ?
+          country_language0.language as res__0,
+          subquery1.res__name as res__1
+        FROM
+          country_language country_language0
+        JOIN (SELECT
+            country0.code as res__code,
+            country0.name as res__name,
+            country0.continent as res__continent,
+            country0.region as res__region,
+            country0.surface_area as res__surface_area,
+            country0.indep_year as res__indep_year,
+            country0.population as res__population,
+            country0.life_expectancy as res__life_expectancy,
+            country0.gnp as res__gnp,
+            country0.gnp_old as res__gnp_old,
+            country0.local_name as res__local_name,
+            country0.government_form as res__government_form,
+            country0.head_of_state as res__head_of_state,
+            country0.capital as res__capital,
+            country0.code2 as res__code2
+          FROM
+            country country0
+          ORDER BY
+            country0.population DESC
+          LIMIT
+            2) subquery1
+        ON country_language0.country_code = subquery1.res__code
         """.trim.replaceAll("\\s+", " ")
       )
 
       val res = db.run(query)
-
       val expected = Seq(
-        ("MYS", "Kuala Lumpur"),
-        ("MYS", "Ipoh"),
-        ("MYS", "Johor Baharu"),
-        ("MYS", "Petaling Jaya"),
-        ("MYS", "Kelang"),
-        ("MYS", "Kuala Terengganu"),
-        ("MYS", "Pinang"),
-        ("MYS", "Kota Bharu"),
-        ("MYS", "Kuantan"),
-        ("MYS", "Taiping"),
-        ("MYS", "Seremban"),
-        ("MYS", "Kuching"),
-        ("MYS", "Sibu"),
-        ("MYS", "Sandakan"),
-        ("MYS", "Alor Setar"),
-        ("MYS", "Selayang Baru"),
-        ("MYS", "Sungai Petani"),
-        ("MYS", "Shah Alam")
+        ("Chinese", "China"),
+        ("Dong", "China"),
+        ("Hui", "China"),
+        ("Mant�u", "China"),
+        ("Miao", "China"),
+        ("Mongolian", "China"),
+        ("Puyi", "China"),
+        ("Tibetan", "China"),
+        ("Tujia", "China"),
+        ("Uighur", "China"),
+        ("Yi", "China"),
+        ("Zhuang", "China"),
+        ("Asami", "India"),
+        ("Bengali", "India"),
+        ("Gujarati", "India"),
+        ("Hindi", "India"),
+        ("Kannada", "India"),
+        ("Malajalam", "India"),
+        ("Marathi", "India"),
+        ("Orija", "India"),
+        ("Punjabi", "India"),
+        ("Tamil", "India"),
+        ("Telugu", "India"),
+        ("Urdu", "India")
       )
 
       assert(res == expected)

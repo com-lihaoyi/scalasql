@@ -36,14 +36,18 @@ object QueryToSql {
 
         case t: Query.SubqueryRef[_] =>
           val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr)
-          (subNameMapping, sqlStr + usql" " + SqlStr.raw(namedFromsMap(t)))
+          (subNameMapping, usql"(" + sqlStr + usql") " + SqlStr.raw(namedFromsMap(t)))
       }
 
-      val fromSelectables = (query.from ++ query.joins.flatMap(_.from.map(_.from)))
+      val fromSelectables:  Map[Query.From, (Iterable[(Expr[_], SqlStr)], SqlStr)] = (query.from ++ query.joins.flatMap(_.from.map(_.from)))
         .map(f => (f, computeSelectable(f)))
         .toMap
 
-      exprNaming.withValue(fromSelectables.values.flatMap(_._1).toMap) {
+      exprNaming.withValue(
+        fromSelectables.flatMap { case (k, vs) =>
+          vs._1.map { case (e, s) => (e, SqlStr.raw(namedFromsMap(k)) + usql"." + s) }
+        }
+      ) {
         val jsonQuery = qr.queryWriter.flatten(query.expr)
 
         val flatQuery = FlatJson.flatten(jsonQuery)
@@ -100,12 +104,15 @@ object QueryToSql {
           usql" OFFSET " + SqlStr.raw(offset.toString)
         }
 
+        val jsonQueryMap = jsonQuery
+          .map{case (k, v) => (v, SqlStr.raw(("res" +: k).mkString("__")))}
+          .toMap
+
         (
-          Map(),
+          jsonQueryMap,
           usql"SELECT " + exprStr + usql" FROM " + tables + joins + filtersOpt + sortOpt + limitOpt + offsetOpt
         )
       }
     }
   }
-
 }
