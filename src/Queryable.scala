@@ -14,7 +14,7 @@ trait Queryable[Q, R]{
 }
 
 object Queryable{
-  implicit def exprQr[T](implicit valueReader0: Reader[T]): Queryable[Expr[T], T] = {
+  implicit def ExprQueryable[T](implicit valueReader0: Reader[T]): Queryable[Expr[T], T] = {
     new Queryable[Expr[T], T]{
       def walk(q: Expr[T]) = Seq(Nil -> q)
       def valueReader = valueReader0
