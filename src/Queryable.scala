@@ -74,7 +74,7 @@ object Queryable{
     )
   }
 
-  implicit def Tuple5Queryable[
+  implicit def Tuple6Queryable[
     Q1, Q2, Q3, Q4, Q5, Q6, R1, R2, R3, R4, R5, R6
   ](implicit q1: Queryable[Q1, R1],
     q2: Queryable[Q2, R2],
