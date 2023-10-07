@@ -149,25 +149,25 @@ object Query {
 }
 
 trait Expr[T] {
-  final def toSqlExpr: SqlStr = {
-    QueryToSql.exprNaming.value.get(this).getOrElse(toSqlExpr0)
+  final def toSqlExpr(implicit ctx: QueryToSql.Context): SqlStr = {
+    ctx.exprNaming.get(this).getOrElse(toSqlExpr0)
   }
-  def toSqlExpr0: SqlStr
+  def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr
 }
 
 object Expr{
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
-    override def toSqlExpr0: SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
+    override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
   }
 }
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
   def expr(tableRef: TableRef): Expr[T] = new Expr[T] {
-    def toSqlExpr0 = {
-      SqlStr.raw(QueryToSql.fromNaming.value(tableRef)) +
+    def toSqlExpr0(implicit ctx: QueryToSql.Context) = {
+      SqlStr.raw(ctx.fromNaming(tableRef)) +
         usql"." +
-        SqlStr.raw(QueryToSql.columnNameMapper.value(name.value))
+        SqlStr.raw(ctx.columnNameMapper(name.value))
     }
   }
 }

@@ -8,8 +8,9 @@ object FlatJson {
   val delimiter = "__"
   val basePrefix = "res"
 
-  def flatten(x:  Seq[(List[String], Expr[_])]): Seq[(String, SqlStr)] = {
-    x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlExpr)}
+  def flatten(x: Seq[(List[String], Expr[_])],
+              context: QueryToSql.Context): Seq[(String, SqlStr)] = {
+    x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlExpr(context))}
   }
 
   def unflatten(kvs: Seq[(String, ujson.Value)]): ujson.Value = unflatten0(kvs)(basePrefix)
