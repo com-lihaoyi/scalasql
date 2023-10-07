@@ -846,5 +846,49 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
     }
+
+    test("subquery") {
+      val query = City.query
+        .join(Country.query.sortBy(_.population).asc.take(5))
+        .map { case (city, country) => (city.name, country.name) }
+
+      val sql = db.toSqlQuery(query)
+      assert(
+        sql ==
+          """
+        SELECT
+          country1.code as res__0,
+          city0.name as res__1
+        FROM city city0, country country1
+        WHERE city0.country_code = country1.code
+        AND country1.name = ?
+        """.trim.replaceAll("\\s+", " ")
+      )
+
+      val res = db.run(query)
+
+      val expected = Seq(
+        ("MYS", "Kuala Lumpur"),
+        ("MYS", "Ipoh"),
+        ("MYS", "Johor Baharu"),
+        ("MYS", "Petaling Jaya"),
+        ("MYS", "Kelang"),
+        ("MYS", "Kuala Terengganu"),
+        ("MYS", "Pinang"),
+        ("MYS", "Kota Bharu"),
+        ("MYS", "Kuantan"),
+        ("MYS", "Taiping"),
+        ("MYS", "Seremban"),
+        ("MYS", "Kuching"),
+        ("MYS", "Sibu"),
+        ("MYS", "Sandakan"),
+        ("MYS", "Alor Setar"),
+        ("MYS", "Selayang Baru"),
+        ("MYS", "Sungai Petani"),
+        ("MYS", "Shah Alam")
+      )
+
+      assert(res == expected)
+    }
   }
 }

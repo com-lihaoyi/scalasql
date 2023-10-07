@@ -29,10 +29,13 @@ case class Query[T](expr: T,
                     orderBy: Option[OrderBy],
                     limit: Option[Int],
                     offset: Option[Int]) extends From{
-  
+
+  def subquery(implicit qr: Queryable[T, _]) = new SubqueryRef[T](this, qr)
+
   def map[V](f: T => V): Query[V] = {
     copy(expr = f(expr))
   }
+
   def flatMap[V](f: T => Query[V]): Query[V] = {
     val other = f(expr)
     if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty) {
@@ -69,19 +72,22 @@ case class Query[T](expr: T,
 
   def take(n: Int) = copy(limit = Some(n))
 
-  def join[V](other: Query[V]): Query[(T, V)] = join0(other, None)
-  def joinOn[V](other: Query[V])(on: (T, V) => Expr[Boolean]): Query[(T, V)] = join0(other, Some(on))
+  def join[V](other: Query[V])
+             (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, None)
+
+  def joinOn[V](other: Query[V])
+               (on: (T, V) => Expr[Boolean])
+               (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, Some(on))
+
   def join0[V](other: Query[V],
-               on: Option[(T, V) => Expr[Boolean]]): Query[(T, V)] = {
+               on: Option[(T, V) => Expr[Boolean]])
+              (implicit qr: Queryable[V, _]): Query[(T, V)] = {
 
     if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty){
-      val newJoinFrom =
-        other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))
-
       Query(
         (expr, other.expr),
         from,
-        joins ++ Seq(Join(None, newJoinFrom)),
+        joins ++ Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr)))))),
         where ++ other.where,
         groupBy,
         orderBy,
@@ -89,17 +95,16 @@ case class Query[T](expr: T,
         offset
       )
     }else {
-      ???
-//      Query(
-//        (expr, other.expr),
-//        from,
-//        joins ++ Seq(Join(None, JoinFrom(new SubqueryRef(other, ), on.map(_(expr, other.expr))))),
-//        where,
-//        groupBy,
-//        orderBy,
-//        limit,
-//        offset
-//      )
+      Query(
+        (expr, other.expr),
+        from,
+        joins ++ Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, qr), on.map(_(expr, other.expr)))))),
+        where,
+        groupBy,
+        orderBy,
+        limit,
+        offset
+      )
     }
 
   }
@@ -138,7 +143,10 @@ object Query {
 }
 
 trait Expr[T] {
-  def toSqlExpr: SqlStr
+  final def toSqlExpr: SqlStr = {
+    QueryToSql.exprNaming.value.get(this).getOrElse(toSqlExpr0)
+  }
+  def toSqlExpr0: SqlStr
 }
 
 object Expr{
@@ -147,17 +155,25 @@ object Expr{
   }
 
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
-    override def toSqlExpr: SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
+    override def toSqlExpr0: SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
   }
 }
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
   def expr(tableRef: TableRef): Expr[T] = new Expr[T] {
-    def toSqlExpr = {
+    def toSqlExpr0 = {
       SqlStr.raw(QueryToSql.fromNaming.value(tableRef)) +
         usql"." +
         SqlStr.raw(QueryToSql.columnNameMapper.value(name.value))
     }
   }
+}
+
+trait ExprFlattener[T]{
+  def flatten(t: T): Seq[(List[String], Expr[_])]
+}
+
+object ExprFlattener{
+
 }
