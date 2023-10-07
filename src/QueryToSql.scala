@@ -44,7 +44,7 @@ object QueryToSql {
         .toMap
 
       exprNaming.withValue(fromSelectables.values.flatMap(_._1).toMap) {
-        val jsonQuery = OptionPickler.writeJs(query.expr)(qr.queryWriter)
+        val jsonQuery = qr.queryWriter.flatten(query.expr)
 
         val flatQuery = FlatJson.flatten(jsonQuery)
         val exprStr = SqlStr.join(

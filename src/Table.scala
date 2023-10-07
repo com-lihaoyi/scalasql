@@ -26,11 +26,17 @@ object Table{
   }
 
   class Metadata[V[_[_]]](val valueReader: Reader[V[Val]],
-                          val queryWriter: Writer[V[Expr]],
+                          val queryWriter: ExprFlattener[V[Expr]],
                           val query: () => Query[V[Expr]])
 
   object Metadata{
     private trait Dummy[T[_]] extends Product
+
+    def exprFlattener[T](flatten0: T => Seq[(List[String], Expr[_])]) = {
+      new ExprFlattener[T] {
+        def flatten(t: T): Seq[(List[String], Expr[_])] = flatten0(t)
+      }
+    }
     def applyImpl[V[_[_]] <: Product](c: scala.reflect.macros.blackbox.Context)
                                      ()
                                      (implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
@@ -48,11 +54,19 @@ object Table{
         }
       }
 
+      val flattenExprs = for(applyParam <- applyParameters) yield {
+        val name = applyParam.name
+
+        q"usql.ExprFlattener.flattenPrefixed(t.${TermName(name.toString)}, ${name.toString})"
+      }
+
+      val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
+
       c.Expr[Metadata[V]](
         q"""
         new _root_.usql.Table.Metadata[$wtt](
           _root_.usql.OptionPickler.macroR,
-          _root_.usql.OptionPickler.macroW,
+          usql.Table.Metadata.exprFlattener{ t => $allFlattenedExprs },
           () => {
             val $tableRef = new usql.Query.TableRef(this)
             _root_.usql.Query.fromTable(new $wtt(..$queryParams), $tableRef)

@@ -150,10 +150,6 @@ trait Expr[T] {
 }
 
 object Expr{
-  implicit def exprW[T]: OptionPickler.Writer[Expr[T]] = {
-    OptionPickler.writer[SqlStr].comap[Expr[T]](_.toSqlExpr)
-  }
-
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
     override def toSqlExpr0: SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), ())
   }
@@ -175,5 +171,35 @@ trait ExprFlattener[T]{
 }
 
 object ExprFlattener{
+  def flatten[T](t: T)(implicit e: ExprFlattener[T]): Seq[(List[String], Expr[_])] = e.flatten(t)
+  def flattenPrefixed[T](t: T,
+                         prefix: String)(implicit e: ExprFlattener[T]): Seq[(List[String], Expr[_])] =
+    flatten(t).map{case (k, v) => (prefix +: k, v)}
 
+  implicit def ExprFlattener[T]: ExprFlattener[Expr[T]] = {
+    new ExprFlattener[Expr[T]] {
+      def flatten(t: Expr[T]): Seq[(List[String], Expr[_])] = {
+        Seq((Nil, t))
+      }
+    }
+  }
+  implicit def Tuple2Flattener[T, V](implicit f1: ExprFlattener[T], f2: ExprFlattener[V]) = {
+    new ExprFlattener[(T, V)] {
+      def flatten(t: (T, V)): Seq[(List[String], Expr[_])] = {
+        f1.flatten(t._1).map{case (k, v) => ("0" +: k, v)} ++
+        f2.flatten(t._2).map{case (k, v) => ("1" +: k, v)}
+      }
+    }
+  }
+  implicit def Tuple3Flattener[T, V, U](implicit f1: ExprFlattener[T],
+                                        f2: ExprFlattener[V],
+                                        f3: ExprFlattener[U]) = {
+    new ExprFlattener[(T, V, U)] {
+      def flatten(t: (T, V, U)): Seq[(List[String], Expr[_])] = {
+        f1.flatten(t._1).map{case (k, v) => ("0" +: k, v)} ++
+        f2.flatten(t._2).map{case (k, v) => ("1" +: k, v)} ++
+        f3.flatten(t._3).map{case (k, v) => ("2" +: k, v)}
+      }
+    }
+  }
 }
