@@ -24,11 +24,6 @@ object Table{
                           val query: () => Query[V[Expr]])
 
   object Metadata{
-    class TableQueryable[Q, R](flatten0: Q => Seq[(List[String], Expr[_])],
-                               valueReader0: Reader[R]) extends Queryable[Q, R] {
-      def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
-      def valueReader: Reader[R] = valueReader0
-    }
 
     def applyImpl[V[_[_]] <: Product](c: scala.reflect.macros.blackbox.Context)
                                      ()
@@ -50,7 +45,7 @@ object Table{
       val flattenExprs = for(applyParam <- applyParameters) yield {
         val name = applyParam.name
 
-        q"usql.Table.Metadata.flattenPrefixed(t.${TermName(name.toString)}, ${name.toString})"
+        q"usql.Table.Internal.flattenPrefixed(t.${TermName(name.toString)}, ${name.toString})"
       }
 
       val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
@@ -58,7 +53,7 @@ object Table{
       c.Expr[Metadata[V]](
         q"""
         new _root_.usql.Table.Metadata[$wtt](
-          new usql.Table.Metadata.TableQueryable(
+          new usql.Table.Internal.TableQueryable(
             t => $allFlattenedExprs,
             _root_.usql.OptionPickler.macroR
           ),
@@ -69,6 +64,14 @@ object Table{
         )
        """
       )
+    }
+  }
+
+  object Internal{
+    class TableQueryable[Q, R](flatten0: Q => Seq[(List[String], Expr[_])],
+                               valueReader0: Reader[R]) extends Queryable[Q, R] {
+      def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
+      def valueReader: Reader[R] = valueReader0
     }
 
     def flattenPrefixed[T](t: T, prefix: String)
