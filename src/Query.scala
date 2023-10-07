@@ -56,11 +56,16 @@ case class Query[T](expr: T,
   }
 
   def filter(f: T => Expr[Boolean]): Query[T] = {
-    copy(where = where ++ Seq(f(expr)))
+    (groupBy.isEmpty, limit.isEmpty, offset.isEmpty) match{
+      case (true, true, true) => copy(where = where ++ Seq(f(expr)))
+      case (false, true, true) => copy(groupBy = groupBy.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
+      case (false, _, _) => Query(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
+    }
   }
 
   def sortBy(f: T => Expr[_]) = {
-    copy(orderBy = Some(OrderBy(f(expr), None, None)))
+    if (limit.isEmpty && offset.isEmpty) copy(orderBy = Some(OrderBy(f(expr), None, None)))
+    else Query(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
@@ -69,9 +74,9 @@ case class Query[T](expr: T,
   def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
   def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
-  def drop(n: Int) = copy(offset = Some(n))
+  def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n))
 
-  def take(n: Int) = copy(limit = Some(n))
+  def take(n: Int) = copy(limit = Some(math.min(limit.getOrElse(Int.MaxValue), n)))
 
   def join[V](other: Query[V])
              (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, None)
@@ -98,7 +103,7 @@ case class Query[T](expr: T,
 
     Query(
       expr = (expr, other.expr),
-      from = if (thisTrivial) from else Seq(new SubqueryRef(this, qr)),
+      from = if (thisTrivial) from else Seq(subquery),
       joins = (if (thisTrivial) joins else Nil) ++
         (if (otherTrivial) Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))))
         else Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
@@ -136,7 +141,7 @@ object Query {
   class TableRef(val value: Table.Base) extends From
   class SubqueryRef[T](val value: Query[T], val qr: Queryable[T, _]) extends From
 
-  case class GroupBy(expr: Expr[_], having: Option[Expr[_]])
+  case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
 
   case class Join(prefix: Option[String], from: Seq[JoinFrom])
 

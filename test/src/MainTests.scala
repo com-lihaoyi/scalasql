@@ -879,12 +879,9 @@ object MainTests extends TestSuite {
             country0.head_of_state as res__head_of_state,
             country0.capital as res__capital,
             country0.code2 as res__code2
-          FROM
-            country country0
-          ORDER BY
-            country0.population DESC
-          LIMIT
-            2) subquery1
+          FROM country country0
+          ORDER BY country0.population DESC
+          LIMIT 2) subquery1
         ON country_language0.country_code = subquery1.res__code
         """.trim.replaceAll("\\s+", " ")
         )
@@ -948,12 +945,9 @@ object MainTests extends TestSuite {
               country0.head_of_state as res__head_of_state,
               country0.capital as res__capital,
               country0.code2 as res__code2
-            FROM
-              country country0
-            ORDER BY
-              country0.population DESC
-            LIMIT
-              2) subquery0
+            FROM country country0
+            ORDER BY country0.population DESC
+            LIMIT 2) subquery0
             JOIN country_language country_language1 ON subquery0.res__code = country_language1.country_code
         """.trim.replaceAll("\\s+", " ")
         )
@@ -1026,12 +1020,9 @@ object MainTests extends TestSuite {
               city0.country_code as res__country_code,
               city0.district as res__district,
               city0.population as res__population
-            FROM
-              city city0
-            ORDER BY
-              city0.population DESC
-            LIMIT
-              20) subquery1
+            FROM city city0
+            ORDER BY city0.population DESC
+            LIMIT 20) subquery1
           ON subquery0.res__code = subquery1.res__country_code
 
         """.trim.replaceAll("\\s+", " ")
@@ -1044,6 +1035,46 @@ object MainTests extends TestSuite {
           ("China", "Peking"),
           ("India", "Delhi"),
           ("China", "Chongqing")
+        )
+
+        assert(res == expected)
+      }
+
+      test("sortLimitSortLimit") {
+        val query = City.query.sortBy(_.population).desc.take(20).sortBy(_.population).asc.take(10).map(_.name)
+
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+          """
+          SELECT
+            subquery0.res__name as res
+          FROM (SELECT
+              city0.id as res__id,
+              city0.name as res__name,
+              city0.country_code as res__country_code,
+              city0.district as res__district,
+              city0.population as res__population
+            FROM city city0
+            ORDER BY city0.population DESC
+            LIMIT 20) subquery0
+          ORDER BY subquery0.res__population ASC
+          LIMIT 10
+        """.trim.replaceAll("\\s+", " ")
+        )
+
+        val res = db.run(query)
+        val expected = List(
+          "Santaf� de Bogot�",
+          "Bangkok",
+          "Chongqing",
+          "Lima",
+          "Teheran",
+          "Cairo",
+          "Delhi",
+          "London",
+          "Peking",
+          "Tokyo"
         )
 
         assert(res == expected)
