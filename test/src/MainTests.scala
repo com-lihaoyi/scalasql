@@ -73,6 +73,16 @@ object MainTests extends TestSuite {
   def tests = Tests {
 
     // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
+    test("constant") {
+      val query = Expr(1)
+      val sql = db.toSqlQuery(query)
+      assert(sql == """SELECT ? as res""")
+
+      val res = db.run(query)
+      val expected = 1
+      assert(res == expected)
+    }
+
     test("city") {
       val query = City.query
       val sql = db.toSqlQuery(query)
@@ -595,13 +605,27 @@ object MainTests extends TestSuite {
       }
     }
 
-    test("sortLimitOffset"){
-      val query = City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population))
-      val sql = db.toSqlQuery(query)
+    test("aggregate"){
+      test("sum") {
+        val query = City.query.map(_.population).sum
+        val sql = db.toSqlQuery(query)
 
-      assert(
-        sql ==
-        """
+        assert(sql == """SELECT SUM(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = Seq(1429559884)
+        assert(res == expected)
+      }
+    }
+
+    test("sortLimitOffset") {
+      test {
+        val query = City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population))
+        val sql = db.toSqlQuery(query)
+
+        assert(
+          sql ==
+            """
         SELECT
           city0.name as res__0,
           city0.population as res__1
@@ -609,25 +633,25 @@ object MainTests extends TestSuite {
         ORDER BY city0.population DESC
         LIMIT 5 OFFSET 5
         """.trim.replaceAll("\\s+", " ")
-      )
+        )
 
-      val res = db.run(query)
-      val expected = Seq(
-        ("Karachi", 9269265),
-        ("Istanbul", 8787958),
-        ("Ciudad de M�xico", 8591309),
-        ("Moscow", 8389200),
-        ("New York", 8008278)
-      )
-      assert(res == expected)
-    }
+        val res = db.run(query)
+        val expected = Seq(
+          ("Karachi", 9269265),
+          ("Istanbul", 8787958),
+          ("Ciudad de M�xico", 8591309),
+          ("Moscow", 8389200),
+          ("New York", 8008278)
+        )
+        assert(res == expected)
+      }
 
-    test("sortLimitOffset2"){
-      val query = City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population))
-      val sql = db.toSqlQuery(query)
-      assert(
-        sql ==
-        """
+      test {
+        val query = City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population))
+        val sql = db.toSqlQuery(query)
+        assert(
+          sql ==
+            """
         SELECT
           city0.name as res__0,
           city0.population as res__1
@@ -635,17 +659,18 @@ object MainTests extends TestSuite {
         ORDER BY city0.population ASC
         LIMIT 5
         """.trim.replaceAll("\\s+", " ")
-      )
+        )
 
-      val res = db.run(query)
-      val expected = Seq(
-        ("Adamstown", 42),
-        ("West Island", 167),
-        ("Fakaofo", 300),
-        ("Citt� del Vaticano", 455),
-        ("Bantam", 503)
-      )
-      assert(res == expected)
+        val res = db.run(query)
+        val expected = Seq(
+          ("Adamstown", 42),
+          ("West Island", 167),
+          ("Fakaofo", 300),
+          ("Citt� del Vaticano", 455),
+          ("Bantam", 503)
+        )
+        assert(res == expected)
+      }
     }
 
     test("joins"){

@@ -29,7 +29,7 @@ case class Query[T](expr: T,
                     orderBy: Option[OrderBy],
                     limit: Option[Int],
                     offset: Option[Int])
-                   (implicit qr: Queryable[T, _]) extends From{
+                   (implicit val qr: Queryable[T, _]) extends Expr[Seq[T]] with From{
 
   def subquery(implicit qr: Queryable[T, _]) = new SubqueryRef[T](this, qr)
 
@@ -113,6 +113,10 @@ case class Query[T](expr: T,
       limit = if (thisTrivial) limit else None,
       offset = if (thisTrivial) offset else None
     )
+  }
+
+  override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = {
+    QueryToSql.toSqlQuery(this.asInstanceOf[Expr[Any]], qr.asInstanceOf[Queryable[Any, _]], ctx.tableNameMapper, ctx.columnNameMapper)
   }
 }
 

@@ -16,4 +16,9 @@ trait ExprOps {
   implicit class ExprBooleanOps0(v: Expr[Boolean]) {
     def &&(x: Expr[Boolean]): Expr[Boolean] = Expr { implicit ctx => v.toSqlExpr + usql" AND " + x.toSqlExpr }
   }
+  implicit class ExprSeqOps0(v: Query[Expr[Int]]) {
+    def sum: Expr[Int] = Expr { implicit ctx =>
+      usql"SUM(" + v.expr.toSqlExpr + usql")"
+    }
+  }
 }

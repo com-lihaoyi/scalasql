@@ -7,12 +7,33 @@ import scala.util.DynamicVariable
 object QueryToSql {
   class Context(val fromNaming: Map[Query.From, String],
                 val exprNaming: Map[Expr[_], SqlStr],
+                val tableNameMapper: String => String,
                 val columnNameMapper: String => String)
-  def toSqlQuery[T, V](query: Query[T],
+  def toSqlQuery[T, V](expr: T,
                        qr: Queryable[T, V],
                        tableNameMapper: String => String = identity,
                        columnNameMapper: String => String = identity): SqlStr = {
-    toSqlQuery0(query, qr, tableNameMapper, columnNameMapper)._2
+    (expr, qr) match{
+      case (query: Query[Any], qr2: Queryable.QueryQueryable[Any, _]) =>
+        toSqlQuery0(query, qr2.qr, tableNameMapper, columnNameMapper)._2
+      case _ =>
+        val context = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
+        usql"SELECT " + sqlExprsStr(expr, qr, context)._2
+    }
+  }
+
+  def sqlExprsStr[T, V](expr: T, qr: Queryable[T, V], context: Context) = {
+    val flattenedExpr = qr.walk(expr)
+    val flatQuery = FlatJson.flatten(flattenedExpr, context)
+
+    val exprsStr = SqlStr.join(
+      flatQuery.map {
+        case (k, v) => v + usql" as " + SqlStr.raw(context.tableNameMapper(k))
+      },
+      usql", "
+    )
+
+    (flattenedExpr, exprsStr)
   }
 
   def toSqlQuery0[T, V](query: Query[T],
@@ -43,16 +64,9 @@ object QueryToSql {
       vs._1.map { case (e, s) => (e, SqlStr.raw(namedFromsMap(k)) + usql"." + s) }
     }
 
-    val context = new Context(namedFromsMap, exprNaming, columnNameMapper)
-    val jsonQuery = qr.walk(query.expr)
+    val context = new Context(namedFromsMap, exprNaming, tableNameMapper, columnNameMapper)
 
-    val flatQuery = FlatJson.flatten(jsonQuery, context)
-    val exprStr = SqlStr.join(
-      flatQuery.map {
-        case (k, v) => v + usql" as " + SqlStr.raw(tableNameMapper(k))
-      },
-      usql", "
-    )
+    val (flattenedExpr, exprStr) = sqlExprsStr(query.expr, qr, context)
 
     def optional[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
 
@@ -100,7 +114,7 @@ object QueryToSql {
       usql" OFFSET " + SqlStr.raw(offset.toString)
     }
 
-    val jsonQueryMap = jsonQuery
+    val jsonQueryMap = flattenedExpr
       .map{case (k, v) => (v, SqlStr.raw(("res" +: k).map(columnNameMapper).mkString("__")))}
       .toMap
 

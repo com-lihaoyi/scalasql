@@ -11,14 +11,26 @@ import OptionPickler.Reader
 trait Queryable[Q, R]{
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader: Reader[R]
+  def unpack(t: ujson.Value): ujson.Value = t.arr.head
 }
 
 object Queryable{
-  implicit def ExprQueryable[T](implicit valueReader0: Reader[T]): Queryable[Expr[T], T] = {
-    new Queryable[Expr[T], T]{
-      def walk(q: Expr[T]) = Seq(Nil -> q)
-      def valueReader = valueReader0
-    }
+  implicit def ExprQueryable[T](implicit valueReader0: Reader[T]): Queryable[Expr[T], T] =
+    new ExprQueryable[T]()
+
+  class ExprQueryable[T](implicit valueReader0: Reader[T]) extends Queryable[Expr[T], T]{
+    def walk(q: Expr[T]) = Seq(Nil -> q)
+    def valueReader = valueReader0
+
+  }
+
+  implicit def QueryQueryable[T, V](implicit qr: Queryable[T, V]): Queryable[Query[T], Seq[V]] =
+    new QueryQueryable()(qr)
+
+  class QueryQueryable[T, V](implicit val qr: Queryable[T, V]) extends Queryable[Query[T], Seq[V]]{
+    def walk(q: Query[T]) = qr.walk(q.expr)
+    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+    override def unpack(t: ujson.Value) = t
   }
 
   private class TupleNQueryable[Q, V](val walk0: Q => Seq[Seq[(List[String], Expr[_])]])
@@ -40,6 +52,7 @@ object Queryable{
     Q1, Q2, R1, R2
   ](implicit q1: Queryable[Q1, R1],
     q2: Queryable[Q2, R2]): Queryable[(Q1, Q2), (R1, R2)] = {
+    val QueryQueryable = ()
     new Queryable.TupleNQueryable(t => Seq(q1.walk(t._1), q2.walk(t._2)))
   }
 
@@ -48,6 +61,7 @@ object Queryable{
   ](implicit q1: Queryable[Q1, R1],
     q2: Queryable[Q2, R2],
     q3: Queryable[Q3, R3]): Queryable[(Q1, Q2, Q3), (R1, R2, R3)] = {
+    val QueryQueryable = ()
     new Queryable.TupleNQueryable(t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)))
   }
 
@@ -57,6 +71,7 @@ object Queryable{
     q2: Queryable[Q2, R2],
     q3: Queryable[Q3, R3],
     q4: Queryable[Q4, R4]): Queryable[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
+    val QueryQueryable = ()
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4))
     )
@@ -69,6 +84,7 @@ object Queryable{
     q3: Queryable[Q3, R3],
     q4: Queryable[Q4, R4],
     q5: Queryable[Q5, R5]): Queryable[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
+    val QueryQueryable = ()
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5))
     )
@@ -82,6 +98,7 @@ object Queryable{
     q4: Queryable[Q4, R4],
     q5: Queryable[Q5, R5],
     q6: Queryable[Q6, R6]): Queryable[(Q1, Q2, Q3, Q4, Q5, Q6), (R1, R2, R3, R4, R5, R6)] = {
+    val QueryQueryable = ()
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5), q6.walk(t._6))
     )

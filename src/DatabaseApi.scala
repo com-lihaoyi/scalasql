@@ -14,18 +14,18 @@ class DatabaseApi(connection: java.sql.Connection,
     finally statement.close()
   }
 
-  def toSqlQuery[T, V](query: Query[T])
+  def toSqlQuery[T, V](query: T)
                       (implicit qr: Queryable[T, V]): String = {
     toSqlQuery0(query).queryParts.mkString("?")
   }
 
-  def toSqlQuery0[T, V](query: Query[T])
+  def toSqlQuery0[T, V](query: T)
                        (implicit qr: Queryable[T, V]): SqlStr = {
     QueryToSql.toSqlQuery(query, qr, tableNameMapper, columnNameMapper)
   }
 
-  def run[T, V](query: Query[T])
-               (implicit qr: Queryable[T, V]): Seq[V] = {
+  def run[T, V](query: T)
+               (implicit qr: Queryable[T, V]): V = {
 
     val querySqlStr = toSqlQuery0(query)
 
@@ -42,7 +42,7 @@ class DatabaseApi(connection: java.sql.Connection,
 
     val resultSet: ResultSet = statement.executeQuery()
 
-    val res = collection.mutable.Buffer.empty[V]
+    val jsonRes = collection.mutable.ArrayBuffer.empty[ujson.Value]
     try {
       while (resultSet.next()) {
         val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
@@ -64,13 +64,13 @@ class DatabaseApi(connection: java.sql.Connection,
         }
 
         val unMappedJson = unMapJson(json)
-        res.append(OptionPickler.read[V](unMappedJson)(qr.valueReader))
+        jsonRes.append(unMappedJson)
       }
     } finally {
       resultSet.close()
       statement.close()
     }
 
-    res.toSeq
+    OptionPickler.read[V](qr.unpack(new ujson.Arr(jsonRes)))(qr.valueReader)
   }
 }
