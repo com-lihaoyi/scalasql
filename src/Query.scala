@@ -21,7 +21,7 @@ import Query._
  * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
  *
  */
-case class Query[T](expr: T,
+case class Query[Q](expr: Q,
                     from: Seq[From],
                     joins: Seq[Join],
                     where: Seq[Expr[_]],
@@ -29,15 +29,15 @@ case class Query[T](expr: T,
                     orderBy: Option[OrderBy],
                     limit: Option[Int],
                     offset: Option[Int])
-                   (implicit val qr: Queryable[T, _]) extends Expr[Seq[T]] with From{
+                   (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with From{
 
-  def subquery(implicit qr: Queryable[T, _]) = new SubqueryRef[T](this, qr)
+  def subquery(implicit qr: Queryable[Q, _]) = new SubqueryRef[Q](this, qr)
 
-  def map[V](f: T => V)(implicit qr: Queryable[V, _]): Query[V] = {
+  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Query[V] = {
     copy(expr = f(expr))
   }
 
-  def flatMap[V](f: T => Query[V])(implicit qr: Queryable[V, _]): Query[V] = {
+  def flatMap[V](f: Q => Query[V])(implicit qr: Queryable[V, _]): Query[V] = {
     val other = f(expr)
     if (other.groupBy.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty) {
       Query(
@@ -55,7 +55,7 @@ case class Query[T](expr: T,
     }
   }
 
-  def filter(f: T => Expr[Boolean]): Query[T] = {
+  def filter(f: Q => Expr[Boolean]): Query[Q] = {
     (groupBy.isEmpty, limit.isEmpty, offset.isEmpty) match{
       case (true, true, true) => copy(where = where ++ Seq(f(expr)))
       case (false, true, true) => copy(groupBy = groupBy.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
@@ -63,7 +63,7 @@ case class Query[T](expr: T,
     }
   }
 
-  def sortBy(f: T => Expr[_]) = {
+  def sortBy(f: Q => Expr[_]) = {
     if (limit.isEmpty && offset.isEmpty) copy(orderBy = Some(OrderBy(f(expr), None, None)))
     else Query(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
@@ -79,15 +79,15 @@ case class Query[T](expr: T,
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   def join[V](other: Query[V])
-             (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, None)
+             (implicit qr: Queryable[V, _]): Query[(Q, V)] = join0(other, None)
 
   def joinOn[V](other: Query[V])
-               (on: (T, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Query[(T, V)] = join0(other, Some(on))
+               (on: (Q, V) => Expr[Boolean])
+               (implicit qr: Queryable[V, _]): Query[(Q, V)] = join0(other, Some(on))
 
   def join0[V](other: Query[V],
-               on: Option[(T, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Query[(T, V)] = {
+               on: Option[(Q, V) => Expr[Boolean]])
+              (implicit joinQr: Queryable[V, _]): Query[(Q, V)] = {
 
     val thisTrivial =
       this.groupBy.isEmpty &&
@@ -116,7 +116,7 @@ case class Query[T](expr: T,
   }
 
   override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = {
-    QueryToSql.toSqlQuery(this.asInstanceOf[Expr[Any]], qr.asInstanceOf[Queryable[Any, _]], ctx.tableNameMapper, ctx.columnNameMapper)
+    qr.toSqlQuery(this.expr, ctx)
   }
 }
 

@@ -21,7 +21,7 @@ class DatabaseApi(connection: java.sql.Connection,
 
   def toSqlQuery0[T, V](query: T)
                        (implicit qr: Queryable[T, V]): SqlStr = {
-    QueryToSql.toSqlQuery(query, qr, tableNameMapper, columnNameMapper)
+    qr.toSqlQuery(query, new QueryToSql.Context(Map(), Map(), tableNameMapper, columnNameMapper))
   }
 
   def run[T, V](query: T)

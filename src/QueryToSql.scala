@@ -9,20 +9,8 @@ object QueryToSql {
                 val exprNaming: Map[Expr[_], SqlStr],
                 val tableNameMapper: String => String,
                 val columnNameMapper: String => String)
-  def toSqlQuery[T, V](expr: T,
-                       qr: Queryable[T, V],
-                       tableNameMapper: String => String = identity,
-                       columnNameMapper: String => String = identity): SqlStr = {
-    (expr, qr) match{
-      case (query: Query[Any], qr2: Queryable.QueryQueryable[Any, _]) =>
-        toSqlQuery0(query, qr2.qr, tableNameMapper, columnNameMapper)._2
-      case _ =>
-        val context = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
-        usql"SELECT " + sqlExprsStr(expr, qr, context)._2
-    }
-  }
 
-  def sqlExprsStr[T, V](expr: T, qr: Queryable[T, V], context: Context) = {
+  def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
     val flattenedExpr = qr.walk(expr)
     val flatQuery = FlatJson.flatten(flattenedExpr, context)
 
@@ -36,8 +24,8 @@ object QueryToSql {
     (flattenedExpr, exprsStr)
   }
 
-  def toSqlQuery0[T, V](query: Query[T],
-                        qr: Queryable[T, V],
+  def toSqlQuery0[Q, R](query: Query[Q],
+                        qr: Queryable[Q, R],
                         tableNameMapper: String => String,
                         columnNameMapper: String => String): (Map[Expr[_], SqlStr], SqlStr) = {
     val namedFroms = (query.from ++ query.joins.flatMap(_.from).map(_.from)).zipWithIndex.map {

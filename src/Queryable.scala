@@ -1,6 +1,7 @@
 package usql
 
 import OptionPickler.Reader
+import usql.SqlStr.SqlStringSyntax
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -12,6 +13,10 @@ trait Queryable[Q, R]{
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader: Reader[R]
   def unpack(t: ujson.Value): ujson.Value = t.arr.head
+
+  def toSqlQuery(q: Q, ctx: QueryToSql.Context): SqlStr = {
+    usql"SELECT " + QueryToSql.sqlExprsStr[Q, R](q, this, ctx)._2
+  }
 }
 
 object Queryable{
@@ -24,17 +29,21 @@ object Queryable{
 
   }
 
-  implicit def QueryQueryable[T, V](implicit qr: Queryable[T, V]): Queryable[Query[T], Seq[V]] =
+  implicit def QueryQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Query[Q], Seq[R]] =
     new QueryQueryable()(qr)
 
-  class QueryQueryable[T, V](implicit val qr: Queryable[T, V]) extends Queryable[Query[T], Seq[V]]{
-    def walk(q: Query[T]) = qr.walk(q.expr)
+  class QueryQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Query[Q], Seq[R]]{
+    def walk(q: Query[Q]) = qr.walk(q.expr)
     def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
     override def unpack(t: ujson.Value) = t
+
+    override def toSqlQuery(q: Query[Q], ctx: QueryToSql.Context): SqlStr = {
+      QueryToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
+    }
   }
 
-  private class TupleNQueryable[Q, V](val walk0: Q => Seq[Seq[(List[String], Expr[_])]])
-                                     (implicit val valueReader: Reader[V]) extends Queryable[Q, V] {
+  private class TupleNQueryable[Q, R](val walk0: Q => Seq[Seq[(List[String], Expr[_])]])
+                                     (implicit val valueReader: Reader[R]) extends Queryable[Q, R] {
     def walk(q: Q) = walkIndexed(walk0(q))
 
     def walkIndexed(items: Seq[Seq[(List[String], Expr[_])]]) = {
