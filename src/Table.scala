@@ -1,6 +1,8 @@
 package usql
 import scala.language.experimental.macros
 import OptionPickler.{Reader, Writer}
+import usql.Query.TableRef
+import usql.SqlStr.SqlStringSyntax
 
 abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) extends Table.Base {
   val tableName = name.value
@@ -77,6 +79,17 @@ object Table{
     def flattenPrefixed[T](t: T, prefix: String)
                           (implicit q: Queryable[T, _]): Seq[(List[String], Expr[_])] = {
       q.walk(t).map { case (k, v) => (prefix +: k, v) }
+    }
+  }
+}
+
+case class Column[T]()(implicit val name: sourcecode.Name,
+                       val table: Table.Base) {
+  def expr(tableRef: TableRef): Expr[T] = new Expr[T] {
+    def toSqlExpr0(implicit ctx: QueryToSql.Context) = {
+      SqlStr.raw(ctx.fromNaming(tableRef)) +
+        usql"." +
+        SqlStr.raw(ctx.columnNameMapper(name.value))
     }
   }
 }
