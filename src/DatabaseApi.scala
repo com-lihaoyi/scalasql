@@ -21,7 +21,8 @@ class DatabaseApi(connection: java.sql.Connection,
 
   def toSqlQuery0[T, V](query: T)
                        (implicit qr: Queryable[T, V]): SqlStr = {
-    qr.toSqlQuery(query, new QueryToSql.Context(Map(), Map(), tableNameMapper, columnNameMapper))
+    val ctx = new QueryToSql.Context(Map(), Map(), tableNameMapper, columnNameMapper)
+    SqlStr.flatten(qr.toSqlQuery(query, ctx))
   }
 
   def run[T, V](query: T)

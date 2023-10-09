@@ -18,12 +18,12 @@ object QueryToSql {
 
         val exprsStr = SqlStr.join(
           flatQuery.map {
-            case (k, v) => v + usql" as " + SqlStr.raw(context.tableNameMapper(k))
+            case (k, v) => usql"$v as ${SqlStr.raw(context.tableNameMapper(k))}"
           },
           usql", "
         )
 
-        (flattenedExpr, usql"SELECT " + exprsStr)
+        (flattenedExpr, usql"SELECT $exprsStr")
     }
   }
 
@@ -31,12 +31,13 @@ object QueryToSql {
                         qr: Queryable[Q, R],
                         tableNameMapper: String => String,
                         columnNameMapper: String => String): (Map[Expr[_], SqlStr], SqlStr) = {
-    val namedFroms = (query.from ++ query.joins.flatMap(_.from).map(_.from)).zipWithIndex.map {
-      case (t: Query.TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
-      case (s: Query.SubqueryRef[_], i) => (s, "subquery" + i)
-    }
-    val namedFromsMap = namedFroms.toMap
-
+    val namedFromsMap = (query.from ++ query.joins.flatMap(_.from).map(_.from))
+      .zipWithIndex
+      .map {
+        case (t: Query.TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
+        case (s: Query.SubqueryRef[_], i) => (s, "subquery" + i)
+      }
+      .toMap
 
     def computeSelectable(t: Query.From) = t match {
       case t: Query.TableRef =>
@@ -44,18 +45,18 @@ object QueryToSql {
 
       case t: Query.SubqueryRef[_] =>
         val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper)
-        (subNameMapping, usql"(" + sqlStr + usql") " + SqlStr.raw(namedFromsMap(t)))
+        (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
-    val fromSelectables:  Map[Query.From, (Iterable[(Expr[_], SqlStr)], SqlStr)] = (query.from ++ query.joins.flatMap(_.from.map(_.from)))
+    val fromSelectables = (query.from ++ query.joins.flatMap(_.from.map(_.from)))
       .map(f => (f, computeSelectable(f)))
       .toMap
 
     val exprNaming = fromSelectables.flatMap { case (k, vs) =>
-      vs._1.map { case (e, s) => (e, SqlStr.raw(namedFromsMap(k)) + usql"." + s) }
+      vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
     }
 
-    val context = new Context(namedFromsMap, exprNaming, tableNameMapper, columnNameMapper)
+    implicit val context: Context = new Context(namedFromsMap, exprNaming, tableNameMapper, columnNameMapper)
 
     val (flattenedExpr, exprStr) = sqlExprsStr(query.expr, qr, context)
 
@@ -67,18 +68,17 @@ object QueryToSql {
 
     val joins = SqlStr.join(
       query.joins.map { join =>
-        optional(join.prefix)(s => usql" " + SqlStr.raw(s) + usql" ") +
-          usql" JOIN " +
-          SqlStr.join(
-            join.from.map { jf =>
-              fromSelectables(jf.from)._2 + optional(jf.on)(on => usql" ON " + on.toSqlExpr(context))
-            }
-          )
+        val joinPrefix = optional(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
+        val joinSelectables = SqlStr.join(
+          join.from.map { jf => fromSelectables(jf.from)._2 + optional(jf.on)(on => usql" ON $on") }
+        )
+
+        usql"$joinPrefix JOIN $joinSelectables"
       }
     )
 
     val filtersOpt = optionalSeq(query.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr(context)), usql" AND ")
+      usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
     }
 
     val sortOpt = optional(query.orderBy) { orderBy =>
