@@ -616,6 +616,16 @@ object MainTests extends TestSuite {
         val expected = 1429559884
         assert(res == expected)
       }
+      test("sumBy") {
+        val query = City.query.sumBy(_.population)
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT SUM(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 1429559884
+        assert(res == expected)
+      }
       test("count") {
         val query = Country.query.count
         val sql = db.toSqlQuery(query)

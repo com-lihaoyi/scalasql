@@ -30,5 +30,11 @@ trait ExprOps {
         expr = Expr{implicit ctx: QueryToSql.Context => usql"COUNT(1)"}
       ).toSqlExpr
     }
+    
+    def sumBy(f: T => Expr[Int]): Expr[Int] = Expr { implicit ctx =>
+      v.copy[Expr[Int]](
+        expr = Expr{implicit ctx: QueryToSql.Context => usql"SUM(" + f(v.expr).toSqlExpr + usql")"}
+      ).toSqlExpr
+    }
   }
 }
