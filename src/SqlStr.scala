@@ -5,17 +5,19 @@ package usql
  * interpolated values, of type [[Interp]]
  */
 case class SqlStr(queryParts: Seq[String],
-                  params: Seq[Interp]) {
+                  params: Seq[Interp],
+                  isCompleteQuery: Boolean) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head)  ++ other.queryParts.tail,
     params ++ other.params,
+    false
   )
 }
 
 object SqlStr {
 
   implicit class SqlStringSyntax(sc: StringContext) {
-    def usql(args: Interp*) = new SqlStr(sc.parts, args)
+    def usql(args: Interp*) = new SqlStr(sc.parts, args, false)
   }
 
   def join(strs: Seq[SqlStr], sep: SqlStr = usql""): SqlStr = {
@@ -23,7 +25,7 @@ object SqlStr {
     else strs.reduce(_ + sep + _)
   }
 
-  def raw(s: String) = new SqlStr(Seq(s), Nil)
+  def raw(s: String) = new SqlStr(Seq(s), Nil, false)
 }
 
 sealed trait Interp

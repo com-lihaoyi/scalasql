@@ -12,16 +12,19 @@ object QueryToSql {
 
   def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
     val flattenedExpr = qr.walk(expr)
-    val flatQuery = FlatJson.flatten(flattenedExpr, context)
+    FlatJson.flatten(flattenedExpr, context) match {
+      case Seq(("res", singleExpr)) if singleExpr.isCompleteQuery => (flattenedExpr, singleExpr)
+      case flatQuery =>
 
-    val exprsStr = SqlStr.join(
-      flatQuery.map {
-        case (k, v) => v + usql" as " + SqlStr.raw(context.tableNameMapper(k))
-      },
-      usql", "
-    )
+        val exprsStr = SqlStr.join(
+          flatQuery.map {
+            case (k, v) => v + usql" as " + SqlStr.raw(context.tableNameMapper(k))
+          },
+          usql", "
+        )
 
-    (flattenedExpr, exprsStr)
+        (flattenedExpr, usql"SELECT " + exprsStr)
+    }
   }
 
   def toSqlQuery0[Q, R](query: Query[Q],
@@ -108,7 +111,7 @@ object QueryToSql {
 
     (
       jsonQueryMap,
-      usql"SELECT " + exprStr + usql" FROM " + tables + joins + filtersOpt + sortOpt + limitOpt + offsetOpt
+      exprStr + usql" FROM " + tables + joins + filtersOpt + sortOpt + limitOpt + offsetOpt
     )
   }
 }

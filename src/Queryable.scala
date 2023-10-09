@@ -15,7 +15,7 @@ trait Queryable[Q, R]{
   def unpack(t: ujson.Value): ujson.Value = t.arr.head
 
   def toSqlQuery(q: Q, ctx: QueryToSql.Context): SqlStr = {
-    usql"SELECT " + QueryToSql.sqlExprsStr[Q, R](q, this, ctx)._2
+    QueryToSql.sqlExprsStr[Q, R](q, this, ctx)._2
   }
 }
 

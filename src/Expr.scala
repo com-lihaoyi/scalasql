@@ -14,6 +14,6 @@ object Expr{
   }
 
   def apply[T](x: T)(implicit conv: T => Interp) = new Expr[T] {
-    override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)))
+    override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), false)
   }
 }
