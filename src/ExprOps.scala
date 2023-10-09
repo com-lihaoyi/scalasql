@@ -7,81 +7,81 @@ trait ExprOps {
   // List of ANSI SQL operators http://users.atw.hu/sqlnut/sqlnut2-chp-2-sect-2.html
   // List of ANSI SQL scalar functions http://users.atw.hu/sqlnut/sqlnut2-chp-4-sect-4.html
   // List of ANSI SQL aggregate functions https://www.oreilly.com/library/view/sql-in-a/9780596155322/ch04s02.html
-  implicit class ExprIntOps0(v: Expr[Int]) {
+  implicit class ExprIntOps0[T: Numeric](v: Expr[T]) {
     /** Addition */
-    def +(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"$v + $x" }
+    def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v + $x" }
 
     /** Subtraction */
-    def -(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"$v - $x" }
+    def -[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v - $x" }
 
     /** Multiplication */
-    def *(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"$v * $x" }
+    def *[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v * $x" }
 
     /** Division */
-    def /(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"$v / $x" }
+    def /[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v / $x" }
 
     /** Remainder */
-    def %(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"MOD($v, $x)" }
+    def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"MOD($v, $x)" }
 
     /** Greater than */
-    def >(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v > $x" }
+    def >[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v > $x" }
 
     /** Less than */
-    def <(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v < $x" }
+    def <[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v < $x" }
 
     /** Greater than or equal to */
-    def >=(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v >= $x" }
+    def >=[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v >= $x" }
 
     /** Less than or equal to */
-    def <=(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v <= $x" }
+    def <=[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v <= $x" }
 
     /** Bitwise AND */
-    def &(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v * $x" }
+    def &[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v * $x" }
 
     /** Bitwise OR */
-    def |(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v | $x" }
+    def |[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v | $x" }
 
     /** Bitwise XOR */
-    def ^(x: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v ^ $x" }
+    def ^[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v ^ $x" }
 
     /** TRUE if the operand is within a range */
     def between(x: Expr[Int], y: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v BETWEEN $x AND $y" }
 
     /** Unary Positive Operator */
-    def unary_+ : Expr[Int] = Expr { implicit ctx => usql"+$v"}
+    def unary_+ : Expr[T] = Expr { implicit ctx => usql"+$v"}
 
     /** Unary Negation Operator */
-    def unary_- : Expr[Int] = Expr { implicit ctx => usql"-$v"}
+    def unary_- : Expr[T] = Expr { implicit ctx => usql"-$v"}
 
     /** Unary Bitwise NOT Operator */
-    def unary_~ : Expr[Int] = Expr { implicit ctx => usql"~$v"}
+    def unary_~ : Expr[T] = Expr { implicit ctx => usql"~$v"}
 
     /** Returns the absolute value of a number. */
-    def abs: Expr[Int] = Expr { implicit ctx => usql"ABS($v)"}
+    def abs: Expr[T] = Expr { implicit ctx => usql"ABS($v)"}
 
     /** Returns the remainder of one number divided into another. */
-    def mod(x: Expr[Int]) : Expr[Int] = Expr { implicit ctx => usql"MOD($v, $x)"}
+    def mod[V: Numeric](x: Expr[V]) : Expr[T] = Expr { implicit ctx => usql"MOD($v, $x)"}
 
     /** Returns an integer value representing the number of bits in another value. */
     def bitLength: Expr[Int] = Expr { implicit ctx => usql"BIT_LENGTH($v)"}
 
     /** Rounds a noninteger value upwards to the next greatest integer. Returns an integer value unchanged. */
-    def ceil: Expr[Int] = Expr { implicit ctx => usql"CEIL($v)"}
+    def ceil: Expr[T] = Expr { implicit ctx => usql"CEIL($v)"}
 
     /** Rounds a noninteger value downwards to the next least integer. Returns an integer value unchanged. */
-    def floor: Expr[Int] = Expr { implicit ctx => usql"FLOOR($v)"}
+    def floor: Expr[T] = Expr { implicit ctx => usql"FLOOR($v)"}
 
     /** Raises a value to the power of the mathematical constant known as e. */
-    def expr(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"EXP($v, $x)"}
+    def exp(x: Expr[T]): Expr[T] = Expr { implicit ctx => usql"EXP($v, $x)"}
 
     /** Returns the natural logarithm of a number. */
-    def ln: Expr[Int] = Expr { implicit ctx => usql"LN($v)"}
+    def ln: Expr[T] = Expr { implicit ctx => usql"LN($v)"}
 
     /** Raises a number to a specified power. */
-    def pow(x: Expr[Int]): Expr[Int] = Expr { implicit ctx => usql"POW($v, $x)"}
+    def pow(x: Expr[T]): Expr[T] = Expr { implicit ctx => usql"POW($v, $x)"}
 
     /** Computes the square root of a number. */
-    def sqrt: Expr[Int] = Expr { implicit ctx => usql"SQRT($v)"}
+    def sqrt: Expr[T] = Expr { implicit ctx => usql"SQRT($v)"}
   }
 
   implicit class ExprStringOps0(v: Expr[String]) {
@@ -138,18 +138,18 @@ trait ExprOps {
   }
 
 
-  implicit class ExprSeqIntOps0(v: Query[Expr[Int]]) {
+  implicit class ExprSeqIntOps0[V: Numeric](v: Query[Expr[V]])(implicit qr: Queryable[Expr[V], _]) {
     /** Computes the sum of column values */
-    def sum: Expr[Int] = queryExpr(v)(implicit ctx => usql"SUM(${v.expr})")
+    def sum: Expr[V] = queryExpr(v)(implicit ctx => usql"SUM(${v.expr})")
 
     /** Finds the minimum value in a column  */
-    def min: Expr[Int] = queryExpr(v)(implicit ctx => usql"MIN(${v.expr})")
+    def min: Expr[V] = queryExpr(v)(implicit ctx => usql"MIN(${v.expr})")
 
     /** Finds the maximum value in a column  */
-    def max: Expr[Int] = queryExpr(v)(implicit ctx => usql"MAX(${v.expr})")
+    def max: Expr[V] = queryExpr(v)(implicit ctx => usql"MAX(${v.expr})")
 
     /** Computes the average value of a column */
-    def avg: Expr[Int] = queryExpr(v)(implicit ctx => usql"AVG(${v.expr})")
+    def avg: Expr[V] = queryExpr(v)(implicit ctx => usql"AVG(${v.expr})")
   }
 
   implicit class ExprSeqOps0[T](v: Query[T])(implicit qr: Queryable[T, _]) {
@@ -157,16 +157,16 @@ trait ExprOps {
     def count: Expr[Int] = queryExpr(v)(implicit ctx => usql"COUNT(1)")
 
     /** Computes the sum of column values */
-    def sumBy(f: T => Expr[Int]): Expr[Int] = queryExpr(v)(implicit ctx => usql"SUM(${f(v.expr)})")
+    def sumBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"SUM(${f(v.expr)})")
 
     /** Finds the minimum value in a column  */
-    def minBy(f: T => Expr[Int]): Expr[Int] = queryExpr(v)(implicit ctx => usql"MIN(${f(v.expr)})")
+    def minBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"MIN(${f(v.expr)})")
 
     /** Finds the maximum value in a column  */
-    def maxBy(f: T => Expr[Int]): Expr[Int] = queryExpr(v)(implicit ctx => usql"MAX(${f(v.expr)})")
+    def maxBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"MAX(${f(v.expr)})")
 
     /** Computes the average value of a column */
-    def avgBy(f: T => Expr[Int]): Expr[Int] = queryExpr(v)(implicit ctx => usql"AVG(${f(v.expr)})")
+    def avgBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"AVG(${f(v.expr)})")
 
     /** TRUE if any value in a set is TRUE */
     def any(f: T => Expr[Boolean]): Expr[Boolean] = queryExpr(v)(implicit ctx => usql"ANY(${f(v.expr)})")

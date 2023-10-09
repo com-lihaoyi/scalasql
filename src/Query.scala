@@ -74,7 +74,7 @@ case class Query[Q](expr: Q,
   def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
   def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
-  def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n))
+  def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
 
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
