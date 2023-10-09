@@ -116,7 +116,7 @@ case class Query[Q](expr: Q,
   }
 
   override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = {
-    Queryable.QueryQueryable(qr).toSqlQuery(this, ctx)
+    usql"(" + Queryable.QueryQueryable(qr).toSqlQuery(this, ctx) + usql")"
   }
 }
 

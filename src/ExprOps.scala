@@ -18,7 +18,10 @@ trait ExprOps {
   }
   implicit class ExprSeqOps0(v: Query[Expr[Int]]) {
     def sum: Expr[Int] = Expr { implicit ctx =>
-      usql"SUM(" + v.toSqlExpr + usql")"
+      v.copy[Expr[Int]](
+        expr = Expr{implicit ctx: QueryToSql.Context => usql"SUM(" + v.expr.toSqlExpr + usql")"}
+      ).toSqlExpr
+
     }
   }
 }
