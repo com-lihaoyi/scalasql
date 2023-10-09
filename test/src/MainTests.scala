@@ -636,6 +636,66 @@ object MainTests extends TestSuite {
         val expected = 239
         assert(res == expected)
       }
+      test("min") {
+        val query = City.query.map(_.population).min
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 42
+        assert(res == expected)
+      }
+      test("minBy") {
+        val query = City.query.minBy(_.population)
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 42
+        assert(res == expected)
+      }
+      test("max") {
+        val query = City.query.map(_.population).max
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 10500000
+        assert(res == expected)
+      }
+      test("maxBy") {
+        val query = City.query.maxBy(_.population)
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 10500000
+        assert(res == expected)
+      }
+      test("avg") {
+        val query = City.query.map(_.population).avg
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 350468
+        assert(res == expected)
+      }
+      test("avgBy") {
+        val query = City.query.avgBy(_.population)
+        val sql = db.toSqlQuery(query)
+
+        assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
+
+        val res = db.run(query)
+        val expected = 350468
+        assert(res == expected)
+      }
     }
 
     test("sortLimitOffset") {
