@@ -5,55 +5,18 @@ import usql._
 import ExprOps._
 import pprint.PPrinter
 
-object MainTests extends TestSuite {
-  def camelToSnake(s: String) = {
-    s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
-  }
-
-  def snakeToCamel(s: String) = {
-    val out = new StringBuilder()
-    val chunks = s.split("_", -1)
-    for(i <- Range(0, chunks.length)){
-      val chunk = chunks(i)
-      if (i == 0) out.append(chunk)
-      else{
-        out.append(chunk(0).toUpper)
-        out.append(chunk.drop(1))
-      }
-    }
-    out.toString()
-  }
-  val db = new DatabaseApi(
-    java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""),
-    tableNameMapper = camelToSnake,
-    tableNameUnMapper = snakeToCamel,
-    columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel
-  )
-  db.runRaw(os.read(os.pwd / "test" / "resources" / "customers.sql"))
-
-  case class Check[T, V](query: T)(implicit qr: Queryable[T, V]){
-    def expect(sql: String, value: V) = {
-      val sqlResult = db.toSqlQuery(query)
-      val expectedSql = sql.trim.replaceAll("\\s+", " ")
-      assert(sqlResult == expectedSql)
-
-      val result = db.run(query)
-      lazy val pprinter: PPrinter = PPrinter.Color.copy(
-        additionalHandlers = { case v: Val[_] => pprinter.treeify(v.apply(), false, true) }
-      )
-      pprinter.log(result)
-      assert(result == value)
-    }
-  }
-
+/**
+ * Tests for basic query operations: map, filter, join, etc.
+ */
+object QueryTests extends TestSuite {
+  val checker = new TestDb("querytests")
   def tests = Tests {
-    test("constant") - Check(Expr(1)).expect(
+    test("constant") - checker(Expr(1)).expect(
       sql = "SELECT ? as res",
       value = 1
     )
 
-    test("table") - Check(Customer.query).expect(
+    test("table") - checker(Customer.query).expect(
       sql = """
         SELECT
           customer0.id as res__id,
@@ -69,7 +32,7 @@ object MainTests extends TestSuite {
     )
 
     test("filter"){
-      test("single") - Check(PurchaseOrder.query.filter(_.customerId === 2)).expect(
+      test("single") - checker(PurchaseOrder.query.filter(_.customerId === 2)).expect(
         sql = """
         SELECT
           purchase_order0.id as res__id,
@@ -84,7 +47,7 @@ object MainTests extends TestSuite {
         )
       )
 
-      test("multiple") - Check(
+      test("multiple") - checker(
         PurchaseOrder.query.filter(_.customerId === 2).filter(_.orderDate === "2018-02-25")
       ).expect(
         sql = """
@@ -100,7 +63,7 @@ object MainTests extends TestSuite {
           PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
         )
       )
-      test("combined") - Check(
+      test("combined") - checker(
         PurchaseOrder.query.filter(p => p.customerId === 2 && p.orderDate === "2018-02-25")
       ).expect(
         sql = """
@@ -119,17 +82,17 @@ object MainTests extends TestSuite {
     }
 
     test("map"){
-      test("single") - Check(Customer.query.map(_.name)).expect(
+      test("single") - checker(Customer.query.map(_.name)).expect(
         sql = "SELECT customer0.name as res FROM customer customer0",
         value = Vector("John Doe", "Pepito Pérez", "Cosme Fulanito")
       )
 
-      test("tuple2") - Check(Customer.query.map(c => (c.name, c.id))).expect(
+      test("tuple2") - checker(Customer.query.map(c => (c.name, c.id))).expect(
         sql = "SELECT customer0.name as res__0, customer0.id as res__1 FROM customer customer0",
         value =  Vector(("John Doe", 1), ("Pepito Pérez", 2), ("Cosme Fulanito", 3))
       )
 
-      test("tuple3") - Check(Customer.query.map(c => (c.name, c.id, c.birthdate))).expect(
+      test("tuple3") - checker(Customer.query.map(c => (c.name, c.id, c.birthdate))).expect(
         sql = """
           SELECT
             customer0.name as res__0,
@@ -144,12 +107,12 @@ object MainTests extends TestSuite {
         )
       )
 
-      test("interpolateInMap") - Check(Product.query.map(_.price * 2)).expect(
+      test("interpolateInMap") - checker(Product.query.map(_.price * 2)).expect(
         sql = "SELECT product0.price * ? as res FROM product product0",
         value = Vector(15.98, 703.92, 7.14, 262.0, 2000.0, 2.0)
       )
 
-      test("heterogenousTuple") - Check(Customer.query.map(c => (c.id, c))).expect(
+      test("heterogenousTuple") - checker(Customer.query.map(c => (c.id, c))).expect(
         sql = """
           SELECT
             customer0.id as res__0,
@@ -166,60 +129,60 @@ object MainTests extends TestSuite {
       )
     }
 
-    test("filterMap") - Check(Product.query.filter(_.price < 100).map(_.name)).expect(
+    test("filterMap") - checker(Product.query.filter(_.price < 100).map(_.name)).expect(
       sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",
       value = Vector("Keyboard", "Shirt", "Spoon")
     )
 
-    test("aggregate") - Check(Item.query.sumBy(_.total)).expect(
+    test("aggregate") - checker(Item.query.sumBy(_.total)).expect(
       sql = "SELECT SUM(item0.total) as res FROM item item0",
       value = 16144.74
     )
 
     test("sort") {
-      test("sort") - Check(Product.query.sortBy(_.price).map(_.name)).expect(
+      test("sort") - checker(Product.query.sortBy(_.price).map(_.name)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
         value = Vector("Spoon", "Shirt", "Keyboard", "Bed", "Television", "Cell Phone")
       )
 
-      test("sortLimit") - Check(Product.query.sortBy(_.price).map(_.name).take(2)).expect(
+      test("sortLimit") - checker(Product.query.sortBy(_.price).map(_.name).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Vector("Spoon", "Shirt")
       )
 
-      test("sortLimitTwiceHigher") - Check(Product.query.sortBy(_.price).map(_.name).take(2).take(3)).expect(
+      test("sortLimitTwiceHigher") - checker(Product.query.sortBy(_.price).map(_.name).take(2).take(3)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Vector("Spoon", "Shirt")
       )
 
-      test("sortLimitTwiceLower") - Check(Product.query.sortBy(_.price).map(_.name).take(2).take(1)).expect(
+      test("sortLimitTwiceLower") - checker(Product.query.sortBy(_.price).map(_.name).take(2).take(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1",
         value = Vector("Spoon")
       )
 
-      test("sortOffset") - Check(Product.query.sortBy(_.price).map(_.name).drop(2)).expect(
+      test("sortOffset") - checker(Product.query.sortBy(_.price).map(_.name).drop(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2",
         value = Vector("Keyboard", "Bed", "Television", "Cell Phone")
       )
 
-      test("sortOffsetTwice") - Check(Product.query.sortBy(_.price).map(_.name).drop(2).drop(2)).expect(
+      test("sortOffsetTwice") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).drop(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 4",
         value = Vector("Television", "Cell Phone")
       )
 
-      test("sortOffsetLimit") - Check(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
+      test("sortOffsetLimit") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Vector("Keyboard", "Bed")
       )
 
-      test("sortLimitOffset") - Check(Product.query.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
+      test("sortLimitOffset") - checker(Product.query.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
         value = Vector("Shirt")
       )
     }
 
     test("joins"){
-      test("joinFilter") - Check(
+      test("joinFilter") - checker(
         Customer.query.joinOn(PurchaseOrder.query)(_.id === _.customerId)
           .filter(_._1.name === "Pepito Pérez")
       ).expect(
@@ -247,7 +210,7 @@ object MainTests extends TestSuite {
         )
       )
 
-      test("joinFilterMap") - Check(
+      test("joinFilterMap") - checker(
         Customer.query.joinOn(PurchaseOrder.query)(_.id === _.customerId)
           .filter(_._1.name === "John Doe")
           .map(_._2.orderDate)
@@ -261,7 +224,7 @@ object MainTests extends TestSuite {
         value = Vector("2018-02-13")
       )
 
-      test("flatMap") - Check(
+      test("flatMap") - checker(
         Customer.query.flatMap(c => PurchaseOrder.query.map((c, _)))
           .filter{case (c, p) => c.id === p.customerId && c.name === "John Doe"}
           .map(_._2.orderDate)
@@ -274,7 +237,7 @@ object MainTests extends TestSuite {
         """,
         value = Vector("2018-02-13")
       )
-      test("flatMap") - Check(
+      test("flatMap") - checker(
         Customer.query.flatMap(c =>
           PurchaseOrder.query
             .filter { p => c.id === p.customerId && c.name === "John Doe" }
