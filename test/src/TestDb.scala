@@ -32,6 +32,7 @@ class TestDb(name: String) {
   class Apply[T, V](query: T)(implicit qr: Queryable[T, V]) {
     def expect(sql: String, value: V) = {
       val sqlResult = db.toSqlQuery(query)
+      pprint.log(sqlResult)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql)
 

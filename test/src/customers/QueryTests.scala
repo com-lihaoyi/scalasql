@@ -3,7 +3,6 @@ package usql.customers
 import utest._
 import usql._
 import ExprOps._
-import pprint.PPrinter
 
 /**
  * Tests for basic query operations: map, filter, join, etc.

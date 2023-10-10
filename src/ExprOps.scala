@@ -36,13 +36,13 @@ trait ExprOps {
     def <=[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v <= $x" }
 
     /** Bitwise AND */
-    def &[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v * $x" }
+    def &[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v & $x" }
 
     /** Bitwise OR */
-    def |[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v | $x" }
+    def |[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v | $x" }
 
     /** Bitwise XOR */
-    def ^[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v ^ $x" }
+    def ^[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v ^ $x" }
 
     /** TRUE if the operand is within a range */
     def between(x: Expr[Int], y: Expr[Int]): Expr[Boolean] = Expr { implicit ctx => usql"$v BETWEEN $x AND $y" }
