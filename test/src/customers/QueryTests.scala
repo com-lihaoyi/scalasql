@@ -159,14 +159,14 @@ object QueryTests extends TestSuite {
         value = Vector("Spoon")
       )
 
-      test("sortOffset") - checker(Product.query.sortBy(_.price).map(_.name).drop(2)).expect(
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2",
-        value = Vector("Keyboard", "Bed", "Television", "Cell Phone")
+      test("sortLimitOffset") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
+        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
+        value = Vector("Keyboard", "Bed")
       )
 
-      test("sortOffsetTwice") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).drop(2)).expect(
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 4",
-        value = Vector("Television", "Cell Phone")
+      test("sortLimitOffsetTwice") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)).expect(
+        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
+        value = Vector("Television")
       )
 
       test("sortOffsetLimit") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(

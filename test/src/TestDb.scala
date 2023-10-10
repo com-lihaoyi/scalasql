@@ -20,8 +20,10 @@ class TestDb(name: String) {
     out.toString()
   }
 
+  println("Creating Test DB")
+  Class.forName("org.sqlite.JDBC")
   val db = new DatabaseApi(
-    java.sql.DriverManager.getConnection(s"jdbc:h2:mem:$name", "sa", ""),
+    java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,

@@ -29,10 +29,10 @@ object ExprOpsTests extends TestSuite {
       value = 3
     )
 
-//    test("modulo") - checker(Expr(6) % Expr(2)).expect(
-//      sql = "SELECT MOD(?, ?) as res",
-//      value = 0
-//    )
+    test("modulo") - checker(Expr(6) % Expr(2)).expect(
+      sql = "SELECT MOD(?, ?) as res",
+      value = 0
+    )
 
     test("greaterThan") - checker(Expr(6) > Expr(2)).expect(
       sql = "SELECT ? > ? as res",
@@ -52,53 +52,45 @@ object ExprOpsTests extends TestSuite {
       sql = "SELECT ? <= ? as res",
       value = false
     )
-//    test("bitwiseAnd") - checker(Expr(6) & Expr(2)).expect(
-//      sql = "SELECT ? & ? as res",
-//      value = 2
-//    )
-//    test("bitwiseOr") - checker(Expr(6) | Expr(2)).expect(
-//      sql = "SELECT ? | ? as res",
-//      value = 2
-//    )
-//    test("bitwiseOr") - checker(Expr(6) ^ Expr(2)).expect(
-//      sql = "SELECT ? ^ ? as res",
-//      value = 2
-//    )
+    test("bitwiseAnd") - checker(Expr(6) & Expr(2)).expect(
+      sql = "SELECT ? & ? as res",
+      value = 2
+    )
+    test("bitwiseOr") - checker(Expr(6) | Expr(3)).expect(
+      sql = "SELECT ? | ? as res",
+      value = 7
+    )
 
-    test("between") - checker(Expr(4).between(Expr(6), Expr(2))).expect(
+    test("between") - checker(Expr(4).between(Expr(2), Expr(6))).expect(
       sql = "SELECT ? BETWEEN ? AND ? as res",
       value = true
     )
-    test("between") - checker(+Expr(-4)).expect(
+    test("unaryPlus") - checker(+Expr(-4)).expect(
       sql = "SELECT +? as res",
       value = -4
     )
-    test("between") - checker(-Expr(-4)).expect(
+    test("unaryMinus") - checker(-Expr(-4)).expect(
       sql = "SELECT -? as res",
       value = 4
     )
-//    test("between") - checker(~Expr(-4)).expect(
-//      sql = "SELECT ~? as res",
-//      value = 4
-//    )
+    test("unaryTilde") - checker(~Expr(-4)).expect(
+      sql = "SELECT ~? as res",
+      value = 3
+    )
     test("abs") - checker(Expr(-4).abs).expect(
       sql = "SELECT ABS(?) as res",
       value = 4
     )
-//    test("mod") - checker(Expr(4).mod(Expr(2))).expect(
-//      sql = "SELECT MOD(?, ?) as res",
-//      value = 4
-//    )
-    test("bitLength") - checker(Expr(4).bitLength).expect(
-      sql = "SELECT BIT_LENGTH(?) as res",
-      value = 32
+    test("mod") - checker(Expr(8).mod(Expr(3))).expect(
+      sql = "SELECT MOD(?, ?) as res",
+      value = 2
     )
     test("ceil") - checker(Expr(4.3).ceil).expect(
       sql = "SELECT CEIL(?) as res",
       value = 5
     )
     test("floor") - checker(Expr(4.7).floor).expect(
-      sql = "SELECT FLOOR(CAST(? AS DOUBLE)) as res",
+      sql = "SELECT FLOOR(?) as res",
       value = 4
     )
     test("floor") - checker(Expr(4.7).floor).expect(

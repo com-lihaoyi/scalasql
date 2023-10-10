@@ -62,9 +62,6 @@ trait ExprOps {
     /** Returns the remainder of one number divided into another. */
     def mod[V: Numeric](x: Expr[V]) : Expr[T] = Expr { implicit ctx => usql"MOD($v, $x)"}
 
-    /** Returns an integer value representing the number of bits in another value. */
-    def bitLength: Expr[Int] = Expr { implicit ctx => usql"BIT_LENGTH($v)"}
-
     /** Rounds a noninteger value upwards to the next greatest integer. Returns an integer value unchanged. */
     def ceil: Expr[T] = Expr { implicit ctx => usql"CEIL($v)"}
 

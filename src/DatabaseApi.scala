@@ -10,7 +10,7 @@ class DatabaseApi(connection: java.sql.Connection,
 
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
-    try statement.execute(sql)
+    try statement.executeUpdate(sql)
     finally statement.close()
   }
 
@@ -31,7 +31,6 @@ class DatabaseApi(connection: java.sql.Connection,
     val querySqlStr = toSqlQuery0(query)
 
     val queryStr = querySqlStr.queryParts.mkString("?")
-
     val statement = connection.prepareStatement(queryStr)
 
     for((p, n) <- querySqlStr.params.zipWithIndex) p match{
