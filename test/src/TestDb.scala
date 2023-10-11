@@ -34,7 +34,7 @@ class TestDb(name: String) {
   class Apply[T, V](query: T)(implicit qr: Queryable[T, V]) {
     def expect(sql: String, value: V) = {
       val sqlResult = db.toSqlQuery(query)
-      pprint.log(sqlResult)
+      // pprint.log(sqlResult)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql)
 
@@ -44,7 +44,7 @@ class TestDb(name: String) {
           case v: Val[_] => pprinter.treeify(v.apply(), false, true)
         }
       )
-      pprinter.log(result)
+      // pprinter.log(result)
       assert(result == value)
     }
   }

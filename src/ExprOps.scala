@@ -151,7 +151,7 @@ trait ExprOps {
 
   implicit class ExprSeqOps0[T](v: Query[T])(implicit qr: Queryable[T, _]) {
     /** Counts the rows */
-    def count: Expr[Int] = queryExpr(v)(implicit ctx => usql"COUNT(1)")
+    def size: Expr[Int] = queryExpr(v)(implicit ctx => usql"COUNT(1)")
 
     /** Computes the sum of column values */
     def sumBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"SUM(${f(v.expr)})")

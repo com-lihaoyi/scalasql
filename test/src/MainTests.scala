@@ -627,7 +627,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("count") {
-        val query = Country.query.count
+        val query = Country.query.size
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT COUNT(1) as res FROM country country0""")
