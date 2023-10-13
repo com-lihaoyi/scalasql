@@ -4,6 +4,7 @@ trait Expr[T] {
   final def toSqlExpr(implicit ctx: QueryToSql.Context): SqlStr = {
     ctx.exprNaming.get(this).getOrElse(toSqlExpr0)
   }
+
   def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr
 }
 

@@ -47,10 +47,8 @@ object Queryable{
     new UpdateReturningQueryable[Q, R]()(qr)
 
   class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]]{
-    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = {
+    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
 
-      qr.walk(ur.returning)
-    }
     override def unpack(t: ujson.Value) = t
     def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 
@@ -58,7 +56,7 @@ object Queryable{
       val (namedFromsMap, fromSelectables, exprNaming) = QueryToSql.computeContext(
         ctx0.tableNameMapper,
         ctx0.columnNameMapper,
-        Seq(q.update.table) ++ q.update.from ++ q.update.joins.flatMap(_.from).map(_.from)
+        q.update.from ++ q.update.joins.flatMap(_.from).map(_.from)
       )
 
       implicit val ctx: Context = new Context(
@@ -67,8 +65,9 @@ object Queryable{
         ctx0.tableNameMapper,
         ctx0.columnNameMapper
       )
+
       val tableName = SqlStr.raw(ctx.tableNameMapper(q.update.table.value.tableName))
-      val updateList = q.update.set0.map{case (k, v) => k.toSqlExpr(ctx) + usql" = " + v.toSqlExpr(ctx)}
+      val updateList = q.update.set0.map{case (k, v) => usql"$k = $v"}
       val sets = SqlStr.join(updateList, usql", ")
       val where =
         if (q.update.where.isEmpty) usql""
@@ -77,9 +76,10 @@ object Queryable{
       val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
 
       val returning = usql" RETURNING " + exprStr
-      val res = usql"UPDATE " + tableName + usql" SET " + sets + where + returning
-      pprint.log(res.queryParts.mkString("?"))
-      res
+      val res = usql"UPDATE $tableName SET " + sets + where + returning
+      val flattened = SqlStr.flatten(res)
+      pprint.log(flattened.queryParts.mkString("?"))
+      flattened
     }
   }
 

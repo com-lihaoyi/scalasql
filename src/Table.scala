@@ -88,11 +88,18 @@ object Table{
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
-  def expr(tableRef: TableRef): Expr[T] = new Expr[T] {
+  def expr(tableRef: TableRef): Expr[T] = new Column.ColumnExpr[T](tableRef, name.value)
+}
+
+object Column{
+  class ColumnExpr[T](tableRef: TableRef, name: String) extends Expr[T] {
     def toSqlExpr0(implicit ctx: QueryToSql.Context) = {
-      SqlStr.raw(ctx.fromNaming(tableRef)) +
-        usql"." +
-        SqlStr.raw(ctx.columnNameMapper(name.value))
+      val prefix = ctx.fromNaming.get(tableRef) match{
+        case None => usql""
+        case Some(p) => SqlStr.raw(p) + usql"."
+      }
+
+      prefix + SqlStr.raw(ctx.columnNameMapper(name))
     }
   }
 }

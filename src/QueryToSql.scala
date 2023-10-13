@@ -134,6 +134,7 @@ object QueryToSql {
     val exprNaming = fromSelectables.flatMap { case (k, vs) =>
       vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
     }
+
     (namedFromsMap, fromSelectables, exprNaming)
   }
 }
