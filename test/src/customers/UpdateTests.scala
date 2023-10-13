@@ -10,10 +10,16 @@ object UpdateTests extends TestSuite {
   val checker = new TestDb("querytests")
   def tests = Tests {
     test("simple") - {
+
+      checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
+        sql = "SELECT customer0.birthdate as res FROM customer customer0 WHERE customer0.name = ?",
+        value = Vector("1960-10-30")
+      )
+
       val returned = checker.db.run(
         Customer.update
           .filter(_.name === "John Doe")
-          .set(_.birthdate -> "1990-10-30")
+          .set(_.birthdate -> "2019-04-07")
           .returning(_.id)
       )
 
@@ -21,7 +27,7 @@ object UpdateTests extends TestSuite {
 
       checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
         sql = "SELECT customer0.birthdate as res FROM customer customer0 WHERE customer0.name = ?",
-        value = Vector("1990-10-30")
+        value = Vector("2019-04-07")
       )
     }
   }
