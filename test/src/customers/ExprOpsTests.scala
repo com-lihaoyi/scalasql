@@ -5,7 +5,7 @@ import utest._
 import ExprOps._
 
 /**
- * Tests for basic query operations: map, filter, join, etc.
+ * Tests for all the individual symbolic operators and functions that we provide by default
  */
 object ExprOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")

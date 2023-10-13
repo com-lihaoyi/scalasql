@@ -5,7 +5,7 @@ import usql._
 import utest._
 
 /**
- * Tests for basic query operations: map, filter, join, etc.
+ * Tests for all the aggregate operators that we provide by default
  */
 object AggregateOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
