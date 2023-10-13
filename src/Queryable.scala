@@ -53,32 +53,26 @@ object Queryable{
     def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 
     override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: QueryToSql.Context): SqlStr = {
-      val (namedFromsMap, fromSelectables, exprNaming) = QueryToSql.computeContext(
+      val (namedFromsMap, fromSelectables, exprNaming, context) = QueryToSql.computeContext(
         ctx0.tableNameMapper,
         ctx0.columnNameMapper,
         q.update.from ++ q.update.joins.flatMap(_.from).map(_.from)
       )
 
-      implicit val ctx: Context = new Context(
-        namedFromsMap,
-        exprNaming,
-        ctx0.tableNameMapper,
-        ctx0.columnNameMapper
-      )
+      implicit val ctx: Context = context
 
       val tableName = SqlStr.raw(ctx.tableNameMapper(q.update.table.value.tableName))
       val updateList = q.update.set0.map{case (k, v) => usql"$k = $v"}
       val sets = SqlStr.join(updateList, usql", ")
-      val where =
-        if (q.update.where.isEmpty) usql""
-        else usql" WHERE " + SqlStr.join(q.update.where.map(_.toSqlExpr(ctx)), usql" AND ")
+      val where = SqlStr.optSeq(q.update.where){where =>
+        usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
+      }
 
       val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
 
       val returning = usql" RETURNING " + exprStr
       val res = usql"UPDATE $tableName SET " + sets + where + returning
       val flattened = SqlStr.flatten(res)
-      pprint.log(flattened.queryParts.mkString("?"))
       flattened
     }
   }

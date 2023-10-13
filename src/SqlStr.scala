@@ -15,6 +15,9 @@ case class SqlStr(queryParts: Seq[String],
 }
 
 object SqlStr {
+  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
+
+  def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else usql""
 
   def flatten(self: SqlStr) = {
     val finalParts = collection.mutable.Buffer[String]()
