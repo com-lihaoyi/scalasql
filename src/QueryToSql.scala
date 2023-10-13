@@ -78,10 +78,9 @@ object QueryToSql {
         case Some(Query.AscDesc.Desc) => usql" DESC"
       }
 
-      val nulls = orderBy.nulls match {
-        case None => usql""
-        case Some(Query.Nulls.First) => usql" NULLS FIRST"
-        case Some(Query.Nulls.Last) => usql" NULLS LAST"
+      val nulls = SqlStr.opt(orderBy.nulls){
+        case Query.Nulls.First => usql" NULLS FIRST"
+        case Query.Nulls.Last => usql" NULLS LAST"
       }
 
       usql" ORDER BY " + orderBy.expr.toSqlExpr(context) + ascDesc + nulls
