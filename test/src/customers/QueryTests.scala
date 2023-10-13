@@ -133,10 +133,27 @@ object QueryTests extends TestSuite {
       value = Vector("Keyboard", "Shirt", "Spoon")
     )
 
-    test("aggregate") - checker(Item.query.sumBy(_.total)).expect(
-      sql = "SELECT SUM(item0.total) as res FROM item item0",
-      value = 16144.74
-    )
+    test("aggregate"){
+      test("single") - checker(
+        Item.query.aggregate(_.sumBy(_.total))
+      ).expect(
+        sql = "SELECT SUM(item0.total) as res FROM item item0",
+        value = 16144.74
+      )
+      test("multiple") - checker(
+        Item.query.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
+      ).expect(
+        sql = "SELECT SUM(item0.total) as res__0, MAX(item0.total) as res__1 FROM item item0",
+        value = (16144.74, 15000.0)
+      )
+    }
+
+//    test("groupBy") - checker(
+//      Item.query.groupBy(_.productId)(_.sumBy(_.total))
+//    ).expect(
+//      sql = "SELECT item0.product_id as res__0, SUM(item0.total) as res__1 FROM item item0",
+//      value = null
+//    )
 
     test("sort") {
       test("sort") - checker(Product.query.sortBy(_.price).map(_.name)).expect(

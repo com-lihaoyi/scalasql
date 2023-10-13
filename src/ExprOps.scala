@@ -126,52 +126,46 @@ trait ExprOps {
     def unary_! : Expr[Boolean] = Expr { implicit ctx => usql"NOT $v"}
   }
 
-  def queryExpr[T, V](v: Query[T])
-                     (f: QueryToSql.Context => SqlStr)
-                     (implicit qr: Queryable[Expr[V], _]): Expr[V] = Expr { implicit ctx =>
-    v.copy[Expr[V]](
-      expr = Expr { implicit ctx => f(ctx) }
-    ).toSqlExpr
-  }
 
 
-  implicit class ExprSeqIntOps0[V: Numeric](v: Query[Expr[V]])(implicit qr: Queryable[Expr[V], _]) {
+  implicit class ExprSeqIntOps0[V: Numeric](v: QueryLike[Expr[V]])(implicit qr: Queryable[Expr[V], V]) {
     /** Computes the sum of column values */
-    def sum: Expr[V] = queryExpr(v)(implicit ctx => usql"SUM(${v.expr})")
+    def sum: Expr[V] = v.queryExpr(implicit ctx => usql"SUM(${v.expr})")
 
     /** Finds the minimum value in a column  */
-    def min: Expr[V] = queryExpr(v)(implicit ctx => usql"MIN(${v.expr})")
+    def min: Expr[V] = v.queryExpr(implicit ctx => usql"MIN(${v.expr})")
 
     /** Finds the maximum value in a column  */
-    def max: Expr[V] = queryExpr(v)(implicit ctx => usql"MAX(${v.expr})")
+    def max: Expr[V] = v.queryExpr(implicit ctx => usql"MAX(${v.expr})")
 
     /** Computes the average value of a column */
-    def avg: Expr[V] = queryExpr(v)(implicit ctx => usql"AVG(${v.expr})")
+    def avg: Expr[V] = v.queryExpr(implicit ctx => usql"AVG(${v.expr})")
   }
 
-  implicit class ExprSeqOps0[T](v: Query[T])(implicit qr: Queryable[T, _]) {
+  implicit class ExprSeqOps0[T](v: QueryLike[T])(implicit qr: Queryable[T, _]) {
     /** Counts the rows */
-    def size: Expr[Int] = queryExpr(v)(implicit ctx => usql"COUNT(1)")
+    def size: Expr[Int] = v.queryExpr(implicit ctx => usql"COUNT(1)")
 
     /** Computes the sum of column values */
-    def sumBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"SUM(${f(v.expr)})")
+    def sumBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[V] = v.queryExpr(implicit ctx => usql"SUM(${f(v.expr)})")
 
     /** Finds the minimum value in a column  */
-    def minBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"MIN(${f(v.expr)})")
+    def minBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[V] = v.queryExpr(implicit ctx => usql"MIN(${f(v.expr)})")
 
     /** Finds the maximum value in a column  */
-    def maxBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"MAX(${f(v.expr)})")
+    def maxBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[V] = v.queryExpr(implicit ctx => usql"MAX(${f(v.expr)})")
 
     /** Computes the average value of a column */
-    def avgBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], _]): Expr[V] = queryExpr(v)(implicit ctx => usql"AVG(${f(v.expr)})")
+    def avgBy[V: Numeric](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[V] = v.queryExpr(implicit ctx => usql"AVG(${f(v.expr)})")
 
     /** TRUE if any value in a set is TRUE */
-    def any(f: T => Expr[Boolean]): Expr[Boolean] = queryExpr(v)(implicit ctx => usql"ANY(${f(v.expr)})")
+    def any(f: T => Expr[Boolean]): Expr[Boolean] = v.queryExpr(implicit ctx => usql"ANY(${f(v.expr)})")
 
     /** TRUE if all values in a set are TRUE */
-    def all(f: T => Expr[Boolean]): Expr[Boolean] = queryExpr(v)(implicit ctx => usql"ALL(${f(v.expr)})")
+    def all(f: T => Expr[Boolean]): Expr[Boolean] = v.queryExpr(implicit ctx => usql"ALL(${f(v.expr)})")
 
     /** TRUE if the operand is equal to one of a list of expressions or one or more rows returned by a subquery */
-    def contains(e: Expr[_]): Expr[Boolean] = queryExpr(v)(implicit ctx => usql"ALL($e in $v})")
+//    def contains(e: Expr[_]): Expr[Boolean] = v.queryExpr(implicit ctx => usql"ALL($e in $v})")
   }
 }
+

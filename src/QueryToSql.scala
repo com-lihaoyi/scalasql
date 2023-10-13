@@ -13,7 +13,9 @@ object QueryToSql {
   def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
     val flattenedExpr = qr.walk(expr)
     FlatJson.flatten(flattenedExpr, context) match {
-      case Seq((FlatJson.basePrefix, singleExpr)) if singleExpr.isCompleteQuery => (flattenedExpr, singleExpr)
+      case Seq((FlatJson.basePrefix, singleExpr)) if singleExpr.isCompleteQuery =>
+        (flattenedExpr, singleExpr)
+
       case flatQuery =>
 
         val exprsStr = SqlStr.join(
