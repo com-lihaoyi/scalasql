@@ -100,15 +100,11 @@ case class Query[Q](expr: Q,
   def join[V](other: Query[V])
              (implicit qr: Queryable[V, _]): Query[(Q, V)] = join0(other, None)
 
-
   def aggregate[E, V](f: QueryProxy[Q] => E)
                      (implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V]{implicit ctx: QueryToSql.Context =>
-
-      this
-        .copy(expr = f(new QueryProxy[Q](expr)))
-        .toSqlExpr
+      this.copy(expr = f(new QueryProxy[Q](expr))).toSqlExpr
     }
   }
 
