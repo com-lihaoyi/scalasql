@@ -42,7 +42,7 @@ case class Query[Q](expr: Q,
                     offset: Option[Int])
                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with QueryLike[Q] with From{
 
-
+  private def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
   def queryExpr[V](f: QueryToSql.Context => SqlStr)
                      (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit ctx:  QueryToSql.Context =>
@@ -58,7 +58,7 @@ case class Query[Q](expr: Q,
 
   def flatMap[V](f: Q => Query[V])(implicit qr: Queryable[V, _]): Query[V] = {
     val other = f(expr)
-    if (other.groupBy0.isEmpty && other.orderBy.isEmpty && other.limit.isEmpty && other.offset.isEmpty) {
+    if (simple(other.groupBy0, other.orderBy, other.limit, other.offset)) {
       Query(
         other.expr,
         from ++ other.from,
@@ -75,15 +75,15 @@ case class Query[Q](expr: Q,
   }
 
   def filter(f: Q => Expr[Boolean]): Query[Q] = {
-    (groupBy0.isEmpty, limit.isEmpty, offset.isEmpty) match{
-      case (true, true, true) => copy(where = where ++ Seq(f(expr)))
-      case (false, true, true) => copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
-      case (false, _, _) => Query(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
+    (groupBy0.isEmpty, simple(limit, offset)) match{
+      case (true, true) => copy(where = where ++ Seq(f(expr)))
+      case (false, true) => copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
+      case (false, _) => Query(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
     }
   }
 
   def sortBy(f: Q => Expr[_]) = {
-    if (limit.isEmpty && offset.isEmpty) copy(orderBy = Some(OrderBy(f(expr), None, None)))
+    if (simple(limit, offset)) copy(orderBy = Some(OrderBy(f(expr), None, None)))
     else Query(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
 
@@ -119,8 +119,7 @@ case class Query[Q](expr: Q,
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new QueryProxy[Q](this.expr)))
     val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
-    val isSimple = orderBy.isEmpty && limit.isEmpty && offset.isEmpty
-    if (isSimple) this.copy(expr = newExpr, groupBy0 = groupByOpt)
+    if (simple(orderBy, limit, offset)) this.copy(expr = newExpr, groupBy0 = groupByOpt)
     else Query(
       expr = newExpr,
       from = Seq(new SubqueryRef[Q](this, qr)),
@@ -141,17 +140,9 @@ case class Query[Q](expr: Q,
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): Query[(Q, V)] = {
 
-    val thisTrivial =
-      this.groupBy0.isEmpty &&
-      this.orderBy.isEmpty &&
-      this.limit.isEmpty &&
-      this.offset.isEmpty
+    val thisTrivial = simple(this.groupBy0, this.orderBy, this.limit, this.offset)
 
-    val otherTrivial =
-      other.groupBy0.isEmpty &&
-      other.orderBy.isEmpty &&
-      other.limit.isEmpty &&
-      other.offset.isEmpty
+    val otherTrivial = simple(other.groupBy0, other.orderBy, other.limit, other.offset)
 
     Query(
       expr = (expr, other.expr),
