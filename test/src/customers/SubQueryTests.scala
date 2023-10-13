@@ -102,6 +102,25 @@ object SubQueryTests extends TestSuite {
         """,
         value = Vector("Keyboard", "Bed")
       )
+
+      test("sortGroupBy") - checker(
+        Item.query.sortBy(_.quantity).take(5).groupBy(_.productId)(_.sumBy(_.total))
+      ).expect(
+        sql = """
+          SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
+          FROM (SELECT
+              item0.id as res__id,
+              item0.order_id as res__order_id,
+              item0.product_id as res__product_id,
+              item0.quantity as res__quantity,
+              item0.total as res__total
+            FROM item item0
+            ORDER BY item0.quantity
+            LIMIT 5) subquery0
+          GROUP BY subquery0.res__product_id
+        """,
+        value = Vector((1, 135.83), (2, 703.92), (3, 24.99), (4, 262.0))
+      )
     }
   }
 }

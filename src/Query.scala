@@ -117,9 +117,19 @@ case class Query[Q](expr: Q,
                    (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Query[(K, V)] = {
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
-    this.copy(
-      expr = (groupKeyValue, groupAggregate(new QueryProxy[Q](this.expr))),
-      groupBy0 = Some(GroupBy(groupKeyExpr, Nil))
+    val newExpr = (groupKeyValue, groupAggregate(new QueryProxy[Q](this.expr)))
+    val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
+    val isSimple = orderBy.isEmpty && limit.isEmpty && offset.isEmpty
+    if (isSimple) this.copy(expr = newExpr, groupBy0 = groupByOpt)
+    else Query(
+      expr = newExpr,
+      from = Seq(new SubqueryRef[Q](this, qr)),
+      joins = Nil,
+      where = Nil,
+      groupBy0 = groupByOpt,
+      orderBy = None,
+      limit = None,
+      offset = None
     )
   }
 

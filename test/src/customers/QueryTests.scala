@@ -39,7 +39,7 @@ object QueryTests extends TestSuite {
           purchase_order0.order_date as res__order_date
         FROM purchase_order purchase_order0
         WHERE purchase_order0.customer_id = ?
-      """,
+        """,
         value = Vector(
           PurchaseOrder(id = 1, customerId = 2, orderDate = "2018-01-04"),
           PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
@@ -66,14 +66,14 @@ object QueryTests extends TestSuite {
         PurchaseOrder.query.filter(p => p.customerId === 2 && p.orderDate === "2018-02-25")
       ).expect(
         sql = """
-        SELECT
-          purchase_order0.id as res__id,
-          purchase_order0.customer_id as res__customer_id,
-          purchase_order0.order_date as res__order_date
-        FROM purchase_order purchase_order0
-        WHERE purchase_order0.customer_id = ?
-        AND purchase_order0.order_date = ?
-      """,
+          SELECT
+            purchase_order0.id as res__id,
+            purchase_order0.customer_id as res__customer_id,
+            purchase_order0.order_date as res__order_date
+          FROM purchase_order purchase_order0
+          WHERE purchase_order0.customer_id = ?
+          AND purchase_order0.order_date = ?
+        """,
         value = Vector(
           PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
         )
@@ -153,10 +153,10 @@ object QueryTests extends TestSuite {
         Item.query.groupBy(_.productId)(_.sumBy(_.total))
       ).expect(
         sql = """
-        SELECT item0.product_id as res__0, SUM(item0.total) as res__1
-        FROM item item0
-        GROUP BY item0.product_id
-      """,
+          SELECT item0.product_id as res__0, SUM(item0.total) as res__1
+          FROM item item0
+          GROUP BY item0.product_id
+        """,
         value =  Vector((1, 135.83), (2, 703.92), (3, 24.99), (4, 262.0), (5, 15000.0), (6, 18.0))
       )
 
