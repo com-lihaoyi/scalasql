@@ -163,8 +163,7 @@ object QueryTests extends TestSuite {
       test("having") - checker(
         Item.query.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
       ).expect(
-        sql =
-          """
+        sql = """
           SELECT item0.product_id as res__0, SUM(item0.total) as res__1
           FROM item item0
           GROUP BY item0.product_id
@@ -176,8 +175,7 @@ object QueryTests extends TestSuite {
       test("filterHaving") - checker(
         Item.query.filter(_.quantity > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
       ).expect(
-        sql =
-          """
+        sql = """
           SELECT item0.product_id as res__0, SUM(item0.total) as res__1
           FROM item item0
           WHERE item0.quantity > ?
