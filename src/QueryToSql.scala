@@ -2,6 +2,7 @@ package usql
 
 import usql.SqlStr.SqlStringSyntax
 
+import scala.collection.immutable
 import scala.util.DynamicVariable
 
 object QueryToSql {
@@ -11,6 +12,9 @@ object QueryToSql {
                 val columnNameMapper: String => String)
 
   def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
+    sqlExprsStr0(expr, qr, context, usql"SELECT ")
+  }
+  def sqlExprsStr0[Q, R](expr: Q, qr: Queryable[Q, R], context: Context, prefix: SqlStr) = {
     val flattenedExpr = qr.walk(expr)
     FlatJson.flatten(flattenedExpr, context) match {
       case Seq((FlatJson.basePrefix, singleExpr)) if singleExpr.isCompleteQuery =>
@@ -25,7 +29,7 @@ object QueryToSql {
           usql", "
         )
 
-        (flattenedExpr, usql"SELECT $exprsStr")
+        (flattenedExpr, prefix + exprsStr)
     }
   }
 
@@ -33,30 +37,11 @@ object QueryToSql {
                         qr: Queryable[Q, R],
                         tableNameMapper: String => String,
                         columnNameMapper: String => String): (Map[Expr[_], SqlStr], SqlStr) = {
-    val namedFromsMap = (query.from ++ query.joins.flatMap(_.from).map(_.from))
-      .zipWithIndex
-      .map {
-        case (t: Query.TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
-        case (s: Query.SubqueryRef[_], i) => (s, "subquery" + i)
-      }
-      .toMap
-
-    def computeSelectable(t: Query.From) = t match {
-      case t: Query.TableRef =>
-        (Nil, SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t)))
-
-      case t: Query.SubqueryRef[_] =>
-        val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper)
-        (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
-    }
-
-    val fromSelectables = (query.from ++ query.joins.flatMap(_.from.map(_.from)))
-      .map(f => (f, computeSelectable(f)))
-      .toMap
-
-    val exprNaming = fromSelectables.flatMap { case (k, vs) =>
-      vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
-    }
+    val (namedFromsMap, fromSelectables, exprNaming) = computeContext(
+      tableNameMapper,
+      columnNameMapper,
+      query.from ++ query.joins.flatMap(_.from.map(_.from))
+    )
 
     implicit val context: Context = new Context(namedFromsMap, exprNaming, tableNameMapper, columnNameMapper)
 
@@ -122,5 +107,33 @@ object QueryToSql {
       jsonQueryMap,
       exprStr + usql" FROM " + tables + joins + filtersOpt + groupByOpt + sortOpt + limitOpt + offsetOpt
     )
+  }
+
+  def computeContext[R, Q](tableNameMapper: String => String, columnNameMapper: String => String, selectables: Seq[Query.From]) = {
+    val namedFromsMap = selectables
+      .zipWithIndex
+      .map {
+        case (t: Query.TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
+        case (s: Query.SubqueryRef[_], i) => (s, "subquery" + i)
+      }
+      .toMap
+
+    def computeSelectable(t: Query.From) = t match {
+      case t: Query.TableRef =>
+        (Nil, SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t)))
+
+      case t: Query.SubqueryRef[_] =>
+        val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper)
+        (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
+    }
+
+    val fromSelectables = selectables
+      .map(f => (f, computeSelectable(f)))
+      .toMap
+
+    val exprNaming = fromSelectables.flatMap { case (k, vs) =>
+      vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
+    }
+    (namedFromsMap, fromSelectables, exprNaming)
   }
 }

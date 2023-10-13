@@ -1,6 +1,7 @@
 package usql
 
 import OptionPickler.Reader
+import usql.QueryToSql.Context
 import usql.SqlStr.SqlStringSyntax
 
 /**
@@ -39,6 +40,46 @@ object Queryable{
 
     override def toSqlQuery(q: Query[Q], ctx: QueryToSql.Context): SqlStr = {
       QueryToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
+    }
+  }
+
+  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[UpdateReturning[Q, R], Seq[R]] =
+    new UpdateReturningQueryable[Q, R]()(qr)
+
+  class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]]{
+    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = {
+
+      qr.walk(ur.returning)
+    }
+    override def unpack(t: ujson.Value) = t
+    def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+
+    override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: QueryToSql.Context): SqlStr = {
+      val (namedFromsMap, fromSelectables, exprNaming) = QueryToSql.computeContext(
+        ctx0.tableNameMapper,
+        ctx0.columnNameMapper,
+        Seq(q.update.table) ++ q.update.from ++ q.update.joins.flatMap(_.from).map(_.from)
+      )
+
+      implicit val ctx: Context = new Context(
+        namedFromsMap,
+        exprNaming,
+        ctx0.tableNameMapper,
+        ctx0.columnNameMapper
+      )
+      val tableName = SqlStr.raw(ctx.tableNameMapper(q.update.table.value.tableName))
+      val updateList = q.update.set0.map{case (k, v) => k.toSqlExpr(ctx) + usql" = " + v.toSqlExpr(ctx)}
+      val sets = SqlStr.join(updateList, usql", ")
+      val where =
+        if (q.update.where.isEmpty) usql""
+        else usql" WHERE " + SqlStr.join(q.update.where.map(_.toSqlExpr(ctx)), usql" AND ")
+
+      val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
+
+      val returning = usql" RETURNING " + exprStr
+      val res = usql"UPDATE " + tableName + usql" SET " + sets + where + returning
+      pprint.log(res.queryParts.mkString("?"))
+      res
     }
   }
 

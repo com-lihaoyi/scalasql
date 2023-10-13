@@ -4,17 +4,18 @@ import OptionPickler.{Reader, Writer}
 import usql.Query.TableRef
 import usql.SqlStr.SqlStringSyntax
 
-abstract class Table[V[_[_]] <: Product]()(implicit name: sourcecode.Name) extends Table.Base {
+abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
   val tableName = name.value
   implicit def self: Table[V] = this
 
   def metadata: Table.Metadata[V]
 
-  def initMetadata[V[_[_]] <: Product](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
+  def initMetadata[V[_[_]]](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
   implicit def containerQr: Queryable[V[Expr], V[Val]] =  metadata.queryable
 
   def query: Query[V[Expr]] = metadata.query()
+  def update: Update[V[Expr]] = metadata.update()
 }
 
 object Table{
@@ -23,11 +24,12 @@ object Table{
   }
 
   class Metadata[V[_[_]]](val queryable: Queryable[V[Expr], V[Val]],
-                          val query: () => Query[V[Expr]])
+                          val query: () => Query[V[Expr]],
+                          val update: () => Update[V[Expr]])
 
   object Metadata{
 
-    def applyImpl[V[_[_]] <: Product](c: scala.reflect.macros.blackbox.Context)
+    def applyImpl[V[_[_]]](c: scala.reflect.macros.blackbox.Context)
                                      ()
                                      (implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
       import c.universe._
@@ -54,15 +56,16 @@ object Table{
 
       c.Expr[Metadata[V]](
         q"""
+        val $tableRef = new usql.Query.TableRef(this)
         new _root_.usql.Table.Metadata[$wtt](
           new usql.Table.Internal.TableQueryable(
             t => $allFlattenedExprs,
             _root_.usql.OptionPickler.macroR
           ),
           () => {
-            val $tableRef = new usql.Query.TableRef(this)
             _root_.usql.Query.fromTable(new $wtt(..$queryParams), $tableRef)
-          }
+          },
+          () => _root_.usql.Update.fromTable(new $wtt(..$queryParams), $tableRef)
         )
        """
       )
