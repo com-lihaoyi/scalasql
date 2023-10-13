@@ -113,17 +113,15 @@ case class Query[Q](expr: Q,
   }
 
   def groupBy[K, V](groupKey: Q => K)
-                   (groupAggregate: Query[Q] => V)
+                   (groupAggregate: QueryProxy[Q] => V)
                    (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Query[(K, V)] = {
-    ???
+    val groupKeyValue = groupKey(expr)
+    val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
+    this.copy(
+      expr = (groupKeyValue, groupAggregate(new QueryProxy[Q](this.expr))),
+      groupBy0 = Some(GroupBy(groupKeyExpr, Nil))
+    )
   }
-//    val groupKeyValue = groupKey(expr)
-//    val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
-//    this.copy(
-//      expr = (groupKeyValue, groupAggregate(this)),
-//      groupBy0 = Some(GroupBy(groupKeyExpr, Nil))
-//    )
-//  }
 
   def joinOn[V](other: Query[V])
                (on: (Q, V) => Expr[Boolean])

@@ -148,12 +148,28 @@ object QueryTests extends TestSuite {
       )
     }
 
-//    test("groupBy") - checker(
-//      Item.query.groupBy(_.productId)(_.sumBy(_.total))
-//    ).expect(
-//      sql = "SELECT item0.product_id as res__0, SUM(item0.total) as res__1 FROM item item0",
-//      value = null
-//    )
+    test("groupBy") - checker(
+      Item.query.groupBy(_.productId)(_.sumBy(_.total))
+    ).expect(
+      sql = """
+        SELECT item0.product_id as res__0, SUM(item0.total) as res__1
+        FROM item item0
+        GROUP BY item0.product_id
+      """,
+      value =  Vector((1, 135.83), (2, 703.92), (3, 24.99), (4, 262.0), (5, 15000.0), (6, 18.0))
+    )
+
+    test("groupByHaving") - checker(
+      Item.query.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
+    ).expect(
+      sql = """
+        SELECT item0.product_id as res__0, SUM(item0.total) as res__1
+        FROM item item0
+        GROUP BY item0.product_id
+        HAVING SUM(item0.total) > ? AND item0.product_id > ?
+      """,
+      value = Vector((2, 703.92), (4, 262.0), (5, 15000.0))
+    )
 
     test("sort") {
       test("sort") - checker(Product.query.sortBy(_.price).map(_.name)).expect(

@@ -83,6 +83,13 @@ object QueryToSql {
       usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
     }
 
+    val groupByOpt = optional(query.groupBy0) { groupBy =>
+      val havingOpt = optionalSeq(groupBy.having){ having =>
+        usql" HAVING " + SqlStr.join(having.map(_.toSqlExpr), usql" AND ")
+      }
+      usql" GROUP BY ${groupBy.expr}${havingOpt}"
+    }
+
     val sortOpt = optional(query.orderBy) { orderBy =>
       val ascDesc = orderBy.ascDesc match {
         case None => usql""
@@ -113,7 +120,7 @@ object QueryToSql {
 
     (
       jsonQueryMap,
-      exprStr + usql" FROM " + tables + joins + filtersOpt + sortOpt + limitOpt + offsetOpt
+      exprStr + usql" FROM " + tables + joins + filtersOpt + groupByOpt + sortOpt + limitOpt + offsetOpt
     )
   }
 }
