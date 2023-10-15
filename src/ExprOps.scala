@@ -8,8 +8,8 @@ trait ExprOps {
   // List of ANSI SQL scalar functions http://users.atw.hu/sqlnut/sqlnut2-chp-4-sect-4.html
   // List of ANSI SQL aggregate functions https://www.oreilly.com/library/view/sql-in-a/9780596155322/ch04s02.html
   implicit class ExprIntOps0[T: Numeric](v: Expr[T]) {
-    /** Addition */
-    def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v + $x" }
+      /** Addition */
+      def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v + $x" }
 
     /** Subtraction */
     def -[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v - $x" }
