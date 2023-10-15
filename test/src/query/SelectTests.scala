@@ -25,9 +25,9 @@ object SelectTests extends TestSuite {
         FROM customer customer0
       """,
       value = Vector(
-        Customer(id = 1, name = "John Doe", birthdate = "1960-10-30"),
-        Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
-        Customer(id = 3, name = "Cosme Fulanito", birthdate = "1956-05-12")
+        Customer(id = 1, name = "James Bond", birthdate = "2001-02-03"),
+        Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+        Customer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09")
       )
     )
 
@@ -42,13 +42,13 @@ object SelectTests extends TestSuite {
         WHERE purchase_order0.customer_id = ?
         """,
         value = Vector(
-          PurchaseOrder(id = 1, customerId = 2, orderDate = "2018-01-04"),
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+          PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03"),
+          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
         )
       )
 
       test("multiple") - checker(
-        PurchaseOrder.select.filter(_.customerId === 2).filter(_.orderDate === "2018-02-25")
+        PurchaseOrder.select.filter(_.customerId === 2).filter(_.orderDate === "2012-05-06")
       ).expect(
         sql = """
         SELECT
@@ -60,11 +60,11 @@ object SelectTests extends TestSuite {
         AND purchase_order0.order_date = ?
       """,
         value = Vector(
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
         )
       )
       test("combined") - checker(
-        PurchaseOrder.select.filter(p => p.customerId === 2 && p.orderDate === "2018-02-25")
+        PurchaseOrder.select.filter(p => p.customerId === 2 && p.orderDate === "2012-05-06")
       ).expect(
         sql = """
           SELECT
@@ -76,7 +76,7 @@ object SelectTests extends TestSuite {
           AND purchase_order0.order_date = ?
         """,
         value = Vector(
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
         )
       )
     }
@@ -84,12 +84,12 @@ object SelectTests extends TestSuite {
     test("map"){
       test("single") - checker(Customer.select.map(_.name)).expect(
         sql = "SELECT customer0.name as res FROM customer customer0",
-        value = Vector("John Doe", "Pepito Pérez", "Cosme Fulanito")
+        value = Vector("James Bond", "叉烧包", "Li Haoyi")
       )
 
       test("tuple2") - checker(Customer.select.map(c => (c.name, c.id))).expect(
         sql = "SELECT customer0.name as res__0, customer0.id as res__1 FROM customer customer0",
-        value =  Vector(("John Doe", 1), ("Pepito Pérez", 2), ("Cosme Fulanito", 3))
+        value =  Vector(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
       )
 
       test("tuple3") - checker(Customer.select.map(c => (c.name, c.id, c.birthdate))).expect(
@@ -101,9 +101,9 @@ object SelectTests extends TestSuite {
           FROM customer customer0
         """,
         value =  Vector(
-          ("John Doe", 1, "1960-10-30"),
-          ("Pepito Pérez", 2, "1954-07-15"),
-          ("Cosme Fulanito", 3, "1956-05-12")
+          ("James Bond", 1, "2001-02-03"),
+          ("叉烧包", 2, "1923-11-12"),
+          ("Li Haoyi", 3, "1965-08-09")
         )
       )
 
@@ -122,16 +122,16 @@ object SelectTests extends TestSuite {
           FROM customer customer0
         """,
         value = Vector(
-          (1, Customer(id = 1, name = "John Doe", birthdate = "1960-10-30")),
-          (2, Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15")),
-          (3, Customer(id = 3, name = "Cosme Fulanito", birthdate = "1956-05-12"))
+          (1, Customer(id = 1, name = "James Bond", birthdate = "2001-02-03")),
+          (2, Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12")),
+          (3, Customer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09"))
         )
       )
     }
 
     test("filterMap") - checker(Product.select.filter(_.price < 100).map(_.name)).expect(
       sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",
-      value = Vector("Keyboard", "Shirt", "Spoon")
+      value = Vector("Face Mask", "Socks", "Cookie")
     )
 
     test("aggregate"){
@@ -190,49 +190,49 @@ object SelectTests extends TestSuite {
     test("sort") {
       test("sort") - checker(Product.select.sortBy(_.price).map(_.name)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
-        value = Vector("Spoon", "Shirt", "Keyboard", "Bed", "Television", "Cell Phone")
+        value = Vector("Cookie", "Socks", "Face Mask", "Skateboard", "Guitar", "Camera")
       )
 
       test("sortLimit") - checker(Product.select.sortBy(_.price).map(_.name).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
-        value = Vector("Spoon", "Shirt")
+        value = Vector("Cookie", "Socks")
       )
 
       test("sortLimitTwiceHigher") - checker(Product.select.sortBy(_.price).map(_.name).take(2).take(3)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
-        value = Vector("Spoon", "Shirt")
+        value = Vector("Cookie", "Socks")
       )
 
       test("sortLimitTwiceLower") - checker(Product.select.sortBy(_.price).map(_.name).take(2).take(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1",
-        value = Vector("Spoon")
+        value = Vector("Cookie")
       )
 
       test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
-        value = Vector("Keyboard", "Bed")
+        value = Vector("Face Mask", "Skateboard")
       )
 
       test("sortLimitOffsetTwice") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
-        value = Vector("Television")
+        value = Vector("Guitar")
       )
 
       test("sortOffsetLimit") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
-        value = Vector("Keyboard", "Bed")
+        value = Vector("Face Mask", "Skateboard")
       )
 
       test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
-        value = Vector("Shirt")
+        value = Vector("Socks")
       )
     }
 
     test("joins"){
       test("joinFilter") - checker(
         Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
-          .filter(_._1.name === "Pepito Pérez")
+          .filter(_._1.name === "叉烧包")
       ).expect(
         sql = """
           SELECT
@@ -248,19 +248,19 @@ object SelectTests extends TestSuite {
         """,
         value = Vector(
           (
-            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
-            PurchaseOrder(id = 1, customerId = 2, orderDate = "2018-01-04")
+            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03")
           ),
           (
-            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
-            PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
           )
         )
       )
 
       test("joinSelectFilter") - checker(
         Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
-          .filter(_._1.name === "Pepito Pérez")
+          .filter(_._1.name === "叉烧包")
       ).expect(
         sql = """
           SELECT
@@ -276,19 +276,19 @@ object SelectTests extends TestSuite {
         """,
         value = Vector(
           (
-            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
-            PurchaseOrder(id = 1, customerId = 2, orderDate = "2018-01-04")
+            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03")
           ),
           (
-            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
-            PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
           )
         )
       )
 
       test("joinFilterMap") - checker(
         Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
-          .filter(_._1.name === "John Doe")
+          .filter(_._1.name === "James Bond")
           .map(_._2.orderDate)
       ).expect(
         sql = """
@@ -297,12 +297,12 @@ object SelectTests extends TestSuite {
           JOIN purchase_order purchase_order1 ON customer0.id = purchase_order1.customer_id
           WHERE customer0.name = ?
         """,
-        value = Vector("2018-02-13")
+        value = Vector("2012-04-05")
       )
 
       test("flatMap") - checker(
         Customer.select.flatMap(c => PurchaseOrder.select.map((c, _)))
-          .filter{case (c, p) => c.id === p.customerId && c.name === "John Doe"}
+          .filter{case (c, p) => c.id === p.customerId && c.name === "James Bond"}
           .map(_._2.orderDate)
       ).expect(
         sql = """
@@ -311,12 +311,12 @@ object SelectTests extends TestSuite {
           WHERE customer0.id = purchase_order1.customer_id
           AND customer0.name = ?
         """,
-        value = Vector("2018-02-13")
+        value = Vector("2012-04-05")
       )
       test("flatMap") - checker(
         Customer.select.flatMap(c =>
           PurchaseOrder.select
-            .filter { p => c.id === p.customerId && c.name === "John Doe" }
+            .filter { p => c.id === p.customerId && c.name === "James Bond" }
         ).map(_.orderDate)
 
       ).expect(
@@ -326,7 +326,7 @@ object SelectTests extends TestSuite {
           WHERE customer0.id = purchase_order1.customer_id
           AND customer0.name = ?
         """,
-        value = Vector("2018-02-13")
+        value = Vector("2012-04-05")
       )
     }
 

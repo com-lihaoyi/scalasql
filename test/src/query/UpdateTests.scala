@@ -11,18 +11,18 @@ object UpdateTests extends TestSuite {
   def tests = Tests {
     val checker = new TestDb("querytests")
     test("update") - {
-      checker(Customer.update.filter(_.name === "John Doe").set(_.birthdate -> "2019-04-07"))
+      checker(Customer.update.filter(_.name === "James Bond").set(_.birthdate -> "2019-04-07"))
         .expect(
           sql = "UPDATE customer SET birthdate = ? WHERE customer.name = ?",
           value = 1
         )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
 
-      checker(Customer.select.filter(_.name === "Cosme Fulanito").map(_.birthdate)).expect(
-        value = Vector("1956-05-12") // not updated
+      checker(Customer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
+        value = Vector("1965-08-09") // not updated
       )
     }
 
@@ -32,10 +32,10 @@ object UpdateTests extends TestSuite {
         value = 3
       )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
-      checker(Customer.select.filter(_.name === "Cosme Fulanito").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -43,7 +43,7 @@ object UpdateTests extends TestSuite {
     test("returning") - {
       checker(
         Customer.update
-          .filter(_.name === "John Doe")
+          .filter(_.name === "James Bond")
           .set(_.birthdate -> "2019-04-07")
           .returning(_.id)
       ).expect(
@@ -51,7 +51,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -59,7 +59,7 @@ object UpdateTests extends TestSuite {
     test("multiple") - {
       checker(
         Customer.update
-          .filter(_.name === "John Doe")
+          .filter(_.name === "James Bond")
           .set(_.birthdate -> "2019-04-07", _.name -> "John Dee")
           .returning(_.id)
       ).expect(
@@ -67,7 +67,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Nil
       )
 
@@ -79,7 +79,7 @@ object UpdateTests extends TestSuite {
     test("dynamic") - {
       checker(
         Customer.update
-          .filter(_.name === "John Doe")
+          .filter(_.name === "James Bond")
           .set(c => c.name -> c.name.toUpperCase)
           .returning(_.id)
       ).expect(
@@ -87,19 +87,19 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Nil
       )
 
-      checker(Customer.select.filter(_.name === "JOHN DOE").map(_.birthdate)).expect(
-        value =  Vector("1960-10-30")
+      checker(Customer.select.filter(_.name === "JAMES BOND").map(_.birthdate)).expect(
+        value =  Vector("2001-02-03")
       )
     }
 
     test("join") - {
       checker(
         Customer.update
-          .filter(_.name === "John Doe")
+          .filter(_.name === "James Bond")
           .joinOn(PurchaseOrder.select)(_.id === _.customerId)
           .set(c => c._1.birthdate -> c._2.orderDate)
           .returning(_._1.id)
@@ -114,15 +114,15 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
-        value = Vector("2018-02-13")
+      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+        value = Vector("2012-04-05")
       )
     }
 
     test("multijoin") - {
       checker(
         Customer.update
-          .filter(_.name === "John Doe")
+          .filter(_.name === "James Bond")
           .joinOn(PurchaseOrder)(_.id === _.customerId)
           .joinOn(Item)(_._2.id === _.orderId)
           .joinOn(Product)(_._2.productId === _.id)
@@ -142,7 +142,7 @@ object UpdateTests extends TestSuite {
       )
 
       checker(Customer.select.filter(_.id === 1).map(_.name)).expect(
-        value = Vector("Cell Phone")
+        value = Vector("Camera")
       )
     }
   }

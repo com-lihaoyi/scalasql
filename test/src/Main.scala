@@ -40,20 +40,20 @@ object Main {
         FOREIGN KEY(product_id) REFERENCES product(id)
     );
 
-    INSERT INTO product (id, sku, name, price) VALUES (1, 'keyboard', 'Keyboard', 7.99);
-    INSERT INTO product (id, sku, name, price) VALUES (2, 'tv', 'Television', 351.96);
-    INSERT INTO product (id, sku, name, price) VALUES (3, 'shirt', 'Shirt', 3.57);
-    INSERT INTO product (id, sku, name, price) VALUES (4, 'bed', 'Bed', 131.00);
-    INSERT INTO product (id, sku, name, price) VALUES (5, 'cell-phone', 'Cell Phone', 1000.00);
-    INSERT INTO product (id, sku, name, price) VALUES (6, 'spoon', 'Spoon', 1.00);
+    INSERT INTO product (id, sku, name, price) VALUES (1, 'face-mask', 'Face Mask', 7.99);
+    INSERT INTO product (id, sku, name, price) VALUES (2, 'guitar', 'Guitar', 351.96);
+    INSERT INTO product (id, sku, name, price) VALUES (3, 'socks', 'Socks', 3.57);
+    INSERT INTO product (id, sku, name, price) VALUES (4, 'skateboard', 'Skateboard', 131.00);
+    INSERT INTO product (id, sku, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
+    INSERT INTO product (id, sku, name, price) VALUES (6, 'cookie', 'Cookie', 1.00);
 
-    INSERT INTO customer (id, name, birthdate) VALUES (1, 'John Doe', '1960-10-30');
-    INSERT INTO customer (id, name, birthdate) VALUES (2, 'Pepito Pérez', '1954-07-15');
-    INSERT INTO customer (id, name, birthdate) VALUES (3, 'Cosme Fulanito', '1956-05-12');
+    INSERT INTO customer (id, name, birthdate) VALUES (1, 'James Bond', '2001-02-03');
+    INSERT INTO customer (id, name, birthdate) VALUES (2, '叉烧包', '1923-11-12');
+    INSERT INTO customer (id, name, birthdate) VALUES (3, 'Li Haoyi', '1965-08-09');
 
-    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (1, 2, '2018-01-04');
-    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (2, 1, '2018-02-13');
-    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (3, 2, '2018-02-25');
+    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (1, 2, '2010-02-03');
+    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (2, 1, '2012-04-05');
+    INSERT INTO purchase_order (id, customer_id, order_date) VALUES (3, 2, '2012-05-06');
 
     INSERT INTO item (id, order_id, product_id, quantity, total) VALUES (1, 1, 1, 10, 79.90);
     INSERT INTO item (id, order_id, product_id, quantity, total) VALUES (2, 1, 2, 2, 703.92);

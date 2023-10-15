@@ -79,7 +79,7 @@ object SubQueryTests extends TestSuite {
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
-      value = Vector(("Cell Phone", 15))
+      value = Vector(("Camera", 15))
     )
 
     test("sortLimitSortLimit") - checker(
@@ -98,7 +98,7 @@ object SubQueryTests extends TestSuite {
         ORDER BY subquery0.res__price ASC
         LIMIT 2
       """,
-      value = Vector("Keyboard", "Bed")
+      value = Vector("Face Mask", "Skateboard")
     )
 
     test("sortGroupBy") - checker(
@@ -136,12 +136,12 @@ object SubQueryTests extends TestSuite {
         JOIN product product1 ON subquery0.res__0 = product1.id
       """,
       value = Vector(
-        ("Keyboard", 135.83),
-        ("Television", 703.92),
-        ("Shirt", 24.99),
-        ("Bed", 262.0),
-        ("Cell Phone", 15000.0),
-        ("Spoon", 18.0)
+        ("Face Mask", 135.83),
+        ("Guitar", 703.92),
+        ("Socks", 24.99),
+        ("Skateboard", 262.0),
+        ("Camera", 15000.0),
+        ("Cookie", 18.0)
       )
     )
 
@@ -160,7 +160,7 @@ object SubQueryTests extends TestSuite {
             FROM purchase_order purchase_order0
             WHERE customer0.id = purchase_order0.customer_id) = ?
       """,
-      value = Vector(Customer(3, "Cosme Fulanito", "1956-05-12"))
+      value = Vector(Customer(3, "Li Haoyi", "1965-08-09"))
     )
     test("subqueryInMap") - checker(
       Customer.select.map(c => (c, PurchaseOrder.select.filter(p => c.id === p.customerId).size))
@@ -175,9 +175,9 @@ object SubQueryTests extends TestSuite {
         FROM customer customer0
       """,
       value = Vector(
-        (Customer(1, "John Doe", "1960-10-30"), 1),
-        (Customer(2, "Pepito Pérez", "1954-07-15"), 2),
-        (Customer(3, "Cosme Fulanito", "1956-05-12"), 0)
+        (Customer(1, "James Bond", "2001-02-03"), 1),
+        (Customer(2, "叉烧包", "1923-11-12"), 2),
+        (Customer(3, "Li Haoyi", "1965-08-09"), 0)
       )
     )
     test("subqueryInMapNested") - checker(
@@ -193,9 +193,9 @@ object SubQueryTests extends TestSuite {
         FROM customer customer0
       """,
       value = Vector(
-        (Customer(1, "John Doe", "1960-10-30"), true),
-        (Customer(2, "Pepito Pérez", "1954-07-15"), false),
-        (Customer(3, "Cosme Fulanito", "1956-05-12"), false)
+        (Customer(1, "James Bond", "2001-02-03"), true),
+        (Customer(2, "叉烧包", "1923-11-12"), false),
+        (Customer(3, "Li Haoyi", "1965-08-09"), false)
       )
     )
   }
