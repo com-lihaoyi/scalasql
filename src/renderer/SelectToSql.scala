@@ -6,8 +6,8 @@ import usql.{FlatJson, Queryable}
 
 object SelectToSql {
 
-  def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
-    sqlExprsStr0(expr, qr, context, usql"SELECT ")
+  def sqlExprsStr[Q, R](expr: Q, exprPrefix: SqlStr, qr: Queryable[Q, R], context: Context) = {
+    sqlExprsStr0(expr, qr, context, usql"SELECT " + exprPrefix)
   }
   def sqlExprsStr0[Q, R](expr: Q, qr: Queryable[Q, R], context: Context, prefix: SqlStr) = {
     val flattenedExpr = qr.walk(expr)
@@ -57,7 +57,8 @@ object SelectToSql {
 
     implicit val context: Context = ctx
 
-    val (flattenedExpr, exprStr) = sqlExprsStr(query.expr, qr, context)
+    val exprPrefix = SqlStr.opt(query.exprPrefix){p => SqlStr.raw(p) + usql" "}
+    val (flattenedExpr, exprStr) = sqlExprsStr(query.expr, exprPrefix, qr, context)
 
     val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), usql", ")
 

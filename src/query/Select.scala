@@ -24,6 +24,7 @@ import usql.renderer.{Context, SelectToSql, SqlStr}
  *
  */
 case class Select[Q](expr: Q,
+                     exprPrefix: Option[String],
                      from: Seq[From],
                      joins: Seq[Join],
                      where: Seq[Expr[_]],
@@ -37,6 +38,7 @@ case class Select[Q](expr: Q,
 
   override def select = this
 
+  def distinct: Select[Q] = this.copy(exprPrefix = Some("DISTINCT"))
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
   def queryExpr[V](f: Context => SqlStr)
@@ -57,6 +59,7 @@ case class Select[Q](expr: Q,
     if (simple(other.groupBy0, other.orderBy, other.limit, other.offset)) {
       Select(
         other.expr,
+        exprPrefix,
         from ++ other.from,
         joins ++ other.joins,
         where ++ other.where,
@@ -74,7 +77,7 @@ case class Select[Q](expr: Q,
     (groupBy0.isEmpty, simple(limit, offset)) match {
       case (true, true) => copy(where = where ++ Seq(f(expr)))
       case (false, true) => copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
-      case (false, _) => Select(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
+      case (false, _) => Select(expr, None, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
     }
   }
 
@@ -95,6 +98,7 @@ case class Select[Q](expr: Q,
 
     Select(
       expr = (expr, other.expr),
+      exprPrefix = exprPrefix,
       from = if (thisTrivial) from else Seq(subquery),
       joins = (if (thisTrivial) joins else Nil) ++
         (if (otherTrivial) Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))))
@@ -125,6 +129,7 @@ case class Select[Q](expr: Q,
     if (simple(orderBy, limit, offset)) this.copy(expr = newExpr, groupBy0 = groupByOpt)
     else Select(
       expr = newExpr,
+      exprPrefix = exprPrefix,
       from = Seq(new SubqueryRef[Q](this, qr)),
       joins = Nil,
       where = Nil,
@@ -138,7 +143,7 @@ case class Select[Q](expr: Q,
 
   def sortBy(f: Q => Expr[_]) = {
     if (simple(limit, offset)) copy(orderBy = Some(OrderBy(f(expr), None, None)))
-    else Select(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
+    else Select(expr, None, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
@@ -155,7 +160,7 @@ case class Select[Q](expr: Q,
 
 object Select {
   def fromTable[T](e: T, table: TableRef)(implicit qr: Queryable[T, _]) = {
-    Select(e, Seq(table), Nil, Nil, None, None, None, None)
+    Select(e, None, Seq(table), Nil, Nil, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],

@@ -4,6 +4,7 @@ import OptionPickler.Reader
 import renderer.Context
 import renderer.{SelectToSql, SqlStr}
 import usql.query.Expr
+import usql.renderer.SqlStr.SqlStringSyntax
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -18,7 +19,7 @@ trait Queryable[Q, R]{
   def unpack(t: ujson.Value): ujson.Value = t.arr.head
 
   def toSqlQuery(q: Q, ctx: Context): SqlStr = {
-    SelectToSql.sqlExprsStr[Q, R](q, this, ctx)._2
+    SelectToSql.sqlExprsStr[Q, R](q, usql"", this, ctx)._2
   }
 }
 

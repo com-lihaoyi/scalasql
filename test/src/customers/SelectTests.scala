@@ -332,7 +332,21 @@ object SelectTests extends TestSuite {
 
 //    test("union")  - ???
 //    test("unionAll") - ???
-//    test("distinct") - ???
+    test("distinct"){
+      test("nondistinct") - checker(
+        Item.select.map(_.orderId)
+      ).expect(
+        sql = "SELECT item0.order_id as res FROM item item0",
+        value = Vector(1, 1, 1, 2, 2, 3, 3)
+      )
+
+      test("distinct") - checker(
+        Item.select.map(_.orderId).distinct
+      ).expect(
+        sql = "SELECT DISTINCT item0.order_id as res FROM item item0",
+        value = Vector(1, 2, 3)
+      )
+    }
 //    test("distinct on") - ???
 //    test("isEmpty") - ???
 //    test("nonEmpty") - ???
