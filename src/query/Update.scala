@@ -1,8 +1,7 @@
 package usql.query
 
-import usql.{OptionPickler, Queryable}
+import usql.{Column, OptionPickler, Queryable}
 import usql.query.Select.Join
-import usql.query.UpdateReturning.UpdateReturningQueryable
 import usql.renderer.{Context, SqlStr, UpdateToSql}
 
 /**
@@ -12,7 +11,7 @@ import usql.renderer.{Context, SqlStr, UpdateToSql}
  */
 case class Update[Q](expr: Q,
                      table: Select.TableRef,
-                     set0: Seq[(Expr[_], Expr[_])],
+                     set0: Seq[(Column.ColumnExpr[_], Expr[_])],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
                     (implicit val qr: Queryable[Q, _]) {
@@ -20,7 +19,7 @@ case class Update[Q](expr: Q,
     this.copy(where = where ++ Seq(f(expr)))
   }
 
-  def set(f: (Q => (Expr[_], Expr[_]))*): Update[Q] = {
+  def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q] = {
     this.copy(set0 = f.map(_(expr)))
   }
 

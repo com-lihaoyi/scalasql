@@ -25,13 +25,12 @@ trait Queryable[Q, R]{
 }
 
 object Queryable{
-  implicit def ExprQueryable[T](implicit valueReader0: Reader[T]): Queryable[Expr[T], T] =
-    new ExprQueryable[T]()
+  implicit def ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: Reader[T]): Queryable[E[T], T] =
+    new ExprQueryable[E, T]()
 
-  class ExprQueryable[T](implicit valueReader0: Reader[T]) extends Queryable[Expr[T], T]{
-    def walk(q: Expr[T]) = Seq(Nil -> q)
+  class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: Reader[T]) extends Queryable[E[T], T]{
+    def walk(q: E[T]) = Seq(Nil -> q)
     def valueReader = valueReader0
-
   }
 
   private class TupleNQueryable[Q, R](val walk0: Q => Seq[Seq[(List[String], Expr[_])]])

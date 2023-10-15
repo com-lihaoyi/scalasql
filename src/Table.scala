@@ -16,10 +16,11 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
 
   def initMetadata[V[_[_]]](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def containerQr: Queryable[V[Expr], V[Val]] =  metadata.queryable
+  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
+    metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
 
   def select: Select[V[Expr]] = metadata.query()
-  def update: Update[V[Expr]] = metadata.update()
+  def update: Update[V[Column.ColumnExpr]] = metadata.update()
 }
 
 object Table{
@@ -29,7 +30,7 @@ object Table{
 
   class Metadata[V[_[_]]](val queryable: Queryable[V[Expr], V[Val]],
                           val query: () => Select[V[Expr]],
-                          val update: () => Update[V[Expr]])
+                          val update: () => Update[V[Column.ColumnExpr]])
 
   object Metadata{
 
@@ -92,11 +93,11 @@ object Table{
 
 case class Column[T]()(implicit val name: sourcecode.Name,
                        val table: Table.Base) {
-  def expr(tableRef: TableRef): Expr[T] = new Column.ColumnExpr[T](tableRef, name.value)
+  def expr(tableRef: TableRef): Column.ColumnExpr[T] = new Column.ColumnExpr[T](tableRef, name.value)
 }
 
 object Column{
-  class ColumnExpr[T](tableRef: TableRef, name: String) extends Expr[T] {
+  class ColumnExpr[T](tableRef: TableRef, val name: String) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context) = {
       val prefix = ctx.fromNaming(tableRef) match{
         case "" => usql""

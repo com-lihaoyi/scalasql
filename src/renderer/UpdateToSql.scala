@@ -39,14 +39,7 @@ object UpdateToSql {
 
     val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
     val updateList = q.set0.map { case (k, v) =>
-      val setLhsCtxt = new Context(
-        ctx.fromNaming + (q.table -> ""),
-        ctx.exprNaming,
-        ctx.tableNameMapper,
-        ctx.columnNameMapper
-      )
-
-      val kStr = k.toSqlExpr(setLhsCtxt)
+      val kStr = SqlStr.raw(k.name)
       usql"$kStr = $v"
     }
     val sets = SqlStr.join(updateList, usql", ")

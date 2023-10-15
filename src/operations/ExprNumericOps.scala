@@ -3,7 +3,7 @@ package usql.operations
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 
-class ExprIntOps[T: Numeric](v: Expr[T]) {
+class ExprNumericOps[T: Numeric](v: Expr[T]) {
   /** Addition */
   def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v + $x" }
 
@@ -76,3 +76,4 @@ class ExprIntOps[T: Numeric](v: Expr[T]) {
   /** Computes the square root of a number. */
   def sqrt: Expr[T] = Expr { implicit ctx => usql"SQRT($v)"}
 }
+
