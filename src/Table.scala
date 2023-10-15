@@ -71,7 +71,7 @@ object Table{
           },
           () => _root_.usql.query.Update.fromTable(new $wtt(..$queryParams), $tableRef)
         )
-       """
+        """
       )
     }
   }
