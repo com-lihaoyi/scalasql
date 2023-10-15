@@ -38,12 +38,12 @@ object Queryable{
                                      (implicit val valueReader: Reader[R]) extends Queryable[Q, R] {
     def walk(q: Q) = walkIndexed(walk0(q))
 
-    def walkIndexed(items: Seq[Seq[(List[String], Expr[_])]]) = {
-      walkPrefixed(items.zipWithIndex.map { case (v, i) => (i.toString, v) })
+    def walkIndexed(purchases: Seq[Seq[(List[String], Expr[_])]]) = {
+      walkPrefixed(purchases.zipWithIndex.map { case (v, i) => (i.toString, v) })
     }
 
-    def walkPrefixed(items: Seq[(String, Seq[(List[String], Expr[_])])]) = {
-      items.flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
+    def walkPrefixed(purchases: Seq[(String, Seq[(List[String], Expr[_])])]) = {
+      purchases.flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
     }
   }
 

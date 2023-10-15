@@ -11,137 +11,137 @@ object UpdateTests extends TestSuite {
   def tests = Tests {
     val checker = new TestDb("querytests")
     test("update") - {
-      checker(Customer.update.filter(_.name === "James Bond").set(_.birthdate -> "2019-04-07"))
+      checker(Buyer.update.filter(_.name === "James Bond").set(_.birthdate -> "2019-04-07"))
         .expect(
-          sql = "UPDATE customer SET birthdate = ? WHERE customer.name = ?",
+          sql = "UPDATE buyer SET birthdate = ? WHERE buyer.name = ?",
           value = 1
         )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
 
-      checker(Customer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
         value = Vector("1965-08-09") // not updated
       )
     }
 
     test("bulk") - {
-      checker(Customer.update.set(_.birthdate -> "2019-04-07")).expect(
-        sql = "UPDATE customer SET birthdate = ?",
+      checker(Buyer.update.set(_.birthdate -> "2019-04-07")).expect(
+        sql = "UPDATE buyer SET birthdate = ?",
         value = 3
       )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
-      checker(Customer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
 
     test("returning") - {
       checker(
-        Customer.update
+        Buyer.update
           .filter(_.name === "James Bond")
           .set(_.birthdate -> "2019-04-07")
           .returning(_.id)
       ).expect(
-        sql = "UPDATE customer SET birthdate = ? WHERE customer.name = ? RETURNING customer.id as res",
+        sql = "UPDATE buyer SET birthdate = ? WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
 
     test("multiple") - {
       checker(
-        Customer.update
+        Buyer.update
           .filter(_.name === "James Bond")
           .set(_.birthdate -> "2019-04-07", _.name -> "John Dee")
           .returning(_.id)
       ).expect(
-        sql = "UPDATE customer SET birthdate = ?, name = ? WHERE customer.name = ? RETURNING customer.id as res",
+        sql = "UPDATE buyer SET birthdate = ?, name = ? WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Nil
       )
 
-      checker(Customer.select.filter(_.name === "John Dee").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "John Dee").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
 
     test("dynamic") - {
       checker(
-        Customer.update
+        Buyer.update
           .filter(_.name === "James Bond")
           .set(c => c.name -> c.name.toUpperCase)
           .returning(_.id)
       ).expect(
-        sql = "UPDATE customer SET name = UPPER(customer.name) WHERE customer.name = ? RETURNING customer.id as res",
+        sql = "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Nil
       )
 
-      checker(Customer.select.filter(_.name === "JAMES BOND").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "JAMES BOND").map(_.birthdate)).expect(
         value =  Vector("2001-02-03")
       )
     }
 
     test("join") - {
       checker(
-        Customer.update
+        Buyer.update
           .filter(_.name === "James Bond")
-          .joinOn(PurchaseOrder.select)(_.id === _.customerId)
-          .set(c => c._1.birthdate -> c._2.orderDate)
+          .joinOn(ShippingInfo.select)(_.id === _.buyerId)
+          .set(c => c._1.birthdate -> c._2.shippingDate)
           .returning(_._1.id)
       ).expect(
         sql = """
-          UPDATE customer
-          SET birthdate = purchase_order0.order_date
-          FROM purchase_order purchase_order0
-          WHERE customer.id = purchase_order0.customer_id AND customer.name = ?
-          RETURNING customer.id as res
+          UPDATE buyer
+          SET birthdate = shipping_info0.shipping_date
+          FROM shipping_info shipping_info0
+          WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+          RETURNING buyer.id as res
         """,
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
         value = Vector("2012-04-05")
       )
     }
 
     test("multijoin") - {
       checker(
-        Customer.update
+        Buyer.update
           .filter(_.name === "James Bond")
-          .joinOn(PurchaseOrder)(_.id === _.customerId)
-          .joinOn(Item)(_._2.id === _.orderId)
+          .joinOn(ShippingInfo)(_.id === _.buyerId)
+          .joinOn(Purchase)(_._2.id === _.shippingInfoId)
           .joinOn(Product)(_._2.productId === _.id)
           .set(c => c._1._1._1.name -> c._2.name)
           .returning(_._1._1._1.id)
       ).expect(
         sql = """
-          UPDATE customer
+          UPDATE buyer
           SET name = product2.name
-          FROM purchase_order purchase_order0
-          JOIN item item1 ON purchase_order0.id = item1.order_id
-          JOIN product product2 ON item1.product_id = product2.id
-          WHERE customer.id = purchase_order0.customer_id AND customer.name = ?
-          RETURNING customer.id as res
+          FROM shipping_info shipping_info0
+          JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
+          JOIN product product2 ON purchase1.product_id = product2.id
+          WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+          RETURNING buyer.id as res
         """,
         value = Vector(1)
       )
 
-      checker(Customer.select.filter(_.id === 1).map(_.name)).expect(
+      checker(Buyer.select.filter(_.id === 1).map(_.name)).expect(
         value = Vector("Camera")
       )
     }

@@ -10,40 +10,40 @@ import ExprOps._
 object ExprSeqOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
-    test("size") - checker(Item.select.size).expect(
-      sql = "SELECT COUNT(1) as res FROM item item0",
+    test("size") - checker(Purchase.select.size).expect(
+      sql = "SELECT COUNT(1) as res FROM purchase purchase0",
       value = 7
     )
 
-    test("sumBy") - checker(Item.select.sumBy(_.quantity)).expect(
-      sql = "SELECT SUM(item0.quantity) as res FROM item item0",
+    test("sumBy") - checker(Purchase.select.sumBy(_.count)).expect(
+      sql = "SELECT SUM(purchase0.count) as res FROM purchase purchase0",
       value = 140
     )
 
-    test("minBy") - checker(Item.select.minBy(_.quantity)).expect(
-      sql = "SELECT MIN(item0.quantity) as res FROM item item0",
+    test("minBy") - checker(Purchase.select.minBy(_.count)).expect(
+      sql = "SELECT MIN(purchase0.count) as res FROM purchase purchase0",
       value = 3
     )
 
-    test("maxBy") - checker(Item.select.maxBy(_.quantity)).expect(
-      sql = "SELECT MAX(item0.quantity) as res FROM item item0",
+    test("maxBy") - checker(Purchase.select.maxBy(_.count)).expect(
+      sql = "SELECT MAX(purchase0.count) as res FROM purchase purchase0",
       value = 100
     )
 
-    test("avgBy") - checker(Item.select.avgBy(_.quantity)).expect(
-      sql = "SELECT AVG(item0.quantity) as res FROM item item0",
+    test("avgBy") - checker(Purchase.select.avgBy(_.count)).expect(
+      sql = "SELECT AVG(purchase0.count) as res FROM purchase purchase0",
       value = 20
     )
 
     // Not supported by Sqlite
 
-//    test("any") - checker(Item.query.any(_.quantity > 5)).expect(
-//      sql = "SELECT ANY(item0.quantity > ?) as res FROM item item0",
+//    test("any") - checker(Purchase.query.any(_.count > 5)).expect(
+//      sql = "SELECT ANY(purchase0.count > ?) as res FROM purchase purchase0",
 //      value = true
 //    )
 //
-//    test("all") - checker(Item.query.all(_.quantity > 5)).expect(
-//      sql = "SELECT ALL(item0.quantity > ?) as res FROM item item0",
+//    test("all") - checker(Purchase.query.all(_.count > 5)).expect(
+//      sql = "SELECT ALL(purchase0.count > ?) as res FROM purchase purchase0",
 //      value = false
 //    )
 

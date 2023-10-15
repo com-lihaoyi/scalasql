@@ -1,4 +1,4 @@
-package usql.customers
+package usql.buyers
 
 import usql._
 import usql.query.Expr

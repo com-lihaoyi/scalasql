@@ -10,23 +10,23 @@ import ExprOps._
 object ExprSeqNumericOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
-    test("sum") - checker(Item.select.map(_.quantity).sum).expect(
-      sql = "SELECT SUM(item0.quantity) as res FROM item item0",
+    test("sum") - checker(Purchase.select.map(_.count).sum).expect(
+      sql = "SELECT SUM(purchase0.count) as res FROM purchase purchase0",
       value = 140
     )
 
-    test("min") - checker(Item.select.map(_.quantity).min).expect(
-      sql = "SELECT MIN(item0.quantity) as res FROM item item0",
+    test("min") - checker(Purchase.select.map(_.count).min).expect(
+      sql = "SELECT MIN(purchase0.count) as res FROM purchase purchase0",
       value = 3
     )
 
-    test("max") - checker(Item.select.map(_.quantity).max).expect(
-      sql = "SELECT MAX(item0.quantity) as res FROM item item0",
+    test("max") - checker(Purchase.select.map(_.count).max).expect(
+      sql = "SELECT MAX(purchase0.count) as res FROM purchase purchase0",
       value = 100
     )
 
-    test("avg") - checker(Item.select.map(_.quantity).avg).expect(
-      sql = "SELECT AVG(item0.quantity) as res FROM item item0",
+    test("avg") - checker(Purchase.select.map(_.count).avg).expect(
+      sql = "SELECT AVG(purchase0.count) as res FROM purchase purchase0",
       value = 20
     )
   }

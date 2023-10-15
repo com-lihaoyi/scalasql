@@ -16,89 +16,89 @@ object SelectTests extends TestSuite {
       value = 1
     )
 
-    test("table") - checker(Customer.select).expect(
+    test("table") - checker(Buyer.select).expect(
       sql = """
         SELECT
-          customer0.id as res__id,
-          customer0.name as res__name,
-          customer0.birthdate as res__birthdate
-        FROM customer customer0
+          buyer0.id as res__id,
+          buyer0.name as res__name,
+          buyer0.birthdate as res__birthdate
+        FROM buyer buyer0
       """,
       value = Vector(
-        Customer(id = 1, name = "James Bond", birthdate = "2001-02-03"),
-        Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-        Customer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09")
+        Buyer(id = 1, name = "James Bond", birthdate = "2001-02-03"),
+        Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+        Buyer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09")
       )
     )
 
     test("filter"){
-      test("single") - checker(PurchaseOrder.select.filter(_.customerId === 2)).expect(
+      test("single") - checker(ShippingInfo.select.filter(_.buyerId === 2)).expect(
         sql = """
         SELECT
-          purchase_order0.id as res__id,
-          purchase_order0.customer_id as res__customer_id,
-          purchase_order0.order_date as res__order_date
-        FROM purchase_order purchase_order0
-        WHERE purchase_order0.customer_id = ?
+          shipping_info0.id as res__id,
+          shipping_info0.buyer_id as res__buyer_id,
+          shipping_info0.shipping_date as res__shipping_date
+        FROM shipping_info shipping_info0
+        WHERE shipping_info0.buyer_id = ?
         """,
         value = Vector(
-          PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03"),
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
+          ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03"),
+          ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
         )
       )
 
       test("multiple") - checker(
-        PurchaseOrder.select.filter(_.customerId === 2).filter(_.orderDate === "2012-05-06")
+        ShippingInfo.select.filter(_.buyerId === 2).filter(_.shippingDate === "2012-05-06")
       ).expect(
         sql = """
         SELECT
-          purchase_order0.id as res__id,
-          purchase_order0.customer_id as res__customer_id,
-          purchase_order0.order_date as res__order_date
-        FROM purchase_order purchase_order0
-        WHERE purchase_order0.customer_id = ?
-        AND purchase_order0.order_date = ?
+          shipping_info0.id as res__id,
+          shipping_info0.buyer_id as res__buyer_id,
+          shipping_info0.shipping_date as res__shipping_date
+        FROM shipping_info shipping_info0
+        WHERE shipping_info0.buyer_id = ?
+        AND shipping_info0.shipping_date = ?
       """,
         value = Vector(
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
+          ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
         )
       )
       test("combined") - checker(
-        PurchaseOrder.select.filter(p => p.customerId === 2 && p.orderDate === "2012-05-06")
+        ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === "2012-05-06")
       ).expect(
         sql = """
           SELECT
-            purchase_order0.id as res__id,
-            purchase_order0.customer_id as res__customer_id,
-            purchase_order0.order_date as res__order_date
-          FROM purchase_order purchase_order0
-          WHERE purchase_order0.customer_id = ?
-          AND purchase_order0.order_date = ?
+            shipping_info0.id as res__id,
+            shipping_info0.buyer_id as res__buyer_id,
+            shipping_info0.shipping_date as res__shipping_date
+          FROM shipping_info shipping_info0
+          WHERE shipping_info0.buyer_id = ?
+          AND shipping_info0.shipping_date = ?
         """,
         value = Vector(
-          PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
+          ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
         )
       )
     }
 
     test("map"){
-      test("single") - checker(Customer.select.map(_.name)).expect(
-        sql = "SELECT customer0.name as res FROM customer customer0",
+      test("single") - checker(Buyer.select.map(_.name)).expect(
+        sql = "SELECT buyer0.name as res FROM buyer buyer0",
         value = Vector("James Bond", "叉烧包", "Li Haoyi")
       )
 
-      test("tuple2") - checker(Customer.select.map(c => (c.name, c.id))).expect(
-        sql = "SELECT customer0.name as res__0, customer0.id as res__1 FROM customer customer0",
+      test("tuple2") - checker(Buyer.select.map(c => (c.name, c.id))).expect(
+        sql = "SELECT buyer0.name as res__0, buyer0.id as res__1 FROM buyer buyer0",
         value =  Vector(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
       )
 
-      test("tuple3") - checker(Customer.select.map(c => (c.name, c.id, c.birthdate))).expect(
+      test("tuple3") - checker(Buyer.select.map(c => (c.name, c.id, c.birthdate))).expect(
         sql = """
           SELECT
-            customer0.name as res__0,
-            customer0.id as res__1,
-            customer0.birthdate as res__2
-          FROM customer customer0
+            buyer0.name as res__0,
+            buyer0.id as res__1,
+            buyer0.birthdate as res__2
+          FROM buyer buyer0
         """,
         value =  Vector(
           ("James Bond", 1, "2001-02-03"),
@@ -109,22 +109,22 @@ object SelectTests extends TestSuite {
 
       test("interpolateInMap") - checker(Product.select.map(_.price * 2)).expect(
         sql = "SELECT product0.price * ? as res FROM product product0",
-        value = Vector(17.76, 600, 6.28, 246.9, 2000.0, 2.0)
+        value = Vector(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
       )
 
-      test("heterogenousTuple") - checker(Customer.select.map(c => (c.id, c))).expect(
+      test("heterogenousTuple") - checker(Buyer.select.map(c => (c.id, c))).expect(
         sql = """
           SELECT
-            customer0.id as res__0,
-            customer0.id as res__1__id,
-            customer0.name as res__1__name,
-            customer0.birthdate as res__1__birthdate
-          FROM customer customer0
+            buyer0.id as res__0,
+            buyer0.id as res__1__id,
+            buyer0.name as res__1__name,
+            buyer0.birthdate as res__1__birthdate
+          FROM buyer buyer0
         """,
         value = Vector(
-          (1, Customer(id = 1, name = "James Bond", birthdate = "2001-02-03")),
-          (2, Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12")),
-          (3, Customer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09"))
+          (1, Buyer(id = 1, name = "James Bond", birthdate = "2001-02-03")),
+          (2, Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12")),
+          (3, Buyer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09"))
         )
       )
     }
@@ -136,53 +136,53 @@ object SelectTests extends TestSuite {
 
     test("aggregate"){
       test("single") - checker(
-        Item.select.aggregate(_.sumBy(_.total))
+        Purchase.select.aggregate(_.sumBy(_.total))
       ).expect(
-        sql = "SELECT SUM(item0.total) as res FROM item item0",
-        value = 12354.9
+        sql = "SELECT SUM(purchase0.total) as res FROM purchase purchase0",
+        value = 12343.2
       )
       test("multiple") - checker(
-        Item.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
+        Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
       ).expect(
-        sql = "SELECT SUM(item0.total) as res__0, MAX(item0.total) as res__1 FROM item item0",
-        value = (12354.9, 10000.0)
+        sql = "SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0",
+        value = (12343.2, 10000.0)
       )
     }
 
     test("groupBy") - {
       test("simple") - checker(
-        Item.select.groupBy(_.productId)(_.sumBy(_.total))
+        Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
       ).expect(
         sql = """
-          SELECT item0.product_id as res__0, SUM(item0.total) as res__1
-          FROM item item0
-          GROUP BY item0.product_id
+          SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+          FROM purchase purchase0
+          GROUP BY purchase0.product_id
         """,
-        value = Vector((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 13.0))
+        value = Vector((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
 
       )
 
       test("having") - checker(
-        Item.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
+        Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
       ).expect(
         sql = """
-          SELECT item0.product_id as res__0, SUM(item0.total) as res__1
-          FROM item item0
-          GROUP BY item0.product_id
-          HAVING SUM(item0.total) > ? AND item0.product_id > ?
+          SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+          FROM purchase purchase0
+          GROUP BY purchase0.product_id
+          HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
         """,
         value = Vector((2, 900.0), (4, 493.8), (5, 10000.0))
       )
 
       test("filterHaving") - checker(
-        Item.select.filter(_.quantity > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
+        Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
       ).expect(
         sql = """
-          SELECT item0.product_id as res__0, SUM(item0.total) as res__1
-          FROM item item0
-          WHERE item0.quantity > ?
-          GROUP BY item0.product_id
-          HAVING SUM(item0.total) > ?
+          SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+          FROM purchase purchase0
+          WHERE purchase0.count > ?
+          GROUP BY purchase0.product_id
+          HAVING SUM(purchase0.total) > ?
         """,
         value = Vector((1, 888.0), (5, 10000.0))
       )
@@ -232,100 +232,100 @@ object SelectTests extends TestSuite {
 
     test("joins"){
       test("joinFilter") - checker(
-        Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
+        Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
           .filter(_._1.name === "叉烧包")
       ).expect(
         sql = """
           SELECT
-            customer0.id as res__0__id,
-            customer0.name as res__0__name,
-            customer0.birthdate as res__0__birthdate,
-            purchase_order1.id as res__1__id,
-            purchase_order1.customer_id as res__1__customer_id,
-            purchase_order1.order_date as res__1__order_date
-          FROM customer customer0
-          JOIN purchase_order purchase_order1 ON customer0.id = purchase_order1.customer_id
-          WHERE customer0.name = ?
+            buyer0.id as res__0__id,
+            buyer0.name as res__0__name,
+            buyer0.birthdate as res__0__birthdate,
+            shipping_info1.id as res__1__id,
+            shipping_info1.buyer_id as res__1__buyer_id,
+            shipping_info1.shipping_date as res__1__shipping_date
+          FROM buyer buyer0
+          JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          WHERE buyer0.name = ?
         """,
         value = Vector(
           (
-            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-            PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03")
+            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03")
           ),
           (
-            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-            PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
+            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
           )
         )
       )
 
       test("joinSelectFilter") - checker(
-        Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
+        Buyer.select.joinOn(ShippingInfo.select)(_.id === _.buyerId)
           .filter(_._1.name === "叉烧包")
       ).expect(
         sql = """
           SELECT
-            customer0.id as res__0__id,
-            customer0.name as res__0__name,
-            customer0.birthdate as res__0__birthdate,
-            purchase_order1.id as res__1__id,
-            purchase_order1.customer_id as res__1__customer_id,
-            purchase_order1.order_date as res__1__order_date
-          FROM customer customer0
-          JOIN purchase_order purchase_order1 ON customer0.id = purchase_order1.customer_id
-          WHERE customer0.name = ?
+            buyer0.id as res__0__id,
+            buyer0.name as res__0__name,
+            buyer0.birthdate as res__0__birthdate,
+            shipping_info1.id as res__1__id,
+            shipping_info1.buyer_id as res__1__buyer_id,
+            shipping_info1.shipping_date as res__1__shipping_date
+          FROM buyer buyer0
+          JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          WHERE buyer0.name = ?
         """,
         value = Vector(
           (
-            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-            PurchaseOrder(id = 1, customerId = 2, orderDate = "2010-02-03")
+            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03")
           ),
           (
-            Customer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-            PurchaseOrder(id = 3, customerId = 2, orderDate = "2012-05-06")
+            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
           )
         )
       )
 
       test("joinFilterMap") - checker(
-        Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
+        Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
           .filter(_._1.name === "James Bond")
-          .map(_._2.orderDate)
+          .map(_._2.shippingDate)
       ).expect(
         sql = """
-          SELECT purchase_order1.order_date as res
-          FROM customer customer0
-          JOIN purchase_order purchase_order1 ON customer0.id = purchase_order1.customer_id
-          WHERE customer0.name = ?
+          SELECT shipping_info1.shipping_date as res
+          FROM buyer buyer0
+          JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          WHERE buyer0.name = ?
         """,
         value = Vector("2012-04-05")
       )
 
       test("flatMap") - checker(
-        Customer.select.flatMap(c => PurchaseOrder.select.map((c, _)))
-          .filter{case (c, p) => c.id === p.customerId && c.name === "James Bond"}
-          .map(_._2.orderDate)
+        Buyer.select.flatMap(c => ShippingInfo.select.map((c, _)))
+          .filter{case (c, p) => c.id === p.buyerId && c.name === "James Bond"}
+          .map(_._2.shippingDate)
       ).expect(
         sql = """
-          SELECT purchase_order1.order_date as res
-          FROM customer customer0, purchase_order purchase_order1
-          WHERE customer0.id = purchase_order1.customer_id
-          AND customer0.name = ?
+          SELECT shipping_info1.shipping_date as res
+          FROM buyer buyer0, shipping_info shipping_info1
+          WHERE buyer0.id = shipping_info1.buyer_id
+          AND buyer0.name = ?
         """,
         value = Vector("2012-04-05")
       )
       test("flatMap") - checker(
-        Customer.select.flatMap(c =>
-          PurchaseOrder.select
-            .filter { p => c.id === p.customerId && c.name === "James Bond" }
-        ).map(_.orderDate)
+        Buyer.select.flatMap(c =>
+          ShippingInfo.select
+            .filter { p => c.id === p.buyerId && c.name === "James Bond" }
+        ).map(_.shippingDate)
 
       ).expect(
         sql = """
-          SELECT purchase_order1.order_date as res
-          FROM customer customer0, purchase_order purchase_order1
-          WHERE customer0.id = purchase_order1.customer_id
-          AND customer0.name = ?
+          SELECT shipping_info1.shipping_date as res
+          FROM buyer buyer0, shipping_info shipping_info1
+          WHERE buyer0.id = shipping_info1.buyer_id
+          AND buyer0.name = ?
         """,
         value = Vector("2012-04-05")
       )
@@ -335,14 +335,14 @@ object SelectTests extends TestSuite {
 //    test("unionAll") - ???
     test("distinct"){
       test("nondistinct") - checker(
-        Item.select.map(_.orderId)
+        Purchase.select.map(_.shippingInfoId)
       ).expect(
-        sql = "SELECT item0.order_id as res FROM item item0",
+        sql = "SELECT purchase0.shipping_info_id as res FROM purchase purchase0",
         value = Vector(1, 1, 1, 2, 2, 3, 3)
       )
 
-      test("distinct") - checker(Item.select.map(_.orderId).distinct).expect(
-        sql = "SELECT DISTINCT item0.order_id as res FROM item item0",
+      test("distinct") - checker(Purchase.select.map(_.shippingInfoId).distinct).expect(
+        sql = "SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0",
         value = Vector(1, 2, 3)
       )
     }

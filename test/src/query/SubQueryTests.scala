@@ -11,13 +11,13 @@ object SubQueryTests extends TestSuite {
   val checker = new TestDb("subquerytests")
   def tests = Tests {
     test("sortTakeJoin") - checker(
-      Item.select
+      Purchase.select
         .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
-        .map{case (item, product) => item.total}
+        .map{case (purchase, product) => purchase.total}
     ).expect(
       sql = """
-        SELECT item0.total as res
-        FROM item item0
+        SELECT purchase0.total as res
+        FROM purchase purchase0
         JOIN (SELECT
             product0.id as res__id,
             product0.sku as res__sku,
@@ -26,18 +26,18 @@ object SubQueryTests extends TestSuite {
           FROM product product0
           ORDER BY product0.price DESC
           LIMIT 1) subquery1
-        ON item0.product_id = subquery1.res__id
+        ON purchase0.product_id = subquery1.res__id
       """,
       value = Vector(10000.0)
     )
 
     test("sortTakeFrom") - checker(
       Product.select.sortBy(_.price).desc.take(1)
-        .joinOn(Item.select)(_.id === _.productId)
-        .map{case (product, item) => item.total}
+        .joinOn(Purchase.select)(_.id === _.productId)
+        .map{case (product, purchase) => purchase.total}
     ).expect(
       sql = """
-        SELECT item1.total as res
+        SELECT purchase1.total as res
         FROM (SELECT
             product0.id as res__id,
             product0.sku as res__sku,
@@ -46,20 +46,20 @@ object SubQueryTests extends TestSuite {
           FROM product product0
           ORDER BY product0.price DESC
           LIMIT 1) subquery0
-        JOIN item item1 ON subquery0.res__id = item1.product_id
+        JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
       """,
       value = Vector(10000.0)
     )
 
     test("sortTakeFromAndJoin") - checker(
       Product.select.sortBy(_.price).desc.take(3)
-        .joinOn(Item.select.sortBy(_.quantity).desc.take(3))(_.id === _.productId)
-        .map{case (product, item) => (product.name, item.quantity) }
+        .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
+        .map{case (product, purchase) => (product.name, purchase.count) }
     ).expect(
       sql = """
         SELECT
           subquery0.res__name as res__0,
-          subquery1.res__quantity as res__1
+          subquery1.res__count as res__1
         FROM (SELECT
             product0.id as res__id,
             product0.sku as res__sku,
@@ -69,13 +69,13 @@ object SubQueryTests extends TestSuite {
           ORDER BY product0.price DESC
           LIMIT 3) subquery0
         JOIN (SELECT
-            item0.id as res__id,
-            item0.order_id as res__order_id,
-            item0.product_id as res__product_id,
-            item0.quantity as res__quantity,
-            item0.total as res__total
-          FROM item item0
-          ORDER BY item0.quantity DESC
+            purchase0.id as res__id,
+            purchase0.shipping_info_id as res__shipping_info_id,
+            purchase0.product_id as res__product_id,
+            purchase0.count as res__count,
+            purchase0.total as res__total
+          FROM purchase purchase0
+          ORDER BY purchase0.count DESC
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
@@ -102,18 +102,18 @@ object SubQueryTests extends TestSuite {
     )
 
     test("sortGroupBy") - checker(
-      Item.select.sortBy(_.quantity).take(5).groupBy(_.productId)(_.sumBy(_.total))
+      Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
     ).expect(
       sql = """
         SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
         FROM (SELECT
-            item0.id as res__id,
-            item0.order_id as res__order_id,
-            item0.product_id as res__product_id,
-            item0.quantity as res__quantity,
-            item0.total as res__total
-          FROM item item0
-          ORDER BY item0.quantity
+            purchase0.id as res__id,
+            purchase0.shipping_info_id as res__shipping_info_id,
+            purchase0.product_id as res__product_id,
+            purchase0.count as res__count,
+            purchase0.total as res__total
+          FROM purchase purchase0
+          ORDER BY purchase0.count
           LIMIT 5) subquery0
         GROUP BY subquery0.res__product_id
       """,
@@ -121,7 +121,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("groupByJoin") - checker(
-      Item.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product.select)(_._1 === _.id)
+      Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product.select)(_._1 === _.id)
         .map{case ((productId, total), product) => (product.name, total)}
     ).expect(
       sql = """
@@ -129,10 +129,10 @@ object SubQueryTests extends TestSuite {
           product1.name as res__0,
           subquery0.res__1 as res__1
         FROM (SELECT
-            item0.product_id as res__0,
-            SUM(item0.total) as res__1
-          FROM item item0
-          GROUP BY item0.product_id) subquery0
+            purchase0.product_id as res__0,
+            SUM(purchase0.total) as res__1
+          FROM purchase purchase0
+          GROUP BY purchase0.product_id) subquery0
         JOIN product product1 ON subquery0.res__0 = product1.id
       """,
       value = Vector(
@@ -141,61 +141,61 @@ object SubQueryTests extends TestSuite {
         ("Socks", 15.7),
         ("Skateboard", 493.8),
         ("Camera", 10000.0),
-        ("Cookie", 13.0)
+        ("Cookie", 1.3)
       )
     )
 
     test("subqueryInFilter") - checker(
-      Customer.select.filter(c => PurchaseOrder.select.filter(p => c.id === p.customerId).size === 0)
+      Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0)
     ).expect(
       sql =
         """
         SELECT
-          customer0.id as res__id,
-          customer0.name as res__name,
-          customer0.birthdate as res__birthdate
-        FROM customer customer0
+          buyer0.id as res__id,
+          buyer0.name as res__name,
+          buyer0.birthdate as res__birthdate
+        FROM buyer buyer0
         WHERE (SELECT
             COUNT(1) as res
-            FROM purchase_order purchase_order0
-            WHERE customer0.id = purchase_order0.customer_id) = ?
+            FROM shipping_info shipping_info0
+            WHERE buyer0.id = shipping_info0.buyer_id) = ?
       """,
-      value = Vector(Customer(3, "Li Haoyi", "1965-08-09"))
+      value = Vector(Buyer(3, "Li Haoyi", "1965-08-09"))
     )
     test("subqueryInMap") - checker(
-      Customer.select.map(c => (c, PurchaseOrder.select.filter(p => c.id === p.customerId).size))
+      Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size))
     ).expect(
       sql =
         """
         SELECT
-          customer0.id as res__0__id,
-          customer0.name as res__0__name,
-          customer0.birthdate as res__0__birthdate,
-          (SELECT COUNT(1) as res FROM purchase_order purchase_order0 WHERE customer0.id = purchase_order0.customer_id) as res__1
-        FROM customer customer0
+          buyer0.id as res__0__id,
+          buyer0.name as res__0__name,
+          buyer0.birthdate as res__0__birthdate,
+          (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
+        FROM buyer buyer0
       """,
       value = Vector(
-        (Customer(1, "James Bond", "2001-02-03"), 1),
-        (Customer(2, "叉烧包", "1923-11-12"), 2),
-        (Customer(3, "Li Haoyi", "1965-08-09"), 0)
+        (Buyer(1, "James Bond", "2001-02-03"), 1),
+        (Buyer(2, "叉烧包", "1923-11-12"), 2),
+        (Buyer(3, "Li Haoyi", "1965-08-09"), 0)
       )
     )
     test("subqueryInMapNested") - checker(
-      Customer.select.map(c => (c, PurchaseOrder.select.filter(p => c.id === p.customerId).size === 1))
+      Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1))
     ).expect(
       sql =
         """
         SELECT
-          customer0.id as res__0__id,
-          customer0.name as res__0__name,
-          customer0.birthdate as res__0__birthdate,
-          (SELECT COUNT(1) as res FROM purchase_order purchase_order0 WHERE customer0.id = purchase_order0.customer_id) = ? as res__1
-        FROM customer customer0
+          buyer0.id as res__0__id,
+          buyer0.name as res__0__name,
+          buyer0.birthdate as res__0__birthdate,
+          (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
+        FROM buyer buyer0
       """,
       value = Vector(
-        (Customer(1, "James Bond", "2001-02-03"), true),
-        (Customer(2, "叉烧包", "1923-11-12"), false),
-        (Customer(3, "Li Haoyi", "1965-08-09"), false)
+        (Buyer(1, "James Bond", "2001-02-03"), true),
+        (Buyer(2, "叉烧包", "1923-11-12"), false),
+        (Buyer(3, "Li Haoyi", "1965-08-09"), false)
       )
     )
   }

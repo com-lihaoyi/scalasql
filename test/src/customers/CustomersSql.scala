@@ -1,4 +1,4 @@
-package usql.customers
+package usql.buyers
 import usql._
 
 case class Product[T[_]](id: T[Int],
@@ -9,27 +9,27 @@ object Product extends Table[Product]{
   val metadata = initMetadata()
 }
 
-case class Customer[T[_]](id: T[Int],
+case class Buyer[T[_]](id: T[Int],
                           name: T[String],
                           birthdate: T[String])
-object Customer extends Table[Customer]{
+object Buyer extends Table[Buyer]{
   val metadata = initMetadata()
 }
 
 
-case class PurchaseOrder[T[_]](id: T[Int],
-                               customerId: T[Int],
-                               orderDate: T[String])
-object PurchaseOrder extends Table[PurchaseOrder]{
+case class ShippingInfo[T[_]](id: T[Int],
+                               buyerId: T[Int],
+                               shippingDate: T[String])
+object ShippingInfo extends Table[ShippingInfo]{
   val metadata = initMetadata()
 }
 
 
-case class Item[T[_]](id: T[Int],
-                      orderId: T[Int],
+case class Purchase[T[_]](id: T[Int],
+                      shippingInfoId: T[Int],
                       productId: T[Int],
-                      quantity: T[Int],
+                      count: T[Int],
                       total: T[Double])
-object Item extends Table[Item]{
+object Purchase extends Table[Purchase]{
   val metadata = initMetadata()
 }
