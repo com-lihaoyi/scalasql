@@ -42,37 +42,42 @@ class DatabaseApi(connection: java.sql.Connection,
       case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
     }
 
-    val resultSet: ResultSet = statement.executeQuery()
+    if (qr.isExecuteUpdate){
 
-    val jsonRes = collection.mutable.ArrayBuffer.empty[ujson.Value]
-    try {
-      while (resultSet.next()) {
-        val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
-        val meta = resultSet.getMetaData
+      statement.executeUpdate().asInstanceOf[V]
+    }else {
+      val resultSet: ResultSet = statement.executeQuery()
 
-        for (i <- Range(0, meta.getColumnCount)) {
-          val v = resultSet.getString(i + 1) match{
-            case null => ujson.Null
-            case s => ujson.Str(s)
+      val jsonRes = collection.mutable.ArrayBuffer.empty[ujson.Value]
+      try {
+        while (resultSet.next()) {
+          val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
+          val meta = resultSet.getMetaData
+
+          for (i <- Range(0, meta.getColumnCount)) {
+            val v = resultSet.getString(i + 1) match{
+              case null => ujson.Null
+              case s => ujson.Str(s)
+            }
+            kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
           }
-          kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
-        }
 
-        val json = FlatJson.unflatten(kvs.toSeq)
-        def unMapJson(j: ujson.Value): ujson.Value = j match{
-          case ujson.Obj(kvs) => ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
-          case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
-          case j => j
-        }
+          val json = FlatJson.unflatten(kvs.toSeq)
+          def unMapJson(j: ujson.Value): ujson.Value = j match{
+            case ujson.Obj(kvs) => ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
+            case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
+            case j => j
+          }
 
-        val unMappedJson = unMapJson(json)
-        jsonRes.append(unMappedJson)
+          val unMappedJson = unMapJson(json)
+          jsonRes.append(unMappedJson)
+        }
+      } finally {
+        resultSet.close()
+        statement.close()
       }
-    } finally {
-      resultSet.close()
-      statement.close()
-    }
 
-    OptionPickler.read[V](qr.unpack(new ujson.Arr(jsonRes)))(qr.valueReader)
+      OptionPickler.read[V](qr.unpack(new ujson.Arr(jsonRes)))(qr.valueReader)
+    }
   }
 }

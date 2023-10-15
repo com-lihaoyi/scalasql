@@ -9,7 +9,37 @@ import ExprOps._
 object UpdateTests extends TestSuite {
   def tests = Tests {
     val checker = new TestDb("querytests")
-    test("simple") - {
+    test("update") - {
+      checker(Customer.update.filter(_.name === "John Doe").set(_.birthdate -> "2019-04-07"))
+        .expect(
+          sql = "UPDATE customer SET birthdate = ? WHERE customer.name = ?",
+          value = 1
+        )
+
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+        value = Vector("2019-04-07")
+      )
+
+      checker(Customer.select.filter(_.name === "Cosme Fulanito").map(_.birthdate)).expect(
+        value = Vector("1956-05-12") // not updated
+      )
+    }
+
+    test("bulk") - {
+      checker(Customer.update.set(_.birthdate -> "2019-04-07")).expect(
+        sql = "UPDATE customer SET birthdate = ?",
+        value = 3
+      )
+
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
+        value = Vector("2019-04-07")
+      )
+      checker(Customer.select.filter(_.name === "Cosme Fulanito").map(_.birthdate)).expect(
+        value = Vector("2019-04-07")
+      )
+    }
+
+    test("returning") - {
       checker(
         Customer.update
           .filter(_.name === "John Doe")

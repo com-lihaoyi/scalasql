@@ -2,7 +2,8 @@ package usql.query
 
 import usql.{OptionPickler, Queryable}
 import usql.query.Select.Join
-import usql.renderer.{Context, SqlStr, UpdateReturningToSql}
+import usql.query.UpdateReturning.UpdateReturningQueryable
+import usql.renderer.{Context, SqlStr, UpdateToSql}
 
 /**
  * Syntax reference
@@ -53,24 +54,20 @@ object Update {
   def fromTable[Q](expr: Q, table: Select.TableRef)(implicit qr: Queryable[Q, _]): Update[Q] = {
     Update(expr, table, Nil, Nil, Nil)
   }
-}
 
-case class UpdateReturning[Q, R](update: Update[_], returning: Q)(implicit val qr: Queryable[Q, R])
+  implicit def UpdateQueryable[Q](implicit qr: Queryable[Q, _]): Queryable[Update[Q], Int] =
+    new UpdateQueryable[Q]()(qr)
 
-object UpdateReturning{
-  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[UpdateReturning[Q, R], Seq[R]] =
-    new UpdateReturningQueryable[Q, R]()(qr)
-
-  class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]] {
-    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
+  class UpdateQueryable[Q](implicit qr: Queryable[Q, _]) extends Queryable[Update[Q], Int] {
+    override def isExecuteUpdate = true
+    def walk(ur: Update[Q]): Seq[(List[String], Expr[_])] = Nil
 
     override def unpack(t: ujson.Value) = t
 
-    def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+    def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
-    override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: Context): SqlStr = {
-      UpdateReturningToSql.apply(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
+    override def toSqlQuery(q: Update[Q], ctx0: Context): SqlStr = {
+      UpdateToSql(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
     }
   }
-
 }

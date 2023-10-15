@@ -12,6 +12,7 @@ import usql.query.Expr
  * tree-shaped blob back into a return value via [[valueReader]]
  */
 trait Queryable[Q, R]{
+  def isExecuteUpdate: Boolean = false
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader: Reader[R]
   def unpack(t: ujson.Value): ujson.Value = t.arr.head
