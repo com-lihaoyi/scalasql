@@ -17,8 +17,8 @@ case class Update[Q](expr: Q,
   def filter(f: Q => Expr[Boolean]): Update[Q] = {
     this.copy(where = where ++ Seq(f(expr)))
   }
-  def set(f: Q => (Expr[_], Expr[_])): Update[Q] = {
-    this.copy(set0 = Seq(f(expr)))
+  def set(f: (Q => (Expr[_], Expr[_]))*): Update[Q] = {
+    this.copy(set0 = f.map(_(expr)))
   }
 
   def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): UpdateReturning[Q2, R] = {

@@ -32,11 +32,13 @@ class TestDb(name: String) {
   db.runRaw(os.read(os.pwd / "test" / "resources" / "customers.sql"))
   def apply[T, V](query: T)(implicit qr: Queryable[T, V])  = new Apply(query)
   class Apply[T, V](query: T)(implicit qr: Queryable[T, V]) {
-    def expect(sql: String, value: V) = {
-      val sqlResult = db.toSqlQuery(query)
-//       pprint.log(sqlResult)
-      val expectedSql = sql.trim.replaceAll("\\s+", " ")
-      assert(sqlResult == expectedSql, pprint.apply(sqlResult))
+    def expect(sql: String = null, value: V) = {
+      if (sql != null){
+        val sqlResult = db.toSqlQuery(query)
+        //       pprint.log(sqlResult)
+        val expectedSql = sql.trim.replaceAll("\\s+", " ")
+        assert(sqlResult == expectedSql, pprint.apply(sqlResult))
+      }
 
       val result = db.run(query)
       lazy val pprinter: PPrinter = PPrinter.Color.copy(
