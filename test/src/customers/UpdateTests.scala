@@ -20,7 +20,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -36,11 +36,11 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
         value = Nil
       )
 
-      checker(Customer.query.filter(_.name === "John Dee").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "John Dee").map(_.birthdate)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -56,11 +56,11 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
         value = Nil
       )
 
-      checker(Customer.query.filter(_.name === "JOHN DOE").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "JOHN DOE").map(_.birthdate)).expect(
         value =  Vector("1960-10-30")
       )
     }
@@ -69,7 +69,7 @@ object UpdateTests extends TestSuite {
       checker(
         Customer.update
           .filter(_.name === "John Doe")
-          .joinOn(PurchaseOrder.query)(_.id === _.customerId)
+          .joinOn(PurchaseOrder.select)(_.id === _.customerId)
           .set(c => c._1.birthdate -> c._2.orderDate)
           .returning(_._1.id)
       ).expect(
@@ -83,7 +83,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.query.filter(_.name === "John Doe").map(_.birthdate)).expect(
+      checker(Customer.select.filter(_.name === "John Doe").map(_.birthdate)).expect(
         value = Vector("2018-02-13")
       )
     }
@@ -92,9 +92,9 @@ object UpdateTests extends TestSuite {
       checker(
         Customer.update
           .filter(_.name === "John Doe")
-          .joinOn(PurchaseOrder.query)(_.id === _.customerId)
-          .joinOn(Item.query)(_._2.id === _.orderId)
-          .joinOn(Product.query)(_._2.productId === _.id)
+          .joinOn(PurchaseOrder.select)(_.id === _.customerId)
+          .joinOn(Item.select)(_._2.id === _.orderId)
+          .joinOn(Product.select)(_._2.productId === _.id)
           .set(c => c._1._1._1.name -> c._2.name)
           .returning(_._1._1._1.id)
       ).expect(
@@ -110,7 +110,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Customer.query.filter(_.id === 1).map(_.name)).expect(
+      checker(Customer.select.filter(_.id === 1).map(_.name)).expect(
         value = Vector("Cell Phone")
       )
     }

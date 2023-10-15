@@ -1,14 +1,14 @@
 package usql
 
 import usql.SqlStr.SqlStringSyntax
-import Query._
-trait QueryLike[Q]{
+import Select._
+trait SelectLike[Q]{
   def expr: Q
   def queryExpr[V](f: QueryToSql.Context => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V]
 }
 
-class QueryProxy[Q](val expr: Q) extends QueryLike [Q]{
+class SelectProxy[Q](val expr: Q) extends SelectLike [Q]{
   def queryExpr[V](f: QueryToSql.Context => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V]{implicit c => f(c)}
@@ -30,17 +30,18 @@ class QueryProxy[Q](val expr: Q) extends QueryLike [Q]{
  * Good syntax reference:
  *
  * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
+ * https://www.postgresql.org/docs/current/sql-select.html
  *
  */
-case class Query[Q](expr: Q,
-                    from: Seq[From],
-                    joins: Seq[Join],
-                    where: Seq[Expr[_]],
-                    groupBy0: Option[GroupBy],
-                    orderBy: Option[OrderBy],
-                    limit: Option[Int],
-                    offset: Option[Int])
-                   (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with QueryLike[Q] with From{
+case class Select[Q](expr: Q,
+                     from: Seq[From],
+                     joins: Seq[Join],
+                     where: Seq[Expr[_]],
+                     groupBy0: Option[GroupBy],
+                     orderBy: Option[OrderBy],
+                     limit: Option[Int],
+                     offset: Option[Int])
+                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with SelectLike[Q] with From{
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
   def queryExpr[V](f: QueryToSql.Context => SqlStr)
@@ -52,14 +53,14 @@ case class Query[Q](expr: Q,
 
   def subquery(implicit qr: Queryable[Q, _]) = new SubqueryRef[Q](this, qr)
 
-  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Query[V] = {
+  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Select[V] = {
     copy(expr = f(expr))
   }
 
-  def flatMap[V](f: Q => Query[V])(implicit qr: Queryable[V, _]): Query[V] = {
+  def flatMap[V](f: Q => Select[V])(implicit qr: Queryable[V, _]): Select[V] = {
     val other = f(expr)
     if (simple(other.groupBy0, other.orderBy, other.limit, other.offset)) {
-      Query(
+      Select(
         other.expr,
         from ++ other.from,
         joins ++ other.joins,
@@ -74,17 +75,17 @@ case class Query[Q](expr: Q,
     }
   }
 
-  def filter(f: Q => Expr[Boolean]): Query[Q] = {
+  def filter(f: Q => Expr[Boolean]): Select[Q] = {
     (groupBy0.isEmpty, simple(limit, offset)) match{
       case (true, true) => copy(where = where ++ Seq(f(expr)))
       case (false, true) => copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
-      case (false, _) => Query(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
+      case (false, _) => Select(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
     }
   }
 
   def sortBy(f: Q => Expr[_]) = {
     if (simple(limit, offset)) copy(orderBy = Some(OrderBy(f(expr), None, None)))
-    else Query(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
+    else Select(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
@@ -97,26 +98,26 @@ case class Query[Q](expr: Q,
 
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  def join[V](other: Query[V])
-             (implicit qr: Queryable[V, _]): Query[(Q, V)] = join0(other, None)
+  def join[V](other: Select[V])
+             (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other, None)
 
-  def aggregate[E, V](f: QueryProxy[Q] => E)
+  def aggregate[E, V](f: SelectProxy[Q] => E)
                      (implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V]{implicit ctx: QueryToSql.Context =>
-      this.copy(expr = f(new QueryProxy[Q](expr))).toSqlExpr
+      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlExpr
     }
   }
 
   def groupBy[K, V](groupKey: Q => K)
-                   (groupAggregate: QueryProxy[Q] => V)
-                   (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Query[(K, V)] = {
+                   (groupAggregate: SelectProxy[Q] => V)
+                   (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Select[(K, V)] = {
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
-    val newExpr = (groupKeyValue, groupAggregate(new QueryProxy[Q](this.expr)))
+    val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
     val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
     if (simple(orderBy, limit, offset)) this.copy(expr = newExpr, groupBy0 = groupByOpt)
-    else Query(
+    else Select(
       expr = newExpr,
       from = Seq(new SubqueryRef[Q](this, qr)),
       joins = Nil,
@@ -128,19 +129,19 @@ case class Query[Q](expr: Q,
     )
   }
 
-  def joinOn[V](other: Query[V])
+  def joinOn[V](other: Select[V])
                (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Query[(Q, V)] = join0(other, Some(on))
+               (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other, Some(on))
 
-  def join0[V](other: Query[V],
+  def join0[V](other: Select[V],
                on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Query[(Q, V)] = {
+              (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
 
     val thisTrivial = simple(this.groupBy0, this.orderBy, this.limit, this.offset)
 
     val otherTrivial = simple(other.groupBy0, other.orderBy, other.limit, other.offset)
 
-    Query(
+    Select(
       expr = (expr, other.expr),
       from = if (thisTrivial) from else Seq(subquery),
       joins = (if (thisTrivial) joins else Nil) ++
@@ -159,9 +160,9 @@ case class Query[Q](expr: Q,
   }
 }
 
-object Query {
+object Select {
   def fromTable[T](e: T, table: TableRef)(implicit qr: Queryable[T, _]) = {
-    Query(e, Seq(table), Nil, Nil, None, None, None, None)
+    Select(e, Seq(table), Nil, Nil, None, None, None, None)
   }
 
   case class OrderBy(expr: Expr[_],
@@ -184,7 +185,7 @@ object Query {
   class TableRef(val value: Table.Base) extends From{
     override def toString = s"TableRef(${value.tableName})"
   }
-  class SubqueryRef[T](val value: Query[T], val qr: Queryable[T, _]) extends From
+  class SubqueryRef[T](val value: Select[T], val qr: Queryable[T, _]) extends From
 
   case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
 

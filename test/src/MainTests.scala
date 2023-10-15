@@ -84,7 +84,7 @@ object MainTests extends TestSuite {
     }
 
     test("city") {
-      val query = City.query
+      val query = City.select
       val sql = db.toSqlQuery(query)
       assert(
         sql ==
@@ -143,7 +143,7 @@ object MainTests extends TestSuite {
       assert(res == expected)
     }
     test("country") {
-      val query = Country.query
+      val query = Country.select
       val sql = db.toSqlQuery(query)
 
       assert(
@@ -169,7 +169,7 @@ object MainTests extends TestSuite {
         """.trim.replaceAll("\\s+", " ")
       )
 
-      val res = db.run(Country.query).take(2)
+      val res = db.run(Country.select).take(2)
       val expected = Seq[Country[Val]](
         Country(
           code = "ABW",
@@ -211,7 +211,7 @@ object MainTests extends TestSuite {
     }
 
     test("countryLanguage") {
-      val query = CountryLanguage.query
+      val query = CountryLanguage.select
       val sql = db.toSqlQuery(query)
       assert(
         sql ==
@@ -264,7 +264,7 @@ object MainTests extends TestSuite {
 
     test("queryFilter") {
       test("singleName") {
-        val query = City.query.filter(_.name === "Singapore")
+        val query = City.select.filter(_.name === "Singapore")
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -295,7 +295,7 @@ object MainTests extends TestSuite {
       }
 
       test("singleId") {
-        val query = City.query.filter(_.id === 3208)
+        val query = City.select.filter(_.id === 3208)
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -326,7 +326,7 @@ object MainTests extends TestSuite {
       }
 
       test("singlePopulation") {
-        val query = City.query.filter(_.population > 9000000)
+        val query = City.select.filter(_.population > 9000000)
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -416,7 +416,7 @@ object MainTests extends TestSuite {
         )
 
         test("combined") {
-          val query = City.query.filter(c => c.population > 5000000 && c.countryCode === "CHN")
+          val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
           val sql = db.toSqlQuery(query)
           assert(
             sql ==
@@ -439,7 +439,7 @@ object MainTests extends TestSuite {
         }
 
         test("separate") {
-          val query = City.query.filter(_.population > 5000000).filter(_.countryCode === "CHN")
+          val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
           val sql = db.toSqlQuery(query)
           assert(
             sql ==
@@ -464,7 +464,7 @@ object MainTests extends TestSuite {
     }
 
     test("lifting"){
-      def find(cityId: Int) = db.run(City.query.filter(_.id === cityId))
+      def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
       assert(find(3208) == List(City[Val](3208, "Singapore", "SGP", "�", 4017733)))
       assert(find(3209) == List(City[Val](3209, "Bratislava", "SVK", "Bratislava", 448292)))
@@ -472,7 +472,7 @@ object MainTests extends TestSuite {
 
     test("mapping"){
       test("tuple2") {
-        val query = Country.query.map(c => (c.name, c.continent))
+        val query = Country.select.map(c => (c.name, c.continent))
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -497,7 +497,7 @@ object MainTests extends TestSuite {
       }
 
       test("tuple3"){
-        val query = Country.query.map(c => (c.name, c.continent, c.population))
+        val query = Country.select.map(c => (c.name, c.continent, c.population))
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -523,7 +523,7 @@ object MainTests extends TestSuite {
       }
 
       test("interpolateInMap"){
-        val query = Country.query.filter(_.name === "Singapore").map(c => c.population * 2)
+        val query = Country.select.filter(_.name === "Singapore").map(c => c.population * 2)
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -541,7 +541,7 @@ object MainTests extends TestSuite {
       }
 
       test("interpolateInMap2"){
-        val query = Country.query.filter(_.name === "Singapore").map(c => (c.name, c.population * 2))
+        val query = Country.select.filter(_.name === "Singapore").map(c => (c.name, c.population * 2))
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -560,7 +560,7 @@ object MainTests extends TestSuite {
       }
 
       test("heterogenousTuple"){
-        val query = City.query.filter(_.name === "Singapore").map(c => (c, c.name, c.population * 2))
+        val query = City.select.filter(_.name === "Singapore").map(c => (c, c.name, c.population * 2))
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -598,7 +598,7 @@ object MainTests extends TestSuite {
       }
 
       test("filterMap"){
-        def findName(cityId: Int) = db.run(City.query.filter(_.id === cityId).map(_.name))
+        def findName(cityId: Int) = db.run(City.select.filter(_.id === cityId).map(_.name))
 
         assert(findName(3208) == List("Singapore"))
         assert(findName(3209) == List("Bratislava"))
@@ -607,7 +607,7 @@ object MainTests extends TestSuite {
 
     test("aggregate"){
       test("sum") {
-        val query = City.query.map(_.population).sum
+        val query = City.select.map(_.population).sum
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT SUM(city0.population) as res FROM city city0""")
@@ -617,7 +617,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("sumBy") {
-        val query = City.query.sumBy(_.population)
+        val query = City.select.sumBy(_.population)
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT SUM(city0.population) as res FROM city city0""")
@@ -627,7 +627,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("count") {
-        val query = Country.query.size
+        val query = Country.select.size
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT COUNT(1) as res FROM country country0""")
@@ -637,7 +637,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("min") {
-        val query = City.query.map(_.population).min
+        val query = City.select.map(_.population).min
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
@@ -647,7 +647,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("minBy") {
-        val query = City.query.minBy(_.population)
+        val query = City.select.minBy(_.population)
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
@@ -657,7 +657,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("max") {
-        val query = City.query.map(_.population).max
+        val query = City.select.map(_.population).max
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
@@ -667,7 +667,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("maxBy") {
-        val query = City.query.maxBy(_.population)
+        val query = City.select.maxBy(_.population)
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
@@ -677,7 +677,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("avg") {
-        val query = City.query.map(_.population).avg
+        val query = City.select.map(_.population).avg
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
@@ -687,7 +687,7 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("avgBy") {
-        val query = City.query.avgBy(_.population)
+        val query = City.select.avgBy(_.population)
         val sql = db.toSqlQuery(query)
 
         assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
@@ -700,7 +700,7 @@ object MainTests extends TestSuite {
 
     test("sortLimitOffset") {
       test {
-        val query = City.query.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population))
+        val query = City.select.sortBy(_.population).desc.drop(5).take(5).map(c => (c.name, c.population))
         val sql = db.toSqlQuery(query)
 
         assert(
@@ -727,7 +727,7 @@ object MainTests extends TestSuite {
       }
 
       test {
-        val query = City.query.sortBy(_.population).asc.take(5).map(c => (c.name, c.population))
+        val query = City.select.sortBy(_.population).asc.take(5).map(c => (c.name, c.population))
         val sql = db.toSqlQuery(query)
         assert(
           sql ==
@@ -755,8 +755,8 @@ object MainTests extends TestSuite {
 
     test("joins"){
       test {
-        val query = City.query
-          .joinOn(Country.query)(_.countryCode === _.code)
+        val query = City.select
+          .joinOn(Country.select)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Aruba" }
         val sql = db.toSqlQuery(query)
         assert(
@@ -826,8 +826,8 @@ object MainTests extends TestSuite {
       }
 
       test{
-        val query = City.query
-          .joinOn(Country.query)(_.countryCode === _.code)
+        val query = City.select
+          .joinOn(Country.select)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Malaysia" }
           .map { case (city, country) => (city.name, country.name) }
 
@@ -872,8 +872,8 @@ object MainTests extends TestSuite {
     }
     test("flatMap"){
       test {
-        val query = City.query
-          .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+        val query = City.select
+          .flatMap(city => Country.select.map(country => (city.countryCode, country.code, country.name, city.name)))
           .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
             cityCountryCode === countryCode && countryName === "Aruba"
           }
@@ -905,8 +905,8 @@ object MainTests extends TestSuite {
       }
 
       test{
-        val query = City.query
-          .flatMap(city => Country.query.map(country => (city.countryCode, country.code, country.name, city.name)))
+        val query = City.select
+          .flatMap(city => Country.select.map(country => (city.countryCode, country.code, country.name, city.name)))
           .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
             cityCountryCode === countryCode && countryName === "Malaysia"
           }
@@ -954,8 +954,8 @@ object MainTests extends TestSuite {
 
     test("subquery") {
       test("join") {
-        val query = CountryLanguage.query
-          .joinOn(Country.query.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
+        val query = CountryLanguage.select
+          .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
           .map { case (language, country) => (language.language, country.name) }
 
         val sql = db.toSqlQuery(query)
@@ -1022,8 +1022,8 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("from") {
-        val query = Country.query.sortBy(_.population).desc.take(2)
-          .joinOn(CountryLanguage.query)(_.code === _.countryCode)
+        val query = Country.select.sortBy(_.population).desc.take(2)
+          .joinOn(CountryLanguage.select)(_.code === _.countryCode)
           .map { case (country, language) => (language.language, country.name) }
 
         val sql = db.toSqlQuery(query)
@@ -1088,8 +1088,8 @@ object MainTests extends TestSuite {
         assert(res == expected)
       }
       test("fromAndJoin") {
-        val query = Country.query.sortBy(_.population).desc.take(2)
-          .joinOn(City.query.sortBy(_.population).desc.take(20))(_.code === _.countryCode)
+        val query = Country.select.sortBy(_.population).desc.take(2)
+          .joinOn(City.select.sortBy(_.population).desc.take(20))(_.code === _.countryCode)
           .map { case (country, city) => (country.name, city.name) }
 
         val sql = db.toSqlQuery(query)
@@ -1146,7 +1146,7 @@ object MainTests extends TestSuite {
       }
 
       test("sortLimitSortLimit") {
-        val query = City.query.sortBy(_.population).desc.take(20).sortBy(_.population).asc.take(10).map(_.name)
+        val query = City.select.sortBy(_.population).desc.take(20).sortBy(_.population).asc.take(10).map(_.name)
 
         val sql = db.toSqlQuery(query)
         assert(

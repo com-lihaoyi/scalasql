@@ -12,8 +12,8 @@ object SubQueryTests extends TestSuite {
   val checker = new TestDb("subquerytests")
   def tests = Tests {
     test("sortTakeJoin") - checker(
-      Item.query
-        .joinOn(Product.query.sortBy(_.price).desc.take(1))(_.productId === _.id)
+      Item.select
+        .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
         .map{case (item, product) => item.total}
     ).expect(
       sql = """
@@ -33,8 +33,8 @@ object SubQueryTests extends TestSuite {
     )
 
     test("sortTakeFrom") - checker(
-      Product.query.sortBy(_.price).desc.take(1)
-        .joinOn(Item.query)(_.id === _.productId)
+      Product.select.sortBy(_.price).desc.take(1)
+        .joinOn(Item.select)(_.id === _.productId)
         .map{case (product, item) => item.total}
     ).expect(
       sql = """
@@ -53,8 +53,8 @@ object SubQueryTests extends TestSuite {
     )
 
     test("sortTakeFromAndJoin") - checker(
-      Product.query.sortBy(_.price).desc.take(3)
-        .joinOn(Item.query.sortBy(_.quantity).desc.take(3))(_.id === _.productId)
+      Product.select.sortBy(_.price).desc.take(3)
+        .joinOn(Item.select.sortBy(_.quantity).desc.take(3))(_.id === _.productId)
         .map{case (product, item) => (product.name, item.quantity) }
     ).expect(
       sql = """
@@ -84,7 +84,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("sortLimitSortLimit") - checker(
-      Product.query.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
+      Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
     ).expect(
       sql = """
         SELECT subquery0.res__name as res
@@ -103,7 +103,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("sortGroupBy") - checker(
-      Item.query.sortBy(_.quantity).take(5).groupBy(_.productId)(_.sumBy(_.total))
+      Item.select.sortBy(_.quantity).take(5).groupBy(_.productId)(_.sumBy(_.total))
     ).expect(
       sql = """
         SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
@@ -122,7 +122,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("groupByJoin") - checker(
-      Item.query.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product.query)(_._1 === _.id)
+      Item.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product.select)(_._1 === _.id)
         .map{case ((productId, total), product) => (product.name, total)}
     ).expect(
       sql = """

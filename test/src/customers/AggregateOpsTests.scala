@@ -10,47 +10,47 @@ import utest._
 object AggregateOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
-    test("sum") - checker(Item.query.map(_.quantity).sum).expect(
+    test("sum") - checker(Item.select.map(_.quantity).sum).expect(
       sql = "SELECT SUM(item0.quantity) as res FROM item item0",
       value = 61
     )
 
-    test("min") - checker(Item.query.map(_.quantity).min).expect(
+    test("min") - checker(Item.select.map(_.quantity).min).expect(
       sql = "SELECT MIN(item0.quantity) as res FROM item item0",
       value = 2
     )
 
-    test("max") - checker(Item.query.map(_.quantity).max).expect(
+    test("max") - checker(Item.select.map(_.quantity).max).expect(
       sql = "SELECT MAX(item0.quantity) as res FROM item item0",
       value = 18
     )
 
-    test("avg") - checker(Item.query.map(_.quantity).avg).expect(
+    test("avg") - checker(Item.select.map(_.quantity).avg).expect(
       sql = "SELECT AVG(item0.quantity) as res FROM item item0",
       value = 8
     )
 
-    test("size") - checker(Item.query.size).expect(
+    test("size") - checker(Item.select.size).expect(
       sql = "SELECT COUNT(1) as res FROM item item0",
       value = 7
     )
 
-    test("sumBy") - checker(Item.query.sumBy(_.quantity)).expect(
+    test("sumBy") - checker(Item.select.sumBy(_.quantity)).expect(
       sql = "SELECT SUM(item0.quantity) as res FROM item item0",
       value = 61
     )
 
-    test("minBy") - checker(Item.query.minBy(_.quantity)).expect(
+    test("minBy") - checker(Item.select.minBy(_.quantity)).expect(
       sql = "SELECT MIN(item0.quantity) as res FROM item item0",
       value = 2
     )
 
-    test("maxBy") - checker(Item.query.maxBy(_.quantity)).expect(
+    test("maxBy") - checker(Item.select.maxBy(_.quantity)).expect(
       sql = "SELECT MAX(item0.quantity) as res FROM item item0",
       value = 18
     )
 
-    test("avgBy") - checker(Item.query.avgBy(_.quantity)).expect(
+    test("avgBy") - checker(Item.select.avgBy(_.quantity)).expect(
       sql = "SELECT AVG(item0.quantity) as res FROM item item0",
       value = 8
     )

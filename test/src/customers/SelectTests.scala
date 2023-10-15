@@ -7,7 +7,7 @@ import ExprOps._
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
-object QueryTests extends TestSuite {
+object SelectTests extends TestSuite {
   val checker = new TestDb("querytests")
   def tests = Tests {
     test("constant") - checker(Expr(1)).expect(
@@ -15,7 +15,7 @@ object QueryTests extends TestSuite {
       value = 1
     )
 
-    test("table") - checker(Customer.query).expect(
+    test("table") - checker(Customer.select).expect(
       sql = """
         SELECT
           customer0.id as res__id,
@@ -31,7 +31,7 @@ object QueryTests extends TestSuite {
     )
 
     test("filter"){
-      test("single") - checker(PurchaseOrder.query.filter(_.customerId === 2)).expect(
+      test("single") - checker(PurchaseOrder.select.filter(_.customerId === 2)).expect(
         sql = """
         SELECT
           purchase_order0.id as res__id,
@@ -47,7 +47,7 @@ object QueryTests extends TestSuite {
       )
 
       test("multiple") - checker(
-        PurchaseOrder.query.filter(_.customerId === 2).filter(_.orderDate === "2018-02-25")
+        PurchaseOrder.select.filter(_.customerId === 2).filter(_.orderDate === "2018-02-25")
       ).expect(
         sql = """
         SELECT
@@ -63,7 +63,7 @@ object QueryTests extends TestSuite {
         )
       )
       test("combined") - checker(
-        PurchaseOrder.query.filter(p => p.customerId === 2 && p.orderDate === "2018-02-25")
+        PurchaseOrder.select.filter(p => p.customerId === 2 && p.orderDate === "2018-02-25")
       ).expect(
         sql = """
           SELECT
@@ -81,17 +81,17 @@ object QueryTests extends TestSuite {
     }
 
     test("map"){
-      test("single") - checker(Customer.query.map(_.name)).expect(
+      test("single") - checker(Customer.select.map(_.name)).expect(
         sql = "SELECT customer0.name as res FROM customer customer0",
         value = Vector("John Doe", "Pepito Pérez", "Cosme Fulanito")
       )
 
-      test("tuple2") - checker(Customer.query.map(c => (c.name, c.id))).expect(
+      test("tuple2") - checker(Customer.select.map(c => (c.name, c.id))).expect(
         sql = "SELECT customer0.name as res__0, customer0.id as res__1 FROM customer customer0",
         value =  Vector(("John Doe", 1), ("Pepito Pérez", 2), ("Cosme Fulanito", 3))
       )
 
-      test("tuple3") - checker(Customer.query.map(c => (c.name, c.id, c.birthdate))).expect(
+      test("tuple3") - checker(Customer.select.map(c => (c.name, c.id, c.birthdate))).expect(
         sql = """
           SELECT
             customer0.name as res__0,
@@ -106,12 +106,12 @@ object QueryTests extends TestSuite {
         )
       )
 
-      test("interpolateInMap") - checker(Product.query.map(_.price * 2)).expect(
+      test("interpolateInMap") - checker(Product.select.map(_.price * 2)).expect(
         sql = "SELECT product0.price * ? as res FROM product product0",
         value = Vector(15.98, 703.92, 7.14, 262.0, 2000.0, 2.0)
       )
 
-      test("heterogenousTuple") - checker(Customer.query.map(c => (c.id, c))).expect(
+      test("heterogenousTuple") - checker(Customer.select.map(c => (c.id, c))).expect(
         sql = """
           SELECT
             customer0.id as res__0,
@@ -128,20 +128,20 @@ object QueryTests extends TestSuite {
       )
     }
 
-    test("filterMap") - checker(Product.query.filter(_.price < 100).map(_.name)).expect(
+    test("filterMap") - checker(Product.select.filter(_.price < 100).map(_.name)).expect(
       sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",
       value = Vector("Keyboard", "Shirt", "Spoon")
     )
 
     test("aggregate"){
       test("single") - checker(
-        Item.query.aggregate(_.sumBy(_.total))
+        Item.select.aggregate(_.sumBy(_.total))
       ).expect(
         sql = "SELECT SUM(item0.total) as res FROM item item0",
         value = 16144.74
       )
       test("multiple") - checker(
-        Item.query.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
+        Item.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
       ).expect(
         sql = "SELECT SUM(item0.total) as res__0, MAX(item0.total) as res__1 FROM item item0",
         value = (16144.74, 15000.0)
@@ -150,7 +150,7 @@ object QueryTests extends TestSuite {
 
     test("groupBy") - {
       test("simple") - checker(
-        Item.query.groupBy(_.productId)(_.sumBy(_.total))
+        Item.select.groupBy(_.productId)(_.sumBy(_.total))
       ).expect(
         sql = """
           SELECT item0.product_id as res__0, SUM(item0.total) as res__1
@@ -161,7 +161,7 @@ object QueryTests extends TestSuite {
       )
 
       test("having") - checker(
-        Item.query.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
+        Item.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
       ).expect(
         sql = """
           SELECT item0.product_id as res__0, SUM(item0.total) as res__1
@@ -173,7 +173,7 @@ object QueryTests extends TestSuite {
       )
 
       test("filterHaving") - checker(
-        Item.query.filter(_.quantity > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
+        Item.select.filter(_.quantity > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
       ).expect(
         sql = """
           SELECT item0.product_id as res__0, SUM(item0.total) as res__1
@@ -187,42 +187,42 @@ object QueryTests extends TestSuite {
     }
 
     test("sort") {
-      test("sort") - checker(Product.query.sortBy(_.price).map(_.name)).expect(
+      test("sort") - checker(Product.select.sortBy(_.price).map(_.name)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
         value = Vector("Spoon", "Shirt", "Keyboard", "Bed", "Television", "Cell Phone")
       )
 
-      test("sortLimit") - checker(Product.query.sortBy(_.price).map(_.name).take(2)).expect(
+      test("sortLimit") - checker(Product.select.sortBy(_.price).map(_.name).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Vector("Spoon", "Shirt")
       )
 
-      test("sortLimitTwiceHigher") - checker(Product.query.sortBy(_.price).map(_.name).take(2).take(3)).expect(
+      test("sortLimitTwiceHigher") - checker(Product.select.sortBy(_.price).map(_.name).take(2).take(3)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Vector("Spoon", "Shirt")
       )
 
-      test("sortLimitTwiceLower") - checker(Product.query.sortBy(_.price).map(_.name).take(2).take(1)).expect(
+      test("sortLimitTwiceLower") - checker(Product.select.sortBy(_.price).map(_.name).take(2).take(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1",
         value = Vector("Spoon")
       )
 
-      test("sortLimitOffset") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
+      test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Vector("Keyboard", "Bed")
       )
 
-      test("sortLimitOffsetTwice") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)).expect(
+      test("sortLimitOffsetTwice") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
         value = Vector("Television")
       )
 
-      test("sortOffsetLimit") - checker(Product.query.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
+      test("sortOffsetLimit") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Vector("Keyboard", "Bed")
       )
 
-      test("sortLimitOffset") - checker(Product.query.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
+      test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
         value = Vector("Shirt")
       )
@@ -230,7 +230,7 @@ object QueryTests extends TestSuite {
 
     test("joins"){
       test("joinFilter") - checker(
-        Customer.query.joinOn(PurchaseOrder.query)(_.id === _.customerId)
+        Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
           .filter(_._1.name === "Pepito Pérez")
       ).expect(
         sql = """
@@ -258,7 +258,7 @@ object QueryTests extends TestSuite {
       )
 
       test("joinFilterMap") - checker(
-        Customer.query.joinOn(PurchaseOrder.query)(_.id === _.customerId)
+        Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
           .filter(_._1.name === "John Doe")
           .map(_._2.orderDate)
       ).expect(
@@ -272,7 +272,7 @@ object QueryTests extends TestSuite {
       )
 
       test("flatMap") - checker(
-        Customer.query.flatMap(c => PurchaseOrder.query.map((c, _)))
+        Customer.select.flatMap(c => PurchaseOrder.select.map((c, _)))
           .filter{case (c, p) => c.id === p.customerId && c.name === "John Doe"}
           .map(_._2.orderDate)
       ).expect(
@@ -285,8 +285,8 @@ object QueryTests extends TestSuite {
         value = Vector("2018-02-13")
       )
       test("flatMap") - checker(
-        Customer.query.flatMap(c =>
-          PurchaseOrder.query
+        Customer.select.flatMap(c =>
+          PurchaseOrder.select
             .filter { p => c.id === p.customerId && c.name === "John Doe" }
         ).map(_.orderDate)
 

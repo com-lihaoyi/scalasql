@@ -30,15 +30,15 @@ object Queryable{
 
   }
 
-  implicit def QueryQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Query[Q], Seq[R]] =
+  implicit def QueryQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Select[Q], Seq[R]] =
     new QueryQueryable()(qr)
 
-  class QueryQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Query[Q], Seq[R]]{
-    def walk(q: Query[Q]) = qr.walk(q.expr)
+  class QueryQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Select[Q], Seq[R]]{
+    def walk(q: Select[Q]) = qr.walk(q.expr)
     def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
     override def unpack(t: ujson.Value) = t
 
-    override def toSqlQuery(q: Query[Q], ctx: QueryToSql.Context): SqlStr = {
+    override def toSqlQuery(q: Select[Q], ctx: QueryToSql.Context): SqlStr = {
       QueryToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
     }
   }

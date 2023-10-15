@@ -1,7 +1,7 @@
 package usql
 import scala.language.experimental.macros
 import OptionPickler.{Reader, Writer}
-import usql.Query.TableRef
+import usql.Select.TableRef
 import usql.SqlStr.SqlStringSyntax
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
@@ -14,7 +14,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Ba
 
   implicit def containerQr: Queryable[V[Expr], V[Val]] =  metadata.queryable
 
-  def query: Query[V[Expr]] = metadata.query()
+  def select: Select[V[Expr]] = metadata.query()
   def update: Update[V[Expr]] = metadata.update()
 }
 
@@ -24,7 +24,7 @@ object Table{
   }
 
   class Metadata[V[_[_]]](val queryable: Queryable[V[Expr], V[Val]],
-                          val query: () => Query[V[Expr]],
+                          val query: () => Select[V[Expr]],
                           val update: () => Update[V[Expr]])
 
   object Metadata{
