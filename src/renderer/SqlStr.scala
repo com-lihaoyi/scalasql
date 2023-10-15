@@ -7,22 +7,25 @@ import usql.query.Expr
  * Represents a SQL query with interpolated `?`s expressions and the associated
  * interpolated values, of type [[Interp]]
  */
-case class SqlStr(queryParts: Seq[String],
-                  params: Seq[Interp],
-                  isCompleteQuery: Boolean) {
+class SqlStr(private val queryParts: Seq[String],
+             private val params: Seq[Interp],
+             private val isCompleteQuery: Boolean) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head) ++ other.queryParts.tail,
     params ++ other.params,
     false
   )
+
+  def asCompleteQuery = new SqlStr(queryParts, params, true)
 }
 
 object SqlStr {
-  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
+  case class Flattened(queryParts: Seq[String], params: Seq[Interp.Simple], isCompleteQuery: Boolean)
 
+  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
   def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else usql""
 
-  def flatten(self: SqlStr) = {
+  def flatten(self: SqlStr): Flattened = {
     val finalParts = collection.mutable.Buffer[String]()
     val finalArgs = collection.mutable.Buffer[Interp.Simple]()
 
@@ -51,7 +54,7 @@ object SqlStr {
     }
 
     rec(self)
-    new SqlStr(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery)
+    Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery)
   }
 
   implicit class SqlStringSyntax(sc: StringContext) {

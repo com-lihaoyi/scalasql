@@ -54,7 +54,7 @@ case class Select[Q](expr: Q,
         )
 
         f(newCtx)
-      }).toSqlExpr.copy(isCompleteQuery = true)
+      }).toSqlExpr.asCompleteQuery
     }
   }
 
@@ -164,7 +164,7 @@ case class Select[Q](expr: Q,
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").copy(isCompleteQuery = true)
+    (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").asCompleteQuery
   }
 }
 
