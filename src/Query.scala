@@ -42,7 +42,7 @@ case class Query[Q](expr: Q,
                     offset: Option[Int])
                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with QueryLike[Q] with From{
 
-  private def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
+  def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
   def queryExpr[V](f: QueryToSql.Context => SqlStr)
                      (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit ctx:  QueryToSql.Context =>

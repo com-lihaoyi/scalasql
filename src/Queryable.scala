@@ -2,7 +2,7 @@ package usql
 
 import OptionPickler.Reader
 import usql.QueryToSql.Context
-import usql.SqlStr.SqlStringSyntax
+import usql.SqlStr.{SqlStringSyntax, opt, optSeq}
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -56,22 +56,55 @@ object Queryable{
       val (namedFromsMap, fromSelectables, exprNaming, context) = QueryToSql.computeContext(
         ctx0.tableNameMapper,
         ctx0.columnNameMapper,
-        q.update.from ++ q.update.joins.flatMap(_.from).map(_.from)
+        q.update.joins.flatMap(_.from).map(_.from),
+        Some(q.update.table)
       )
 
       implicit val ctx: Context = context
 
       val tableName = SqlStr.raw(ctx.tableNameMapper(q.update.table.value.tableName))
-      val updateList = q.update.set0.map{case (k, v) => usql"$k = $v"}
+      val updateList = q.update.set0.map{case (k, v) =>
+        val setLhsCtxt = new QueryToSql.Context(
+          ctx.fromNaming + (q.update.table -> ""),
+          ctx.exprNaming,
+          ctx.tableNameMapper,
+          ctx.columnNameMapper
+        )
+
+        val kStr = k.toSqlExpr(setLhsCtxt)
+        usql"$kStr = $v"
+      }
       val sets = SqlStr.join(updateList, usql", ")
-      val where = SqlStr.optSeq(q.update.where){where =>
+
+      val (from, fromOns) = q.update.joins.headOption match{
+        case None => (usql"", Nil)
+        case Some(firstJoin) =>
+          val (froms, ons) = firstJoin.from.map { jf => (fromSelectables(jf.from)._2, jf.on) }.unzip
+          (usql" FROM " + SqlStr.join(froms, usql", "), ons.flatten)
+      }
+
+      val where = SqlStr.optSeq(fromOns ++ q.update.where) { where =>
         usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
+      }
+
+
+      val joins = optSeq(q.update.joins.drop(1)) { joins =>
+        SqlStr.join(
+          joins.map { join =>
+            val joinPrefix = SqlStr.opt(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
+            val joinSelectables = SqlStr.join(
+              join.from.map { jf => fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => usql" ON $on") }
+            )
+
+            usql"$joinPrefix JOIN $joinSelectables"
+          }
+        )
       }
 
       val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
 
       val returning = usql" RETURNING " + exprStr
-      val res = usql"UPDATE $tableName SET " + sets + where + returning
+      val res = usql"UPDATE $tableName SET " + sets + from + joins + where + returning
       val flattened = SqlStr.flatten(res)
       flattened
     }

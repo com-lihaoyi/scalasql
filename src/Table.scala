@@ -94,8 +94,9 @@ case class Column[T]()(implicit val name: sourcecode.Name,
 object Column{
   class ColumnExpr[T](tableRef: TableRef, name: String) extends Expr[T] {
     def toSqlExpr0(implicit ctx: QueryToSql.Context) = {
-      val prefix =  SqlStr.opt(ctx.fromNaming.get(tableRef)){p =>
-        SqlStr.raw(p) + usql"."
+      val prefix = ctx.fromNaming(tableRef) match{
+        case "" => usql""
+        case s => SqlStr.raw(s) + usql"."
       }
 
       prefix + SqlStr.raw(ctx.columnNameMapper(name))

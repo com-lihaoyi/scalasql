@@ -10,7 +10,6 @@ import usql.Query.{From, Join}
 case class Update[Q](expr: Q,
                      table: Query.TableRef,
                      set0: Seq[(Expr[_], Expr[_])],
-                     from: Seq[From],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
                     (implicit val qr: Queryable[Q, _]){
@@ -21,6 +20,27 @@ case class Update[Q](expr: Q,
     this.copy(set0 = f.map(_(expr)))
   }
 
+  def joinOn[V](other: Query[V])
+               (on: (Q, V) => Expr[Boolean])
+               (implicit qr: Queryable[V, _]): Update[(Q, V)] = join0(other, Some(on))
+
+  def join0[V](other: Query[V],
+               on: Option[(Q, V) => Expr[Boolean]])
+              (implicit joinQr: Queryable[V, _]): Update[(Q, V)] = {
+    val otherTrivial = other.simple(other.groupBy0, other.orderBy, other.limit, other.offset)
+    Update(
+      (expr, other.expr),
+      table = table,
+      set0 = set0,
+      joins =
+        joins ++
+        (if (otherTrivial) Seq(Join(None, other.from.map(Query.JoinFrom(_, on.map(_(expr, other.expr))))))
+        else Seq(Join(None, Seq(Query.JoinFrom(new Query.SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
+      where = where
+    )
+
+  }
+
   def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): UpdateReturning[Q2, R] = {
     UpdateReturning(this, f(expr))
   }
@@ -28,7 +48,7 @@ case class Update[Q](expr: Q,
 
 object Update{
   def fromTable[Q](expr: Q, table: Query.TableRef)(implicit qr: Queryable[Q, _]): Update[Q] = {
-    Update(expr, table, Nil, Nil, Nil, Nil)
+    Update(expr, table, Nil, Nil, Nil)
   }
 }
 

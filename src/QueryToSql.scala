@@ -40,7 +40,8 @@ object QueryToSql {
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,
-      query.from ++ query.joins.flatMap(_.from.map(_.from))
+      query.from ++ query.joins.flatMap(_.from.map(_.from)),
+      None
     )
 
     implicit val context: Context = ctx
@@ -106,8 +107,9 @@ object QueryToSql {
 
   def computeContext(tableNameMapper: String => String,
                      columnNameMapper: String => String,
-                     selectables: Seq[Query.From]) = {
-    val namedFromsMap = selectables
+                     selectables: Seq[Query.From],
+                     updateTable: Option[Query.TableRef]) = {
+    val namedFromsMap0 = selectables
       .zipWithIndex
       .map {
         case (t: Query.TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
@@ -115,9 +117,11 @@ object QueryToSql {
       }
       .toMap
 
+    val namedFromsMap = namedFromsMap0 ++ updateTable.map(t => t -> tableNameMapper(t.value.tableName))
+
     def computeSelectable(t: Query.From) = t match {
       case t: Query.TableRef =>
-        (Nil, SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t)))
+        (Map.empty[Expr[_], SqlStr], SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t)))
 
       case t: Query.SubqueryRef[_] =>
         val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper)
