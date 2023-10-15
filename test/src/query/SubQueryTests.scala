@@ -1,9 +1,8 @@
-package usql.customers
-
+package usql.query
 
 import usql._
-import ExprOps._
 import utest._
+import ExprOps._
 
 /**
  * Tests for queries operations that force subqueries to be used.

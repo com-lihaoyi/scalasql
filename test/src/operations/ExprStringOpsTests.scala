@@ -1,4 +1,4 @@
-package usql.customers
+package usql.operations
 
 import usql.ExprOps._
 import usql._

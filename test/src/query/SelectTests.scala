@@ -1,9 +1,9 @@
-package usql.customers
+package usql.query
 
-import utest._
 import usql._
-import ExprOps._
 import usql.query.Expr
+import utest._
+import ExprOps._
 
 /**
  * Tests for basic query operations: map, filter, join, etc.

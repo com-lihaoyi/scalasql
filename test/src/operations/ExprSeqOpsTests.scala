@@ -1,8 +1,9 @@
-package usql.customers
+package usql.operations
 
 import usql._
 import utest._
 import ExprOps._
+
 /**
  * Tests for all the aggregate operators that we provide by default
  */

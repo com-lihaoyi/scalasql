@@ -1,9 +1,9 @@
-package usql.customers
+package usql.operations
 
+import usql.ExprOps._
 import usql._
-import utest._
-import ExprOps._
 import usql.query.Expr
+import utest._
 
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default

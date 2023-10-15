@@ -1,8 +1,9 @@
-package usql.customers
+package usql.query
 
 import usql._
 import utest._
 import ExprOps._
+
 /**
  * Tests for basic update operations
  */
