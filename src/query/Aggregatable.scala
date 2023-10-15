@@ -3,7 +3,10 @@ package usql.query
 import usql.Queryable
 import usql.renderer.{Context, SqlStr}
 
-trait SelectLike[Q] {
+/**
+ * Something that supports aggregate operations
+ */
+trait Aggregatable[Q] {
   def expr: Q
 
   def queryExpr[V](f: Context => SqlStr)

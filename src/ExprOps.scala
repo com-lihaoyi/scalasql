@@ -1,7 +1,7 @@
 package usql
 
 import renderer.SqlStr.SqlStringSyntax
-import usql.query.{Expr, SelectLike}
+import usql.query.{Expr, Aggregatable}
 
 object ExprOps extends ExprOps
 trait ExprOps {
@@ -127,7 +127,7 @@ trait ExprOps {
     def unary_! : Expr[Boolean] = Expr { implicit ctx => usql"NOT $v"}
   }
 
-  implicit class ExprSeqIntOps0[V: Numeric](v: SelectLike[Expr[V]])(implicit qr: Queryable[Expr[V], V]) {
+  implicit class ExprSeqIntOps0[V: Numeric](v: Aggregatable[Expr[V]])(implicit qr: Queryable[Expr[V], V]) {
     /** Computes the sum of column values */
     def sum: Expr[V] = v.queryExpr(implicit ctx => usql"SUM(${v.expr})")
 
@@ -141,7 +141,7 @@ trait ExprOps {
     def avg: Expr[V] = v.queryExpr(implicit ctx => usql"AVG(${v.expr})")
   }
 
-  implicit class ExprSeqOps0[T](v: SelectLike[T])(implicit qr: Queryable[T, _]) {
+  implicit class ExprSeqOps0[T](v: Aggregatable[T])(implicit qr: Queryable[T, _]) {
     /** Counts the rows */
     def size: Expr[Int] = v.queryExpr(implicit ctx => usql"COUNT(1)")
 

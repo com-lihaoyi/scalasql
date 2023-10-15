@@ -35,7 +35,7 @@ case class Select[Q](expr: Q,
                      offset: Option[Int])
                     (implicit val qr: Queryable[Q, _])
 
-  extends Expr[Seq[Q]] with SelectLike[Q] with From with Joinable[Q]{
+  extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinable[Q]{
 
   override def select = this
 
