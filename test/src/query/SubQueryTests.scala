@@ -28,7 +28,7 @@ object SubQueryTests extends TestSuite {
           LIMIT 1) subquery1
         ON item0.product_id = subquery1.res__id
       """,
-      value = Vector(15000.0)
+      value = Vector(10000.0)
     )
 
     test("sortTakeFrom") - checker(
@@ -48,7 +48,7 @@ object SubQueryTests extends TestSuite {
           LIMIT 1) subquery0
         JOIN item item1 ON subquery0.res__id = item1.product_id
       """,
-      value = Vector(15000.0)
+      value = Vector(10000.0)
     )
 
     test("sortTakeFromAndJoin") - checker(
@@ -79,7 +79,7 @@ object SubQueryTests extends TestSuite {
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
-      value = Vector(("Camera", 15))
+      value = Vector(("Camera", 10))
     )
 
     test("sortLimitSortLimit") - checker(
@@ -117,7 +117,7 @@ object SubQueryTests extends TestSuite {
           LIMIT 5) subquery0
         GROUP BY subquery0.res__product_id
       """,
-      value = Vector((1, 135.83), (2, 703.92), (3, 24.99), (4, 262.0))
+      value = Vector((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
     )
 
     test("groupByJoin") - checker(
@@ -136,12 +136,12 @@ object SubQueryTests extends TestSuite {
         JOIN product product1 ON subquery0.res__0 = product1.id
       """,
       value = Vector(
-        ("Face Mask", 135.83),
-        ("Guitar", 703.92),
-        ("Socks", 24.99),
-        ("Skateboard", 262.0),
-        ("Camera", 15000.0),
-        ("Cookie", 18.0)
+        ("Face Mask", 932.4),
+        ("Guitar", 900.0),
+        ("Socks", 15.7),
+        ("Skateboard", 493.8),
+        ("Camera", 10000.0),
+        ("Cookie", 13.0)
       )
     )
 

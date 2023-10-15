@@ -202,7 +202,7 @@ INSERT INTO country VALUES ('NRU','Nauru','Oceania','Micronesia',21.00,1968,1200
 INSERT INTO country VALUES ('NZL','New Zealand','Oceania','Australia and New Zealand',270534.00,1907,3862000,77.8,54669.00,64960.00,'New Zealand/Aotearoa','Constitutional Monarchy','Elisabeth II',3499,'NZ');
 INSERT INTO country VALUES ('OMN','Oman','Asia','Middle East',309500.00,1951,2542000,71.8,16904.00,16153.00,'�Uman','Monarchy (Sultanate)','Qabus ibn Sa�id',2821,'OM');
 INSERT INTO country VALUES ('PAK','Pakistan','Asia','Southern and Central Asia',796095.00,1947,156483000,61.1,61289.00,58549.00,'Pakistan','Republic','Mohammad Rafiq Tarar',2831,'PK');
-INSERT INTO country VALUES ('PAN','Panama','North America','Central America',75517.00,1903,2856000,75.5,9131.00,8700.00,'Panam�','Republic','Mireya Elisa Moscoso Rodr�guez',2882,'PA');
+INSERT INTO country VALUES ('PAN','Panama','North America','Central America',75517.00,1903,2856000,75.5,9123.45,8700.00,'Panam�','Republic','Mireya Elisa Moscoso Rodr�guez',2882,'PA');
 INSERT INTO country VALUES ('PCN','Pitcairn','Oceania','Polynesia',49.00,NULL,50,NULL,0.00,NULL,'Pitcairn','Dependent Territory of the UK','Elisabeth II',2912,'PN');
 INSERT INTO country VALUES ('PER','Peru','South America','South America',1285216.00,1821,25662000,70.0,64140.00,65186.00,'Per�/Piruw','Republic','Valentin Paniagua Corazao',2890,'PE');
 INSERT INTO country VALUES ('PHL','Philippines','Asia','Southeast Asia',300000.00,1946,75967000,67.5,65107.00,82239.00,'Pilipinas','Republic','Gloria Macapagal-Arroyo',766,'PH');

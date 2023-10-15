@@ -12,22 +12,22 @@ object ExprSeqNumericOpsTests extends TestSuite {
   def tests = Tests {
     test("sum") - checker(Item.select.map(_.quantity).sum).expect(
       sql = "SELECT SUM(item0.quantity) as res FROM item item0",
-      value = 61
+      value = 140
     )
 
     test("min") - checker(Item.select.map(_.quantity).min).expect(
       sql = "SELECT MIN(item0.quantity) as res FROM item item0",
-      value = 2
+      value = 3
     )
 
     test("max") - checker(Item.select.map(_.quantity).max).expect(
       sql = "SELECT MAX(item0.quantity) as res FROM item item0",
-      value = 18
+      value = 100
     )
 
     test("avg") - checker(Item.select.map(_.quantity).avg).expect(
       sql = "SELECT AVG(item0.quantity) as res FROM item item0",
-      value = 8
+      value = 20
     )
   }
 }

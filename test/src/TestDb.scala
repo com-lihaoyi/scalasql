@@ -29,7 +29,7 @@ class TestDb(name: String) {
     columnNameMapper = camelToSnake,
     columnNameUnMapper = snakeToCamel
   )
-  db.runRaw(os.read(os.pwd / "test" / "resources" / "customers.sql"))
+  db.runRaw(os.read(os.pwd / "test" / "resources" / "unit-test-data.sql"))
   def apply[T, V](query: T)(implicit qr: Queryable[T, V])  = new Apply(query)
   class Apply[T, V](query: T)(implicit qr: Queryable[T, V]) {
     def expect(sql: String = null, value: V) = {

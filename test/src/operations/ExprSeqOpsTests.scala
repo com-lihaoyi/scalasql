@@ -17,22 +17,22 @@ object ExprSeqOpsTests extends TestSuite {
 
     test("sumBy") - checker(Item.select.sumBy(_.quantity)).expect(
       sql = "SELECT SUM(item0.quantity) as res FROM item item0",
-      value = 61
+      value = 140
     )
 
     test("minBy") - checker(Item.select.minBy(_.quantity)).expect(
       sql = "SELECT MIN(item0.quantity) as res FROM item item0",
-      value = 2
+      value = 3
     )
 
     test("maxBy") - checker(Item.select.maxBy(_.quantity)).expect(
       sql = "SELECT MAX(item0.quantity) as res FROM item item0",
-      value = 18
+      value = 100
     )
 
     test("avgBy") - checker(Item.select.avgBy(_.quantity)).expect(
       sql = "SELECT AVG(item0.quantity) as res FROM item item0",
-      value = 8
+      value = 20
     )
 
     // Not supported by Sqlite

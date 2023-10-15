@@ -109,7 +109,7 @@ object SelectTests extends TestSuite {
 
       test("interpolateInMap") - checker(Product.select.map(_.price * 2)).expect(
         sql = "SELECT product0.price * ? as res FROM product product0",
-        value = Vector(15.98, 703.92, 7.14, 262.0, 2000.0, 2.0)
+        value = Vector(17.76, 600, 6.28, 246.9, 2000.0, 2.0)
       )
 
       test("heterogenousTuple") - checker(Customer.select.map(c => (c.id, c))).expect(
@@ -139,13 +139,13 @@ object SelectTests extends TestSuite {
         Item.select.aggregate(_.sumBy(_.total))
       ).expect(
         sql = "SELECT SUM(item0.total) as res FROM item item0",
-        value = 16144.74
+        value = 12354.9
       )
       test("multiple") - checker(
         Item.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
       ).expect(
         sql = "SELECT SUM(item0.total) as res__0, MAX(item0.total) as res__1 FROM item item0",
-        value = (16144.74, 15000.0)
+        value = (12354.9, 10000.0)
       )
     }
 
@@ -158,7 +158,8 @@ object SelectTests extends TestSuite {
           FROM item item0
           GROUP BY item0.product_id
         """,
-        value =  Vector((1, 135.83), (2, 703.92), (3, 24.99), (4, 262.0), (5, 15000.0), (6, 18.0))
+        value = Vector((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 13.0))
+
       )
 
       test("having") - checker(
@@ -170,7 +171,7 @@ object SelectTests extends TestSuite {
           GROUP BY item0.product_id
           HAVING SUM(item0.total) > ? AND item0.product_id > ?
         """,
-        value = Vector((2, 703.92), (4, 262.0), (5, 15000.0))
+        value = Vector((2, 900.0), (4, 493.8), (5, 10000.0))
       )
 
       test("filterHaving") - checker(
@@ -183,7 +184,7 @@ object SelectTests extends TestSuite {
           GROUP BY item0.product_id
           HAVING SUM(item0.total) > ?
         """,
-        value = Vector((1, 135.83), (5, 15000.0))
+        value = Vector((1, 888.0), (5, 10000.0))
       )
     }
 
