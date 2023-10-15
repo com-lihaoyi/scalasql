@@ -1,5 +1,7 @@
 package usql
 
+import renderer.{Context, Interp, SelectToSql, SqlStr}
+
 import java.sql.{ResultSet, Statement}
 
 class DatabaseApi(connection: java.sql.Connection,
@@ -21,7 +23,7 @@ class DatabaseApi(connection: java.sql.Connection,
 
   def toSqlQuery0[T, V](query: T)
                        (implicit qr: Queryable[T, V]): SqlStr = {
-    val ctx = new QueryToSql.Context(Map(), Map(), tableNameMapper, columnNameMapper)
+    val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     SqlStr.flatten(qr.toSqlQuery(query, ctx))
   }
 

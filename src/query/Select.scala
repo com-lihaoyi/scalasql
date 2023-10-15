@@ -1,19 +1,9 @@
-package usql
+package usql.query
 
-import usql.SqlStr.SqlStringSyntax
 import Select._
-trait SelectLike[Q]{
-  def expr: Q
-  def queryExpr[V](f: QueryToSql.Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V]
-}
+import usql.{OptionPickler, Queryable, Table}
+import usql.renderer.{Context, SelectToSql, SqlStr}
 
-class SelectProxy[Q](val expr: Q) extends SelectLike [Q]{
-  def queryExpr[V](f: QueryToSql.Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
-    Expr[V]{implicit c => f(c)}
-  }
-}
 /**
  * Models the various components of a SQL query:
  *
@@ -41,13 +31,14 @@ case class Select[Q](expr: Q,
                      orderBy: Option[OrderBy],
                      limit: Option[Int],
                      offset: Option[Int])
-                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with SelectLike[Q] with From{
+                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with SelectLike[Q] with From {
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
-  def queryExpr[V](f: QueryToSql.Context => SqlStr)
-                     (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
-    Expr[V] { implicit ctx:  QueryToSql.Context =>
-      this.copy[Expr[V]](expr = Expr[V] { implicit ctx: QueryToSql.Context => f(ctx) }).toSqlExpr
+
+  def queryExpr[V](f: Context => SqlStr)
+                  (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
+    Expr[V] { implicit ctx: Context =>
+      this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context => f(ctx) }).toSqlExpr
     }
   }
 
@@ -70,13 +61,13 @@ case class Select[Q](expr: Q,
         limit,
         offset
       )
-    }else{
+    } else {
       ???
     }
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
-    (groupBy0.isEmpty, simple(limit, offset)) match{
+    (groupBy0.isEmpty, simple(limit, offset)) match {
       case (true, true) => copy(where = where ++ Seq(f(expr)))
       case (false, true) => copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
       case (false, _) => Select(expr, Seq(subquery), Nil, Seq(f(expr)), None, None, None, None)
@@ -89,9 +80,11 @@ case class Select[Q](expr: Q,
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
+
   def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Desc))))
 
   def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
+
   def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
@@ -104,7 +97,7 @@ case class Select[Q](expr: Q,
   def aggregate[E, V](f: SelectProxy[Q] => E)
                      (implicit qr: Queryable[E, V]): Expr[V] = {
 
-    Expr[V]{implicit ctx: QueryToSql.Context =>
+    Expr[V] { implicit ctx: Context =>
       this.copy(expr = f(new SelectProxy[Q](expr))).toSqlExpr
     }
   }
@@ -155,8 +148,8 @@ case class Select[Q](expr: Q,
     )
   }
 
-  override def toSqlExpr0(implicit ctx: QueryToSql.Context): SqlStr = {
-    Queryable.QueryQueryable(qr).toSqlQuery(this, ctx).copy(isCompleteQuery = true)
+  override def toSqlExpr0(implicit ctx: Context): SqlStr = {
+    Select.SelectQueryable(qr).toSqlQuery(this, ctx).copy(isCompleteQuery = true)
   }
 }
 
@@ -170,21 +163,27 @@ object Select {
                      nulls: Option[Nulls])
 
   sealed trait AscDesc
+
   object AscDesc {
     case object Asc extends AscDesc
+
     case object Desc extends AscDesc
   }
 
   sealed trait Nulls
+
   object Nulls {
     case object First extends Nulls
+
     case object Last extends Nulls
   }
 
   sealed trait From
-  class TableRef(val value: Table.Base) extends From{
+
+  class TableRef(val value: Table.Base) extends From {
     override def toString = s"TableRef(${value.tableName})"
   }
+
   class SubqueryRef[T](val value: Select[T], val qr: Queryable[T, _]) extends From
 
   case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
@@ -192,5 +191,20 @@ object Select {
   case class Join(prefix: Option[String], from: Seq[JoinFrom])
 
   case class JoinFrom(from: From, on: Option[Expr[_]])
-}
 
+  implicit def SelectQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Select[Q], Seq[R]] =
+    new QueryQueryable()(qr)
+
+  class QueryQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Select[Q], Seq[R]] {
+    def walk(q: Select[Q]) = qr.walk(q.expr)
+
+    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+
+    override def unpack(t: ujson.Value) = t
+
+    override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = {
+      SelectToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
+    }
+  }
+
+}

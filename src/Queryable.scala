@@ -1,8 +1,9 @@
 package usql
 
 import OptionPickler.Reader
-import usql.QueryToSql.Context
-import usql.SqlStr.{SqlStringSyntax, opt, optSeq}
+import renderer.Context
+import renderer.{SelectToSql, SqlStr}
+import usql.query.Expr
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -15,8 +16,8 @@ trait Queryable[Q, R]{
   def valueReader: Reader[R]
   def unpack(t: ujson.Value): ujson.Value = t.arr.head
 
-  def toSqlQuery(q: Q, ctx: QueryToSql.Context): SqlStr = {
-    QueryToSql.sqlExprsStr[Q, R](q, this, ctx)._2
+  def toSqlQuery(q: Q, ctx: Context): SqlStr = {
+    SelectToSql.sqlExprsStr[Q, R](q, this, ctx)._2
   }
 }
 
@@ -28,75 +29,6 @@ object Queryable{
     def walk(q: Expr[T]) = Seq(Nil -> q)
     def valueReader = valueReader0
 
-  }
-
-  implicit def QueryQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Select[Q], Seq[R]] =
-    new QueryQueryable()(qr)
-
-  class QueryQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Select[Q], Seq[R]]{
-    def walk(q: Select[Q]) = qr.walk(q.expr)
-    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
-    override def unpack(t: ujson.Value) = t
-
-    override def toSqlQuery(q: Select[Q], ctx: QueryToSql.Context): SqlStr = {
-      QueryToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
-    }
-  }
-
-  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[UpdateReturning[Q, R], Seq[R]] =
-    new UpdateReturningQueryable[Q, R]()(qr)
-
-  class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]]{
-    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
-
-    override def unpack(t: ujson.Value) = t
-    def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
-
-    override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: QueryToSql.Context): SqlStr = {
-      val (namedFromsMap, fromSelectables, exprNaming, context) = QueryToSql.computeContext(
-        ctx0.tableNameMapper,
-        ctx0.columnNameMapper,
-        q.update.joins.flatMap(_.from).map(_.from),
-        Some(q.update.table)
-      )
-
-      implicit val ctx: Context = context
-
-      val tableName = SqlStr.raw(ctx.tableNameMapper(q.update.table.value.tableName))
-      val updateList = q.update.set0.map{case (k, v) =>
-        val setLhsCtxt = new QueryToSql.Context(
-          ctx.fromNaming + (q.update.table -> ""),
-          ctx.exprNaming,
-          ctx.tableNameMapper,
-          ctx.columnNameMapper
-        )
-
-        val kStr = k.toSqlExpr(setLhsCtxt)
-        usql"$kStr = $v"
-      }
-      val sets = SqlStr.join(updateList, usql", ")
-
-      val (from, fromOns) = q.update.joins.headOption match{
-        case None => (usql"", Nil)
-        case Some(firstJoin) =>
-          val (froms, ons) = firstJoin.from.map { jf => (fromSelectables(jf.from)._2, jf.on) }.unzip
-          (usql" FROM " + SqlStr.join(froms, usql", "), ons.flatten)
-      }
-
-      val where = SqlStr.optSeq(fromOns ++ q.update.where) { where =>
-        usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
-      }
-
-
-      val joins = optSeq(q.update.joins.drop(1))(QueryToSql.joinsToSqlStr(_, fromSelectables))
-
-      val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
-
-      val returning = usql" RETURNING " + exprStr
-      val res = usql"UPDATE $tableName SET " + sets + from + joins + where + returning
-      val flattened = SqlStr.flatten(res)
-      flattened
-    }
   }
 
   private class TupleNQueryable[Q, R](val walk0: Q => Seq[Seq[(List[String], Expr[_])]])

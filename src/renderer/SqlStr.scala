@@ -1,4 +1,7 @@
-package usql
+package usql.renderer
+
+import usql.query.Expr
+
 
 /**
  * Represents a SQL query with interpolated `?`s expressions and the associated
@@ -81,8 +84,8 @@ object Interp{
   case class BooleanInterp(b: Boolean) extends Simple
 
   implicit def exprInterp(t: Expr[_])
-                         (implicit ctx: QueryToSql.Context): Interp = ExprInterp(t, ctx)
-  case class ExprInterp(e: Expr[_], ctx: QueryToSql.Context) extends Interp
+                         (implicit ctx: Context): Interp = ExprInterp(t, ctx)
+  case class ExprInterp(e: Expr[_], ctx: Context) extends Interp
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
   case class SqlStrInterp(s: SqlStr) extends Interp

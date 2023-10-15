@@ -3,6 +3,7 @@ package usql.customers
 import usql._
 import utest._
 import ExprOps._
+import usql.query.Expr
 
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default

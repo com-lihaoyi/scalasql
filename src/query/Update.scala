@@ -1,6 +1,8 @@
-package usql
+package usql.query
 
-import usql.Select.{From, Join}
+import usql.{OptionPickler, Queryable}
+import usql.query.Select.Join
+import usql.renderer.{Context, SqlStr, UpdateReturningToSql}
 
 /**
  * Syntax reference
@@ -12,10 +14,11 @@ case class Update[Q](expr: Q,
                      set0: Seq[(Expr[_], Expr[_])],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
-                    (implicit val qr: Queryable[Q, _]){
+                    (implicit val qr: Queryable[Q, _]) {
   def filter(f: Q => Expr[Boolean]): Update[Q] = {
     this.copy(where = where ++ Seq(f(expr)))
   }
+
   def set(f: (Q => (Expr[_], Expr[_]))*): Update[Q] = {
     this.copy(set0 = f.map(_(expr)))
   }
@@ -34,8 +37,8 @@ case class Update[Q](expr: Q,
       set0 = set0,
       joins =
         joins ++
-        (if (otherTrivial) Seq(Join(None, other.from.map(Select.JoinFrom(_, on.map(_(expr, other.expr))))))
-        else Seq(Join(None, Seq(Select.JoinFrom(new Select.SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
+          (if (otherTrivial) Seq(Join(None, other.from.map(Select.JoinFrom(_, on.map(_(expr, other.expr))))))
+          else Seq(Join(None, Seq(Select.JoinFrom(new Select.SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
       where = where
     )
 
@@ -46,11 +49,28 @@ case class Update[Q](expr: Q,
   }
 }
 
-object Update{
+object Update {
   def fromTable[Q](expr: Q, table: Select.TableRef)(implicit qr: Queryable[Q, _]): Update[Q] = {
     Update(expr, table, Nil, Nil, Nil)
   }
 }
 
-case class UpdateReturning[Q, R](update: Update[_], returning: Q)(implicit val qr: Queryable[Q, R]) {
+case class UpdateReturning[Q, R](update: Update[_], returning: Q)(implicit val qr: Queryable[Q, R])
+
+object UpdateReturning{
+  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[UpdateReturning[Q, R], Seq[R]] =
+    new UpdateReturningQueryable[Q, R]()(qr)
+
+  class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]] {
+    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
+
+    override def unpack(t: ujson.Value) = t
+
+    def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+
+    override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: Context): SqlStr = {
+      UpdateReturningToSql.apply(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
+    }
+  }
+
 }

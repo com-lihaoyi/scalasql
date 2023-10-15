@@ -1,6 +1,7 @@
 package usql
 
-import usql.SqlStr.SqlStringSyntax
+import renderer.SqlStr.SqlStringSyntax
+import usql.query.{Expr, SelectLike}
 
 object ExprOps extends ExprOps
 trait ExprOps {

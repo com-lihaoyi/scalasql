@@ -1,0 +1,8 @@
+package usql.renderer
+
+import usql.query.{Expr, Select}
+
+class Context(val fromNaming: Map[Select.From, String],
+              val exprNaming: Map[Expr[_], SqlStr],
+              val tableNameMapper: String => String,
+              val columnNameMapper: String => String)

@@ -1,8 +1,10 @@
 package usql
 import scala.language.experimental.macros
 import OptionPickler.{Reader, Writer}
-import usql.Select.TableRef
-import usql.SqlStr.SqlStringSyntax
+import renderer.{Context, SelectToSql, SqlStr}
+import usql.query.Select.TableRef
+import renderer.SqlStr.SqlStringSyntax
+import usql.query.{Expr, Select, Update}
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
   val tableName = name.value
@@ -56,16 +58,16 @@ object Table{
 
       c.Expr[Metadata[V]](
         q"""
-        val $tableRef = new usql.Query.TableRef(this)
+        val $tableRef = new usql.query.Select.TableRef(this)
         new _root_.usql.Table.Metadata[$wtt](
           new usql.Table.Internal.TableQueryable(
             t => $allFlattenedExprs,
             _root_.usql.OptionPickler.macroR
           ),
           () => {
-            _root_.usql.Query.fromTable(new $wtt(..$queryParams), $tableRef)
+            _root_.usql.query.Select.fromTable(new $wtt(..$queryParams), $tableRef)
           },
-          () => _root_.usql.Update.fromTable(new $wtt(..$queryParams), $tableRef)
+          () => _root_.usql.query.Update.fromTable(new $wtt(..$queryParams), $tableRef)
         )
        """
       )
@@ -93,7 +95,7 @@ case class Column[T]()(implicit val name: sourcecode.Name,
 
 object Column{
   class ColumnExpr[T](tableRef: TableRef, name: String) extends Expr[T] {
-    def toSqlExpr0(implicit ctx: QueryToSql.Context) = {
+    def toSqlExpr0(implicit ctx: Context) = {
       val prefix = ctx.fromNaming(tableRef) match{
         case "" => usql""
         case s => SqlStr.raw(s) + usql"."

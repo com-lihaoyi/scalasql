@@ -1,15 +1,10 @@
-package usql
+package usql.renderer
 
-import usql.SqlStr.SqlStringSyntax
+import SqlStr.SqlStringSyntax
+import usql.query.{Expr, Select}
+import usql.{FlatJson, Queryable}
 
-import scala.collection.immutable
-import scala.util.DynamicVariable
-
-object QueryToSql {
-  class Context(val fromNaming: Map[Select.From, String],
-                val exprNaming: Map[Expr[_], SqlStr],
-                val tableNameMapper: String => String,
-                val columnNameMapper: String => String)
+object SelectToSql {
 
   def sqlExprsStr[Q, R](expr: Q, qr: Queryable[Q, R], context: Context) = {
     sqlExprsStr0(expr, qr, context, usql"SELECT ")
