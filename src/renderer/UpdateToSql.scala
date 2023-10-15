@@ -31,7 +31,8 @@ object UpdateToSql {
       tableNameMapper,
       columnNameMapper,
       q.joins.flatMap(_.from).map(_.from),
-      Some(q.table)
+      Some(q.table),
+      Map()
     )
 
     implicit val ctx: Context = context

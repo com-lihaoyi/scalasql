@@ -1,6 +1,7 @@
 package usql.query
 
 import Select._
+import usql.renderer.SqlStr.SqlStringSyntax
 import usql.{OptionPickler, Queryable, Table}
 import usql.renderer.{Context, SelectToSql, SqlStr}
 
@@ -43,8 +44,20 @@ case class Select[Q](expr: Q,
 
   def queryExpr[V](f: Context => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
-    Expr[V] { implicit ctx: Context =>
-      this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context => f(ctx) }).toSqlExpr
+    Expr[V] { implicit outerCtx: Context =>
+      this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context =>
+        val newCtx = new Context(
+          outerCtx.fromNaming ++ ctx.fromNaming,
+          ctx.exprNaming,
+          ctx.tableNameMapper,
+          ctx.columnNameMapper
+        )
+
+        println("A")
+        val res = f(newCtx)
+        println("B")
+        res
+      }).toSqlExpr.copy(isCompleteQuery = true)
     }
   }
 
@@ -154,7 +167,7 @@ case class Select[Q](expr: Q,
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    Select.SelectQueryable(qr).toSqlQuery(this, ctx).copy(isCompleteQuery = true)
+    (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").copy(isCompleteQuery = true)
   }
 }
 
@@ -208,8 +221,7 @@ object Select {
     override def unpack(t: ujson.Value) = t
 
     override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = {
-      SelectToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper)._2
+      SelectToSql.toSqlQuery0(q, qr, ctx.tableNameMapper, ctx.columnNameMapper, ctx.fromNaming)._2
     }
   }
-
 }

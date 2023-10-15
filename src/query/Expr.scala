@@ -1,5 +1,6 @@
 package usql.query
 
+import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, Interp, SelectToSql, SqlStr}
 
 trait Expr[T] {
@@ -20,5 +21,5 @@ object Expr{
     override def toSqlExpr0(implicit ctx: Context): SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), false)
   }
 
-  
+
 }

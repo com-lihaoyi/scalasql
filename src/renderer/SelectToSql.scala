@@ -1,6 +1,7 @@
 package usql.renderer
 
 import SqlStr.SqlStringSyntax
+import usql.query.Select.{From, Join}
 import usql.query.{Expr, Select}
 import usql.{FlatJson, Queryable}
 
@@ -47,12 +48,14 @@ object SelectToSql {
   def toSqlQuery0[Q, R](query: Select[Q],
                         qr: Queryable[Q, R],
                         tableNameMapper: String => String,
-                        columnNameMapper: String => String): (Map[Expr[_], SqlStr], SqlStr) = {
+                        columnNameMapper: String => String,
+                        previousFromMapping: Map[From, String]): (Map[Expr[_], SqlStr], SqlStr) = {
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
-      None
+      None,
+      previousFromMapping
     )
 
     implicit val context: Context = ctx
@@ -111,7 +114,8 @@ object SelectToSql {
   def computeContext(tableNameMapper: String => String,
                      columnNameMapper: String => String,
                      selectables: Seq[Select.From],
-                     updateTable: Option[Select.TableRef]) = {
+                     updateTable: Option[Select.TableRef],
+                     previousFromMapping: Map[From, String]) = {
     val namedFromsMap0 = selectables
       .zipWithIndex
       .map {
@@ -120,14 +124,14 @@ object SelectToSql {
       }
       .toMap
 
-    val namedFromsMap = namedFromsMap0 ++ updateTable.map(t => t -> tableNameMapper(t.value.tableName))
+    val namedFromsMap = previousFromMapping ++ namedFromsMap0 ++ updateTable.map(t => t -> tableNameMapper(t.value.tableName))
 
     def computeSelectable(t: Select.From) = t match {
       case t: Select.TableRef =>
         (Map.empty[Expr[_], SqlStr], SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t)))
 
       case t: Select.SubqueryRef[_] =>
-        val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper)
+        val (subNameMapping, sqlStr) = toSqlQuery0(t.value, t.qr, tableNameMapper, columnNameMapper, previousFromMapping)
         (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 

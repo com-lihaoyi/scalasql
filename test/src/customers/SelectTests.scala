@@ -340,15 +340,28 @@ object SelectTests extends TestSuite {
         value = Vector(1, 1, 1, 2, 2, 3, 3)
       )
 
-      test("distinct") - checker(
-        Item.select.map(_.orderId).distinct
-      ).expect(
+      test("distinct") - checker(Item.select.map(_.orderId).distinct).expect(
         sql = "SELECT DISTINCT item0.order_id as res FROM item item0",
         value = Vector(1, 2, 3)
       )
     }
 //    test("distinct on") - ???
-//    test("isEmpty") - ???
+    test("subqueryAggregate") - checker(
+      Customer.select.filter(c => PurchaseOrder.select.filter(p => c.id === p.customerId).size === 0)
+    ).expect(
+      sql = """
+        SELECT
+          customer0.id as res__id,
+          customer0.name as res__name,
+          customer0.birthdate as res__birthdate
+        FROM customer customer0
+        WHERE (SELECT
+            COUNT(1) as res
+            FROM purchase_order purchase_order0
+            WHERE customer0.id = purchase_order0.customer_id) = ?
+      """,
+      value = Vector(Customer(3, "Cosme Fulanito", "1956-05-12"))
+    )
 //    test("nonEmpty") - ???
 //    test("nested") - ???
   }
