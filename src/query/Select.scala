@@ -53,10 +53,7 @@ case class Select[Q](expr: Q,
           ctx.columnNameMapper
         )
 
-        println("A")
-        val res = f(newCtx)
-        println("B")
-        res
+        f(newCtx)
       }).toSqlExpr.copy(isCompleteQuery = true)
     }
   }

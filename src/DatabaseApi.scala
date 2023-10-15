@@ -18,24 +18,26 @@ class DatabaseApi(connection: java.sql.Connection,
 
   def toSqlQuery[T, V](query: T)
                       (implicit qr: Queryable[T, V]): String = {
-    toSqlQuery0(query).queryParts.mkString("?")
+    val (str, params) = toSqlQuery0(query)
+    str
   }
 
   def toSqlQuery0[T, V](query: T)
-                       (implicit qr: Queryable[T, V]): SqlStr = {
+                       (implicit qr: Queryable[T, V]): (String, Seq[Interp]) = {
     val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
-    SqlStr.flatten(qr.toSqlQueryUnwrapped(query, ctx))
+    val flattened = SqlStr.flatten(qr.toSqlQueryUnwrapped(query, ctx))
+    val queryStr0 = flattened.queryParts.mkString("?")
+    val queryStr = if (flattened.isCompleteQuery) queryStr0.drop(1).dropRight(1) else queryStr0
+    (queryStr, flattened.params)
   }
 
   def run[T, V](query: T)
                (implicit qr: Queryable[T, V]): V = {
 
-    val querySqlStr = toSqlQuery0(query)
+    val (str, params) = toSqlQuery0(query)
+    val statement = connection.prepareStatement(str)
 
-    val queryStr = querySqlStr.queryParts.mkString("?")
-    val statement = connection.prepareStatement(queryStr)
-
-    for((p, n) <- querySqlStr.params.zipWithIndex) p match{
+    for((p, n) <- params.zipWithIndex) p match{
       case Interp.StringInterp(s) => statement.setString(n + 1, s)
       case Interp.IntInterp(i) => statement.setInt(n + 1, i)
       case Interp.DoubleInterp(d) => statement.setDouble(n + 1, d)
@@ -64,7 +66,9 @@ class DatabaseApi(connection: java.sql.Connection,
 
           val json = FlatJson.unflatten(kvs.toSeq)
           def unMapJson(j: ujson.Value): ujson.Value = j match{
-            case ujson.Obj(kvs) => ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
+            case ujson.Obj(kvs) =>
+              ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
+
             case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
             case j => j
           }

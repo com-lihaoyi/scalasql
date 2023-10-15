@@ -51,7 +51,7 @@ object SqlStr {
     }
 
     rec(self)
-    new SqlStr(finalParts.toSeq, finalArgs.toSeq, false)
+    new SqlStr(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery)
   }
 
   implicit class SqlStringSyntax(sc: StringContext) {
