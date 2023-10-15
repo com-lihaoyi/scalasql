@@ -31,7 +31,11 @@ case class Select[Q](expr: Q,
                      orderBy: Option[OrderBy],
                      limit: Option[Int],
                      offset: Option[Int])
-                    (implicit val qr: Queryable[Q, _]) extends Expr[Seq[Q]] with SelectLike[Q] with From {
+                    (implicit val qr: Queryable[Q, _])
+
+  extends Expr[Seq[Q]] with SelectLike[Q] with From with Joinable[Q]{
+
+  override def select = this
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
@@ -74,25 +78,34 @@ case class Select[Q](expr: Q,
     }
   }
 
-  def sortBy(f: Q => Expr[_]) = {
-    if (simple(limit, offset)) copy(orderBy = Some(OrderBy(f(expr), None, None)))
-    else Select(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
+  def join[V](other: Joinable[V])
+             (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other.select, None)
+
+  def joinOn[V](other: Joinable[V])
+               (on: (Q, V) => Expr[Boolean])
+               (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other.select, Some(on))
+
+  def join0[V](other: Select[V],
+               on: Option[(Q, V) => Expr[Boolean]])
+              (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
+
+    val thisTrivial = simple(this.groupBy0, this.orderBy, this.limit, this.offset)
+
+    val otherTrivial = simple(other.groupBy0, other.orderBy, other.limit, other.offset)
+
+    Select(
+      expr = (expr, other.expr),
+      from = if (thisTrivial) from else Seq(subquery),
+      joins = (if (thisTrivial) joins else Nil) ++
+        (if (otherTrivial) Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))))
+        else Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
+      where = (if (thisTrivial) where else Nil) ++ (if (otherTrivial) other.where else Nil),
+      groupBy0 = if (thisTrivial) groupBy0 else None,
+      orderBy = if (thisTrivial) orderBy else None,
+      limit = if (thisTrivial) limit else None,
+      offset = if (thisTrivial) offset else None
+    )
   }
-
-  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
-
-  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Desc))))
-
-  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
-
-  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
-
-  def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
-
-  def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
-
-  def join[V](other: Select[V])
-             (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other, None)
 
   def aggregate[E, V](f: SelectProxy[Q] => E)
                      (implicit qr: Queryable[E, V]): Expr[V] = {
@@ -122,31 +135,18 @@ case class Select[Q](expr: Q,
     )
   }
 
-  def joinOn[V](other: Select[V])
-               (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other, Some(on))
 
-  def join0[V](other: Select[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
-
-    val thisTrivial = simple(this.groupBy0, this.orderBy, this.limit, this.offset)
-
-    val otherTrivial = simple(other.groupBy0, other.orderBy, other.limit, other.offset)
-
-    Select(
-      expr = (expr, other.expr),
-      from = if (thisTrivial) from else Seq(subquery),
-      joins = (if (thisTrivial) joins else Nil) ++
-        (if (otherTrivial) Seq(Join(None, other.from.map(JoinFrom(_, on.map(_(expr, other.expr))))))
-        else Seq(Join(None, Seq(JoinFrom(new SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
-      where = (if (thisTrivial) where else Nil) ++ (if (otherTrivial) other.where else Nil),
-      groupBy0 = if (thisTrivial) groupBy0 else None,
-      orderBy = if (thisTrivial) orderBy else None,
-      limit = if (thisTrivial) limit else None,
-      offset = if (thisTrivial) offset else None
-    )
+  def sortBy(f: Q => Expr[_]) = {
+    if (simple(limit, offset)) copy(orderBy = Some(OrderBy(f(expr), None, None)))
+    else Select(expr, Seq(subquery), Nil, Nil, None, Some(OrderBy(f(expr), None, None)), None, None)
   }
+
+  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
+  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Desc))))
+  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
+  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
+  def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
+  def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
     Select.SelectQueryable(qr).toSqlQuery(this, ctx).copy(isCompleteQuery = true)

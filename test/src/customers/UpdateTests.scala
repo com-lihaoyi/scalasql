@@ -122,9 +122,9 @@ object UpdateTests extends TestSuite {
       checker(
         Customer.update
           .filter(_.name === "John Doe")
-          .joinOn(PurchaseOrder.select)(_.id === _.customerId)
-          .joinOn(Item.select)(_._2.id === _.orderId)
-          .joinOn(Product.select)(_._2.productId === _.id)
+          .joinOn(PurchaseOrder)(_.id === _.customerId)
+          .joinOn(Item)(_._2.id === _.orderId)
+          .joinOn(Product)(_._2.productId === _.id)
           .set(c => c._1._1._1.name -> c._2.name)
           .returning(_._1._1._1.id)
       ).expect(

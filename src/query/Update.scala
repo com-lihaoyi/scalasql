@@ -24,9 +24,9 @@ case class Update[Q](expr: Q,
     this.copy(set0 = f.map(_(expr)))
   }
 
-  def joinOn[V](other: Select[V])
+  def joinOn[V](other: Joinable[V])
                (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Update[(Q, V)] = join0(other, Some(on))
+               (implicit qr: Queryable[V, _]): Update[(Q, V)] = join0(other.select, Some(on))
 
   def join0[V](other: Select[V],
                on: Option[(Q, V) => Expr[Boolean]])

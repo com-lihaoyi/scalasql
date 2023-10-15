@@ -4,9 +4,11 @@ import OptionPickler.{Reader, Writer}
 import renderer.{Context, SelectToSql, SqlStr}
 import usql.query.Select.TableRef
 import renderer.SqlStr.SqlStringSyntax
-import usql.query.{Expr, Select, Update}
+import usql.query.{Expr, Joinable, Select, Update}
 
-abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
+abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
+  extends Table.Base with Joinable[V[Expr]]{
+
   val tableName = name.value
   implicit def self: Table[V] = this
 

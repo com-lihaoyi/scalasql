@@ -231,6 +231,34 @@ object SelectTests extends TestSuite {
 
     test("joins"){
       test("joinFilter") - checker(
+        Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
+          .filter(_._1.name === "Pepito Pérez")
+      ).expect(
+        sql = """
+          SELECT
+            customer0.id as res__0__id,
+            customer0.name as res__0__name,
+            customer0.birthdate as res__0__birthdate,
+            purchase_order1.id as res__1__id,
+            purchase_order1.customer_id as res__1__customer_id,
+            purchase_order1.order_date as res__1__order_date
+          FROM customer customer0
+          JOIN purchase_order purchase_order1 ON customer0.id = purchase_order1.customer_id
+          WHERE customer0.name = ?
+        """,
+        value = Vector(
+          (
+            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
+            PurchaseOrder(id = 1, customerId = 2, orderDate = "2018-01-04")
+          ),
+          (
+            Customer(id = 2, name = "Pepito Pérez", birthdate = "1954-07-15"),
+            PurchaseOrder(id = 3, customerId = 2, orderDate = "2018-02-25")
+          )
+        )
+      )
+
+      test("joinSelectFilter") - checker(
         Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
           .filter(_._1.name === "Pepito Pérez")
       ).expect(
@@ -259,7 +287,7 @@ object SelectTests extends TestSuite {
       )
 
       test("joinFilterMap") - checker(
-        Customer.select.joinOn(PurchaseOrder.select)(_.id === _.customerId)
+        Customer.select.joinOn(PurchaseOrder)(_.id === _.customerId)
           .filter(_._1.name === "John Doe")
           .map(_._2.orderDate)
       ).expect(
@@ -301,6 +329,14 @@ object SelectTests extends TestSuite {
         value = Vector("2018-02-13")
       )
     }
+
+//    test("union")  - ???
+//    test("unionAll") - ???
+//    test("distinct") - ???
+//    test("distinct on") - ???
+//    test("isEmpty") - ???
+//    test("nonEmpty") - ???
+//    test("nested") - ???
   }
 }
 
