@@ -33,6 +33,22 @@ object QueryToSql {
     }
   }
 
+
+  def joinsToSqlStr(joins: Seq[Query.Join],
+                    fromSelectables: Map[Query.From, (Map[Expr[_], SqlStr], SqlStr)])
+                   (implicit ctx: Context) = {
+    SqlStr.join(
+      joins.map { join =>
+        val joinPrefix = SqlStr.opt(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
+        val joinSelectables = SqlStr.join(
+          join.from.map { jf => fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => usql" ON $on") }
+        )
+
+        usql"$joinPrefix JOIN $joinSelectables"
+      }
+    )
+  }
+
   def toSqlQuery0[Q, R](query: Query[Q],
                         qr: Queryable[Q, R],
                         tableNameMapper: String => String,
@@ -50,16 +66,7 @@ object QueryToSql {
 
     val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), usql", ")
 
-    val joins = SqlStr.join(
-      query.joins.map { join =>
-        val joinPrefix = SqlStr.opt(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
-        val joinSelectables = SqlStr.join(
-          join.from.map { jf => fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => usql" ON $on") }
-        )
-
-        usql"$joinPrefix JOIN $joinSelectables"
-      }
-    )
+    val joins = joinsToSqlStr(query.joins, fromSelectables)
 
     val filtersOpt = SqlStr.optSeq(query.where) { where =>
       usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")

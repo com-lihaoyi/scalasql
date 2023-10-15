@@ -88,18 +88,7 @@ object Queryable{
       }
 
 
-      val joins = optSeq(q.update.joins.drop(1)) { joins =>
-        SqlStr.join(
-          joins.map { join =>
-            val joinPrefix = SqlStr.opt(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
-            val joinSelectables = SqlStr.join(
-              join.from.map { jf => fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => usql" ON $on") }
-            )
-
-            usql"$joinPrefix JOIN $joinSelectables"
-          }
-        )
-      }
+      val joins = optSeq(q.update.joins.drop(1))(QueryToSql.joinsToSqlStr(_, fromSelectables))
 
       val (flattenedExpr, exprStr) = QueryToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
 
