@@ -9,6 +9,7 @@ object usql extends RootModule with ScalaModule {
     ivy"com.lihaoyi::upickle:3.1.3",
     ivy"com.lihaoyi::os-lib:0.9.1",
     ivy"org.scala-lang:scala-reflect:$scalaVersion",
+    ivy"com.github.vertical-blank:sql-formatter:2.0.4"
   )
 
   object test extends ScalaTests {

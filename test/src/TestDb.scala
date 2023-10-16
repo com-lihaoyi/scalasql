@@ -1,4 +1,5 @@
 package usql
+import com.github.vertical_blank.sqlformatter.SqlFormatter
 import pprint.PPrinter
 
 class TestDb(name: String) {
@@ -37,7 +38,8 @@ class TestDb(name: String) {
         val sqlResult = db.toSqlQuery(query)
         //       pprint.log(sqlResult)
         val expectedSql = sql.trim.replaceAll("\\s+", " ")
-        assert(sqlResult == expectedSql, pprint.apply(sqlResult))
+
+        assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
       }
 
       val result = db.run(query)
