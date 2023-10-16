@@ -7,7 +7,7 @@ CREATE TABLE buyer (
 
 CREATE TABLE product (
     id INT PRIMARY KEY,
-    sku VARCHAR(256),
+    kebab_case_name VARCHAR(256),
     name VARCHAR(256),
     price DECIMAL(20, 2)
 );
@@ -33,12 +33,12 @@ INSERT INTO buyer (id, name, date_of_birth) VALUES (1, 'James Bond', '2001-02-03
 INSERT INTO buyer (id, name, date_of_birth) VALUES (2, '叉烧包', '1923-11-12');
 INSERT INTO buyer (id, name, date_of_birth) VALUES (3, 'Li Haoyi', '1965-08-09');
 
-INSERT INTO product (id, sku, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
-INSERT INTO product (id, sku, name, price) VALUES (2, 'guitar', 'Guitar', 300);
-INSERT INTO product (id, sku, name, price) VALUES (3, 'socks', 'Socks', 3.14);
-INSERT INTO product (id, sku, name, price) VALUES (4, 'skate-board', 'Skate Board', 123.45);
-INSERT INTO product (id, sku, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
-INSERT INTO product (id, sku, name, price) VALUES (6, 'cookie', 'Cookie', 0.10);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (2, 'guitar', 'Guitar', 300);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (3, 'socks', 'Socks', 3.14);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (4, 'skate-board', 'Skate Board', 123.45);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
+INSERT INTO product (id, kebab_case_name, name, price) VALUES (6, 'cookie', 'Cookie', 0.10);
 
 INSERT INTO shipping_info (id, buyer_id, shipping_date) VALUES (1, 2, '2010-02-03');
 INSERT INTO shipping_info (id, buyer_id, shipping_date) VALUES (2, 1, '2012-04-05');

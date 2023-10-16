@@ -2,7 +2,7 @@ package usql
 import usql._
 
 case class Product[T[_]](id: T[Int],
-                         sku: T[String],
+                         kebabCaseName: T[String],
                          name: T[String],
                          price: T[Double])
 object Product extends Table[Product]{

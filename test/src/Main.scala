@@ -10,10 +10,10 @@ object Main {
     val createTableSql =
       """CREATE TABLE product (
         id INT PRIMARY KEY,
-        sku VARCHAR(256),
+        kebab_case_name VARCHAR(256),
         name VARCHAR(256),
         price DECIMAL(20, 2)
-    --     UNIQUE KEY UNIQUE_PRODUCT_SKU (sku)
+    --     UNIQUE KEY UNIQUE_PRODUCT_SKU (kebab_case_name)
     );
 
     CREATE TABLE buyer (
@@ -40,12 +40,12 @@ object Main {
         FOREIGN KEY(product_id) REFERENCES product(id)
     );
 
-    INSERT INTO product (id, sku, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
-    INSERT INTO product (id, sku, name, price) VALUES (2, 'guitar', 'Guitar', 300);
-    INSERT INTO product (id, sku, name, price) VALUES (3, 'socks', 'Socks', 3.14);
-    INSERT INTO product (id, sku, name, price) VALUES (4, 'skate-board', 'Skate Board', 123.45);
-    INSERT INTO product (id, sku, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
-    INSERT INTO product (id, sku, name, price) VALUES (6, 'cookie', 'Cookie', 1.00);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (2, 'guitar', 'Guitar', 300);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (3, 'socks', 'Socks', 3.14);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (4, 'skate-board', 'Skate Board', 123.45);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
+    INSERT INTO product (id, kebab_case_name, name, price) VALUES (6, 'cookie', 'Cookie', 1.00);
 
     INSERT INTO buyer (id, name, date_of_birth) VALUES (1, 'James Bond', '2001-02-03');
     INSERT INTO buyer (id, name, date_of_birth) VALUES (2, '叉烧包', '1923-11-12');

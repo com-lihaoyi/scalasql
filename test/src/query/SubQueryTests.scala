@@ -20,7 +20,7 @@ object SubQueryTests extends TestSuite {
         FROM purchase purchase0
         JOIN (SELECT
             product0.id as res__id,
-            product0.sku as res__sku,
+            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
@@ -40,7 +40,7 @@ object SubQueryTests extends TestSuite {
         SELECT purchase1.total as res
         FROM (SELECT
             product0.id as res__id,
-            product0.sku as res__sku,
+            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
@@ -62,7 +62,7 @@ object SubQueryTests extends TestSuite {
           subquery1.res__count as res__1
         FROM (SELECT
             product0.id as res__id,
-            product0.sku as res__sku,
+            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
@@ -89,7 +89,7 @@ object SubQueryTests extends TestSuite {
         SELECT subquery0.res__name as res
         FROM (SELECT
             product0.id as res__id,
-            product0.sku as res__sku,
+            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
@@ -203,7 +203,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("selectLimitUnionSelect") - checker(
-      Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(_.sku.toLowerCase))
+      Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
     ).expect(
       sql = """
         SELECT subquery0.res as res
@@ -212,7 +212,7 @@ object SubQueryTests extends TestSuite {
           FROM buyer buyer0
           LIMIT 2) subquery0
         UNION ALL
-        SELECT LOWER(product0.sku) as res
+        SELECT LOWER(product0.kebab_case_name) as res
         FROM product product0
       """,
       value = Vector(
@@ -221,7 +221,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("selectUnionSelectLimit") - checker(
-      Buyer.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.sku.toLowerCase).take(2))
+      Buyer.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2))
     ).expect(
       sql = """
         SELECT LOWER(buyer0.name) as res
@@ -229,7 +229,7 @@ object SubQueryTests extends TestSuite {
         UNION ALL
         SELECT subquery0.res as res
         FROM (SELECT
-            LOWER(product0.sku) as res
+            LOWER(product0.kebab_case_name) as res
           FROM product product0
           LIMIT 2) subquery0
       """,

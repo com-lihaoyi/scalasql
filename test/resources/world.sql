@@ -3767,7 +3767,7 @@ INSERT INTO city VALUES (3486,'Szeged','HUN','Csongr�d',158158);
 INSERT INTO city VALUES (3487,'P�cs','HUN','Baranya',157332);
 INSERT INTO city VALUES (3488,'Gy�r','HUN','Gy�r-Moson-Sopron',127119);
 INSERT INTO city VALUES (3489,'Nyiregyh�za','HUN','Szabolcs-Szatm�r-Ber',112419);
-INSERT INTO city VALUES (3490,'Kecskem�t','HUN','B�cs-Kiskun',105606);
+INSERT INTO city VALUES (3490,'Kecskem�t','HUN','B�cs-Kikebab_case_namen',105606);
 INSERT INTO city VALUES (3491,'Sz�kesfeh�rv�r','HUN','Fej�r',105119);
 INSERT INTO city VALUES (3492,'Montevideo','URY','Montevideo',1236000);
 INSERT INTO city VALUES (3493,'Noum�a','NCL','�',76293);

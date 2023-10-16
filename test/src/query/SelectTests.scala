@@ -391,13 +391,13 @@ object SelectTests extends TestSuite {
 
     test("compound") {
       test("union") - checker(
-        Product.select.map(_.name.toLowerCase).union(Product.select.map(_.sku.toLowerCase))
+        Product.select.map(_.name.toLowerCase).union(Product.select.map(_.kebabCaseName.toLowerCase))
       ).expect(
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
           UNION
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
         """,
         value = Vector(
@@ -413,13 +413,13 @@ object SelectTests extends TestSuite {
       )
 
       test("unionAll") - checker(
-        Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.sku.toLowerCase))
+        Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
       ).expect(
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
           UNION ALL
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
         """,
         value = Vector(
@@ -439,26 +439,26 @@ object SelectTests extends TestSuite {
       )
 
       test("intersect") - checker(
-        Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.sku.toLowerCase))
+        Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.kebabCaseName.toLowerCase))
       ).expect(
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
           INTERSECT
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
         """,
         value = Vector("camera", "cookie", "guitar", "socks")
       )
 
       test("except") - checker(
-        Product.select.map(_.name.toLowerCase).except(Product.select.map(_.sku.toLowerCase))
+        Product.select.map(_.name.toLowerCase).except(Product.select.map(_.kebabCaseName.toLowerCase))
       ).expect(
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
           EXCEPT
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
         """,
         value = Vector("face mask", "skate board")
@@ -467,7 +467,7 @@ object SelectTests extends TestSuite {
       test("unionAllUnionSort") - checker(
         Product.select.map(_.name.toLowerCase)
           .unionAll(Buyer.select.map(_.name.toLowerCase))
-          .union(Product.select.map(_.sku.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase))
           .sortBy(identity)
       ).expect(
         sql = """
@@ -477,7 +477,7 @@ object SelectTests extends TestSuite {
           SELECT LOWER(buyer0.name) as res
           FROM buyer buyer0
           UNION
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
           ORDER BY LOWER(product0.name)
         """,
@@ -499,7 +499,7 @@ object SelectTests extends TestSuite {
       test("unionAllUnionSortLimit") - checker(
         Product.select.map(_.name.toLowerCase)
           .unionAll(Buyer.select.map(_.name.toLowerCase))
-          .union(Product.select.map(_.sku.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase))
           .sortBy(identity)
           .drop(4)
           .take(4)
@@ -511,7 +511,7 @@ object SelectTests extends TestSuite {
           SELECT LOWER(buyer0.name) as res
           FROM buyer buyer0
           UNION
-          SELECT LOWER(product0.sku) as res
+          SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
           ORDER BY LOWER(product0.name)
           LIMIT 4
@@ -523,7 +523,7 @@ object SelectTests extends TestSuite {
       test("intersectAggregate") - checker(
         Product.select
           .map(p => (p.name.toLowerCase, p.price))
-          .except(Product.select.map(p => (p.sku.toLowerCase, p.price)))
+          .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
           .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
       ).expect(
         sql = """
@@ -536,7 +536,7 @@ object SelectTests extends TestSuite {
             FROM product product0
             EXCEPT
             SELECT
-              LOWER(product0.sku) as res__0,
+              LOWER(product0.kebab_case_name) as res__0,
               product0.price as res__1
             FROM product product0) subquery0
         """,
