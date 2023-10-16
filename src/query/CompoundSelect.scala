@@ -60,9 +60,9 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
 
   def joinOn[V](other: Joinable[V])
                (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other.select, Some(on))
+               (implicit qr: Queryable[V, _]): Select[(Q, V)] = join0(other, Some(on))
 
-  def join0[V](other: Select[V],
+  def join0[V](other: Joinable[V],
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
 
