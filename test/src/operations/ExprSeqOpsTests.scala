@@ -10,6 +10,20 @@ import ExprOps._
 object ExprSeqOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
+    test("contains") - checker(
+      Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
+    ).expect(
+      sql = """
+        SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.birthdate as res__birthdate
+        FROM buyer buyer0
+        WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
+      """,
+      value = Vector(
+        Buyer(1, "James Bond", "2001-02-03"),
+        Buyer(2, "叉烧包", "1923-11-12")
+      )
+    )
+
     test("size") - checker(Purchase.select.size).expect(
       sql = "SELECT COUNT(1) as res FROM purchase purchase0",
       value = 7

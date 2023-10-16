@@ -40,6 +40,9 @@ case class Select[Q](expr: Q,
   override def select = this
 
   def distinct: Select[Q] = this.copy(exprPrefix = Some("DISTINCT"))
+  def contains(other: Expr[_]): Expr[Boolean] =
+    Expr { implicit ctx => usql"$other in $this" }
+
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
   def queryExpr[V](f: Context => SqlStr)
