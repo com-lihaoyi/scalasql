@@ -36,7 +36,7 @@ INSERT INTO buyer (id, name, birthdate) VALUES (3, 'Li Haoyi', '1965-08-09');
 INSERT INTO product (id, sku, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
 INSERT INTO product (id, sku, name, price) VALUES (2, 'guitar', 'Guitar', 300);
 INSERT INTO product (id, sku, name, price) VALUES (3, 'socks', 'Socks', 3.14);
-INSERT INTO product (id, sku, name, price) VALUES (4, 'skateboard', 'Skateboard', 123.45);
+INSERT INTO product (id, sku, name, price) VALUES (4, 'skate-board', 'Skate Board', 123.45);
 INSERT INTO product (id, sku, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
 INSERT INTO product (id, sku, name, price) VALUES (6, 'cookie', 'Cookie', 0.10);
 

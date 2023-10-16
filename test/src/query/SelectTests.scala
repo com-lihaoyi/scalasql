@@ -191,7 +191,7 @@ object SelectTests extends TestSuite {
     test("sort") {
       test("sort") - checker(Product.select.sortBy(_.price).map(_.name)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
-        value = Vector("Cookie", "Socks", "Face Mask", "Skateboard", "Guitar", "Camera")
+        value = Vector("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
       )
 
       test("sortLimit") - checker(Product.select.sortBy(_.price).map(_.name).take(2)).expect(
@@ -211,7 +211,7 @@ object SelectTests extends TestSuite {
 
       test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
-        value = Vector("Face Mask", "Skateboard")
+        value = Vector("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffsetTwice") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)).expect(
@@ -221,7 +221,7 @@ object SelectTests extends TestSuite {
 
       test("sortOffsetLimit") - checker(Product.select.sortBy(_.price).map(_.name).drop(2).take(2)).expect(
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
-        value = Vector("Face Mask", "Skateboard")
+        value = Vector("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffset") - checker(Product.select.sortBy(_.price).map(_.name).take(2).drop(1)).expect(
@@ -330,8 +330,6 @@ object SelectTests extends TestSuite {
       )
     }
 
-//    test("union")  - ???
-//    test("unionAll") - ???
     test("distinct"){
       test("nondistinct") - checker(
         Purchase.select.map(_.shippingInfoId)
@@ -345,7 +343,6 @@ object SelectTests extends TestSuite {
         value = Vector(1, 2, 3)
       )
     }
-//    test("distinct on") - ???
 
 
     test("contains") - checker(
@@ -392,124 +389,159 @@ object SelectTests extends TestSuite {
       value = Vector(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     )
 
-    test("union") - checker(
-      Product.select.map(_.name.toLowerCase).union(Product.select.map(_.sku.toLowerCase))
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        UNION
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-      """,
-      value = Vector("camera", "cookie", "face mask", "face-mask", "guitar", "skateboard", "socks")
-    )
-
-    test("unionAll") - checker(
-      Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.sku.toLowerCase))
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        UNION ALL
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-      """,
-      value = Vector(
-        "face mask",
-        "guitar",
-        "socks",
-        "skateboard",
-        "camera",
-        "cookie",
-        "face-mask",
-        "guitar",
-        "socks",
-        "skateboard",
-        "camera",
-        "cookie"
+    test("compound") {
+      test("union") - checker(
+        Product.select.map(_.name.toLowerCase).union(Product.select.map(_.sku.toLowerCase))
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          UNION
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+        """,
+        value = Vector(
+          "camera",
+          "cookie",
+          "face mask",
+          "face-mask",
+          "guitar",
+          "skate board",
+          "skate-board",
+          "socks"
+        )
       )
-    )
 
-    test("intersect") - checker(
-      Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.sku.toLowerCase))
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        INTERSECT
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-      """,
-      value = Vector("camera", "cookie", "guitar", "skateboard", "socks")
-    )
-
-    test("except") - checker(
-      Product.select.map(_.name.toLowerCase).except(Product.select.map(_.sku.toLowerCase))
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        EXCEPT
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-      """,
-      value = Vector("face mask")
-    )
-
-    test("unionAllUnionSort") - checker(
-      Product.select.map(_.name.toLowerCase)
-        .unionAll(Buyer.select.map(_.name.toLowerCase))
-        .union(Product.select.map(_.sku.toLowerCase))
-        .sortBy(identity)
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        UNION ALL
-        SELECT LOWER(buyer0.name) as res
-        FROM buyer buyer0
-        UNION
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-        ORDER BY LOWER(product0.name)
-      """,
-      value = Vector(
-        "camera",
-        "cookie",
-        "face mask",
-        "face-mask",
-        "guitar",
-        "james bond",
-        "li haoyi",
-        "skateboard",
-        "socks",
-        "叉烧包"
+      test("unionAll") - checker(
+        Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.sku.toLowerCase))
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          UNION ALL
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+        """,
+        value = Vector(
+          "face mask",
+          "guitar",
+          "socks",
+          "skate board",
+          "camera",
+          "cookie",
+          "face-mask",
+          "guitar",
+          "socks",
+          "skate-board",
+          "camera",
+          "cookie"
+        )
       )
-    )
 
-    test("unionAllUnionSortLimit") - checker(
-      Product.select.map(_.name.toLowerCase)
-        .unionAll(Buyer.select.map(_.name.toLowerCase))
-        .union(Product.select.map(_.sku.toLowerCase))
-        .sortBy(identity)
-        .drop(4)
-        .take(4)
-    ).expect(
-      sql = """
-        SELECT LOWER(product0.name) as res
-        FROM product product0
-        UNION ALL
-        SELECT LOWER(buyer0.name) as res
-        FROM buyer buyer0
-        UNION
-        SELECT LOWER(product0.sku) as res
-        FROM product product0
-        ORDER BY LOWER(product0.name)
-        LIMIT 4
-        OFFSET 4
-      """,
-      value = Vector("guitar", "james bond", "li haoyi", "skateboard")
-    )
+      test("intersect") - checker(
+        Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.sku.toLowerCase))
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          INTERSECT
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+        """,
+        value = Vector("camera", "cookie", "guitar", "socks")
+      )
+
+      test("except") - checker(
+        Product.select.map(_.name.toLowerCase).except(Product.select.map(_.sku.toLowerCase))
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          EXCEPT
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+        """,
+        value = Vector("face mask", "skate board")
+      )
+
+      test("unionAllUnionSort") - checker(
+        Product.select.map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.sku.toLowerCase))
+          .sortBy(identity)
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          UNION ALL
+          SELECT LOWER(buyer0.name) as res
+          FROM buyer buyer0
+          UNION
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+          ORDER BY LOWER(product0.name)
+        """,
+        value = Vector(
+          "camera",
+          "cookie",
+          "face mask",
+          "face-mask",
+          "guitar",
+          "james bond",
+          "li haoyi",
+          "skate board",
+          "skate-board",
+          "socks",
+          "叉烧包"
+        )
+      )
+
+      test("unionAllUnionSortLimit") - checker(
+        Product.select.map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.sku.toLowerCase))
+          .sortBy(identity)
+          .drop(4)
+          .take(4)
+      ).expect(
+        sql = """
+          SELECT LOWER(product0.name) as res
+          FROM product product0
+          UNION ALL
+          SELECT LOWER(buyer0.name) as res
+          FROM buyer buyer0
+          UNION
+          SELECT LOWER(product0.sku) as res
+          FROM product product0
+          ORDER BY LOWER(product0.name)
+          LIMIT 4
+          OFFSET 4
+        """,
+        value = Vector("guitar", "james bond", "li haoyi", "skate board")
+      )
+
+      test("intersectAggregate") - checker(
+        Product.select
+          .map(p => (p.name.toLowerCase, p.price))
+          .except(Product.select.map(p => (p.sku.toLowerCase, p.price)))
+          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
+      ).expect(
+        sql = """
+          SELECT
+            MAX(subquery0.res__1) as res__0,
+            MIN(subquery0.res__1) as res__1
+          FROM (SELECT
+              LOWER(product0.name) as res__0,
+              product0.price as res__1
+            FROM product product0
+            EXCEPT
+            SELECT
+              LOWER(product0.sku) as res__0,
+              product0.price as res__1
+            FROM product product0) subquery0
+        """,
+        value = (123.45, 8.88)
+      )
+    }
   }
 }

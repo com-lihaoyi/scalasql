@@ -208,7 +208,7 @@ object UpdateTests extends TestSuite {
           (1, "Face Mask", 1000.0),
           (2, "Guitar", 1000.0),
           (3, "Socks", 1000.0),
-          (4, "Skateboard", 1000.0),
+          (4, "Skate Board", 1000.0),
           (5, "Camera", 1000.0),
           (6, "Cookie", 1000.0)
         )

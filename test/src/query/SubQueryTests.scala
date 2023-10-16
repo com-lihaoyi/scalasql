@@ -98,7 +98,7 @@ object SubQueryTests extends TestSuite {
         ORDER BY subquery0.res__price ASC
         LIMIT 2
       """,
-      value = Vector("Face Mask", "Skateboard")
+      value = Vector("Face Mask", "Skate Board")
     )
 
     test("sortGroupBy") - checker(
@@ -139,7 +139,7 @@ object SubQueryTests extends TestSuite {
         ("Face Mask", 932.4),
         ("Guitar", 900.0),
         ("Socks", 15.7),
-        ("Skateboard", 493.8),
+        ("Skate Board", 493.8),
         ("Camera", 10000.0),
         ("Cookie", 1.3)
       )
@@ -216,7 +216,7 @@ object SubQueryTests extends TestSuite {
         FROM product product0
       """,
       value = Vector(
-        "james bond", "叉烧包", "face-mask", "guitar", "socks", "skateboard", "camera", "cookie"
+        "james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie"
       )
     )
 

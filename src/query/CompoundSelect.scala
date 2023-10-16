@@ -20,21 +20,7 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
   def distinct: Select[Q] = ???
 
   def queryExpr[V](f: Q => Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
-    ???
-//    Expr[V] { implicit outerCtx: Context =>
-//      this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context =>
-//        val newCtx = new Context(
-//          outerCtx.fromNaming ++ ctx.fromNaming,
-//          ctx.exprNaming,
-//          ctx.tableNameMapper,
-//          ctx.columnNameMapper
-//        )
-//
-//        f(newCtx)
-//      }).toSqlExpr.asCompleteQuery
-//    }
-  }
+                  (implicit qr: Queryable[Expr[V], V]): Expr[V] = ???
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
     (lhs, compoundOps) match {
