@@ -35,7 +35,7 @@ case class SimpleSelect[Q](expr: Q,
 
   def distinct: Select[Q] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V](f: (Expr[_], Context) => SqlStr)
+  def queryExpr[V](f: Q => Context => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context =>
@@ -46,7 +46,7 @@ case class SimpleSelect[Q](expr: Q,
           ctx.columnNameMapper
         )
 
-        f(expr, newCtx)
+        f(qr.walk(expr).head._2)(newCtx)
       }).toSqlExpr.asCompleteQuery
     }
   }

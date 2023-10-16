@@ -18,7 +18,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
 
   def distinct: Select[Q] = ???
 
-  def queryExpr[V](f: Context => SqlStr)
+  def queryExpr[V](f: Q => Context => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V] = {
     ???
 //    Expr[V] { implicit outerCtx: Context =>

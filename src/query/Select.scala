@@ -6,9 +6,6 @@ import usql.{OptionPickler, Queryable}
 
 trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinable[Q] {
 
-  def queryExpr[V](f: Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V]
-
   override def select = this
 
   def distinct: Select[Q]
