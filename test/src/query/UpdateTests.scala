@@ -116,7 +116,7 @@ object UpdateTests extends TestSuite {
       checker(
         Buyer.update
           .filter(_.name === "James Bond")
-          .joinOn(ShippingInfo.select)(_.id === _.buyerId)
+          .joinOn(ShippingInfo)(_.id === _.buyerId)
           .set(c => c._1.birthdate -> c._2.shippingDate)
           .returning(_._1.id)
       ).expect(

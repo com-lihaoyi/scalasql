@@ -757,7 +757,7 @@ object MainTests extends TestSuite {
     test("joins"){
       test {
         val query = City.select
-          .joinOn(Country.select)(_.countryCode === _.code)
+          .joinOn(Country)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Aruba" }
         val sql = db.toSqlQuery(query)
         assert(
@@ -828,7 +828,7 @@ object MainTests extends TestSuite {
 
       test{
         val query = City.select
-          .joinOn(Country.select)(_.countryCode === _.code)
+          .joinOn(Country)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Malaysia" }
           .map { case (city, country) => (city.name, country.name) }
 
@@ -1024,7 +1024,7 @@ object MainTests extends TestSuite {
       }
       test("from") {
         val query = Country.select.sortBy(_.population).desc.take(2)
-          .joinOn(CountryLanguage.select)(_.code === _.countryCode)
+          .joinOn(CountryLanguage)(_.code === _.countryCode)
           .map { case (country, language) => (language.language, country.name) }
 
         val sql = db.toSqlQuery(query)

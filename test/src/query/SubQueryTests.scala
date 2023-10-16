@@ -33,7 +33,7 @@ object SubQueryTests extends TestSuite {
 
     test("sortTakeFrom") - checker(
       Product.select.sortBy(_.price).desc.take(1)
-        .joinOn(Purchase.select)(_.id === _.productId)
+        .joinOn(Purchase)(_.id === _.productId)
         .map{case (product, purchase) => purchase.total}
     ).expect(
       sql = """
@@ -121,7 +121,7 @@ object SubQueryTests extends TestSuite {
     )
 
     test("groupByJoin") - checker(
-      Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product.select)(_._1 === _.id)
+      Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
         .map{case ((productId, total), product) => (product.name, total)}
     ).expect(
       sql = """

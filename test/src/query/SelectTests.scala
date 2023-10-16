@@ -259,7 +259,7 @@ object SelectTests extends TestSuite {
       )
 
       test("joinSelectFilter") - checker(
-        Buyer.select.joinOn(ShippingInfo.select)(_.id === _.buyerId)
+        Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
           .filter(_._1.name === "叉烧包")
       ).expect(
         sql = """
