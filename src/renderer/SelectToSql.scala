@@ -65,6 +65,17 @@ object SelectToSql {
     val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_]]) usql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
 
+    val compound = SqlStr.optSeq(query.compoundOps){ compoundOps =>
+      val compoundStrs = compoundOps.map{op =>
+        val (compoundMapping, compoundStr, compoundCtx) =
+          apply(op.rhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+
+        usql" ${SqlStr.raw(op.op)} $compoundStr"
+      }
+
+      SqlStr.join(compoundStrs)
+    }
+
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
       val ascDesc = orderBy.ascDesc match {
         case None => usql""
@@ -88,7 +99,7 @@ object SelectToSql {
       usql" OFFSET " + SqlStr.raw(offset.toString)
     }
 
-    val res = lhsStr + sortOpt + limitOpt + offsetOpt
+    val res = lhsStr + compound + sortOpt + limitOpt + offsetOpt
 
     (lhsMap, res, context)
   }

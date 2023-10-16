@@ -31,10 +31,10 @@ trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinabl
   def nullsFirst: Select[Q]
   def nullsLast: Select[Q]
 
-  def union(other: Select[Q]) = compound0("UNION", other)
-  def unionAll(other: Select[Q]) = compound0("UNION ALL", other)
-  def intersect(other: Select[Q]) = compound0("INTERSECT", other)
-  def except(other: Select[Q]) = compound0("EXCEPT", other)
+  def union(other: Select[Q]): Select[Q] = compound0("UNION", other)
+  def unionAll(other: Select[Q]): Select[Q] = compound0("UNION ALL", other)
+  def intersect(other: Select[Q]): Select[Q] = compound0("INTERSECT", other)
+  def except(other: Select[Q]): Select[Q] = compound0("EXCEPT", other)
   def compound0(op: String, other: Select[Q]): CompoundSelect[Q]
 
   def drop(n: Int): Select[Q]

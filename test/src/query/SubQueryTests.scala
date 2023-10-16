@@ -189,13 +189,52 @@ object SubQueryTests extends TestSuite {
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
           buyer0.birthdate as res__0__birthdate,
-          (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
+          (SELECT
+            COUNT(1) as res
+            FROM shipping_info shipping_info0
+            WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
         FROM buyer buyer0
       """,
       value = Vector(
         (Buyer(1, "James Bond", "2001-02-03"), true),
         (Buyer(2, "叉烧包", "1923-11-12"), false),
         (Buyer(3, "Li Haoyi", "1965-08-09"), false)
+      )
+    )
+
+    test("selectLimitUnionSelect") - checker(
+      Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(_.sku.toLowerCase))
+    ).expect(
+      sql = """
+        SELECT subquery0.res as res
+        FROM (SELECT
+            LOWER(buyer0.name) as res
+          FROM buyer buyer0
+          LIMIT 2) subquery0
+        UNION ALL
+        SELECT LOWER(product0.sku) as res
+        FROM product product0
+      """,
+      value = Vector(
+        "james bond", "叉烧包", "face-mask", "guitar", "socks", "skateboard", "camera", "cookie"
+      )
+    )
+
+    test("selectUnionSelectLimit") - checker(
+      Buyer.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.sku.toLowerCase).take(2))
+    ).expect(
+      sql = """
+        SELECT LOWER(buyer0.name) as res
+        FROM buyer buyer0
+        UNION ALL
+        SELECT subquery0.res as res
+        FROM (SELECT
+            LOWER(product0.sku) as res
+          FROM product product0
+          LIMIT 2) subquery0
+      """,
+      value = Vector(
+        "james bond", "叉烧包", "li haoyi", "face-mask", "guitar"
       )
     )
   }

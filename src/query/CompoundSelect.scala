@@ -7,7 +7,7 @@ import usql.{Queryable, Table}
 
 
 case class CompoundSelect[Q](lhs: SimpleSelect[Q],
-                             compoundOps: Seq[CompoundSelect.Op],
+                             compoundOps: Seq[CompoundSelect.Op[Q]],
                              orderBy: Option[OrderBy],
                              limit: Option[Int],
                              offset: Option[Int])
@@ -38,11 +38,8 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
     (lhs, compoundOps) match {
-      case (s: SimpleSelect[Q], Nil) => CompoundSelect(SimpleSelect.from(s.map(f)), compoundOps, orderBy, limit, offset)
-
-      case (cs: CompoundSelect[Q], Nil) =>
-        val ref = new SubqueryRef(cs, cs.qr)
-        this.copy(lhs = SimpleSelect(cs.lhs.asInstanceOf[Select[Q]].map(f).expr, None, Seq(ref), Nil, Nil, None))
+      case (s: Select[Q], Nil) =>
+        CompoundSelect(SimpleSelect.from(s.map(f)), Nil, orderBy, limit, offset)
 
       case _ => SimpleSelect.from(this).map(f)
     }
@@ -89,7 +86,7 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
   def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
   def compound0(op: String, other: Select[Q]) = {
-    val op2 = CompoundSelect.Op(op, other)
+    val op2 = CompoundSelect.Op(op, SimpleSelect.from(other))
     if (simple(orderBy, limit, offset)) copy(compoundOps = compoundOps ++ Seq(op2))
     else CompoundSelect(SimpleSelect.from(this), Seq(op2), None, None, None)
   }
@@ -103,5 +100,5 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
 }
 
 object CompoundSelect {
-  case class Op(op: String, rhs: Joinable[_])
+  case class Op[Q](op: String, rhs: Joinable[Q])
 }

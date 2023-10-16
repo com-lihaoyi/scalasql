@@ -118,11 +118,12 @@ case class SimpleSelect[Q](expr: Q,
   def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q]) = {
-    CompoundSelect(this, Seq(CompoundSelect.Op(op, other)), None, None, None)
+    val op2 = CompoundSelect.Op(op, SimpleSelect.from(other))
+    CompoundSelect(this, Seq(op2), None, None, None)
   }
 
   def drop(n: Int) = CompoundSelect(this, Nil, None, None, Some(n))
-  def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), Some(n))
+  def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
     (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").asCompleteQuery
