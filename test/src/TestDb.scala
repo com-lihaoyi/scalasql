@@ -1,7 +1,7 @@
 package usql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import pprint.PPrinter
-import usql.query.Expr
+import usql.query.{Expr, SubqueryRef}
 
 class TestDb(name: String) {
   def camelToSnake(s: String) = {
@@ -55,6 +55,7 @@ object TestDb{
   lazy val pprinter: PPrinter = PPrinter.Color.copy(
     additionalHandlers = {
       case v: Val[_] => pprinter.treeify(v.apply(), false, true)
+      case v: SubqueryRef[_] => pprinter.treeify(v.value, false, true)
       case v: Expr[_] if !v.isInstanceOf[scala.Product] => pprinter.treeify(v.exprToString, false, true)
     }
   )
