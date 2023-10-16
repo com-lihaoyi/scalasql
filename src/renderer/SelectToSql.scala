@@ -98,7 +98,6 @@ object SelectToSql {
                    tableNameMapper: String => String,
                    columnNameMapper: String => String,
                    previousFromMapping: Map[From, String]): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
-    println("SelectToSql.simple")
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,

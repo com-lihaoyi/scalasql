@@ -40,8 +40,17 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
     (lhs, compoundOps) match {
       case (s: SimpleSelect[Q], Nil) => CompoundSelect(s.map(f), compoundOps, orderBy, limit, offset)
 
-      case (CompoundSelect(lhs2: Select[Q], Nil, orderBy2, limit2, offset2), Nil) =>
-        this.copy(lhs = CompoundSelect(lhs2.map(f), compoundOps, orderBy, limit, offset))
+      case (cs @ CompoundSelect(lhs2: Select[Q], Nil, orderBy2, limit2, offset2), Nil) =>
+        this.copy(
+          lhs = SimpleSelect(
+            lhs2.map(f).expr,
+            None,
+            Seq(new SubqueryRef(CompoundSelect(lhs2, Nil, orderBy2, limit2, offset2), cs.qr)),
+            Nil,
+            Nil,
+            None
+          )
+        )
 
       case _ => SimpleSelect(f(expr), None, Seq(this.subquery), Nil, Nil, None)
     }
