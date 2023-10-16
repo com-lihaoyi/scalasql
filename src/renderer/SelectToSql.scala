@@ -1,6 +1,6 @@
 package usql.renderer
 
-import SqlStr.SqlStringSyntax
+import SqlStr.{SqlStringSyntax, flatten}
 import usql.query.{AscDesc, CompoundSelect, Expr, From, Join, Joinable, Nulls, Select, SimpleSelect, SubqueryRef, TableRef}
 import usql.{FlatJson, Queryable}
 
@@ -60,7 +60,9 @@ object SelectToSql {
                      tableNameMapper: String => String,
                      columnNameMapper: String => String,
                      previousFromMapping: Map[From, String]): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
-    val (lhsMap, lhsStr, context) = apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+    val (lhsMap, lhsStr0, context) = apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+
+    val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_]]) usql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
 
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
@@ -86,7 +88,9 @@ object SelectToSql {
       usql" OFFSET " + SqlStr.raw(offset.toString)
     }
 
-    (lhsMap, lhsStr + sortOpt + limitOpt + offsetOpt, context)
+    val res = lhsStr + sortOpt + limitOpt + offsetOpt
+
+    (lhsMap, res, context)
   }
 
   def simple[Q, R](query: SimpleSelect[Q],
@@ -94,6 +98,7 @@ object SelectToSql {
                    tableNameMapper: String => String,
                    columnNameMapper: String => String,
                    previousFromMapping: Map[From, String]): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
+    println("SelectToSql.simple")
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,

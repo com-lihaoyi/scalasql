@@ -1,6 +1,7 @@
 package usql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import pprint.PPrinter
+import usql.query.Expr
 
 class TestDb(name: String) {
   def camelToSnake(s: String) = {
@@ -33,6 +34,7 @@ class TestDb(name: String) {
   db.runRaw(os.read(os.pwd / "test" / "resources" / "unit-test-data.sql"))
   def apply[T, V](query: T)(implicit qr: Queryable[T, V])  = new Apply(query)
   class Apply[T, V](query: T)(implicit qr: Queryable[T, V]) {
+    TestDb.pprinter.log(query)
     def expect(sql: String = null, value: V) = {
       if (sql != null){
         val sqlResult = db.toSqlQuery(query)
@@ -43,13 +45,17 @@ class TestDb(name: String) {
       }
 
       val result = db.run(query)
-      lazy val pprinter: PPrinter = PPrinter.Color.copy(
-        additionalHandlers = {
-          case v: Val[_] => pprinter.treeify(v.apply(), false, true)
-        }
-      )
       // pprinter.log(result)
       assert(result == value, pprint.apply(result))
     }
   }
+}
+
+object TestDb{
+  lazy val pprinter: PPrinter = PPrinter.Color.copy(
+    additionalHandlers = {
+      case v: Val[_] => pprinter.treeify(v.apply(), false, true)
+      case v: Expr[_] if !v.isInstanceOf[scala.Product] => pprinter.treeify(v.exprToString, false, true)
+    }
+  )
 }

@@ -16,8 +16,8 @@ trait Expr[T] {
   override def equals(other: Any): Boolean = throw new Exception(
     "Expr#equals is not defined. Use Expr#exprIdentity for your equality checks"
   )
-  val exprIdentity: Expr.Identity = new Expr.Identity()
-  val exprToString: String = super.toString
+  lazy val exprIdentity: Expr.Identity = new Expr.Identity()
+  def exprToString: String = super.toString
 }
 
 object Expr{

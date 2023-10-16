@@ -1,14 +1,13 @@
 package usql.query
 
-import usql.query.Joinable
 import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, SelectToSql, SqlStr}
-import usql.{OptionPickler, Queryable, Table}
+import usql.renderer.{Context, SqlStr}
+import usql.{Queryable, Table}
 
 
 
 case class CompoundSelect[Q](lhs: Joinable[Q],
-                             op: Option[CompoundSelect.Op],
+                             compoundOps: Seq[CompoundSelect.Op],
                              orderBy: Option[OrderBy],
                              limit: Option[Int],
                              offset: Option[Int])
@@ -38,8 +37,12 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   }
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
-    (lhs, op) match {
-      case (s: SimpleSelect[Q], None) => CompoundSelect(s.map(f), op, orderBy, limit, offset)
+    (lhs, compoundOps) match {
+      case (s: SimpleSelect[Q], Nil) => CompoundSelect(s.map(f), compoundOps, orderBy, limit, offset)
+
+      case (CompoundSelect(lhs2: Select[Q], Nil, orderBy2, limit2, offset2), Nil) =>
+        this.copy(lhs = CompoundSelect(lhs2.map(f), compoundOps, orderBy, limit, offset))
+
       case _ => SimpleSelect(f(expr), None, Seq(this.subquery), Nil, Nil, None)
     }
   }
@@ -49,8 +52,8 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
-    (lhs, op) match {
-      case (s: SimpleSelect[Q], None) => CompoundSelect(s.filter(f), op, orderBy, limit, offset)
+    (lhs, compoundOps) match {
+      case (s: SimpleSelect[Q], Nil) => CompoundSelect(s.filter(f), compoundOps, orderBy, limit, offset)
       case _ => SimpleSelect(expr, None, Seq(this.subquery), Nil, Seq(f(expr)), None)
     }
   }
@@ -110,7 +113,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
     val newOrder = Some(OrderBy(f(expr), None, None))
 
     if (simple(limit, offset)) copy(orderBy = newOrder)
-    else CompoundSelect(this, op, newOrder, None, None)
+    else CompoundSelect(this, compoundOps, newOrder, None, None)
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
@@ -118,16 +121,10 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
   def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
 
-
   def compound0(op: String, other: Select[Q]) = {
-    CompoundSelect(
-      this,
-      Some(CompoundSelect.Op(op, other)),
-      None,
-      None,
-      None
-    )
-
+    val op2 = CompoundSelect.Op(op, other)
+    if (simple(orderBy, limit, offset)) copy(compoundOps = compoundOps ++ Seq(op2))
+    else CompoundSelect(this, Seq(op2), None, None, None)
   }
 
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
