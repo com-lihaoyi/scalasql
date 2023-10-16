@@ -7,8 +7,6 @@ import usql.renderer.{Context, SqlStr}
  * Something that supports aggregate operations
  */
 trait Aggregatable[Q] {
-  def expr: Q
-
-  def queryExpr[V](f: Context => SqlStr)
+  def queryExpr[V](f: (Expr[_], Context) => SqlStr)
                   (implicit qr: Queryable[Expr[V], V]): Expr[V]
 }

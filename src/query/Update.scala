@@ -1,7 +1,6 @@
 package usql.query
 
-import usql.{Column, OptionPickler, Queryable}
-import usql.query.Select.Join
+import usql.{Column, OptionPickler, Queryable, Table}
 import usql.renderer.{Context, SqlStr, UpdateToSql}
 
 /**
@@ -10,7 +9,7 @@ import usql.renderer.{Context, SqlStr, UpdateToSql}
  * https://www.postgresql.org/docs/current/sql-update.html
  */
 case class Update[Q](expr: Q,
-                     table: Select.TableRef,
+                     table: TableRef,
                      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
@@ -30,15 +29,15 @@ case class Update[Q](expr: Q,
   def join0[V](other: Select[V],
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): Update[(Q, V)] = {
-    val otherTrivial = other.simple(other.groupBy0, other.orderBy, other.limit, other.offset)
+    val otherTrivial = other.isInstanceOf[Table.Base]
+    val otherSelect = other.select
+    lazy val otherTableJoin = Join(None, Seq(JoinFrom(new TableRef(other.asInstanceOf[Table.Base]), on.map(_(expr, otherSelect.expr)))))
+    lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
     Update(
       (expr, other.expr),
       table = table,
       set0 = set0,
-      joins =
-        joins ++
-          (if (otherTrivial) Seq(Join(None, other.from.map(Select.JoinFrom(_, on.map(_(expr, other.expr))))))
-          else Seq(Join(None, Seq(Select.JoinFrom(new Select.SubqueryRef(other, joinQr), on.map(_(expr, other.expr))))))),
+      joins = joins ++ Seq(if (otherTrivial) otherTableJoin else otherSubqueryJoin),
       where = where
     )
 
@@ -50,7 +49,7 @@ case class Update[Q](expr: Q,
 }
 
 object Update {
-  def fromTable[Q](expr: Q, table: Select.TableRef)(implicit qr: Queryable[Q, _]): Update[Q] = {
+  def fromTable[Q](expr: Q, table: TableRef)(implicit qr: Queryable[Q, _]): Update[Q] = {
     Update(expr, table, Nil, Nil, Nil)
   }
 

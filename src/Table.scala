@@ -2,7 +2,7 @@ package usql
 import scala.language.experimental.macros
 import OptionPickler.{Reader, Writer}
 import renderer.{Context, SelectToSql, SqlStr}
-import usql.query.Select.TableRef
+import usql.query.TableRef
 import renderer.SqlStr.SqlStringSyntax
 import usql.query.{Expr, Joinable, Select, Update}
 
@@ -61,7 +61,7 @@ object Table{
 
       c.Expr[Metadata[V]](
         q"""
-        val $tableRef = new usql.query.Select.TableRef(this)
+        val $tableRef = new usql.query.TableRef(this)
         new _root_.usql.Table.Metadata[$wtt](
           new usql.Table.Internal.TableQueryable(
             t => $allFlattenedExprs,
