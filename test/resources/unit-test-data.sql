@@ -2,7 +2,7 @@
 CREATE TABLE buyer (
     id INT PRIMARY KEY,
     name VARCHAR(256),
-    birthdate DATE
+    date_of_birth DATE
 );
 
 CREATE TABLE product (
@@ -29,9 +29,9 @@ CREATE TABLE purchase (
     FOREIGN KEY(product_id) REFERENCES product(id)
 );
 
-INSERT INTO buyer (id, name, birthdate) VALUES (1, 'James Bond', '2001-02-03');
-INSERT INTO buyer (id, name, birthdate) VALUES (2, '叉烧包', '1923-11-12');
-INSERT INTO buyer (id, name, birthdate) VALUES (3, 'Li Haoyi', '1965-08-09');
+INSERT INTO buyer (id, name, date_of_birth) VALUES (1, 'James Bond', '2001-02-03');
+INSERT INTO buyer (id, name, date_of_birth) VALUES (2, '叉烧包', '1923-11-12');
+INSERT INTO buyer (id, name, date_of_birth) VALUES (3, 'Li Haoyi', '1965-08-09');
 
 INSERT INTO product (id, sku, name, price) VALUES (1, 'face-mask', 'Face Mask', 8.88);
 INSERT INTO product (id, sku, name, price) VALUES (2, 'guitar', 'Guitar', 300);

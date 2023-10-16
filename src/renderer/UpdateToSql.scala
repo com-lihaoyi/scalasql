@@ -39,7 +39,7 @@ object UpdateToSql {
 
     val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
     val updateList = q.set0.map { case (k, v) =>
-      val kStr = SqlStr.raw(k.name)
+      val kStr = SqlStr.raw(columnNameMapper(k.name))
       usql"$kStr = $v"
     }
     val sets = SqlStr.join(updateList, usql", ")

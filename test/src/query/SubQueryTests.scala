@@ -153,7 +153,7 @@ object SubQueryTests extends TestSuite {
         SELECT
           buyer0.id as res__id,
           buyer0.name as res__name,
-          buyer0.birthdate as res__birthdate
+          buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
         WHERE (SELECT
             COUNT(1) as res
@@ -170,7 +170,7 @@ object SubQueryTests extends TestSuite {
         SELECT
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
-          buyer0.birthdate as res__0__birthdate,
+          buyer0.date_of_birth as res__0__date_of_birth,
           (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
         FROM buyer buyer0
       """,
@@ -188,7 +188,7 @@ object SubQueryTests extends TestSuite {
         SELECT
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
-          buyer0.birthdate as res__0__birthdate,
+          buyer0.date_of_birth as res__0__date_of_birth,
           (SELECT
             COUNT(1) as res
             FROM shipping_info shipping_info0

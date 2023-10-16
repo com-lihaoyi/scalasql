@@ -10,8 +10,8 @@ object Product extends Table[Product]{
 }
 
 case class Buyer[T[_]](id: T[Int],
-                          name: T[String],
-                          birthdate: T[String])
+                       name: T[String],
+                       dateOfBirth: T[String])
 object Buyer extends Table[Buyer]{
   val metadata = initMetadata()
 }

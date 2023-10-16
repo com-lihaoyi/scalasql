@@ -21,13 +21,13 @@ object SelectTests extends TestSuite {
         SELECT
           buyer0.id as res__id,
           buyer0.name as res__name,
-          buyer0.birthdate as res__birthdate
+          buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
       """,
       value = Vector(
-        Buyer(id = 1, name = "James Bond", birthdate = "2001-02-03"),
-        Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
-        Buyer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09")
+        Buyer(id = 1, name = "James Bond", dateOfBirth = "2001-02-03"),
+        Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
+        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = "1965-08-09")
       )
     )
 
@@ -92,12 +92,12 @@ object SelectTests extends TestSuite {
         value =  Vector(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
       )
 
-      test("tuple3") - checker(Buyer.select.map(c => (c.name, c.id, c.birthdate))).expect(
+      test("tuple3") - checker(Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))).expect(
         sql = """
           SELECT
             buyer0.name as res__0,
             buyer0.id as res__1,
-            buyer0.birthdate as res__2
+            buyer0.date_of_birth as res__2
           FROM buyer buyer0
         """,
         value =  Vector(
@@ -118,13 +118,13 @@ object SelectTests extends TestSuite {
             buyer0.id as res__0,
             buyer0.id as res__1__id,
             buyer0.name as res__1__name,
-            buyer0.birthdate as res__1__birthdate
+            buyer0.date_of_birth as res__1__date_of_birth
           FROM buyer buyer0
         """,
         value = Vector(
-          (1, Buyer(id = 1, name = "James Bond", birthdate = "2001-02-03")),
-          (2, Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12")),
-          (3, Buyer(id = 3, name = "Li Haoyi", birthdate = "1965-08-09"))
+          (1, Buyer(id = 1, name = "James Bond", dateOfBirth = "2001-02-03")),
+          (2, Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12")),
+          (3, Buyer(id = 3, name = "Li Haoyi", dateOfBirth = "1965-08-09"))
         )
       )
     }
@@ -238,7 +238,7 @@ object SelectTests extends TestSuite {
           SELECT
             buyer0.id as res__0__id,
             buyer0.name as res__0__name,
-            buyer0.birthdate as res__0__birthdate,
+            buyer0.date_of_birth as res__0__date_of_birth,
             shipping_info1.id as res__1__id,
             shipping_info1.buyer_id as res__1__buyer_id,
             shipping_info1.shipping_date as res__1__shipping_date
@@ -248,11 +248,11 @@ object SelectTests extends TestSuite {
         """,
         value = Vector(
           (
-            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
             ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03")
           ),
           (
-            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
             ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
           )
         )
@@ -266,7 +266,7 @@ object SelectTests extends TestSuite {
           SELECT
             buyer0.id as res__0__id,
             buyer0.name as res__0__name,
-            buyer0.birthdate as res__0__birthdate,
+            buyer0.date_of_birth as res__0__date_of_birth,
             shipping_info1.id as res__1__id,
             shipping_info1.buyer_id as res__1__buyer_id,
             shipping_info1.shipping_date as res__1__shipping_date
@@ -276,11 +276,11 @@ object SelectTests extends TestSuite {
         """,
         value = Vector(
           (
-            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
             ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03")
           ),
           (
-            Buyer(id = 2, name = "叉烧包", birthdate = "1923-11-12"),
+            Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
             ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
           )
         )
@@ -349,7 +349,7 @@ object SelectTests extends TestSuite {
       Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
     ).expect(
       sql = """
-        SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.birthdate as res__birthdate
+        SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
         WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
       """,

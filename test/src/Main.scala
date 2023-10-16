@@ -19,7 +19,7 @@ object Main {
     CREATE TABLE buyer (
         id INT PRIMARY KEY,
         name VARCHAR(256),
-        birthdate DATE
+        date_of_birth DATE
     );
 
 
@@ -47,9 +47,9 @@ object Main {
     INSERT INTO product (id, sku, name, price) VALUES (5, 'camera', 'Camera', 1000.00);
     INSERT INTO product (id, sku, name, price) VALUES (6, 'cookie', 'Cookie', 1.00);
 
-    INSERT INTO buyer (id, name, birthdate) VALUES (1, 'James Bond', '2001-02-03');
-    INSERT INTO buyer (id, name, birthdate) VALUES (2, '叉烧包', '1923-11-12');
-    INSERT INTO buyer (id, name, birthdate) VALUES (3, 'Li Haoyi', '1965-08-09');
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (1, 'James Bond', '2001-02-03');
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (2, '叉烧包', '1923-11-12');
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (3, 'Li Haoyi', '1965-08-09');
 
     INSERT INTO shipping_info (id, buyer_id, shipping_date) VALUES (1, 2, '2010-02-03');
     INSERT INTO shipping_info (id, buyer_id, shipping_date) VALUES (2, 1, '2012-04-05');

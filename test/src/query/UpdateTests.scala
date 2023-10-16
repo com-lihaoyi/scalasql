@@ -11,31 +11,31 @@ object UpdateTests extends TestSuite {
   def tests = Tests {
     val checker = new TestDb("querytests")
     test("update") - {
-      checker(Buyer.update.filter(_.name === "James Bond").set(_.birthdate -> "2019-04-07"))
+      checker(Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> "2019-04-07"))
         .expect(
-          sql = "UPDATE buyer SET birthdate = ? WHERE buyer.name = ?",
+          sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
           value = 1
         )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Vector("2019-04-07")
       )
 
-      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth)).expect(
         value = Vector("1965-08-09") // not updated
       )
     }
 
     test("bulk") - {
-      checker(Buyer.update.set(_.birthdate -> "2019-04-07")).expect(
-        sql = "UPDATE buyer SET birthdate = ?",
+      checker(Buyer.update.set(_.dateOfBirth -> "2019-04-07")).expect(
+        sql = "UPDATE buyer SET date_of_birth = ?",
         value = 3
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Vector("2019-04-07")
       )
-      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -44,14 +44,14 @@ object UpdateTests extends TestSuite {
       checker(
         Buyer.update
           .filter(_.name === "James Bond")
-          .set(_.birthdate -> "2019-04-07")
+          .set(_.dateOfBirth -> "2019-04-07")
           .returning(_.id)
       ).expect(
-        sql = "UPDATE buyer SET birthdate = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+        sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Vector(1)
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -60,18 +60,18 @@ object UpdateTests extends TestSuite {
       checker(
         Buyer.update
           .filter(_.name === "James Bond")
-          .set(_.birthdate -> "2019-04-07", _.name -> "John Dee")
+          .set(_.dateOfBirth -> "2019-04-07", _.name -> "John Dee")
           .returning(_.id)
       ).expect(
-        sql = "UPDATE buyer SET birthdate = ?, name = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+        sql = "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Vector(1)
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Nil
       )
 
-      checker(Buyer.select.filter(_.name === "John Dee").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "John Dee").map(_.dateOfBirth)).expect(
         value = Vector("2019-04-07")
       )
     }
@@ -80,13 +80,13 @@ object UpdateTests extends TestSuite {
       checker(
         Buyer.update
           .filter(_.name === "James Bond")
-          .set(_.birthdate -> "2019-04-07", _.name -> "John Dee")
-          .returning(c => (c.id, c.name, c.birthdate))
+          .set(_.dateOfBirth -> "2019-04-07", _.name -> "John Dee")
+          .returning(c => (c.id, c.name, c.dateOfBirth))
       ).expect(
         sql = """
           UPDATE buyer
-          SET birthdate = ?, name = ? WHERE buyer.name = ?
-          RETURNING buyer.id as res__0, buyer.name as res__1, buyer.birthdate as res__2
+          SET date_of_birth = ?, name = ? WHERE buyer.name = ?
+          RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
         """,
         value = Vector((1, "John Dee", "2019-04-07"))
       )
@@ -103,11 +103,11 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Nil
       )
 
-      checker(Buyer.select.filter(_.name === "JAMES BOND").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "JAMES BOND").map(_.dateOfBirth)).expect(
         value =  Vector("2001-02-03")
       )
     }
@@ -117,12 +117,12 @@ object UpdateTests extends TestSuite {
         Buyer.update
           .filter(_.name === "James Bond")
           .joinOn(ShippingInfo)(_.id === _.buyerId)
-          .set(c => c._1.birthdate -> c._2.shippingDate)
+          .set(c => c._1.dateOfBirth -> c._2.shippingDate)
           .returning(_._1.id)
       ).expect(
         sql = """
           UPDATE buyer
-          SET birthdate = shipping_info0.shipping_date
+          SET date_of_birth = shipping_info0.shipping_date
           FROM shipping_info shipping_info0
           WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
           RETURNING buyer.id as res
@@ -130,7 +130,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Vector("2012-04-05")
       )
     }
@@ -167,11 +167,11 @@ object UpdateTests extends TestSuite {
         Buyer.update
           .filter(_.name === "James Bond")
           .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id === _.buyerId)
-          .set(c => c._1.birthdate -> c._2.shippingDate)
+          .set(c => c._1.dateOfBirth -> c._2.shippingDate)
           .returning(_._1.id)
       ).expect(
         sql = """
-          UPDATE buyer SET birthdate = subquery0.res__shipping_date
+          UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
           FROM (SELECT
               shipping_info0.id as res__id,
               shipping_info0.buyer_id as res__buyer_id,
@@ -185,7 +185,7 @@ object UpdateTests extends TestSuite {
         value = Vector(1)
       )
 
-      checker(Buyer.select.filter(_.name === "James Bond").map(_.birthdate)).expect(
+      checker(Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth)).expect(
         value = Vector("2012-04-05")
       )
     }
