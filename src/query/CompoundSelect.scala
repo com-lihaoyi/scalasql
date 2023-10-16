@@ -8,7 +8,7 @@ import usql.{OptionPickler, Queryable, Table}
 
 
 case class CompoundSelect[Q](lhs: Joinable[Q],
-                             op: Option[CompoundSelect.Op[Q]],
+                             op: Option[CompoundSelect.Op],
                              orderBy: Option[OrderBy],
                              limit: Option[Int],
                              offset: Option[Int])
@@ -38,7 +38,10 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   }
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
-    SimpleSelect(f(expr), None, Seq(this.subquery), Nil, Nil, None)
+    (lhs, op) match {
+      case (s: SimpleSelect[Q], None) => CompoundSelect(s.map(f), op, orderBy, limit, offset)
+      case _ => SimpleSelect(f(expr), None, Seq(this.subquery), Nil, Nil, None)
+    }
   }
 
   def flatMap[V](f: Q => Select[V])(implicit qr: Queryable[V, _]): Select[V] = {
@@ -46,7 +49,10 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
-    SimpleSelect(expr, None, Seq(this.subquery), Nil, Seq(f(expr)), None)
+    (lhs, op) match {
+      case (s: SimpleSelect[Q], None) => CompoundSelect(s.filter(f), op, orderBy, limit, offset)
+      case _ => SimpleSelect(expr, None, Seq(this.subquery), Nil, Seq(f(expr)), None)
+    }
   }
 
   def join[V](other: Joinable[V])
@@ -63,7 +69,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
     val otherTrivial = other.isInstanceOf[Table.Base]
 
     val otherSelect = other.select
-    lazy val otherTableJoin = Join(None, Seq(JoinFrom(new TableRef(other.asInstanceOf[Table.Base]), on.map(_(expr, otherSelect.expr)))))
+    lazy val otherTableJoin = Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
     lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
     SimpleSelect(
       expr = (expr, otherSelect.expr),
@@ -140,5 +146,5 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
 }
 
 object CompoundSelect {
-  case class Op[Q](op: String, rhs: Joinable[Q])
+  case class Op(op: String, rhs: Joinable[_])
 }

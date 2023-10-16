@@ -80,7 +80,8 @@ case class SimpleSelect[Q](expr: Q,
     val otherTrivial = other.isInstanceOf[Table.Base]
 
     val otherSelect = other.select
-    lazy val otherTableJoin = Join(None, Seq(JoinFrom(new TableRef(other.asInstanceOf[Table.Base]), on.map(_(expr, otherSelect.expr)))))
+
+    lazy val otherTableJoin = Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
     lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
     SimpleSelect(
       expr = (expr, otherSelect.expr),
