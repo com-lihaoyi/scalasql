@@ -51,13 +51,12 @@ case class SimpleSelect[Q](expr: Q,
     }
   }
 
-  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Select[V] = {
-    copy(expr = f(expr))
-  }
+  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Select[V] = copy(expr = f(expr))
 
-  def flatMap[V](f: Q => Select[V])(implicit qr: Queryable[V, _]): Select[V] = {
-//    val other = f(expr)
-    ???
+  def flatMap[V](f: Q => Select[V])(implicit qr2: Queryable[V, _]): Select[V] = {
+    val other = f(expr)
+    val simple = SimpleSelect.from(other)
+    simple.copy(from = this.from ++ simple.from)
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
@@ -133,5 +132,12 @@ case class SimpleSelect[Q](expr: Q,
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
     (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").asCompleteQuery
+  }
+}
+
+object SimpleSelect{
+  def from[Q](s: Select[Q]) = s match{
+    case s: SimpleSelect[Q] => s
+    case s: CompoundSelect[Q] => SimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
   }
 }

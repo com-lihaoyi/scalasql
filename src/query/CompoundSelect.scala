@@ -6,7 +6,7 @@ import usql.{Queryable, Table}
 
 
 
-case class CompoundSelect[Q](lhs: Joinable[Q],
+case class CompoundSelect[Q](lhs: SimpleSelect[Q],
                              compoundOps: Seq[CompoundSelect.Op],
                              orderBy: Option[OrderBy],
                              limit: Option[Int],
@@ -38,7 +38,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
     (lhs, compoundOps) match {
-      case (s: SimpleSelect[Q], Nil) => CompoundSelect(s.map(f), compoundOps, orderBy, limit, offset)
+      case (s: SimpleSelect[Q], Nil) => CompoundSelect(SimpleSelect.from(s.map(f)), compoundOps, orderBy, limit, offset)
 
       case (cs: CompoundSelect[Q], Nil) =>
         val ref = new SubqueryRef(cs, cs.qr)
@@ -54,7 +54,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
     (lhs, compoundOps) match {
-      case (s: SimpleSelect[Q], Nil) => CompoundSelect(s.filter(f), compoundOps, orderBy, limit, offset)
+      case (s: SimpleSelect[Q], Nil) => CompoundSelect(SimpleSelect.from(s.filter(f)), compoundOps, orderBy, limit, offset)
       case _ => SimpleSelect(expr, None, Seq(this.subquery), Nil, Seq(f(expr)), None)
     }
   }
@@ -114,7 +114,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
     val newOrder = Some(OrderBy(f(expr), None, None))
 
     if (simple(limit, offset)) copy(orderBy = newOrder)
-    else CompoundSelect(this, compoundOps, newOrder, None, None)
+    else CompoundSelect(SimpleSelect.from(this), compoundOps, newOrder, None, None)
   }
 
   def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
@@ -125,7 +125,7 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
   def compound0(op: String, other: Select[Q]) = {
     val op2 = CompoundSelect.Op(op, other)
     if (simple(orderBy, limit, offset)) copy(compoundOps = compoundOps ++ Seq(op2))
-    else CompoundSelect(this, Seq(op2), None, None, None)
+    else CompoundSelect(SimpleSelect.from(this), Seq(op2), None, None, None)
   }
 
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))

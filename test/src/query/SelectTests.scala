@@ -313,7 +313,7 @@ object SelectTests extends TestSuite {
         """,
         value = Vector("2012-04-05")
       )
-      test("flatMap") - checker(
+      test("flatMap2") - checker(
         Buyer.select.flatMap(c =>
           ShippingInfo.select
             .filter { p => c.id === p.buyerId && c.name === "James Bond" }

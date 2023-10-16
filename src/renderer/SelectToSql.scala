@@ -148,6 +148,7 @@ object SelectToSql {
       .map {
         case (t: TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
         case (s: SubqueryRef[_], i) => (s, "subquery" + i)
+        case x => throw new Exception("wtf " + x)
       }
       .toMap
 
