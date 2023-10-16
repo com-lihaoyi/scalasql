@@ -100,5 +100,5 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
 }
 
 object CompoundSelect {
-  case class Op[Q](op: String, rhs: Joinable[Q])
+  case class Op[Q](op: String, rhs: SimpleSelect[Q])
 }
