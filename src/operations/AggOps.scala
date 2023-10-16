@@ -4,7 +4,7 @@ import usql.Queryable
 import usql.query.{Aggregatable, Expr}
 import usql.renderer.SqlStr.SqlStringSyntax
 
-class ExprSeqOps[T](v: Aggregatable[T])(implicit qr: Queryable[T, _]) {
+class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable[T, _]) {
   /** Counts the rows */
   def size: Expr[Int] = v.queryExpr(implicit ctx => usql"COUNT(1)")
 
