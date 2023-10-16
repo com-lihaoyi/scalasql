@@ -348,8 +348,50 @@ object SelectTests extends TestSuite {
     }
 //    test("distinct on") - ???
 
-//    test("nonEmpty") - ???
-//    test("nested") - ???
+
+    test("contains") - checker(
+      Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
+    ).expect(
+      sql = """
+        SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.birthdate as res__birthdate
+        FROM buyer buyer0
+        WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
+      """,
+      value = Vector(
+        Buyer(1, "James Bond", "2001-02-03"),
+        Buyer(2, "叉烧包", "1923-11-12")
+      )
+    )
+
+    test("nonEmpty") - checker(
+      Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).nonEmpty))
+    ).expect(
+      sql = """
+        SELECT
+          buyer0.name as res__0,
+          EXISTS (SELECT
+            shipping_info0.id as res
+            FROM shipping_info shipping_info0
+            WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+        FROM buyer buyer0
+      """,
+      value = Vector(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
+    )
+
+    test("isEmpty") - checker(
+      Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).isEmpty))
+    ).expect(
+      sql = """
+        SELECT
+          buyer0.name as res__0,
+          NOT EXISTS (SELECT
+            shipping_info0.id as res
+            FROM shipping_info shipping_info0
+            WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+        FROM buyer buyer0
+      """,
+      value = Vector(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
+    )
   }
 }
 
