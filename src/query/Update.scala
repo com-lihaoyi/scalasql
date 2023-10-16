@@ -13,7 +13,7 @@ case class Update[Q](expr: Q,
                      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
-                    (implicit val qr: Queryable[Q, _]) {
+                    (implicit val qr: Queryable[Q, _])  extends JoinOps[Update, Q]{
   def filter(f: Q => Expr[Boolean]): Update[Q] = {
     this.copy(where = where ++ Seq(f(expr)))
   }
@@ -22,9 +22,6 @@ case class Update[Q](expr: Q,
     this.copy(set0 = f.map(_(expr)))
   }
 
-  def joinOn[V](other: Joinable[V])
-               (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): Update[(Q, V)] = join0(other, Some(on))
 
   def join0[V](other: Joinable[V],
                on: Option[(Q, V) => Expr[Boolean]])
