@@ -69,19 +69,13 @@ case class SimpleSelect[Q](expr: Q,
               (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
 
     val thisTrivial = groupBy0.isEmpty
-    val otherTrivial = other.isInstanceOf[Table.Base]
+    val (otherJoin, otherSelect) = joinInfo(other, on)
 
-    val otherSelect = other.select
-
-    lazy val otherTableJoin = Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
-    lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
     SimpleSelect(
       expr = (expr, otherSelect.expr),
       exprPrefix = if (thisTrivial) exprPrefix else None,
       from = if (thisTrivial) from else Seq(this.subquery),
-      joins =
-        (if (thisTrivial) joins else Nil) ++
-        (if (otherTrivial) Seq(otherTableJoin) else Seq(otherSubqueryJoin)),
+      joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
       where = if (thisTrivial) where else Nil,
       groupBy0 = if (thisTrivial) groupBy0 else None,
     )

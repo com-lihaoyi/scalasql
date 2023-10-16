@@ -1,9 +1,9 @@
 package usql.query
 
-import usql.Queryable
+import usql.{Queryable, Table}
 
 trait JoinOps[C[_], Q] {
-
+  def expr: Q
   def join[V](other: Joinable[V])
              (implicit qr: Queryable[V, _]): C[(Q, V)] = join0(other, None)
 
@@ -14,4 +14,16 @@ trait JoinOps[C[_], Q] {
   def join0[V](other: Joinable[V],
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): C[(Q, V)]
+
+  def joinInfo[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit joinQr: Queryable[V, _]) = {
+    val otherTrivial = other.isInstanceOf[Table.Base]
+
+    val otherSelect = other.select
+
+    val otherJoin =
+      if (otherTrivial) Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
+      else Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
+
+    (Seq(otherJoin), otherSelect)
+  }
 }

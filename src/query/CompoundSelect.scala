@@ -44,7 +44,7 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
         val ref = new SubqueryRef(cs, cs.qr)
         this.copy(lhs = SimpleSelect(cs.lhs.asInstanceOf[Select[Q]].map(f).expr, None, Seq(ref), Nil, Nil, None))
 
-      case _ => SimpleSelect(f(expr), None, Seq(this.subquery), Nil, Nil, None)
+      case _ => SimpleSelect.from(this).map(f)
     }
   }
 
@@ -55,60 +55,26 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
     (lhs, compoundOps) match {
       case (s: SimpleSelect[Q], Nil) => CompoundSelect(SimpleSelect.from(s.filter(f)), compoundOps, orderBy, limit, offset)
-      case _ => SimpleSelect(expr, None, Seq(this.subquery), Nil, Seq(f(expr)), None)
+      case _ => SimpleSelect.from(this).filter(f)
     }
   }
 
   def join0[V](other: Joinable[V],
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
-
-    val otherTrivial = other.isInstanceOf[Table.Base]
-
-    val otherSelect = other.select
-    lazy val otherTableJoin = Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
-    lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
-    SimpleSelect(
-      expr = (expr, otherSelect.expr),
-      exprPrefix = None,
-      from = Seq(this.subquery),
-      joins = if (otherTrivial) Seq(otherTableJoin) else Seq(otherSubqueryJoin),
-      where = Nil,
-      groupBy0 = None,
-    )
+    SimpleSelect.from(this).join0(other, on)
   }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)
                      (implicit qr: Queryable[E, V]): Expr[V] = {
-    ???
-//    SimpleSelect(
-//      expr = f(new SelectProxy(expr)),
-//      exprPrefix = None,
-//      from = Seq(this),
-//      joins = Nil,
-//      where = Nil,
-//      groupBy0 = None
-//    ).aggregate(f)
+    SimpleSelect.from(this).aggregate(f)
   }
 
   def groupBy[K, V](groupKey: Q => K)
                    (groupAggregate: SelectProxy[Q] => V)
                    (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Select[(K, V)] = {
-
-    val groupKeyValue = groupKey(expr)
-    val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
-    val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
-    val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
-    SimpleSelect(
-      expr = newExpr,
-      exprPrefix = None,
-      from = Seq(new SubqueryRef[Q](this, qr)),
-      joins = Nil,
-      where = Nil,
-      groupBy0 = groupByOpt,
-    )
+    SimpleSelect.from(this).groupBy(groupKey)(groupAggregate)
   }
-
 
   def sortBy(f: Q => Expr[_]) = {
     val newOrder = Some(OrderBy(f(expr), None, None))

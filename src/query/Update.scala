@@ -26,18 +26,8 @@ case class Update[Q](expr: Q,
   def join0[V](other: Joinable[V],
                on: Option[(Q, V) => Expr[Boolean]])
               (implicit joinQr: Queryable[V, _]): Update[(Q, V)] = {
-    val otherTrivial = other.isInstanceOf[Table.Base]
-    val otherSelect = other.select
-    lazy val otherTableJoin = Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
-    lazy val otherSubqueryJoin = Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
-    Update(
-      (expr, otherSelect.expr),
-      table = table,
-      set0 = set0,
-      joins = joins ++ Seq(if (otherTrivial) otherTableJoin else otherSubqueryJoin),
-      where = where
-    )
-
+    val (otherJoin, otherSelect) = joinInfo(other, on)
+    this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
   }
 
   def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): UpdateReturning[Q2, R] = {
