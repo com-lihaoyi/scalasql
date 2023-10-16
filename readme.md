@@ -25,6 +25,11 @@ typed `Table` descriptions.
    this library, so it should be both implementable and maintainable by ~1 person
    in free time
 
+6. **90% coverage of common SQL APIs, user-extensible to handle the rest**: we should
+   aim to support the most common use cases out of the box, and for use cases we cannot
+   support we should provide a mechanism for the user to extend the library to support
+   them. That ensures the library is both easy to get started with and can scale beyond
+   toy examples.
 
 # Non-Goals
 
@@ -43,6 +48,12 @@ typed `Table` descriptions.
    around their query plans being un-predictable or non-deterministic, such that
    even with the appropriate indices the query planner may decide not to use them.
    This is not something we can fix at the client layer
+
+4. **Full Coverage of SQL APIs**: the full set of SQL APIs is huge, different for
+   each database, and ever-changing. We thus do not aim to have complete coverage,
+   aiming instead for common use cases and leaving more esoteric things to the user
+   to extend the library to support.
+   
 
 # How to get there:
 
