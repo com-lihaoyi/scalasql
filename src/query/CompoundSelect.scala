@@ -14,6 +14,8 @@ case class CompoundSelect[Q](lhs: Joinable[Q],
                              offset: Option[Int])
                             (implicit val qr: Queryable[Q, _]) extends Select[Q] {
 
+  def expr = lhs.select.expr
+
   override def select = this
 
   def distinct: Select[Q] = ???
