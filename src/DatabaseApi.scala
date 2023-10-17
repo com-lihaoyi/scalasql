@@ -1,7 +1,7 @@
 package usql
 
 import renderer.{Context, Interp, SelectToSql, SqlStr}
-import upickle.core.{ArrVisitor, Visitor}
+import upickle.core.{ArrVisitor, ObjArrVisitor, Visitor}
 import usql.DatabaseApi.handleResultRow
 
 import java.sql.{ResultSet, Statement}
@@ -86,17 +86,8 @@ object DatabaseApi{
       kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
     }
 
-    val json = FlatJson.unflatten(kvs.toSeq)
+    val json = FlatJson.unflatten(kvs.toSeq, columnNameUnMapper)
 
-    def unMapJson(j: ujson.Value): ujson.Value = j match {
-      case ujson.Obj(kvs) =>
-        ujson.Obj.from(kvs.map { case (k, v) => (columnNameUnMapper(k), unMapJson(v)) })
-
-      case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
-      case j => j
-    }
-
-    val unMappedJson = unMapJson(json)
-    unMappedJson.transform(rowVisitor)
+    json.transform(rowVisitor)
   }
 }

@@ -16,13 +16,15 @@ object FlatJson {
     x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlExpr(context))}
   }
 
-  def unflatten(kvs: Seq[(String, ujson.Value)]): ujson.Value = unflatten0(kvs)(basePrefix)
-  def unflatten0(kvs: Seq[(String, ujson.Value)]): ujson.Value = {
+  def unflatten(kvs: Seq[(String, ujson.Value)],
+                columnNameUnMapper: String => String): ujson.Value = unflatten0(kvs, columnNameUnMapper)(basePrefix)
+  def unflatten0(kvs: Seq[(String, ujson.Value)],
+                 columnNameUnMapper: String => String): ujson.Value = {
     val root: ujson.Value = ujson.Obj()
 
     for ((k, v) <- kvs) {
 
-      val segments = k.split(delimiter)
+      val segments = k.split(delimiter).map(columnNameUnMapper)
       var current = root
 
       var (prevS, prevIsDigit) = (segments.head, segments.head.forall(_.isDigit))
