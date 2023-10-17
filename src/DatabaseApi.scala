@@ -84,7 +84,13 @@ object DatabaseApi{
       kvs.append(k -> v)
     }
 
-    def rec(kvs: Seq[(List[String], String)], visitor: Visitor[Any, Any], depth: Int): Any = {
+    def visitValue(group: Seq[(List[String], String)], v: ObjArrVisitor[Any, Any]) = {
+      val sub = v.subVisitor.asInstanceOf[Visitor[Any, Any]]
+      val groupTail = group.map { case (k, v) => (k.tail, v) }
+      v.visitValue(rec(groupTail, sub), -1)
+    }
+
+    def rec(kvs: Seq[(List[String], String)], visitor: Visitor[Any, Any]): Any = {
       kvs match{
         case Seq((Nil, null)) => visitor.visitNull(-1)
         case Seq((Nil, v)) => visitor.visitString(v, -1)
@@ -92,36 +98,20 @@ object DatabaseApi{
           val grouped = kvs.groupBy(_._1.head)
           if (kvs.exists(_._1.head.forall(_.isDigit))){
             val arrVisitor = visitor.visitArray(-1, -1)
-            for ((k, group) <- grouped.toSeq.sortBy(_._1.toInt)){
-              arrVisitor.visitValue(
-                rec(
-                  group.map{case (k, v) => (k.tail, v)},
-                  arrVisitor.subVisitor.asInstanceOf[Visitor[Any, Any]],
-                  depth + 1
-                ),
-                -1
-              )
-            }
+            for ((k, group) <- grouped.toSeq.sortBy(_._1.toInt)) visitValue(group, arrVisitor)
             arrVisitor.visitEnd(-1)
           }else {
             val objVisitor = visitor.visitObject(-1, true, -1)
             for ((k, group) <- grouped){
               val keyVisitor = objVisitor.visitKey(-1)
               objVisitor.visitKeyValue(keyVisitor.visitString(k, -1))
-              objVisitor.visitValue(
-                rec(
-                  group.map{case (k, v) => (k.tail, v)},
-                  objVisitor.subVisitor.asInstanceOf[Visitor[Any, Any]],
-                  depth + 1
-                ),
-                -1
-              )
+              visitValue(group, objVisitor)
             }
             objVisitor.visitEnd(-1)
           }
       }
     }
 
-    rec(kvs.toSeq, rowVisitor.asInstanceOf[Visitor[Any, Any]], 0).asInstanceOf[V]
+    rec(kvs.toSeq, rowVisitor.asInstanceOf[Visitor[Any, Any]]).asInstanceOf[V]
   }
 }
