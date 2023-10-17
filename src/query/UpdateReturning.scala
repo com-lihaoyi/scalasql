@@ -13,7 +13,7 @@ object UpdateReturning{
   class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]] {
     def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
 
-    override def unpack(t: ujson.Value) = t
+    override def singleRow = false
 
     def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 

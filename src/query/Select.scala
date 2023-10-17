@@ -54,7 +54,7 @@ object Select {
 
     def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 
-    override def unpack(t: ujson.Value) = t
+    override def singleRow = false
 
     override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = {
       SelectToSql.apply(q, qr, ctx.tableNameMapper, ctx.columnNameMapper, ctx.fromNaming)._2

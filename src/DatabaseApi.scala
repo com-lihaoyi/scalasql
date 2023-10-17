@@ -1,8 +1,11 @@
 package usql
 
 import renderer.{Context, Interp, SelectToSql, SqlStr}
+import upickle.core.{ArrVisitor, Visitor}
+import usql.DatabaseApi.handleResultRow
 
 import java.sql.{ResultSet, Statement}
+import scala.collection.mutable
 
 class DatabaseApi(connection: java.sql.Connection,
                   tableNameMapper: String => String = identity,
@@ -44,44 +47,56 @@ class DatabaseApi(connection: java.sql.Connection,
       case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
     }
 
-    if (qr.isExecuteUpdate){
-
-      statement.executeUpdate().asInstanceOf[V]
-    }else {
+    if (qr.isExecuteUpdate) statement.executeUpdate().asInstanceOf[V]
+    else {
       val resultSet: ResultSet = statement.executeQuery()
 
-      val jsonRes = collection.mutable.ArrayBuffer.empty[ujson.Value]
       try {
-        while (resultSet.next()) {
-          val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
-          val meta = resultSet.getMetaData
-
-          for (i <- Range(0, meta.getColumnCount)) {
-            val v = resultSet.getString(i + 1) match{
-              case null => ujson.Null
-              case s => ujson.Str(s)
-            }
-            kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
+        if (qr.singleRow){
+          assert(resultSet.next())
+          val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader)
+          assert(!resultSet.next())
+          res
+        }else {
+          val arrVisitor = qr.valueReader.visitArray(-1, -1)
+          while (resultSet.next()) {
+            val rowRes = handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor)
+            arrVisitor.visitValue(rowRes, -1)
           }
-
-          val json = FlatJson.unflatten(kvs.toSeq)
-          def unMapJson(j: ujson.Value): ujson.Value = j match{
-            case ujson.Obj(kvs) =>
-              ujson.Obj.from(kvs.map{case (k, v) => (columnNameUnMapper(k), unMapJson(v))})
-
-            case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
-            case j => j
-          }
-
-          val unMappedJson = unMapJson(json)
-          jsonRes.append(unMappedJson)
+          arrVisitor.visitEnd(-1)
         }
       } finally {
         resultSet.close()
         statement.close()
       }
-
-      OptionPickler.read[V](qr.unpack(new ujson.Arr(jsonRes)))(qr.valueReader)
     }
+  }
+}
+
+object DatabaseApi{
+  def handleResultRow[V](resultSet: ResultSet, columnNameUnMapper: String => String, rowVisitor: Visitor[_, V]): V  = {
+    val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
+    val meta = resultSet.getMetaData
+
+    for (i <- Range(0, meta.getColumnCount)) {
+      val v = resultSet.getString(i + 1) match {
+        case null => ujson.Null
+        case s => ujson.Str(s)
+      }
+      kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
+    }
+
+    val json = FlatJson.unflatten(kvs.toSeq)
+
+    def unMapJson(j: ujson.Value): ujson.Value = j match {
+      case ujson.Obj(kvs) =>
+        ujson.Obj.from(kvs.map { case (k, v) => (columnNameUnMapper(k), unMapJson(v)) })
+
+      case ujson.Arr(vs) => ujson.Arr(vs.map(unMapJson))
+      case j => j
+    }
+
+    val unMappedJson = unMapJson(json)
+    unMappedJson.transform(rowVisitor)
   }
 }

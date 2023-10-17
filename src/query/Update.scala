@@ -47,7 +47,7 @@ object Update {
     override def isExecuteUpdate = true
     def walk(ur: Update[Q]): Seq[(List[String], Expr[_])] = Nil
 
-    override def unpack(t: ujson.Value) = t
+    override def singleRow = false
 
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 

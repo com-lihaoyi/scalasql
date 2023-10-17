@@ -16,7 +16,7 @@ trait Queryable[Q, R]{
   def isExecuteUpdate: Boolean = false
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader: Reader[R]
-  def unpack(t: ujson.Value): ujson.Value = t.arr.head
+  def singleRow: Boolean = true
 
   def toSqlQuery(q: Q, ctx: Context): SqlStr = {
     SelectToSql.sqlExprsStr[Q, R](q, usql"", this, ctx)._2
