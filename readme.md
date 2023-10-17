@@ -78,11 +78,11 @@ typed `Table` descriptions.
 ```
   {Expr[Int],Query[Q]               {Int,Seq[R],
    CaseCls[Expr],Tuple}              CaseCls[Val],Tuple}
-           |                                ^
-           |                                |
-         Q +-----------+     +--------------+ R
-                       |     |
-                       v     |
+           |                               ^
+           |                               |
+         Q +-----------+       +-----------+ R
+                       |       |
+                       v       |
            +-- DatabaseApi#run(q: Q): R <--+
            |                               |
          Q |                               | R
