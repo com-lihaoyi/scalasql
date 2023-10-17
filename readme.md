@@ -80,19 +80,19 @@ typed `Table` descriptions.
    map,filter,groupBy}              case-class,tuples}
            |                                ^
            |                                |
-           +---------- Q     R -------------+
+         Q +-----------+     +--------------+ R
                        |     |
                        v     |
            +-- DatabaseApi#run(q: Q): R <--+
            |                               |
-           Q                               R
+         Q |                               | R
            |                               |
            v                               |
  Queryable#{walk,toSqlQuery}       Queryable#valueReader
            |                               ^
-           v                               |
-         SqlStr                         ResultSet
-           |                               ^
+           |                               |
+    SqlStr |                               | ResultSet
+           |                               |
            |                               |
            +-------> java.sql.execute -----+
 ```
