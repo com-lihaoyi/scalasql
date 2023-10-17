@@ -96,7 +96,9 @@ object DatabaseApi{
         case Seq((Nil, v)) => visitor.visitString(v, -1)
         case _ =>
           val grouped = kvs.groupBy(_._1.head)
-          if (kvs.exists(_._1.head.forall(_.isDigit))){
+          // Hack to check if a random key looks like a number,
+          // in which case this data represents an array
+          if (kvs.head._1.head.head.isDigit){
             val arrVisitor = visitor.visitArray(-1, -1)
             for ((k, group) <- grouped.toSeq.sortBy(_._1.toInt)) visitValue(group, arrVisitor)
             arrVisitor.visitEnd(-1)
