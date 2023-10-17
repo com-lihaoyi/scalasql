@@ -1,5 +1,6 @@
 package usql.query
 
+import usql.{OptionPickler, Queryable}
 import usql.renderer.{Context, Interp, SqlStr}
 
 trait Expr[T] {
@@ -22,6 +23,16 @@ trait Expr[T] {
 
 object Expr{
   class Identity()
+
+  implicit def ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T]): Queryable[E[T], T] =
+    new ExprQueryable[E, T]()
+
+  class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T]) extends Queryable[E[T], T] {
+    def walk(q: E[T]) = Seq(Nil -> q)
+
+    def valueReader = valueReader0
+  }
+
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
   class Simple[T](f: Context => SqlStr) extends Expr[T]{
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
