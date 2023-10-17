@@ -75,19 +75,53 @@ class DatabaseApi(connection: java.sql.Connection,
 
 object DatabaseApi{
   def handleResultRow[V](resultSet: ResultSet, columnNameUnMapper: String => String, rowVisitor: Visitor[_, V]): V  = {
-    val kvs = collection.mutable.Buffer.empty[(String, ujson.Value)]
+    val kvs = collection.mutable.Buffer.empty[(List[String], String)]
     val meta = resultSet.getMetaData
 
     for (i <- Range(0, meta.getColumnCount)) {
-      val v = resultSet.getString(i + 1) match {
-        case null => ujson.Null
-        case s => ujson.Str(s)
-      }
-      kvs.append(meta.getColumnLabel(i + 1).toLowerCase -> v)
+      val k = meta.getColumnLabel(i + 1).toLowerCase.split(FlatJson.delimiter).map(columnNameUnMapper).toList.drop(1)
+      val v = resultSet.getString(i + 1)
+      kvs.append(k -> v)
     }
 
-    val json = FlatJson.unflatten(kvs.toSeq, columnNameUnMapper)
+    def rec(kvs: Seq[(List[String], String)], visitor: Visitor[Any, Any], depth: Int): Any = {
+      kvs match{
+        case Seq((Nil, null)) => visitor.visitNull(-1)
+        case Seq((Nil, v)) => visitor.visitString(v, -1)
+        case _ =>
+          val grouped = kvs.groupBy(_._1.head)
+          if (kvs.exists(_._1.head.forall(_.isDigit))){
+            val arrVisitor = visitor.visitArray(-1, -1)
+            for ((k, group) <- grouped.toSeq.sortBy(_._1.toInt)){
+              arrVisitor.visitValue(
+                rec(
+                  group.map{case (k, v) => (k.tail, v)},
+                  arrVisitor.subVisitor.asInstanceOf[Visitor[Any, Any]],
+                  depth + 1
+                ),
+                -1
+              )
+            }
+            arrVisitor.visitEnd(-1)
+          }else {
+            val objVisitor = visitor.visitObject(-1, true, -1)
+            for ((k, group) <- grouped){
+              val keyVisitor = objVisitor.visitKey(-1)
+              objVisitor.visitKeyValue(keyVisitor.visitString(k, -1))
+              objVisitor.visitValue(
+                rec(
+                  group.map{case (k, v) => (k.tail, v)},
+                  objVisitor.subVisitor.asInstanceOf[Visitor[Any, Any]],
+                  depth + 1
+                ),
+                -1
+              )
+            }
+            objVisitor.visitEnd(-1)
+          }
+      }
+    }
 
-    json.transform(rowVisitor)
+    rec(kvs.toSeq, rowVisitor.asInstanceOf[Visitor[Any, Any]], 0).asInstanceOf[V]
   }
 }
