@@ -19,14 +19,14 @@ class DatabaseApi(connection: java.sql.Connection,
     finally statement.close()
   }
 
-  def toSqlQuery[T, V](query: T)
-                      (implicit qr: Queryable[T, V]): String = {
+  def toSqlQuery[Q](query: Q)
+                      (implicit qr: Queryable[Q, _]): String = {
     val (str, params) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[T, V](query: T)
-                       (implicit qr: Queryable[T, V]): (String, Seq[Interp]) = {
+  def toSqlQuery0[Q](query: Q)
+                       (implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
     val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val flattened = SqlStr.flatten(qr.toSqlQueryUnwrapped(query, ctx))
     val queryStr0 = flattened.queryParts.mkString("?")
@@ -34,8 +34,8 @@ class DatabaseApi(connection: java.sql.Connection,
     (queryStr, flattened.params)
   }
 
-  def run[T, V](query: T)
-               (implicit qr: Queryable[T, V]): V = {
+  def run[Q, R](query: Q)
+               (implicit qr: Queryable[Q, R]): R = {
 
     val (str, params) = toSqlQuery0(query)
     val statement = connection.prepareStatement(str)
@@ -47,7 +47,7 @@ class DatabaseApi(connection: java.sql.Connection,
       case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
     }
 
-    if (qr.isExecuteUpdate) statement.executeUpdate().asInstanceOf[V]
+    if (qr.isExecuteUpdate) statement.executeUpdate().asInstanceOf[R]
     else {
       val resultSet: ResultSet = statement.executeQuery()
 

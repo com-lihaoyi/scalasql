@@ -80,22 +80,19 @@ typed `Table` descriptions.
    map,filter,groupBy}              case-class,tuples}
            |                                ^
            |                                |
-            -----------       --------------
+           +---------- Q     R -------------+
                        |     |
                        v     |
-            -- DatabaseApi#run(q: Q): R <--
+           +-- DatabaseApi#run(q: Q): R <--+
            |                               |
            Q                               R
-           |                               ^
-           v                               |
- Queryable#{walk,toSqlQuery}         OptionPickler.read
-           |                               ^
            |                               |
-           |                          ujson.Value
+           v                               |
+ Queryable#{walk,toSqlQuery}       Queryable#valueReader
            |                               ^
            v                               |
          SqlStr                         ResultSet
            |                               ^
            |                               |
-            -------> java.sql.execute -----        
+           +-------> java.sql.execute -----+
 ```
