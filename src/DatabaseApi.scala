@@ -100,7 +100,7 @@ object DatabaseApi{
           // in which case this data represents an array
           if (kvs.head._1.head.head.isDigit){
             val arrVisitor = visitor.visitArray(-1, -1)
-            for ((k, group) <- grouped.toSeq.sortBy(_._1.toInt)) visitValue(group, arrVisitor)
+            for (i <- Range(0, grouped.size)) visitValue(grouped(i.toString), arrVisitor)
             arrVisitor.visitEnd(-1)
           }else {
             val objVisitor = visitor.visitObject(-1, true, -1)
