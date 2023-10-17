@@ -1,6 +1,6 @@
 package usql
 
-import renderer.{Context, SelectToSql, SqlStr}
+import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import usql.query.Expr
 

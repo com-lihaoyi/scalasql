@@ -1,7 +1,7 @@
 package usql
 
-import renderer.{Context, Interp, SelectToSql, SqlStr}
-import upickle.core.{ArrVisitor, ObjArrVisitor, Visitor}
+import renderer.{Context, Interp, SqlStr}
+import upickle.core.Visitor
 import usql.DatabaseApi.handleResultRow
 
 import java.sql.{ResultSet, Statement}
@@ -78,8 +78,8 @@ object DatabaseApi{
                          columnNameUnMapper: String => String,
                          rowVisitor: Visitor[_, V]): V  = {
 
-    val keys = IndexedSeq.newBuilder[IndexedSeq[String]]
-    val values = IndexedSeq.newBuilder[String]
+    val keys = Array.newBuilder[IndexedSeq[String]]
+    val values = Array.newBuilder[String]
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
