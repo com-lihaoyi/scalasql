@@ -1,7 +1,7 @@
 package usql.renderer
 
 import SqlStr.{SqlStringSyntax, optSeq}
-import usql.query.{Update, UpdateReturning}
+import usql.query.Update
 import usql.Queryable
 
 object UpdateToSql {
@@ -11,17 +11,6 @@ object UpdateToSql {
                columnNameMapper: String => String) = {
     val (ctx, str) = apply0(q, tableNameMapper, columnNameMapper)
     str
-  }
-
-  def returning[Q, R](q: UpdateReturning[Q, R],
-                  qr: Queryable[Q, R],
-                  tableNameMapper: String => String,
-                  columnNameMapper: String => String) = {
-    val (ctx, str) = apply0(q.update, tableNameMapper, columnNameMapper)
-    val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(q.returning), ctx, usql"")
-
-    val returning = usql" RETURNING " + exprStr
-    str + returning
   }
 
   def apply0[Q](q: Update[Q],

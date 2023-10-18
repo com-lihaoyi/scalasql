@@ -13,11 +13,13 @@ import usql.{Column, OptionPickler, Queryable}
 case class InsertSelect[Q, C](insert: Insert[Q],
                               columns: C,
                               select: Select[C])
-                             (implicit val qr: Queryable[Q, _]) {
+                             (implicit val qr: Queryable[Q, _],
+                              qrc: Queryable[C, _]) extends Returnable[Q]{
+  def expr = insert.expr
+  def table = insert.table
 
-//  def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): InsertReturning[Q2, R] = {
-//    InsertReturning(this, f(insert.expr))
-//  }
+  override def toSqlQuery(implicit ctx: Context): SqlStr =
+    InsertSelect.InsertSelectQueryable[Q, C](qrc).toSqlQuery(this, ctx)
 }
 
 object InsertSelect {

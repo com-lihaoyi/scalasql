@@ -39,7 +39,6 @@ class TestDb(name: String) {
       if (sql != null){
         val sqlResult = db.toSqlQuery(query)
         val expectedSql = sql.trim.replaceAll("\\s+", " ")
-
         assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
       }
 

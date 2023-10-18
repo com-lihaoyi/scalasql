@@ -1,24 +1,45 @@
 package usql.query
 
-import usql.renderer.{Context, SqlStr, UpdateToSql}
+import usql.renderer.SqlStr.SqlStringSyntax
+import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr, UpdateToSql}
 import usql.{OptionPickler, Queryable}
 
+trait Returnable[Q]{
+  def expr: Q
+  def table: TableRef
+  def toSqlQuery(implicit ctx: Context): SqlStr
+  def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): Returning[Q2, R] = {
+    Returning(this, f(expr))
+  }
+}
 
-case class UpdateReturning[Q, R](update: Update[_], returning: Q)(implicit val qr: Queryable[Q, R])
+case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
 
-object UpdateReturning{
-  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[UpdateReturning[Q, R], Seq[R]] =
-    new UpdateReturningQueryable[Q, R]()(qr)
+object Returning{
+  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Returning[Q, R], Seq[R]] =
+    new InsertReturningQueryable[Q, R]()(qr)
 
-  class UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[UpdateReturning[Q, R], Seq[R]] {
-    def walk(ur: UpdateReturning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
+  class InsertReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Returning[Q, R], Seq[R]] {
+    def walk(ur: Returning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
 
     override def singleRow = false
 
     def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 
-    override def toSqlQuery(q: UpdateReturning[Q, R], ctx0: Context): SqlStr = {
-      UpdateToSql.returning(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
+    override def toSqlQuery(q: Returning[Q, R], ctx0: Context): SqlStr = {
+      implicit val (_, _, _, ctx) = SelectToSql.computeContext(
+        ctx0.tableNameMapper,
+        ctx0.columnNameMapper,
+        Nil,
+        Some(q.returnable.table),
+        Map()
+      )
+
+      val prefix = q.returnable.toSqlQuery
+      val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(q.returning), ctx, usql"")
+      val suffix = usql" RETURNING $exprStr"
+
+      prefix + suffix
     }
   }
 

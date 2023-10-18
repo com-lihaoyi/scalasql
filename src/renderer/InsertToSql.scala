@@ -1,7 +1,7 @@
 package renderer
 
 import usql.{Column, Queryable}
-import usql.query.{Expr, InsertReturning, InsertSelect, InsertValues}
+import usql.query.{Expr, InsertSelect, InsertValues}
 import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
 import usql.renderer.SqlStr.SqlStringSyntax
 
@@ -33,25 +33,5 @@ object InsertToSql {
     )
 
     usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) ${q.select.toSqlStr.withCompleteQuery(false)}"
-  }
-
-  def returning[Q,R ](q: InsertReturning[Q, R],
-                      qr: Queryable[Q, R],
-                      tableNameMapper: String => String,
-                      columnNameMapper: String => String): SqlStr = {
-
-    implicit val (_, _, _, ctx) = SelectToSql.computeContext(
-      tableNameMapper,
-      columnNameMapper,
-      Nil,
-      Some(q.insert.insert.table),
-      Map()
-    )
-
-    val prefix = values(q.insert, tableNameMapper, columnNameMapper)
-    val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(q.returning), ctx, usql"")
-    val suffix = usql" RETURNING $exprStr"
-
-    prefix + suffix
   }
 }

@@ -13,7 +13,7 @@ case class Update[Q](expr: Q,
                      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
                      joins: Seq[Join],
                      where: Seq[Expr[_]])
-                    (implicit val qr: Queryable[Q, _])  extends JoinOps[Update, Q]{
+                    (implicit val qr: Queryable[Q, _]) extends JoinOps[Update, Q] with Returnable[Q]{
   def filter(f: Q => Expr[Boolean]): Update[Q] = {
     this.copy(where = where ++ Seq(f(expr)))
   }
@@ -30,9 +30,8 @@ case class Update[Q](expr: Q,
     this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
   }
 
-  def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): UpdateReturning[Q2, R] = {
-    UpdateReturning(this, f(expr))
-  }
+  override def toSqlQuery(implicit ctx: Context): SqlStr =
+    Update.UpdateQueryable(qr).toSqlQuery(this, ctx)
 }
 
 object Update {
