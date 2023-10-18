@@ -61,16 +61,19 @@ object Table{
 
       c.Expr[Metadata[V]](
         q"""
-        val $tableRef = new usql.query.TableRef(this)
         new _root_.usql.Table.Metadata[$wtt](
           new usql.Table.Internal.TableQueryable(
             t => $allFlattenedExprs,
             _root_.usql.OptionPickler.macroR
           ),
           () => {
+            val $tableRef = new usql.query.TableRef(this)
             _root_.usql.query.Select.fromTable(new $wtt(..$queryParams), $tableRef)
           },
-          () => _root_.usql.query.Update.fromTable(new $wtt(..$queryParams), $tableRef)
+          () => {
+            val $tableRef = new usql.query.TableRef(this)
+            _root_.usql.query.Update.fromTable(new $wtt(..$queryParams), $tableRef)
+          }
         )
         """
       )

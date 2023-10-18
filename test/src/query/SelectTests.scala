@@ -299,6 +299,27 @@ object SelectTests extends TestSuite {
         """,
         value = Vector("2012-04-05")
       )
+      test("selfJoin") - checker(
+        Buyer.select.joinOn(Buyer)(_.id === _.id)
+
+      ).expect(
+        sql = """
+          SELECT
+            buyer0.id as res__0__id,
+            buyer0.name as res__0__name,
+            buyer0.date_of_birth as res__0__date_of_birth,
+            buyer1.id as res__1__id,
+            buyer1.name as res__1__name,
+            buyer1.date_of_birth as res__1__date_of_birth
+          FROM buyer buyer0
+          JOIN buyer buyer1 ON buyer0.id = buyer1.id
+        """,
+        value =  Vector(
+          (Buyer(1, "James Bond", "2001-02-03"), Buyer(1, "James Bond", "2001-02-03")),
+          (Buyer(2, "叉烧包", "1923-11-12"), Buyer(2, "叉烧包", "1923-11-12")),
+          (Buyer(3, "Li Haoyi", "1965-08-09"), Buyer(3, "Li Haoyi", "1965-08-09"))
+        )
+      )
 
       test("flatMap") - checker(
         Buyer.select.flatMap(c => ShippingInfo.select.map((c, _)))
