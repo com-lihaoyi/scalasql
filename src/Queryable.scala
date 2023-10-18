@@ -24,14 +24,11 @@ object Queryable{
 
   private class TupleNQueryable[Q, R](val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
                                       val valueReader: Reader[R]) extends Queryable[Q, R] {
-    def walk(q: Q) = walkIndexed(walk0(q))
-
-    def walkIndexed(purchases: Seq[Seq[(List[String], Expr[_])]]) = {
-      walkPrefixed(purchases.zipWithIndex.map { case (v, i) => (i.toString, v) })
-    }
-
-    def walkPrefixed(purchases: Seq[(String, Seq[(List[String], Expr[_])])]) = {
-      purchases.flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
+    def walk(q: Q) = {
+      walk0(q)
+        .zipWithIndex
+        .map { case (v, i) => (i.toString, v) }
+        .flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
     }
   }
 
