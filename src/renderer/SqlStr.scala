@@ -44,7 +44,7 @@ object SqlStr {
         boundary = false
         a match {
           case ei: Interp.ExprInterp =>
-            rec(ei.e.toSqlExpr(ei.ctx), false)
+            rec(ei.e.toSqlStr(ei.ctx), false)
             boundary = true
 
           case si: Interp.SqlStrInterp =>

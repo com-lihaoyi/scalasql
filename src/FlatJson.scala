@@ -14,7 +14,7 @@ object FlatJson {
 
   def flatten(x: Seq[(List[String], Expr[_])],
               context: Context): Seq[(String, SqlStr)] = {
-    x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlExpr(context))}
+    x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlStr(context))}
   }
 
   /**

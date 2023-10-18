@@ -88,7 +88,7 @@ object SelectToSql {
         case Nulls.Last => usql" NULLS LAST"
       }
 
-      usql" ORDER BY " + orderBy.expr.toSqlExpr(context) + ascDesc + nulls
+      usql" ORDER BY " + orderBy.expr.toSqlStr(context) + ascDesc + nulls
     }
 
     val limitOpt = SqlStr.opt(query.limit) { limit =>
@@ -127,12 +127,12 @@ object SelectToSql {
     val joins = joinsToSqlStr(query.joins, fromSelectables)
 
     val filtersOpt = SqlStr.optSeq(query.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
+      usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
     }
 
     val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = SqlStr.optSeq(groupBy.having){ having =>
-        usql" HAVING " + SqlStr.join(having.map(_.toSqlExpr), usql" AND ")
+        usql" HAVING " + SqlStr.join(having.map(_.toSqlStr), usql" AND ")
       }
       usql" GROUP BY ${groupBy.expr}${havingOpt}"
     }

@@ -45,7 +45,7 @@ case class SimpleSelect[Q](expr: Q,
         )
 
         f(expr)(newCtx)
-      }).toSqlExpr.asCompleteQuery
+      }).toSqlStr.asCompleteQuery
     }
   }
 
@@ -83,7 +83,7 @@ case class SimpleSelect[Q](expr: Q,
                      (implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V] { implicit ctx: Context =>
-      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlExpr
+      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlStr
     }
   }
 

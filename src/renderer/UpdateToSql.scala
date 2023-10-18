@@ -52,7 +52,7 @@ object UpdateToSql {
     }
 
     val where = SqlStr.optSeq(fromOns ++ q.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlExpr), usql" AND ")
+      usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
     }
 
 
