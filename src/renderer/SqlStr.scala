@@ -29,33 +29,37 @@ object SqlStr {
     val finalParts = collection.mutable.Buffer[String]()
     val finalArgs = collection.mutable.Buffer[Interp.Simple]()
 
-    def rec(self: SqlStr): Unit = {
+    def rec(self: SqlStr, topLevel: Boolean): Unit = {
       var boundary = true
+      if (!topLevel && self.isCompleteQuery) addFinalPart("(")
+      boundary = true
+
       def addFinalPart(s: String) = {
         if (boundary && finalParts.nonEmpty) finalParts(finalParts.length - 1) = finalParts.last + s
         else finalParts.append(s)
       }
+
       for ((p, a) <- self.queryParts.zip(self.params)) {
         addFinalPart(p)
         boundary = false
         a match {
           case ei: Interp.ExprInterp =>
-            val s = ei.e.toSqlExpr(ei.ctx)
-            rec(if (s.isCompleteQuery) usql"(" + s + usql")" else s)
+            rec(ei.e.toSqlExpr(ei.ctx), false)
             boundary = true
+
           case si: Interp.SqlStrInterp =>
-            val s = si.s
-            rec(if (s.isCompleteQuery) usql"(" + s + usql")" else s)
+            rec(si.s, false)
             boundary = true
-          case s: Interp.Simple =>
-            finalArgs.append(s)
+
+          case s: Interp.Simple => finalArgs.append(s)
         }
       }
 
       addFinalPart(self.queryParts.last)
+      if (!topLevel && self.isCompleteQuery) addFinalPart(")")
     }
 
-    rec(self)
+    rec(self, true)
     Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery)
   }
 
