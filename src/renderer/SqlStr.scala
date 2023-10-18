@@ -2,14 +2,15 @@ package usql.renderer
 
 import usql.query.Expr
 
-
 /**
  * Represents a SQL query with interpolated `?`s expressions and the associated
  * interpolated values, of type [[Interp]]
  */
-class SqlStr(private val queryParts: Seq[String],
-             private val params: Seq[Interp],
-             val isCompleteQuery: Boolean) {
+class SqlStr(
+    private val queryParts: Seq[String],
+    private val params: Seq[Interp],
+    val isCompleteQuery: Boolean
+) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head) ++ other.queryParts.tail,
     params ++ other.params,
@@ -20,7 +21,11 @@ class SqlStr(private val queryParts: Seq[String],
 }
 
 object SqlStr {
-  case class Flattened(queryParts: Seq[String], params: Seq[Interp.Simple], isCompleteQuery: Boolean)
+  case class Flattened(
+      queryParts: Seq[String],
+      params: Seq[Interp.Simple],
+      isCompleteQuery: Boolean
+  )
 
   def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
   def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else usql""
@@ -77,7 +82,7 @@ object SqlStr {
 
 sealed trait Interp
 
-object Interp{
+object Interp {
   sealed trait Simple extends Interp
 
   implicit def stringInterp(s: String): Interp = StringInterp(s)
@@ -92,8 +97,7 @@ object Interp{
   implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
   case class BooleanInterp(b: Boolean) extends Simple
 
-  implicit def exprInterp(t: Expr[_])
-                         (implicit ctx: Context): Interp = ExprInterp(t, ctx)
+  implicit def exprInterp(t: Expr[_])(implicit ctx: Context): Interp = ExprInterp(t, ctx)
   case class ExprInterp(e: Expr[_], ctx: Context) extends Interp
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)

@@ -4,17 +4,15 @@ import renderer.InsertToSql
 import usql.renderer.{Context, SqlStr}
 import usql.{Column, OptionPickler, Queryable}
 
-
 /**
  * Syntax reference
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class InsertSelect[Q, C](insert: Insert[Q],
-                              columns: C,
-                              select: Select[C])
-                             (implicit val qr: Queryable[Q, _],
-                              qrc: Queryable[C, _]) extends Returnable[Q]{
+case class InsertSelect[Q, C](insert: Insert[Q], columns: C, select: Select[C])(implicit
+    val qr: Queryable[Q, _],
+    qrc: Queryable[C, _]
+) extends Returnable[Q] {
   def expr = insert.expr
   def table = insert.table
 
@@ -24,11 +22,13 @@ case class InsertSelect[Q, C](insert: Insert[Q],
 
 object InsertSelect {
 
-
-  implicit def InsertSelectQueryable[Q, C](implicit qr: Queryable[C, _]): Queryable[InsertSelect[Q, C], Int] =
+  implicit def InsertSelectQueryable[Q, C](implicit
+      qr: Queryable[C, _]
+  ): Queryable[InsertSelect[Q, C], Int] =
     new InsertSelectQueryable[Q, C]()(qr)
 
-  class InsertSelectQueryable[Q, C](implicit qr: Queryable[C, _]) extends Queryable[InsertSelect[Q, C], Int] {
+  class InsertSelectQueryable[Q, C](implicit qr: Queryable[C, _])
+      extends Queryable[InsertSelect[Q, C], Int] {
     override def isExecuteUpdate = true
     def walk(ur: InsertSelect[Q, C]): Seq[(List[String], Expr[_])] = Nil
 

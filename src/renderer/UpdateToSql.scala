@@ -5,17 +5,21 @@ import usql.query.Update
 import usql.Queryable
 
 object UpdateToSql {
-  def apply[Q](q: Update[Q],
-               qr: Queryable[Q, _],
-               tableNameMapper: String => String,
-               columnNameMapper: String => String) = {
+  def apply[Q](
+      q: Update[Q],
+      qr: Queryable[Q, _],
+      tableNameMapper: String => String,
+      columnNameMapper: String => String
+  ) = {
     val (ctx, str) = apply0(q, tableNameMapper, columnNameMapper)
     str
   }
 
-  def apply0[Q](q: Update[Q],
-                tableNameMapper: String => String,
-                columnNameMapper: String => String) = {
+  def apply0[Q](
+      q: Update[Q],
+      tableNameMapper: String => String,
+      columnNameMapper: String => String
+  ) = {
     val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
       tableNameMapper,
       columnNameMapper,
@@ -44,11 +48,9 @@ object UpdateToSql {
       usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
     }
 
-
     val joins = optSeq(q.joins.drop(1))(SelectToSql.joinsToSqlStr(_, fromSelectables))
 
     (ctx, usql"UPDATE $tableName SET " + sets + from + joins + where)
   }
-
 
 }

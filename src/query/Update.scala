@@ -8,12 +8,13 @@ import usql.renderer.{Context, SqlStr, UpdateToSql}
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class Update[Q](expr: Q,
-                     table: TableRef,
-                     set0: Seq[(Column.ColumnExpr[_], Expr[_])],
-                     joins: Seq[Join],
-                     where: Seq[Expr[_]])
-                    (implicit val qr: Queryable[Q, _]) extends JoinOps[Update, Q] with Returnable[Q]{
+case class Update[Q](
+    expr: Q,
+    table: TableRef,
+    set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+    joins: Seq[Join],
+    where: Seq[Expr[_]]
+)(implicit val qr: Queryable[Q, _]) extends JoinOps[Update, Q] with Returnable[Q] {
   def filter(f: Q => Expr[Boolean]): Update[Q] = {
     this.copy(where = where ++ Seq(f(expr)))
   }
@@ -22,10 +23,9 @@ case class Update[Q](expr: Q,
     this.copy(set0 = f.map(_(expr)))
   }
 
-
-  def join0[V](other: Joinable[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Update[(Q, V)] = {
+  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ): Update[(Q, V)] = {
     val (otherJoin, otherSelect) = joinInfo(other, on)
     this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
   }

@@ -6,7 +6,7 @@ import usql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Updat
 import renderer.SqlStr.SqlStringSyntax
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
-  extends Table.Base with Joinable[V[Expr]]{
+    extends Table.Base with Joinable[V[Expr]] {
 
   val tableName = name.value
   implicit def self: Table[V] = this
@@ -23,36 +23,38 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   def insert: Insert[V[Column.ColumnExpr]] = metadata.insert()
 }
 
-object Table{
+object Table {
   trait Base {
     def tableName: String
   }
 
-  class Metadata[V[_[_]]](val queryable: Queryable[V[Expr], V[Val]],
-                          val query: () => Select[V[Expr]],
-                          val update: () => Update[V[Column.ColumnExpr]],
-                          val insert: () => Insert[V[Column.ColumnExpr]])
+  class Metadata[V[_[_]]](
+      val queryable: Queryable[V[Expr], V[Val]],
+      val query: () => Select[V[Expr]],
+      val update: () => Update[V[Column.ColumnExpr]],
+      val insert: () => Insert[V[Column.ColumnExpr]]
+  )
 
-  object Metadata{
+  object Metadata {
 
-    def applyImpl[V[_[_]]](c: scala.reflect.macros.blackbox.Context)
-                                     ()
-                                     (implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
+    def applyImpl[V[_[_]]](c: scala.reflect.macros.blackbox.Context)()(implicit
+        wtt: c.WeakTypeTag[V[Any]]
+    ): c.Expr[Metadata[V]] = {
       import c.universe._
 
       val tableRef = TermName(c.freshName("tableRef"))
       val applyParameters = c.prefix.actualType.member(TermName("apply")).info.paramLists.head
 
-      val queryParams = for(applyParam <- applyParameters) yield {
+      val queryParams = for (applyParam <- applyParameters) yield {
         val name = applyParam.name
-        if (c.prefix.actualType.member(name) != NoSymbol){
+        if (c.prefix.actualType.member(name) != NoSymbol) {
           q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
-        }else{
+        } else {
           q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 
-      val flattenExprs = for(applyParam <- applyParameters) yield {
+      val flattenExprs = for (applyParam <- applyParameters) yield {
         val name = applyParam.name
 
         q"usql.Table.Internal.flattenPrefixed(t.${TermName(name.toString)}, ${name.toString})"
@@ -85,29 +87,30 @@ object Table{
     }
   }
 
-  object Internal{
-    class TableQueryable[Q, R](flatten0: Q => Seq[(List[String], Expr[_])],
-                               valueReader0: Reader[R]) extends Queryable[Q, R] {
+  object Internal {
+    class TableQueryable[Q, R](flatten0: Q => Seq[(List[String], Expr[_])], valueReader0: Reader[R])
+        extends Queryable[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
       def valueReader: Reader[R] = valueReader0
     }
 
-    def flattenPrefixed[T](t: T, prefix: String)
-                          (implicit q: Queryable[T, _]): Seq[(List[String], Expr[_])] = {
+    def flattenPrefixed[T](t: T, prefix: String)(implicit
+        q: Queryable[T, _]
+    ): Seq[(List[String], Expr[_])] = {
       q.walk(t).map { case (k, v) => (prefix +: k, v) }
     }
   }
 }
 
-case class Column[T]()(implicit val name: sourcecode.Name,
-                       val table: Table.Base) {
-  def expr(tableRef: TableRef): Column.ColumnExpr[T] = new Column.ColumnExpr[T](tableRef, name.value)
+case class Column[T]()(implicit val name: sourcecode.Name, val table: Table.Base) {
+  def expr(tableRef: TableRef): Column.ColumnExpr[T] =
+    new Column.ColumnExpr[T](tableRef, name.value)
 }
 
-object Column{
+object Column {
   class ColumnExpr[T](tableRef: TableRef, val name: String) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context) = {
-      val prefix = ctx.fromNaming(tableRef) match{
+      val prefix = ctx.fromNaming(tableRef) match {
         case "" => usql""
         case s => SqlStr.raw(s) + usql"."
       }

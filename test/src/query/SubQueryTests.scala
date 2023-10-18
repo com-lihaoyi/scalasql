@@ -11,10 +11,10 @@ object SubQueryTests extends TestSuite {
   val checker = new TestDb("subquerytests")
   def tests = Tests {
     test("sortTakeJoin") - checker(
-      Purchase.select
-        .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
-        .map{case (purchase, product) => purchase.total}
-    ).expect(
+      query =
+        Purchase.select
+          .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
+          .map { case (purchase, product) => purchase.total },
       sql = """
         SELECT purchase0.total as res
         FROM purchase purchase0
@@ -28,14 +28,14 @@ object SubQueryTests extends TestSuite {
           LIMIT 1) subquery1
         ON purchase0.product_id = subquery1.res__id
       """,
-      value = Vector(10000.0)
+      value = Seq(10000.0)
     )
 
     test("sortTakeFrom") - checker(
-      Product.select.sortBy(_.price).desc.take(1)
-        .joinOn(Purchase)(_.id === _.productId)
-        .map{case (product, purchase) => purchase.total}
-    ).expect(
+      query =
+        Product.select.sortBy(_.price).desc.take(1)
+          .joinOn(Purchase)(_.id === _.productId)
+          .map { case (product, purchase) => purchase.total },
       sql = """
         SELECT purchase1.total as res
         FROM (SELECT
@@ -48,14 +48,14 @@ object SubQueryTests extends TestSuite {
           LIMIT 1) subquery0
         JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
       """,
-      value = Vector(10000.0)
+      value = Seq(10000.0)
     )
 
     test("sortTakeFromAndJoin") - checker(
-      Product.select.sortBy(_.price).desc.take(3)
-        .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
-        .map{case (product, purchase) => (product.name, purchase.count) }
-    ).expect(
+      query =
+        Product.select.sortBy(_.price).desc.take(3)
+          .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
+          .map { case (product, purchase) => (product.name, purchase.count) },
       sql = """
         SELECT
           subquery0.res__name as res__0,
@@ -79,12 +79,12 @@ object SubQueryTests extends TestSuite {
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
-      value = Vector(("Camera", 10))
+      value = Seq(("Camera", 10))
     )
 
     test("sortLimitSortLimit") - checker(
-      Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
-    ).expect(
+      query =
+        Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name),
       sql = """
         SELECT subquery0.res__name as res
         FROM (SELECT
@@ -98,12 +98,12 @@ object SubQueryTests extends TestSuite {
         ORDER BY subquery0.res__price ASC
         LIMIT 2
       """,
-      value = Vector("Face Mask", "Skate Board")
+      value = Seq("Face Mask", "Skate Board")
     )
 
     test("sortGroupBy") - checker(
-      Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
-    ).expect(
+      query =
+        Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total)),
       sql = """
         SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
         FROM (SELECT
@@ -117,13 +117,13 @@ object SubQueryTests extends TestSuite {
           LIMIT 5) subquery0
         GROUP BY subquery0.res__product_id
       """,
-      value = Vector((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
+      value = Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
     )
 
     test("groupByJoin") - checker(
-      Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
-        .map{case ((productId, total), product) => (product.name, total)}
-    ).expect(
+      query =
+        Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
+          .map { case ((productId, total), product) => (product.name, total) },
       sql = """
         SELECT
           product1.name as res__0,
@@ -135,7 +135,7 @@ object SubQueryTests extends TestSuite {
           GROUP BY purchase0.product_id) subquery0
         JOIN product product1 ON subquery0.res__0 = product1.id
       """,
-      value = Vector(
+      value = Seq(
         ("Face Mask", 932.4),
         ("Guitar", 900.0),
         ("Socks", 15.7),
@@ -146,8 +146,8 @@ object SubQueryTests extends TestSuite {
     )
 
     test("subqueryInFilter") - checker(
-      Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0)
-    ).expect(
+      query =
+        Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0),
       sql =
         """
         SELECT
@@ -160,11 +160,11 @@ object SubQueryTests extends TestSuite {
             FROM shipping_info shipping_info0
             WHERE buyer0.id = shipping_info0.buyer_id) = ?
       """,
-      value = Vector(Buyer(3, "Li Haoyi", "1965-08-09"))
+      value = Seq(Buyer[Val](3, "Li Haoyi", "1965-08-09"))
     )
     test("subqueryInMap") - checker(
-      Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size))
-    ).expect(
+      query =
+        Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size)),
       sql =
         """
         SELECT
@@ -174,15 +174,15 @@ object SubQueryTests extends TestSuite {
           (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
         FROM buyer buyer0
       """,
-      value = Vector(
-        (Buyer(1, "James Bond", "2001-02-03"), 1),
-        (Buyer(2, "叉烧包", "1923-11-12"), 2),
-        (Buyer(3, "Li Haoyi", "1965-08-09"), 0)
+      value = Seq(
+        (Buyer[Val](1, "James Bond", "2001-02-03"), 1),
+        (Buyer[Val](2, "叉烧包", "1923-11-12"), 2),
+        (Buyer[Val](3, "Li Haoyi", "1965-08-09"), 0)
       )
     )
     test("subqueryInMapNested") - checker(
-      Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1))
-    ).expect(
+      query =
+        Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1)),
       sql =
         """
         SELECT
@@ -195,16 +195,18 @@ object SubQueryTests extends TestSuite {
             WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
         FROM buyer buyer0
       """,
-      value = Vector(
-        (Buyer(1, "James Bond", "2001-02-03"), true),
-        (Buyer(2, "叉烧包", "1923-11-12"), false),
-        (Buyer(3, "Li Haoyi", "1965-08-09"), false)
+      value = Seq(
+        (Buyer[Val](1, "James Bond", "2001-02-03"), true),
+        (Buyer[Val](2, "叉烧包", "1923-11-12"), false),
+        (Buyer[Val](3, "Li Haoyi", "1965-08-09"), false)
       )
     )
 
     test("selectLimitUnionSelect") - checker(
-      Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
-    ).expect(
+      query =
+        Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(
+          _.kebabCaseName.toLowerCase
+        )),
       sql = """
         SELECT subquery0.res as res
         FROM (SELECT
@@ -215,14 +217,23 @@ object SubQueryTests extends TestSuite {
         SELECT LOWER(product0.kebab_case_name) as res
         FROM product product0
       """,
-      value = Vector(
-        "james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie"
+      value = Seq(
+        "james bond",
+        "叉烧包",
+        "face-mask",
+        "guitar",
+        "socks",
+        "skate-board",
+        "camera",
+        "cookie"
       )
     )
 
     test("selectUnionSelectLimit") - checker(
-      Buyer.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2))
-    ).expect(
+      query =
+        Buyer.select.map(_.name.toLowerCase).unionAll(
+          Product.select.map(_.kebabCaseName.toLowerCase).take(2)
+        ),
       sql = """
         SELECT LOWER(buyer0.name) as res
         FROM buyer buyer0
@@ -233,10 +244,13 @@ object SubQueryTests extends TestSuite {
           FROM product product0
           LIMIT 2) subquery0
       """,
-      value = Vector(
-        "james bond", "叉烧包", "li haoyi", "face-mask", "guitar"
+      value = Seq(
+        "james bond",
+        "叉烧包",
+        "li haoyi",
+        "face-mask",
+        "guitar"
       )
     )
   }
 }
-

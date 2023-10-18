@@ -2,9 +2,7 @@ package usql.query
 
 import usql.{Queryable, Table}
 
-case class OrderBy(expr: Expr[_],
-                   ascDesc: Option[AscDesc],
-                   nulls: Option[Nulls])
+case class OrderBy(expr: Expr[_], ascDesc: Option[AscDesc], nulls: Option[Nulls])
 
 sealed trait AscDesc
 

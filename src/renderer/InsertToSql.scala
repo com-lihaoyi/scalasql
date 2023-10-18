@@ -6,9 +6,11 @@ import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
 import usql.renderer.SqlStr.SqlStringSyntax
 
 object InsertToSql {
-  def values(q: InsertValues[_],
-            tableNameMapper: String => String,
-            columnNameMapper: String => String): SqlStr = {
+  def values(
+      q: InsertValues[_],
+      tableNameMapper: String => String,
+      columnNameMapper: String => String
+  ): SqlStr = {
 
     implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val columns = SqlStr.join(q.columns.map(c => SqlStr.raw(columnNameMapper(c.name))), usql", ")
@@ -20,15 +22,19 @@ object InsertToSql {
     usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) VALUES $values"
   }
 
-  def select[Q, C](q: InsertSelect[Q, C],
-                   exprs: Seq[Expr[_]],
-                   tableNameMapper: String => String,
-                   columnNameMapper: String => String): SqlStr = {
+  def select[Q, C](
+      q: InsertSelect[Q, C],
+      exprs: Seq[Expr[_]],
+      tableNameMapper: String => String,
+      columnNameMapper: String => String
+  ): SqlStr = {
 
     implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
 
     val columns = SqlStr.join(
-      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]]).map(c => SqlStr.raw(columnNameMapper(c.name))),
+      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]]).map(c =>
+        SqlStr.raw(columnNameMapper(c.name))
+      ),
       usql", "
     )
 

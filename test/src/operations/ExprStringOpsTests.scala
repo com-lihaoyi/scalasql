@@ -11,35 +11,40 @@ import utest._
 object ExprStringOpsTests extends TestSuite {
   val checker = new TestDb("strxpropstests")
   def tests = Tests {
-    test("like") - checker(Expr("hello").like("he%")).expect(
+    test("like") - checker(
+      query = Expr("hello").like("he%"),
       sql = "SELECT ? LIKE ? as res",
       value = true
     )
 
-//    test("position") - checker(Expr("hello").position("ll")).expect(
+//    test("position") - checker(
+//      query = Expr("hello").position("ll"),
 //      sql = "SELECT POSITION(?, ?) as res",
 //      value = 3
 //    )
 
-    test("toLowerCase") - checker(Expr("Hello").toLowerCase).expect(
+    test("toLowerCase") - checker(
+      query = Expr("Hello").toLowerCase,
       sql = "SELECT LOWER(?) as res",
       value = "hello"
     )
 
-    test("trim") - checker(Expr("  Hello ").trim).expect(
+    test("trim") - checker(
+      query = Expr("  Hello ").trim,
       sql = "SELECT TRIM(?) as res",
       value = "Hello"
     )
 
-    test("substring") - checker(Expr("Hello").substring(2, 2)).expect(
+    test("substring") - checker(
+      query = Expr("Hello").substring(2, 2),
       sql = "SELECT SUBSTRING(?, ?, ?) as res",
       value = "el"
     )
 
-//    test("overlay") - checker(Expr("Hello").overlay("LL", 2, 2)).expect(
+//    test("overlay") - checker(
+//      query = Expr("Hello").overlay("LL", 2, 2),
 //      sql = "SELECT OVERLAY(? PLACING ? FROM ? FOR ?) as res",
 //      value = "HeLLo"
 //    )
   }
 }
-

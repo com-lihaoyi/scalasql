@@ -20,21 +20,20 @@ import usql.renderer.{Context, SqlStr}
  *
  * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
  * https://www.postgresql.org/docs/current/sql-select.html
- *
  */
-case class SimpleSelect[Q](expr: Q,
-                           exprPrefix: Option[String],
-                           from: Seq[From],
-                           joins: Seq[Join],
-                           where: Seq[Expr[_]],
-                           groupBy0: Option[GroupBy])
-                          (implicit val qr: Queryable[Q, _]) extends Select[Q]{
+case class SimpleSelect[Q](
+    expr: Q,
+    exprPrefix: Option[String],
+    from: Seq[From],
+    joins: Seq[Join],
+    where: Seq[Expr[_]],
+    groupBy0: Option[GroupBy]
+)(implicit val qr: Queryable[Q, _]) extends Select[Q] {
   override def select = this
 
   def distinct: Select[Q] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V](f: Q => Context => SqlStr)
-                  (implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
+  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context =>
         val newCtx = new Context(
@@ -62,9 +61,9 @@ case class SimpleSelect[Q](expr: Q,
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
-  def join0[V](other: Joinable[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
+  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ): Select[(Q, V)] = {
 
     val thisTrivial = groupBy0.isEmpty
     val (otherJoin, otherSelect) = joinInfo(other, on)
@@ -75,21 +74,21 @@ case class SimpleSelect[Q](expr: Q,
       from = if (thisTrivial) from else Seq(this.subquery),
       joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
       where = if (thisTrivial) where else Nil,
-      groupBy0 = if (thisTrivial) groupBy0 else None,
+      groupBy0 = if (thisTrivial) groupBy0 else None
     )
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)
-                     (implicit qr: Queryable[E, V]): Expr[V] = {
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V] { implicit ctx: Context =>
       this.copy(expr = f(new SelectProxy[Q](expr))).toSqlStr
     }
   }
 
-  def groupBy[K, V](groupKey: Q => K)
-                   (groupAggregate: SelectProxy[Q] => V)
-                   (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Select[(K, V)] = {
+  def groupBy[K, V](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
+      qrk: Queryable[K, _],
+      qrv: Queryable[V, _]
+  ): Select[(K, V)] = {
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
@@ -104,7 +103,6 @@ case class SimpleSelect[Q](expr: Q,
       groupBy0 = groupByOpt
     )
   }
-
 
   def sortBy(f: Q => Expr[_]) = {
     CompoundSelect(this, Nil, Some(OrderBy(f(expr), None, None)), None, None)
@@ -128,9 +126,10 @@ case class SimpleSelect[Q](expr: Q,
   }
 }
 
-object SimpleSelect{
-  def from[Q](s: Select[Q]) = s match{
+object SimpleSelect {
+  def from[Q](s: Select[Q]) = s match {
     case s: SimpleSelect[Q] => s
-    case s: CompoundSelect[Q] => SimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
+    case s: CompoundSelect[Q] =>
+      SimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
   }
 }

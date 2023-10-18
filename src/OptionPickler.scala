@@ -7,7 +7,7 @@ object OptionPickler extends upickle.AttributeTagged {
     }
 
   override implicit def OptionReader[T: Reader]: Reader[Option[T]] = {
-    new Reader.Delegate[Any, Option[T]](implicitly[Reader[T]].map(Some(_))){
+    new Reader.Delegate[Any, Option[T]](implicitly[Reader[T]].map(Some(_))) {
       override def visitNull(index: Int) = None
     }
   }
@@ -19,7 +19,7 @@ object OptionPickler extends upickle.AttributeTagged {
 
     override def visitFalse(index: Int) = false
 
-    override def visitString(s: CharSequence, index: Int) = s match{
+    override def visitString(s: CharSequence, index: Int) = s match {
       case "0" | "false" | "FALSE" => false
       case "1" | "true" | "TRUE" => true
     }

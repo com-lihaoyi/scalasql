@@ -7,11 +7,13 @@ import usql.DatabaseApi.handleResultRow
 import java.sql.{ResultSet, Statement}
 import scala.collection.mutable
 
-class DatabaseApi(connection: java.sql.Connection,
-                  tableNameMapper: String => String = identity,
-                  tableNameUnMapper: String => String = identity,
-                  columnNameMapper: String => String = identity,
-                  columnNameUnMapper: String => String = identity) {
+class DatabaseApi(
+    connection: java.sql.Connection,
+    tableNameMapper: String => String = identity,
+    tableNameUnMapper: String => String = identity,
+    columnNameMapper: String => String = identity,
+    columnNameUnMapper: String => String = identity
+) {
 
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
@@ -19,27 +21,24 @@ class DatabaseApi(connection: java.sql.Connection,
     finally statement.close()
   }
 
-  def toSqlQuery[Q](query: Q)
-                      (implicit qr: Queryable[Q, _]): String = {
+  def toSqlQuery[Q](query: Q)(implicit qr: Queryable[Q, _]): String = {
     val (str, params) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[Q](query: Q)
-                       (implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
+  def toSqlQuery0[Q](query: Q)(implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
     val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
     val queryStr = flattened.queryParts.mkString("?")
     (queryStr, flattened.params)
   }
 
-  def run[Q, R](query: Q)
-               (implicit qr: Queryable[Q, R]): R = {
+  def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
 
     val (str, params) = toSqlQuery0(query)
     val statement = connection.prepareStatement(str)
 
-    for((p, n) <- params.zipWithIndex) p match{
+    for ((p, n) <- params.zipWithIndex) p match {
       case Interp.StringInterp(s) => statement.setString(n + 1, s)
       case Interp.IntInterp(i) => statement.setInt(n + 1, i)
       case Interp.DoubleInterp(d) => statement.setDouble(n + 1, d)
@@ -51,12 +50,12 @@ class DatabaseApi(connection: java.sql.Connection,
       val resultSet: ResultSet = statement.executeQuery()
 
       try {
-        if (qr.singleRow){
+        if (qr.singleRow) {
           assert(resultSet.next())
           val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader)
           assert(!resultSet.next())
           res
-        }else {
+        } else {
           val arrVisitor = qr.valueReader.visitArray(-1, -1)
           while (resultSet.next()) {
             val rowRes = handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor)
@@ -72,10 +71,12 @@ class DatabaseApi(connection: java.sql.Connection,
   }
 }
 
-object DatabaseApi{
-  def handleResultRow[V](resultSet: ResultSet,
-                         columnNameUnMapper: String => String,
-                         rowVisitor: Visitor[_, V]): V  = {
+object DatabaseApi {
+  def handleResultRow[V](
+      resultSet: ResultSet,
+      columnNameUnMapper: String => String,
+      rowVisitor: Visitor[_, V]
+  ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
     val values = Array.newBuilder[String]

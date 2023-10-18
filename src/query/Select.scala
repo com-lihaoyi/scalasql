@@ -4,7 +4,8 @@ import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, SelectToSql, SqlStr}
 import usql.{OptionPickler, Queryable}
 
-trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinable[Q] with JoinOps[Select, Q] {
+trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinable[Q]
+    with JoinOps[Select, Q] {
 
   override def select = this
 
@@ -18,12 +19,12 @@ trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinabl
   def flatMap[V](f: Q => Select[V])(implicit qr: Queryable[V, _]): Select[V]
   def filter(f: Q => Expr[Boolean]): Select[Q]
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)
-                     (implicit qr: Queryable[E, V]): Expr[V]
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V]
 
-  def groupBy[K, V](groupKey: Q => K)
-                   (groupAggregate: SelectProxy[Q] => V)
-                   (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Select[(K, V)]
+  def groupBy[K, V](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
+      qrk: Queryable[K, _],
+      qrv: Queryable[V, _]
+  ): Select[(K, V)]
 
   def sortBy(f: Q => Expr[_]): Select[Q]
   def asc: Select[Q]

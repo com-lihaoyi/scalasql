@@ -11,105 +11,124 @@ import utest._
 object ExprIntOpsTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
-    test("plus") - checker(Expr(6) + Expr(2)).expect(
+    test("plus") - checker(
+      query = Expr(6) + Expr(2),
       sql = "SELECT ? + ? as res",
       value = 8
     )
 
-    test("minus") - checker(Expr(6) - Expr(2)).expect(
+    test("minus") - checker(
+      query = Expr(6) - Expr(2),
       sql = "SELECT ? - ? as res",
       value = 4
     )
 
-    test("times") - checker(Expr(6) * Expr(2)).expect(
+    test("times") - checker(
+      query = Expr(6) * Expr(2),
       sql = "SELECT ? * ? as res",
       value = 12
     )
 
-    test("divide") - checker(Expr(6) / Expr(2)).expect(
+    test("divide") - checker(
+      query = Expr(6) / Expr(2),
       sql = "SELECT ? / ? as res",
       value = 3
     )
 
-    test("modulo") - checker(Expr(6) % Expr(2)).expect(
+    test("modulo") - checker(
+      query = Expr(6) % Expr(2),
       sql = "SELECT MOD(?, ?) as res",
       value = 0
     )
 
-    test("greaterThan") - checker(Expr(6) > Expr(2)).expect(
+    test("greaterThan") - checker(
+      query = Expr(6) > Expr(2),
       sql = "SELECT ? > ? as res",
       value = true
     )
 
-    test("lessThan") - checker(Expr(6) < Expr(2)).expect(
+    test("lessThan") - checker(
+      query = Expr(6) < Expr(2),
       sql = "SELECT ? < ? as res",
       value = false
     )
 
-    test("greaterThanOrEquals") - checker(Expr(6) >= Expr(2)).expect(
+    test("greaterThanOrEquals") - checker(
+      query = Expr(6) >= Expr(2),
       sql = "SELECT ? >= ? as res",
       value = true
     )
 
-    test("lessThanOrEquals") - checker(Expr(6) <= Expr(2)).expect(
+    test("lessThanOrEquals") - checker(
+      query = Expr(6) <= Expr(2),
       sql = "SELECT ? <= ? as res",
       value = false
     )
 
-    test("bitwiseAnd") - checker(Expr(6) & Expr(2)).expect(
+    test("bitwiseAnd") - checker(
+      query = Expr(6) & Expr(2),
       sql = "SELECT ? & ? as res",
       value = 2
     )
 
-    test("bitwiseOr") - checker(Expr(6) | Expr(3)).expect(
+    test("bitwiseOr") - checker(
+      query = Expr(6) | Expr(3),
       sql = "SELECT ? | ? as res",
       value = 7
     )
 
-    test("between") - checker(Expr(4).between(Expr(2), Expr(6))).expect(
+    test("between") - checker(
+      query = Expr(4).between(Expr(2), Expr(6)),
       sql = "SELECT ? BETWEEN ? AND ? as res",
       value = true
     )
 
-    test("unaryPlus") - checker(+Expr(-4)).expect(
+    test("unaryPlus") - checker(
+      query = +Expr(-4),
       sql = "SELECT +? as res",
       value = -4
     )
 
-    test("unaryMinus") - checker(-Expr(-4)).expect(
+    test("unaryMinus") - checker(
+      query = -Expr(-4),
       sql = "SELECT -? as res",
       value = 4
     )
 
-    test("unaryTilde") - checker(~Expr(-4)).expect(
+    test("unaryTilde") - checker(
+      query = ~Expr(-4),
       sql = "SELECT ~? as res",
       value = 3
     )
 
-    test("abs") - checker(Expr(-4).abs).expect(
+    test("abs") - checker(
+      query = Expr(-4).abs,
       sql = "SELECT ABS(?) as res",
       value = 4
     )
 
-    test("mod") - checker(Expr(8).mod(Expr(3))).expect(
+    test("mod") - checker(
+      query = Expr(8).mod(Expr(3)),
       sql = "SELECT MOD(?, ?) as res",
       value = 2
     )
 
-    test("ceil") - checker(Expr(4.3).ceil).expect(
+    test("ceil") - checker(
+      query = Expr(4.3).ceil,
       sql = "SELECT CEIL(?) as res",
-      value = 5
+      value = 5.0
     )
 
-    test("floor") - checker(Expr(4.7).floor).expect(
+    test("floor") - checker(
+      query = Expr(4.7).floor,
       sql = "SELECT FLOOR(?) as res",
-      value = 4
+      value = 4.0
     )
-    
-    test("floor") - checker(Expr(4.7).floor).expect(
+
+    test("floor") - checker(
+      query = Expr(4.7).floor,
       sql = "SELECT FLOOR(?) as res",
-      value = 4
+      value = 4.0
     )
   }
 }
-

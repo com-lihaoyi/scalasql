@@ -1,12 +1,12 @@
 package usql
 import OptionPickler.Reader
 
-class Val[T](value: T){
+class Val[T](value: T) {
   def apply() = value
 
   override def hashCode(): Int = value.##
 
-  override def equals(obj: Any): Boolean = obj match{
+  override def equals(obj: Any): Boolean = obj match {
     case v: Val[_] => v() == apply()
     case _ => false
   }
@@ -14,7 +14,7 @@ class Val[T](value: T){
   override def toString: String = s"Val(${value.toString})"
 }
 
-object Val{
+object Val {
   implicit def apply[T](value: T): Val[T] = new Val(value)
   implicit def reader[T: Reader]: Reader[Val[T]] = OptionPickler.reader[T].map(Val(_))
 }

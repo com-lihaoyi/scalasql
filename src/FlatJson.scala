@@ -12,18 +12,19 @@ object FlatJson {
   val delimiter = "__"
   val basePrefix = "res"
 
-  def flatten(x: Seq[(List[String], Expr[_])],
-              context: Context): Seq[(String, SqlStr)] = {
-    x.map{case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlStr(context))}
+  def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
+    x.map { case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlStr(context)) }
   }
 
   /**
    * Walk the [[ResultSet]]'s column values and labels and feed them into [[rowVisitor]]
    * to re-construct the Scala object of type [[V]].
    */
-  def unflatten[V](keys: IndexedSeq[IndexedSeq[String]],
-                   values: IndexedSeq[String],
-                   rowVisitor: Visitor[_, _]): V = {
+  def unflatten[V](
+      keys: IndexedSeq[IndexedSeq[String]],
+      values: IndexedSeq[String],
+      rowVisitor: Visitor[_, _]
+  ): V = {
 
     /**
      * Similar to `groupBy`, but assumes groups are contiguous within the collection, and works

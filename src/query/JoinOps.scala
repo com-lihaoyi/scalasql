@@ -4,25 +4,35 @@ import usql.{Queryable, Table}
 
 trait JoinOps[C[_], Q] {
   def expr: Q
-  def join[V](other: Joinable[V])
-             (implicit qr: Queryable[V, _]): C[(Q, V)] = join0(other, None)
+  def join[V](other: Joinable[V])(implicit qr: Queryable[V, _]): C[(Q, V)] = join0(other, None)
 
-  def joinOn[V](other: Joinable[V])
-               (on: (Q, V) => Expr[Boolean])
-               (implicit qr: Queryable[V, _]): C[(Q, V)] = join0(other, Some(on))
+  def joinOn[V](other: Joinable[V])(on: (Q, V) => Expr[Boolean])(implicit
+      qr: Queryable[V, _]
+  ): C[(Q, V)] = join0(other, Some(on))
 
-  def join0[V](other: Joinable[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): C[(Q, V)]
+  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ): C[(Q, V)]
 
-  def joinInfo[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit joinQr: Queryable[V, _]) = {
+  def joinInfo[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ) = {
     val otherTrivial = other.isInstanceOf[Table.Base]
 
     val otherSelect = other.select
 
     val otherJoin =
-      if (otherTrivial) Join(None, Seq(JoinFrom(otherSelect.asInstanceOf[SimpleSelect[_]].from.head, on.map(_(expr, otherSelect.expr)))))
-      else Join(None, Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr)))))
+      if (otherTrivial) Join(
+        None,
+        Seq(JoinFrom(
+          otherSelect.asInstanceOf[SimpleSelect[_]].from.head,
+          on.map(_(expr, otherSelect.expr))
+        ))
+      )
+      else Join(
+        None,
+        Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr), on.map(_(expr, otherSelect.expr))))
+      )
 
     (Seq(otherJoin), otherSelect)
   }

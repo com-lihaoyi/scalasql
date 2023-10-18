@@ -4,7 +4,7 @@ import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr, UpdateToSql}
 import usql.{OptionPickler, Queryable}
 
-trait Returnable[Q]{
+trait Returnable[Q] {
   def expr: Q
   def table: TableRef
   def toSqlQuery(implicit ctx: Context): SqlStr
@@ -13,18 +13,24 @@ trait Returnable[Q]{
   }
 }
 
-case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
+case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit
+    val qr: Queryable[Q, R]
+)
 
-object Returning{
-  implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Returning[Q, R], Seq[R]] =
+object Returning {
+  implicit def UpdateReturningQueryable[Q, R](implicit
+      qr: Queryable[Q, R]
+  ): Queryable[Returning[Q, R], Seq[R]] =
     new InsertReturningQueryable[Q, R]()(qr)
 
-  class InsertReturningQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Returning[Q, R], Seq[R]] {
+  class InsertReturningQueryable[Q, R](implicit qr: Queryable[Q, R])
+      extends Queryable[Returning[Q, R], Seq[R]] {
     def walk(ur: Returning[Q, R]): Seq[(List[String], Expr[_])] = qr.walk(ur.returning)
 
     override def singleRow = false
 
-    def valueReader: OptionPickler.Reader[Seq[R]] = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
+    def valueReader: OptionPickler.Reader[Seq[R]] =
+      OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
 
     override def toSqlQuery(q: Returning[Q, R], ctx0: Context): SqlStr = {
       implicit val (_, _, _, ctx) = SelectToSql.computeContext(

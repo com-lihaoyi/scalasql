@@ -14,38 +14,45 @@ object InsertTests extends TestSuite {
     test("single") {
       test("simple") - {
         checker(
-          Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4)
-        ).expect(
+          query =
+            Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
           value = 1
         )
 
-        checker(Buyer.select.filter(_.name === "test buyer")).expect(
-          value = Vector(Buyer(4, "test buyer", "2023-09-09"))
+        checker(
+          query = Buyer.select.filter(_.name === "test buyer"),
+          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
         )
       }
 
       test("partial") - {
-        checker(Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09"))
-          .expect(sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)", value = 1)
+        checker(
+          query = Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09"),
+          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
+          value = 1
+        )
 
-        checker(Buyer.select.filter(_.name === "test buyer")).expect(
+        checker(
+          query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Vector(Buyer(4, "test buyer", "2023-09-09"))
+          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
         )
       }
 
       test("returning") - {
         checker(
-          Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09").returning(_.id)
-        ).expect(
+          query = Buyer.insert
+            .values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09")
+            .returning(_.id),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
           value = Seq(4)
         )
 
-        checker(Buyer.select.filter(_.name === "test buyer")).expect(
+        checker(
+          query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Vector(Buyer(4, "test buyer", "2023-09-09"))
+          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
         )
       }
     }
@@ -53,14 +60,12 @@ object InsertTests extends TestSuite {
     test("batch") {
       test("simple") - {
         checker(
-          Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
+          query = Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
             ("test buyer A", "2001-04-07", 4),
             ("test buyer B", "2002-05-08", 5),
             ("test buyer C", "2003-06-09", 6)
-          )
-        ).expect(
-          sql =
-            """
+          ),
+          sql = """
             INSERT INTO buyer (name, date_of_birth, id)
             VALUES
               (?, ?, ?),
@@ -70,26 +75,26 @@ object InsertTests extends TestSuite {
           value = 3
         )
 
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
-            Buyer(4, "test buyer A", "2001-04-07"),
-            Buyer(5, "test buyer B", "2002-05-08"),
-            Buyer(6, "test buyer C", "2003-06-09")
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](4, "test buyer A", "2001-04-07"),
+            Buyer[Val](5, "test buyer B", "2002-05-08"),
+            Buyer[Val](6, "test buyer C", "2003-06-09")
           )
         )
       }
 
       test("partial") - {
         checker(
-          Buyer.insert.batched(_.name, _.dateOfBirth)(
+          query = Buyer.insert.batched(_.name, _.dateOfBirth)(
             ("test buyer A", "2001-04-07"),
             ("test buyer B", "2002-05-08"),
             ("test buyer C", "2003-06-09")
-          )
-        ).expect(
+          ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             VALUES (?, ?), (?, ?), (?, ?)
@@ -97,29 +102,29 @@ object InsertTests extends TestSuite {
           value = 3
         )
 
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
             // id=4,5,6 comes from auto increment
-            Buyer(4, "test buyer A", "2001-04-07"),
-            Buyer(5, "test buyer B", "2002-05-08"),
-            Buyer(6, "test buyer C", "2003-06-09")
+            Buyer[Val](4, "test buyer A", "2001-04-07"),
+            Buyer[Val](5, "test buyer B", "2002-05-08"),
+            Buyer[Val](6, "test buyer C", "2003-06-09")
           )
         )
       }
 
       test("returning") - {
         checker(
-          Buyer.insert
+          query = Buyer.insert
             .batched(_.name, _.dateOfBirth)(
               ("test buyer A", "2001-04-07"),
               ("test buyer B", "2002-05-08"),
               ("test buyer C", "2003-06-09")
             )
-            .returning(_.id)
-        ).expect(
+            .returning(_.id),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             VALUES
@@ -131,15 +136,16 @@ object InsertTests extends TestSuite {
           value = Seq(4, 5, 6)
         )
 
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
             // id=4,5,6 comes from auto increment
-            Buyer(4, "test buyer A", "2001-04-07"),
-            Buyer(5, "test buyer B", "2002-05-08"),
-            Buyer(6, "test buyer C", "2003-06-09")
+            Buyer[Val](4, "test buyer A", "2001-04-07"),
+            Buyer[Val](5, "test buyer B", "2002-05-08"),
+            Buyer[Val](6, "test buyer C", "2003-06-09")
           )
         )
       }
@@ -148,13 +154,12 @@ object InsertTests extends TestSuite {
     test("select") {
       test("caseclass") {
         checker(
-          Buyer.insert.select(
+          query = Buyer.insert.select(
             identity,
             Buyer.select
               .filter(_.name !== "Li Haoyi")
               .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
-          )
-        ).expect(
+          ),
           sql = """
             INSERT INTO buyer (id, name, date_of_birth)
             SELECT
@@ -166,24 +171,25 @@ object InsertTests extends TestSuite {
           """,
           value = 2
         )
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
-            Buyer(4, "James Bond", "2001-02-03"),
-            Buyer(5, "叉烧包", "1923-11-12"),
+
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](4, "James Bond", "2001-02-03"),
+            Buyer[Val](5, "叉烧包", "1923-11-12")
           )
         )
       }
 
       test("simple") {
         checker(
-          Buyer.insert.select(
+          query = Buyer.insert.select(
             x => (x.name, x.dateOfBirth),
             Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
-          )
-        ).expect(
+          ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
@@ -193,27 +199,27 @@ object InsertTests extends TestSuite {
           value = 2
         )
 
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer(4, "James Bond", "2001-02-03"),
-            Buyer(5, "叉烧包", "1923-11-12"),
+            Buyer[Val](4, "James Bond", "2001-02-03"),
+            Buyer[Val](5, "叉烧包", "1923-11-12")
           )
         )
       }
 
       test("returning") {
         checker(
-          Buyer.insert
+          query = Buyer.insert
             .select(
               x => (x.name, x.dateOfBirth),
               Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
             )
-            .returning(_.id)
-        ).expect(
+            .returning(_.id),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             SELECT
@@ -226,18 +232,18 @@ object InsertTests extends TestSuite {
           value = Seq(4, 5)
         )
 
-        checker(Buyer.select).expect(
-          value = Vector(
-            Buyer(1, "James Bond", "2001-02-03"),
-            Buyer(2, "叉烧包", "1923-11-12"),
-            Buyer(3, "Li Haoyi", "1965-08-09"),
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", "2001-02-03"),
+            Buyer[Val](2, "叉烧包", "1923-11-12"),
+            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer(4, "James Bond", "2001-02-03"),
-            Buyer(5, "叉烧包", "1923-11-12"),
+            Buyer[Val](4, "James Bond", "2001-02-03"),
+            Buyer[Val](5, "叉烧包", "1923-11-12")
           )
         )
       }
     }
   }
 }
-

@@ -8,6 +8,5 @@ import usql.renderer.{Context, SqlStr}
  */
 trait Aggregatable[Q] {
   def expr: Q
-  def queryExpr[V](f: Q => Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V]
+  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V]
 }

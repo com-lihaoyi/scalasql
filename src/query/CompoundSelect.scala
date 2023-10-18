@@ -4,14 +4,13 @@ import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, SqlStr}
 import usql.{Queryable, Table}
 
-
-
-case class CompoundSelect[Q](lhs: SimpleSelect[Q],
-                             compoundOps: Seq[CompoundSelect.Op[Q]],
-                             orderBy: Option[OrderBy],
-                             limit: Option[Int],
-                             offset: Option[Int])
-                            (implicit val qr: Queryable[Q, _]) extends Select[Q] {
+case class CompoundSelect[Q](
+    lhs: SimpleSelect[Q],
+    compoundOps: Seq[CompoundSelect.Op[Q]],
+    orderBy: Option[OrderBy],
+    limit: Option[Int],
+    offset: Option[Int]
+)(implicit val qr: Queryable[Q, _]) extends Select[Q] {
 
   def expr = lhs.select.expr
 
@@ -19,8 +18,7 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
 
   def distinct: Select[Q] = ???
 
-  def queryExpr[V](f: Q => Context => SqlStr)
-                  (implicit qr: Queryable[Expr[V], V]): Expr[V] = ???
+  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V] = ???
 
   def map[V](f: Q => V)(implicit qr2: Queryable[V, _]): Select[V] = {
     (lhs, compoundOps) match {
@@ -37,25 +35,26 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
 
   def filter(f: Q => Expr[Boolean]): Select[Q] = {
     (lhs, compoundOps) match {
-      case (s: SimpleSelect[Q], Nil) => CompoundSelect(SimpleSelect.from(s.filter(f)), compoundOps, orderBy, limit, offset)
+      case (s: SimpleSelect[Q], Nil) =>
+        CompoundSelect(SimpleSelect.from(s.filter(f)), compoundOps, orderBy, limit, offset)
       case _ => SimpleSelect.from(this).filter(f)
     }
   }
 
-  def join0[V](other: Joinable[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Select[(Q, V)] = {
+  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ): Select[(Q, V)] = {
     SimpleSelect.from(this).join0(other, on)
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)
-                     (implicit qr: Queryable[E, V]): Expr[V] = {
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
     SimpleSelect.from(this).aggregate(f)
   }
 
-  def groupBy[K, V](groupKey: Q => K)
-                   (groupAggregate: SelectProxy[Q] => V)
-                   (implicit qrk: Queryable[K, _], qrv: Queryable[V, _]): Select[(K, V)] = {
+  def groupBy[K, V](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
+      qrk: Queryable[K, _],
+      qrv: Queryable[V, _]
+  ): Select[(K, V)] = {
     SimpleSelect.from(this).groupBy(groupKey)(groupAggregate)
   }
 

@@ -21,24 +21,28 @@ trait Expr[T] {
   def exprToString: String = super.toString
 }
 
-object Expr{
+object Expr {
   class Identity()
 
-  implicit def ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T]): Queryable[E[T], T] =
+  implicit def ExprQueryable[E[_] <: Expr[_], T](implicit
+      valueReader0: OptionPickler.Reader[T]
+  ): Queryable[E[T], T] =
     new ExprQueryable[E, T]()
 
-  class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T]) extends Queryable[E[T], T] {
+  class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
+      extends Queryable[E[T], T] {
     def walk(q: E[T]) = Seq(Nil -> q)
 
     def valueReader = valueReader0
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
-  class Simple[T](f: Context => SqlStr) extends Expr[T]{
+  class Simple[T](f: Context => SqlStr) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
   implicit def apply[T](x: T)(implicit conv: T => Interp): Expr[T] = new Expr[T] {
-    override def toSqlExpr0(implicit ctx: Context): SqlStr = new SqlStr(Seq("", ""), Seq(conv(x)), false)
+    override def toSqlExpr0(implicit ctx: Context): SqlStr =
+      new SqlStr(Seq("", ""), Seq(conv(x)), false)
   }
 }

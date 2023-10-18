@@ -3,7 +3,6 @@ package usql
 import mainargs.{ParserForMethods, main}
 import ExprOps._
 
-
 object Main {
   @main
   def main() = {
@@ -80,7 +79,6 @@ object Main {
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrExit(args)
 }
-
 
 import java.sql.{Connection, DriverManager, Statement}
 

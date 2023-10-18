@@ -3,8 +3,8 @@ package usql.operations
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 
-
 class ExprStringOps(v: Expr[String]) {
+
   /** TRUE if the operand matches a pattern */
   def like[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => usql"$v LIKE $x" }
 
@@ -22,7 +22,9 @@ class ExprStringOps(v: Expr[String]) {
   def trim: Expr[String] = Expr { implicit ctx => usql"TRIM($v)" }
 
   /** Returns a portion of a string. */
-  def substring(start: Expr[Int], length: Expr[Int]): Expr[String] = Expr { implicit ctx => usql"SUBSTRING($v, $start, $length)" }
+  def substring(start: Expr[Int], length: Expr[Int]): Expr[String] = Expr { implicit ctx =>
+    usql"SUBSTRING($v, $start, $length)"
+  }
 
   /** Returns the result of replacing a substring of one string with another. */
   // Not supported by SQlite
@@ -31,4 +33,3 @@ class ExprStringOps(v: Expr[String]) {
 //    usql"OVERLAY($v PLACING $replacement FROM $start$lengthStr)"
 //  }
 }
-

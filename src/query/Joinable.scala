@@ -6,4 +6,3 @@ package usql.query
 trait Joinable[Q] {
   def select: Select[Q]
 }
-

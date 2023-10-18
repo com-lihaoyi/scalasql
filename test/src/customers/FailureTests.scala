@@ -11,7 +11,7 @@ object FailureTests extends TestSuite {
   val checker = new TestDb("expropstests")
   def tests = Tests {
     test("equals") - {
-      val ex = intercept[Exception]{Expr(1) == 2}
+      val ex = intercept[Exception] { Expr(1) == 2 }
       assert(ex.getMessage.contains("Expr#equals is not defined"))
 
       assert(Expr(1).exprIdentity != Expr(1).exprIdentity)
@@ -19,7 +19,7 @@ object FailureTests extends TestSuite {
       assert(e.exprIdentity == e.exprIdentity)
     }
     test("toString") - {
-      val ex = intercept[Exception]{Expr(1).toString}
+      val ex = intercept[Exception] { Expr(1).toString }
       assert(ex.getMessage.contains("Expr#toString is not defined"))
 
       val s: String = Expr(1).exprToString
@@ -27,4 +27,3 @@ object FailureTests extends TestSuite {
 
   }
 }
-

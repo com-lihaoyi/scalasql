@@ -3,8 +3,7 @@ package usql.operations
 import usql.query.{Expr, Select}
 import usql.renderer.SqlStr.SqlStringSyntax
 
-
-class SelectOps[T](v: Select[T]){
+class SelectOps[T](v: Select[T]) {
 
   def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => usql"$other in $v" }
 
