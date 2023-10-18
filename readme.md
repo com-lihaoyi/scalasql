@@ -76,8 +76,8 @@ typed `Table` descriptions.
 # Design
 
 ```
-  {Expr[Int],Query[Q]               {Int,Seq[R],
-   CaseCls[Expr],Tuple}              CaseCls[Val],Tuple}
+  {Expr[Int],Query[Q]                 {Int,Seq[R],
+   CaseCls[Expr],Tuple[Q]}         CaseCls[Val],Tuple[R]}
            |                               ^
            |                               |
          Q +-----------+       +-----------+ R
