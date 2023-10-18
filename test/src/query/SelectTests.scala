@@ -63,6 +63,7 @@ object SelectTests extends TestSuite {
           ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
         )
       )
+      
       test("combined") - checker(
         ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === "2012-05-06")
       ).expect(
@@ -141,6 +142,7 @@ object SelectTests extends TestSuite {
         sql = "SELECT SUM(purchase0.total) as res FROM purchase purchase0",
         value = 12343.2
       )
+
       test("multiple") - checker(
         Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
       ).expect(
@@ -299,6 +301,7 @@ object SelectTests extends TestSuite {
         """,
         value = Vector("2012-04-05")
       )
+
       test("selfJoin") - checker(Buyer.select.joinOn(Buyer)(_.id === _.id)).expect(
         sql = """
           SELECT
@@ -317,6 +320,7 @@ object SelectTests extends TestSuite {
           (Buyer(3, "Li Haoyi", "1965-08-09"), Buyer(3, "Li Haoyi", "1965-08-09"))
         )
       )
+
       test("selfJoin2") - checker(Buyer.select.joinOn(Buyer)(_.id !== _.id)).expect(
         sql = """
           SELECT
@@ -352,6 +356,7 @@ object SelectTests extends TestSuite {
         """,
         value = Vector("2012-04-05")
       )
+
       test("flatMap2") - checker(
         Buyer.select.flatMap(c =>
           ShippingInfo.select
