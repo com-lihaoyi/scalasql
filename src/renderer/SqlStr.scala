@@ -9,7 +9,7 @@ import usql.query.Expr
  */
 class SqlStr(private val queryParts: Seq[String],
              private val params: Seq[Interp],
-             private val isCompleteQuery: Boolean) {
+             val isCompleteQuery: Boolean) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head) ++ other.queryParts.tail,
     params ++ other.params,

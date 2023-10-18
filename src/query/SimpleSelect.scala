@@ -1,9 +1,7 @@
 package usql.query
 
-import Select._
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.{OptionPickler, Queryable, Table}
-import usql.renderer.{Context, SelectToSql, SqlStr}
+import usql.Queryable
+import usql.renderer.{Context, SqlStr}
 
 /**
  * Models the various components of a SQL query:
