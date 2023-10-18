@@ -58,6 +58,36 @@ object InsertTests extends TestSuite {
         )
       )
     }
+    test("batchPartial") - {
+      checker(
+        Buyer.insert.batched(_.name, _.dateOfBirth)(
+          ("test buyer A", "2001-04-07"),
+          ("test buyer B", "2002-05-08"),
+          ("test buyer C", "2003-06-09")
+        )
+      ).expect(
+        sql = """
+          INSERT INTO buyer (name, date_of_birth)
+          VALUES
+            (?, ?),
+            (?, ?),
+            (?, ?)
+        """,
+        value = 3
+      )
+
+      checker(Buyer.select).expect(
+        value = Vector(
+          Buyer(1, "James Bond", "2001-02-03"),
+          Buyer(2, "叉烧包", "1923-11-12"),
+          Buyer(3, "Li Haoyi", "1965-08-09"),
+          // id=4,5,6 comes from auto increment
+          Buyer(4, "test buyer A", "2001-04-07"),
+          Buyer(5, "test buyer B", "2002-05-08"),
+          Buyer(6, "test buyer C", "2003-06-09")
+        )
+      )
+    }
   }
 }
 
