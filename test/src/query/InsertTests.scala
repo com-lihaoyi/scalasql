@@ -5,7 +5,7 @@ import usql._
 import utest._
 
 /**
- * Tests for basic update operations
+ * Tests for basic insert operations
  */
 object InsertTests extends TestSuite {
   def tests = Tests {
@@ -15,6 +15,15 @@ object InsertTests extends TestSuite {
         .expect(sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)", value = 1)
 
       checker(Buyer.select.filter(_.name === "test buyer")).expect(
+        value = Vector(Buyer(4, "test buyer", "2023-09-09"))
+      )
+    }
+    test("partial") - {
+      checker(Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09"))
+        .expect(sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)", value = 1)
+
+      checker(Buyer.select.filter(_.name === "test buyer")).expect(
+        // id=4 comes from auto increment
         value = Vector(Buyer(4, "test buyer", "2023-09-09"))
       )
     }

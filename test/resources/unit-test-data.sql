@@ -1,26 +1,26 @@
 
 CREATE TABLE buyer (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(256),
     date_of_birth DATE
 );
 
 CREATE TABLE product (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     kebab_case_name VARCHAR(256),
     name VARCHAR(256),
     price DECIMAL(20, 2)
 );
 
 CREATE TABLE shipping_info (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     buyer_id INT,
     shipping_date DATE,
     FOREIGN KEY(buyer_id) REFERENCES buyer(id)
 );
 
 CREATE TABLE purchase (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     shipping_info_id INT,
     product_id INT,
     count INT,
