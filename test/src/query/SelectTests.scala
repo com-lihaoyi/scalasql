@@ -63,7 +63,7 @@ object SelectTests extends TestSuite {
           ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
         )
       )
-      
+
       test("combined") - checker(
         ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === "2012-05-06")
       ).expect(
