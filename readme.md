@@ -76,11 +76,15 @@ typed `Table` descriptions.
 # Design
 
 ```
-  {Expr[Int],Query[Q]                 {Int,Seq[R],
-   CaseCls[Expr],Tuple[Q]}         CaseCls[Val],Tuple[R]}
+   {Table.select,update,map,
+    filter,join,aggregate}
            |                               ^
            |                               |
-         Q +-----------+       +-----------+ R
+  {Expr[Int],Select[Q],Update[Q]      {Int,Seq[R],
+   CaseCls[Expr],Tuple[Q]}         CaseCls[Val],Tuple[R]}
+           |                               |
+           |                               |
+           +-----------+       +-----------+
                        |       |
                        v       |
            +-- DatabaseApi#run(q: Q): R <--+
