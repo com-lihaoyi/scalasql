@@ -11,19 +11,8 @@ object InsertTests extends TestSuite {
   def tests = Tests {
     val checker = new TestDb("querytests")
     test("simple") - {
-      checker(
-        Buyer.insert.values(
-          _.name -> "test buyer",
-          _.dateOfBirth -> "2023-09-09",
-          _.id -> 4
-        )
-      ).expect(
-          sql = """
-            INSERT INTO buyer (name, date_of_birth, id)
-            VALUES (?, ?, ?)
-          """,
-          value = 1
-        )
+      checker(Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4))
+        .expect(sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)", value = 1)
 
       checker(Buyer.select.filter(_.name === "test buyer")).expect(
         value = Vector(Buyer(4, "test buyer", "2023-09-09"))
