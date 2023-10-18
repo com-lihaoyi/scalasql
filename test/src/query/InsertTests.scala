@@ -165,12 +165,12 @@ object InsertTests extends TestSuite {
             Buyer(1, "James Bond", "2001-02-03"),
             Buyer(2, "叉烧包", "1923-11-12"),
             Buyer(3, "Li Haoyi", "1965-08-09"),
-            // id=4,5 comes from auto increment, 6 is filtered out in the select
             Buyer(4, "James Bond", "2001-02-03"),
             Buyer(5, "叉烧包", "1923-11-12"),
           )
         )
       }
+
       test("simple") {
         checker(
           Buyer.insert.select(
@@ -186,6 +186,7 @@ object InsertTests extends TestSuite {
           """,
           value = 2
         )
+        
         checker(Buyer.select).expect(
           value = Vector(
             Buyer(1, "James Bond", "2001-02-03"),
