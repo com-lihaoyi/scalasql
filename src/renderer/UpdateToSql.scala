@@ -18,7 +18,7 @@ object UpdateToSql {
                   tableNameMapper: String => String,
                   columnNameMapper: String => String) = {
     val (ctx, str) = apply0(q.update, tableNameMapper, columnNameMapper)
-    val (flattenedExpr, exprStr) = SelectToSql.sqlExprsStr0(q.returning, qr, ctx, usql"")
+    val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(q.returning), ctx, usql"")
 
     val returning = usql" RETURNING " + exprStr
     str + returning

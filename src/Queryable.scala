@@ -1,8 +1,7 @@
 package usql
 
 import OptionPickler.Reader
-import renderer.Context
-import renderer.{SelectToSql, SqlStr}
+import renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 
@@ -18,7 +17,7 @@ trait Queryable[Q, R]{
   def valueReader: Reader[R]
   def singleRow: Boolean = true
 
-  def toSqlQuery(q: Q, ctx: Context): SqlStr = SelectToSql.sqlExprsStr[Q, R](q, usql"", this, ctx)._2
+  def toSqlQuery(q: Q, ctx: Context): SqlStr = ExprsToSql(this.walk(q), usql"", ctx)._2
 }
 
 object Queryable{

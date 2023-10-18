@@ -1,32 +1,12 @@
 package usql.renderer
 
-import SqlStr.{SqlStringSyntax, flatten}
-import usql.query.{AscDesc, CompoundSelect, Expr, From, Join, Joinable, Nulls, Select, SimpleSelect, SubqueryRef, TableRef}
+import SqlStr.SqlStringSyntax
+import usql.query.{AscDesc, CompoundSelect, Expr, From, Join, Joinable, Nulls, SimpleSelect, SubqueryRef, TableRef}
 import usql.{FlatJson, Queryable}
 
 object SelectToSql {
 
-  def sqlExprsStr[Q, R](expr: Q, exprPrefix: SqlStr, qr: Queryable[Q, R], context: Context) = {
-    sqlExprsStr0(expr, qr, context, usql"SELECT " + exprPrefix)
-  }
-  def sqlExprsStr0[Q, R](expr: Q, qr: Queryable[Q, R], context: Context, prefix: SqlStr) = {
-    val flattenedExpr = qr.walk(expr)
-    FlatJson.flatten(flattenedExpr, context) match {
-      case Seq((FlatJson.basePrefix, singleExpr)) if singleExpr.isCompleteQuery =>
-        (flattenedExpr, singleExpr)
 
-      case flatQuery =>
-
-        val exprsStr = SqlStr.join(
-          flatQuery.map {
-            case (k, v) => usql"$v as ${SqlStr.raw(context.tableNameMapper(k))}"
-          },
-          usql", "
-        )
-
-        (flattenedExpr, prefix + exprsStr)
-    }
-  }
 
 
   def joinsToSqlStr(joins: Seq[Join],
@@ -120,7 +100,7 @@ object SelectToSql {
     implicit val context: Context = ctx
 
     val exprPrefix = SqlStr.opt(query.exprPrefix){p => SqlStr.raw(p) + usql" "}
-    val (flattenedExpr, exprStr) = sqlExprsStr(query.expr, exprPrefix, qr, context)
+    val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, context)
 
     val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), usql", ")
 
