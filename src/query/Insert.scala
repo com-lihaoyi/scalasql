@@ -82,6 +82,10 @@ case class Insert[Q](expr: Q,
       valuesLists = items.map(t => Seq(t._1, t._2, t._3, t._4, t._5, t._6))
     )
   }
+
+  def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): InsertReturning[Q2, R] = {
+    InsertReturning(this, f(expr))
+  }
 }
 
 object Insert {
@@ -101,7 +105,7 @@ object Insert {
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
     override def toSqlQuery(q: Insert[Q], ctx0: Context): SqlStr = {
-      InsertToSql(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
+      InsertToSql(q, ctx0.tableNameMapper, ctx0.columnNameMapper)
     }
   }
 }
