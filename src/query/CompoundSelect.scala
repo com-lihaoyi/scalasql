@@ -81,7 +81,7 @@ case class CompoundSelect[Q](lhs: SimpleSelect[Q],
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").asCompleteQuery
+    Select.SelectQueryable(qr).toSqlQuery(this, ctx).asCompleteQuery
   }
 }
 

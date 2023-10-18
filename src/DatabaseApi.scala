@@ -28,9 +28,8 @@ class DatabaseApi(connection: java.sql.Connection,
   def toSqlQuery0[Q](query: Q)
                        (implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
     val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
-    val flattened = SqlStr.flatten(qr.toSqlQueryUnwrapped(query, ctx))
-    val queryStr0 = flattened.queryParts.mkString("?")
-    val queryStr = if (flattened.isCompleteQuery) queryStr0.drop(1).dropRight(1) else queryStr0
+    val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
+    val queryStr = flattened.queryParts.mkString("?")
     (queryStr, flattened.params)
   }
 

@@ -126,7 +126,7 @@ case class SimpleSelect[Q](expr: Q,
   def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
 
   override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    (usql"(" + Select.SelectQueryable(qr).toSqlQuery(this, ctx) + usql")").asCompleteQuery
+    Select.SelectQueryable(qr).toSqlQuery(this, ctx).asCompleteQuery
   }
 }
 

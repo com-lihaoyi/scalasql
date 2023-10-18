@@ -40,10 +40,12 @@ object SqlStr {
         boundary = false
         a match {
           case ei: Interp.ExprInterp =>
-            rec(ei.e.toSqlExpr(ei.ctx))
+            val s = ei.e.toSqlExpr(ei.ctx)
+            rec(if (s.isCompleteQuery) usql"(" + s + usql")" else s)
             boundary = true
           case si: Interp.SqlStrInterp =>
-            rec(si.s)
+            val s = si.s
+            rec(if (s.isCompleteQuery) usql"(" + s + usql")" else s)
             boundary = true
           case s: Interp.Simple =>
             finalArgs.append(s)
