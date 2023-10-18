@@ -88,10 +88,7 @@ object InsertTests extends TestSuite {
         ).expect(
           sql = """
             INSERT INTO buyer (name, date_of_birth)
-            VALUES
-              (?, ?),
-              (?, ?),
-              (?, ?)
+            VALUES (?, ?), (?, ?), (?, ?)
           """,
           value = 3
         )
@@ -108,6 +105,7 @@ object InsertTests extends TestSuite {
           )
         )
       }
+
       test("returning") - {
         checker(
           Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -140,7 +138,39 @@ object InsertTests extends TestSuite {
         )
       }
     }
+
     test("select") {
+      test("caseclass") {
+        checker(
+          Buyer.insert.select(
+            identity,
+            Buyer.select
+              .filter(_.name !== "Li Haoyi")
+              .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
+          )
+        ).expect(
+          sql = """
+            INSERT INTO buyer (id, name, date_of_birth)
+            SELECT
+              buyer0.id + (SELECT MAX(buyer0.id) as res FROM buyer buyer0) as res__id,
+              buyer0.name as res__name,
+              buyer0.date_of_birth as res__date_of_birth
+            FROM buyer buyer0
+            WHERE buyer0.name <> ?
+          """,
+          value = 2
+        )
+        checker(Buyer.select).expect(
+          value = Vector(
+            Buyer(1, "James Bond", "2001-02-03"),
+            Buyer(2, "叉烧包", "1923-11-12"),
+            Buyer(3, "Li Haoyi", "1965-08-09"),
+            // id=4,5 comes from auto increment, 6 is filtered out in the select
+            Buyer(4, "James Bond", "2001-02-03"),
+            Buyer(5, "叉烧包", "1923-11-12"),
+          )
+        )
+      }
       test("simple") {
         checker(
           Buyer.insert.select(
@@ -177,7 +207,9 @@ object InsertTests extends TestSuite {
         ).expect(
           sql = """
             INSERT INTO buyer (name, date_of_birth)
-            SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
+            SELECT
+              buyer0.name as res__0,
+              buyer0.date_of_birth as res__1
             FROM buyer buyer0
             WHERE buyer0.name <> ?
             RETURNING buyer.id as res

@@ -1,23 +1,23 @@
 package usql
 import usql._
 
-case class Product[T[_]](id: T[Int],
-                         kebabCaseName: T[String],
-                         name: T[String],
-                         price: T[Double])
+case class Product[+T[_]](id: T[Int],
+                          kebabCaseName: T[String],
+                          name: T[String],
+                          price: T[Double])
 object Product extends Table[Product]{
   val metadata = initMetadata()
 }
 
-case class Buyer[T[_]](id: T[Int],
-                       name: T[String],
-                       dateOfBirth: T[String])
+case class Buyer[+T[_]](id: T[Int],
+                        name: T[String],
+                        dateOfBirth: T[String])
 object Buyer extends Table[Buyer]{
   val metadata = initMetadata()
 }
 
 
-case class ShippingInfo[T[_]](id: T[Int],
+case class ShippingInfo[+T[_]](id: T[Int],
                                buyerId: T[Int],
                                shippingDate: T[String])
 object ShippingInfo extends Table[ShippingInfo]{
@@ -25,11 +25,11 @@ object ShippingInfo extends Table[ShippingInfo]{
 }
 
 
-case class Purchase[T[_]](id: T[Int],
-                      shippingInfoId: T[Int],
-                      productId: T[Int],
-                      count: T[Int],
-                      total: T[Double])
+case class Purchase[+T[_]](id: T[Int],
+                           shippingInfoId: T[Int],
+                           productId: T[Int],
+                           count: T[Int],
+                           total: T[Double])
 object Purchase extends Table[Purchase]{
   val metadata = initMetadata()
 }
