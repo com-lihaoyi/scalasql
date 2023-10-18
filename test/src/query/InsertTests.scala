@@ -13,8 +13,12 @@ object InsertTests extends TestSuite {
     val checker = new TestDb("querytests")
     test("single") {
       test("simple") - {
-        checker(Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4))
-          .expect(sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)", value = 1)
+        checker(
+          Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4)
+        ).expect(
+          sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
+          value = 1
+        )
 
         checker(Buyer.select.filter(_.name === "test buyer")).expect(
           value = Vector(Buyer(4, "test buyer", "2023-09-09"))
@@ -108,11 +112,13 @@ object InsertTests extends TestSuite {
 
       test("returning") - {
         checker(
-          Buyer.insert.batched(_.name, _.dateOfBirth)(
-            ("test buyer A", "2001-04-07"),
-            ("test buyer B", "2002-05-08"),
-            ("test buyer C", "2003-06-09")
-          ).returning(_.id)
+          Buyer.insert
+            .batched(_.name, _.dateOfBirth)(
+              ("test buyer A", "2001-04-07"),
+              ("test buyer B", "2002-05-08"),
+              ("test buyer C", "2003-06-09")
+            )
+            .returning(_.id)
         ).expect(
           sql = """
             INSERT INTO buyer (name, date_of_birth)
@@ -201,10 +207,12 @@ object InsertTests extends TestSuite {
 
       test("returning") {
         checker(
-          Buyer.insert.select(
-            x => (x.name, x.dateOfBirth),
-            Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
-          ).returning(_.id)
+          Buyer.insert
+            .select(
+              x => (x.name, x.dateOfBirth),
+              Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
+            )
+            .returning(_.id)
         ).expect(
           sql = """
             INSERT INTO buyer (name, date_of_birth)
