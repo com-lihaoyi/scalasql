@@ -18,10 +18,7 @@ trait Queryable[Q, R]{
   def valueReader: Reader[R]
   def singleRow: Boolean = true
 
-  def toSqlQuery(q: Q, ctx: Context): SqlStr = {
-    SelectToSql.sqlExprsStr[Q, R](q, usql"", this, ctx)._2
-  }
-  def toSqlQueryUnwrapped(q: Q, ctx: Context): SqlStr = toSqlQuery(q, ctx)
+  def toSqlQuery(q: Q, ctx: Context): SqlStr = SelectToSql.sqlExprsStr[Q, R](q, usql"", this, ctx)._2
 }
 
 object Queryable{
