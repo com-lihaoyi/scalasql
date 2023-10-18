@@ -186,7 +186,7 @@ object InsertTests extends TestSuite {
           """,
           value = 2
         )
-        
+
         checker(Buyer.select).expect(
           value = Vector(
             Buyer(1, "James Bond", "2001-02-03"),
