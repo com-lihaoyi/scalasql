@@ -5,7 +5,7 @@ import usql.{OptionPickler, Queryable}
 import usql.renderer.{Context, SqlStr}
 
 
-case class InsertReturning[Q, R](insert: Insert[_], returning: Q)(implicit val qr: Queryable[Q, R])
+case class InsertReturning[Q, R](insert: InsertValues[_], returning: Q)(implicit val qr: Queryable[Q, R])
 
 object InsertReturning{
   implicit def UpdateReturningQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[InsertReturning[Q, R], Seq[R]] =

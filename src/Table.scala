@@ -2,7 +2,7 @@ package usql
 import scala.language.experimental.macros
 import OptionPickler.{Reader, Writer}
 import renderer.{Context, SelectToSql, SqlStr}
-import usql.query.{Expr, Insert, Joinable, Select, TableRef, Update}
+import usql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)

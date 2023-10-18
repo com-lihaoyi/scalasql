@@ -1,12 +1,12 @@
 package renderer
 
 import usql.Queryable
-import usql.query.{Insert, InsertReturning}
+import usql.query.{InsertValues, InsertReturning}
 import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
 import usql.renderer.SqlStr.SqlStringSyntax
 
 object InsertToSql {
-  def apply(q: Insert[_],
+  def apply(q: InsertValues[_],
             tableNameMapper: String => String,
             columnNameMapper: String => String): SqlStr = {
 
@@ -17,7 +17,7 @@ object InsertToSql {
         .map(values => usql"(" + SqlStr.join(values.map(_.toSqlStr), usql", ") + usql")"),
       usql", "
     )
-    usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.table.value.tableName))} ($columns) VALUES $values"
+    usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) VALUES $values"
   }
 
   def returning[Q,R ](q: InsertReturning[Q, R],
@@ -29,7 +29,7 @@ object InsertToSql {
       tableNameMapper,
       columnNameMapper,
       Nil,
-      Some(q.insert.table),
+      Some(q.insert.insert.table),
       Map()
     )
 
