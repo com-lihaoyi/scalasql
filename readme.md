@@ -71,7 +71,7 @@ typed `Table` descriptions.
 
 3. **Higher-kinded Database Row Objects**: by making the fields of the case class `Foo` 
    typed `T[V]` for arbitrary `T`s, we can use the same `case class` to model both the
-   query expression `Foo[Expr]` as well as the output data `Foo[Value]`.
+   query expression `CaseCls[Expr]` as well as the output data `CaseCls[Value]`.
 
 # Design
 
