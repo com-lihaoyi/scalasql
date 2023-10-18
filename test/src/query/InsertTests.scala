@@ -27,16 +27,16 @@ object InsertTests extends TestSuite {
           ("test buyer C", "2003-06-09", 6)
         )
       ).expect(
-          sql =
-            """
-            INSERT INTO buyer (name, date_of_birth, id)
-            VALUES
-              (?, ?, ?),
-              (?, ?, ?),
-              (?, ?, ?)
-          """,
-          value = 3
-        )
+        sql =
+          """
+          INSERT INTO buyer (name, date_of_birth, id)
+          VALUES
+            (?, ?, ?),
+            (?, ?, ?),
+            (?, ?, ?)
+        """,
+        value = 3
+      )
 
       checker(Buyer.select).expect(
         value = Vector(
