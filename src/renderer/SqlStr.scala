@@ -16,7 +16,7 @@ class SqlStr(private val queryParts: Seq[String],
     false
   )
 
-  def asCompleteQuery = new SqlStr(queryParts, params, true)
+  def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v)
 }
 
 object SqlStr {

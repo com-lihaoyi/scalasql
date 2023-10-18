@@ -6,6 +6,11 @@ import usql.{Column, OptionPickler, Queryable}
 
 case class Insert[Q](expr: Q, table: TableRef)
                     (implicit val qr: Queryable[Q, _]) {
+  def select[C](columns: Q => C, select: Select[C])
+               (implicit qrs: Queryable[C, _]): InsertSelect[Q, C] = {
+    InsertSelect(this, columns(expr), select)
+  }
+
   def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q] = {
     val kvs = f.map(_(expr))
     InsertValues(this, columns = kvs.map(_._1), valuesLists = Seq(kvs.map(_._2)))

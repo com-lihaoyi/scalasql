@@ -2,6 +2,7 @@ package query
 
 import usql.ExprOps._
 import usql._
+import usql.query.Expr
 import utest._
 
 /**
@@ -44,6 +45,7 @@ object InsertTests extends TestSuite {
         )
       }
     }
+
     test("batch") {
       test("simple") - {
         checker(
@@ -75,6 +77,7 @@ object InsertTests extends TestSuite {
           )
         )
       }
+
       test("partial") - {
         checker(
           Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -136,6 +139,35 @@ object InsertTests extends TestSuite {
           )
         )
       }
+    }
+    test("select"){
+      checker(
+        Buyer.insert.select(
+          x => (x.name, x.dateOfBirth),
+          Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
+        )
+      ).expect(
+        sql = """
+          INSERT INTO buyer (name, date_of_birth)
+          SELECT
+            buyer0.name as res__0,
+            buyer0.date_of_birth as res__1
+          FROM buyer buyer0
+          WHERE buyer0.name <> ?
+        """,
+        value = 2
+      )
+
+      checker(Buyer.select).expect(
+        value = Vector(
+          Buyer(1, "James Bond", "2001-02-03"),
+          Buyer(2, "叉烧包", "1923-11-12"),
+          Buyer(3, "Li Haoyi", "1965-08-09"),
+          // id=4,5 comes from auto increment, 6 is filtered out in the select
+          Buyer(4, "James Bond", "2001-02-03"),
+          Buyer(5, "叉烧包", "1923-11-12"),
+        )
+      )
     }
   }
 }
