@@ -3,7 +3,7 @@ package usql.query
 import usql.{OptionPickler, Queryable}
 import usql.renderer.{Context, Interp, SqlStr}
 
-trait Expr[T] {
+trait Expr[T] extends Interp.Renderable {
   final def toSqlStr(implicit ctx: Context): SqlStr = {
     ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
   }

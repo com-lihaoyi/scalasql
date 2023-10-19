@@ -48,11 +48,7 @@ object SqlStr {
         addFinalPart(p)
         boundary = false
         a match {
-          case ei: Interp.ExprInterp =>
-            rec(ei.e.toSqlStr(ei.ctx), false)
-            boundary = true
-
-          case ei: Interp.SelectInterp =>
+          case ei: Interp.RenderableInterp =>
             rec(ei.e.toSqlStr(ei.ctx), false)
             boundary = true
 
@@ -89,6 +85,10 @@ sealed trait Interp
 object Interp {
   sealed trait Simple extends Interp
 
+  trait Renderable{
+    def toSqlStr(implicit ctx: Context): SqlStr
+  }
+
   implicit def stringInterp(s: String): Interp = StringInterp(s)
   case class StringInterp(s: String) extends Simple
 
@@ -101,11 +101,8 @@ object Interp {
   implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
   case class BooleanInterp(b: Boolean) extends Simple
 
-  implicit def exprInterp(t: Expr[_])(implicit ctx: Context): Interp = ExprInterp(t, ctx)
-  case class ExprInterp(e: Expr[_], ctx: Context) extends Interp
-
-  implicit def selectInterp(t: Select[_])(implicit ctx: Context): Interp = SelectInterp(t, ctx)
-  case class SelectInterp(e: Select[_], ctx: Context) extends Interp
+  implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp = RenderableInterp(t, ctx)
+  case class RenderableInterp(e: Renderable, ctx: Context) extends Interp
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
   case class SqlStrInterp(s: SqlStr) extends Interp

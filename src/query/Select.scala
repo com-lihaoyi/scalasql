@@ -1,10 +1,10 @@
 package usql.query
 
 import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, SelectToSql, SqlStr}
+import usql.renderer.{Context, Interp, SelectToSql, SqlStr}
 import usql.{OptionPickler, Queryable}
 
-trait Select[Q] extends Aggregatable[Q] with From with Joinable[Q]
+trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
     with JoinOps[Select, Q] {
 
   override def select = this
