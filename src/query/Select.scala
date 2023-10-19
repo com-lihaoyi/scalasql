@@ -4,7 +4,7 @@ import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, SelectToSql, SqlStr}
 import usql.{OptionPickler, Queryable}
 
-trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinable[Q]
+trait Select[Q] extends Aggregatable[Q] with From with Joinable[Q]
     with JoinOps[Select, Q] {
 
   override def select = this
@@ -40,6 +40,10 @@ trait Select[Q] extends Expr[Seq[Q]] with Aggregatable[Q] with From with Joinabl
 
   def drop(n: Int): Select[Q]
   def take(n: Int): Select[Q]
+
+  def toSqlExpr0(implicit ctx: Context): SqlStr
+
+  final def toSqlStr(implicit ctx: Context): SqlStr = toSqlExpr0
 }
 
 object Select {

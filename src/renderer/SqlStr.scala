@@ -1,6 +1,6 @@
 package usql.renderer
 
-import usql.query.Expr
+import usql.query.{Expr, Select}
 
 /**
  * Represents a SQL query with interpolated `?`s expressions and the associated
@@ -52,6 +52,10 @@ object SqlStr {
             rec(ei.e.toSqlStr(ei.ctx), false)
             boundary = true
 
+          case ei: Interp.SelectInterp =>
+            rec(ei.e.toSqlStr(ei.ctx), false)
+            boundary = true
+
           case si: Interp.SqlStrInterp =>
             rec(si.s, false)
             boundary = true
@@ -99,6 +103,9 @@ object Interp {
 
   implicit def exprInterp(t: Expr[_])(implicit ctx: Context): Interp = ExprInterp(t, ctx)
   case class ExprInterp(e: Expr[_], ctx: Context) extends Interp
+
+  implicit def selectInterp(t: Select[_])(implicit ctx: Context): Interp = SelectInterp(t, ctx)
+  case class SelectInterp(e: Select[_], ctx: Context) extends Interp
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
   case class SqlStrInterp(s: SqlStr) extends Interp
