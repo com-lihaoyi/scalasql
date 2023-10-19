@@ -48,10 +48,6 @@ object SqlStr {
         addFinalPart(p)
         boundary = false
         a match {
-          case ei: Interp.RenderableInterp =>
-            rec(ei.e.toSqlStr(ei.ctx), false)
-            boundary = true
-
           case si: Interp.SqlStrInterp =>
             rec(si.s, false)
             boundary = true
@@ -101,8 +97,7 @@ object Interp {
   implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
   case class BooleanInterp(b: Boolean) extends Simple
 
-  implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp = RenderableInterp(t, ctx)
-  case class RenderableInterp(e: Renderable, ctx: Context) extends Interp
+  implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp = SqlStrInterp(t.toSqlStr(ctx))
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
   case class SqlStrInterp(s: SqlStr) extends Interp
