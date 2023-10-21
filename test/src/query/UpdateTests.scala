@@ -6,11 +6,13 @@ import ExprOps._
 
 import java.sql.Date
 
+object PgUpdateTests extends UpdateTests with PostgresSuite
+object SqliteUpdateTests extends UpdateTests with SqliteSuite
 /**
  * Tests for basic update operations
  */
-object UpdateTests extends TestSuite {
-  val checker = new TestDb()
+trait UpdateTests extends TestSuite {
+  val checker: TestDb
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {

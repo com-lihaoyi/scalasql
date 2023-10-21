@@ -7,12 +7,14 @@ import ExprOps._
 
 import java.sql.Date
 
+object PgSelectTests extends SelectTests with PostgresSuite
+object SqliteSelectTests extends SelectTests with SqliteSuite
+
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
-object SelectTests extends TestSuite {
-  val checker = new TestDb()
-  checker.reset()
+trait SelectTests extends TestSuite {
+  val checker: TestDb
   def tests = Tests {
     test("constant") - checker(
       query = Expr(1),

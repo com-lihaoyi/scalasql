@@ -1,18 +1,33 @@
 package usql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.PostgreSQLContainer
-
 import pprint.PPrinter
 import usql.query.{Expr, SubqueryRef}
+import utest.TestSuite
 
 import java.sql.DriverManager
 
-class TestDb() {
+trait SqliteSuite extends TestSuite{
+  val checker = new TestDb(
+    "jdbc:sqlite::memory:",
+    "sqlite-test-data.sql"
+  )
 
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+}
+trait PostgresSuite extends TestSuite{
+  val checker = new TestDb(
+    s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}",
+    "postgres-test-data.sql"
+  )
+
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+}
+class TestDb(connectionString: String,
+             testDataFileName: String) {
 
   val db = new DatabaseApi(
-    DriverManager.getConnection(s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"),
-    //    DriverManager.getConnection("jdbc:sqlite::memory:"),
+    DriverManager.getConnection(connectionString),
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
@@ -20,7 +35,7 @@ class TestDb() {
   )
 
   def reset() = {
-    db.runRaw(os.read(os.pwd / "test" / "resources" / "postgres-test-data.sql"))
+    db.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
   def camelToSnake(s: String) = {
@@ -58,7 +73,7 @@ class TestDb() {
 }
 
 object TestDb {
-  private val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
+  val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
   pg.start()
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(

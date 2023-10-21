@@ -8,8 +8,7 @@ import utest._
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-object ExprIntOpsTests extends TestSuite {
-  val checker = new TestDb()
+object ExprIntOpsTests extends TestSuite with SqliteSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr(6) + Expr(2),

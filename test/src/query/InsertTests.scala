@@ -7,11 +7,15 @@ import utest._
 
 import java.sql.Date
 
+
+object PgInsertTests extends InsertTests with PostgresSuite
+object SqliteInsertTests extends InsertTests with SqliteSuite
 /**
  * Tests for basic insert operations
  */
-object InsertTests extends TestSuite {
-  val checker = new TestDb()
+trait InsertTests extends TestSuite {
+  val checker: TestDb
+
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("single") {

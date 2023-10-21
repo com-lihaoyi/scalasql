@@ -7,8 +7,7 @@ import ExprOps._
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-object ExprSeqOpsTests extends TestSuite {
-  val checker = new TestDb()
+object ExprSeqOpsTests extends TestSuite with SqliteSuite {
   def tests = Tests {
 
     test("size") - checker(

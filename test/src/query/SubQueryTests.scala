@@ -6,12 +6,13 @@ import ExprOps._
 
 import java.sql.Date
 
+object PgSubQueryTests extends SubQueryTests with PostgresSuite
+object SqliteSubQueryTests extends SubQueryTests with SqliteSuite
 /**
  * Tests for queries operations that force subqueries to be used.
  */
-object SubQueryTests extends TestSuite {
-  val checker = new TestDb()
-  checker.reset()
+trait SubQueryTests extends TestSuite {
+  val checker: TestDb
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query =

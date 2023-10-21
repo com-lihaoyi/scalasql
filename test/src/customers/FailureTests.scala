@@ -7,8 +7,8 @@ import utest._
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-object FailureTests extends TestSuite {
-  val checker = new TestDb()
+object FailureTests extends TestSuite with SqliteSuite {
+
   def tests = Tests {
     test("equals") - {
       val ex = intercept[Exception] { Expr(1) == 2 }
