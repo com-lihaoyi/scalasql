@@ -10,7 +10,7 @@ class ExprStringOps(v: Expr[String]) {
 
   /** Returns an integer value representing the starting position of a string within the search string. */
   // not supported by Sqlite
-//  def position(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($v, $x)" }
+  def position(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($v IN $x)" }
 
   /** Converts a string to all lowercase characters. */
   def toLowerCase: Expr[String] = Expr { implicit ctx => usql"LOWER($v)" }

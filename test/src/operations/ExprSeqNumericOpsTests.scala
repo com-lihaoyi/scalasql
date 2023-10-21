@@ -4,10 +4,14 @@ import usql._
 import utest._
 import ExprOps._
 
+object SqliteExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
+object PgExprExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
+
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-object ExprSeqNumericOpsTests extends TestSuite with SqliteSuite {
+trait ExprSeqNumericOpsTests extends TestSuite {
+  val checker: TestDb
   def tests = Tests {
     test("sum") - checker(
       query = Purchase.select.map(_.count).sum,

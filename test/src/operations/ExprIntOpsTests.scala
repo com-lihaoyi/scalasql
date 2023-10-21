@@ -5,10 +5,14 @@ import usql._
 import usql.query.Expr
 import utest._
 
+object SqliteExprIntOpsTests extends ExprIntOpsTests with SqliteSuite
+object PgExprExprIntOpsTests extends ExprIntOpsTests with PostgresSuite
+
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-object ExprIntOpsTests extends TestSuite with SqliteSuite {
+trait ExprIntOpsTests extends TestSuite {
+  val checker: TestDb
   def tests = Tests {
     test("plus") - checker(
       query = Expr(6) + Expr(2),

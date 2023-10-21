@@ -5,10 +5,14 @@ import usql._
 import usql.query.Expr
 import utest._
 
+object SqliteExprStringOpsTests extends ExprStringOpsTests with SqliteSuite
+object PgExprExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
+
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-object ExprStringOpsTests extends TestSuite with SqliteSuite {
+trait ExprStringOpsTests extends TestSuite  {
+  val checker: TestDb
   def tests = Tests {
     test("like") - checker(
       query = Expr("hello").like("he%"),
@@ -16,11 +20,11 @@ object ExprStringOpsTests extends TestSuite with SqliteSuite {
       value = true
     )
 
-//    test("position") - checker(
-//      query = Expr("hello").position("ll"),
-//      sql = "SELECT POSITION(?, ?) as res",
-//      value = 3
-//    )
+    test("position") - checker(
+      query = Expr("ll").position("hello"),
+      sql = "SELECT POSITION(? IN ?) as res",
+      value = 3
+    )
 
     test("toLowerCase") - checker(
       query = Expr("Hello").toLowerCase,

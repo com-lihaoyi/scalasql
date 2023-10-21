@@ -4,12 +4,15 @@ import usql._
 import utest._
 import ExprOps._
 
+object SqliteExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
+object PgExprExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
+
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-object ExprSeqOpsTests extends TestSuite with SqliteSuite {
+trait ExprSeqOpsTests extends TestSuite {
+  val checker: TestDb
   def tests = Tests {
-
     test("size") - checker(
       query = Purchase.select.size,
       sql = "SELECT COUNT(1) as res FROM purchase purchase0",
