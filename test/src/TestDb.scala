@@ -87,13 +87,22 @@ class TestDb(connection: Connection,
 }
 
 object TestDb {
-  println("Initializing Postgres")
-  val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
-  pg.start()
+  lazy val pg = {
+    println("Initializing Postgres")
+    val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
+    pg.start()
+    pg
+  }
 
-  println("Initializing MySql")
-  val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
-  mysql.start()
+  lazy val mysql = {
+    println("Initializing MySql")
+    val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
+      .withCommand(
+        "mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"
+      )
+    mysql.start()
+    mysql
+  }
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(
     additionalHandlers = {
