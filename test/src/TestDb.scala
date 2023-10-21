@@ -10,7 +10,8 @@ import java.sql.{Connection, DriverManager}
 trait SqliteSuite extends TestSuite{
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
-    "sqlite-test-data.sql"
+    "sqlite-test-data.sql",
+    mySqlUpdateJoinSyntax = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -20,7 +21,8 @@ trait PostgresSuite extends TestSuite{
     DriverManager.getConnection(
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
     ),
-    "postgres-test-data.sql"
+    "postgres-test-data.sql",
+    mySqlUpdateJoinSyntax = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -32,20 +34,23 @@ trait MySqlSuite extends TestSuite{
       TestDb.mysql.getUsername,
       TestDb.mysql.getPassword
     ),
-    "mysql-test-data.sql"
+    "mysql-test-data.sql",
+    mySqlUpdateJoinSyntax = true
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
 class TestDb(connection: Connection,
-             testDataFileName: String) {
+             testDataFileName: String,
+             mySqlUpdateJoinSyntax: Boolean) {
 
   val db = new DatabaseApi(
     connection,
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel
+    columnNameUnMapper = snakeToCamel,
+    mySqlUpdateJoinSyntax = mySqlUpdateJoinSyntax
   )
 
   def reset() = {
@@ -70,12 +75,22 @@ class TestDb(connection: Connection,
     out.toString()
   }
 
-  def apply[T, V](query: T, sql: String = null, value: V = null.asInstanceOf[V], normalize: V => V = null)
+  def apply[T, V](query: T, sql: String = null, sqls: Seq[String] = null, value: V = null.asInstanceOf[V], normalize: V => V = null)
                  (implicit qr: Queryable[T, V]) = {
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
+    }
+    if (sqls != null){
+      val sqlResult = db.toSqlQuery(query)
+//      pprint.log(sqlResult)
+//      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
+      assert(
+        sqls.exists(_.trim.replaceAll("\\s+", " ") == sqlResult),
+        pprint.apply(SqlFormatter.format(sqlResult))
+      )
+
     }
 
     val result = db.run(query)

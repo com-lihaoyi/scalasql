@@ -62,7 +62,14 @@ object Select {
     override def singleRow = false
 
     override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = {
-      SelectToSql.apply(q, qr, ctx.tableNameMapper, ctx.columnNameMapper, ctx.fromNaming)._2
+      SelectToSql.apply(
+        q,
+        qr,
+        ctx.tableNameMapper,
+        ctx.columnNameMapper,
+        ctx.fromNaming,
+        ctx.mySqlUpdateJoinSyntax
+      )._2
     }
   }
 }

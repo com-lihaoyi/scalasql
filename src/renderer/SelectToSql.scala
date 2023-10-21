@@ -40,13 +40,14 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      previousFromMapping: Map[From, String],
+      mySqlUpdateJoinSyntax: Boolean
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     query match {
       case q: SimpleSelect[_] =>
-        simple(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+        simple(q, qr, tableNameMapper, columnNameMapper, previousFromMapping, mySqlUpdateJoinSyntax)
       case q: CompoundSelect[_] =>
-        compound(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+        compound(q, qr, tableNameMapper, columnNameMapper, previousFromMapping, mySqlUpdateJoinSyntax)
     }
   }
 
@@ -55,10 +56,11 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      previousFromMapping: Map[From, String],
+      mySqlUpdateJoinSyntax: Boolean
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (lhsMap, lhsStr0, context) =
-      apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+      apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping, mySqlUpdateJoinSyntax)
 
     val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_]]) usql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
@@ -66,7 +68,7 @@ object SelectToSql {
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
       val compoundStrs = compoundOps.map { op =>
         val (compoundMapping, compoundStr, compoundCtx) =
-          apply(op.rhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+          apply(op.rhs, qr, tableNameMapper, columnNameMapper, previousFromMapping, mySqlUpdateJoinSyntax)
 
         usql" ${SqlStr.raw(op.op)} $compoundStr"
       }
@@ -78,7 +80,8 @@ object SelectToSql {
       context.fromNaming,
       context.exprNaming ++ lhsMap,
       context.tableNameMapper,
-      context.columnNameMapper
+      context.columnNameMapper,
+      mySqlUpdateJoinSyntax
     )
 
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
@@ -114,14 +117,16 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      previousFromMapping: Map[From, String],
+      mySqlUpdateJoinSyntax: Boolean
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
       None,
-      previousFromMapping
+      previousFromMapping,
+      mySqlUpdateJoinSyntax
     )
 
     implicit val context: Context = ctx
@@ -165,7 +170,8 @@ object SelectToSql {
       columnNameMapper: String => String,
       selectables: Seq[From],
       updateTable: Option[TableRef],
-      previousFromMapping: Map[From, String]
+      previousFromMapping: Map[From, String],
+      mySqlUpdateJoinSyntax: Boolean
   ) = {
     val namedFromsMap0 = selectables
       .zipWithIndex
@@ -189,7 +195,7 @@ object SelectToSql {
 
       case t: SubqueryRef[_] =>
         val (subNameMapping, sqlStr, _) =
-          apply(t.value, t.qr, tableNameMapper, columnNameMapper, previousFromMapping)
+          apply(t.value, t.qr, tableNameMapper, columnNameMapper, previousFromMapping, mySqlUpdateJoinSyntax)
         (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
@@ -205,7 +211,8 @@ object SelectToSql {
       namedFromsMap,
       exprNaming,
       tableNameMapper,
-      columnNameMapper
+      columnNameMapper,
+      mySqlUpdateJoinSyntax
     )
 
     (namedFromsMap, fromSelectables, exprNaming, ctx)

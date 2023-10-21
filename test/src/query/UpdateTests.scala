@@ -20,7 +20,11 @@ trait UpdateTests extends TestSuite {
     test("update") - {
       checker(
         query = Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
-        sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
+        sqls =
+          Seq(
+            "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
+            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?",
+          ),
         value = 1
       )
 
@@ -38,7 +42,10 @@ trait UpdateTests extends TestSuite {
     test("bulk") - {
       checker(
         query = Buyer.update.set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
-        sql = "UPDATE buyer SET date_of_birth = ?",
+        sqls = Seq(
+          "UPDATE buyer SET date_of_birth = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ?",
+        ),
         value = 3
       )
 
@@ -59,7 +66,10 @@ trait UpdateTests extends TestSuite {
             .filter(_.name === "James Bond")
             .set(_.dateOfBirth -> Date.valueOf("2019-04-07"))
             .returning(_.id),
-        sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+        sqls = Seq(
+          "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+          "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+        ),
         value = Seq(1)
       )
 
@@ -75,8 +85,10 @@ trait UpdateTests extends TestSuite {
           Buyer.update
             .filter(_.name === "James Bond")
             .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee"),
-        sql =
+        sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?",
+        ),
         value = 1
       )
 
@@ -98,11 +110,18 @@ trait UpdateTests extends TestSuite {
             .filter(_.name === "James Bond")
             .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
             .returning(c => (c.id, c.name, c.dateOfBirth)),
-        sql = """
-          UPDATE buyer
-          SET date_of_birth = ?, name = ? WHERE buyer.name = ?
-          RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
-        """,
+        sqls = Seq(
+          """
+            UPDATE buyer
+            SET date_of_birth = ?, name = ? WHERE buyer.name = ?
+            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+          """,
+          """
+            UPDATE buyer
+            SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
+            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+          """
+        ),
         value = Seq((1, "John Dee", Date.valueOf("2019-04-07")))
       )
     }
@@ -113,8 +132,10 @@ trait UpdateTests extends TestSuite {
           Buyer.update
             .filter(_.name === "James Bond")
             .set(c => c.name -> c.name.toUpperCase),
-        sql =
+        sqls = Seq(
           "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?",
+          "UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?"
+        ),
         value = 1
       )
 
@@ -136,12 +157,20 @@ trait UpdateTests extends TestSuite {
             .filter(_.name === "James Bond")
             .joinOn(ShippingInfo)(_.id === _.buyerId)
             .set(c => c._1.dateOfBirth -> c._2.shippingDate),
-        sql = """
-          UPDATE buyer
-          SET date_of_birth = shipping_info0.shipping_date
-          FROM shipping_info shipping_info0
-          WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
-        """,
+        sqls = Seq(
+          """
+            UPDATE buyer
+            SET date_of_birth = shipping_info0.shipping_date
+            FROM shipping_info shipping_info0
+            WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+          """,
+          """
+            UPDATE buyer
+            JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
+            SET buyer.date_of_birth = shipping_info0.shipping_date
+            WHERE buyer.name = ?
+          """
+        ),
         value = 1
       )
 
@@ -161,16 +190,27 @@ trait UpdateTests extends TestSuite {
             .joinOn(Product)(_._2.productId === _.id)
             .filter(t => t._2.name.toLowerCase === t._2.kebabCaseName.toLowerCase)
             .set(c => c._1._1._1.name -> c._2.name),
-        sql = """
-          UPDATE buyer
-          SET name = product2.name
-          FROM shipping_info shipping_info0
-          JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
-          JOIN product product2 ON purchase1.product_id = product2.id
-          WHERE buyer.id = shipping_info0.buyer_id
-          AND buyer.name = ?
-          AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
-        """,
+        sqls = Seq(
+          """
+            UPDATE buyer
+            SET name = product2.name
+            FROM shipping_info shipping_info0
+            JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
+            JOIN product product2 ON purchase1.product_id = product2.id
+            WHERE buyer.id = shipping_info0.buyer_id
+            AND buyer.name = ?
+            AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
+          """,
+          """
+            UPDATE buyer
+            JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
+            JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
+            JOIN product product2 ON purchase1.product_id = product2.id
+            SET buyer.name = product2.name
+            WHERE buyer.name = ?
+            AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
+          """
+        ),
         value = 1
       )
 
@@ -187,17 +227,32 @@ trait UpdateTests extends TestSuite {
             .filter(_.name === "James Bond")
             .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id === _.buyerId)
             .set(c => c._1.dateOfBirth -> c._2.shippingDate),
-        sql = """
-          UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
-          FROM (SELECT
-              shipping_info0.id as res__id,
-              shipping_info0.buyer_id as res__buyer_id,
-              shipping_info0.shipping_date as res__shipping_date
-            FROM shipping_info shipping_info0
-            ORDER BY res__id ASC
-            LIMIT 2) subquery0
-          WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
-        """,
+        sqls = Seq(
+          """
+            UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
+            FROM (SELECT
+                shipping_info0.id as res__id,
+                shipping_info0.buyer_id as res__buyer_id,
+                shipping_info0.shipping_date as res__shipping_date
+              FROM shipping_info shipping_info0
+              ORDER BY res__id ASC
+              LIMIT 2) subquery0
+            WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+          """,
+          """
+            UPDATE
+              buyer
+              JOIN (SELECT
+                  shipping_info0.id as res__id,
+                  shipping_info0.buyer_id as res__buyer_id,
+                  shipping_info0.shipping_date as res__shipping_date
+                FROM shipping_info shipping_info0
+                ORDER BY res__id ASC
+                LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
+            SET buyer.date_of_birth = subquery0.res__shipping_date
+            WHERE buyer.name = ?
+          """,
+        ),
         value = 1
       )
 
@@ -212,10 +267,16 @@ trait UpdateTests extends TestSuite {
         query =
           Product.update
             .set(_.price -> Product.select.maxBy(_.price)),
-        sql = """
-          UPDATE product
-          SET price = (SELECT MAX(product0.price) as res FROM product product0)
-        """,
+        sqls = Seq(
+          """
+            UPDATE product
+            SET price = (SELECT MAX(product0.price) as res FROM product product0)
+          """,
+          """
+            UPDATE product
+            SET product.price = (SELECT MAX(product0.price) as res FROM product product0)
+          """
+        ),
         value = 6
       )
 
@@ -238,11 +299,18 @@ trait UpdateTests extends TestSuite {
           Product.update
             .filter(_.price === Product.select.maxBy(_.price))
             .set(_.price -> 0),
-        sql = """
-          UPDATE product
-          SET price = ?
-          WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
-        """,
+        sqls = Seq(
+          """
+            UPDATE product
+            SET price = ?
+            WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
+          """,
+          """
+            UPDATE product
+            SET product.price = ?
+            WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
+          """
+        ),
         value = 1
       )
 

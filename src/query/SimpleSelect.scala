@@ -36,12 +36,7 @@ case class SimpleSelect[Q](
   def queryExpr[V](f: Q => Context => SqlStr)(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy[Expr[V]](expr = Expr[V] { implicit ctx: Context =>
-        val newCtx = new Context(
-          outerCtx.fromNaming ++ ctx.fromNaming,
-          ctx.exprNaming,
-          ctx.tableNameMapper,
-          ctx.columnNameMapper
-        )
+        val newCtx = ctx.withAddedFromNaming(outerCtx.fromNaming)
 
         f(expr)(newCtx)
       }).toSqlStr.withCompleteQuery(true)

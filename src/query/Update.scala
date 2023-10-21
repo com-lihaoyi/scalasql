@@ -51,7 +51,13 @@ object Update {
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
     override def toSqlQuery(q: Update[Q], ctx0: Context): SqlStr = {
-      UpdateToSql(q, qr, ctx0.tableNameMapper, ctx0.columnNameMapper)
+      UpdateToSql(
+        q,
+        qr,
+        ctx0.tableNameMapper,
+        ctx0.columnNameMapper,
+        mySqlUpdateJoinSyntax = ctx0.mySqlUpdateJoinSyntax
+      )
     }
   }
 }

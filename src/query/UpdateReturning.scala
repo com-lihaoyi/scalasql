@@ -38,7 +38,8 @@ object Returning {
         ctx0.columnNameMapper,
         Nil,
         Some(q.returnable.table),
-        Map()
+        Map(),
+        ctx0.mySqlUpdateJoinSyntax
       )
 
       val prefix = q.returnable.toSqlQuery
