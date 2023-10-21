@@ -1,4 +1,4 @@
-package query
+package usql.query
 
 import usql.ExprOps._
 import usql._
@@ -10,7 +10,7 @@ import utest._
  */
 object InsertTests extends TestSuite {
   def tests = Tests {
-    val checker = new TestDb("querytests")
+    val checker = new TestDb()
     test("single") {
       test("simple") - {
         checker(

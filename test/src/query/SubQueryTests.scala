@@ -8,7 +8,7 @@ import ExprOps._
  * Tests for queries operations that force subqueries to be used.
  */
 object SubQueryTests extends TestSuite {
-  val checker = new TestDb("subquerytests")
+  val checker = new TestDb()
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query =
@@ -136,13 +136,14 @@ object SubQueryTests extends TestSuite {
         JOIN product product1 ON subquery0.res__0 = product1.id
       """,
       value = Seq(
+        ("Camera", 10000.0),
+        ("Cookie", 1.3),
         ("Face Mask", 932.4),
         ("Guitar", 900.0),
-        ("Socks", 15.7),
         ("Skate Board", 493.8),
-        ("Camera", 10000.0),
-        ("Cookie", 1.3)
-      )
+        ("Socks", 15.7),
+      ),
+      normalize = (x: Seq[(String, Double)]) => x.sorted
     )
 
     test("subqueryInFilter") - checker(

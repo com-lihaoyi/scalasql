@@ -9,7 +9,7 @@ import utest._
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
 object ExprStringOpsTests extends TestSuite {
-  val checker = new TestDb("strxpropstests")
+  val checker = new TestDb()
   def tests = Tests {
     test("like") - checker(
       query = Expr("hello").like("he%"),

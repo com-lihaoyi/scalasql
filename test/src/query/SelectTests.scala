@@ -9,7 +9,8 @@ import ExprOps._
  * Tests for basic query operations: map, filter, join, etc.
  */
 object SelectTests extends TestSuite {
-  val checker = new TestDb("querytests")
+  val checker = new TestDb()
+  override def utestAfterAll() = checker.close()
   def tests = Tests {
     test("constant") - checker(
       query = Expr(1),

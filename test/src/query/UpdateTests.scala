@@ -9,7 +9,7 @@ import ExprOps._
  */
 object UpdateTests extends TestSuite {
   def tests = Tests {
-    val checker = new TestDb("querytests")
+    val checker = new TestDb()
     test("update") - {
       checker(
         query = Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> "2019-04-07"),

@@ -8,7 +8,7 @@ import ExprOps._
  * Tests for all the aggregate operators that we provide by default
  */
 object ExprSeqNumericOpsTests extends TestSuite {
-  val checker = new TestDb("expropstests")
+  val checker = new TestDb()
   def tests = Tests {
     test("sum") - checker(
       query = Purchase.select.map(_.count).sum,

@@ -4,13 +4,15 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import pprint.PPrinter
 import usql.query.{Expr, SubqueryRef}
 
-class TestDb(name: String) {
+import java.sql.DriverManager
 
-//  private val DB_PORT: Int = 7777
-//  private var pg: EmbeddedPostgres = EmbeddedPostgres.builder()
-//    .setPort(DB_PORT)
-//    .setDataDirectory((os.root / "tmp" / "my_unit_tests" / "data").toNIO)
-//    .start()
+class TestDb() {
+
+  private val DB_PORT: Int = 7777
+  private var pg: EmbeddedPostgres = EmbeddedPostgres.builder()
+    .setPort(DB_PORT)
+    .setDataDirectory((os.root / "tmp" / "my_unit_tests" / "data").toNIO)
+    .start()
 
   def camelToSnake(s: String) = {
     s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
@@ -33,13 +35,15 @@ class TestDb(name: String) {
   println("Creating Test DB")
   Class.forName("org.sqlite.JDBC")
   val db = new DatabaseApi(
-    java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
+    DriverManager.getConnection(s"jdbc:postgresql://localhost:$DB_PORT/postgres?user=postgres&password="),
+//    DriverManager.getConnection("jdbc:sqlite::memory:"),
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
     columnNameUnMapper = snakeToCamel
   )
-  db.runRaw(os.read(os.pwd / "test" / "resources" / "sqlite-test-data.sql"))
+  db.runRaw(os.read(os.pwd / "test" / "resources" / "postgres-test-data.sql"))
+//  db.runRaw(os.read(os.pwd / "test" / "resources" / "sqlite-test-data.sql"))
   def apply[T, V](query: T, sql: String = null, value: V = null.asInstanceOf[V], normalize: V => V = null)(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query)
@@ -54,8 +58,8 @@ class TestDb(name: String) {
       val normalized = if (normalize == null) result else normalize(result)
       assert(normalized == value, pprint.apply(normalized))
     }
-
   }
+  def close() = pg.close()
 }
 
 object TestDb {
