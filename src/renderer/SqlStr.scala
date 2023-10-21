@@ -97,6 +97,15 @@ object Interp {
   implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
   case class BooleanInterp(b: Boolean) extends Simple
 
+  implicit def dateInterp(b: java.sql.Date): Interp = DateInterp(b)
+  case class DateInterp(b: java.sql.Date) extends Simple
+
+  implicit def timeInterp(b: java.sql.Time): Interp = TimeInterp(b)
+  case class TimeInterp(b: java.sql.Time) extends Simple
+
+  implicit def timestampInterp(b: java.sql.Timestamp): Interp = TimestampInterp(b)
+  case class TimestampInterp(b: java.sql.Timestamp) extends Simple
+
   implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp = SqlStrInterp(t.toSqlStr(ctx))
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)

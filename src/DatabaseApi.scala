@@ -43,6 +43,9 @@ class DatabaseApi(
       case Interp.IntInterp(i) => statement.setInt(n + 1, i)
       case Interp.DoubleInterp(d) => statement.setDouble(n + 1, d)
       case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
+      case Interp.DateInterp(d) => statement.setDate(n + 1, d)
+      case Interp.TimeInterp(t) => statement.setTime(n + 1, t)
+      case Interp.TimestampInterp(ts) => statement.setTimestamp(n + 1, ts)
     }
 
     if (qr.isExecuteUpdate) statement.executeUpdate().asInstanceOf[R]

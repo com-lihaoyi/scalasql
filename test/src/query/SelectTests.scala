@@ -5,6 +5,8 @@ import usql.query.Expr
 import utest._
 import ExprOps._
 
+import java.sql.Date
+
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
@@ -53,7 +55,7 @@ object SelectTests extends TestSuite {
 
       test("multiple") - checker(
         query =
-          ShippingInfo.select.filter(_.buyerId === 2).filter(_.shippingDate === "2012-05-06"),
+          ShippingInfo.select.filter(_.buyerId === 2).filter(_.shippingDate === Date.valueOf("2012-05-06")),
         sql = """
         SELECT
           shipping_info0.id as res__id,
@@ -70,7 +72,7 @@ object SelectTests extends TestSuite {
 
       test("combined") - checker(
         query =
-          ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === "2012-05-06"),
+          ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === Date.valueOf("2012-05-06")),
         sql = """
           SELECT
             shipping_info0.id as res__id,
