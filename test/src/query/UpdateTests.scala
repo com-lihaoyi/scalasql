@@ -162,6 +162,7 @@ trait UpdateTests extends TestSuite {
             .joinOn(ShippingInfo)(_.id === _.buyerId)
             .joinOn(Purchase)(_._2.id === _.shippingInfoId)
             .joinOn(Product)(_._2.productId === _.id)
+            .filter(t => t._2.name.toLowerCase === t._2.kebabCaseName.toLowerCase)
             .set(c => c._1._1._1.name -> c._2.name)
             .returning(_._1._1._1.id),
         sql = """
@@ -170,7 +171,9 @@ trait UpdateTests extends TestSuite {
           FROM shipping_info shipping_info0
           JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
           JOIN product product2 ON purchase1.product_id = product2.id
-          WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+          WHERE buyer.id = shipping_info0.buyer_id
+          AND buyer.name = ?
+          AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
           RETURNING buyer.id as res
         """,
         value = Seq(1)
