@@ -6,6 +6,7 @@ import ExprOps._
 
 object SqliteExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
 object PostgresExprExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
+object MySqlExprExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
 
 /**
  * Tests for all the aggregate operators that we provide by default

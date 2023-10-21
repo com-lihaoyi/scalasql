@@ -8,6 +8,7 @@ import java.sql.Date
 
 object PostgresUpdateTests extends UpdateTests with PostgresSuite
 object SqliteUpdateTests extends UpdateTests with SqliteSuite
+object MySqlUpdateTests extends UpdateTests with MySqlSuite
 /**
  * Tests for basic update operations
  */
@@ -73,11 +74,10 @@ trait UpdateTests extends TestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
-            .returning(_.id),
+            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee"),
         sql =
-          "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ? RETURNING buyer.id as res",
-        value = Seq(1)
+          "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
+        value = 1
       )
 
       checker(
@@ -112,11 +112,10 @@ trait UpdateTests extends TestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(c => c.name -> c.name.toUpperCase)
-            .returning(_.id),
+            .set(c => c.name -> c.name.toUpperCase),
         sql =
-          "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ? RETURNING buyer.id as res",
-        value = Seq(1)
+          "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?",
+        value = 1
       )
 
       checker(
@@ -136,16 +135,14 @@ trait UpdateTests extends TestSuite {
           Buyer.update
             .filter(_.name === "James Bond")
             .joinOn(ShippingInfo)(_.id === _.buyerId)
-            .set(c => c._1.dateOfBirth -> c._2.shippingDate)
-            .returning(_._1.id),
+            .set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sql = """
           UPDATE buyer
           SET date_of_birth = shipping_info0.shipping_date
           FROM shipping_info shipping_info0
           WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
-          RETURNING buyer.id as res
         """,
-        value = Seq(1)
+        value = 1
       )
 
       checker(
@@ -163,8 +160,7 @@ trait UpdateTests extends TestSuite {
             .joinOn(Purchase)(_._2.id === _.shippingInfoId)
             .joinOn(Product)(_._2.productId === _.id)
             .filter(t => t._2.name.toLowerCase === t._2.kebabCaseName.toLowerCase)
-            .set(c => c._1._1._1.name -> c._2.name)
-            .returning(_._1._1._1.id),
+            .set(c => c._1._1._1.name -> c._2.name),
         sql = """
           UPDATE buyer
           SET name = product2.name
@@ -174,9 +170,8 @@ trait UpdateTests extends TestSuite {
           WHERE buyer.id = shipping_info0.buyer_id
           AND buyer.name = ?
           AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
-          RETURNING buyer.id as res
         """,
-        value = Seq(1)
+        value = 1
       )
 
       checker(
@@ -191,8 +186,7 @@ trait UpdateTests extends TestSuite {
           Buyer.update
             .filter(_.name === "James Bond")
             .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id === _.buyerId)
-            .set(c => c._1.dateOfBirth -> c._2.shippingDate)
-            .returning(_._1.id),
+            .set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sql = """
           UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
           FROM (SELECT
@@ -203,9 +197,8 @@ trait UpdateTests extends TestSuite {
             ORDER BY res__id ASC
             LIMIT 2) subquery0
           WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
-          RETURNING buyer.id as res
         """,
-        value = Seq(1)
+        value = 1
       )
 
       checker(
@@ -218,16 +211,16 @@ trait UpdateTests extends TestSuite {
       checker(
         query =
           Product.update
-            .set(_.price -> Product.select.maxBy(_.price))
-            .returning(p => (p.id, p.name, p.price)),
+            .set(_.price -> Product.select.maxBy(_.price)),
         sql = """
           UPDATE product
           SET price = (SELECT MAX(product0.price) as res FROM product product0)
-          RETURNING
-            product.id as res__0,
-            product.name as res__1,
-            product.price as res__2
         """,
+        value = 6
+      )
+
+      checker(
+        query = Product.select.map(p => (p.id, p.name, p.price)),
         value = Seq(
           (1, "Face Mask", 1000.0),
           (2, "Guitar", 1000.0),
@@ -237,11 +230,6 @@ trait UpdateTests extends TestSuite {
           (6, "Cookie", 1000.0)
         )
       )
-
-      checker(
-        query = Product.select.filter(_.name === "Face Mask").map(_.price),
-        value = Seq(1000.0)
-      )
     }
 
     test("whereSubquery") - {
@@ -249,16 +237,28 @@ trait UpdateTests extends TestSuite {
         query =
           Product.update
             .filter(_.price === Product.select.maxBy(_.price))
-            .set(_.price -> 0)
-            .returning(p => (p.name, p.price)),
+            .set(_.price -> 0),
         sql = """
           UPDATE product
           SET price = ?
           WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
-          RETURNING product.name as res__0, product.price as res__1
         """,
-        value = Seq(("Camera", 0.0))
+        value = 1
       )
+
+      checker(
+        query = Product.select.map(p => (p.id, p.name, p.price)),
+        value = Seq(
+          (1, "Face Mask", 8.88),
+          (2, "Guitar", 300.0),
+          (3, "Socks", 3.14),
+          (4, "Skate Board", 123.45),
+          (5, "Camera", 0.0),
+          (6, "Cookie", 0.1),
+        ),
+        normalize = (x: Seq[(Int, String, Double)]) => x.sorted
+      )
+
     }
   }
 }

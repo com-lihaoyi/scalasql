@@ -8,6 +8,7 @@ import java.sql.Date
 
 object PostgresSubQueryTests extends SubQueryTests with PostgresSuite
 object SqliteSubQueryTests extends SubQueryTests with SqliteSuite
+object MySqlSubQueryTests extends SubQueryTests with MySqlSuite
 /**
  * Tests for queries operations that force subqueries to be used.
  */
@@ -121,7 +122,8 @@ trait SubQueryTests extends TestSuite {
           LIMIT 5) subquery0
         GROUP BY subquery0.res__product_id
       """,
-      value = Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
+      value = Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0)),
+      normalize = (x: Seq[(Int, Double)]) => x.sorted
     )
 
     test("groupByJoin") - checker(
