@@ -5,7 +5,7 @@ import utest._
 import ExprOps._
 
 object SqliteExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
-object PgExprExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
+object PostgresExprExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
 
 /**
  * Tests for all the aggregate operators that we provide by default

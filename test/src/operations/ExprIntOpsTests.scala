@@ -6,7 +6,7 @@ import usql.query.Expr
 import utest._
 
 object SqliteExprIntOpsTests extends ExprIntOpsTests with SqliteSuite
-object PgExprExprIntOpsTests extends ExprIntOpsTests with PostgresSuite
+object PostgresExprExprIntOpsTests extends ExprIntOpsTests with PostgresSuite
 
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default

@@ -7,7 +7,8 @@ import ExprOps._
 
 import java.sql.Date
 
-object PgSelectTests extends SelectTests with PostgresSuite
+object PostgresSelectTests extends SelectTests with PostgresSuite
+object MySqlSelectTests extends SelectTests with MySqlSuite
 object SqliteSelectTests extends SelectTests with SqliteSuite
 
 /**
@@ -402,7 +403,8 @@ trait SelectTests extends TestSuite {
             Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
           )
-        )
+        ),
+        normalize = (x: Seq[(Buyer[Val], Buyer[Val])]) => x.sortBy(t => (t._1.id(), t._2.id()))
       )
 
       test("flatMap") - checker(

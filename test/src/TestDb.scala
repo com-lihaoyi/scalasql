@@ -1,15 +1,15 @@
 package usql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import usql.query.{Expr, SubqueryRef}
 import utest.TestSuite
 
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager}
 
 trait SqliteSuite extends TestSuite{
   val checker = new TestDb(
-    "jdbc:sqlite::memory:",
+    DriverManager.getConnection("jdbc:sqlite::memory:"),
     "sqlite-test-data.sql"
   )
 
@@ -17,17 +17,31 @@ trait SqliteSuite extends TestSuite{
 }
 trait PostgresSuite extends TestSuite{
   val checker = new TestDb(
-    s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}",
+    DriverManager.getConnection(
+      s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
+    ),
     "postgres-test-data.sql"
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
-class TestDb(connectionString: String,
+trait MySqlSuite extends TestSuite{
+  val checker = new TestDb(
+    DriverManager.getConnection(
+      TestDb.mysql.getJdbcUrl + "?allowMultiQueries=true",
+      TestDb.mysql.getUsername,
+      TestDb.mysql.getPassword
+    ),
+    "mysql-test-data.sql"
+  )
+
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+}
+class TestDb(connection: Connection,
              testDataFileName: String) {
 
   val db = new DatabaseApi(
-    DriverManager.getConnection(connectionString),
+    connection,
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
@@ -73,8 +87,13 @@ class TestDb(connectionString: String,
 }
 
 object TestDb {
+  println("Initializing Postgres")
   val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
   pg.start()
+
+  println("Initializing MySql")
+  val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
+  mysql.start()
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(
     additionalHandlers = {

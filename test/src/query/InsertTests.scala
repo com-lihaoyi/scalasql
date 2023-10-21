@@ -8,7 +8,7 @@ import utest._
 import java.sql.Date
 
 
-object PgInsertTests extends InsertTests with PostgresSuite
+object PostgresInsertTests extends InsertTests with PostgresSuite
 object SqliteInsertTests extends InsertTests with SqliteSuite
 /**
  * Tests for basic insert operations

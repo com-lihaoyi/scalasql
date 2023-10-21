@@ -6,7 +6,7 @@ import ExprOps._
 
 import java.sql.Date
 
-object PgUpdateTests extends UpdateTests with PostgresSuite
+object PostgresUpdateTests extends UpdateTests with PostgresSuite
 object SqliteUpdateTests extends UpdateTests with SqliteSuite
 /**
  * Tests for basic update operations
