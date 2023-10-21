@@ -12,7 +12,7 @@ import java.sql.Date
  */
 object SelectTests extends TestSuite {
   val checker = new TestDb()
-  override def utestAfterAll() = checker.close()
+  checker.reset()
   def tests = Tests {
     test("constant") - checker(
       query = Expr(1),
@@ -30,9 +30,9 @@ object SelectTests extends TestSuite {
         FROM buyer buyer0
       """,
       value = Seq[Buyer[Val]](
-        Buyer(id = 1, name = "James Bond", dateOfBirth = "2001-02-03"),
-        Buyer(id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
-        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = "1965-08-09")
+        Buyer(id = 1, name = "James Bond", dateOfBirth = Date.valueOf("2001-02-03")),
+        Buyer(id = 2, name = "叉烧包", dateOfBirth = Date.valueOf("1923-11-12")),
+        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = Date.valueOf("1965-08-09"))
       )
     )
 
@@ -48,8 +48,8 @@ object SelectTests extends TestSuite {
         WHERE shipping_info0.buyer_id = ?
         """,
         value = Seq[ShippingInfo[Val]](
-          ShippingInfo(id = 1, buyerId = 2, shippingDate = "2010-02-03"),
-          ShippingInfo(id = 3, buyerId = 2, shippingDate = "2012-05-06")
+          ShippingInfo(1, 2, Date.valueOf("2010-02-03")),
+          ShippingInfo(3, 2, Date.valueOf("2012-05-06"))
         )
       )
 
@@ -66,7 +66,7 @@ object SelectTests extends TestSuite {
         AND shipping_info0.shipping_date = ?
       """,
         value = Seq(
-          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = "2012-05-06")
+          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = Date.valueOf("2012-05-06"))
         )
       )
 
@@ -83,7 +83,7 @@ object SelectTests extends TestSuite {
           AND shipping_info0.shipping_date = ?
         """,
         value = Seq(
-          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = "2012-05-06")
+          ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
         )
       )
     }
@@ -111,9 +111,9 @@ object SelectTests extends TestSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          ("James Bond", 1, "2001-02-03"),
-          ("叉烧包", 2, "1923-11-12"),
-          ("Li Haoyi", 3, "1965-08-09")
+          ("James Bond", 1, Date.valueOf("2001-02-03")),
+          ("叉烧包", 2, Date.valueOf("1923-11-12")),
+          ("Li Haoyi", 3, Date.valueOf("1965-08-09"))
         )
       )
 
@@ -134,9 +134,9 @@ object SelectTests extends TestSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          (1, Buyer[Val](id = 1, name = "James Bond", dateOfBirth = "2001-02-03")),
-          (2, Buyer[Val](id = 2, name = "叉烧包", dateOfBirth = "1923-11-12")),
-          (3, Buyer[Val](id = 3, name = "Li Haoyi", dateOfBirth = "1965-08-09"))
+          (1, Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))),
+          (2, Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))),
+          (3, Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")))
         )
       )
     }
@@ -281,12 +281,12 @@ object SelectTests extends TestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
-            ShippingInfo[Val](id = 1, buyerId = 2, shippingDate = "2010-02-03")
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            ShippingInfo[Val](1, 2, Date.valueOf("2010-02-03"))
           ),
           (
-            Buyer[Val](id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
-            ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = "2012-05-06")
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
           )
         )
       )
@@ -309,12 +309,12 @@ object SelectTests extends TestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
-            ShippingInfo[Val](id = 1, buyerId = 2, shippingDate = "2010-02-03")
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            ShippingInfo[Val](1, 2, Date.valueOf("2010-02-03"))
           ),
           (
-            Buyer[Val](id = 2, name = "叉烧包", dateOfBirth = "1923-11-12"),
-            ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = "2012-05-06")
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
           )
         )
       )
@@ -330,7 +330,7 @@ object SelectTests extends TestSuite {
           JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
           WHERE buyer0.name = ?
         """,
-        value = Seq("2012-04-05")
+        value = Seq(Date.valueOf("2012-04-05"))
       )
 
       test("selfJoin") - checker(
@@ -347,9 +347,18 @@ object SelectTests extends TestSuite {
           JOIN buyer buyer1 ON buyer0.id = buyer1.id
         """,
         value = Seq(
-          (Buyer[Val](1, "James Bond", "2001-02-03"), Buyer[Val](1, "James Bond", "2001-02-03")),
-          (Buyer[Val](2, "叉烧包", "1923-11-12"), Buyer[Val](2, "叉烧包", "1923-11-12")),
-          (Buyer[Val](3, "Li Haoyi", "1965-08-09"), Buyer[Val](3, "Li Haoyi", "1965-08-09"))
+          (
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+            ),
+          (
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+          ),
+          (
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+          )
         )
       )
 
@@ -367,12 +376,30 @@ object SelectTests extends TestSuite {
           JOIN buyer buyer1 ON buyer0.id <> buyer1.id
         """,
         value = Seq(
-          (Buyer[Val](1, "James Bond", "2001-02-03"), Buyer[Val](2, "叉烧包", "1923-11-12")),
-          (Buyer[Val](1, "James Bond", "2001-02-03"), Buyer[Val](3, "Li Haoyi", "1965-08-09")),
-          (Buyer[Val](2, "叉烧包", "1923-11-12"), Buyer[Val](1, "James Bond", "2001-02-03")),
-          (Buyer[Val](2, "叉烧包", "1923-11-12"), Buyer[Val](3, "Li Haoyi", "1965-08-09")),
-          (Buyer[Val](3, "Li Haoyi", "1965-08-09"), Buyer[Val](1, "James Bond", "2001-02-03")),
-          (Buyer[Val](3, "Li Haoyi", "1965-08-09"), Buyer[Val](2, "叉烧包", "1923-11-12"))
+          (
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+          ),
+          (
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+          ),
+          (
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+          ),
+          (
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+          ),
+          (
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+          ),
+          (
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+          )
         )
       )
 
@@ -387,7 +414,7 @@ object SelectTests extends TestSuite {
           WHERE buyer0.id = shipping_info1.buyer_id
           AND buyer0.name = ?
         """,
-        value = Seq("2012-04-05")
+        value = Seq(Date.valueOf("2012-04-05"))
       )
 
       test("flatMap2") - checker(
@@ -402,7 +429,7 @@ object SelectTests extends TestSuite {
           WHERE buyer0.id = shipping_info1.buyer_id
           AND buyer0.name = ?
         """,
-        value = Seq("2012-04-05")
+        value = Seq(Date.valueOf("2012-04-05"))
       )
     }
 
@@ -431,8 +458,8 @@ object SelectTests extends TestSuite {
         WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
       """,
       value = Seq(
-        Buyer[Val](1, "James Bond", "2001-02-03"),
-        Buyer[Val](2, "叉烧包", "1923-11-12")
+        Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+        Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
       )
     )
 

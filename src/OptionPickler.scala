@@ -1,4 +1,7 @@
 package usql
+
+import java.sql.Date
+
 object OptionPickler extends upickle.AttributeTagged {
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
     implicitly[Writer[T]].comap[Option[T]] {
@@ -26,4 +29,9 @@ object OptionPickler extends upickle.AttributeTagged {
 
   }
 
+  implicit val DateReader: Reader[Date] = new SimpleReader[Date] {
+    override def expectedMsg = "expected date"
+
+    override def visitString(s: CharSequence, index: Int) = Date.valueOf(s.toString)
+  }
 }

@@ -1,6 +1,7 @@
 package usql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
-import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import org.testcontainers.containers.PostgreSQLContainer
+
 import pprint.PPrinter
 import usql.query.{Expr, SubqueryRef}
 
@@ -8,11 +9,19 @@ import java.sql.DriverManager
 
 class TestDb() {
 
-  private val DB_PORT: Int = 7777
-  private var pg: EmbeddedPostgres = EmbeddedPostgres.builder()
-    .setPort(DB_PORT)
-    .setDataDirectory((os.root / "tmp" / "my_unit_tests" / "data").toNIO)
-    .start()
+
+  val db = new DatabaseApi(
+    DriverManager.getConnection(s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"),
+    //    DriverManager.getConnection("jdbc:sqlite::memory:"),
+    tableNameMapper = camelToSnake,
+    tableNameUnMapper = snakeToCamel,
+    columnNameMapper = camelToSnake,
+    columnNameUnMapper = snakeToCamel
+  )
+
+  def reset() = {
+    db.runRaw(os.read(os.pwd / "test" / "resources" / "postgres-test-data.sql"))
+  }
 
   def camelToSnake(s: String) = {
     s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
@@ -32,37 +41,26 @@ class TestDb() {
     out.toString()
   }
 
-  println("Creating Test DB")
-  Class.forName("org.sqlite.JDBC")
-  val db = new DatabaseApi(
-    DriverManager.getConnection(s"jdbc:postgresql://localhost:$DB_PORT/postgres?user=postgres&password="),
-//    DriverManager.getConnection("jdbc:sqlite::memory:"),
-    tableNameMapper = camelToSnake,
-    tableNameUnMapper = snakeToCamel,
-    columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel
-  )
-  db.runRaw(os.read(os.pwd / "test" / "resources" / "postgres-test-data.sql"))
-//  db.runRaw(os.read(os.pwd / "test" / "resources" / "sqlite-test-data.sql"))
-  def apply[T, V](query: T, sql: String = null, value: V = null.asInstanceOf[V], normalize: V => V = null)(implicit qr: Queryable[T, V]) = {
+  def apply[T, V](query: T, sql: String = null, value: V = null.asInstanceOf[V], normalize: V => V = null)
+                 (implicit qr: Queryable[T, V]) = {
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
 
-
     val result = db.run(query)
-    // pprinter.log(result)
     if (value != null) {
       val normalized = if (normalize == null) result else normalize(result)
       assert(normalized == value, pprint.apply(normalized))
     }
   }
-  def close() = pg.close()
 }
 
 object TestDb {
+  private val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
+  pg.start()
+
   lazy val pprinter: PPrinter = PPrinter.Color.copy(
     additionalHandlers = {
       case v: Val[_] => pprinter.treeify(v.apply(), false, true)

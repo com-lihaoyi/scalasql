@@ -5,30 +5,33 @@ import usql._
 import usql.query.Expr
 import utest._
 
+import java.sql.Date
+
 /**
  * Tests for basic insert operations
  */
 object InsertTests extends TestSuite {
+  val checker = new TestDb()
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
-    val checker = new TestDb()
     test("single") {
       test("simple") - {
         checker(
           query =
-            Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09", _.id -> 4),
+            Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09"), _.id -> 4),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
           value = 1
         )
 
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
-          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
+          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
         )
       }
 
       test("partial") - {
         checker(
-          query = Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09"),
+          query = Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09")),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
           value = 1
         )
@@ -36,14 +39,14 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
+          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
         )
       }
 
       test("returning") - {
         checker(
           query = Buyer.insert
-            .values(_.name -> "test buyer", _.dateOfBirth -> "2023-09-09")
+            .values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09"))
             .returning(_.id),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
           value = Seq(4)
@@ -52,7 +55,7 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Seq(Buyer[Val](4, "test buyer", "2023-09-09"))
+          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
         )
       }
     }
@@ -61,9 +64,9 @@ object InsertTests extends TestSuite {
       test("simple") - {
         checker(
           query = Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
-            ("test buyer A", "2001-04-07", 4),
-            ("test buyer B", "2002-05-08", 5),
-            ("test buyer C", "2003-06-09", 6)
+            ("test buyer A", Date.valueOf("2001-04-07"), 4),
+            ("test buyer B", Date.valueOf("2002-05-08"), 5),
+            ("test buyer C", Date.valueOf("2003-06-09"), 6)
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth, id)
@@ -78,12 +81,12 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
-            Buyer[Val](4, "test buyer A", "2001-04-07"),
-            Buyer[Val](5, "test buyer B", "2002-05-08"),
-            Buyer[Val](6, "test buyer C", "2003-06-09")
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
+            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
+            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
           )
         )
       }
@@ -91,9 +94,9 @@ object InsertTests extends TestSuite {
       test("partial") - {
         checker(
           query = Buyer.insert.batched(_.name, _.dateOfBirth)(
-            ("test buyer A", "2001-04-07"),
-            ("test buyer B", "2002-05-08"),
-            ("test buyer C", "2003-06-09")
+            ("test buyer A", Date.valueOf("2001-04-07")),
+            ("test buyer B", Date.valueOf("2002-05-08")),
+            ("test buyer C", Date.valueOf("2003-06-09"))
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
@@ -105,13 +108,13 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Val](4, "test buyer A", "2001-04-07"),
-            Buyer[Val](5, "test buyer B", "2002-05-08"),
-            Buyer[Val](6, "test buyer C", "2003-06-09")
+            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
+            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
+            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
           )
         )
       }
@@ -120,9 +123,9 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.insert
             .batched(_.name, _.dateOfBirth)(
-              ("test buyer A", "2001-04-07"),
-              ("test buyer B", "2002-05-08"),
-              ("test buyer C", "2003-06-09")
+              ("test buyer A", Date.valueOf("2001-04-07")),
+              ("test buyer B", Date.valueOf("2002-05-08")),
+              ("test buyer C", Date.valueOf("2003-06-09"))
             )
             .returning(_.id),
           sql = """
@@ -139,13 +142,13 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Val](4, "test buyer A", "2001-04-07"),
-            Buyer[Val](5, "test buyer B", "2002-05-08"),
-            Buyer[Val](6, "test buyer C", "2003-06-09")
+            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
+            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
+            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
           )
         )
       }
@@ -175,11 +178,11 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
-            Buyer[Val](4, "James Bond", "2001-02-03"),
-            Buyer[Val](5, "叉烧包", "1923-11-12")
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12")),
           )
         )
       }
@@ -202,12 +205,12 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer[Val](4, "James Bond", "2001-02-03"),
-            Buyer[Val](5, "叉烧包", "1923-11-12")
+            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
           )
         )
       }
@@ -235,12 +238,12 @@ object InsertTests extends TestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", "2001-02-03"),
-            Buyer[Val](2, "叉烧包", "1923-11-12"),
-            Buyer[Val](3, "Li Haoyi", "1965-08-09"),
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer[Val](4, "James Bond", "2001-02-03"),
-            Buyer[Val](5, "叉烧包", "1923-11-12")
+            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
           )
         )
       }

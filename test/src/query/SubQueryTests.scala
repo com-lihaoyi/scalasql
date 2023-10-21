@@ -4,11 +4,14 @@ import usql._
 import utest._
 import ExprOps._
 
+import java.sql.Date
+
 /**
  * Tests for queries operations that force subqueries to be used.
  */
 object SubQueryTests extends TestSuite {
   val checker = new TestDb()
+  checker.reset()
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query =
@@ -161,7 +164,7 @@ object SubQueryTests extends TestSuite {
             FROM shipping_info shipping_info0
             WHERE buyer0.id = shipping_info0.buyer_id) = ?
       """,
-      value = Seq(Buyer[Val](3, "Li Haoyi", "1965-08-09"))
+      value = Seq(Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")))
     )
     test("subqueryInMap") - checker(
       query =
@@ -176,9 +179,9 @@ object SubQueryTests extends TestSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Val](1, "James Bond", "2001-02-03"), 1),
-        (Buyer[Val](2, "叉烧包", "1923-11-12"), 2),
-        (Buyer[Val](3, "Li Haoyi", "1965-08-09"), 0)
+        (Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")), 1),
+        (Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")), 2),
+        (Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")), 0)
       )
     )
     test("subqueryInMapNested") - checker(
@@ -197,9 +200,9 @@ object SubQueryTests extends TestSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Val](1, "James Bond", "2001-02-03"), true),
-        (Buyer[Val](2, "叉烧包", "1923-11-12"), false),
-        (Buyer[Val](3, "Li Haoyi", "1965-08-09"), false)
+        (Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")), true),
+        (Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")), false),
+        (Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")), false)
       )
     )
 

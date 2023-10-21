@@ -4,44 +4,48 @@ import usql._
 import utest._
 import ExprOps._
 
+import java.sql.Date
+
 /**
  * Tests for basic update operations
  */
 object UpdateTests extends TestSuite {
+  val checker = new TestDb()
+
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
-    val checker = new TestDb()
     test("update") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> "2019-04-07"),
+        query = Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
         sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
         value = 1
       )
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq("2019-04-07")
+        value = Seq(Date.valueOf("2019-04-07"))
       )
 
       checker(
         query = Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth),
-        value = Seq("1965-08-09") // not updated
+        value = Seq(Date.valueOf("1965-08-09")) // not updated
       )
     }
 
     test("bulk") - {
       checker(
-        query = Buyer.update.set(_.dateOfBirth -> "2019-04-07"),
+        query = Buyer.update.set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
         sql = "UPDATE buyer SET date_of_birth = ?",
         value = 3
       )
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq("2019-04-07")
+        value = Seq(Date.valueOf("2019-04-07"))
       )
       checker(
         query = Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth),
-        value = Seq("2019-04-07")
+        value = Seq(Date.valueOf("2019-04-07"))
       )
     }
 
@@ -50,7 +54,7 @@ object UpdateTests extends TestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> "2019-04-07")
+            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"))
             .returning(_.id),
         sql = "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
         value = Seq(1)
@@ -58,7 +62,7 @@ object UpdateTests extends TestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq("2019-04-07")
+        value = Seq(Date.valueOf("2019-04-07"))
       )
     }
 
@@ -67,7 +71,7 @@ object UpdateTests extends TestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> "2019-04-07", _.name -> "John Dee")
+            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
             .returning(_.id),
         sql =
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ? RETURNING buyer.id as res",
@@ -76,12 +80,12 @@ object UpdateTests extends TestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq[String]()
+        value = Seq[Date]()
       )
 
       checker(
         query = Buyer.select.filter(_.name === "John Dee").map(_.dateOfBirth),
-        value = Seq("2019-04-07")
+        value = Seq(Date.valueOf("2019-04-07"))
       )
     }
 
@@ -90,14 +94,14 @@ object UpdateTests extends TestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> "2019-04-07", _.name -> "John Dee")
+            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
             .returning(c => (c.id, c.name, c.dateOfBirth)),
         sql = """
           UPDATE buyer
           SET date_of_birth = ?, name = ? WHERE buyer.name = ?
           RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
         """,
-        value = Seq((1, "John Dee", "2019-04-07"))
+        value = Seq((1, "John Dee", Date.valueOf("2019-04-07")))
       )
     }
 
@@ -115,12 +119,12 @@ object UpdateTests extends TestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq[String]()
+        value = Seq[Date]()
       )
 
       checker(
         query = Buyer.select.filter(_.name === "JAMES BOND").map(_.dateOfBirth),
-        value = Seq("2001-02-03")
+        value = Seq(Date.valueOf("2001-02-03"))
       )
     }
 
@@ -144,7 +148,7 @@ object UpdateTests extends TestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq("2012-04-05")
+        value = Seq(Date.valueOf("2012-04-05"))
       )
     }
 
@@ -201,7 +205,7 @@ object UpdateTests extends TestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq("2012-04-05")
+        value = Seq(Date.valueOf("2012-04-05"))
       )
     }
 

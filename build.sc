@@ -9,7 +9,10 @@ object usql extends RootModule with ScalaModule {
     ivy"com.lihaoyi::upickle:3.1.3",
     ivy"com.lihaoyi::os-lib:0.9.1",
     ivy"org.scala-lang:scala-reflect:$scalaVersion",
-    ivy"com.github.vertical-blank:sql-formatter:2.0.4"
+    ivy"com.github.vertical-blank:sql-formatter:2.0.4",
+    ivy"org.apache.logging.log4j:log4j-api:2.20.0",
+    ivy"org.apache.logging.log4j:log4j-core:2.20.0",
+    ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
   )
 
   object test extends ScalaTests {
@@ -18,7 +21,8 @@ object usql extends RootModule with ScalaModule {
       ivy"com.h2database:h2:2.2.224",
       ivy"org.hsqldb:hsqldb:2.5.1",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
-      ivy"io.zonky.test:embedded-postgres:2.0.4"
+      ivy"org.testcontainers:postgresql:1.19.1",
+      ivy"org.postgresql:postgresql:42.6.0"
     )
     def testFramework = "utest.runner.Framework"
   }
