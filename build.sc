@@ -18,6 +18,7 @@ object usql extends RootModule with ScalaModule {
       ivy"com.h2database:h2:2.2.224",
       ivy"org.hsqldb:hsqldb:2.5.1",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
+      ivy"io.zonky.test:embedded-postgres:2.0.4"
     )
     def testFramework = "utest.runner.Framework"
   }

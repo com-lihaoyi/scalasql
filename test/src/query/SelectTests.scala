@@ -170,7 +170,8 @@ object SelectTests extends TestSuite {
           FROM purchase purchase0
           GROUP BY purchase0.product_id
         """,
-        value = Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
+        value = Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30)),
+        normalize = (x: Seq[(Int, Double)]) => x.sorted
       )
 
       test("having") - checker(
@@ -184,7 +185,8 @@ object SelectTests extends TestSuite {
           GROUP BY purchase0.product_id
           HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
         """,
-        value = Seq((2, 900.0), (4, 493.8), (5, 10000.0))
+        value = Seq((2, 900.0), (4, 493.8), (5, 10000.0)),
+        normalize = (x: Seq[(Int, Double)]) => x.sorted
       )
 
       test("filterHaving") - checker(
@@ -199,7 +201,8 @@ object SelectTests extends TestSuite {
           GROUP BY purchase0.product_id
           HAVING SUM(purchase0.total) > ?
         """,
-        value = Seq((1, 888.0), (5, 10000.0))
+        value = Seq((1, 888.0), (5, 10000.0)),
+        normalize = (x: Seq[(Int, Double)]) => x.sorted
       )
     }
 
@@ -411,7 +414,8 @@ object SelectTests extends TestSuite {
       test("distinct") - checker(
         query = Purchase.select.map(_.shippingInfoId).distinct,
         sql = "SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0",
-        value = Seq(1, 2, 3)
+        value = Seq(1, 2, 3),
+        normalize = (x: Seq[Int]) => x.sorted
       )
     }
 
@@ -485,7 +489,8 @@ object SelectTests extends TestSuite {
           "skate board",
           "skate-board",
           "socks"
-        )
+        ),
+        normalize = (x: Seq[String]) => x.sorted
       )
 
       test("unionAll") - checker(
@@ -528,7 +533,8 @@ object SelectTests extends TestSuite {
           SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
         """,
-        value = Seq("camera", "cookie", "guitar", "socks")
+        value = Seq("camera", "cookie", "guitar", "socks"),
+        normalize = (x: Seq[String]) => x.sorted
       )
 
       test("except") - checker(
@@ -561,7 +567,7 @@ object SelectTests extends TestSuite {
           UNION
           SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
-          ORDER BY LOWER(product0.name)
+          ORDER BY res
         """,
         value = Seq(
           "camera",
@@ -595,7 +601,7 @@ object SelectTests extends TestSuite {
           UNION
           SELECT LOWER(product0.kebab_case_name) as res
           FROM product product0
-          ORDER BY LOWER(product0.name)
+          ORDER BY res
           LIMIT 4
           OFFSET 4
         """,

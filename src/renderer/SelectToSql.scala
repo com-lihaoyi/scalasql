@@ -74,6 +74,13 @@ object SelectToSql {
       SqlStr.join(compoundStrs)
     }
 
+    val newCtx = new Context(
+      context.fromNaming,
+      context.exprNaming ++ lhsMap,
+      context.tableNameMapper,
+      context.columnNameMapper
+    )
+
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
       val ascDesc = orderBy.ascDesc match {
         case None => usql""
@@ -86,7 +93,7 @@ object SelectToSql {
         case Nulls.Last => usql" NULLS LAST"
       }
 
-      usql" ORDER BY " + orderBy.expr.toSqlStr(context) + ascDesc + nulls
+      usql" ORDER BY " + orderBy.expr.toSqlStr(newCtx) + ascDesc + nulls
     }
 
     val limitOpt = SqlStr.opt(query.limit) { limit =>

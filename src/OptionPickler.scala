@@ -20,8 +20,8 @@ object OptionPickler extends upickle.AttributeTagged {
     override def visitFalse(index: Int) = false
 
     override def visitString(s: CharSequence, index: Int) = s match {
-      case "0" | "false" | "FALSE" => false
-      case "1" | "true" | "TRUE" => true
+      case "0" | "f" | "false" | "FALSE" => false
+      case "1" | "t" | "true" | "TRUE" => true
     }
 
   }

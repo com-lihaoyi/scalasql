@@ -719,7 +719,7 @@ object MainTests extends TestSuite {
           city0.name as res__0,
           city0.population as res__1
         FROM city city0
-        ORDER BY city0.population DESC
+        ORDER BY res__1 DESC
         LIMIT 5 OFFSET 5
         """.trim.replaceAll("\\s+", " ")
         )
@@ -745,7 +745,7 @@ object MainTests extends TestSuite {
           city0.name as res__0,
           city0.population as res__1
         FROM city city0
-        ORDER BY city0.population ASC
+        ORDER BY res__1 ASC
         LIMIT 5
         """.trim.replaceAll("\\s+", " ")
         )
@@ -1002,7 +1002,7 @@ object MainTests extends TestSuite {
             country0.capital as res__capital,
             country0.code2 as res__code2
           FROM country country0
-          ORDER BY country0.population DESC
+          ORDER BY res__population DESC
           LIMIT 2) subquery1
         ON country_language0.country_code = subquery1.res__code
         """.trim.replaceAll("\\s+", " ")
@@ -1068,7 +1068,7 @@ object MainTests extends TestSuite {
               country0.capital as res__capital,
               country0.code2 as res__code2
             FROM country country0
-            ORDER BY country0.population DESC
+            ORDER BY res__population DESC
             LIMIT 2) subquery0
             JOIN country_language country_language1 ON subquery0.res__code = country_language1.country_code
         """.trim.replaceAll("\\s+", " ")
@@ -1134,7 +1134,7 @@ object MainTests extends TestSuite {
                 country0.capital as res__capital,
                 country0.code2 as res__code2
               FROM country country0
-              ORDER BY country0.population DESC
+              ORDER BY res__population DESC
               LIMIT 2) subquery0
           JOIN (SELECT
               city0.id as res__id,
@@ -1143,7 +1143,7 @@ object MainTests extends TestSuite {
               city0.district as res__district,
               city0.population as res__population
             FROM city city0
-            ORDER BY city0.population DESC
+            ORDER BY res__population DESC
             LIMIT 20) subquery1
           ON subquery0.res__code = subquery1.res__country_code
 
@@ -1180,7 +1180,7 @@ object MainTests extends TestSuite {
               city0.district as res__district,
               city0.population as res__population
             FROM city city0
-            ORDER BY city0.population DESC
+            ORDER BY res__population DESC
             LIMIT 20) subquery0
           ORDER BY subquery0.res__population ASC
           LIMIT 10

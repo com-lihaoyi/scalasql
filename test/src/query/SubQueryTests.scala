@@ -24,7 +24,7 @@ object SubQueryTests extends TestSuite {
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
-          ORDER BY product0.price DESC
+          ORDER BY res__price DESC
           LIMIT 1) subquery1
         ON purchase0.product_id = subquery1.res__id
       """,
@@ -44,7 +44,7 @@ object SubQueryTests extends TestSuite {
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
-          ORDER BY product0.price DESC
+          ORDER BY res__price DESC
           LIMIT 1) subquery0
         JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
       """,
@@ -66,7 +66,7 @@ object SubQueryTests extends TestSuite {
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
-          ORDER BY product0.price DESC
+          ORDER BY res__price DESC
           LIMIT 3) subquery0
         JOIN (SELECT
             purchase0.id as res__id,
@@ -75,7 +75,7 @@ object SubQueryTests extends TestSuite {
             purchase0.count as res__count,
             purchase0.total as res__total
           FROM purchase purchase0
-          ORDER BY purchase0.count DESC
+          ORDER BY res__count DESC
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
@@ -93,7 +93,7 @@ object SubQueryTests extends TestSuite {
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
-          ORDER BY product0.price DESC
+          ORDER BY res__price DESC
           LIMIT 4) subquery0
         ORDER BY subquery0.res__price ASC
         LIMIT 2
@@ -113,7 +113,7 @@ object SubQueryTests extends TestSuite {
             purchase0.count as res__count,
             purchase0.total as res__total
           FROM purchase purchase0
-          ORDER BY purchase0.count
+          ORDER BY res__count
           LIMIT 5) subquery0
         GROUP BY subquery0.res__product_id
       """,

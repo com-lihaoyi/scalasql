@@ -191,7 +191,7 @@ object UpdateTests extends TestSuite {
               shipping_info0.buyer_id as res__buyer_id,
               shipping_info0.shipping_date as res__shipping_date
             FROM shipping_info shipping_info0
-            ORDER BY shipping_info0.id ASC
+            ORDER BY res__id ASC
             LIMIT 2) subquery0
           WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
           RETURNING buyer.id as res
