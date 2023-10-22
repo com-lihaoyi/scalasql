@@ -8,6 +8,7 @@ import usql.utils.OptionPickler
 trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
     with JoinOps[Select, Q] {
 
+  protected def qr: Queryable[Q, _]
   def isTrivialJoin: Boolean = false
   def select = this
 
@@ -43,9 +44,17 @@ trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Jo
   def drop(n: Int): Select[Q]
   def take(n: Int): Select[Q]
 
-  def toSqlExpr0(implicit ctx: Context): SqlStr
 
-  final def toSqlStr(implicit ctx: Context): SqlStr = toSqlExpr0
+
+  def toSqlStr(implicit ctx: Context): SqlStr = {
+    SelectToSql.apply(
+      this,
+      qr,
+      ctx.tableNameMapper,
+      ctx.columnNameMapper,
+      ctx.fromNaming
+    )._2.withCompleteQuery(true)
+  }
 }
 
 object Select {
@@ -63,14 +72,6 @@ object Select {
 
     override def singleRow = false
 
-    override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = {
-      SelectToSql.apply(
-        q,
-        qr,
-        ctx.tableNameMapper,
-        ctx.columnNameMapper,
-        ctx.fromNaming
-      )._2
-    }
+    override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = q.toSqlStr(ctx)
   }
 }

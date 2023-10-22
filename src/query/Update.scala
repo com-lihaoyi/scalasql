@@ -65,8 +65,6 @@ object Update {
 
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
-    override def toSqlQuery(q: Update[Q], ctx0: Context): SqlStr = {
-      q.toSqlQuery(ctx0)
-    }
+    override def toSqlQuery(q: Update[Q], ctx0: Context): SqlStr = q.toSqlQuery(ctx0)
   }
 }

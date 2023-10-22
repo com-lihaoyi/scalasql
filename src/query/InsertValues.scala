@@ -18,8 +18,9 @@ case class InsertValues[Q](
   def table = insert.table
   def expr: Q = insert.expr
 
-  override def toSqlQuery(implicit ctx: Context): SqlStr =
-    InsertValues.InsertQueryable(qr).toSqlQuery(this, ctx)
+  override def toSqlQuery(implicit ctx: Context): SqlStr = {
+    InsertToSql.values(this, ctx.tableNameMapper, ctx.columnNameMapper)
+  }
 }
 
 object InsertValues {
@@ -35,8 +36,6 @@ object InsertValues {
 
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
-    override def toSqlQuery(q: InsertValues[Q], ctx0: Context): SqlStr = {
-      InsertToSql.values(q, ctx0.tableNameMapper, ctx0.columnNameMapper)
-    }
+    override def toSqlQuery(q: InsertValues[Q], ctx0: Context): SqlStr = q.toSqlQuery(ctx0)
   }
 }

@@ -115,10 +115,6 @@ case class SimpleSelect[Q](
 
   def drop(n: Int) = CompoundSelect(this, Nil, None, None, Some(n))
   def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
-
-  override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    Select.SelectQueryable(qr).toSqlQuery(this, ctx).withCompleteQuery(true)
-  }
 }
 
 object SimpleSelect {

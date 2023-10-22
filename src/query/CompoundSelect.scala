@@ -1,7 +1,7 @@
 package usql.query
 
 import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, SqlStr}
+import usql.renderer.{Context, SelectToSql, SqlStr}
 import usql.{Queryable, Table}
 
 case class CompoundSelect[Q](
@@ -79,9 +79,7 @@ case class CompoundSelect[Q](
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  override def toSqlExpr0(implicit ctx: Context): SqlStr = {
-    Select.SelectQueryable(qr).toSqlQuery(this, ctx).withCompleteQuery(true)
-  }
+
 }
 
 object CompoundSelect {
