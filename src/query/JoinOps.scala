@@ -17,12 +17,10 @@ trait JoinOps[C[_], Q] {
   def joinInfo[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
       joinQr: Queryable[V, _]
   ) = {
-    val otherTrivial = other.isInstanceOf[Table.Base]
-
     val otherSelect = other.select
 
     val otherJoin =
-      if (otherTrivial) Join(
+      if (other.isTrivialJoin) Join(
         None,
         Seq(JoinFrom(
           otherSelect.asInstanceOf[SimpleSelect[_]].from.head,

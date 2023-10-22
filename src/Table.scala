@@ -6,7 +6,7 @@ import usql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Updat
 import renderer.SqlStr.SqlStringSyntax
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
-    extends Table.Base with Joinable[V[Expr]] {
+    extends Table.Base {
 
   val tableName = name.value
   implicit def self: Table[V] = this
@@ -18,25 +18,13 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
     metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
 
-  def select: Select[V[Expr]] = {
-    val ref = tableRef
-    Select.fromTable(metadata.vExpr(ref).asInstanceOf[V[Expr]], ref)
-  }
 
-  def update: Update[V[Column.ColumnExpr]] = {
-    val ref = tableRef
-    Update.fromTable(metadata.vExpr(ref), ref)
-  }
-
-  def insert: Insert[V[Column.ColumnExpr]] = {
-    val ref = tableRef
-    Insert.fromTable(metadata.vExpr(ref), ref)
-  }
 
   def tableRef = new usql.query.TableRef(this)
 }
 
 object Table {
+
   trait Base {
     def tableName: String
   }

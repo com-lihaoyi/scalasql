@@ -1,9 +1,27 @@
 package usql
 
 import usql.operations.ExprStringOps
-import usql.query.{Aggregatable, Expr, Select}
+import usql.query.{Aggregatable, Expr, Insert, Joinable, Select, Update}
 import usql.renderer.SqlStr.SqlStringSyntax
 
+class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr]]{
+  def select: Select[V[Expr]] = {
+    val ref = t.tableRef
+    Select.fromTable(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], ref)(t.containerQr)
+  }
+
+  def update: Update[V[Column.ColumnExpr]] = {
+    val ref = t.tableRef
+    Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
+  }
+
+  def insert: Insert[V[Column.ColumnExpr]] = {
+    val ref = t.tableRef
+    Insert.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
+  }
+
+  def isTrivialJoin = true
+}
 
 trait ExprOps {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
@@ -24,6 +42,9 @@ trait ExprOps {
 
   implicit def SelectOpsConv[T](v: Select[T]): operations.SelectOps[T] =
     new operations.SelectOps(v)
+
+  implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
+
 }
 
 object PostgresExprOps extends PostgresExprOps{

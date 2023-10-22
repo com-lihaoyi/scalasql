@@ -7,7 +7,8 @@ import usql.{OptionPickler, Queryable}
 trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
     with JoinOps[Select, Q] {
 
-  override def select = this
+  def isTrivialJoin: Boolean = false
+  def select = this
 
   def distinct: Select[Q]
 
