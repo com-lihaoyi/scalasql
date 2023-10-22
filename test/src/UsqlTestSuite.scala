@@ -18,7 +18,7 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
 
-trait HsqlDbSuite extends TestSuite with HsqlDialect {
+trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
     "hsqldb-test-data.sql",

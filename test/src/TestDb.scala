@@ -47,16 +47,17 @@ class TestDb(connection: Connection,
   def apply[T, V](
       query: T,
       sql: String = null,
-      sqls: Seq[String] = null,
-      value: V = null.asInstanceOf[V],
-      normalize: V => V = null
+      sqls: Seq[String] = Nil,
+      value: V = null,
+      moreValues: Seq[V] = Nil,
+      normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
-    if (sqls != null) {
+    if (sqls.nonEmpty) {
       val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
@@ -68,10 +69,10 @@ class TestDb(connection: Connection,
     }
 
     val result = db.run(query)
-    if (value != null) {
-      val normalized = if (normalize == null) result else normalize(result)
-      assert(normalized == value, pprint.apply(normalized))
-    }
+
+    val values = Option(value) ++ moreValues
+    val normalized = normalize(result)
+    assert(values.exists(value => normalized == value), pprint.apply(normalized))
   }
 }
 

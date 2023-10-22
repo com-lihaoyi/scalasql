@@ -41,13 +41,19 @@ trait ExprNumericOpsTests extends UsqlTestSuite {
 
     test("bitwiseAnd") - checker(
       query = Expr(6) & Expr(2),
-      sql = "SELECT ? & ? as res",
+      sqls = Seq(
+        "SELECT ? & ? as res",
+        "SELECT BITAND(?, ?) as res"
+      ),
       value = 2
     )
 
     test("bitwiseOr") - checker(
       query = Expr(6) | Expr(3),
-      sql = "SELECT ? | ? as res",
+      sqls = Seq(
+        "SELECT ? | ? as res",
+        "SELECT BITOR(?, ?) as res",
+      ),
       value = 7
     )
 
@@ -65,13 +71,19 @@ trait ExprNumericOpsTests extends UsqlTestSuite {
 
     test("unaryMinus") - checker(
       query = -Expr(-4),
-      sql = "SELECT -? as res",
+      sqls = Seq(
+        "SELECT -? as res",
+        "SELECT -(?) as res"
+      ),
       value = 4
     )
 
     test("unaryTilde") - checker(
       query = ~Expr(-4),
-      sql = "SELECT ~? as res",
+      sqls = Seq(
+        "SELECT ~? as res",
+        "SELECT BITNOT(?) as res"
+      ),
       value = 3
     )
 
