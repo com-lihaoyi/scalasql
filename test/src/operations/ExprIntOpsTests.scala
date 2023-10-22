@@ -5,10 +5,6 @@ import usql._
 import usql.query.Expr
 import utest._
 
-object SqliteExprIntOpsTests extends ExprIntOpsTests with SqliteSuite
-object PostgresExprExprIntOpsTests extends ExprIntOpsTests with PostgresSuite
-object MySqlExprExprIntOpsTests extends ExprIntOpsTests with MySqlSuite
-
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */

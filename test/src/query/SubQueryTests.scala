@@ -4,9 +4,7 @@ import usql._
 import utest._
 import java.sql.Date
 
-object PostgresSubQueryTests extends SubQueryTests with PostgresSuite
-object SqliteSubQueryTests extends SubQueryTests with SqliteSuite
-object MySqlSubQueryTests extends SubQueryTests with MySqlSuite
+
 /**
  * Tests for queries operations that force subqueries to be used.
  */

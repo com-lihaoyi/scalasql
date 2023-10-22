@@ -1,15 +1,12 @@
 package usql.query
 
 import usql._
-import usql.query.Expr
 import utest._
 
 import java.sql.Date
 
 
-object PostgresInsertTests extends InsertTests with PostgresSuite
-object SqliteInsertTests extends InsertTests with SqliteSuite
-object MySqlInsertTests extends InsertTests with MySqlSuite
+
 /**
  * Tests for basic insert operations
  */

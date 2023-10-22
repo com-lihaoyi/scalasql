@@ -5,9 +5,6 @@ import utest._
 
 import java.sql.Date
 
-object PostgresUpdateTests extends UpdateTests with PostgresSuite
-object SqliteUpdateTests extends UpdateTests with SqliteSuite
-object MySqlUpdateTests extends UpdateTests with MySqlSuite
 /**
  * Tests for basic update operations
  */

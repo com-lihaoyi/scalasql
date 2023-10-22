@@ -1,14 +1,10 @@
 package usql.query
 
 import usql._
-import usql.query.Expr
 import utest._
 
 import java.sql.Date
 
-object PostgresSelectTests extends SelectTests with PostgresSuite
-object MySqlSelectTests extends SelectTests with MySqlSuite
-object SqliteSelectTests extends SelectTests with SqliteSuite
 
 /**
  * Tests for basic query operations: map, filter, join, etc.

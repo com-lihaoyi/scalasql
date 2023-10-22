@@ -4,9 +4,7 @@ import usql._
 import usql.query.Expr
 import utest._
 
-object SqliteExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
-object PostgresExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
-object MySqlExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
+
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */

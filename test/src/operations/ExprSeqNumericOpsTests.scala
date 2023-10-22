@@ -3,9 +3,7 @@ package usql.operations
 import usql._
 import utest._
 
-object SqliteExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
-object PostgresExprExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
-object MySqlExprExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
+
 
 /**
  * Tests for all the aggregate operators that we provide by default
