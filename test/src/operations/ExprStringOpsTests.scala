@@ -14,6 +14,16 @@ trait ExprStringOpsTests extends UsqlTestSuite  {
       sql = "SELECT ? LIKE ? as res",
       value = true
     )
+    test("length") - checker(
+      query = Expr("hello").length,
+      sql = "SELECT LENGTH(?) as res",
+      value = 5
+    )
+    test("octetLength") - checker(
+      query = Expr("叉烧包").octetLength,
+      sql = "SELECT OCTET_LENGTH(?) as res",
+      value = 9
+    )
 
     test("position") - checker(
       query = Expr("hello").indexOf("ll"),
@@ -34,6 +44,18 @@ trait ExprStringOpsTests extends UsqlTestSuite  {
       query = Expr("  Hello ").trim,
       sql = "SELECT TRIM(?) as res",
       value = "Hello"
+    )
+
+    test("ltrim") - checker(
+      query = Expr("  Hello ").ltrim,
+      sql = "SELECT LTRIM(?) as res",
+      value = "Hello "
+    )
+
+    test("rtrim") - checker(
+      query = Expr("  Hello ").rtrim,
+      sql = "SELECT RTRIM(?) as res",
+      value = "  Hello"
     )
 
     test("substring") - checker(

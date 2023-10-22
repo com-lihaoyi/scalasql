@@ -20,6 +20,13 @@ abstract class ExprStringOps(v: Expr[String]) {
   /** Removes leading characters, trailing characters, or both from a character string. */
   def trim: Expr[String] = Expr { implicit ctx => usql"TRIM($v)" }
 
+  def length: Expr[Int] = Expr { implicit ctx => usql"LENGTH($v)" }
+  def octetLength: Expr[Int] = Expr { implicit ctx => usql"OCTET_LENGTH($v)" }
+
+  def ltrim: Expr[String] = Expr { implicit ctx => usql"LTRIM($v)" }
+
+  def rtrim: Expr[String] = Expr { implicit ctx => usql"RTRIM($v)" }
+
   /** Returns a portion of a string. */
   def substring(start: Expr[Int], length: Expr[Int]): Expr[String] = Expr { implicit ctx =>
     usql"SUBSTRING($v, $start, $length)"

@@ -7,6 +7,9 @@ import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 object MySqlDialect extends MySqlDialect{
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v){
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
+    def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx => usql"RPAD($v, $length, $fill)" }
+    def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx => usql"LPAD($v, $length, $fill)" }
+    def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends usql.TableOps[V](t) {
