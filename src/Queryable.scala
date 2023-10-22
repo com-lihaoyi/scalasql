@@ -21,7 +21,7 @@ trait Queryable[Q, R] {
 }
 
 object Queryable {
-
+  private implicit def toValueReader[Q, R](implicit q: Queryable[Q, R]): Reader[R] = q.valueReader
   private class TupleNQueryable[Q, R](
       val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
       val valueReader: Reader[R]
@@ -34,6 +34,7 @@ object Queryable {
     }
   }
 
+  import usql.utils.OptionPickler._
   implicit def Tuple2Queryable[
       Q1,
       Q2,
@@ -42,7 +43,7 @@ object Queryable {
   ](implicit q1: Queryable[Q1, R1], q2: Queryable[Q2, R2]): Queryable[(Q1, Q2), (R1, R2)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2)),
-      utils.OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader)
+      implicitly
     )
   }
 
@@ -60,7 +61,7 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3), (R1, R2, R3)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
-      utils.OptionPickler.Tuple3Reader(q1.valueReader, q2.valueReader, q3.valueReader)
+      implicitly
     )
   }
 
@@ -81,12 +82,7 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-      utils.OptionPickler.Tuple4Reader(
-        q1.valueReader,
-        q2.valueReader,
-        q3.valueReader,
-        q4.valueReader
-      )
+      implicitly
     )
   }
 
@@ -110,13 +106,7 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-      utils.OptionPickler.Tuple5Reader(
-        q1.valueReader,
-        q2.valueReader,
-        q3.valueReader,
-        q4.valueReader,
-        q5.valueReader
-      )
+      implicitly
     )
   }
 
@@ -151,14 +141,7 @@ object Queryable {
           q5.walk(t._5),
           q6.walk(t._6)
         ),
-      utils.OptionPickler.Tuple6Reader(
-        q1.valueReader,
-        q2.valueReader,
-        q3.valueReader,
-        q4.valueReader,
-        q5.valueReader,
-        q6.valueReader
-      )
+      implicitly
     )
   }
 }

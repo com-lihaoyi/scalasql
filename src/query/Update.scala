@@ -57,6 +57,6 @@ object Update {
     Update.Impl(expr, table, Nil, Nil, Nil)
   }
 
-  implicit def UpdateQueryable[Q](implicit qr: Queryable[Q, _]): Queryable[Update[Q], Int] =
+  implicit def UpdateQueryable[Q]: Queryable[Update[Q], Int] =
     new Query.Queryable[Update[Q], Int]()
 }
