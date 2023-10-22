@@ -12,7 +12,7 @@ object MySqlDialect extends MySqlDialect{
     def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends usql.TableOps[V](t) {
+  class TableOps[V[_[_]]](t: Table[V]) extends usql.operations.TableOps[V](t) {
     override def update: Update[V[Column.ColumnExpr]] = {
       val ref = t.tableRef
       new Update(Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr))
@@ -73,5 +73,5 @@ object MySqlDialect extends MySqlDialect{
 }
 trait MySqlDialect extends Dialect{
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps = new MySqlDialect.ExprStringOps(v)
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new MySqlDialect.TableOps(t)
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): usql.operations.TableOps[V] = new MySqlDialect.TableOps(t)
 }
