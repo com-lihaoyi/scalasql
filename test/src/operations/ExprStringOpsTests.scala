@@ -11,7 +11,10 @@ trait ExprStringOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),
-      sql = "SELECT ? || ? as res",
+      sqls = Seq(
+        "SELECT ? || ? as res",
+        "SELECT CONCAT(?, ?) as res",
+      ),
       value = "helloworld"
     )
     test("like") - checker(

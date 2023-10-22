@@ -6,6 +6,8 @@ import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 
 object MySqlDialect extends MySqlDialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
+    override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"CONCAT($v, $x)" }
+
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
     def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
       usql"RPAD($v, $length, $fill)"
