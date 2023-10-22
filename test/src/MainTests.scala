@@ -1,6 +1,6 @@
 package usql
 import utest._
-import SqliteExprOps._
+import SqliteDialect._
 import usql.query.Expr
 
 case class Country[T[_]](

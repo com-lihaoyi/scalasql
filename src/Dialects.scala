@@ -1,8 +1,6 @@
 package usql
 
-import usql.operations.ExprStringOps
 import usql.query.{Aggregatable, Expr, Insert, Joinable, Select, Update}
-import usql.renderer.SqlStr.SqlStringSyntax
 
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr]]{
   def select: Select[V[Expr]] = {
@@ -23,7 +21,7 @@ class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr]]{
   def isTrivialJoin = true
 }
 
-trait ExprOps {
+trait Dialect {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
   implicit def ExprIntOpsConv[T: Numeric](v: Expr[T]): operations.ExprNumericOps[T] =
@@ -45,32 +43,4 @@ trait ExprOps {
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
 
-}
-
-object PostgresExprOps extends PostgresExprOps{
-  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v){
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
-  }
-}
-trait PostgresExprOps extends ExprOps{
-  override implicit def ExprStringOpsConv(v: Expr[String]): ExprStringOps = new PostgresExprOps.ExprStringOps(v)
-}
-
-object SqliteExprOps extends SqliteExprOps{
-  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v){
-
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"INSTR($v, $x)" }
-  }
-}
-trait SqliteExprOps extends ExprOps{
-  override implicit def ExprStringOpsConv(v: Expr[String]): ExprStringOps = new SqliteExprOps.ExprStringOps(v)
-}
-
-object MySqlExprOps extends MySqlExprOps{
-  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v){
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
-  }
-}
-trait MySqlExprOps extends ExprOps{
-  override implicit def ExprStringOpsConv(v: Expr[String]): ExprStringOps = new MySqlExprOps.ExprStringOps(v)
 }

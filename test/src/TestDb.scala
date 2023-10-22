@@ -6,10 +6,10 @@ import usql.query.{Expr, SubqueryRef}
 import utest.TestSuite
 
 import java.sql.{Connection, DriverManager}
-trait UsqlTestSuite extends TestSuite with ExprOps {
+trait UsqlTestSuite extends TestSuite with Dialect {
   val checker: TestDb
 }
-trait SqliteSuite extends TestSuite with SqliteExprOps {
+trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     "sqlite-test-data.sql",
@@ -18,7 +18,7 @@ trait SqliteSuite extends TestSuite with SqliteExprOps {
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
-trait PostgresSuite extends TestSuite with PostgresExprOps {
+trait PostgresSuite extends TestSuite with PostgresDialect {
   val checker = new TestDb(
     DriverManager.getConnection(
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
@@ -29,7 +29,7 @@ trait PostgresSuite extends TestSuite with PostgresExprOps {
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
-trait MySqlSuite extends TestSuite with MySqlExprOps {
+trait MySqlSuite extends TestSuite with MySqlDialect {
   val checker = new TestDb(
     DriverManager.getConnection(
       TestDb.mysql.getJdbcUrl + "?allowMultiQueries=true",
