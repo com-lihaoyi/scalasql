@@ -1,10 +1,10 @@
 package usql
-import operations.{ExprBooleanOpsTests, ExprIntOpsTests, ExprSeqNumericOpsTests, ExprSeqOpsTests, ExprStringOpsTests}
+import operations.{ExprBooleanOpsTests, ExprNumericOpsTests, ExprSeqNumericOpsTests, ExprSeqOpsTests, ExprStringOpsTests}
 import query.{InsertTests, SelectTests, SubQueryTests, UpdateTests, ReturningTests}
 
 package mysql{
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
-  object ExprExprIntOpsTests extends ExprIntOpsTests with MySqlSuite
+  object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
   object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
@@ -18,7 +18,7 @@ package mysql{
 
 package postgres{
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
-  object ExprExprIntOpsTests extends ExprIntOpsTests with PostgresSuite
+  object ExprExprIntOpsTests extends ExprNumericOpsTests with PostgresSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
@@ -31,7 +31,7 @@ package postgres{
 
 package sqlite{
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
-  object ExprIntOpsTests extends ExprIntOpsTests with SqliteSuite
+  object ExprIntOpsTests extends ExprNumericOpsTests with SqliteSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
   object ExprStringOpsTests extends ExprStringOpsTests with SqliteSuite

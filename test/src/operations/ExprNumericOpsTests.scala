@@ -8,7 +8,7 @@ import utest._
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprIntOpsTests extends UsqlTestSuite {
+trait ExprNumericOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr(6) + Expr(2),
@@ -38,30 +38,6 @@ trait ExprIntOpsTests extends UsqlTestSuite {
       query = Expr(6) % Expr(2),
       sql = "SELECT MOD(?, ?) as res",
       value = 0
-    )
-
-    test("greaterThan") - checker(
-      query = Expr(6) > Expr(2),
-      sql = "SELECT ? > ? as res",
-      value = true
-    )
-
-    test("lessThan") - checker(
-      query = Expr(6) < Expr(2),
-      sql = "SELECT ? < ? as res",
-      value = false
-    )
-
-    test("greaterThanOrEquals") - checker(
-      query = Expr(6) >= Expr(2),
-      sql = "SELECT ? >= ? as res",
-      value = true
-    )
-
-    test("lessThanOrEquals") - checker(
-      query = Expr(6) <= Expr(2),
-      sql = "SELECT ? <= ? as res",
-      value = false
     )
 
     test("bitwiseAnd") - checker(

@@ -20,18 +20,6 @@ class ExprNumericOps[T: Numeric](v: Expr[T]) {
   /** Remainder */
   def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"MOD($v, $x)" }
 
-  /** Greater than */
-  def >[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v > $x" }
-
-  /** Less than */
-  def <[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v < $x" }
-
-  /** Greater than or equal to */
-  def >=[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v >= $x" }
-
-  /** Less than or equal to */
-  def <=[V: Numeric](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => usql"$v <= $x" }
-
   /** Bitwise AND */
   def &[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => usql"$v & $x" }
 
