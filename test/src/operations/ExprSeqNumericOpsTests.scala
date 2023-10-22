@@ -2,7 +2,6 @@ package usql.operations
 
 import usql._
 import utest._
-import ExprOps._
 
 object SqliteExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
 object PostgresExprExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
@@ -11,8 +10,7 @@ object MySqlExprExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySql
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-trait ExprSeqNumericOpsTests extends TestSuite {
-  val checker: TestDb
+trait ExprSeqNumericOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("sum") - checker(
       query = Purchase.select.map(_.count).sum,

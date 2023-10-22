@@ -2,8 +2,6 @@ package usql.query
 
 import usql._
 import utest._
-import ExprOps._
-
 import java.sql.Date
 
 object PostgresSubQueryTests extends SubQueryTests with PostgresSuite
@@ -12,8 +10,7 @@ object MySqlSubQueryTests extends SubQueryTests with MySqlSuite
 /**
  * Tests for queries operations that force subqueries to be used.
  */
-trait SubQueryTests extends TestSuite {
-  val checker: TestDb
+trait SubQueryTests extends UsqlTestSuite {
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query =

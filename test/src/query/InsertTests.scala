@@ -1,6 +1,5 @@
 package usql.query
 
-import usql.ExprOps._
 import usql._
 import usql.query.Expr
 import utest._
@@ -14,9 +13,7 @@ object MySqlInsertTests extends InsertTests with MySqlSuite
 /**
  * Tests for basic insert operations
  */
-trait InsertTests extends TestSuite {
-  val checker: TestDb
-
+trait InsertTests extends UsqlTestSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("single") {

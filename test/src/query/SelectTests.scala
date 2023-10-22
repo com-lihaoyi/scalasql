@@ -3,7 +3,6 @@ package usql.query
 import usql._
 import usql.query.Expr
 import utest._
-import ExprOps._
 
 import java.sql.Date
 
@@ -14,8 +13,7 @@ object SqliteSelectTests extends SelectTests with SqliteSuite
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
-trait SelectTests extends TestSuite {
-  val checker: TestDb
+trait SelectTests extends UsqlTestSuite {
   def tests = Tests {
     test("constant") - checker(
       query = Expr(1),

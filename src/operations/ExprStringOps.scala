@@ -3,14 +3,13 @@ package usql.operations
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 
-class ExprStringOps(v: Expr[String]) {
+abstract class ExprStringOps(v: Expr[String]) {
 
   /** TRUE if the operand matches a pattern */
   def like[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => usql"$v LIKE $x" }
 
   /** Returns an integer value representing the starting position of a string within the search string. */
-  // not supported by Sqlite
-  def position(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($v IN $x)" }
+  def indexOf(x: Expr[String]): Expr[Int]
 
   /** Converts a string to all lowercase characters. */
   def toLowerCase: Expr[String] = Expr { implicit ctx => usql"LOWER($v)" }

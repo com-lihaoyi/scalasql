@@ -1,6 +1,5 @@
 package usql.operations
 
-import usql.ExprOps._
 import usql._
 import usql.query.Expr
 import utest._
@@ -11,8 +10,7 @@ object MySqlExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprBooleanOpsTests extends TestSuite {
-  val checker: TestDb
+trait ExprBooleanOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("and") - checker(
       query = Expr(true) && Expr(true),

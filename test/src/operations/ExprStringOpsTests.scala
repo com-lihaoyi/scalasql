@@ -1,6 +1,5 @@
 package usql.operations
 
-import usql.ExprOps._
 import usql._
 import usql.query.Expr
 import utest._
@@ -12,8 +11,7 @@ object MySqlExprExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprStringOpsTests extends TestSuite  {
-  val checker: TestDb
+trait ExprStringOpsTests extends UsqlTestSuite  {
   def tests = Tests {
     test("like") - checker(
       query = Expr("hello").like("he%"),
@@ -22,8 +20,11 @@ trait ExprStringOpsTests extends TestSuite  {
     )
 
     test("position") - checker(
-      query = Expr("ll").position("hello"),
-      sql = "SELECT POSITION(? IN ?) as res",
+      query = Expr("hello").indexOf("ll"),
+      sqls = Seq(
+        "SELECT POSITION(? IN ?) as res",
+        "SELECT INSTR(?, ?) as res",
+      ),
       value = 3
     )
 

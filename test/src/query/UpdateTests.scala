@@ -2,7 +2,6 @@ package usql.query
 
 import usql._
 import utest._
-import ExprOps._
 
 import java.sql.Date
 
@@ -12,9 +11,7 @@ object MySqlUpdateTests extends UpdateTests with MySqlSuite
 /**
  * Tests for basic update operations
  */
-trait UpdateTests extends TestSuite {
-  val checker: TestDb
-
+trait UpdateTests extends UsqlTestSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("update") - {

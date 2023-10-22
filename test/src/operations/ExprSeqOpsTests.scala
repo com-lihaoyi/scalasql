@@ -2,7 +2,6 @@ package usql.operations
 
 import usql._
 import utest._
-import ExprOps._
 
 object SqliteExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
 object PostgresExprExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
@@ -11,8 +10,7 @@ object MySqlExprExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-trait ExprSeqOpsTests extends TestSuite {
-  val checker: TestDb
+trait ExprSeqOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("size") - checker(
       query = Purchase.select.size,

@@ -1,6 +1,6 @@
 package usql.operations
 
-import usql.ExprOps._
+
 import usql._
 import usql.query.Expr
 import utest._
@@ -12,8 +12,7 @@ object MySqlExprExprIntOpsTests extends ExprIntOpsTests with MySqlSuite
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprIntOpsTests extends TestSuite {
-  val checker: TestDb
+trait ExprIntOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr(6) + Expr(2),
