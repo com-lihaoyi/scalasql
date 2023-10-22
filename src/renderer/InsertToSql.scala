@@ -10,10 +10,9 @@ object InsertToSql {
       q: InsertValues[_],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      mySqlUpdateJoinSyntax: Boolean
   ): SqlStr = {
 
-    implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper, mySqlUpdateJoinSyntax)
+    implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val columns = SqlStr.join(q.columns.map(c => SqlStr.raw(columnNameMapper(c.name))), usql", ")
     val values = SqlStr.join(
       q.valuesLists
@@ -28,10 +27,9 @@ object InsertToSql {
       exprs: Seq[Expr[_]],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      mySqlUpdateJoinSyntax: Boolean
   ): SqlStr = {
 
-    implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper, mySqlUpdateJoinSyntax)
+    implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
 
     val columns = SqlStr.join(
       exprs.map(_.asInstanceOf[Column.ColumnExpr[_]]).map(c =>

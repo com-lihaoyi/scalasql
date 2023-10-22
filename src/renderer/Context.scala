@@ -7,10 +7,9 @@ class Context(
     val exprNaming: Map[Expr.Identity, SqlStr],
     val tableNameMapper: String => String,
     val columnNameMapper: String => String,
-    val mySqlUpdateJoinSyntax: Boolean
 ) {
   def withAddedFromNaming(added: Map[From, String]) = new Context(
-    added ++ fromNaming, exprNaming, tableNameMapper, columnNameMapper, mySqlUpdateJoinSyntax
+    added ++ fromNaming, exprNaming, tableNameMapper, columnNameMapper
   )
 //  assert(!fromNaming.toString().contains("purchase"))
 }

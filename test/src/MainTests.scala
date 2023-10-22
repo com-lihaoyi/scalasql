@@ -74,7 +74,6 @@ object MainTests extends TestSuite {
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
     columnNameUnMapper = snakeToCamel,
-    mySqlUpdateJoinSyntax = false
   )
   db.runRaw(os.read(os.pwd / "test" / "resources" / "world.sql"))
 

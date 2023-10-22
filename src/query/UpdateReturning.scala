@@ -39,7 +39,6 @@ object Returning {
         Nil,
         Some(q.returnable.table),
         Map(),
-        ctx0.mySqlUpdateJoinSyntax
       )
 
       val prefix = q.returnable.toSqlQuery

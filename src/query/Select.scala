@@ -69,7 +69,6 @@ object Select {
         ctx.tableNameMapper,
         ctx.columnNameMapper,
         ctx.fromNaming,
-        ctx.mySqlUpdateJoinSyntax
       )._2
     }
   }

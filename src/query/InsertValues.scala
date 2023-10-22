@@ -35,7 +35,7 @@ object InsertValues {
     def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
 
     override def toSqlQuery(q: InsertValues[Q], ctx0: Context): SqlStr = {
-      InsertToSql.values(q, ctx0.tableNameMapper, ctx0.columnNameMapper, ctx0.mySqlUpdateJoinSyntax)
+      InsertToSql.values(q, ctx0.tableNameMapper, ctx0.columnNameMapper)
     }
   }
 }

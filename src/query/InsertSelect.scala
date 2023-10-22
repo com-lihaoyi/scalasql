@@ -42,7 +42,6 @@ object InsertSelect {
         qr.walk(q.columns).map(_._2),
         ctx0.tableNameMapper,
         ctx0.columnNameMapper,
-        ctx0.mySqlUpdateJoinSyntax
       )
     }
   }

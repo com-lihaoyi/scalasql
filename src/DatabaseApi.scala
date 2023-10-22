@@ -13,7 +13,6 @@ class DatabaseApi(
     tableNameUnMapper: String => String = identity,
     columnNameMapper: String => String = identity,
     columnNameUnMapper: String => String = identity,
-    mySqlUpdateJoinSyntax: Boolean
 ) {
 
   def runRaw(sql: String) = {
@@ -28,7 +27,7 @@ class DatabaseApi(
   }
 
   def toSqlQuery0[Q](query: Q)(implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
-    val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper, mySqlUpdateJoinSyntax)
+    val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
     val queryStr = flattened.queryParts.mkString("?")
     (queryStr, flattened.params)

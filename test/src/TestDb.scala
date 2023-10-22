@@ -13,7 +13,6 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     "sqlite-test-data.sql",
-    mySqlUpdateJoinSyntax = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -24,7 +23,6 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
     ),
     "postgres-test-data.sql",
-    mySqlUpdateJoinSyntax = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -37,14 +35,12 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
       TestDb.mysql.getPassword
     ),
     "mysql-test-data.sql",
-    mySqlUpdateJoinSyntax = true
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
 class TestDb(connection: Connection,
-             testDataFileName: String,
-             mySqlUpdateJoinSyntax: Boolean) {
+             testDataFileName: String) {
 
   val db = new DatabaseApi(
     connection,
@@ -52,7 +48,6 @@ class TestDb(connection: Connection,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
     columnNameUnMapper = snakeToCamel,
-    mySqlUpdateJoinSyntax = mySqlUpdateJoinSyntax
   )
 
   def reset() = {
