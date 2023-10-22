@@ -66,6 +66,4 @@ object Select {
   def fromTable[T, R](e: T, table: TableRef)(implicit qr: Queryable[T, R]) = {
     SimpleSelect(e, None, Seq(table), Nil, Nil, None)
   }
-
-  implicit def SelectQueryable[Q, R]: Queryable[Select[Q, R], Seq[R]] = Queryable.QueryQueryable
 }

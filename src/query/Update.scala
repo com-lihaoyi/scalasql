@@ -58,7 +58,4 @@ object Update {
   def fromTable[Q, R](expr: Q, table: TableRef)(implicit qr: Queryable[Q, R]): Update.Impl[Q, R] = {
     Update.Impl(expr, table, Nil, Nil, Nil)
   }
-
-  implicit def UpdateQueryable[Q, R]: Queryable[Update[Q, R], Int] =
-    Queryable.QueryQueryable
 }

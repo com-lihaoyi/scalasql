@@ -28,8 +28,3 @@ case class InsertValues[Q, R](
   override def valueReader: OptionPickler.Reader[Int] = implicitly
 }
 
-object InsertValues {
-
-  implicit def SelectQueryable[Q, R]: Queryable[InsertValues[Q, R], Int] = Queryable.QueryQueryable
-
-}

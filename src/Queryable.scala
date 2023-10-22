@@ -12,7 +12,7 @@ import usql.utils.OptionPickler
  * query to a flat list of expressions via [[walk]], and reading a JSON-ish
  * tree-shaped blob back into a return value via [[valueReader]]
  */
-trait Queryable[Q, R] {
+trait Queryable[-Q, R] {
   def isExecuteUpdate(q: Q): Boolean = false
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader(q: Q): Reader[R]
@@ -22,8 +22,8 @@ trait Queryable[Q, R] {
 }
 
 object Queryable {
-  def QueryQueryable[R, C <: Query[R]]: Queryable[C, R] =
-    new Query.Queryable[C, R]()
+  implicit def QueryQueryable[R]: Queryable[Query[R], R] =
+    new Query.Queryable[Query[R], R]()
 
   private class TupleNQueryable[Q, R](
       val walk0: Q => Seq[Seq[(List[String], Expr[_])]],

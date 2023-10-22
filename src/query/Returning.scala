@@ -41,9 +41,3 @@ case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit
     prefix + suffix
   }
 }
-
-object Returning {
-  implicit def UpdateReturningQueryable[Q, R]: Queryable[Returning[Q, R], Seq[R]] =
-    Queryable.QueryQueryable
-
-}
