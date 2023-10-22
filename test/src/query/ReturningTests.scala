@@ -63,6 +63,40 @@ trait ReturningTests extends UsqlTestSuite {
         )
       }
 
+      test("select") {
+        checker(
+          query = Buyer.insert
+            .select(
+              x => (x.name, x.dateOfBirth),
+              Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
+            )
+            .returning(_.id),
+          sql =
+            """
+            INSERT INTO buyer (name, date_of_birth)
+            SELECT
+              buyer0.name as res__0,
+              buyer0.date_of_birth as res__1
+            FROM buyer buyer0
+            WHERE buyer0.name <> ?
+            RETURNING buyer.id as res
+          """,
+          value = Seq(4, 5)
+        )
+
+        checker(
+          query = Buyer.select,
+          value = Seq(
+            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            // id=4,5 comes from auto increment, 6 is filtered out in the select
+            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
+            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
+          )
+        )
+      }
+
     }
 
     test("update") {
