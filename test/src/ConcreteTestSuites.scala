@@ -1,6 +1,6 @@
 package usql
 import operations.{ExprBooleanOpsTests, ExprIntOpsTests, ExprSeqNumericOpsTests, ExprSeqOpsTests, ExprStringOpsTests}
-import query.{InsertTests, SelectTests, SubQueryTests, UpdateTests}
+import query.{InsertTests, SelectTests, SubQueryTests, UpdateTests, ReturningTests}
 
 package mysql{
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
@@ -12,6 +12,8 @@ package mysql{
   object SelectTests extends SelectTests with MySqlSuite
   object SubQueryTests extends SubQueryTests with MySqlSuite
   object UpdateTests extends UpdateTests with MySqlSuite
+  // MySql does not support INSERT/UPDATE RETURNING
+  // object ReturningTests extends ReturningTests with MySqlSuite
 }
 
 package postgres{
@@ -24,6 +26,7 @@ package postgres{
   object SelectTests extends SelectTests with PostgresSuite
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object UpdateTests extends UpdateTests with PostgresSuite
+  object ReturningTests extends ReturningTests with PostgresSuite
 }
 
 package sqlite{
@@ -36,4 +39,5 @@ package sqlite{
   object SelectTests extends SelectTests with SqliteSuite
   object SubQueryTests extends SubQueryTests with SqliteSuite
   object UpdateTests extends UpdateTests with SqliteSuite
+  object ReturningTests extends ReturningTests with SqliteSuite
 }

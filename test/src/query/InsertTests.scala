@@ -42,21 +42,6 @@ trait InsertTests extends UsqlTestSuite {
         )
       }
 
-      test("returning") - {
-        checker(
-          query = Buyer.insert
-            .values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09"))
-            .returning(_.id),
-          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
-          value = Seq(4)
-        )
-
-        checker(
-          query = Buyer.select.filter(_.name === "test buyer"),
-          // id=4 comes from auto increment
-          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
-        )
-      }
     }
 
     test("batch") {
@@ -118,39 +103,6 @@ trait InsertTests extends UsqlTestSuite {
         )
       }
 
-      test("returning") - {
-        checker(
-          query = Buyer.insert
-            .batched(_.name, _.dateOfBirth)(
-              ("test buyer A", Date.valueOf("2001-04-07")),
-              ("test buyer B", Date.valueOf("2002-05-08")),
-              ("test buyer C", Date.valueOf("2003-06-09"))
-            )
-            .returning(_.id),
-          sql = """
-            INSERT INTO buyer (name, date_of_birth)
-            VALUES
-              (?, ?),
-              (?, ?),
-              (?, ?)
-            RETURNING buyer.id as res
-          """,
-          value = Seq(4, 5, 6)
-        )
-
-        checker(
-          query = Buyer.select,
-          value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            // id=4,5,6 comes from auto increment
-            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
-            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
-            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
-          )
-        )
-      }
     }
 
     test("select") {

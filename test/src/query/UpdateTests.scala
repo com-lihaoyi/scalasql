@@ -53,26 +53,6 @@ trait UpdateTests extends UsqlTestSuite {
       )
     }
 
-    test("returning") - {
-      checker(
-        query =
-          Buyer.update
-            .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"))
-            .returning(_.id),
-        sqls = Seq(
-          "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
-          "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
-        ),
-        value = Seq(1)
-      )
-
-      checker(
-        query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2019-04-07"))
-      )
-    }
-
     test("multiple") - {
       checker(
         query =
@@ -94,29 +74,6 @@ trait UpdateTests extends UsqlTestSuite {
       checker(
         query = Buyer.select.filter(_.name === "John Dee").map(_.dateOfBirth),
         value = Seq(Date.valueOf("2019-04-07"))
-      )
-    }
-
-    test("returningMulti") - {
-      checker(
-        query =
-          Buyer.update
-            .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
-            .returning(c => (c.id, c.name, c.dateOfBirth)),
-        sqls = Seq(
-          """
-            UPDATE buyer
-            SET date_of_birth = ?, name = ? WHERE buyer.name = ?
-            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
-          """,
-          """
-            UPDATE buyer
-            SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
-            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
-          """
-        ),
-        value = Seq((1, "John Dee", Date.valueOf("2019-04-07")))
       )
     }
 
