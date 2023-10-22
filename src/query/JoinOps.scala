@@ -2,20 +2,21 @@ package usql.query
 
 import usql.{Queryable, Table}
 
-trait JoinOps[C[_], Q] {
+trait JoinOps[C[_, _], Q, R] {
   def expr: Q
-  def join[V](other: Joinable[V])(implicit qr: Queryable[V, _]): C[(Q, V)] = join0(other, None)
+  def join[Q2, R2](other: Joinable[Q2, R2])(implicit qr: Queryable[Q2, R2]): C[(Q, Q2), (R, R2)] =
+    join0(other, None)
 
-  def joinOn[V](other: Joinable[V])(on: (Q, V) => Expr[Boolean])(implicit
-      qr: Queryable[V, _]
-  ): C[(Q, V)] = join0(other, Some(on))
+  def joinOn[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(implicit
+      qr: Queryable[Q2, R2]
+  ): C[(Q, Q2), (R, R2)] = join0(other, Some(on))
 
-  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
-      joinQr: Queryable[V, _]
-  ): C[(Q, V)]
+  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
+      joinQr: Queryable[Q2, R2]
+  ): C[(Q, Q2), (R, R2)]
 
-  def joinInfo[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
-      joinQr: Queryable[V, _]
+  def joinInfo[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
+      joinQr: Queryable[Q2, R2]
   ) = {
     val otherSelect = other.select
 
@@ -23,7 +24,7 @@ trait JoinOps[C[_], Q] {
       if (other.isTrivialJoin) Join(
         None,
         Seq(JoinFrom(
-          otherSelect.asInstanceOf[SimpleSelect[_]].from.head,
+          otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head,
           on.map(_(expr, otherSelect.expr))
         ))
       )

@@ -2,19 +2,17 @@ package usql.query
 
 import usql.{Column, Queryable}
 
-case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _]) {
-  def select[C](columns: Q => C, select: Select[C])(implicit
-      qrs: Queryable[C, _]
-  ): InsertSelect[Q, C] = {
+case class Insert[Q, R](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, R]) {
+  def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2] = {
     InsertSelect(this, columns(expr), select)
   }
 
-  def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q] = {
+  def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q, R] = {
     val kvs = f.map(_(expr))
     InsertValues(this, columns = kvs.map(_._1), valuesLists = Seq(kvs.map(_._2)))
   }
 
-  def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q] = {
+  def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q, R] = {
     InsertValues(
       this,
       columns = Seq(f1(expr)),
@@ -37,7 +35,7 @@ case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _])
       f1: Q => Column.ColumnExpr[T1],
       f2: Q => Column.ColumnExpr[T2],
       f3: Q => Column.ColumnExpr[T3]
-  )(items: (Expr[T1], Expr[T2], Expr[T3])*): InsertValues[Q] = {
+  )(items: (Expr[T1], Expr[T2], Expr[T3])*): InsertValues[Q, R] = {
     InsertValues(
       this,
       columns = Seq(f1(expr), f2(expr), f3(expr)),
@@ -50,7 +48,7 @@ case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _])
       f2: Q => Column.ColumnExpr[T2],
       f3: Q => Column.ColumnExpr[T3],
       f4: Q => Column.ColumnExpr[T4]
-  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4])*): InsertValues[Q] = {
+  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4])*): InsertValues[Q, R] = {
     InsertValues(
       this,
       columns = Seq(f1(expr), f2(expr), f3(expr), f4(expr)),
@@ -64,7 +62,7 @@ case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _])
       f3: Q => Column.ColumnExpr[T3],
       f4: Q => Column.ColumnExpr[T4],
       f5: Q => Column.ColumnExpr[T5]
-  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4], Expr[T5])*): InsertValues[Q] = {
+  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4], Expr[T5])*): InsertValues[Q, R] = {
     InsertValues(
       this,
       columns = Seq(f1(expr), f2(expr), f3(expr), f4(expr), f5(expr)),
@@ -79,7 +77,7 @@ case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _])
       f4: Q => Column.ColumnExpr[T4],
       f5: Q => Column.ColumnExpr[T5],
       f6: Q => Column.ColumnExpr[T6]
-  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4], Expr[T5], Expr[T6])*): InsertValues[Q] = {
+  )(items: (Expr[T1], Expr[T2], Expr[T3], Expr[T4], Expr[T5], Expr[T6])*): InsertValues[Q, R] = {
 
     InsertValues(
       this,
@@ -90,7 +88,7 @@ case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _])
 }
 
 object Insert {
-  def fromTable[Q](expr: Q, table: TableRef)(implicit qr: Queryable[Q, _]): Insert[Q] = {
+  def fromTable[Q, R](expr: Q, table: TableRef)(implicit qr: Queryable[Q, R]): Insert[Q, R] = {
     Insert(expr, table)
   }
 }

@@ -5,46 +5,49 @@ import usql.renderer.{Context, Interp, SelectToSql, SqlStr}
 import usql.Queryable
 import usql.utils.OptionPickler
 
-trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
-    with JoinOps[Select, Q] with Query{
+trait Select[Q, R]
+    extends Interp.Renderable
+    with Aggregatable[Q]
+    with From
+    with Joinable[Q, R]
+    with JoinOps[Select, Q, R]
+    with Query {
 
-  protected def qr: Queryable[Q, _]
+  def qr: Queryable[Q, R]
   def isTrivialJoin: Boolean = false
   def select = this
 
-  def distinct: Select[Q]
+  def distinct: Select[Q, R]
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
-  def subquery(implicit qr: Queryable[Q, _]) = new SubqueryRef[Q](this, qr)
+  def subquery(implicit qr: Queryable[Q, R]) = new SubqueryRef[Q, R](this, qr)
 
-  def map[V](f: Q => V)(implicit qr: Queryable[V, _]): Select[V]
-  def flatMap[V](f: Q => Select[V])(implicit qr: Queryable[V, _]): Select[V]
-  def filter(f: Q => Expr[Boolean]): Select[Q]
+  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
+  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
+  def filter(f: Q => Expr[Boolean]): Select[Q, R]
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V]
 
-  def groupBy[K, V](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
-      qrk: Queryable[K, _],
-      qrv: Queryable[V, _]
-  ): Select[(K, V)]
+  def groupBy[K, V, R2, R3](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
+      qrk: Queryable[K, R2],
+      qrv: Queryable[V, R3]
+  ): Select[(K, V), (R2, R3)]
 
-  def sortBy(f: Q => Expr[_]): Select[Q]
-  def asc: Select[Q]
-  def desc: Select[Q]
-  def nullsFirst: Select[Q]
-  def nullsLast: Select[Q]
+  def sortBy(f: Q => Expr[_]): Select[Q, R]
+  def asc: Select[Q, R]
+  def desc: Select[Q, R]
+  def nullsFirst: Select[Q, R]
+  def nullsLast: Select[Q, R]
 
-  def union(other: Select[Q]): Select[Q] = compound0("UNION", other)
-  def unionAll(other: Select[Q]): Select[Q] = compound0("UNION ALL", other)
-  def intersect(other: Select[Q]): Select[Q] = compound0("INTERSECT", other)
-  def except(other: Select[Q]): Select[Q] = compound0("EXCEPT", other)
-  def compound0(op: String, other: Select[Q]): CompoundSelect[Q]
+  def union(other: Select[Q, R]): Select[Q, R] = compound0("UNION", other)
+  def unionAll(other: Select[Q, R]): Select[Q, R] = compound0("UNION ALL", other)
+  def intersect(other: Select[Q, R]): Select[Q, R] = compound0("INTERSECT", other)
+  def except(other: Select[Q, R]): Select[Q, R] = compound0("EXCEPT", other)
+  def compound0(op: String, other: Select[Q, R]): CompoundSelect[Q, R]
 
-  def drop(n: Int): Select[Q]
-  def take(n: Int): Select[Q]
-
-
+  def drop(n: Int): Select[Q, R]
+  def take(n: Int): Select[Q, R]
 
   def toSqlQuery(implicit ctx: Context): SqlStr = {
     SelectToSql.apply(
@@ -60,10 +63,15 @@ trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Jo
 }
 
 object Select {
-  def fromTable[T](e: T, table: TableRef)(implicit qr: Queryable[T, _]) = {
+  def fromTable[T, R](e: T, table: TableRef)(implicit qr: Queryable[T, R]) = {
     SimpleSelect(e, None, Seq(table), Nil, Nil, None)
   }
 
-  implicit def SelectQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Select[Q], Seq[R]] =
-    new Query.Queryable[Select[Q], Seq[R]]()(OptionPickler.SeqLikeReader(qr.valueReader, implicitly))
+  implicit def SelectQueryable[Q, R](implicit
+      qr: Queryable[Q, R]
+  ): Queryable[Select[Q, R], Seq[R]] =
+    new Query.Queryable[Select[Q, R], Seq[R]]()(OptionPickler.SeqLikeReader(
+      qr.valueReader,
+      implicitly
+    ))
 }

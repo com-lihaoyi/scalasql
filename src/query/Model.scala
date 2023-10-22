@@ -24,7 +24,7 @@ trait From
 class TableRef(val value: Table.Base) extends From {
   override def toString = s"TableRef(${value.tableName})"
 }
-class SubqueryRef[T](val value: Select[T], val qr: Queryable[T, _]) extends From
+class SubqueryRef[Q, R](val value: Select[Q, R], val qr: Queryable[Q, R]) extends From
 
 case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
 

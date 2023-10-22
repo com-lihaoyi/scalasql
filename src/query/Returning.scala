@@ -16,7 +16,7 @@ trait Returnable[Q] {
 
 case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit
     val qr: Queryable[Q, R]
-) extends Query{
+) extends Query {
   def walk() = qr.walk(returning)
 
   override def singleRow = false
@@ -43,6 +43,9 @@ object Returning {
   implicit def UpdateReturningQueryable[Q, R](implicit
       qr: Queryable[Q, R]
   ): Queryable[Returning[Q, R], Seq[R]] =
-    new Query.Queryable[Returning[Q, R], Seq[R]]()(OptionPickler.SeqLikeReader(qr.valueReader, implicitly))
+    new Query.Queryable[Returning[Q, R], Seq[R]]()(OptionPickler.SeqLikeReader(
+      qr.valueReader,
+      implicitly
+    ))
 
 }

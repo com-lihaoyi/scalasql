@@ -20,7 +20,7 @@ trait Dialect {
   ): operations.AggOps[T] =
     new operations.AggOps(v)
 
-  implicit def SelectOpsConv[T](v: Select[T]): operations.SelectOps[T] =
+  implicit def SelectOpsConv[T](v: Select[T, _]): operations.SelectOps[T] =
     new operations.SelectOps(v)
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)

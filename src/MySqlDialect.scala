@@ -19,21 +19,21 @@ object MySqlDialect extends MySqlDialect {
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends usql.operations.TableOps[V](t) {
-    override def update: Update[V[Column.ColumnExpr]] = {
+    override def update: Update[V[Column.ColumnExpr], V[Val]] = {
       val ref = t.tableRef
       new Update(Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr))
     }
   }
 
-  class Update[Q](update: Update.Impl[Q]) extends usql.query.Update[Q] {
-    def filter(f: Q => Expr[Boolean]): Update[Q] = new Update(update.filter(f))
+  class Update[Q, R](update: Update.Impl[Q, R]) extends usql.query.Update[Q, R] {
+    def filter(f: Q => Expr[Boolean]): Update[Q, R] = new Update(update.filter(f))
 
-    def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q] =
+    def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q, R] =
       new Update(update.set(f: _*))
 
-    def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
-        joinQr: Queryable[V, _]
-    ): Update[(Q, V)] =
+    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
+        joinQr: Queryable[Q2, R2]
+    ): Update[(Q, Q2), (R, R2)] =
       new Update(update.join0(other, on))
 
     def expr: Q = update.expr
@@ -44,8 +44,8 @@ object MySqlDialect extends MySqlDialect {
       toSqlQuery0(update, ctx.tableNameMapper, ctx.columnNameMapper)
     }
 
-    def toSqlQuery0[Q](
-        q: Update.Impl[Q],
+    def toSqlQuery0[Q, R](
+        q: Update.Impl[Q, R],
         tableNameMapper: String => String,
         columnNameMapper: String => String
     ) = {
@@ -75,7 +75,7 @@ object MySqlDialect extends MySqlDialect {
       usql"UPDATE $tableName" + joins + usql" SET " + sets + where
     }
 
-    def qr: Queryable[Q, _] = update.qr
+    def qr: Queryable[Q, R] = update.qr
   }
 }
 trait MySqlDialect extends Dialect {

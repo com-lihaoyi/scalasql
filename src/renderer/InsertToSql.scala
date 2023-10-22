@@ -7,7 +7,7 @@ import usql.renderer.SqlStr.SqlStringSyntax
 
 object InsertToSql {
   def values(
-      q: InsertValues[_],
+      q: InsertValues[_, _],
       tableNameMapper: String => String,
       columnNameMapper: String => String
   ): SqlStr = {
@@ -22,8 +22,8 @@ object InsertToSql {
     usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) VALUES $values"
   }
 
-  def select[Q, C](
-      q: InsertSelect[Q, C],
+  def select(
+      q: InsertSelect[_, _, _, _],
       exprs: Seq[Expr[_]],
       tableNameMapper: String => String,
       columnNameMapper: String => String

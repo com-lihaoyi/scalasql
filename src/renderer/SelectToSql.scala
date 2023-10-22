@@ -37,22 +37,22 @@ object SelectToSql {
   }
 
   def apply[Q, R](
-      query: Joinable[Q],
+      query: Joinable[Q, R],
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
       previousFromMapping: Map[From, String]
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     query match {
-      case q: SimpleSelect[_] =>
+      case q: SimpleSelect[Q, R] =>
         simple(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
-      case q: CompoundSelect[_] =>
+      case q: CompoundSelect[Q, R] =>
         compound(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
     }
   }
 
   def compound[Q, R](
-      query: CompoundSelect[Q],
+      query: CompoundSelect[Q, R],
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
@@ -61,7 +61,7 @@ object SelectToSql {
     val (lhsMap, lhsStr0, context) =
       apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
 
-    val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_]]) usql"($lhsStr0)" else lhsStr0
+    val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) usql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
 
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
@@ -111,7 +111,7 @@ object SelectToSql {
   }
 
   def simple[Q, R](
-      query: SimpleSelect[Q],
+      query: SimpleSelect[Q, R],
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
@@ -172,7 +172,7 @@ object SelectToSql {
       .zipWithIndex
       .map {
         case (t: TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
-        case (s: SubqueryRef[_], i) => (s, "subquery" + i)
+        case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
         case x => throw new Exception("wtf " + x)
       }
       .toMap
@@ -188,7 +188,7 @@ object SelectToSql {
           SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t))
         )
 
-      case t: SubqueryRef[_] =>
+      case t: SubqueryRef[_, _] =>
         val (subNameMapping, sqlStr, _) =
           apply(t.value, t.qr, tableNameMapper, columnNameMapper, previousFromMapping)
         (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")

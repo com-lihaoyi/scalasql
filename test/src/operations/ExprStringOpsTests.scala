@@ -13,7 +13,7 @@ trait ExprStringOpsTests extends UsqlTestSuite {
       query = Expr("hello") + Expr("world"),
       sqls = Seq(
         "SELECT ? || ? as res",
-        "SELECT CONCAT(?, ?) as res",
+        "SELECT CONCAT(?, ?) as res"
       ),
       value = "helloworld"
     )

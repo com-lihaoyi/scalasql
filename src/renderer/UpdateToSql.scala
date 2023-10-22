@@ -5,8 +5,8 @@ import usql.query.Update
 import usql.Queryable
 
 object UpdateToSql {
-  def apply[Q](
-      q: Update.Impl[Q],
+  def apply[Q, R](
+      q: Update.Impl[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String
   ) = {

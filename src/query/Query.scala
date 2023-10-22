@@ -10,8 +10,9 @@ trait Query {
   def isExecuteUpdate: Boolean = false
 }
 
-object Query{
-  class Queryable[Q <: Query, R]()(implicit valueReader0: OptionPickler.Reader[R]) extends usql.Queryable[Q, R]{
+object Query {
+  class Queryable[Q <: Query, R]()(implicit valueReader0: OptionPickler.Reader[R])
+      extends usql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.isExecuteUpdate
     override def walk(q: Q) = q.walk()
     override def singleRow(q: Q) = q.singleRow

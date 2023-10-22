@@ -10,11 +10,11 @@ import usql.{Column, Queryable}
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class InsertValues[Q](
-    insert: Insert[Q],
+case class InsertValues[Q, R](
+    insert: Insert[Q, R],
     columns: Seq[Column.ColumnExpr[_]],
     valuesLists: Seq[Seq[Expr[_]]]
-)(implicit val qr: Queryable[Q, _]) extends Returnable[Q] with Query {
+)(implicit val qr: Queryable[Q, R]) extends Returnable[Q] with Query {
   def table = insert.table
   def expr: Q = insert.expr
 
@@ -28,7 +28,7 @@ case class InsertValues[Q](
 
 object InsertValues {
 
-  implicit def InsertQueryable[Q]: Queryable[InsertValues[Q], Int] =
-    new Query.Queryable[InsertValues[Q], Int]()
+  implicit def InsertQueryable[Q, R]: Queryable[InsertValues[Q, R], Int] =
+    new Query.Queryable[InsertValues[Q, R], Int]()
 
 }
