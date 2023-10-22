@@ -12,10 +12,10 @@ import usql.renderer.SqlStr.SqlStringSyntax
  * tree-shaped blob back into a return value via [[valueReader]]
  */
 trait Queryable[Q, R] {
-  def isExecuteUpdate: Boolean = false
+  def isExecuteUpdate(q: Q): Boolean = false
   def walk(q: Q): Seq[(List[String], Expr[_])]
   def valueReader: Reader[R]
-  def singleRow: Boolean = true
+  def singleRow(q: Q): Boolean = true
 
   def toSqlQuery(q: Q, ctx: Context): SqlStr = ExprsToSql(this.walk(q), usql"", ctx)._2
 }

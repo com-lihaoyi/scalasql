@@ -39,7 +39,7 @@ case class SimpleSelect[Q](
         val newCtx = ctx.withAddedFromNaming(outerCtx.fromNaming)
 
         f(expr)(newCtx)
-      }).toSqlStr.withCompleteQuery(true)
+      }).toSqlQuery.withCompleteQuery(true)
     }
   }
 
@@ -76,7 +76,7 @@ case class SimpleSelect[Q](
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V] { implicit ctx: Context =>
-      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlStr
+      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlQuery
     }
   }
 

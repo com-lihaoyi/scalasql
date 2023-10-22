@@ -13,7 +13,7 @@ import usql.utils.OptionPickler
 case class InsertSelect[Q, C](insert: Insert[Q], columns: C, select: Select[C])(implicit
     val qr: Queryable[Q, _],
     qrc: Queryable[C, _]
-) extends Returnable[Q] {
+) extends Returnable[Q] with Query{
   def expr = insert.expr
   def table = insert.table
 
@@ -24,24 +24,19 @@ case class InsertSelect[Q, C](insert: Insert[Q], columns: C, select: Select[C])(
       ctx.tableNameMapper,
       ctx.columnNameMapper
     )
+
+  override def isExecuteUpdate = true
+
+  def walk() = Nil
+
+  override def singleRow = true
+
 }
 
 object InsertSelect {
 
-  implicit def InsertSelectQueryable[Q, C](implicit
-      qr: Queryable[C, _]
-  ): Queryable[InsertSelect[Q, C], Int] =
-    new InsertSelectQueryable[Q, C]()(qr)
+  implicit def InsertSelectQueryable[Q, C]: Queryable[InsertSelect[Q, C], Int] =
+    new Query.Queryable[InsertSelect[Q, C], Int]()
 
-  class InsertSelectQueryable[Q, C](implicit qr: Queryable[C, _])
-      extends Queryable[InsertSelect[Q, C], Int] {
-    override def isExecuteUpdate = true
-    def walk(ur: InsertSelect[Q, C]): Seq[(List[String], Expr[_])] = Nil
 
-    override def singleRow = true
-
-    def valueReader: OptionPickler.Reader[Int] = OptionPickler.IntReader
-
-    override def toSqlQuery(q: InsertSelect[Q, C], ctx0: Context): SqlStr = q.toSqlQuery(ctx0)
-  }
 }

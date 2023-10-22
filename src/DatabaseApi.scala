@@ -49,12 +49,12 @@ class DatabaseApi(
       case Interp.TimestampInterp(ts) => statement.setTimestamp(n + 1, ts)
     }
 
-    if (qr.isExecuteUpdate) statement.executeUpdate().asInstanceOf[R]
+    if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
     else {
       val resultSet: ResultSet = statement.executeQuery()
 
       try {
-        if (qr.singleRow) {
+        if (qr.singleRow(query)) {
           assert(resultSet.next())
           val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader)
           assert(!resultSet.next())

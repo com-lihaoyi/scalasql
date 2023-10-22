@@ -67,7 +67,7 @@ object MySqlDialect extends MySqlDialect {
       val sets = SqlStr.join(updateList, usql", ")
 
       val where = SqlStr.optSeq(q.where) { where =>
-        usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
+        usql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), usql" AND ")
       }
 
       val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, fromSelectables))

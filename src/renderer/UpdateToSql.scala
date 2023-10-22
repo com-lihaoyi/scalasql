@@ -35,7 +35,7 @@ object UpdateToSql {
     }
 
     val where = SqlStr.optSeq(fromOns ++ q.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
+      usql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), usql" AND ")
     }
 
     val joins = optSeq(q.joins.drop(1))(SelectToSql.joinsToSqlStr(_, fromSelectables))

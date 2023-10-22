@@ -16,7 +16,7 @@ object InsertToSql {
     val columns = SqlStr.join(q.columns.map(c => SqlStr.raw(columnNameMapper(c.name))), usql", ")
     val values = SqlStr.join(
       q.valuesLists
-        .map(values => usql"(" + SqlStr.join(values.map(_.toSqlStr), usql", ") + usql")"),
+        .map(values => usql"(" + SqlStr.join(values.map(_.toSqlQuery), usql", ") + usql")"),
       usql", "
     )
     usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) VALUES $values"
@@ -38,6 +38,6 @@ object InsertToSql {
       usql", "
     )
 
-    usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) ${q.select.toSqlStr.withCompleteQuery(false)}"
+    usql"INSERT INTO ${SqlStr.raw(tableNameMapper(q.insert.table.value.tableName))} ($columns) ${q.select.toSqlQuery.withCompleteQuery(false)}"
   }
 }

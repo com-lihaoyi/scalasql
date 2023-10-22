@@ -6,7 +6,7 @@ import usql.Queryable
 import usql.utils.OptionPickler
 
 trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
-    with JoinOps[Select, Q] {
+    with JoinOps[Select, Q] with Query{
 
   protected def qr: Queryable[Q, _]
   def isTrivialJoin: Boolean = false
@@ -46,7 +46,7 @@ trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Jo
 
 
 
-  def toSqlStr(implicit ctx: Context): SqlStr = {
+  def toSqlQuery(implicit ctx: Context): SqlStr = {
     SelectToSql.apply(
       this,
       qr,
@@ -55,6 +55,8 @@ trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Jo
       ctx.fromNaming
     )._2.withCompleteQuery(true)
   }
+  def walk() = qr.walk(expr)
+  override def singleRow = false
 }
 
 object Select {
@@ -63,15 +65,5 @@ object Select {
   }
 
   implicit def SelectQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Select[Q], Seq[R]] =
-    new SelectQueryable()(qr)
-
-  class SelectQueryable[Q, R](implicit qr: Queryable[Q, R]) extends Queryable[Select[Q], Seq[R]] {
-    def walk(q: Select[Q]) = qr.walk(q.expr)
-
-    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader, Vector.iterableFactory)
-
-    override def singleRow = false
-
-    override def toSqlQuery(q: Select[Q], ctx: Context): SqlStr = q.toSqlStr(ctx)
-  }
+    new Query.Queryable[Select[Q], Seq[R]]()(OptionPickler.SeqLikeReader(qr.valueReader, implicitly))
 }

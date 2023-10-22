@@ -5,7 +5,7 @@ import usql.renderer.{Context, Interp, SqlStr}
 import usql.utils.OptionPickler
 
 trait Expr[T] extends Interp.Renderable {
-  final def toSqlStr(implicit ctx: Context): SqlStr = {
+  final def toSqlQuery(implicit ctx: Context): SqlStr = {
     ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
   }
 
