@@ -18,9 +18,22 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
     metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
 
-  def select: Select[V[Expr]] = metadata.query()
-  def update: Update[V[Column.ColumnExpr]] = metadata.update()
-  def insert: Insert[V[Column.ColumnExpr]] = metadata.insert()
+  def select: Select[V[Expr]] = {
+    val ref = tableRef
+    Select.fromTable(metadata.vExpr(ref).asInstanceOf[V[Expr]], ref)
+  }
+
+  def update: Update[V[Column.ColumnExpr]] = {
+    val ref = tableRef
+    Update.fromTable(metadata.vExpr(ref), ref)
+  }
+
+  def insert: Insert[V[Column.ColumnExpr]] = {
+    val ref = tableRef
+    Insert.fromTable(metadata.vExpr(ref), ref)
+  }
+
+  def tableRef = new usql.query.TableRef(this)
 }
 
 object Table {
@@ -30,9 +43,7 @@ object Table {
 
   class Metadata[V[_[_]]](
       val queryable: Queryable[V[Expr], V[Val]],
-      val query: () => Select[V[Expr]],
-      val update: () => Update[V[Column.ColumnExpr]],
-      val insert: () => Insert[V[Column.ColumnExpr]]
+      val vExpr: TableRef => V[Column.ColumnExpr],
   )
 
   object Metadata {
@@ -69,18 +80,7 @@ object Table {
             t => $allFlattenedExprs,
             _root_.usql.OptionPickler.macroR
           ),
-          () => {
-            val $tableRef = new usql.query.TableRef(this)
-            _root_.usql.query.Select.fromTable(new $wtt(..$queryParams), $tableRef)
-          },
-          () => {
-            val $tableRef = new usql.query.TableRef(this)
-            _root_.usql.query.Update.fromTable(new $wtt(..$queryParams), $tableRef)
-          },
-          () => {
-            val $tableRef = new usql.query.TableRef(this)
-            _root_.usql.query.Insert.fromTable(new $wtt(..$queryParams), $tableRef)
-          }
+          ($tableRef: usql.query.TableRef) => new $wtt(..$queryParams)
         )
         """
       )
