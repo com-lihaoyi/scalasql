@@ -5,6 +5,8 @@ import usql.renderer.SqlStr.SqlStringSyntax
 
 abstract class ExprStringOps(v: Expr[String]) {
 
+  def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"$v || $x" }
+
   /** TRUE if the operand matches a pattern */
   def like[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => usql"$v LIKE $x" }
 

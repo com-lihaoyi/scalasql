@@ -9,6 +9,11 @@ import utest._
  */
 trait ExprStringOpsTests extends UsqlTestSuite {
   def tests = Tests {
+    test("plus") - checker(
+      query = Expr("hello") + Expr("world"),
+      sql = "SELECT ? || ? as res",
+      value = "helloworld"
+    )
     test("like") - checker(
       query = Expr("hello").like("he%"),
       sql = "SELECT ? LIKE ? as res",
