@@ -1,9 +1,9 @@
 package usql
 import scala.language.experimental.macros
-import OptionPickler.{Reader, Writer}
 import renderer.{Context, SelectToSql, SqlStr}
 import usql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
+import usql.utils.OptionPickler
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     extends Table.Base {
@@ -18,8 +18,6 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
     metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
 
-
-
   def tableRef = new usql.query.TableRef(this)
 }
 
@@ -31,7 +29,7 @@ object Table {
 
   class Metadata[V[_[_]]](
       val queryable: Queryable[V[Expr], V[Val]],
-      val vExpr: TableRef => V[Column.ColumnExpr],
+      val vExpr: TableRef => V[Column.ColumnExpr]
   )
 
   object Metadata {
@@ -56,7 +54,7 @@ object Table {
       val flattenExprs = for (applyParam <- applyParameters) yield {
         val name = applyParam.name
 
-        q"usql.Table.Internal.flattenPrefixed(t.${TermName(name.toString)}, ${name.toString})"
+        q"_root_.usql.Table.Internal.flattenPrefixed(table.${TermName(name.toString)}, ${name.toString})"
       }
 
       val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
@@ -65,10 +63,10 @@ object Table {
         q"""
         new _root_.usql.Table.Metadata[$wtt](
           new usql.Table.Internal.TableQueryable(
-            t => $allFlattenedExprs,
-            _root_.usql.OptionPickler.macroR
+            table => $allFlattenedExprs,
+            _root_.usql.utils.OptionPickler.macroR
           ),
-          ($tableRef: usql.query.TableRef) => new $wtt(..$queryParams)
+          ($tableRef: _root_.usql.query.TableRef) => new $wtt(..$queryParams)
         )
         """
       )
@@ -76,10 +74,12 @@ object Table {
   }
 
   object Internal {
-    class TableQueryable[Q, R](flatten0: Q => Seq[(List[String], Expr[_])], valueReader0: Reader[R])
-        extends Queryable[Q, R] {
+    class TableQueryable[Q, R](
+        flatten0: Q => Seq[(List[String], Expr[_])],
+        valueReader0: OptionPickler.Reader[R]
+    ) extends Queryable[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
-      def valueReader: Reader[R] = valueReader0
+      def valueReader: OptionPickler.Reader[R] = valueReader0
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(implicit

@@ -2,8 +2,7 @@ import usql._
 import usql.query.Expr
 import utest._
 
-
-object MySqlDialectTests extends MySqlSuite  {
+object MySqlDialectTests extends MySqlSuite {
   def tests = Tests {
     test("reverse") - checker(
       query = Expr("Hello").reverse,

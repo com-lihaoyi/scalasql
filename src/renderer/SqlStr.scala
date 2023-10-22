@@ -81,7 +81,7 @@ sealed trait Interp
 object Interp {
   sealed trait Simple extends Interp
 
-  trait Renderable{
+  trait Renderable {
     def toSqlStr(implicit ctx: Context): SqlStr
   }
 
@@ -106,7 +106,8 @@ object Interp {
   implicit def timestampInterp(b: java.sql.Timestamp): Interp = TimestampInterp(b)
   case class TimestampInterp(b: java.sql.Timestamp) extends Simple
 
-  implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp = SqlStrInterp(t.toSqlStr(ctx))
+  implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
+    SqlStrInterp(t.toSqlStr(ctx))
 
   implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
   case class SqlStrInterp(s: SqlStr) extends Interp

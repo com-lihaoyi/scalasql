@@ -1,7 +1,8 @@
 package usql.query
 
-import usql.{OptionPickler, Queryable}
+import usql.Queryable
 import usql.renderer.{Context, Interp, SqlStr}
+import usql.utils.OptionPickler
 
 trait Expr[T] extends Interp.Renderable {
   final def toSqlStr(implicit ctx: Context): SqlStr = {

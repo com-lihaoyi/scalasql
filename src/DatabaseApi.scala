@@ -3,6 +3,7 @@ package usql
 import renderer.{Context, Interp, SqlStr}
 import upickle.core.Visitor
 import usql.DatabaseApi.handleResultRow
+import usql.utils.FlatJson
 
 import java.sql.{ResultSet, Statement}
 import scala.collection.mutable
@@ -12,7 +13,7 @@ class DatabaseApi(
     tableNameMapper: String => String = identity,
     tableNameUnMapper: String => String = identity,
     columnNameMapper: String => String = identity,
-    columnNameUnMapper: String => String = identity,
+    columnNameUnMapper: String => String = identity
 ) {
 
   def runRaw(sql: String) = {

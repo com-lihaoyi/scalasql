@@ -3,7 +3,7 @@ package usql.operations
 import usql.{Column, Table}
 import usql.query.{Expr, Insert, Joinable, Select, Update}
 
-class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr]]{
+class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr]] {
   def select: Select[V[Expr]] = {
     val ref = t.tableRef
     Select.fromTable(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], ref)(t.containerQr)

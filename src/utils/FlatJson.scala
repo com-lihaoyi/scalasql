@@ -1,8 +1,8 @@
-package usql
+package usql.utils
 
-import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import usql.query.Expr
+import usql.renderer.{Context, SqlStr}
 
 /**
  * Converts back and forth between a tree-shaped JSON and flat key-value map
@@ -31,6 +31,8 @@ object FlatJson {
      * on start/end/depth indices and "returns" the groups via a callback to avoid allocating
      * intermediate data structures.
      */
+    FlatJson
+
     def groupedOn(start: Int, end: Int, depth: Int)(callback: (String, Int, Int) => Unit) = {
       var prevKey = keys(start)(depth)
       var prevIndex = start

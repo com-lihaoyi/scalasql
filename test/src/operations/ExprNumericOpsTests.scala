@@ -1,6 +1,5 @@
 package usql.operations
 
-
 import usql._
 import usql.query.Expr
 import utest._

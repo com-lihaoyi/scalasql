@@ -2,7 +2,8 @@ package usql.query
 
 import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, Interp, SelectToSql, SqlStr}
-import usql.{OptionPickler, Queryable}
+import usql.Queryable
+import usql.utils.OptionPickler
 
 trait Select[Q] extends Interp.Renderable with Aggregatable[Q] with From with Joinable[Q]
     with JoinOps[Select, Q] {
@@ -68,7 +69,7 @@ object Select {
         qr,
         ctx.tableNameMapper,
         ctx.columnNameMapper,
-        ctx.fromNaming,
+        ctx.fromNaming
       )._2
     }
   }

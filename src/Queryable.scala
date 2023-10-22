@@ -1,6 +1,6 @@
 package usql
 
-import OptionPickler.Reader
+import utils.OptionPickler.Reader
 import renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
@@ -42,7 +42,7 @@ object Queryable {
   ](implicit q1: Queryable[Q1, R1], q2: Queryable[Q2, R2]): Queryable[(Q1, Q2), (R1, R2)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2)),
-      OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader)
+      utils.OptionPickler.Tuple2Reader(q1.valueReader, q2.valueReader)
     )
   }
 
@@ -60,7 +60,7 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3), (R1, R2, R3)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
-      OptionPickler.Tuple3Reader(q1.valueReader, q2.valueReader, q3.valueReader)
+      utils.OptionPickler.Tuple3Reader(q1.valueReader, q2.valueReader, q3.valueReader)
     )
   }
 
@@ -81,7 +81,12 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-      OptionPickler.Tuple4Reader(q1.valueReader, q2.valueReader, q3.valueReader, q4.valueReader)
+      utils.OptionPickler.Tuple4Reader(
+        q1.valueReader,
+        q2.valueReader,
+        q3.valueReader,
+        q4.valueReader
+      )
     )
   }
 
@@ -105,7 +110,7 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-      OptionPickler.Tuple5Reader(
+      utils.OptionPickler.Tuple5Reader(
         q1.valueReader,
         q2.valueReader,
         q3.valueReader,
@@ -146,7 +151,7 @@ object Queryable {
           q5.walk(t._5),
           q6.walk(t._6)
         ),
-      OptionPickler.Tuple6Reader(
+      utils.OptionPickler.Tuple6Reader(
         q1.valueReader,
         q2.valueReader,
         q3.valueReader,

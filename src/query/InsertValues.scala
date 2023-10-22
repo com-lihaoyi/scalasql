@@ -2,7 +2,8 @@ package usql.query
 
 import renderer.InsertToSql
 import usql.renderer.{Context, SqlStr}
-import usql.{Column, OptionPickler, Queryable}
+import usql.utils.OptionPickler
+import usql.{Column, Queryable}
 
 /**
  * Syntax reference

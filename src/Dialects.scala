@@ -3,7 +3,6 @@ package usql
 import usql.operations.TableOps
 import usql.query.{Aggregatable, Expr, Insert, Joinable, Select, Update}
 
-
 trait Dialect {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)

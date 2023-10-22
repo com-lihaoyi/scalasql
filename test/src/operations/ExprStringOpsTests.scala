@@ -7,7 +7,7 @@ import utest._
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprStringOpsTests extends UsqlTestSuite  {
+trait ExprStringOpsTests extends UsqlTestSuite {
   def tests = Tests {
     test("like") - checker(
       query = Expr("hello").like("he%"),
@@ -29,7 +29,7 @@ trait ExprStringOpsTests extends UsqlTestSuite  {
       query = Expr("hello").indexOf("ll"),
       sqls = Seq(
         "SELECT POSITION(? IN ?) as res",
-        "SELECT INSTR(?, ?) as res",
+        "SELECT INSTR(?, ?) as res"
       ),
       value = 3
     )

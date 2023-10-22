@@ -2,7 +2,8 @@ package usql.query
 
 import usql.renderer.SqlStr.SqlStringSyntax
 import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr, UpdateToSql}
-import usql.{OptionPickler, Queryable}
+import usql.Queryable
+import usql.utils.OptionPickler
 
 trait Returnable[Q] {
   def expr: Q
@@ -38,7 +39,7 @@ object Returning {
         ctx0.columnNameMapper,
         Nil,
         Some(q.returnable.table),
-        Map(),
+        Map()
       )
 
       val prefix = q.returnable.toSqlQuery

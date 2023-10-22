@@ -4,7 +4,6 @@ import usql._
 import utest._
 import java.sql.Date
 
-
 /**
  * Tests for queries operations that force subqueries to be used.
  */
@@ -142,7 +141,7 @@ trait SubQueryTests extends UsqlTestSuite {
         ("Face Mask", 932.4),
         ("Guitar", 900.0),
         ("Skate Board", 493.8),
-        ("Socks", 15.7),
+        ("Socks", 15.7)
       ),
       normalize = (x: Seq[(String, Double)]) => x.sorted
     )

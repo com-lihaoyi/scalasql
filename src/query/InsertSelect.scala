@@ -2,7 +2,8 @@ package usql.query
 
 import renderer.InsertToSql
 import usql.renderer.{Context, SqlStr}
-import usql.{Column, OptionPickler, Queryable}
+import usql.Queryable
+import usql.utils.OptionPickler
 
 /**
  * Syntax reference
@@ -41,7 +42,7 @@ object InsertSelect {
         q,
         qr.walk(q.columns).map(_._2),
         ctx0.tableNameMapper,
-        ctx0.columnNameMapper,
+        ctx0.columnNameMapper
       )
     }
   }

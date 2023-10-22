@@ -8,14 +8,14 @@ object UpdateToSql {
   def apply[Q](
       q: Update.Impl[Q],
       tableNameMapper: String => String,
-      columnNameMapper: String => String,
+      columnNameMapper: String => String
   ) = {
     val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
       tableNameMapper,
       columnNameMapper,
       q.joins.flatMap(_.from).map(_.from),
       Some(q.table),
-      Map(),
+      Map()
     )
 
     implicit val ctx: Context = context
@@ -26,7 +26,6 @@ object UpdateToSql {
       usql"$kStr = $v"
     }
     val sets = SqlStr.join(updateList, usql", ")
-
 
     val (from, fromOns) = q.joins.headOption match {
       case None => (usql"", Nil)

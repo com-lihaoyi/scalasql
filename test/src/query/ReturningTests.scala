@@ -109,7 +109,7 @@ trait ReturningTests extends UsqlTestSuite {
               .returning(_.id),
           sqls = Seq(
             "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
-            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
+            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res"
           ),
           value = Seq(1)
         )

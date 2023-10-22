@@ -1,5 +1,6 @@
 package usql
-import OptionPickler.Reader
+import usql.utils.OptionPickler
+import utils.OptionPickler.Reader
 
 class Val[T](value: T) {
   def apply() = value

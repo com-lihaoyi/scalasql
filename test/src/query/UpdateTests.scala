@@ -13,11 +13,13 @@ trait UpdateTests extends UsqlTestSuite {
   def tests = Tests {
     test("update") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond").set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
+        query = Buyer.update.filter(_.name === "James Bond").set(
+          _.dateOfBirth -> Date.valueOf("2019-04-07")
+        ),
         sqls =
           Seq(
             "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
-            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?",
+            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?"
           ),
         value = 1
       )
@@ -38,7 +40,7 @@ trait UpdateTests extends UsqlTestSuite {
         query = Buyer.update.set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
         sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?",
-          "UPDATE buyer SET buyer.date_of_birth = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ?"
         ),
         value = 3
       )
@@ -61,7 +63,7 @@ trait UpdateTests extends UsqlTestSuite {
             .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee"),
         sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
-          "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?"
         ),
         value = 1
       )
@@ -202,7 +204,7 @@ trait UpdateTests extends UsqlTestSuite {
                 LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
             SET buyer.date_of_birth = subquery0.res__shipping_date
             WHERE buyer.name = ?
-          """,
+          """
         ),
         value = 1
       )
@@ -273,7 +275,7 @@ trait UpdateTests extends UsqlTestSuite {
           (3, "Socks", 3.14),
           (4, "Skate Board", 123.45),
           (5, "Camera", 0.0),
-          (6, "Cookie", 0.1),
+          (6, "Cookie", 0.1)
         ),
         normalize = (x: Seq[(Int, String, Double)]) => x.sorted
       )

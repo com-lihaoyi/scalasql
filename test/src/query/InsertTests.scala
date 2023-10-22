@@ -5,8 +5,6 @@ import utest._
 
 import java.sql.Date
 
-
-
 /**
  * Tests for basic insert operations
  */
@@ -17,7 +15,11 @@ trait InsertTests extends UsqlTestSuite {
       test("simple") - {
         checker(
           query =
-            Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09"), _.id -> 4),
+            Buyer.insert.values(
+              _.name -> "test buyer",
+              _.dateOfBirth -> Date.valueOf("2023-09-09"),
+              _.id -> 4
+            ),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
           value = 1
         )
@@ -30,7 +32,10 @@ trait InsertTests extends UsqlTestSuite {
 
       test("partial") - {
         checker(
-          query = Buyer.insert.values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09")),
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> Date.valueOf("2023-09-09")
+          ),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
           value = 1
         )
@@ -133,7 +138,7 @@ trait InsertTests extends UsqlTestSuite {
             Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
             Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
             Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12")),
+            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
           )
         )
       }

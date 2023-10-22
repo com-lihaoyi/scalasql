@@ -1,7 +1,6 @@
-package usql
+package usql.utils
 
 import java.sql.Date
-import java.time.LocalDate
 
 object OptionPickler extends upickle.AttributeTagged {
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =

@@ -5,7 +5,6 @@ import utest._
 
 import java.sql.Date
 
-
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
@@ -52,7 +51,9 @@ trait SelectTests extends UsqlTestSuite {
 
       test("multiple") - checker(
         query =
-          ShippingInfo.select.filter(_.buyerId === 2).filter(_.shippingDate === Date.valueOf("2012-05-06")),
+          ShippingInfo.select.filter(_.buyerId === 2).filter(
+            _.shippingDate === Date.valueOf("2012-05-06")
+          ),
         sql = """
         SELECT
           shipping_info0.id as res__id,
@@ -69,7 +70,9 @@ trait SelectTests extends UsqlTestSuite {
 
       test("combined") - checker(
         query =
-          ShippingInfo.select.filter(p => p.buyerId === 2 && p.shippingDate === Date.valueOf("2012-05-06")),
+          ShippingInfo.select.filter(p =>
+            p.buyerId === 2 && p.shippingDate === Date.valueOf("2012-05-06")
+          ),
         sql = """
           SELECT
             shipping_info0.id as res__id,
@@ -347,7 +350,7 @@ trait SelectTests extends UsqlTestSuite {
           (
             Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
             Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
-            ),
+          ),
           (
             Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
             Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))

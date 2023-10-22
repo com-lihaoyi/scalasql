@@ -13,7 +13,8 @@ import usql.query.{
   SubqueryRef,
   TableRef
 }
-import usql.{FlatJson, Queryable}
+import usql.Queryable
+import usql.utils.FlatJson
 
 object SelectToSql {
 
@@ -40,7 +41,7 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String],
+      previousFromMapping: Map[From, String]
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     query match {
       case q: SimpleSelect[_] =>
@@ -55,7 +56,7 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String],
+      previousFromMapping: Map[From, String]
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (lhsMap, lhsStr0, context) =
       apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
@@ -114,14 +115,14 @@ object SelectToSql {
       qr: Queryable[Q, R],
       tableNameMapper: String => String,
       columnNameMapper: String => String,
-      previousFromMapping: Map[From, String],
+      previousFromMapping: Map[From, String]
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
       tableNameMapper,
       columnNameMapper,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
       None,
-      previousFromMapping,
+      previousFromMapping
     )
 
     implicit val context: Context = ctx
@@ -165,7 +166,7 @@ object SelectToSql {
       columnNameMapper: String => String,
       selectables: Seq[From],
       updateTable: Option[TableRef],
-      previousFromMapping: Map[From, String],
+      previousFromMapping: Map[From, String]
   ) = {
     val namedFromsMap0 = selectables
       .zipWithIndex
@@ -205,7 +206,7 @@ object SelectToSql {
       namedFromsMap,
       exprNaming,
       tableNameMapper,
-      columnNameMapper,
+      columnNameMapper
     )
 
     (namedFromsMap, fromSelectables, exprNaming, ctx)

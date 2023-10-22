@@ -1,8 +1,8 @@
 package usql.renderer
 
-import usql.FlatJson
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
+import usql.utils.FlatJson
 
 object ExprsToSql {
   def apply(flattenedExpr: Seq[(List[String], Expr[_])], exprPrefix: SqlStr, context: Context) = {

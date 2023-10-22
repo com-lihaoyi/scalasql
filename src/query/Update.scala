@@ -1,34 +1,35 @@
 package usql.query
 
-import usql.{Column, OptionPickler, Queryable, Table}
+import usql.{Column, Queryable}
 import usql.renderer.{Context, SqlStr, UpdateToSql}
-
+import usql.utils.OptionPickler
 
 trait Update[Q] extends JoinOps[Update, Q] with Returnable[Q] {
   def filter(f: Q => Expr[Boolean]): Update[Q]
 
   def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q]
 
-  def join0[V](other: Joinable[V],
-               on: Option[(Q, V) => Expr[Boolean]])
-              (implicit joinQr: Queryable[V, _]): Update[(Q, V)]
+  def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+      joinQr: Queryable[V, _]
+  ): Update[(Q, V)]
 
   def qr: Queryable[Q, _]
 }
 
-
 object Update {
+
   /**
    * Syntax reference
    *
    * https://www.postgresql.org/docs/current/sql-update.html
    */
-  case class Impl[Q](expr: Q,
-                     table: TableRef,
-                     set0: Seq[(Column.ColumnExpr[_], Expr[_])],
-                     joins: Seq[Join],
-                     where: Seq[Expr[_]])
-                    (implicit val qr: Queryable[Q, _]) extends Update[Q] {
+  case class Impl[Q](
+      expr: Q,
+      table: TableRef,
+      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      joins: Seq[Join],
+      where: Seq[Expr[_]]
+  )(implicit val qr: Queryable[Q, _]) extends Update[Q] {
     def filter(f: Q => Expr[Boolean]): Update.Impl[Q] = {
       this.copy(where = where ++ Seq(f(expr)))
     }
@@ -38,7 +39,7 @@ object Update {
     }
 
     def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
-                                                                          joinQr: Queryable[V, _]
+        joinQr: Queryable[V, _]
     ): Update.Impl[(Q, V)] = {
       val (otherJoin, otherSelect) = joinInfo(other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)

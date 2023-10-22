@@ -12,7 +12,7 @@ trait UsqlTestSuite extends TestSuite with Dialect {
 trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
-    "sqlite-test-data.sql",
+    "sqlite-test-data.sql"
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -22,7 +22,7 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
     DriverManager.getConnection(
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
     ),
-    "postgres-test-data.sql",
+    "postgres-test-data.sql"
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -34,20 +34,19 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
       TestDb.mysql.getUsername,
       TestDb.mysql.getPassword
     ),
-    "mysql-test-data.sql",
+    "mysql-test-data.sql"
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
-class TestDb(connection: Connection,
-             testDataFileName: String) {
+class TestDb(connection: Connection, testDataFileName: String) {
 
   val db = new DatabaseApi(
     connection,
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel,
+    columnNameUnMapper = snakeToCamel
   )
 
   def reset() = {
@@ -72,14 +71,19 @@ class TestDb(connection: Connection,
     out.toString()
   }
 
-  def apply[T, V](query: T, sql: String = null, sqls: Seq[String] = null, value: V = null.asInstanceOf[V], normalize: V => V = null)
-                 (implicit qr: Queryable[T, V]) = {
+  def apply[T, V](
+      query: T,
+      sql: String = null,
+      sqls: Seq[String] = null,
+      value: V = null.asInstanceOf[V],
+      normalize: V => V = null
+  )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
-    if (sqls != null){
+    if (sqls != null) {
       val sqlResult = db.toSqlQuery(query)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
@@ -110,7 +114,9 @@ object TestDb {
     println("Initializing MySql")
     val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
       .withCommand(
-        "mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin"
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_bin"
       )
     mysql.start()
     mysql

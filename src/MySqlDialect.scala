@@ -4,11 +4,15 @@ import usql.query.{Expr, Joinable, Select, TableRef, Update}
 import usql.renderer.{Context, SelectToSql, SqlStr, UpdateToSql}
 import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 
-object MySqlDialect extends MySqlDialect{
-  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v){
+object MySqlDialect extends MySqlDialect {
+  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
-    def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx => usql"RPAD($v, $length, $fill)" }
-    def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx => usql"LPAD($v, $length, $fill)" }
+    def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+      usql"RPAD($v, $length, $fill)"
+    }
+    def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+      usql"LPAD($v, $length, $fill)"
+    }
     def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
   }
 
@@ -19,15 +23,15 @@ object MySqlDialect extends MySqlDialect{
     }
   }
 
-  class Update[Q](update: Update.Impl[Q]) extends usql.query.Update[Q]{
+  class Update[Q](update: Update.Impl[Q]) extends usql.query.Update[Q] {
     def filter(f: Q => Expr[Boolean]): Update[Q] = new Update(update.filter(f))
 
     def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q] =
-      new Update(update.set(f:_*))
+      new Update(update.set(f: _*))
 
-    def join0[V](other: Joinable[V],
-                 on: Option[(Q, V) => Expr[Boolean]])
-                (implicit joinQr: Queryable[V, _]): Update[(Q, V)] =
+    def join0[V](other: Joinable[V], on: Option[(Q, V) => Expr[Boolean]])(implicit
+        joinQr: Queryable[V, _]
+    ): Update[(Q, V)] =
       new Update(update.join0(other, on))
 
     def expr: Q = update.expr
@@ -38,15 +42,17 @@ object MySqlDialect extends MySqlDialect{
       toSqlQuery0(update, ctx.tableNameMapper, ctx.columnNameMapper)
     }
 
-    def toSqlQuery0[Q](q: Update.Impl[Q],
-                       tableNameMapper: String => String,
-                       columnNameMapper: String => String) = {
+    def toSqlQuery0[Q](
+        q: Update.Impl[Q],
+        tableNameMapper: String => String,
+        columnNameMapper: String => String
+    ) = {
       val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
         tableNameMapper,
         columnNameMapper,
         q.joins.flatMap(_.from).map(_.from),
         Some(q.table),
-        Map(),
+        Map()
       )
 
       implicit val ctx: Context = context
@@ -57,7 +63,6 @@ object MySqlDialect extends MySqlDialect{
         usql"$tableName.$colStr = $v"
       }
       val sets = SqlStr.join(updateList, usql", ")
-
 
       val where = SqlStr.optSeq(q.where) { where =>
         usql" WHERE " + SqlStr.join(where.map(_.toSqlStr), usql" AND ")
@@ -71,7 +76,9 @@ object MySqlDialect extends MySqlDialect{
     def qr: Queryable[Q, _] = update.qr
   }
 }
-trait MySqlDialect extends Dialect{
-  override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps = new MySqlDialect.ExprStringOps(v)
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): usql.operations.TableOps[V] = new MySqlDialect.TableOps(t)
+trait MySqlDialect extends Dialect {
+  override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
+    new MySqlDialect.ExprStringOps(v)
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): usql.operations.TableOps[V] =
+    new MySqlDialect.TableOps(t)
 }

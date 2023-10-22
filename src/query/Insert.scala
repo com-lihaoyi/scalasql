@@ -1,8 +1,6 @@
 package usql.query
 
-import renderer.InsertToSql
-import usql.renderer.{Context, SqlStr}
-import usql.{Column, OptionPickler, Queryable}
+import usql.{Column, Queryable}
 
 case class Insert[Q](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, _]) {
   def select[C](columns: Q => C, select: Select[C])(implicit

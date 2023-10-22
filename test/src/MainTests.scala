@@ -73,7 +73,7 @@ object MainTests extends TestSuite {
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel,
+    columnNameUnMapper = snakeToCamel
   )
   db.runRaw(os.read(os.pwd / "test" / "resources" / "world.sql"))
 

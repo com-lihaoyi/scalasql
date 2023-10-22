@@ -9,7 +9,7 @@ object InsertToSql {
   def values(
       q: InsertValues[_],
       tableNameMapper: String => String,
-      columnNameMapper: String => String,
+      columnNameMapper: String => String
   ): SqlStr = {
 
     implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
@@ -26,7 +26,7 @@ object InsertToSql {
       q: InsertSelect[Q, C],
       exprs: Seq[Expr[_]],
       tableNameMapper: String => String,
-      columnNameMapper: String => String,
+      columnNameMapper: String => String
   ): SqlStr = {
 
     implicit val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)

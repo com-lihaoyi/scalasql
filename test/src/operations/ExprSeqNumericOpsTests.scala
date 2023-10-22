@@ -3,8 +3,6 @@ package usql.operations
 import usql._
 import utest._
 
-
-
 /**
  * Tests for all the aggregate operators that we provide by default
  */
