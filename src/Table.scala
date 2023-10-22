@@ -79,7 +79,8 @@ object Table {
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
-      def valueReader: OptionPickler.Reader[R] = valueReader0
+
+      override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(implicit

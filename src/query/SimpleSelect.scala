@@ -2,6 +2,7 @@ package usql.query
 
 import usql.Queryable
 import usql.renderer.{Context, SqlStr}
+import usql.utils.OptionPickler
 
 /**
  * Models the various components of a SQL query:
@@ -115,6 +116,9 @@ case class SimpleSelect[Q, R](
 
   def drop(n: Int) = CompoundSelect(this, Nil, None, None, Some(n))
   def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
+
+  def valueReader: OptionPickler.Reader[Seq[R]] =
+    OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 }
 
 object SimpleSelect {

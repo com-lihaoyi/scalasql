@@ -14,7 +14,7 @@ case class InsertValues[Q, R](
     insert: Insert[Q, R],
     columns: Seq[Column.ColumnExpr[_]],
     valuesLists: Seq[Seq[Expr[_]]]
-)(implicit val qr: Queryable[Q, R]) extends Returnable[Q] with Query {
+)(implicit val qr: Queryable[Q, R]) extends Returnable[Q] with Query[Int] {
   def table = insert.table
   def expr: Q = insert.expr
 
@@ -24,11 +24,12 @@ case class InsertValues[Q, R](
   def walk() = Nil
   override def singleRow = true
   override def isExecuteUpdate = true
+
+  override def valueReader: OptionPickler.Reader[Int] = implicitly
 }
 
 object InsertValues {
 
-  implicit def InsertQueryable[Q, R]: Queryable[InsertValues[Q, R], Int] =
-    new Query.Queryable[InsertValues[Q, R], Int]()
+  implicit def SelectQueryable[Q, R]: Queryable[InsertValues[Q, R], Int] = Queryable.QueryQueryable
 
 }

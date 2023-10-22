@@ -35,6 +35,8 @@ object Expr {
     def walk(q: E[T]) = Seq(Nil -> q)
 
     def valueReader = valueReader0
+
+    def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)

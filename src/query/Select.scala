@@ -11,7 +11,7 @@ trait Select[Q, R]
     with From
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query {
+    with Query[Seq[R]] {
 
   def qr: Queryable[Q, R]
   def isTrivialJoin: Boolean = false
@@ -67,11 +67,5 @@ object Select {
     SimpleSelect(e, None, Seq(table), Nil, Nil, None)
   }
 
-  implicit def SelectQueryable[Q, R](implicit
-      qr: Queryable[Q, R]
-  ): Queryable[Select[Q, R], Seq[R]] =
-    new Query.Queryable[Select[Q, R], Seq[R]]()(OptionPickler.SeqLikeReader(
-      qr.valueReader,
-      implicitly
-    ))
+  implicit def SelectQueryable[Q, R]: Queryable[Select[Q, R], Seq[R]] = Queryable.QueryQueryable
 }

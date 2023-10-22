@@ -3,6 +3,7 @@ package usql
 import usql.query.{Expr, Joinable, Select, TableRef, Update}
 import usql.renderer.{Context, SelectToSql, SqlStr, UpdateToSql}
 import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
+import usql.utils.OptionPickler
 
 object MySqlDialect extends MySqlDialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
@@ -76,6 +77,8 @@ object MySqlDialect extends MySqlDialect {
     }
 
     def qr: Queryable[Q, R] = update.qr
+
+    override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 }
 trait MySqlDialect extends Dialect {

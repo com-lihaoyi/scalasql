@@ -4,7 +4,7 @@ import usql.{Column, Queryable}
 import usql.renderer.{Context, SqlStr, UpdateToSql}
 import usql.utils.OptionPickler
 
-trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query {
+trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
 
   def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q, R]
@@ -51,6 +51,8 @@ object Update {
     override def toSqlQuery(implicit ctx: Context): SqlStr = {
       UpdateToSql(this, ctx.tableNameMapper, ctx.columnNameMapper)
     }
+
+    override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   def fromTable[Q, R](expr: Q, table: TableRef)(implicit qr: Queryable[Q, R]): Update.Impl[Q, R] = {
@@ -58,5 +60,5 @@ object Update {
   }
 
   implicit def UpdateQueryable[Q, R]: Queryable[Update[Q, R], Int] =
-    new Query.Queryable[Update[Q, R], Int]()
+    Queryable.QueryQueryable
 }

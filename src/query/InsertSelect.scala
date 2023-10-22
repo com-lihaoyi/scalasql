@@ -3,6 +3,7 @@ package usql.query
 import renderer.InsertToSql
 import usql.renderer.{Context, SqlStr}
 import usql.Queryable
+import usql.utils.OptionPickler
 
 /**
  * Syntax reference
@@ -11,7 +12,7 @@ import usql.Queryable
  */
 case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R],
                                      columns: C,
-                                     select: Select[C, R2]) extends Returnable[Q] with Query {
+                                     select: Select[C, R2]) extends Returnable[Q] with Query[Int] {
   def expr = insert.expr
   def table = insert.table
 
@@ -29,11 +30,11 @@ case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R],
 
   override def singleRow = true
 
+  override def valueReader: OptionPickler.Reader[Int] = implicitly
 }
 
 object InsertSelect {
 
-  implicit def InsertSelectQueryable[Q, C, R, R2]: Queryable[InsertSelect[Q, C, R, R2], Int] =
-    new Query.Queryable[InsertSelect[Q, C, R, R2], Int]()
+  implicit def InsertSelectQueryable[Q, C, R, R2]: Queryable[InsertSelect[Q, C, R, R2], Int] = Queryable.QueryQueryable
 
 }

@@ -22,12 +22,12 @@ class DatabaseApi(
     finally statement.close()
   }
 
-  def toSqlQuery[Q](query: Q)(implicit qr: Queryable[Q, _]): String = {
+  def toSqlQuery[Q, R](query: Q)(implicit qr: Queryable[Q, R]): String = {
     val (str, params) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[Q](query: Q)(implicit qr: Queryable[Q, _]): (String, Seq[Interp]) = {
+  def toSqlQuery0[Q, R](query: Q)(implicit qr: Queryable[Q, R]): (String, Seq[Interp]) = {
     val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
     val queryStr = flattened.queryParts.mkString("?")
@@ -56,11 +56,11 @@ class DatabaseApi(
       try {
         if (qr.singleRow(query)) {
           assert(resultSet.next())
-          val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader)
+          val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader(query))
           assert(!resultSet.next())
           res
         } else {
-          val arrVisitor = qr.valueReader.visitArray(-1, -1)
+          val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
           while (resultSet.next()) {
             val rowRes = handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor)
             arrVisitor.visitValue(rowRes, -1)
