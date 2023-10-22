@@ -18,7 +18,11 @@ trait Queryable[-Q, R] {
   def valueReader(q: Q): Reader[R]
   def singleRow(q: Q): Boolean = true
 
-  def toSqlQuery(q: Q, ctx: Context): SqlStr = ExprsToSql(this.walk(q), usql"", ctx)._2
+  def toSqlQuery(q: Q, ctx: Context): SqlStr = {
+    val res = ExprsToSql(this.walk(q), usql"", ctx)._2
+    if (res.isCompleteQuery) res
+    else res + SqlStr.raw(ctx.defaultQueryableSuffix)
+  }
 }
 
 object Queryable {

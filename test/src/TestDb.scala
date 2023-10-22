@@ -3,50 +3,23 @@ import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import usql.query.{Expr, SubqueryRef}
+import usql.renderer.SqlStr
 import utest.TestSuite
 
 import java.sql.{Connection, DriverManager}
-trait UsqlTestSuite extends TestSuite with Dialect {
-  val checker: TestDb
-}
-trait SqliteSuite extends TestSuite with SqliteDialect {
-  val checker = new TestDb(
-    DriverManager.getConnection("jdbc:sqlite::memory:"),
-    "sqlite-test-data.sql"
-  )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
-}
-trait PostgresSuite extends TestSuite with PostgresDialect {
-  val checker = new TestDb(
-    DriverManager.getConnection(
-      s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
-    ),
-    "postgres-test-data.sql"
-  )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
-}
-trait MySqlSuite extends TestSuite with MySqlDialect {
-  val checker = new TestDb(
-    DriverManager.getConnection(
-      TestDb.mysql.getJdbcUrl + "?allowMultiQueries=true",
-      TestDb.mysql.getUsername,
-      TestDb.mysql.getPassword
-    ),
-    "mysql-test-data.sql"
-  )
-
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
-}
-class TestDb(connection: Connection, testDataFileName: String) {
+class TestDb(connection: Connection,
+             testDataFileName: String,
+             defaultQueryableSuffix: String) {
 
   val db = new DatabaseApi(
     connection,
     tableNameMapper = camelToSnake,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel
+    columnNameUnMapper = snakeToCamel,
+    defaultQueryableSuffix = defaultQueryableSuffix
   )
 
   def reset() = {
@@ -79,12 +52,12 @@ class TestDb(connection: Connection, testDataFileName: String) {
       normalize: V => V = null
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
-      val sqlResult = db.toSqlQuery(query)
+      val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls != null) {
-      val sqlResult = db.toSqlQuery(query)
+      val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
       assert(

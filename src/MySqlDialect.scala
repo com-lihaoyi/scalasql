@@ -42,27 +42,24 @@ object MySqlDialect extends MySqlDialect {
     def table: TableRef = update.table
 
     override def toSqlQuery(implicit ctx: Context): SqlStr = {
-      toSqlQuery0(update, ctx.tableNameMapper, ctx.columnNameMapper)
+      toSqlQuery0(update, ctx)
     }
 
     def toSqlQuery0[Q, R](
         q: Update.Impl[Q, R],
-        tableNameMapper: String => String,
-        columnNameMapper: String => String
+        prevContext: Context
     ) = {
       val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
-        tableNameMapper,
-        columnNameMapper,
+        prevContext,
         q.joins.flatMap(_.from).map(_.from),
         Some(q.table),
-        Map()
       )
 
       implicit val ctx: Context = context
 
       val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
       val updateList = q.set0.map { case (k, v) =>
-        val colStr = SqlStr.raw(columnNameMapper(k.name))
+        val colStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
         usql"$tableName.$colStr = $v"
       }
       val sets = SqlStr.join(updateList, usql", ")

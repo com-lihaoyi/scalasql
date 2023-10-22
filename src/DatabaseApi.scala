@@ -13,12 +13,18 @@ class DatabaseApi(
     tableNameMapper: String => String = identity,
     tableNameUnMapper: String => String = identity,
     columnNameMapper: String => String = identity,
-    columnNameUnMapper: String => String = identity
+    columnNameUnMapper: String => String = identity,
+    defaultQueryableSuffix: String
 ) {
 
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
-    try statement.executeUpdate(sql)
+
+    try {
+      for(s <- sql.split(';') if s.trim.nonEmpty){
+        statement.executeUpdate(s)
+      }
+    }
     finally statement.close()
   }
 
@@ -28,7 +34,7 @@ class DatabaseApi(
   }
 
   def toSqlQuery0[Q, R](query: Q)(implicit qr: Queryable[Q, R]): (String, Seq[Interp]) = {
-    val ctx = new Context(Map(), Map(), tableNameMapper, columnNameMapper)
+    val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
     val queryStr = flattened.queryParts.mkString("?")
     (queryStr, flattened.params)

@@ -50,13 +50,7 @@ trait Select[Q, R]
   def take(n: Int): Select[Q, R]
 
   def toSqlQuery(implicit ctx: Context): SqlStr = {
-    SelectToSql.apply(
-      this,
-      qr,
-      ctx.tableNameMapper,
-      ctx.columnNameMapper,
-      ctx.fromNaming
-    )._2.withCompleteQuery(true)
+    SelectToSql.apply(this, qr, ctx)._2.withCompleteQuery(true)
   }
   def walk() = qr.walk(expr)
   override def singleRow = false

@@ -48,9 +48,7 @@ object Update {
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }
 
-    override def toSqlQuery(implicit ctx: Context): SqlStr = {
-      UpdateToSql(this, ctx.tableNameMapper, ctx.columnNameMapper)
-    }
+    override def toSqlQuery(implicit ctx: Context): SqlStr = UpdateToSql(this, ctx)
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }

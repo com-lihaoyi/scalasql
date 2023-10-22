@@ -18,9 +18,7 @@ case class InsertValues[Q, R](
   def table = insert.table
   def expr: Q = insert.expr
 
-  override def toSqlQuery(implicit ctx: Context): SqlStr = {
-    InsertToSql.values(this, ctx.tableNameMapper, ctx.columnNameMapper)
-  }
+  override def toSqlQuery(implicit ctx: Context): SqlStr = InsertToSql.values(this, ctx)
   def walk() = Nil
   override def singleRow = true
   override def isExecuteUpdate = true

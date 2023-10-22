@@ -47,3 +47,17 @@ package sqlite {
   object UpdateTests extends UpdateTests with SqliteSuite
   object ReturningTests extends ReturningTests with SqliteSuite
 }
+
+package hsqldb {
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with HsqlDbSuite
+  object ExprIntOpsTests extends ExprNumericOpsTests with HsqlDbSuite
+  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HsqlDbSuite
+  object ExprSeqOpsTests extends ExprSeqOpsTests with HsqlDbSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with HsqlDbSuite
+  object InsertTests extends InsertTests with HsqlDbSuite
+  object SelectTests extends SelectTests with HsqlDbSuite
+  object SubQueryTests extends SubQueryTests with HsqlDbSuite
+  object UpdateTests extends UpdateTests with HsqlDbSuite
+  // HSql does not support RETURNING keyword
+  // object ReturningTests extends ReturningTests with HsqlSuite
+}

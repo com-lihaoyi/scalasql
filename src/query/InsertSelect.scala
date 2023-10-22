@@ -17,12 +17,7 @@ case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R],
   def table = insert.table
 
   override def toSqlQuery(implicit ctx: Context): SqlStr =
-    InsertToSql.select(
-      this,
-      select.qr.walk(columns).map(_._2),
-      ctx.tableNameMapper,
-      ctx.columnNameMapper
-    )
+    InsertToSql.select(this, select.qr.walk(columns).map(_._2), ctx)
 
   override def isExecuteUpdate = true
 

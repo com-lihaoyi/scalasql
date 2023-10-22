@@ -7,22 +7,19 @@ import usql.Queryable
 object UpdateToSql {
   def apply[Q, R](
       q: Update.Impl[Q, R],
-      tableNameMapper: String => String,
-      columnNameMapper: String => String
+      prevContext: Context
   ) = {
     val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
-      tableNameMapper,
-      columnNameMapper,
+      prevContext,
       q.joins.flatMap(_.from).map(_.from),
       Some(q.table),
-      Map()
     )
 
     implicit val ctx: Context = context
 
     val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
     val updateList = q.set0.map { case (k, v) =>
-      val kStr = SqlStr.raw(columnNameMapper(k.name))
+      val kStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
       usql"$kStr = $v"
     }
     val sets = SqlStr.join(updateList, usql", ")

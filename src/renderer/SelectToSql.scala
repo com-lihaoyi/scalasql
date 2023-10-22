@@ -39,27 +39,23 @@ object SelectToSql {
   def apply[Q, R](
       query: Joinable[Q, R],
       qr: Queryable[Q, R],
-      tableNameMapper: String => String,
-      columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      context: Context
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     query match {
       case q: SimpleSelect[Q, R] =>
-        simple(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+        simple(q, qr, context)
       case q: CompoundSelect[Q, R] =>
-        compound(q, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+        compound(q, qr, context)
     }
   }
 
   def compound[Q, R](
       query: CompoundSelect[Q, R],
       qr: Queryable[Q, R],
-      tableNameMapper: String => String,
-      columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      prevContext: Context
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (lhsMap, lhsStr0, context) =
-      apply(query.lhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+      apply(query.lhs, qr, prevContext)
 
     val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) usql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
@@ -67,7 +63,7 @@ object SelectToSql {
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
       val compoundStrs = compoundOps.map { op =>
         val (compoundMapping, compoundStr, compoundCtx) =
-          apply(op.rhs, qr, tableNameMapper, columnNameMapper, previousFromMapping)
+          apply(op.rhs, qr, prevContext)
 
         usql" ${SqlStr.raw(op.op)} $compoundStr"
       }
@@ -75,12 +71,7 @@ object SelectToSql {
       SqlStr.join(compoundStrs)
     }
 
-    val newCtx = new Context(
-      context.fromNaming,
-      context.exprNaming ++ lhsMap,
-      context.tableNameMapper,
-      context.columnNameMapper
-    )
+    val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
 
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
       val ascDesc = orderBy.ascDesc match {
@@ -113,16 +104,12 @@ object SelectToSql {
   def simple[Q, R](
       query: SimpleSelect[Q, R],
       qr: Queryable[Q, R],
-      tableNameMapper: String => String,
-      columnNameMapper: String => String,
-      previousFromMapping: Map[From, String]
+      prevContext: Context
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context) = {
     val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
-      tableNameMapper,
-      columnNameMapper,
+      prevContext,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
       None,
-      previousFromMapping
     )
 
     implicit val context: Context = ctx
@@ -149,7 +136,7 @@ object SelectToSql {
       .map { case (k, v) =>
         (
           v.exprIdentity,
-          SqlStr.raw((FlatJson.basePrefix +: k).map(columnNameMapper).mkString(FlatJson.delimiter))
+          SqlStr.raw((FlatJson.basePrefix +: k).map(prevContext.columnNameMapper).mkString(FlatJson.delimiter))
         )
       }
       .toMap
@@ -162,35 +149,33 @@ object SelectToSql {
   }
 
   def computeContext(
-      tableNameMapper: String => String,
-      columnNameMapper: String => String,
+      prevContext: Context,
       selectables: Seq[From],
       updateTable: Option[TableRef],
-      previousFromMapping: Map[From, String]
   ) = {
     val namedFromsMap0 = selectables
       .zipWithIndex
       .map {
-        case (t: TableRef, i) => (t, tableNameMapper(t.value.tableName) + i)
+        case (t: TableRef, i) => (t, prevContext.tableNameMapper(t.value.tableName) + i)
         case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
         case x => throw new Exception("wtf " + x)
       }
       .toMap
 
-    val namedFromsMap = previousFromMapping ++ namedFromsMap0 ++ updateTable.map(t =>
-      t -> tableNameMapper(t.value.tableName)
+    val namedFromsMap = prevContext.fromNaming ++ namedFromsMap0 ++ updateTable.map(t =>
+      t -> prevContext.tableNameMapper(t.value.tableName)
     )
 
     def computeSelectable(t: From) = t match {
       case t: TableRef =>
         (
           Map.empty[Expr.Identity, SqlStr],
-          SqlStr.raw(tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t))
+          SqlStr.raw(prevContext.tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t))
         )
 
       case t: SubqueryRef[_, _] =>
         val (subNameMapping, sqlStr, _) =
-          apply(t.value, t.qr, tableNameMapper, columnNameMapper, previousFromMapping)
+          apply(t.value, t.qr, prevContext)
         (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
@@ -202,12 +187,7 @@ object SelectToSql {
       vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
     }
 
-    val ctx: Context = new Context(
-      namedFromsMap,
-      exprNaming,
-      tableNameMapper,
-      columnNameMapper
-    )
+    val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)
 
     (namedFromsMap, fromSelectables, exprNaming, ctx)
   }
