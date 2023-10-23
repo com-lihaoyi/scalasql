@@ -4,13 +4,17 @@ import usql.renderer.SqlStr.SqlStringSyntax
 
 object HsqlDbDialect extends SqliteDialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
-
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"INSTR($v, $x)" }
-    def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"GLOB($v, $x)" }
-
     def ltrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"LTRIM($v, $x)" }
     def rtrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"RTRIM($v, $x)" }
+    def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+      usql"RPAD($v, $length, $fill)"
+    }
 
+    def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+      usql"LPAD($v, $length, $fill)"
+    }
+    def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
   }
 
   class ExprNumericOps[T: Numeric](v: Expr[T]) extends operations.ExprNumericOps[T](v){
