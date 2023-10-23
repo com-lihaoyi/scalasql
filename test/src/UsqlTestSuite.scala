@@ -1,5 +1,6 @@
 package usql
 
+import dialects.{Dialect, H2Dialect, HsqlDbDialect, MySqlDialect, PostgresDialect, SqliteDialect}
 import usql.renderer.SqlStr.SqlStringSyntax
 import utest.TestSuite
 

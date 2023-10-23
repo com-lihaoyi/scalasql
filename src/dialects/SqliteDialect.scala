@@ -1,5 +1,6 @@
-package usql
+package usql.dialects
 
+import usql.operations
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 

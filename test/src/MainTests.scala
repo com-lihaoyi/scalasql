@@ -1,6 +1,6 @@
 package usql
 import utest._
-import SqliteDialect._
+import dialects.SqliteDialect._
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 

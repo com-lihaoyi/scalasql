@@ -1,8 +1,9 @@
-package usql
+package usql.dialects
 
-import usql.query.{Expr, Joinable, Select, TableRef, Update}
-import usql.renderer.{Context, SelectToSql, SqlStr, UpdateToSql}
+import usql._
+import usql.query.{Expr, Joinable, TableRef, Update}
 import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
+import usql.renderer.{Context, SelectToSql, SqlStr}
 import usql.utils.OptionPickler
 
 object MySqlDialect extends MySqlDialect {
