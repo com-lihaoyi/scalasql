@@ -1,8 +1,8 @@
-package usql
+package scalasql
 import utest._
 import dialects.SqliteDialect._
-import usql.query.Expr
-import usql.renderer.SqlStr.SqlStringSyntax
+import scalasql.query.Expr
+import scalasql.renderer.SqlStr.SqlStringSyntax
 
 case class Country[T[_]](
     code: T[String],

@@ -1,14 +1,14 @@
-package usql.operations
+package scalasql.operations
 
-import usql.query.{Expr, Select}
-import usql.renderer.SqlStr.SqlStringSyntax
+import scalasql.query.{Expr, Select}
+import scalasql.renderer.SqlStr.SqlStringSyntax
 
 class SelectOps[T](v: Select[T, _]) {
 
-  def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => usql"$other in $v" }
+  def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => sql"$other in $v" }
 
-  def isEmpty: Expr[Boolean] = Expr { implicit ctx => usql"NOT EXISTS $v" }
+  def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"NOT EXISTS $v" }
 
-  def nonEmpty: Expr[Boolean] = Expr { implicit ctx => usql"EXISTS $v" }
+  def nonEmpty: Expr[Boolean] = Expr { implicit ctx => sql"EXISTS $v" }
 
 }

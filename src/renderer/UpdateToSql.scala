@@ -1,8 +1,8 @@
-package usql.renderer
+package scalasql.renderer
 
 import SqlStr.{SqlStringSyntax, optSeq}
-import usql.query.Update
-import usql.Queryable
+import scalasql.query.Update
+import scalasql.Queryable
 
 object UpdateToSql {
   def apply[Q, R](
@@ -20,24 +20,24 @@ object UpdateToSql {
     val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
     val updateList = q.set0.map { case (k, v) =>
       val kStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
-      usql"$kStr = $v"
+      sql"$kStr = $v"
     }
-    val sets = SqlStr.join(updateList, usql", ")
+    val sets = SqlStr.join(updateList, sql", ")
 
     val (from, fromOns) = q.joins.headOption match {
-      case None => (usql"", Nil)
+      case None => (sql"", Nil)
       case Some(firstJoin) =>
         val (froms, ons) = firstJoin.from.map { jf => (fromSelectables(jf.from)._2, jf.on) }.unzip
-        (usql" FROM " + SqlStr.join(froms, usql", "), ons.flatten)
+        (sql" FROM " + SqlStr.join(froms, sql", "), ons.flatten)
     }
 
     val where = SqlStr.optSeq(fromOns ++ q.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), usql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), sql" AND ")
     }
 
     val joins = optSeq(q.joins.drop(1))(SelectToSql.joinsToSqlStr(_, fromSelectables))
 
-    usql"UPDATE $tableName SET " + sets + from + joins + where
+    sql"UPDATE $tableName SET " + sets + from + joins + where
 
   }
 }

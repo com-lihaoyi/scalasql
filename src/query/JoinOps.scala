@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql.{Queryable, Table}
+import scalasql.{Queryable, Table}
 
 trait JoinOps[C[_, _], Q, R] {
   def expr: Q

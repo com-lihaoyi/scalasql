@@ -1,7 +1,7 @@
-package usql.buyers
+package scalasql.buyers
 
-import usql._
-import usql.query.Expr
+import scalasql._
+import scalasql.query.Expr
 import utest._
 
 /**

@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql.{Column, Queryable}
+import scalasql.{Column, Queryable}
 
 case class Insert[Q, R](expr: Q, table: TableRef)(implicit val qr: Queryable[Q, R]) {
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2] = {

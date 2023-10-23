@@ -1,7 +1,7 @@
-package usql.dialects
+package scalasql.dialects
 
-import usql._
-import usql.query.Expr
+import scalasql._
+import scalasql.query.Expr
 import utest._
 
 trait MySqlDialectTests extends MySqlSuite {

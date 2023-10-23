@@ -1,7 +1,7 @@
-package usql.query
+package scalasql.query
 
-import usql.Queryable
-import usql.renderer.{Context, SqlStr}
+import scalasql.Queryable
+import scalasql.renderer.{Context, SqlStr}
 
 /**
  * Something that supports aggregate operations

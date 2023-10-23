@@ -1,5 +1,5 @@
-package usql
-import usql.utils.OptionPickler
+package scalasql
+import scalasql.utils.OptionPickler
 import utils.OptionPickler.Reader
 
 class Val[T](value: T) {

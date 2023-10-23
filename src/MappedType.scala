@@ -1,4 +1,4 @@
-package usql
+package scalasql
 
 import java.sql.JDBCType
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZonedDateTime}

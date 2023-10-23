@@ -1,4 +1,4 @@
-package usql
+package scalasql
 
 object Main {
 

@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql._
+import scalasql._
 import utest._
 
 import java.sql.Date
@@ -8,7 +8,7 @@ import java.sql.Date
 /**
  * Tests for basic update operations
  */
-trait UpdateSubQueryTests extends UsqlTestSuite {
+trait UpdateSubQueryTests extends ScalaSqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 

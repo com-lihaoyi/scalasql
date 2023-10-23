@@ -1,5 +1,5 @@
-package usql
-import usql._
+package scalasql
+import scalasql._
 
 import java.sql.Date
 import java.time.LocalDate

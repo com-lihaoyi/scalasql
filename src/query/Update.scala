@@ -1,8 +1,8 @@
-package usql.query
+package scalasql.query
 
-import usql.{Column, Queryable}
-import usql.renderer.{Context, SqlStr, UpdateToSql}
-import usql.utils.OptionPickler
+import scalasql.{Column, Queryable}
+import scalasql.renderer.{Context, SqlStr, UpdateToSql}
+import scalasql.utils.OptionPickler
 
 trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
   def filter(f: Q => Expr[Boolean]): Update[Q, R]

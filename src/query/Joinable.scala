@@ -1,4 +1,4 @@
-package usql.query
+package scalasql.query
 
 /**
  * Something that can be joined; typically a [[Select]] or a [[Table]]

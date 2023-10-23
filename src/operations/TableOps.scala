@@ -1,7 +1,7 @@
-package usql.operations
+package scalasql.operations
 
-import usql.{Column, Table, Val}
-import usql.query.{Expr, Insert, Joinable, Select, Update}
+import scalasql.{Column, Table, Val}
+import scalasql.query.{Expr, Insert, Joinable, Select, Update}
 
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Val]] {
   def select: Select[V[Expr], V[Val]] = {

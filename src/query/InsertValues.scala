@@ -1,9 +1,9 @@
-package usql.query
+package scalasql.query
 
 import renderer.InsertToSql
-import usql.renderer.{Context, SqlStr}
-import usql.utils.OptionPickler
-import usql.{Column, Queryable}
+import scalasql.renderer.{Context, SqlStr}
+import scalasql.utils.OptionPickler
+import scalasql.{Column, Queryable}
 
 /**
  * Syntax reference

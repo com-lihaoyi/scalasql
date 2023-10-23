@@ -1,12 +1,12 @@
-package usql.renderer
+package scalasql.renderer
 
-import usql.query.Expr
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.utils.FlatJson
+import scalasql.query.Expr
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.utils.FlatJson
 
 object ExprsToSql {
   def apply(flattenedExpr: Seq[(List[String], Expr[_])], exprPrefix: SqlStr, context: Context) = {
-    apply0(flattenedExpr, context, usql"SELECT " + exprPrefix)
+    apply0(flattenedExpr, context, sql"SELECT " + exprPrefix)
   }
 
   def apply0(flattenedExpr: Seq[(List[String], Expr[_])], context: Context, prefix: SqlStr) = {
@@ -17,9 +17,9 @@ object ExprsToSql {
       case flatQuery =>
         val exprsStr = SqlStr.join(
           flatQuery.map {
-            case (k, v) => usql"$v as ${SqlStr.raw(context.tableNameMapper(k))}"
+            case (k, v) => sql"$v as ${SqlStr.raw(context.tableNameMapper(k))}"
           },
-          usql", "
+          sql", "
         )
 
         (flattenedExpr, prefix + exprsStr)

@@ -1,8 +1,8 @@
-package usql.utils
+package scalasql.utils
 
 import upickle.core.Visitor
-import usql.query.Expr
-import usql.renderer.{Context, SqlStr}
+import scalasql.query.Expr
+import scalasql.renderer.{Context, SqlStr}
 
 /**
  * Converts back and forth between a tree-shaped JSON and flat key-value map

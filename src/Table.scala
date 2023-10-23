@@ -1,9 +1,9 @@
-package usql
+package scalasql
 import scala.language.experimental.macros
 import renderer.{Context, SelectToSql, SqlStr}
-import usql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
+import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
-import usql.utils.OptionPickler
+import scalasql.utils.OptionPickler
 
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     extends Table.Base {
@@ -18,7 +18,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
     metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
 
-  def tableRef = new usql.query.TableRef(this)
+  def tableRef = new scalasql.query.TableRef(this)
 }
 
 object Table {
@@ -47,26 +47,26 @@ object Table {
         if (c.prefix.actualType.member(name) != NoSymbol) {
           q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
         } else {
-          q"_root_.usql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr($tableRef)"
+          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 
       val flattenExprs = for (applyParam <- applyParameters) yield {
         val name = applyParam.name
 
-        q"_root_.usql.Table.Internal.flattenPrefixed(table.${TermName(name.toString)}, ${name.toString})"
+        q"_root_.scalasql.Table.Internal.flattenPrefixed(table.${TermName(name.toString)}, ${name.toString})"
       }
 
       val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
 
       c.Expr[Metadata[V]](
         q"""
-        new _root_.usql.Table.Metadata[$wtt](
-          new usql.Table.Internal.TableQueryable(
+        new _root_.scalasql.Table.Metadata[$wtt](
+          new _root_.scalasql.Table.Internal.TableQueryable(
             table => $allFlattenedExprs,
-            _root_.usql.utils.OptionPickler.macroR
+            _root_.scalasql.utils.OptionPickler.macroR
           ),
-          ($tableRef: _root_.usql.query.TableRef) => new $wtt(..$queryParams)
+          ($tableRef: _root_.scalasql.query.TableRef) => new $wtt(..$queryParams)
         )
         """
       )
@@ -100,8 +100,8 @@ object Column {
   class ColumnExpr[T](tableRef: TableRef, val name: String) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context) = {
       val prefix = ctx.fromNaming(tableRef) match {
-        case "" => usql""
-        case s => SqlStr.raw(s) + usql"."
+        case "" => sql""
+        case s => SqlStr.raw(s) + sql"."
       }
 
       prefix + SqlStr.raw(ctx.columnNameMapper(name))

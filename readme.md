@@ -1,6 +1,6 @@
-# uSql
+# ScalaSql
 
-uSql is a small SQL library that allows type-safe low-boilerplate querying of 
+ScalaSql is a small SQL library that allows type-safe low-boilerplate querying of 
 SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
@@ -37,7 +37,7 @@ typed `Table` descriptions.
    [SLICK](https://github.com/slick/slick) or 
    [ZIO-Quill](https://github.com/zio/zio-quill). The fundamental 
    database operations using JDBC are neither async nor pure. Anyone who wants to use
-   uSql in reactive/io-monad environments can easily wrap it as necessary.
+   ScalaSql in reactive/io-monad environments can easily wrap it as necessary.
 
 2. **Compile-time query execution**: like [ZIO-Quill](https://github.com/zio/zio-quill).
    Not because I don't want it (high runtime performance + compile-time logging of 

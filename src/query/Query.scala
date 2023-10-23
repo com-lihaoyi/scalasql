@@ -1,8 +1,8 @@
-package usql.query
+package scalasql.query
 
-import usql.Queryable
-import usql.renderer.{Context, SqlStr}
-import usql.utils.OptionPickler
+import scalasql.Queryable
+import scalasql.renderer.{Context, SqlStr}
+import scalasql.utils.OptionPickler
 
 trait Query[R] {
   def walk(): Seq[(List[String], Expr[_])]
@@ -15,7 +15,7 @@ trait Query[R] {
 object Query {
 
 
-  class Queryable[Q <: Query[R], R]() extends usql.Queryable[Q, R] {
+  class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.isExecuteUpdate
     override def walk(q: Q) = q.walk()
     override def singleRow(q: Q) = q.singleRow

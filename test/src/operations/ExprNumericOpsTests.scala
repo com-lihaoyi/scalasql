@@ -1,13 +1,13 @@
-package usql.operations
+package scalasql.operations
 
-import usql._
-import usql.query.Expr
+import scalasql._
+import scalasql.query.Expr
 import utest._
 
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default
  */
-trait ExprNumericOpsTests extends UsqlTestSuite {
+trait ExprNumericOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr(6) + Expr(2),

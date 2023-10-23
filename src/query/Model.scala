@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql.{Queryable, Table}
+import scalasql.{Queryable, Table}
 
 case class OrderBy(expr: Expr[_], ascDesc: Option[AscDesc], nulls: Option[Nulls])
 

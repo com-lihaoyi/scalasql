@@ -1,8 +1,8 @@
-package usql.query
+package scalasql.query
 
-import usql.Queryable
-import usql.renderer.{Context, SqlStr}
-import usql.utils.OptionPickler
+import scalasql.Queryable
+import scalasql.renderer.{Context, SqlStr}
+import scalasql.utils.OptionPickler
 
 trait Expr[T] extends SqlStr.Renderable {
   final def toSqlQuery(implicit ctx: Context): SqlStr = {

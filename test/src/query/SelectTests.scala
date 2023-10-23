@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql._
+import scalasql._
 import utest._
 
 import java.time.LocalDate
@@ -8,7 +8,7 @@ import java.time.LocalDate
 /**
  * Tests for basic query operations: map, filter, join, etc.
  */
-trait SelectTests extends UsqlTestSuite {
+trait SelectTests extends ScalaSqlSuite {
   def tests = Tests {
     test("constant") - checker(
       query = Expr(1),

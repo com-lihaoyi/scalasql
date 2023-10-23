@@ -1,9 +1,9 @@
-package usql.query
+package scalasql.query
 
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, SelectToSql, SqlStr}
-import usql.utils.OptionPickler
-import usql.{Queryable, Table}
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.utils.OptionPickler
+import scalasql.{Queryable, Table}
 
 case class CompoundSelect[Q, R](
     lhs: SimpleSelect[Q, R],

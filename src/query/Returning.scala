@@ -1,9 +1,9 @@
-package usql.query
+package scalasql.query
 
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr, UpdateToSql}
-import usql.Queryable
-import usql.utils.OptionPickler
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.{Context, ExprsToSql, SelectToSql, SqlStr, UpdateToSql}
+import scalasql.Queryable
+import scalasql.utils.OptionPickler
 
 trait Returnable[Q] {
   def expr: Q
@@ -29,8 +29,8 @@ case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit
     implicit val (_, _, _, ctx) = SelectToSql.computeContext(ctx0, Nil, Some(returnable.table))
 
     val prefix = returnable.toSqlQuery
-    val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(returning), ctx, usql"")
-    val suffix = usql" RETURNING $exprStr"
+    val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(returning), ctx, sql"")
+    val suffix = sql" RETURNING $exprStr"
 
     prefix + suffix
   }

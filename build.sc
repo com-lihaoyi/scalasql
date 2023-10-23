@@ -1,7 +1,7 @@
 
 import mill._, scalalib._
 
-object usql extends RootModule with ScalaModule {
+object scalasql extends RootModule with ScalaModule {
   def scalaVersion = "2.13.11"
   def ivyDeps = Agg(
     ivy"com.lihaoyi::mainargs:0.4.0",

@@ -1,6 +1,6 @@
-package usql.query
+package scalasql.query
 
-import usql._
+import scalasql._
 import utest._
 
 import java.time.LocalDate
@@ -8,7 +8,7 @@ import java.time.LocalDate
 /**
  * Tests for queries operations that force subqueries to be used.
  */
-trait SubQueryTests extends UsqlTestSuite {
+trait SubQueryTests extends ScalaSqlSuite {
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query =

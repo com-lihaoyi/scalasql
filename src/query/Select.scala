@@ -1,9 +1,9 @@
-package usql.query
+package scalasql.query
 
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, SelectToSql, SqlStr}
-import usql.Queryable
-import usql.utils.OptionPickler
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.Queryable
+import scalasql.utils.OptionPickler
 
 trait Select[Q, R]
     extends SqlStr.Renderable

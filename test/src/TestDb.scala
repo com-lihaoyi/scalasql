@@ -1,9 +1,9 @@
-package usql
+package scalasql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
-import usql.query.{Expr, SubqueryRef}
-import usql.renderer.SqlStr
+import scalasql.query.{Expr, SubqueryRef}
+import scalasql.renderer.SqlStr
 import utest.TestSuite
 
 import java.sql.{Connection, DriverManager}

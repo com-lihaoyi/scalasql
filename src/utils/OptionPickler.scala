@@ -1,4 +1,4 @@
-package usql.utils
+package scalasql.utils
 
 import java.sql.Date
 import java.time.{LocalDate, ZoneId}

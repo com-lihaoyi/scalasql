@@ -1,12 +1,12 @@
-package usql.operations
+package scalasql.operations
 
-import usql._
+import scalasql._
 import utest._
 
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-trait ExprSeqNumericOpsTests extends UsqlTestSuite {
+trait ExprSeqNumericOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("sum") - checker(
       query = Purchase.select.map(_.count).sum,

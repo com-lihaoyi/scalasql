@@ -1,12 +1,12 @@
-package usql
+package scalasql
 
 import dialects.{Dialect, H2Dialect, HsqlDbDialect, MySqlDialect, PostgresDialect, SqliteDialect}
-import usql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import utest.TestSuite
 
 import java.sql.DriverManager
 
-trait UsqlTestSuite extends TestSuite with Dialect {
+trait ScalaSqlSuite extends TestSuite with Dialect {
   val checker: TestDb
 }
 trait SqliteSuite extends TestSuite with SqliteDialect {

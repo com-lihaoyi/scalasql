@@ -1,10 +1,10 @@
-package usql
+package scalasql
 
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
-import usql.DatabaseApi.handleResultRow
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.utils.FlatJson
+import scalasql.DatabaseApi.handleResultRow
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.utils.FlatJson
 
 import java.sql.{ResultSet, Statement}
 import scala.collection.mutable

@@ -1,17 +1,17 @@
-package usql.dialects
+package scalasql.dialects
 
-import usql.operations
-import usql.query.Expr
-import usql.renderer.SqlStr.SqlStringSyntax
+import scalasql.operations
+import scalasql.query.Expr
+import scalasql.renderer.SqlStr.SqlStringSyntax
 
 object SqliteDialect extends SqliteDialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
 
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"INSTR($v, $x)" }
-    def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"GLOB($v, $x)" }
+    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
+    def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"GLOB($v, $x)" }
 
-    def ltrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"LTRIM($v, $x)" }
-    def rtrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"RTRIM($v, $x)" }
+    def ltrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"LTRIM($v, $x)" }
+    def rtrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RTRIM($v, $x)" }
 
   }
 }

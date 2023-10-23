@@ -1,7 +1,7 @@
-package usql.renderer
+package scalasql.renderer
 
 import SqlStr.SqlStringSyntax
-import usql.query.{
+import scalasql.query.{
   AscDesc,
   CompoundSelect,
   Expr,
@@ -13,8 +13,8 @@ import usql.query.{
   SubqueryRef,
   TableRef
 }
-import usql.Queryable
-import usql.utils.FlatJson
+import scalasql.Queryable
+import scalasql.utils.FlatJson
 
 object SelectToSql {
 
@@ -24,14 +24,14 @@ object SelectToSql {
   )(implicit ctx: Context) = {
     SqlStr.join(
       joins.map { join =>
-        val joinPrefix = SqlStr.opt(join.prefix)(s => usql" ${SqlStr.raw(s)} ")
+        val joinPrefix = SqlStr.opt(join.prefix)(s => sql" ${SqlStr.raw(s)} ")
         val joinSelectables = SqlStr.join(
           join.from.map { jf =>
-            fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => usql" ON $on")
+            fromSelectables(jf.from)._2 + SqlStr.opt(jf.on)(on => sql" ON $on")
           }
         )
 
-        usql"$joinPrefix JOIN $joinSelectables"
+        sql"$joinPrefix JOIN $joinSelectables"
       }
     )
   }
@@ -57,7 +57,7 @@ object SelectToSql {
     val (lhsMap, lhsStr0, context) =
       apply(query.lhs, qr, prevContext)
 
-    val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) usql"($lhsStr0)" else lhsStr0
+    val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
 
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
@@ -65,7 +65,7 @@ object SelectToSql {
         val (compoundMapping, compoundStr, compoundCtx) =
           apply(op.rhs, qr, prevContext)
 
-        usql" ${SqlStr.raw(op.op)} $compoundStr"
+        sql" ${SqlStr.raw(op.op)} $compoundStr"
       }
 
       SqlStr.join(compoundStrs)
@@ -75,25 +75,25 @@ object SelectToSql {
 
     val sortOpt = SqlStr.opt(query.orderBy) { orderBy =>
       val ascDesc = orderBy.ascDesc match {
-        case None => usql""
-        case Some(AscDesc.Asc) => usql" ASC"
-        case Some(AscDesc.Desc) => usql" DESC"
+        case None => sql""
+        case Some(AscDesc.Asc) => sql" ASC"
+        case Some(AscDesc.Desc) => sql" DESC"
       }
 
       val nulls = SqlStr.opt(orderBy.nulls) {
-        case Nulls.First => usql" NULLS FIRST"
-        case Nulls.Last => usql" NULLS LAST"
+        case Nulls.First => sql" NULLS FIRST"
+        case Nulls.Last => sql" NULLS LAST"
       }
 
-      usql" ORDER BY " + orderBy.expr.toSqlQuery(newCtx) + ascDesc + nulls
+      sql" ORDER BY " + orderBy.expr.toSqlQuery(newCtx) + ascDesc + nulls
     }
 
     val limitOpt = SqlStr.opt(query.limit) { limit =>
-      usql" LIMIT " + SqlStr.raw(limit.toString)
+      sql" LIMIT " + SqlStr.raw(limit.toString)
     }
 
     val offsetOpt = SqlStr.opt(query.offset) { offset =>
-      usql" OFFSET " + SqlStr.raw(offset.toString)
+      sql" OFFSET " + SqlStr.raw(offset.toString)
     }
 
     val res = lhsStr + compound + sortOpt + limitOpt + offsetOpt
@@ -114,22 +114,22 @@ object SelectToSql {
 
     implicit val context: Context = ctx
 
-    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + usql" " }
+    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
     val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, context)
 
-    val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), usql", ")
+    val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), sql", ")
 
     val joins = joinsToSqlStr(query.joins, fromSelectables)
 
     val filtersOpt = SqlStr.optSeq(query.where) { where =>
-      usql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), usql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), sql" AND ")
     }
 
     val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
-        usql" HAVING " + SqlStr.join(having.map(_.toSqlQuery), usql" AND ")
+        sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery), sql" AND ")
       }
-      usql" GROUP BY ${groupBy.expr}${havingOpt}"
+      sql" GROUP BY ${groupBy.expr}${havingOpt}"
     }
 
     val jsonQueryMap = flattenedExpr
@@ -143,7 +143,7 @@ object SelectToSql {
 
     (
       jsonQueryMap,
-      exprStr + usql" FROM " + tables + joins + filtersOpt + groupByOpt,
+      exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt,
       ctx
     )
   }
@@ -170,13 +170,13 @@ object SelectToSql {
       case t: TableRef =>
         (
           Map.empty[Expr.Identity, SqlStr],
-          SqlStr.raw(prevContext.tableNameMapper(t.value.tableName)) + usql" " + SqlStr.raw(namedFromsMap(t))
+          SqlStr.raw(prevContext.tableNameMapper(t.value.tableName)) + sql" " + SqlStr.raw(namedFromsMap(t))
         )
 
       case t: SubqueryRef[_, _] =>
         val (subNameMapping, sqlStr, _) =
           apply(t.value, t.qr, prevContext)
-        (subNameMapping, usql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
+        (subNameMapping, sql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
     val fromSelectables = selectables
@@ -184,7 +184,7 @@ object SelectToSql {
       .toMap
 
     val exprNaming = fromSelectables.flatMap { case (k, vs) =>
-      vs._1.map { case (e, s) => (e, usql"${SqlStr.raw(namedFromsMap(k))}.$s") }
+      vs._1.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k))}.$s") }
     }
 
     val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)

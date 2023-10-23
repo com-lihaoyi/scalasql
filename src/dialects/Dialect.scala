@@ -1,8 +1,8 @@
-package usql.dialects
+package scalasql.dialects
 
-import usql.operations.TableOps
-import usql.query.{Aggregatable, Expr, Select}
-import usql.{Queryable, Table, operations}
+import scalasql.operations.TableOps
+import scalasql.query.{Aggregatable, Expr, Select}
+import scalasql.{Queryable, Table, operations}
 
 trait Dialect {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =

@@ -1,4 +1,4 @@
-package usql
+package scalasql
 import operations.{
   ExprBooleanOpsTests,
   ExprNumericOpsTests,
@@ -15,7 +15,7 @@ import query.{
   UpdateSubQueryTests,
   ReturningTests
 }
-import usql.dialects.{
+import scalasql.dialects.{
   HsqlDbDialectTests,
   MySqlDialectTests,
   PostgresDialectTests,

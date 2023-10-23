@@ -1,33 +1,33 @@
-package usql.dialects
+package scalasql.dialects
 
-import usql._
-import usql.query.{Expr, Joinable, TableRef, Update}
-import usql.renderer.SqlStr.{SqlStringSyntax, optSeq}
-import usql.renderer.{Context, SelectToSql, SqlStr}
-import usql.utils.OptionPickler
+import scalasql._
+import scalasql.query.{Expr, Joinable, TableRef, Update}
+import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
+import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.utils.OptionPickler
 
 object MySqlDialect extends MySqlDialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
-    override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"CONCAT($v, $x)" }
+    override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"POSITION($x IN $v)" }
+    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
     def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
-      usql"RPAD($v, $length, $fill)"
+      sql"RPAD($v, $length, $fill)"
     }
     def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
-      usql"LPAD($v, $length, $fill)"
+      sql"LPAD($v, $length, $fill)"
     }
-    def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
+    def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends usql.operations.TableOps[V](t) {
+  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     override def update: Update[V[Column.ColumnExpr], V[Val]] = {
       val ref = t.tableRef
       new Update(Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr))
     }
   }
 
-  class Update[Q, R](update: Update.Impl[Q, R]) extends usql.query.Update[Q, R] {
+  class Update[Q, R](update: Update.Impl[Q, R]) extends scalasql.query.Update[Q, R] {
     def filter(f: Q => Expr[Boolean]): Update[Q, R] = new Update(update.filter(f))
 
     def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q, R] =
@@ -61,17 +61,17 @@ object MySqlDialect extends MySqlDialect {
       val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
       val updateList = q.set0.map { case (k, v) =>
         val colStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
-        usql"$tableName.$colStr = $v"
+        sql"$tableName.$colStr = $v"
       }
-      val sets = SqlStr.join(updateList, usql", ")
+      val sets = SqlStr.join(updateList, sql", ")
 
       val where = SqlStr.optSeq(q.where) { where =>
-        usql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), usql" AND ")
+        sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), sql" AND ")
       }
 
       val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, fromSelectables))
 
-      usql"UPDATE $tableName" + joins + usql" SET " + sets + where
+      sql"UPDATE $tableName" + joins + sql" SET " + sets + where
     }
 
     def qr: Queryable[Q, R] = update.qr
@@ -82,6 +82,6 @@ object MySqlDialect extends MySqlDialect {
 trait MySqlDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): usql.operations.TableOps[V] =
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new MySqlDialect.TableOps(t)
 }

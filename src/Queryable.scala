@@ -1,10 +1,10 @@
-package usql
+package scalasql
 
 import utils.OptionPickler.Reader
 import renderer.{Context, ExprsToSql, SelectToSql, SqlStr}
-import usql.query.{Expr, Query}
-import usql.renderer.SqlStr.SqlStringSyntax
-import usql.utils.OptionPickler
+import scalasql.query.{Expr, Query}
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.utils.OptionPickler
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -19,7 +19,7 @@ trait Queryable[-Q, R] {
   def singleRow(q: Q): Boolean = true
 
   def toSqlQuery(q: Q, ctx: Context): SqlStr = {
-    val res = ExprsToSql(this.walk(q), usql"", ctx)._2
+    val res = ExprsToSql(this.walk(q), sql"", ctx)._2
     if (res.isCompleteQuery) res
     else res + SqlStr.raw(ctx.defaultQueryableSuffix)
   }
@@ -43,7 +43,7 @@ object Queryable {
     override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
   }
 
-  import usql.utils.OptionPickler._
+  import scalasql.utils.OptionPickler._
 
   implicit def Tuple2Queryable[
       Q1,

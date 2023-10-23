@@ -1,6 +1,6 @@
-package usql.renderer
+package scalasql.renderer
 
-import usql.query.{Expr, From, Select}
+import scalasql.query.{Expr, From, Select}
 
 case class Context(
     fromNaming: Map[From, String],

@@ -1,6 +1,6 @@
-package usql.renderer
+package scalasql.renderer
 
-import usql.MappedType
+import scalasql.MappedType
 
 import java.sql.JDBCType
 
@@ -29,8 +29,8 @@ object SqlStr {
       isCompleteQuery: Boolean
   )
 
-  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(usql"")
-  def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else usql""
+  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
+  def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else sql""
 
   def flatten(self: SqlStr): Flattened = {
     val finalParts = collection.mutable.Buffer[String]()
@@ -67,11 +67,11 @@ object SqlStr {
   }
 
   implicit class SqlStringSyntax(sc: StringContext) {
-    def usql(args: Interp*) = new SqlStr(sc.parts, args, false)
+    def sql(args: Interp*) = new SqlStr(sc.parts, args, false)
   }
 
-  def join(strs: Seq[SqlStr], sep: SqlStr = usql""): SqlStr = {
-    if (strs.isEmpty) usql""
+  def join(strs: Seq[SqlStr], sep: SqlStr = sql""): SqlStr = {
+    if (strs.isEmpty) sql""
     else strs.reduce(_ + sep + _)
   }
 
