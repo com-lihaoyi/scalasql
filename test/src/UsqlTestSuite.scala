@@ -16,7 +16,7 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
     castParams = false
   )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+  checker.reset()
 }
 
 trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
@@ -27,7 +27,7 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
     castParams = true
   )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+  checker.reset()
 }
 
 trait H2Suite extends TestSuite with H2Dialect {
@@ -38,7 +38,7 @@ trait H2Suite extends TestSuite with H2Dialect {
     castParams = true
   )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+  checker.reset()
 }
 
 trait PostgresSuite extends TestSuite with PostgresDialect {
@@ -51,7 +51,7 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
     castParams = false
   )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+  checker.reset()
 }
 
 trait MySqlSuite extends TestSuite with MySqlDialect {
@@ -66,5 +66,5 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
     castParams = false
   )
 
-  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+  checker.reset()
 }
