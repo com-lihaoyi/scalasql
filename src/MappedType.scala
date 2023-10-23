@@ -8,6 +8,9 @@ import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, 
 
 // What SLICK does
 // https://github.com/slick/slick/blob/88b2ffb177776fd74dee38124b8c54d616d1a9ae/slick/src/main/scala/slick/jdbc/JdbcTypesComponent.scala#L15
+
+// Official JDBC mapping docs
+// https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
 sealed trait MappedType[T]  {
   def jdbcType: JDBCType
 }
