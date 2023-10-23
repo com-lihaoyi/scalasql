@@ -30,6 +30,17 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 }
 
+trait H2Suite extends TestSuite with H2Dialect {
+  val checker = new TestDb(
+    DriverManager.getConnection("jdbc:h2:mem:mydb"),
+    "h2-test-data.sql",
+    "",
+    castParams = true
+  )
+
+  override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
+}
+
 trait PostgresSuite extends TestSuite with PostgresDialect {
   val checker = new TestDb(
     DriverManager.getConnection(

@@ -19,7 +19,8 @@ import usql.dialects.{
   HsqlDbDialectTests,
   MySqlDialectTests,
   PostgresDialectTests,
-  SqliteDialectTests
+  SqliteDialectTests,
+  H2DialectTests
 }
 
 package mysql {
@@ -93,4 +94,23 @@ package hsqldb {
   // object ReturningTests extends ReturningTests with HsqlSuite
 
   object HsqlDbDialectTests extends HsqlDbDialectTests
+}
+
+
+package h2 {
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
+  object ExprIntOpsTests extends ExprNumericOpsTests with H2Suite
+  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with H2Suite
+  object ExprSeqOpsTests extends ExprSeqOpsTests with H2Suite
+  object ExprStringOpsTests extends ExprStringOpsTests with H2Suite
+  object InsertTests extends InsertTests with H2Suite
+  object SelectTests extends SelectTests with H2Suite
+  object SubQueryTests extends SubQueryTests with H2Suite
+  object UpdateTests extends UpdateTests with H2Suite
+  object UpdateJoinTests extends UpdateTests with H2Suite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with H2Suite
+  // H2 does not support RETURNING keyword
+  // object ReturningTests extends ReturningTests with H2Suite
+
+  object HsqlDbDialectTests extends H2DialectTests
 }

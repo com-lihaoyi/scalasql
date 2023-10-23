@@ -2,7 +2,7 @@ package usql
 import usql.query.Expr
 import usql.renderer.SqlStr.SqlStringSyntax
 
-object HsqlDbDialect extends HsqlDbDialect {
+object H2Dialect extends H2Dialect {
   class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => usql"INSTR($v, $x)" }
     def ltrim(x: Expr[String]): Expr[String] = Expr { implicit ctx => usql"LTRIM($v, $x)" }
@@ -14,7 +14,6 @@ object HsqlDbDialect extends HsqlDbDialect {
     def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
       usql"LPAD($v, $length, $fill)"
     }
-    def reverse: Expr[String] = Expr { implicit ctx => usql"REVERSE($v)" }
   }
 
   class ExprNumericOps[T: Numeric](v: Expr[T]) extends operations.ExprNumericOps[T](v){
@@ -27,7 +26,7 @@ object HsqlDbDialect extends HsqlDbDialect {
     override def unary_- : Expr[T] = Expr { implicit ctx => usql"-($v)" }
   }
 }
-trait HsqlDbDialect extends Dialect {
+trait H2Dialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): HsqlDbDialect.ExprStringOps =
     new HsqlDbDialect.ExprStringOps(v)
   override implicit def ExprNumericOpsConv[T: Numeric](v: Expr[T]): HsqlDbDialect.ExprNumericOps[T] =
