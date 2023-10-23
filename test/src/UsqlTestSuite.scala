@@ -12,7 +12,8 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     "sqlite-test-data.sql",
-    ""
+    "",
+    castParams = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -22,7 +23,8 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
     "hsqldb-test-data.sql",
-    " FROM (VALUES (0))"
+    " FROM (VALUES (0))",
+    castParams = true
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -34,7 +36,8 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
     ),
     "postgres-test-data.sql",
-    ""
+    "",
+    castParams = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -48,7 +51,8 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
       TestDb.mysql.getPassword
     ),
     "mysql-test-data.sql",
-    ""
+    "",
+    castParams = false
   )
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()

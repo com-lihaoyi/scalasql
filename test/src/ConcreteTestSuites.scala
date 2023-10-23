@@ -6,7 +6,21 @@ import operations.{
   ExprSeqOpsTests,
   ExprStringOpsTests
 }
-import query.{InsertTests, SelectTests, SubQueryTests, UpdateTests, ReturningTests}
+import query.{
+  InsertTests,
+  SelectTests,
+  SubQueryTests,
+  UpdateTests,
+  UpdateJoinTests,
+  UpdateSubQueryTests,
+  ReturningTests
+}
+import usql.dialects.{
+  HsqlDbDialectTests,
+  MySqlDialectTests,
+  PostgresDialectTests,
+  SqliteDialectTests
+}
 
 package mysql {
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
@@ -18,8 +32,13 @@ package mysql {
   object SelectTests extends SelectTests with MySqlSuite
   object SubQueryTests extends SubQueryTests with MySqlSuite
   object UpdateTests extends UpdateTests with MySqlSuite
+  object UpdateJoinTests extends UpdateJoinTests with MySqlSuite
+  // MySql does not support updates with subqueries referencing same table
+  // object UpdateSubQueryTests extends UpdateSubQueryTests with MySqlSuite
   // MySql does not support INSERT/UPDATE RETURNING
   // object ReturningTests extends ReturningTests with MySqlSuite
+
+  object MySqlDialectTests extends MySqlDialectTests
 }
 
 package postgres {
@@ -32,7 +51,12 @@ package postgres {
   object SelectTests extends SelectTests with PostgresSuite
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object UpdateTests extends UpdateTests with PostgresSuite
+  object UpdateJoinTests extends UpdateJoinTests with PostgresSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with PostgresSuite
   object ReturningTests extends ReturningTests with PostgresSuite
+
+  object PostgresDialectTests extends PostgresDialectTests
+
 }
 
 package sqlite {
@@ -45,7 +69,11 @@ package sqlite {
   object SelectTests extends SelectTests with SqliteSuite
   object SubQueryTests extends SubQueryTests with SqliteSuite
   object UpdateTests extends UpdateTests with SqliteSuite
+  object UpdateJoinTests extends UpdateJoinTests with SqliteSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with SqliteSuite
   object ReturningTests extends ReturningTests with SqliteSuite
+
+  object SqliteDialectTests extends SqliteDialectTests
 }
 
 package hsqldb {
@@ -58,6 +86,11 @@ package hsqldb {
   object SelectTests extends SelectTests with HsqlDbSuite
   object SubQueryTests extends SubQueryTests with HsqlDbSuite
   object UpdateTests extends UpdateTests with HsqlDbSuite
+  // HSql does not support UPDATE/JOIN keywords
+  // object UpdateJoinTests extends UpdateTests with HsqlDbSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with HsqlDbSuite
   // HSql does not support RETURNING keyword
   // object ReturningTests extends ReturningTests with HsqlSuite
+
+  object HsqlDbDialectTests extends HsqlDbDialectTests
 }

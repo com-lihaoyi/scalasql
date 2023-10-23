@@ -1,8 +1,10 @@
+package usql.dialects
+
 import usql._
 import usql.query.Expr
 import utest._
 
-object SqliteDialectTests extends SqliteSuite {
+trait SqliteDialectTests extends SqliteSuite {
   def tests = Tests {
 
     test("ltrim2") - checker(

@@ -1,8 +1,10 @@
+package usql.dialects
+
 import usql._
 import usql.query.Expr
 import utest._
 
-object HsqlDbDialectTests extends HsqlDbSuite {
+trait PostgresDialectTests extends PostgresSuite {
   def tests = Tests {
 
     test("ltrim2") - checker(

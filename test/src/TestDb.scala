@@ -11,7 +11,8 @@ import java.sql.{Connection, DriverManager}
 
 class TestDb(connection: Connection,
              testDataFileName: String,
-             defaultQueryableSuffix: String) {
+             defaultQueryableSuffix: String,
+             castParams: Boolean) {
 
   val db = new DatabaseApi(
     connection,
@@ -19,7 +20,8 @@ class TestDb(connection: Connection,
     tableNameUnMapper = snakeToCamel,
     columnNameMapper = camelToSnake,
     columnNameUnMapper = snakeToCamel,
-    defaultQueryableSuffix = defaultQueryableSuffix
+    defaultQueryableSuffix = defaultQueryableSuffix,
+    castParams = castParams
   )
 
   def reset() = {
@@ -55,6 +57,8 @@ class TestDb(connection: Connection,
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
+//      pprint.log(sqlResult)
+//      pprint.log(expectedSql)
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {

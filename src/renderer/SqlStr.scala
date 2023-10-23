@@ -79,32 +79,48 @@ object SqlStr {
 sealed trait Interp
 
 object Interp {
-  sealed trait Simple extends Interp
+  sealed trait Simple extends Interp{
+    def castType: String
+  }
 
   trait Renderable {
     def toSqlQuery(implicit ctx: Context): SqlStr
   }
 
   implicit def stringInterp(s: String): Interp = StringInterp(s)
-  case class StringInterp(s: String) extends Simple
+  case class StringInterp(s: String) extends Simple{
+    def castType = "LONGVARCHAR"
+  }
 
   implicit def intInterp(i: Int): Interp = IntInterp(i)
-  case class IntInterp(i: Int) extends Simple
+  case class IntInterp(i: Int) extends Simple{
+    def castType = "INT"
+  }
 
   implicit def doubleInterp(d: Double): Interp = DoubleInterp(d)
-  case class DoubleInterp(d: Double) extends Simple
+  case class DoubleInterp(d: Double) extends Simple{
+    def castType = "DOUBLE"
+  }
 
   implicit def booleanInterp(b: Boolean): Interp = BooleanInterp(b)
-  case class BooleanInterp(b: Boolean) extends Simple
+  case class BooleanInterp(b: Boolean) extends Simple{
+    def castType = "BOOLEAN"
+  }
 
   implicit def dateInterp(b: java.sql.Date): Interp = DateInterp(b)
-  case class DateInterp(b: java.sql.Date) extends Simple
+  case class DateInterp(b: java.sql.Date) extends Simple{
+    def castType = "DATE"
+  }
 
   implicit def timeInterp(b: java.sql.Time): Interp = TimeInterp(b)
-  case class TimeInterp(b: java.sql.Time) extends Simple
+  case class TimeInterp(b: java.sql.Time) extends Simple{
+    def castType = "TIME"
+  }
 
   implicit def timestampInterp(b: java.sql.Timestamp): Interp = TimestampInterp(b)
-  case class TimestampInterp(b: java.sql.Timestamp) extends Simple
+  case class TimestampInterp(b: java.sql.Timestamp) extends Simple{
+    def castType = "TIMESTAMP"
+  }
 
   implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
     SqlStrInterp(t.toSqlQuery(ctx))

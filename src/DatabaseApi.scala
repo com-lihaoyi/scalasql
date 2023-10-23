@@ -3,6 +3,7 @@ package usql
 import renderer.{Context, Interp, SqlStr}
 import upickle.core.Visitor
 import usql.DatabaseApi.handleResultRow
+import usql.renderer.SqlStr.SqlStringSyntax
 import usql.utils.FlatJson
 
 import java.sql.{ResultSet, Statement}
@@ -14,7 +15,8 @@ class DatabaseApi(
     tableNameUnMapper: String => String = identity,
     columnNameMapper: String => String = identity,
     columnNameUnMapper: String => String = identity,
-    defaultQueryableSuffix: String
+    defaultQueryableSuffix: String,
+    castParams: Boolean
 ) {
 
   def runRaw(sql: String) = {
@@ -28,21 +30,29 @@ class DatabaseApi(
     finally statement.close()
   }
 
-  def toSqlQuery[Q, R](query: Q)(implicit qr: Queryable[Q, R]): String = {
+  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String = {
     val (str, params) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[Q, R](query: Q)(implicit qr: Queryable[Q, R]): (String, Seq[Interp]) = {
+  def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): (String, Seq[Interp]) = {
     val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
-    val queryStr = flattened.queryParts.mkString("?")
+    val queryStr = flattened.queryParts.zipAll(flattened.params, "", null)
+      .map{
+        case (part, null) => part
+        case (part, param) =>
+          if (castParams) part + s"CAST(? AS ${param.castType})"
+          else part + "?"
+      }
+      .mkString
+
     (queryStr, flattened.params)
   }
 
   def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
 
-    val (str, params) = toSqlQuery0(query)
+    val (str, params) = toSqlQuery0(query, castParams)
     val statement = connection.prepareStatement(str)
 
     for ((p, n) <- params.zipWithIndex) p match {
