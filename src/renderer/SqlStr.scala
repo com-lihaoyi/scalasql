@@ -1,9 +1,8 @@
 package usql.renderer
 
 import usql.MappedType
-import usql.query.{Expr, Select}
 
-import java.sql.PreparedStatement
+import java.sql.JDBCType
 
 /**
  * Represents a SQL query with interpolated `?`s expressions and the associated
@@ -98,7 +97,7 @@ object SqlStr {
 
     implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
     case class TypeInterp[T: MappedType](value: T) extends Interp{
-      def castType: String = implicitly[MappedType[T]].castType
+      def jdbcType: JDBCType = implicitly[MappedType[T]].jdbcType
     }
   }
 }

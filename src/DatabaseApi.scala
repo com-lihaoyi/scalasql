@@ -44,7 +44,7 @@ class DatabaseApi(
       .map{
         case (part, null) => part
         case (part, param) =>
-          if (castParams) part + s"CAST(? AS ${param.castType})"
+          if (castParams) part + s"CAST(? AS ${param.jdbcType})"
           else part + "?"
       }
       .mkString
