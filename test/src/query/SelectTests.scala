@@ -3,7 +3,7 @@ package usql.query
 import usql._
 import utest._
 
-import java.sql.Date
+import java.time.LocalDate
 
 /**
  * Tests for basic query operations: map, filter, join, etc.
@@ -26,9 +26,9 @@ trait SelectTests extends UsqlTestSuite {
         FROM buyer buyer0
       """,
       value = Seq[Buyer[Val]](
-        Buyer(id = 1, name = "James Bond", dateOfBirth = Date.valueOf("2001-02-03")),
-        Buyer(id = 2, name = "叉烧包", dateOfBirth = Date.valueOf("1923-11-12")),
-        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = Date.valueOf("1965-08-09"))
+        Buyer(id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
+        Buyer(id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
+        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
       )
     )
 
@@ -44,15 +44,15 @@ trait SelectTests extends UsqlTestSuite {
         WHERE shipping_info0.buyer_id = ?
         """,
         value = Seq[ShippingInfo[Val]](
-          ShippingInfo(1, 2, Date.valueOf("2010-02-03")),
-          ShippingInfo(3, 2, Date.valueOf("2012-05-06"))
+          ShippingInfo(1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo(3, 2, LocalDate.parse("2012-05-06"))
         )
       )
 
       test("multiple") - checker(
         query =
           ShippingInfo.select.filter(_.buyerId === 2).filter(
-            _.shippingDate === Date.valueOf("2012-05-06")
+            _.shippingDate === LocalDate.parse("2012-05-06")
           ),
         sql = """
         SELECT
@@ -64,14 +64,14 @@ trait SelectTests extends UsqlTestSuite {
         AND shipping_info0.shipping_date = ?
       """,
         value = Seq(
-          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = Date.valueOf("2012-05-06"))
+          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
         )
       )
 
       test("combined") - checker(
         query =
           ShippingInfo.select.filter(p =>
-            p.buyerId === 2 && p.shippingDate === Date.valueOf("2012-05-06")
+            p.buyerId === 2 && p.shippingDate === LocalDate.parse("2012-05-06")
           ),
         sql = """
           SELECT
@@ -83,7 +83,7 @@ trait SelectTests extends UsqlTestSuite {
           AND shipping_info0.shipping_date = ?
         """,
         value = Seq(
-          ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
+          ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
         )
       )
     }
@@ -111,9 +111,9 @@ trait SelectTests extends UsqlTestSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          ("James Bond", 1, Date.valueOf("2001-02-03")),
-          ("叉烧包", 2, Date.valueOf("1923-11-12")),
-          ("Li Haoyi", 3, Date.valueOf("1965-08-09"))
+          ("James Bond", 1, LocalDate.parse("2001-02-03")),
+          ("叉烧包", 2, LocalDate.parse("1923-11-12")),
+          ("Li Haoyi", 3, LocalDate.parse("1965-08-09"))
         )
       )
 
@@ -134,9 +134,9 @@ trait SelectTests extends UsqlTestSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          (1, Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))),
-          (2, Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))),
-          (3, Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")))
+          (1, Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))),
+          (2, Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))),
+          (3, Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
         )
       )
     }
@@ -281,12 +281,12 @@ trait SelectTests extends UsqlTestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            ShippingInfo[Val](1, 2, Date.valueOf("2010-02-03"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Val](1, 2, LocalDate.parse("2010-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
           )
         )
       )
@@ -309,12 +309,12 @@ trait SelectTests extends UsqlTestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            ShippingInfo[Val](1, 2, Date.valueOf("2010-02-03"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Val](1, 2, LocalDate.parse("2010-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            ShippingInfo[Val](3, 2, Date.valueOf("2012-05-06"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
           )
         )
       )
@@ -330,7 +330,7 @@ trait SelectTests extends UsqlTestSuite {
           JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
           WHERE buyer0.name = ?
         """,
-        value = Seq(Date.valueOf("2012-04-05"))
+        value = Seq(LocalDate.parse("2012-04-05"))
       )
 
       test("selfJoin") - checker(
@@ -348,16 +348,16 @@ trait SelectTests extends UsqlTestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           )
         )
       )
@@ -377,28 +377,28 @@ trait SelectTests extends UsqlTestSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
           ),
           (
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09"))
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03"))
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         ),
         normalize = (x: Seq[(Buyer[Val], Buyer[Val])]) => x.sortBy(t => (t._1.id(), t._2.id()))
@@ -415,7 +415,7 @@ trait SelectTests extends UsqlTestSuite {
           WHERE buyer0.id = shipping_info1.buyer_id
           AND buyer0.name = ?
         """,
-        value = Seq(Date.valueOf("2012-04-05"))
+        value = Seq(LocalDate.parse("2012-04-05"))
       )
 
       test("flatMap2") - checker(
@@ -430,7 +430,7 @@ trait SelectTests extends UsqlTestSuite {
           WHERE buyer0.id = shipping_info1.buyer_id
           AND buyer0.name = ?
         """,
-        value = Seq(Date.valueOf("2012-04-05"))
+        value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
 
@@ -459,8 +459,8 @@ trait SelectTests extends UsqlTestSuite {
         WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
       """,
       value = Seq(
-        Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-        Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12"))
+        Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
       )
     )
 

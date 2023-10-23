@@ -1,6 +1,7 @@
 package usql.utils
 
 import java.sql.Date
+import java.time.{LocalDate, ZoneId}
 
 object OptionPickler extends upickle.AttributeTagged {
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
@@ -29,13 +30,18 @@ object OptionPickler extends upickle.AttributeTagged {
 
   }
 
-  implicit val DateReader: Reader[Date] = new SimpleReader[Date] {
+  implicit val LocalDateReader: Reader[LocalDate] = new SimpleReader[LocalDate] {
     override def expectedMsg = "expected date"
 
     override def visitString(s: CharSequence, index: Int) = {
       val str = s.toString
-      if (str.forall(_.isDigit)) new Date(str.toLong)
-      else Date.valueOf(str)
+      if (str.forall(_.isDigit)) {
+        LocalDate.ofInstant(
+          java.time.Instant.ofEpochMilli(str.toLong),
+          ZoneId.systemDefault()
+        )
+      }
+      else LocalDate.parse(str)
     }
   }
 }

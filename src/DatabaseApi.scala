@@ -1,6 +1,6 @@
 package usql
 
-import renderer.{Context, Interp, SqlStr}
+import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import usql.DatabaseApi.handleResultRow
 import usql.renderer.SqlStr.SqlStringSyntax
@@ -35,7 +35,9 @@ class DatabaseApi(
     str
   }
 
-  def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): (String, Seq[Interp]) = {
+  def toSqlQuery0[Q, R](query: Q,
+                        castParams: Boolean = false)
+                       (implicit qr: Queryable[Q, R]): (String, Seq[SqlStr.Interp.TypeInterp[_]]) = {
     val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
     val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
     val queryStr = flattened.queryParts.zipAll(flattened.params, "", null)
@@ -55,14 +57,8 @@ class DatabaseApi(
     val (str, params) = toSqlQuery0(query, castParams)
     val statement = connection.prepareStatement(str)
 
-    for ((p, n) <- params.zipWithIndex) p match {
-      case Interp.StringInterp(s) => statement.setString(n + 1, s)
-      case Interp.IntInterp(i) => statement.setInt(n + 1, i)
-      case Interp.DoubleInterp(d) => statement.setDouble(n + 1, d)
-      case Interp.BooleanInterp(b) => statement.setBoolean(n + 1, b)
-      case Interp.DateInterp(d) => statement.setDate(n + 1, d)
-      case Interp.TimeInterp(t) => statement.setTime(n + 1, t)
-      case Interp.TimestampInterp(ts) => statement.setTimestamp(n + 1, ts)
+    for ((p, n) <- params.zipWithIndex) {
+      statement.setObject(n + 1, p.value)
     }
 
     if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]

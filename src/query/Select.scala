@@ -1,12 +1,12 @@
 package usql.query
 
 import usql.renderer.SqlStr.SqlStringSyntax
-import usql.renderer.{Context, Interp, SelectToSql, SqlStr}
+import usql.renderer.{Context, SelectToSql, SqlStr}
 import usql.Queryable
 import usql.utils.OptionPickler
 
 trait Select[Q, R]
-    extends Interp.Renderable
+    extends SqlStr.Renderable
     with Aggregatable[Q]
     with From
     with Joinable[Q, R]

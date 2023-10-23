@@ -3,7 +3,7 @@ package usql.query
 import usql._
 import utest._
 
-import java.sql.Date
+import java.time.LocalDate
 
 /**
  * Tests for basic update operations
@@ -15,7 +15,7 @@ trait ReturningTests extends UsqlTestSuite {
       test("single") - {
         checker(
           query = Buyer.insert
-            .values(_.name -> "test buyer", _.dateOfBirth -> Date.valueOf("2023-09-09"))
+            .values(_.name -> "test buyer", _.dateOfBirth -> LocalDate.parse("2023-09-09"))
             .returning(_.id),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
           value = Seq(4)
@@ -24,7 +24,7 @@ trait ReturningTests extends UsqlTestSuite {
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
+          value = Seq(Buyer[Val](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
 
@@ -32,9 +32,9 @@ trait ReturningTests extends UsqlTestSuite {
         checker(
           query = Buyer.insert
             .batched(_.name, _.dateOfBirth)(
-              ("test buyer A", Date.valueOf("2001-04-07")),
-              ("test buyer B", Date.valueOf("2002-05-08")),
-              ("test buyer C", Date.valueOf("2003-06-09"))
+              ("test buyer A", LocalDate.parse("2001-04-07")),
+              ("test buyer B", LocalDate.parse("2002-05-08")),
+              ("test buyer C", LocalDate.parse("2003-06-09"))
             )
             .returning(_.id),
           sql =
@@ -52,13 +52,13 @@ trait ReturningTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
-            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
-            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
+            Buyer[Val](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Val](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Val](6, "test buyer C", LocalDate.parse("2003-06-09"))
           )
         )
       }
@@ -87,12 +87,12 @@ trait ReturningTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](4, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](5, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         )
       }
@@ -105,7 +105,7 @@ trait ReturningTests extends UsqlTestSuite {
           query =
             Buyer.update
               .filter(_.name === "James Bond")
-              .set(_.dateOfBirth -> Date.valueOf("2019-04-07"))
+              .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"))
               .returning(_.id),
           sqls = Seq(
             "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
@@ -116,7 +116,7 @@ trait ReturningTests extends UsqlTestSuite {
 
         checker(
           query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-          value = Seq(Date.valueOf("2019-04-07"))
+          value = Seq(LocalDate.parse("2019-04-07"))
         )
       }
 
@@ -125,7 +125,7 @@ trait ReturningTests extends UsqlTestSuite {
           query =
             Buyer.update
               .filter(_.name === "James Bond")
-              .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee")
+              .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee")
               .returning(c => (c.id, c.name, c.dateOfBirth)),
           sqls = Seq(
             """
@@ -139,7 +139,7 @@ trait ReturningTests extends UsqlTestSuite {
             RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
           """
           ),
-          value = Seq((1, "John Dee", Date.valueOf("2019-04-07")))
+          value = Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
         )
       }
     }

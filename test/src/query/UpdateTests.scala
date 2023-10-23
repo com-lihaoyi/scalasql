@@ -3,7 +3,7 @@ package usql.query
 import usql._
 import utest._
 
-import java.sql.Date
+import java.time.LocalDate
 
 /**
  * Tests for basic update operations
@@ -14,7 +14,7 @@ trait UpdateTests extends UsqlTestSuite {
     test("update") - {
       checker(
         query = Buyer.update.filter(_.name === "James Bond").set(
-          _.dateOfBirth -> Date.valueOf("2019-04-07")
+          _.dateOfBirth -> LocalDate.parse("2019-04-07")
         ),
         sqls =
           Seq(
@@ -26,18 +26,18 @@ trait UpdateTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2019-04-07"))
+        value = Seq(LocalDate.parse("2019-04-07"))
       )
 
       checker(
         query = Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("1965-08-09")) // not updated
+        value = Seq(LocalDate.parse("1965-08-09")) // not updated
       )
     }
 
     test("bulk") - {
       checker(
-        query = Buyer.update.set(_.dateOfBirth -> Date.valueOf("2019-04-07")),
+        query = Buyer.update.set(_.dateOfBirth -> LocalDate.parse("2019-04-07")),
         sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?",
           "UPDATE buyer SET buyer.date_of_birth = ?"
@@ -47,11 +47,11 @@ trait UpdateTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2019-04-07"))
+        value = Seq(LocalDate.parse("2019-04-07"))
       )
       checker(
         query = Buyer.select.filter(_.name === "Li Haoyi").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2019-04-07"))
+        value = Seq(LocalDate.parse("2019-04-07"))
       )
     }
 
@@ -60,7 +60,7 @@ trait UpdateTests extends UsqlTestSuite {
         query =
           Buyer.update
             .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> Date.valueOf("2019-04-07"), _.name -> "John Dee"),
+            .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee"),
         sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?"
@@ -70,12 +70,12 @@ trait UpdateTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq[Date]()
+        value = Seq[LocalDate]()
       )
 
       checker(
         query = Buyer.select.filter(_.name === "John Dee").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2019-04-07"))
+        value = Seq(LocalDate.parse("2019-04-07"))
       )
     }
 
@@ -94,12 +94,12 @@ trait UpdateTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq[Date]()
+        value = Seq[LocalDate]()
       )
 
       checker(
         query = Buyer.select.filter(_.name === "JAMES BOND").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2001-02-03"))
+        value = Seq(LocalDate.parse("2001-02-03"))
       )
     }
 

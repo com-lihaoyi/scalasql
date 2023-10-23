@@ -3,7 +3,7 @@ package usql.query
 import usql._
 import utest._
 
-import java.sql.Date
+import java.time.LocalDate
 
 /**
  * Tests for basic update operations
@@ -37,7 +37,7 @@ trait UpdateJoinTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2012-04-05"))
+        value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
 
@@ -119,7 +119,7 @@ trait UpdateJoinTests extends UsqlTestSuite {
 
       checker(
         query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
-        value = Seq(Date.valueOf("2012-04-05"))
+        value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
   }

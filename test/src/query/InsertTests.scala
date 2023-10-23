@@ -3,7 +3,7 @@ package usql.query
 import usql._
 import utest._
 
-import java.sql.Date
+import java.time.LocalDate
 
 /**
  * Tests for basic insert operations
@@ -17,7 +17,7 @@ trait InsertTests extends UsqlTestSuite {
           query =
             Buyer.insert.values(
               _.name -> "test buyer",
-              _.dateOfBirth -> Date.valueOf("2023-09-09"),
+              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
               _.id -> 4
             ),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
@@ -26,7 +26,7 @@ trait InsertTests extends UsqlTestSuite {
 
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
-          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
+          value = Seq(Buyer[Val](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
 
@@ -34,7 +34,7 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.insert.values(
             _.name -> "test buyer",
-            _.dateOfBirth -> Date.valueOf("2023-09-09")
+            _.dateOfBirth -> LocalDate.parse("2023-09-09")
           ),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
           value = 1
@@ -43,7 +43,7 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.select.filter(_.name === "test buyer"),
           // id=4 comes from auto increment
-          value = Seq(Buyer[Val](4, "test buyer", Date.valueOf("2023-09-09")))
+          value = Seq(Buyer[Val](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
 
@@ -53,9 +53,9 @@ trait InsertTests extends UsqlTestSuite {
       test("simple") - {
         checker(
           query = Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
-            ("test buyer A", Date.valueOf("2001-04-07"), 4),
-            ("test buyer B", Date.valueOf("2002-05-08"), 5),
-            ("test buyer C", Date.valueOf("2003-06-09"), 6)
+            ("test buyer A", LocalDate.parse("2001-04-07"), 4),
+            ("test buyer B", LocalDate.parse("2002-05-08"), 5),
+            ("test buyer C", LocalDate.parse("2003-06-09"), 6)
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth, id)
@@ -70,12 +70,12 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
-            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
-            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Val](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Val](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Val](6, "test buyer C", LocalDate.parse("2003-06-09"))
           )
         )
       }
@@ -83,9 +83,9 @@ trait InsertTests extends UsqlTestSuite {
       test("partial") - {
         checker(
           query = Buyer.insert.batched(_.name, _.dateOfBirth)(
-            ("test buyer A", Date.valueOf("2001-04-07")),
-            ("test buyer B", Date.valueOf("2002-05-08")),
-            ("test buyer C", Date.valueOf("2003-06-09"))
+            ("test buyer A", LocalDate.parse("2001-04-07")),
+            ("test buyer B", LocalDate.parse("2002-05-08")),
+            ("test buyer C", LocalDate.parse("2003-06-09"))
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
@@ -97,13 +97,13 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Val](4, "test buyer A", Date.valueOf("2001-04-07")),
-            Buyer[Val](5, "test buyer B", Date.valueOf("2002-05-08")),
-            Buyer[Val](6, "test buyer C", Date.valueOf("2003-06-09"))
+            Buyer[Val](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Val](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Val](6, "test buyer C", LocalDate.parse("2003-06-09"))
           )
         )
       }
@@ -134,11 +134,11 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
-            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Val](4, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](5, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         )
       }
@@ -161,12 +161,12 @@ trait InsertTests extends UsqlTestSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Val](1, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](2, "叉烧包", Date.valueOf("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", Date.valueOf("1965-08-09")),
+            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer[Val](4, "James Bond", Date.valueOf("2001-02-03")),
-            Buyer[Val](5, "叉烧包", Date.valueOf("1923-11-12"))
+            Buyer[Val](4, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Val](5, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         )
       }

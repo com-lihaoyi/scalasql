@@ -1,10 +1,10 @@
 package usql.query
 
 import usql.Queryable
-import usql.renderer.{Context, Interp, SqlStr}
+import usql.renderer.{Context, SqlStr}
 import usql.utils.OptionPickler
 
-trait Expr[T] extends Interp.Renderable {
+trait Expr[T] extends SqlStr.Renderable {
   final def toSqlQuery(implicit ctx: Context): SqlStr = {
     ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
   }
@@ -44,7 +44,7 @@ object Expr {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
-  implicit def apply[T](x: T)(implicit conv: T => Interp): Expr[T] = new Expr[T] {
+  implicit def apply[T](x: T)(implicit conv: T => SqlStr.Interp): Expr[T] = new Expr[T] {
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
       new SqlStr(Seq("", ""), Seq(conv(x)), false)
   }

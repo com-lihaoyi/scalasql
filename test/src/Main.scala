@@ -15,7 +15,7 @@ object Main {
     statement.close()
 
     val prepped = conn.prepareStatement("SELECT * from thing WHERE date = ?")
-//    prepped.setDate(1, java.sql.Date.valueOf("2012-04-05"))
+//    prepped.setDate(1, java.sql.LocalDate.parse("2012-04-05"))
     prepped.setString(1, "2012-04-05")
 
     val result = prepped.executeQuery()
