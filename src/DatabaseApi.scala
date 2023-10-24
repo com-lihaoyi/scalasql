@@ -95,7 +95,7 @@ object DatabaseApi {
   ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
-    val values = Array.newBuilder[String]
+    val values = Array.newBuilder[Object]
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
@@ -107,7 +107,7 @@ object DatabaseApi {
 //      pprint.log(k)
 //      pprint.log(resultSet.getObject(i + 1).getClass)
 //      pprint.log(resultSet.getObject(i + 1))
-      val v = resultSet.getString(i + 1)
+      val v = resultSet.getObject(i + 1)
 
       keys.addOne(k)
       values.addOne(v)

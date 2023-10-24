@@ -22,7 +22,7 @@ object FlatJson {
    */
   def unflatten[V](
       keys: IndexedSeq[IndexedSeq[String]],
-      values: IndexedSeq[String],
+      values: IndexedSeq[Object],
       rowVisitor: Visitor[_, _]
   ): V = {
 
@@ -52,19 +52,18 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _]): Any = {
+    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _], inObj: Boolean): Any = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
-        values(startIndex) match {
-          case null => visitor.visitNull(-1)
-          case s => visitor.visitString(s, -1)
-        }
+        pprint.log(values(startIndex).getClass)
+        pprint.log(values(startIndex))
+        if (inObj) scalasql.Val(values(startIndex)) else values(startIndex)
       } else {
         // Hack to check if a random key looks like a number,
         // in which case this data represents an array
         if (keys(startIndex)(depth).head.isDigit) {
           val arrVisitor = visitor.visitArray(-1, -1).narrow
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-            arrVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor), -1)
+            arrVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor, false), -1)
           }
 
           arrVisitor.visitEnd(-1)
@@ -73,7 +72,7 @@ object FlatJson {
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
             val keyVisitor = objVisitor.visitKey(-1)
             objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
-            objVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor), -1)
+            objVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor, true), -1)
           }
 
           objVisitor.visitEnd(-1)
@@ -81,6 +80,6 @@ object FlatJson {
       }
     }
 
-    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]]).asInstanceOf[V]
+    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]], false).asInstanceOf[V]
   }
 }
