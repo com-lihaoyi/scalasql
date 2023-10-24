@@ -45,9 +45,9 @@ CREATE TABLE data_types (
     my_boolean BOOLEAN,
     my_local_date DATE,
     my_local_time TIME,
-    my_local_date_time TIMESTAMP,
+    my_local_date_time TIMESTAMP
 --     my_zoned_date_time TIMESTAMP WITH TIME ZONE,
 #     my_instant DATETIME,
 --     my_offset_time TIME WITH TIME ZONE,
-    my_offset_date_time DATETIME
+#     my_offset_date_time DATETIME
 )

@@ -44,7 +44,7 @@ class DatabaseApi(
       .map {
         case (part, null) => part
         case (part, param) =>
-          val jdbcTypeString = param.jdbcType match {
+          val jdbcTypeString = param.mappedType.jdbcType match {
             case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
             case JDBCType.TIME_WITH_TIMEZONE => "TIME WITH TIME ZONE"
             case n => n.toString
@@ -63,6 +63,7 @@ class DatabaseApi(
     val statement = connection.prepareStatement(str)
 
     for ((p, n) <- params.zipWithIndex) {
+      p.mappedType.asInstanceOf[scalasql.MappedType[Any]].put(statement, n + 1, p.value)
       statement.setObject(n + 1, p.value)
     }
 
@@ -111,8 +112,7 @@ object DatabaseApi {
         .map(s => columnNameUnMapper(s.toLowerCase))
         .drop(1)
 
-      val obj = resultSet.getObject(i + 1)
-      val v = exprs(i).fromObject(obj).asInstanceOf[Object]
+      val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
 
       keys.addOne(k)
       values.addOne(v)

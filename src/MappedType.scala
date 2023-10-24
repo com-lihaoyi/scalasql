@@ -1,6 +1,6 @@
 package scalasql
 
-import java.sql.JDBCType
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneOffset, ZonedDateTime}
 
 // What Quill does
@@ -14,114 +14,101 @@ import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, 
 // https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
 sealed trait MappedType[T] {
   def jdbcType: JDBCType
-  def fromObject: PartialFunction[Object, T]
+  def get(r: ResultSet, idx: Int): T
+  def put(r: PreparedStatement, idx: Int, v: T): Unit
 }
 object MappedType {
   implicit object StringType extends MappedType[String] {
     def jdbcType = JDBCType.LONGVARCHAR
-    def fromObject = { case t: String => t }
+    def get(r: ResultSet, idx: Int) = r.getString(idx)
+    def put(r: PreparedStatement, idx: Int, v: String) = r.setString(idx, v)
   }
 
   implicit object ByteType extends MappedType[Byte] {
     def jdbcType = JDBCType.TINYINT
-    def fromObject = {
-      case t: java.lang.Number => t.byteValue()
-    }
+    def get(r: ResultSet, idx: Int) = r.getByte(idx)
+    def put(r: PreparedStatement, idx: Int, v: Byte) = r.setByte(idx, v)
   }
 
   implicit object ShortType extends MappedType[Short] {
     def jdbcType = JDBCType.SMALLINT
-    def fromObject = {
-      case t: java.lang.Number => t.shortValue()
-    }
+    def get(r: ResultSet, idx: Int) = r.getShort(idx)
+    def put(r: PreparedStatement, idx: Int, v: Short) = r.setShort(idx, v)
   }
 
   implicit object IntType extends MappedType[Int] {
     def jdbcType = JDBCType.INTEGER
-    def fromObject = {
-      case t: java.lang.Number => t.intValue()
-    }
+    def get(r: ResultSet, idx: Int) = r.getInt(idx)
+    def put(r: PreparedStatement, idx: Int, v: Int) = r.setInt(idx, v)
   }
 
   implicit object LongType extends MappedType[Long] {
     def jdbcType = JDBCType.BIGINT
-    def fromObject = {
-      case t: java.lang.Number => t.longValue()
-    }
+    def get(r: ResultSet, idx: Int) = r.getLong(idx)
+    def put(r: PreparedStatement, idx: Int, v: Long) = r.setLong(idx, v)
   }
 
   implicit object DoubleType extends MappedType[Double] {
     def jdbcType = JDBCType.DOUBLE
-    def fromObject = {
-      case t: java.lang.Number => t.doubleValue()
-    }
+    def get(r: ResultSet, idx: Int) = r.getDouble(idx)
+    def put(r: PreparedStatement, idx: Int, v: Double) = r.setDouble(idx, v)
   }
 
   implicit object BooleanType extends MappedType[Boolean] {
     def jdbcType = JDBCType.BOOLEAN
-    def fromObject = {
-      case t: java.lang.Boolean => t
-      case t: java.lang.Number if t.intValue() == 0 => false
-      case t: java.lang.Number if t.intValue() == 1 => true
-    }
+    def get(r: ResultSet, idx: Int) = r.getBoolean(idx)
+    def put(r: PreparedStatement, idx: Int, v: Boolean) = r.setBoolean(idx, v)
   }
 
   implicit object LocalDateType extends MappedType[LocalDate] {
     def jdbcType = JDBCType.DATE
-    def fromObject = {
-      case t: java.sql.Date => t.toLocalDate
-      case s: String => LocalDate.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalDate])
+    def put(r: PreparedStatement, idx: Int, v: LocalDate) = r.setObject(idx, v)
   }
 
   implicit object LocalTimeType extends MappedType[LocalTime] {
     def jdbcType = JDBCType.TIME
-    def fromObject = {
-      case t: java.sql.Time => t.toLocalTime
-      case s: String => LocalTime.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalTime])
+    def put(r: PreparedStatement, idx: Int, v: LocalTime) = r.setObject(idx, v)
   }
 
   implicit object LocalDateTimeType extends MappedType[LocalDateTime] {
     def jdbcType = JDBCType.TIMESTAMP
-    def fromObject = {
-      case t: java.sql.Timestamp => t.toLocalDateTime
-      case s: String => LocalDateTime.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalDateTime])
+    def put(r: PreparedStatement, idx: Int, v: LocalDateTime) = r.setObject(idx, v)
   }
 
   implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
-    def fromObject = {
-      case t: java.time.OffsetDateTime => t.toZonedDateTime
-      case s: String => ZonedDateTime.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = ZonedDateTime.ofInstant(r.getTime(idx).toInstant, java.util.TimeZone.getDefault.toZoneId)
+    def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
   }
 
   implicit object InstantType extends MappedType[Instant] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
-    def fromObject = {
-      case t: java.time.OffsetDateTime => t.toInstant
-      case s: String => Instant.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = r.getTime(idx).toInstant
+    def put(r: PreparedStatement, idx: Int, v: Instant) = r.setTimestamp(idx, java.sql.Timestamp.from(v))
   }
 
   implicit object OffsetTimeType extends MappedType[OffsetTime] {
     def jdbcType = JDBCType.TIME_WITH_TIMEZONE
-
-    def fromObject = {
-      case t: java.time.OffsetTime => t
-      case s: String => OffsetTime.parse(s)
-    }
+    def get(r: ResultSet, idx: Int) = r.getTime(idx).toLocalTime.atOffset(ZoneOffset.UTC)
+    def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setTime(idx, java.sql.Time.valueOf(v.withOffsetSameInstant(ZoneOffset.UTC).toLocalTime))
   }
 
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
-    def fromObject = {
-      case t: java.time.OffsetDateTime => t
-      case t: java.sql.Timestamp => t.toInstant.atOffset(ZoneOffset.UTC)
-      case t: java.time.LocalDateTime => t.atOffset(ZoneOffset.UTC)
-      case s: String => OffsetDateTime.parse(s)
+    def get(r: ResultSet, idx: Int) = {
+      pprint.log(r.getObject(idx))
+      pprint.log(r.getObject(idx).getClass)
+      r.getObject(idx) match{
+        case o: OffsetDateTime => o
+        case s: String => OffsetDateTime.parse(s)
+        case t: java.sql.Timestamp => t.toLocalDateTime.atOffset(ZoneOffset.UTC)
+      }
+    }
+    def put(r: PreparedStatement, idx: Int, v: OffsetDateTime) = {
+      r.setObject(idx, v)
     }
   }
 }

@@ -99,7 +99,7 @@ object SqlStr {
 
     implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
     case class TypeInterp[T: MappedType](value: T) extends Interp {
-      def jdbcType: JDBCType = implicitly[MappedType[T]].jdbcType
+      def mappedType: MappedType[T] = implicitly[MappedType[T]]
     }
   }
 }

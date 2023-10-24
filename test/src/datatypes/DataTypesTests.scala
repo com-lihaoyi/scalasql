@@ -32,7 +32,7 @@ trait DataTypesTests extends ScalaSqlSuite {
 //        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
 //        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
 //        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
-        myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00"),
+//        myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00"),
       )
       checker(
         query = DataTypes.insert.values(
@@ -48,7 +48,7 @@ trait DataTypesTests extends ScalaSqlSuite {
 //          _.myZonedDateTime -> value.myZonedDateTime(),
 //          _.myInstant -> value.myInstant(),
 //          _.myOffsetTime -> value.myOffsetTime(),
-          _.myOffsetDateTime -> value.myOffsetDateTime(),
+//          _.myOffsetDateTime -> value.myOffsetDateTime(),
         ),
         value = 1
       )

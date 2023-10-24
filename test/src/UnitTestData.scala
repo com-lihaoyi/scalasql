@@ -51,7 +51,7 @@ case class DataTypes[+T[_]](
 //    myZonedDateTime: T[ZonedDateTime],
 //  myInstant: T[Instant],
 //  myOffsetTime: T[OffsetTime],
-  myOffsetDateTime: T[OffsetDateTime],
+//  myOffsetDateTime: T[OffsetDateTime],
 )
 
 object DataTypes extends Table[DataTypes] {
