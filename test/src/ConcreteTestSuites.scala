@@ -40,6 +40,8 @@ package mysql {
   // object ReturningTests extends ReturningTests with MySqlSuite
 
   object MySqlDialectTests extends MySqlDialectTests
+
+  object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
 }
 
 package postgres {
@@ -76,6 +78,8 @@ package sqlite {
   object ReturningTests extends ReturningTests with SqliteSuite
 
   object SqliteDialectTests extends SqliteDialectTests
+
+  object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
 }
 
 package hsqldb {

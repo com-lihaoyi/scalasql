@@ -111,10 +111,8 @@ object DatabaseApi {
         .map(s => columnNameUnMapper(s.toLowerCase))
         .drop(1)
 
-//      pprint.log(k)
-//      pprint.log(resultSet.getObject(i + 1).getClass)
-//      pprint.log(resultSet.getObject(i + 1))
-      val v = exprs(i).fromObject(resultSet.getObject(i + 1)).asInstanceOf[Object]
+      val obj = resultSet.getObject(i + 1)
+      val v = exprs(i).fromObject(obj).asInstanceOf[Object]
 
       keys.addOne(k)
       values.addOne(v)

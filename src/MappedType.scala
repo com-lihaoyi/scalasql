@@ -110,12 +110,8 @@ object MappedType {
     def jdbcType = JDBCType.TIME_WITH_TIMEZONE
 
     def fromObject = {
-      case t: java.time.OffsetTime =>
-        pprint.log(t)
-        t
-      case s: String =>
-        pprint.log(s)
-        OffsetTime.parse(s)
+      case t: java.time.OffsetTime => t
+      case s: String => OffsetTime.parse(s)
     }
   }
 
@@ -124,6 +120,7 @@ object MappedType {
     def fromObject = {
       case t: java.time.OffsetDateTime => t
       case t: java.sql.Timestamp => t.toInstant.atOffset(ZoneOffset.UTC)
+      case t: java.time.LocalDateTime => t.atOffset(ZoneOffset.UTC)
       case s: String => OffsetDateTime.parse(s)
     }
   }
