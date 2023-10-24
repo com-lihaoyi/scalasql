@@ -94,6 +94,8 @@ package hsqldb {
   // object ReturningTests extends ReturningTests with HsqlSuite
 
   object HsqlDbDialectTests extends HsqlDbDialectTests
+
+  object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
 }
 
 
@@ -113,4 +115,6 @@ package h2 {
   // object ReturningTests extends ReturningTests with H2Suite
 
   object HsqlDbDialectTests extends H2DialectTests
+
+  object DataTypesTests extends datatypes.DataTypesTests with H2Suite
 }

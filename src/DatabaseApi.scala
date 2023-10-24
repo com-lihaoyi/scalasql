@@ -6,7 +6,7 @@ import scalasql.DatabaseApi.handleResultRow
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.utils.FlatJson
 
-import java.sql.{ResultSet, Statement}
+import java.sql.{JDBCType, ResultSet, Statement}
 import scala.collection.mutable
 
 class DatabaseApi(
@@ -40,7 +40,11 @@ class DatabaseApi(
       .map{
         case (part, null) => part
         case (part, param) =>
-          if (castParams) part + s"CAST(? AS ${param.jdbcType})"
+          val jdbcTypeString = param.jdbcType match{
+            case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
+            case n => n.toString
+          }
+          if (castParams) part + s"CAST(? AS $jdbcTypeString)"
           else part + "?"
       }
       .mkString
@@ -100,6 +104,9 @@ object DatabaseApi {
         .map(s => columnNameUnMapper(s.toLowerCase))
         .drop(1)
 
+//      pprint.log(k)
+//      pprint.log(resultSet.getObject(i + 1).getClass)
+//      pprint.log(resultSet.getObject(i + 1))
       val v = resultSet.getString(i + 1)
 
       keys.addOne(k)

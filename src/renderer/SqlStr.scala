@@ -94,6 +94,9 @@ object SqlStr {
     // Not sure why these two additional implicit conversions are needed
     implicit def strInterp(value: String): Interp = typeInterp(value)
     implicit def intInterp(value: Int): Interp = typeInterp(value)
+    implicit def booleanInterp(value: Boolean): Interp = typeInterp(value)
+    implicit def doubleInterp(value: Double): Interp = typeInterp(value)
+    implicit def longInterp(value: Long): Interp = typeInterp(value)
 
     implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
     case class TypeInterp[T: MappedType](value: T) extends Interp{

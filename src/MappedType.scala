@@ -64,9 +64,9 @@ object MappedType{
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
   }
 
-  implicit object OffsetTimeType extends MappedType[OffsetTime] {
-    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
-  }
+//  implicit object OffsetTimeType extends MappedType[OffsetTime] {
+//    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
+//  }
 
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
