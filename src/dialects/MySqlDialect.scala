@@ -7,16 +7,10 @@ import scalasql.renderer.{Context, SelectToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 object MySqlDialect extends MySqlDialect {
-  class ExprStringOps(v: Expr[String]) extends operations.ExprStringOps(v) {
+  class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
-    def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
-      sql"RPAD($v, $length, $fill)"
-    }
-    def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
-      sql"LPAD($v, $length, $fill)"
-    }
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 

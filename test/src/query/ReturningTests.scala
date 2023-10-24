@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql._
+import scalasql.dialects.ReturningDialect
 import utest._
 
 import java.time.LocalDate
@@ -8,7 +9,7 @@ import java.time.LocalDate
 /**
  * Tests for basic update operations
  */
-trait ReturningTests extends ScalaSqlSuite {
+trait ReturningTests extends ScalaSqlSuite with ReturningDialect  {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("insert") {

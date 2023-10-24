@@ -9,9 +9,6 @@ trait Returnable[Q] {
   def expr: Q
   def table: TableRef
   def toSqlQuery(implicit ctx: Context): SqlStr
-  def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): Returning[Q2, R] = {
-    Returning(this, f(expr))
-  }
 }
 
 case class Returning[Q, R](returnable: Returnable[_], returning: Q)(implicit
