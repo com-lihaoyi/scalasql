@@ -1,6 +1,6 @@
 # ScalaSql
 
-ScalaSql is a small SQL library that allows type-safe low-boilerplate querying of 
+ScalaSql is a small SQL library that allows type-safe low-boilerplate querying of
 SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
@@ -9,7 +9,7 @@ typed `Table` descriptions.
 1. **A database library suitable for use for "getting started"**: prioritizing ease
    of use and simplicity over performance, flexibility, or purity.
 
-2. **Typed, structured queries**: your queries should be able to return primitives, 
+2. **Typed, structured queries**: your queries should be able to return primitives,
    `case class`es, tuples, collections, etc.. A large portion of JDBC boilerplate
    is translating logic "Scala collections" operations into SQL, and translating
    the "flat" key-value SQL result sets back into something more structured. This
@@ -33,15 +33,15 @@ typed `Table` descriptions.
 
 # Non-Goals
 
-1. **Reactive support like or deep IO-Monad integration**, like 
-   [SLICK](https://github.com/slick/slick) or 
-   [ZIO-Quill](https://github.com/zio/zio-quill). The fundamental 
+1. **Reactive support like or deep IO-Monad integration**, like
+   [SLICK](https://github.com/slick/slick) or
+   [ZIO-Quill](https://github.com/zio/zio-quill). The fundamental
    database operations using JDBC are neither async nor pure. Anyone who wants to use
    ScalaSql in reactive/io-monad environments can easily wrap it as necessary.
 
 2. **Compile-time query execution**: like [ZIO-Quill](https://github.com/zio/zio-quill).
-   Not because I don't want it (high runtime performance + compile-time logging of 
-   queries is great!) but because it adds enough complexity I don't think I'll be 
+   Not because I don't want it (high runtime performance + compile-time logging of
+   queries is great!) but because it adds enough complexity I don't think I'll be
    able to implement it in a reasonable timeframe
 
 3. **Database query planning and index usage**: Databases often have problems
@@ -53,25 +53,98 @@ typed `Table` descriptions.
    each database, and ever-changing. We thus do not aim to have complete coverage,
    aiming instead for common use cases and leaving more esoteric things to the user
    to extend the library to support.
-   
 
-# How to get there:
 
-1. **A thin-ish wrapper around JDBC's built-in `java.sql.*` APIs**: we can allow extensibility
-   for others to implement support for more fancy execution formats, but fundamentally JDBC
-   works OK enough that it's a reasonable place to start. This is similar to how
-   [Requests-Scala](https://github.com/com-lihaoyi/requests-scala) is a thin wrapper around
-   `java.net.*`.
+# Comparisons
 
-2. **Leverage [uPickle](https://github.com/com-lihaoyi/upickle)**: for both flattening 
-   out of a structured query into "flat" SQL expressions, as well as for re-constructing
-   a structured return value from a SQL row. uPickle is very good at converting between 
-   tree-shaped structured Scala data structures and "flat" formats, and we should be
-   able to use it here to do our conversions.
 
-3. **Higher-kinded Database Row Objects**: by making the fields of the case class `Foo` 
-   typed `T[V]` for arbitrary `T`s, we can use the same `case class` to model both the
-   query expression `CaseCls[Expr]` as well as the output data `CaseCls[Value]`.
+|                                 | ScalaSql | Quill     | SLICK      | Squeryl | ScalikeJDBC | Doobie  |
+|---------------------------------|----------|-----------|------------|---------|-------------|---------|
+| Async/Monadic                   | No       | Yes (ZIO) | Yes (DBIO) | No      | No          | Yes     |
+| Compile-Time Query Generation   | No       | Yes       | No         | No      | No          | No      |
+| Scala-collection-like Query DSL | Yes      | Yes       | Yes        | No      | No          | No      |
+| Query Optimizer                 | No       | Yes       | Yes        | No      | No          | No      |
+| ORM/ActiveRecord-esque Features | No       | No        | No         | Yes     | Yes         | No      |
+
+
+## Quill
+
+Quill focuses a lot on compile-time query generation, while ScalaSql does not.
+Compile-time query generation has a ton of advantages - zero runtime overhead, compile
+time query logging, etc. - but also comes with a lot of complexity, both in
+maintainability and in the user-facing API. ScalaSql aims for a lower bar: convenient
+classes and methods that generate SQL queries at runtime.
+
+## SLICK
+
+SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
+transactions, and query optimization. These areas result in a lot of user-facing and
+internal complexity for the library. ScalaSql aims to do without them.
+
+## Squeryl
+
+ScalaSql uses a different DSL design from Squeryl, focusing on a Scala-collection-like
+API rather than a SQL-like API:
+
+**ScalaSql**
+```scala
+def songs = MusicDb.songs.filter(_.artistId === id)
+
+val studentsWithAnAddress = students.filter(s => addresses.filter(a => s.addressId === a.id).nonEmpty)
+```
+**Squeryl**
+```scala
+def songs = from(MusicDb.songs)(s => where(s.artistId === id) select(s))
+
+val studentsWithAnAddress = from(students)(s =>
+  where(exists(from(addresses)((a) => where(s.addressId === a.id) select(a.id))))
+  select(s)
+)
+```
+
+ScalaSql aims to mimic both the syntax and semantics of Scala collections, which should
+hopefully result in a library much more familiar to Scala programmers. Squeryl's DSL on
+the other hand is unlike Scala collections, but as an embedded DSL is unlike raw SQL as
+well, making it unfamiliar to people with either Scala or raw SQL expertise
+
+## ScalikeJDBC
+
+Like Squeryl, ScalikeJDBC has a SQL-like DSL, while ScalaSql aims to have a
+Scala-collections-like DSL:
+
+**ScalaSql**
+```scala
+val programmers = db.run(
+   Programmer.select
+     .join(Company)(_.companyId == _.id)
+     .filter{case (p, c) => !p.isDeleted}
+     .sortBy{case (p, c) => p.createdAt}
+     .drop(take(10))
+)
+```
+
+**ScalikeJDBC**
+```scala
+val programmers = DB.readOnly { implicit session =>
+  withSQL {
+    select
+      .from(Programmer as p)
+      .leftJoin(Company as c).on(p.companyId, c.id)
+      .where.eq(p.isDeleted, false)
+      .orderBy(p.createdAt)
+      .limit(10)
+      .offset(0)
+  }.map(Programmer(p, c)).list.apply()
+}
+```
+
+## Doobie
+
+Doobie aims to let you write raw SQL strings, with some niceties around parameter
+interpolation and parsing SQL result sets into Scala data structures, but without
+any kind of strongly-typed data model for the queries you write. ScalaSql also lets
+you write raw `sql"..."` strings, but the primary interface is meant to be the
+strongly-typed collection-like API.
 
 # Design
 
