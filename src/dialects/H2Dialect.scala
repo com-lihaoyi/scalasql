@@ -9,8 +9,11 @@ object H2Dialect extends H2Dialect {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
   }
 
+  class ExprNumericOps[T: Numeric](val v: Expr[T]) extends operations.ExprNumericOps[T](v) with BitwiseFunctionOps[T]
 }
 trait H2Dialect extends Dialect {
-  override implicit def ExprStringOpsConv(v: Expr[String]): HsqlDbDialect.ExprStringOps =
-    new HsqlDbDialect.ExprStringOps(v)
+  override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps =
+    new H2Dialect.ExprStringOps(v)
+  override implicit def ExprNumericOpsConv[T: Numeric](v: Expr[T]): H2Dialect.ExprNumericOps[T] =
+    new H2Dialect.ExprNumericOps(v)
 }

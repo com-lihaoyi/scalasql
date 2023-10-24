@@ -1,6 +1,4 @@
-package scalasql.buyers
-
-import scalasql._
+package scalasql
 import scalasql.query.Expr
 import utest._
 
