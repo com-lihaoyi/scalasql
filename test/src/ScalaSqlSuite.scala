@@ -12,7 +12,8 @@ trait ScalaSqlSuite extends TestSuite with Dialect {
 trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
-    "sqlite-test-data.sql",
+    "sqlite-customer-schema.sql",
+    "customer-data.sql",
     "",
     castParams = false
   )
@@ -23,7 +24,8 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
 trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
-    "hsqldb-test-data.sql",
+    "hsqldb-customer-schema.sql",
+    "customer-data.sql",
     " FROM (VALUES (0))",
     castParams = true
   )
@@ -34,7 +36,8 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
 trait H2Suite extends TestSuite with H2Dialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:h2:mem:mydb"),
-    "h2-test-data.sql",
+    "h2-customer-schema.sql",
+    "customer-data.sql",
     "",
     castParams = true
   )
@@ -47,7 +50,8 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
     DriverManager.getConnection(
       s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
     ),
-    "postgres-test-data.sql",
+    "postgres-customer-schema.sql",
+    "customer-data.sql",
     "",
     castParams = false
   )
@@ -62,7 +66,8 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
       TestDb.mysql.getUsername,
       TestDb.mysql.getPassword
     ),
-    "mysql-test-data.sql",
+    "mysql-customer-schema.sql",
+    "customer-data.sql",
     "",
     castParams = false
   )

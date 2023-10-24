@@ -10,6 +10,7 @@ import java.sql.{Connection, DriverManager}
 
 
 class TestDb(connection: Connection,
+             testSchemaFileName: String,
              testDataFileName: String,
              defaultQueryableSuffix: String,
              castParams: Boolean) {
@@ -25,6 +26,7 @@ class TestDb(connection: Connection,
   )
 
   def reset() = {
+    db.runRaw(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
     db.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 

@@ -22,11 +22,7 @@ class DatabaseApi(
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
 
-    try {
-      for(s <- sql.split(';') if s.trim.nonEmpty){
-        statement.executeUpdate(s)
-      }
-    }
+    try statement.executeUpdate(sql)
     finally statement.close()
   }
 
