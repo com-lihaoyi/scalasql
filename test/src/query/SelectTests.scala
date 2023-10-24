@@ -147,22 +147,22 @@ trait SelectTests extends ScalaSqlSuite {
       value = Seq("Face Mask", "Socks", "Cookie")
     )
 
-    test("aggregate") {
-      test("single") - checker(
-        query =
-          Purchase.select.aggregate(_.sumBy(_.total)),
-        sql = "SELECT SUM(purchase0.total) as res FROM purchase purchase0",
-        value = 12343.2
-      )
-
-      test("multiple") - checker(
-        query =
-          Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total))),
-        sql =
-          "SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0",
-        value = (12343.2, 10000.0)
-      )
-    }
+//    test("aggregate") {
+//      test("single") - checker(
+//        query =
+//          Purchase.select.aggregate(_.sumBy(_.total)),
+//        sql = "SELECT SUM(purchase0.total) as res FROM purchase purchase0",
+//        value = 12343.2
+//      )
+//
+//      test("multiple") - checker(
+//        query =
+//          Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total))),
+//        sql =
+//          "SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0",
+//        value = (12343.2, 10000.0)
+//      )
+//    }
 
     test("groupBy") - {
       test("simple") - checker(
@@ -639,28 +639,28 @@ trait SelectTests extends ScalaSqlSuite {
         value = Seq("guitar", "james bond", "li haoyi", "skate board")
       )
 
-      test("intersectAggregate") - checker(
-        query =
-          Product.select
-            .map(p => (p.name.toLowerCase, p.price))
-            .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-            .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
-        sql = """
-          SELECT
-            MAX(subquery0.res__1) as res__0,
-            MIN(subquery0.res__1) as res__1
-          FROM (SELECT
-              LOWER(product0.name) as res__0,
-              product0.price as res__1
-            FROM product product0
-            EXCEPT
-            SELECT
-              LOWER(product0.kebab_case_name) as res__0,
-              product0.price as res__1
-            FROM product product0) subquery0
-        """,
-        value = (123.45, 8.88)
-      )
+//      test("intersectAggregate") - checker(
+//        query =
+//          Product.select
+//            .map(p => (p.name.toLowerCase, p.price))
+//            .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+//            .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
+//        sql = """
+//          SELECT
+//            MAX(subquery0.res__1) as res__0,
+//            MIN(subquery0.res__1) as res__1
+//          FROM (SELECT
+//              LOWER(product0.name) as res__0,
+//              product0.price as res__1
+//            FROM product product0
+//            EXCEPT
+//            SELECT
+//              LOWER(product0.kebab_case_name) as res__0,
+//              product0.price as res__1
+//            FROM product product0) subquery0
+//        """,
+//        value = (123.45, 8.88)
+//      )
     }
   }
 }

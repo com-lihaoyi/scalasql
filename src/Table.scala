@@ -47,7 +47,7 @@ object Table {
         if (c.prefix.actualType.member(name) != NoSymbol) {
           q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
         } else {
-          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(${name.toString}, ${c.prefix}).expr($tableRef)"
+          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 
@@ -91,13 +91,13 @@ object Table {
   }
 }
 
-case class Column[T]()(implicit val name: sourcecode.Name, val table: Table.Base) {
+case class Column[T: MappedType]()(implicit val name: sourcecode.Name, val table: Table.Base) {
   def expr(tableRef: TableRef): Column.ColumnExpr[T] =
     new Column.ColumnExpr[T](tableRef, name.value)
 }
 
 object Column {
-  class ColumnExpr[T](tableRef: TableRef, val name: String) extends Expr[T] {
+  class ColumnExpr[T](tableRef: TableRef, val name: String)(implicit val mappedType: MappedType[T]) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context) = {
       val prefix = ctx.fromNaming(tableRef) match {
         case "" => sql""

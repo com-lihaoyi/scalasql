@@ -1,9 +1,10 @@
 package scalasql.operations
 
+import scalasql.MappedType
 import scalasql.query.Expr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
-class ExprNumericOps[T: Numeric](v: Expr[T]) {
+class ExprNumericOps[T: Numeric](v: Expr[T])(implicit val m: MappedType[T]) {
 
   /** Addition */
   def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v + $x" }

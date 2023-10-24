@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SelectToSql, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{Queryable, Table}
+import scalasql.{MappedType, Queryable, Table}
 
 case class CompoundSelect[Q, R](
     lhs: SimpleSelect[Q, R],
@@ -19,7 +19,7 @@ case class CompoundSelect[Q, R](
 
   def distinct: Select[Q, R] = ???
 
-  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V] = ???
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V] = ???
 
   def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable[Q2, R2]): Select[Q2, R2] = {
     (lhs, compoundOps) match {
@@ -48,7 +48,7 @@ case class CompoundSelect[Q, R](
     SimpleSelect.from(this).join0(other, on)
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
+  def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
     SimpleSelect.from(this).aggregate(f)
   }
 

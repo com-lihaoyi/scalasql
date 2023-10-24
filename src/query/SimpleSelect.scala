@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.Queryable
+import scalasql.{MappedType, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -34,7 +34,7 @@ case class SimpleSelect[Q, R](
 
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy(expr = Expr[V] { implicit ctx: Context =>
         val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
@@ -74,7 +74,7 @@ case class SimpleSelect[Q, R](
     )
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
+  def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V] { implicit ctx: Context =>
       this.copy(expr = f(new SelectProxy[Q](expr))).toSqlQuery

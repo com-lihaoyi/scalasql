@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SelectToSql, SqlStr}
-import scalasql.Queryable
+import scalasql.{MappedType, Queryable}
 import scalasql.utils.OptionPickler
 
 trait Select[Q, R]
@@ -27,7 +27,7 @@ trait Select[Q, R]
   def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
   def filter(f: Q => Expr[Boolean]): Select[Q, R]
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V]
+  def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V]
 
   def groupBy[K, V, R2, R3](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
       qrk: Queryable[K, R2],

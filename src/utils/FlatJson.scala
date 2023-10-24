@@ -31,8 +31,6 @@ object FlatJson {
      * on start/end/depth indices and "returns" the groups via a callback to avoid allocating
      * intermediate data structures.
      */
-    FlatJson
-
     def groupedOn(start: Int, end: Int, depth: Int)(callback: (String, Int, Int) => Unit) = {
       var prevKey = keys(start)(depth)
       var prevIndex = start
@@ -54,8 +52,6 @@ object FlatJson {
      */
     def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _], inObj: Boolean): Any = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
-        pprint.log(values(startIndex).getClass)
-        pprint.log(values(startIndex))
         if (inObj) scalasql.Val(values(startIndex)) else values(startIndex)
       } else {
         // Hack to check if a random key looks like a number,

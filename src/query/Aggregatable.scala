@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.Queryable
+import scalasql.{MappedType, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -8,5 +8,5 @@ import scalasql.renderer.{Context, SqlStr}
  */
 trait Aggregatable[Q] {
   def expr: Q
-  def queryExpr[V](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V]
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V]
 }

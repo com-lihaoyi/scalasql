@@ -2,16 +2,16 @@ package scalasql.dialects
 
 import scalasql.operations.TableOps
 import scalasql.query.{Aggregatable, Expr, Select}
-import scalasql.{Queryable, Table, operations}
+import scalasql.{MappedType, Queryable, Table, operations}
 
 trait Dialect {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
-  implicit def ExprNumericOpsConv[T: Numeric](v: Expr[T]): operations.ExprNumericOps[T] =
+  implicit def ExprNumericOpsConv[T: Numeric: MappedType](v: Expr[T]): operations.ExprNumericOps[T] =
     new operations.ExprNumericOps(v)
   implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
-  implicit def AggNumericOpsConv[V: Numeric](v: Aggregatable[Expr[V]])(implicit
+  implicit def AggNumericOpsConv[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(implicit
       qr: Queryable[Expr[V], V]
   ): operations.AggNumericOps[V] =
     new operations.AggNumericOps(v)
