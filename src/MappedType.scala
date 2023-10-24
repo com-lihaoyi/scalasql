@@ -1,7 +1,15 @@
 package scalasql
 
 import java.sql.JDBCType
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZonedDateTime
+}
 
 // What Quill does
 // https extends//github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
@@ -12,11 +20,11 @@ import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, 
 // Official JDBC mapping docs
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/index.html
 // https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
-sealed trait MappedType[T]  {
+sealed trait MappedType[T] {
   def jdbcType: JDBCType
   def fromObject: PartialFunction[Object, T]
 }
-object MappedType{
+object MappedType {
   implicit object StringType extends MappedType[String] {
     def jdbcType = JDBCType.LONGVARCHAR
     def fromObject = { case t: String => t }

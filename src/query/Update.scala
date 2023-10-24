@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{Column, Queryable}
+import scalasql.{Column, MappedType, Queryable}
 import scalasql.renderer.{Context, SqlStr, UpdateToSql}
 import scalasql.utils.OptionPickler
 
@@ -48,7 +48,8 @@ object Update {
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }
 
-    override def toSqlQuery(implicit ctx: Context): SqlStr = UpdateToSql(this, ctx)
+    override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+      UpdateToSql(this, ctx)
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }

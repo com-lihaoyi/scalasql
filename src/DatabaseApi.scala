@@ -27,21 +27,24 @@ class DatabaseApi(
     finally statement.close()
   }
 
-  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String = {
-    val (str, params, exprs) = toSqlQuery0(query)
+  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit
+      qr: Queryable[Q, R]
+  ): String = {
+    val (str, params, mappedTypes) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[Q, R](query: Q,
-                        castParams: Boolean = false)
-                       (implicit qr: Queryable[Q, R]): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[Expr[_]]) = {
+  def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(implicit
+      qr: Queryable[Q, R]
+  ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[MappedType[_]]) = {
     val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
-    val flattened = SqlStr.flatten(qr.toSqlQuery(query, ctx))
+    val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
+    val flattened = SqlStr.flatten(sqlStr)
     val queryStr = flattened.queryParts.zipAll(flattened.params, "", null)
-      .map{
+      .map {
         case (part, null) => part
         case (part, param) =>
-          val jdbcTypeString = param.jdbcType match{
+          val jdbcTypeString = param.jdbcType match {
             case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
             case n => n.toString
           }
@@ -50,7 +53,7 @@ class DatabaseApi(
       }
       .mkString
 
-    (queryStr, flattened.params, flattened.exprs)
+    (queryStr, flattened.params, mappedTypes)
   }
 
   def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
@@ -75,7 +78,8 @@ class DatabaseApi(
         } else {
           val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
           while (resultSet.next()) {
-            val rowRes = handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor, exprs)
+            val rowRes =
+              handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor, exprs)
             arrVisitor.visitValue(rowRes, -1)
           }
           arrVisitor.visitEnd(-1)
@@ -93,7 +97,7 @@ object DatabaseApi {
       resultSet: ResultSet,
       columnNameUnMapper: String => String,
       rowVisitor: Visitor[_, V],
-      exprs: Seq[Expr[_]]
+      exprs: Seq[MappedType[_]]
   ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
@@ -109,7 +113,7 @@ object DatabaseApi {
 //      pprint.log(k)
 //      pprint.log(resultSet.getObject(i + 1).getClass)
 //      pprint.log(resultSet.getObject(i + 1))
-      val v = exprs(i).mappedType.fromObject(resultSet.getObject(i + 1)).asInstanceOf[Object]
+      val v = exprs(i).fromObject(resultSet.getObject(i + 1)).asInstanceOf[Object]
 
       keys.addOne(k)
       values.addOne(v)

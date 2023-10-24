@@ -2,7 +2,7 @@ package scalasql.renderer
 
 import SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.query.Update
-import scalasql.Queryable
+import scalasql.{MappedType, Queryable}
 
 object UpdateToSql {
   def apply[Q, R](
@@ -12,7 +12,7 @@ object UpdateToSql {
     val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
       prevContext,
       q.joins.flatMap(_.from).map(_.from),
-      Some(q.table),
+      Some(q.table)
     )
 
     implicit val ctx: Context = context
@@ -32,12 +32,12 @@ object UpdateToSql {
     }
 
     val where = SqlStr.optSeq(fromOns ++ q.where) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), sql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
     }
 
     val joins = optSeq(q.joins.drop(1))(SelectToSql.joinsToSqlStr(_, fromSelectables))
 
-    sql"UPDATE $tableName SET " + sets + from + joins + where
+    (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
 
   }
 }

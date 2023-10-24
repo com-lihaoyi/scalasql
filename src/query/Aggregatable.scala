@@ -8,5 +8,7 @@ import scalasql.renderer.{Context, SqlStr}
  */
 trait Aggregatable[Q] {
   def expr: Q
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit qr: Queryable[Expr[V], V]): Expr[V]
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit
+      qr: Queryable[Expr[V], V]
+  ): Expr[V]
 }

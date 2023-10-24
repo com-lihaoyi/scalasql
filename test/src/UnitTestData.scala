@@ -2,7 +2,15 @@ package scalasql
 import scalasql._
 
 import java.sql.Date
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZonedDateTime
+}
 
 case class Product[+T[_]](id: T[Int], kebabCaseName: T[String], name: T[String], price: T[Double])
 object Product extends Table[Product] {
@@ -31,13 +39,13 @@ object Purchase extends Table[Purchase] {
 }
 
 case class DataTypes[+T[_]](
-  myTinyInt: T[Byte],
-  mySmallInt: T[Short],
-  myInt: T[Int],
-  myBigInt: T[Long],
-  myDouble: T[Double],
-  myBoolean: T[Boolean],
-  myLocalDate: T[LocalDate],
+    myTinyInt: T[Byte],
+    mySmallInt: T[Short],
+    myInt: T[Int],
+    myBigInt: T[Long],
+    myDouble: T[Double],
+    myBoolean: T[Boolean],
+    myLocalDate: T[LocalDate]
 //  myLocalTime: T[LocalTime],
 //  myLocalDateTime: T[LocalDateTime],
 //  myZonedDateTime: T[ZonedDateTime],

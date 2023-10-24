@@ -5,7 +5,8 @@ import scalasql.query.Expr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 object PostgresDialect extends PostgresDialect {
-  class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with TrimOps with PadOps {
+  class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with TrimOps
+      with PadOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
 
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }

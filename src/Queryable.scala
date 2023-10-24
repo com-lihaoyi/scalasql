@@ -18,10 +18,14 @@ trait Queryable[-Q, R] {
   def valueReader(q: Q): Reader[R]
   def singleRow(q: Q): Boolean = true
 
-  def toSqlQuery(q: Q, ctx: Context): SqlStr = {
-    val res = ExprsToSql(this.walk(q), sql"", ctx)._2
-    if (res.isCompleteQuery) res
-    else res + SqlStr.raw(ctx.defaultQueryableSuffix)
+  def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    val walked = this.walk(q)
+    val res = ExprsToSql(walked, sql"", ctx)._2
+    (
+      if (res.isCompleteQuery) res
+      else res + SqlStr.raw(ctx.defaultQueryableSuffix),
+      walked.map(_._2.mappedType)
+    )
   }
 }
 
@@ -71,7 +75,12 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3), (R1, R2, R3)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
-      t => utils.OptionPickler.Tuple3Reader(q1.valueReader(t._1), q2.valueReader(t._2), q3.valueReader(t._3))
+      t =>
+        utils.OptionPickler.Tuple3Reader(
+          q1.valueReader(t._1),
+          q2.valueReader(t._2),
+          q3.valueReader(t._3)
+        )
     )
   }
 
@@ -92,12 +101,13 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-      t => utils.OptionPickler.Tuple4Reader(
-        q1.valueReader(t._1),
-        q2.valueReader(t._2),
-        q3.valueReader(t._3),
-        q4.valueReader(t._4)
-      )
+      t =>
+        utils.OptionPickler.Tuple4Reader(
+          q1.valueReader(t._1),
+          q2.valueReader(t._2),
+          q3.valueReader(t._3),
+          q4.valueReader(t._4)
+        )
     )
   }
 
@@ -121,13 +131,14 @@ object Queryable {
   ): Queryable[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
     new Queryable.TupleNQueryable(
       t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-      t => utils.OptionPickler.Tuple5Reader(
-        q1.valueReader(t._1),
-        q2.valueReader(t._2),
-        q3.valueReader(t._3),
-        q4.valueReader(t._4),
-        q5.valueReader(t._5)
-      )
+      t =>
+        utils.OptionPickler.Tuple5Reader(
+          q1.valueReader(t._1),
+          q2.valueReader(t._2),
+          q3.valueReader(t._3),
+          q4.valueReader(t._4),
+          q5.valueReader(t._5)
+        )
     )
   }
 
@@ -162,14 +173,15 @@ object Queryable {
           q5.walk(t._5),
           q6.walk(t._6)
         ),
-      t => utils.OptionPickler.Tuple6Reader(
-        q1.valueReader(t._1),
-        q2.valueReader(t._2),
-        q3.valueReader(t._3),
-        q4.valueReader(t._4),
-        q5.valueReader(t._5),
-        q6.valueReader(t._6)
-      )
+      t =>
+        utils.OptionPickler.Tuple6Reader(
+          q1.valueReader(t._1),
+          q2.valueReader(t._2),
+          q3.valueReader(t._3),
+          q4.valueReader(t._4),
+          q5.valueReader(t._5),
+          q6.valueReader(t._6)
+        )
     )
   }
 }

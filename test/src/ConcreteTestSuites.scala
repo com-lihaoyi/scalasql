@@ -98,7 +98,6 @@ package hsqldb {
   object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
 }
 
-
 package h2 {
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
   object ExprIntOpsTests extends ExprNumericOpsTests with H2Suite

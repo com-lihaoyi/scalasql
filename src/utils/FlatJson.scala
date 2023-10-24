@@ -13,7 +13,7 @@ object FlatJson {
   val basePrefix = "res"
 
   def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
-    x.map { case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlQuery(context)) }
+    x.map { case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlQuery(context)._1) }
   }
 
   /**
@@ -50,7 +50,13 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _], inObj: Boolean): Any = {
+    def rec(
+        startIndex: Int,
+        endIndex: Int,
+        depth: Int,
+        visitor: Visitor[_, _],
+        inObj: Boolean
+    ): Any = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
         if (inObj) scalasql.Val(values(startIndex)) else values(startIndex)
       } else {
@@ -59,7 +65,10 @@ object FlatJson {
         if (keys(startIndex)(depth).head.isDigit) {
           val arrVisitor = visitor.visitArray(-1, -1).narrow
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-            arrVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor, false), -1)
+            arrVisitor.visitValue(
+              rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor, false),
+              -1
+            )
           }
 
           arrVisitor.visitEnd(-1)
@@ -68,7 +77,10 @@ object FlatJson {
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
             val keyVisitor = objVisitor.visitKey(-1)
             objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
-            objVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor, true), -1)
+            objVisitor.visitValue(
+              rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor, true),
+              -1
+            )
           }
 
           objVisitor.visitEnd(-1)

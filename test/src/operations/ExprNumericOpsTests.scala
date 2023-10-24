@@ -52,7 +52,7 @@ trait ExprNumericOpsTests extends ScalaSqlSuite {
       query = Expr(6) | Expr(3),
       sqls = Seq(
         "SELECT ? | ? as res",
-        "SELECT BITOR(?, ?) as res",
+        "SELECT BITOR(?, ?) as res"
       ),
       value = 7
     )

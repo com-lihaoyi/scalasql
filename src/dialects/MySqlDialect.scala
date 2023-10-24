@@ -36,18 +36,18 @@ object MySqlDialect extends MySqlDialect {
 
     def table: TableRef = update.table
 
-    override def toSqlQuery(implicit ctx: Context): SqlStr = {
+    override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       toSqlQuery0(update, ctx)
     }
 
     def toSqlQuery0[Q, R](
         q: Update.Impl[Q, R],
         prevContext: Context
-    ) = {
+    ): (SqlStr, Seq[MappedType[_]]) = {
       val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
         prevContext,
         q.joins.flatMap(_.from).map(_.from),
-        Some(q.table),
+        Some(q.table)
       )
 
       implicit val ctx: Context = context
@@ -60,12 +60,12 @@ object MySqlDialect extends MySqlDialect {
       val sets = SqlStr.join(updateList, sql", ")
 
       val where = SqlStr.optSeq(q.where) { where =>
-        sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery), sql" AND ")
+        sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
       }
 
       val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, fromSelectables))
 
-      sql"UPDATE $tableName" + joins + sql" SET " + sets + where
+      (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
     }
 
     def qr: Queryable[Q, R] = update.qr

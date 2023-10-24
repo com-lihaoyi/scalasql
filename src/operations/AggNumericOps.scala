@@ -4,7 +4,9 @@ import scalasql.{MappedType, Queryable}
 import scalasql.query.{Aggregatable, Expr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
-class AggNumericOps[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(implicit qr: Queryable[Expr[V], V]) {
+class AggNumericOps[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(implicit
+    qr: Queryable[Expr[V], V]
+) {
 
   /** Computes the sum of column values */
   def sum: Expr[V] = v.queryExpr(expr => implicit ctx => sql"SUM($expr)")

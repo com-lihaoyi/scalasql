@@ -8,12 +8,13 @@ import utest.TestSuite
 
 import java.sql.{Connection, DriverManager}
 
-
-class TestDb(connection: Connection,
-             testSchemaFileName: String,
-             testDataFileName: String,
-             defaultQueryableSuffix: String,
-             castParams: Boolean) {
+class TestDb(
+    connection: Connection,
+    testSchemaFileName: String,
+    testDataFileName: String,
+    defaultQueryableSuffix: String,
+    castParams: Boolean
+) {
 
   val db = new DatabaseApi(
     connection,

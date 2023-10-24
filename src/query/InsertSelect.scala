@@ -10,13 +10,12 @@ import scalasql.utils.OptionPickler
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R],
-                                     columns: C,
-                                     select: Select[C, R2]) extends Returnable[Q] with Query[Int] {
+case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
+    extends Returnable[Q] with Query[Int] {
   def expr = insert.expr
   def table = insert.table
 
-  override def toSqlQuery(implicit ctx: Context): SqlStr =
+  override def toSqlQuery(implicit ctx: Context) =
     InsertToSql.select(this, select.qr.walk(columns).map(_._2), ctx)
 
   override def isExecuteUpdate = true
@@ -27,4 +26,3 @@ case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R],
 
   override def valueReader: OptionPickler.Reader[Int] = implicitly
 }
-

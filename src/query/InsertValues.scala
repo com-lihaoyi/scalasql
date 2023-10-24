@@ -3,7 +3,7 @@ package scalasql.query
 import renderer.InsertToSql
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{Column, Queryable}
+import scalasql.{Column, MappedType, Queryable}
 
 /**
  * Syntax reference
@@ -18,11 +18,11 @@ case class InsertValues[Q, R](
   def table = insert.table
   def expr: Q = insert.expr
 
-  override def toSqlQuery(implicit ctx: Context): SqlStr = InsertToSql.values(this, ctx)
+  override def toSqlQuery(implicit ctx: Context) =
+    (InsertToSql.values(this, ctx), Seq(MappedType.IntType))
   def walk() = Nil
   override def singleRow = true
   override def isExecuteUpdate = true
 
   override def valueReader: OptionPickler.Reader[Int] = implicitly
 }
-

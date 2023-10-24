@@ -1,7 +1,6 @@
 package scalasql.renderer
 
 import scalasql.MappedType
-import scalasql.query.Expr
 
 import java.sql.JDBCType
 
@@ -12,26 +11,22 @@ import java.sql.JDBCType
 class SqlStr(
     private val queryParts: Seq[String],
     private val params: Seq[SqlStr.Interp],
-    val isCompleteQuery: Boolean,
-    private val exprs: Seq[Expr[_]]
+    val isCompleteQuery: Boolean
 ) {
   def +(other: SqlStr) = new SqlStr(
     queryParts.init ++ Seq(queryParts.last + other.queryParts.head) ++ other.queryParts.tail,
     params ++ other.params,
-    false,
-    exprs ++ other.exprs
+    false
   )
 
-  def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, exprs)
-  def withExprs(v: Seq[Expr[_]]) = new SqlStr(queryParts, params, isCompleteQuery, v)
+  def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v)
 }
 
 object SqlStr {
   case class Flattened(
       queryParts: Seq[String],
       params: Seq[Interp.TypeInterp[_]],
-      isCompleteQuery: Boolean,
-      exprs: Seq[Expr[_]]
+      isCompleteQuery: Boolean
   )
 
   def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
@@ -40,13 +35,12 @@ object SqlStr {
   def flatten(self: SqlStr): Flattened = {
     val finalParts = collection.mutable.Buffer[String]()
     val finalArgs = collection.mutable.Buffer[Interp.TypeInterp[_]]()
-    val finalExprs = collection.mutable.Buffer[Expr[_]]()
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       var boundary = true
       if (!topLevel && self.isCompleteQuery) addFinalPart("(")
       boundary = true
-      finalExprs.appendAll(self.exprs)
+
       def addFinalPart(s: String) = {
         if (boundary && finalParts.nonEmpty) finalParts(finalParts.length - 1) = finalParts.last + s
         else finalParts.append(s)
@@ -69,11 +63,11 @@ object SqlStr {
     }
 
     rec(self, true)
-    Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery, finalExprs.toSeq)
+    Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery)
   }
 
   implicit class SqlStringSyntax(sc: StringContext) {
-    def sql(args: Interp*) = new SqlStr(sc.parts, args, false, Nil)
+    def sql(args: Interp*) = new SqlStr(sc.parts, args, false)
   }
 
   def join(strs: Seq[SqlStr], sep: SqlStr = sql""): SqlStr = {
@@ -81,17 +75,16 @@ object SqlStr {
     else strs.reduce(_ + sep + _)
   }
 
-  def raw(s: String) = new SqlStr(Seq(s), Nil, false, Nil)
-
+  def raw(s: String) = new SqlStr(Seq(s), Nil, false)
 
   trait Renderable {
-    def toSqlQuery(implicit ctx: Context): SqlStr
+    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
   }
 
   sealed trait Interp
   object Interp {
     implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
-      SqlStrInterp(t.toSqlQuery(ctx))
+      SqlStrInterp(t.toSqlQuery(ctx)._1)
 
     implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
 
@@ -105,7 +98,7 @@ object SqlStr {
     implicit def longInterp(value: Long): Interp = typeInterp(value)
 
     implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
-    case class TypeInterp[T: MappedType](value: T) extends Interp{
+    case class TypeInterp[T: MappedType](value: T) extends Interp {
       def jdbcType: JDBCType = implicitly[MappedType[T]].jdbcType
     }
   }

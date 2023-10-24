@@ -6,8 +6,8 @@ import scalasql.utils.OptionPickler
 
 trait Expr[T] extends SqlStr.Renderable {
   def mappedType: MappedType[T]
-  final def toSqlQuery(implicit ctx: Context): SqlStr = {
-    ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
+  final def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    (ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0), Seq(mappedType))
   }
 
   def toSqlExpr0(implicit ctx: Context): SqlStr
@@ -40,7 +40,6 @@ object Expr {
     def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
   }
 
-
   def apply[T](f: Context => SqlStr)(implicit mappedType: MappedType[T]): Expr[T] = new Simple[T](f)
   class Simple[T](f: Context => SqlStr)(implicit val mappedType: MappedType[T]) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
@@ -51,11 +50,12 @@ object Expr {
   implicit def from(x: Boolean): Expr[Boolean] = apply(x)
   implicit def from(x: Double): Expr[Double] = apply(x)
   implicit def from(x: String): Expr[String] = apply(x)
-  implicit def apply[T](x: T)
-                       (implicit conv: T => SqlStr.Interp,
-                        mappedType0: MappedType[T]): Expr[T] = new Expr[T] {
+  implicit def apply[T](x: T)(implicit
+      conv: T => SqlStr.Interp,
+      mappedType0: MappedType[T]
+  ): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
-      new SqlStr(Seq("", ""), Seq(conv(x)), false, Seq(this))
+      new SqlStr(Seq("", ""), Seq(conv(x)), false)
   }
 }

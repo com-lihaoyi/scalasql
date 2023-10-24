@@ -34,13 +34,15 @@ case class SimpleSelect[Q, R](
 
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit
+      qr2: Queryable[Expr[V], V]
+  ): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy(expr = Expr[V] { implicit ctx: Context =>
         val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
 
         f(expr)(newCtx)
-      }).toSqlQuery.withCompleteQuery(true)
+      }).toSqlQuery._1.withCompleteQuery(true)
     }
   }
 
@@ -77,7 +79,7 @@ case class SimpleSelect[Q, R](
   def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
 
     Expr[V] { implicit ctx: Context =>
-      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlQuery
+      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlQuery._1
     }
   }
 

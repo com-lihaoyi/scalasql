@@ -9,7 +9,7 @@ import java.time.LocalDate
 /**
  * Tests for basic update operations
  */
-trait ReturningTests extends ScalaSqlSuite with ReturningDialect  {
+trait ReturningTests extends ScalaSqlSuite with ReturningDialect {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("insert") {

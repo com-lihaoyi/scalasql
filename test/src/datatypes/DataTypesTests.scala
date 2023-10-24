@@ -3,7 +3,15 @@ package scalasql.datatypes
 import scalasql._
 import utest._
 
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZonedDateTime
+}
 
 /**
  * Tests for basic query operations: map, filter, join, etc.
@@ -18,7 +26,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         myBigInt = 12345678901L,
         myDouble = 3.14,
         myBoolean = true,
-        myLocalDate = LocalDate.parse("2023-12-20"),
+        myLocalDate = LocalDate.parse("2023-12-20")
 //        myLocalTime = LocalTime.parse("10:15:30"),
 //        myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
 //        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
@@ -33,7 +41,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myBigInt -> value.myBigInt(),
           _.myDouble -> value.myDouble(),
           _.myBoolean -> value.myBoolean(),
-          _.myLocalDate -> value.myLocalDate(),
+          _.myLocalDate -> value.myLocalDate()
 //          _.myLocalTime -> value.myLocalTime(),
 //          _.myLocalDateTime -> value.myLocalDateTime(),
 //          _.myZonedDateTime -> value.myZonedDateTime(),

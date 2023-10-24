@@ -49,8 +49,10 @@ trait Select[Q, R]
   def drop(n: Int): Select[Q, R]
   def take(n: Int): Select[Q, R]
 
-  def toSqlQuery(implicit ctx: Context): SqlStr = {
-    SelectToSql.apply(this, qr, ctx)._2.withCompleteQuery(true)
+  def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    val (_, sqlStr, _, mappedTypes) = SelectToSql.apply(this, qr, ctx)
+
+    (sqlStr.withCompleteQuery(true), mappedTypes)
   }
   def walk() = qr.walk(expr)
   override def singleRow = false

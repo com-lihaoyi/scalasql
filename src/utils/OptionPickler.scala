@@ -1,7 +1,16 @@
 package scalasql.utils
 
 import java.sql.Date
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZoneId,
+  ZonedDateTime
+}
 
 object OptionPickler extends upickle.AttributeTagged {
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
@@ -48,12 +57,9 @@ object OptionPickler extends upickle.AttributeTagged {
     override def expectedMsg = "expected instant"
   }
 
-
   implicit val OffsetTimeReader: Reader[OffsetTime] = new SimpleReader[OffsetTime] {
     override def expectedMsg = "expected offset time"
   }
-
-
 
   implicit val OffsetDateTimeReader: Reader[OffsetDateTime] = new SimpleReader[OffsetDateTime] {
     override def expectedMsg = "expected offset datetime"

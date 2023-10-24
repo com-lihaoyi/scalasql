@@ -22,7 +22,7 @@ object ExprsToSql {
           sql", "
         )
 
-        (flattenedExpr, (prefix + exprsStr).withExprs(flattenedExpr.map(_._2)))
+        (flattenedExpr, prefix + exprsStr)
     }
   }
 }
