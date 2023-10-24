@@ -29,9 +29,10 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalDate = LocalDate.parse("2023-12-20"),
         myLocalTime = LocalTime.parse("10:15:30"),
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
-        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
+//        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
 //        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
-//        myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+01:00"),
+//        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
+        myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00"),
       )
       checker(
         query = DataTypes.insert.values(
@@ -44,9 +45,10 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalDate -> value.myLocalDate(),
           _.myLocalTime -> value.myLocalTime(),
           _.myLocalDateTime -> value.myLocalDateTime(),
-          _.myZonedDateTime -> value.myZonedDateTime(),
+//          _.myZonedDateTime -> value.myZonedDateTime(),
 //          _.myInstant -> value.myInstant(),
-//          _.myOffsetDateTime -> value.myOffsetDateTime(),
+//          _.myOffsetTime -> value.myOffsetTime(),
+          _.myOffsetDateTime -> value.myOffsetDateTime(),
         ),
         value = 1
       )

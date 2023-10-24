@@ -1,15 +1,7 @@
 package scalasql
 
 import java.sql.JDBCType
-import java.time.{
-  Instant,
-  LocalDate,
-  LocalDateTime,
-  LocalTime,
-  OffsetDateTime,
-  OffsetTime,
-  ZonedDateTime
-}
+import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneOffset, ZonedDateTime}
 
 // What Quill does
 // https extends//github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
@@ -114,14 +106,24 @@ object MappedType {
     }
   }
 
-//  implicit object OffsetTimeType extends MappedType[OffsetTime] {
-//    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
-//  }
+  implicit object OffsetTimeType extends MappedType[OffsetTime] {
+    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
+
+    def fromObject = {
+      case t: java.time.OffsetTime =>
+        pprint.log(t)
+        t
+      case s: String =>
+        pprint.log(s)
+        OffsetTime.parse(s)
+    }
+  }
 
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     def fromObject = {
       case t: java.time.OffsetDateTime => t
+      case t: java.sql.Timestamp => t.toInstant.atOffset(ZoneOffset.UTC)
       case s: String => OffsetDateTime.parse(s)
     }
   }

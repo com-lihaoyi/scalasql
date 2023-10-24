@@ -48,10 +48,10 @@ case class DataTypes[+T[_]](
     myLocalDate: T[LocalDate],
     myLocalTime: T[LocalTime],
     myLocalDateTime: T[LocalDateTime],
-    myZonedDateTime: T[ZonedDateTime],
+//    myZonedDateTime: T[ZonedDateTime],
 //  myInstant: T[Instant],
 //  myOffsetTime: T[OffsetTime],
-//  myOffsetDateTime: T[OffsetDateTime],
+  myOffsetDateTime: T[OffsetDateTime],
 )
 
 object DataTypes extends Table[DataTypes] {

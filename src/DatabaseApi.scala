@@ -46,6 +46,7 @@ class DatabaseApi(
         case (part, param) =>
           val jdbcTypeString = param.jdbcType match {
             case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
+            case JDBCType.TIME_WITH_TIMEZONE => "TIME WITH TIME ZONE"
             case n => n.toString
           }
           if (castParams) part + s"CAST(? AS $jdbcTypeString)"

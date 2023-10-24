@@ -58,6 +58,7 @@ package postgres {
 
   object PostgresDialectTests extends PostgresDialectTests
 
+  object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
 }
 
 package sqlite {
