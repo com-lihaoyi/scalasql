@@ -76,11 +76,11 @@ case class SimpleSelect[Q, R](
     )
   }
 
-  def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
-
-    Expr[V] { implicit ctx: Context =>
-      this.copy(expr = f(new SelectProxy[Q](expr))).toSqlQuery._1
-    }
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
+    val selectProxyExpr = f(new SelectProxy[Q](expr))
+    new Aggregate[E, V](
+      implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery,
+      selectProxyExpr)(qr)
   }
 
   def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit

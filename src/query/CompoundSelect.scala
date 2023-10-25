@@ -50,7 +50,7 @@ case class CompoundSelect[Q, R](
     SimpleSelect.from(this).join0(other, on)
   }
 
-  def aggregate[E, V: MappedType](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Expr[V] = {
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     SimpleSelect.from(this).aggregate(f)
   }
 
