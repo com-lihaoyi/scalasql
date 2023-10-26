@@ -45,11 +45,11 @@ CREATE TABLE data_types (
     my_local_date DATE,
     my_local_time TIME,
     my_local_date_time TIMESTAMP,
---     my_zoned_date_time TIMESTAMP WITH TIME ZONE,
     my_instant TIMESTAMP WITH TIME ZONE
 --     my_offset_time TIME WITH TIME ZONE,
 );
 
 CREATE TABLE non_round_trip_types(
+    my_zoned_date_time TIMESTAMP WITH TIME ZONE,
     my_offset_date_time TIMESTAMP WITH TIME ZONE
 )

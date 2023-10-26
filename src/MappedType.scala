@@ -1,7 +1,7 @@
 package scalasql
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneOffset, ZonedDateTime}
+import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 // What Quill does
 // https://github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
@@ -80,7 +80,7 @@ object MappedType {
 
   implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
-    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[ZonedDateTime])
+    def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant.atZone(ZoneId.systemDefault())
     def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
   }
 
@@ -90,12 +90,12 @@ object MappedType {
     def put(r: PreparedStatement, idx: Int, v: Instant) = r.setTimestamp(idx, java.sql.Timestamp.from(v))
   }
 
-//  implicit object OffsetTimeType extends MappedType[OffsetTime] {
-//    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
-//    def get(r: ResultSet, idx: Int) = r.getTime(idx).toLocalTime.atOffset(ZoneOffset.UTC)
-//    def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setTime(idx, java.sql.Time.valueOf(v.withOffsetSameInstant(ZoneOffset.UTC).toLocalTime))
-//  }
-//
+  implicit object OffsetTimeType extends MappedType[OffsetTime] {
+    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
+    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[OffsetTime])
+    def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setObject(idx, v)
+  }
+
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     def get(r: ResultSet, idx: Int) = {

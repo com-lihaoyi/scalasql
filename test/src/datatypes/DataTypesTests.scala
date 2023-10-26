@@ -3,7 +3,7 @@ package scalasql.datatypes
 import scalasql.{datatypes, _}
 import utest._
 
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneOffset, ZonedDateTime}
+import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 case class DataTypes[+T[_]](
     myTinyInt: T[Byte],
@@ -15,7 +15,6 @@ case class DataTypes[+T[_]](
     myLocalDate: T[LocalDate],
     myLocalTime: T[LocalTime],
     myLocalDateTime: T[LocalDateTime],
-//    myZonedDateTime: T[ZonedDateTime],
     myInstant: T[Instant],
 //  myOffsetTime: T[OffsetTime],
 )
@@ -25,6 +24,7 @@ object DataTypes extends Table[DataTypes] {
 }
 
 case class NonRoundTripTypes[+T[_]](
+  myZonedDateTime: T[ZonedDateTime],
   myOffsetDateTime: T[OffsetDateTime],
 )
 
@@ -49,7 +49,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalDate = LocalDate.parse("2023-12-20"),
         myLocalTime = LocalTime.parse("10:15:30"),
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
-//        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
+//        ,
         myInstant = Instant.parse("2011-12-03T10:15:30Z"),
 //        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
       )
@@ -82,24 +82,27 @@ trait DataTypesTests extends ScalaSqlSuite {
     // their instant, but cannot be round-tripped preserving the offset.
     test("nonRoundTrip"){
       val value = NonRoundTripTypes[Val](
+        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
         myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
       )
 
-      def normalize(x: OffsetDateTime) = x.withOffsetSameInstant(OffsetDateTime.now().getOffset)
+      def normalize(v: NonRoundTripTypes[Val]) = v.copy[Val](
+        myZonedDateTime = v.myZonedDateTime().withZoneSameInstant(ZoneId.systemDefault()),
+        myOffsetDateTime = v.myOffsetDateTime().withOffsetSameInstant(OffsetDateTime.now().getOffset),
+      )
 
       checker(
         query = NonRoundTripTypes.insert.values(
           _.myOffsetDateTime -> value.myOffsetDateTime(),
+          _.myZonedDateTime -> value.myZonedDateTime(),
         ),
         value = 1
       )
 
       checker(
         query = NonRoundTripTypes.select,
-        value = Seq(value.copy[Val](myOffsetDateTime = normalize(value.myOffsetDateTime()))),
-        normalize = (x: Seq[datatypes.NonRoundTripTypes[Val]]) =>
-          x.map(v => v.copy[Val](myOffsetDateTime = normalize(v.myOffsetDateTime())))
-      )
+        value = Seq(normalize(value)),
+        normalize = (x: Seq[datatypes.NonRoundTripTypes[Val]]) => x.map(normalize))
     }
   }
 }
