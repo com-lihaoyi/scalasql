@@ -37,23 +37,3 @@ case class Purchase[+T[_]](
 object Purchase extends Table[Purchase] {
   val metadata = initMetadata()
 }
-
-case class DataTypes[+T[_]](
-    myTinyInt: T[Byte],
-    mySmallInt: T[Short],
-    myInt: T[Int],
-    myBigInt: T[Long],
-    myDouble: T[Double],
-    myBoolean: T[Boolean],
-    myLocalDate: T[LocalDate],
-    myLocalTime: T[LocalTime],
-    myLocalDateTime: T[LocalDateTime],
-//    myZonedDateTime: T[ZonedDateTime],
-    myInstant: T[Instant],
-//  myOffsetTime: T[OffsetTime],
-//  myOffsetDateTime: T[OffsetDateTime],
-)
-
-object DataTypes extends Table[DataTypes] {
-  val metadata = initMetadata()
-}

@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS shipping_info;
 DROP TABLE IF EXISTS purchase;
 DROP TABLE IF EXISTS data_types;
+DROP TABLE IF EXISTS non_round_trip_types;
 
 CREATE TABLE buyer (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,5 +48,8 @@ CREATE TABLE data_types (
 --     my_zoned_date_time TIMESTAMP WITH TIME ZONE,
     my_instant DATETIME
 --     my_offset_time TIME WITH TIME ZONE,
---     my_offset_date_time DATETIME
+);
+
+CREATE TABLE non_round_trip_types(
+    my_offset_date_time TIMESTAMP
 )

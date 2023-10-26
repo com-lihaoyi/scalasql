@@ -4,7 +4,7 @@ import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneOffset, ZonedDateTime}
 
 // What Quill does
-// https extends//github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
+// https://github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
 
 // What SLICK does
 // https://github.com/slick/slick/blob/88b2ffb177776fd74dee38124b8c54d616d1a9ae/slick/src/main/scala/slick/jdbc/JdbcTypesComponent.scala#L15
@@ -80,7 +80,7 @@ object MappedType {
 
   implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
-    def get(r: ResultSet, idx: Int) = ZonedDateTime.ofInstant(r.getTime(idx).toInstant, java.util.TimeZone.getDefault.toZoneId)
+    def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[ZonedDateTime])
     def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
   }
 
@@ -90,25 +90,19 @@ object MappedType {
     def put(r: PreparedStatement, idx: Int, v: Instant) = r.setTimestamp(idx, java.sql.Timestamp.from(v))
   }
 
-  implicit object OffsetTimeType extends MappedType[OffsetTime] {
-    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
-    def get(r: ResultSet, idx: Int) = r.getTime(idx).toLocalTime.atOffset(ZoneOffset.UTC)
-    def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setTime(idx, java.sql.Time.valueOf(v.withOffsetSameInstant(ZoneOffset.UTC).toLocalTime))
-  }
-
+//  implicit object OffsetTimeType extends MappedType[OffsetTime] {
+//    def jdbcType = JDBCType.TIME_WITH_TIMEZONE
+//    def get(r: ResultSet, idx: Int) = r.getTime(idx).toLocalTime.atOffset(ZoneOffset.UTC)
+//    def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setTime(idx, java.sql.Time.valueOf(v.withOffsetSameInstant(ZoneOffset.UTC).toLocalTime))
+//  }
+//
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     def get(r: ResultSet, idx: Int) = {
-      pprint.log(r.getObject(idx))
-      pprint.log(r.getObject(idx).getClass)
-      r.getObject(idx) match{
-        case o: OffsetDateTime => o
-        case s: String => OffsetDateTime.parse(s)
-        case t: java.sql.Timestamp => t.toLocalDateTime.atOffset(ZoneOffset.UTC)
-      }
+      r.getTimestamp(idx).toInstant.atOffset(OffsetDateTime.now().getOffset)
     }
     def put(r: PreparedStatement, idx: Int, v: OffsetDateTime) = {
-      r.setObject(idx, v)
+      r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
     }
   }
 }
