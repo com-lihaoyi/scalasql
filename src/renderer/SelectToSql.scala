@@ -36,15 +36,4 @@ object SelectToSql {
     )
   }
 
-  def apply[Q, R](
-      query: Joinable[Q, R],
-      qr: Queryable[Q, R],
-      context: Context
-  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-    query match {
-      case q: SimpleSelect[Q, R] => SimpleSelect.toSqlStr(q, qr, context)
-      case q: CompoundSelect[Q, R] => CompoundSelect.toSqlStr(q, qr, context)
-    }
-  }
-
 }

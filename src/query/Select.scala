@@ -50,12 +50,14 @@ trait Select[Q, R]
   def take(n: Int): Select[Q, R]
 
   def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-    val (_, sqlStr, _, mappedTypes) = SelectToSql.apply(this, qr, ctx)
+    val (_, sqlStr, _, mappedTypes) = toSqlQuery0(ctx)
 
     (sqlStr.withCompleteQuery(true), mappedTypes)
   }
   def walk() = qr.walk(expr)
   override def singleRow = false
+
+  def toSqlQuery0(prevContext: Context): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
 }
 
 object Select {

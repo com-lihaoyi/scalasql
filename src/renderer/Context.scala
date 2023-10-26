@@ -41,7 +41,7 @@ object Context{
 
       case t: SubqueryRef[_, _] =>
         val (subNameMapping, sqlStr, _, _) =
-          SelectToSql(t.value, t.qr, prevContext)
+          t.value.toSqlQuery0(prevContext)
         (subNameMapping, sql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
     }
 

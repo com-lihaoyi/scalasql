@@ -84,6 +84,8 @@ case class CompoundSelect[Q, R](
 
   def valueReader: OptionPickler.Reader[Seq[R]] =
     OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+
+  def toSqlQuery0(prevContext: Context) = CompoundSelect.toSqlStr(this, qr, prevContext)
 }
 
 object CompoundSelect {
@@ -95,8 +97,7 @@ object CompoundSelect {
                       qr: Queryable[Q, R],
                       prevContext: Context
                     ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-    val (lhsMap, lhsStr0, context, mappedTypes) =
-      SelectToSql.apply(query.lhs, qr, prevContext)
+    val (lhsMap, lhsStr0, context, mappedTypes) = query.lhs.toSqlQuery0(prevContext)
 
     val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"($lhsStr0)" else lhsStr0
     implicit val ctx = context
@@ -104,7 +105,7 @@ object CompoundSelect {
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
       val compoundStrs = compoundOps.map { op =>
         val (compoundMapping, compoundStr, compoundCtx, compoundMappedTypes) =
-          SelectToSql.apply(op.rhs, qr, prevContext)
+          op.rhs.toSqlQuery0(prevContext)
 
         sql" ${SqlStr.raw(op.op)} $compoundStr"
       }

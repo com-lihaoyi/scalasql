@@ -123,6 +123,8 @@ case class SimpleSelect[Q, R](
 
   def valueReader: OptionPickler.Reader[Seq[R]] =
     OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+
+  def toSqlQuery0(prevContext: Context) = SimpleSelect.toSqlStr(this, qr, prevContext)
 }
 
 object SimpleSelect {
