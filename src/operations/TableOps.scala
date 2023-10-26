@@ -1,7 +1,7 @@
 package scalasql.operations
 
 import scalasql.{Column, Id, Table}
-import scalasql.query.{Expr, Insert, Joinable, Select, Update}
+import scalasql.query.{Delete, Expr, Insert, Joinable, Select, Update}
 
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
   def select: Select[V[Expr], V[Id]] = {
@@ -17,6 +17,11 @@ class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
   def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
     val ref = t.tableRef
     Insert.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
+  }
+
+  def delete(f: V[Column.ColumnExpr] => Expr[Boolean]): Delete = {
+    val ref = t.tableRef
+    Delete.fromTable(f(t.metadata.vExpr(ref)), ref)(t.containerQr)
   }
 
   def isTrivialJoin = true

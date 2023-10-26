@@ -8,6 +8,7 @@ import operations.{
 }
 import query.{
   InsertTests,
+  DeleteTests,
   SelectTests,
   SubQueryTests,
   UpdateTests,
@@ -24,12 +25,15 @@ import scalasql.dialects.{
 }
 
 package mysql {
+
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
   object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
   object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
   object InsertTests extends InsertTests with MySqlSuite
+  object DeleteTests extends DeleteTests with MySqlSuite
   object SelectTests extends SelectTests with MySqlSuite
   object SubQueryTests extends SubQueryTests with MySqlSuite
   object UpdateTests extends UpdateTests with MySqlSuite
@@ -51,6 +55,7 @@ package postgres {
   object ExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
   object InsertTests extends InsertTests with PostgresSuite
+  object DeleteTests extends DeleteTests with PostgresSuite
   object SelectTests extends SelectTests with PostgresSuite
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object UpdateTests extends UpdateTests with PostgresSuite
@@ -70,6 +75,7 @@ package sqlite {
   object ExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
   object ExprStringOpsTests extends ExprStringOpsTests with SqliteSuite
   object InsertTests extends InsertTests with SqliteSuite
+  object DeleteTests extends DeleteTests with SqliteSuite
   object SelectTests extends SelectTests with SqliteSuite
   object SubQueryTests extends SubQueryTests with SqliteSuite
   object UpdateTests extends UpdateTests with SqliteSuite
@@ -89,6 +95,7 @@ package hsqldb {
   object ExprSeqOpsTests extends ExprSeqOpsTests with HsqlDbSuite
   object ExprStringOpsTests extends ExprStringOpsTests with HsqlDbSuite
   object InsertTests extends InsertTests with HsqlDbSuite
+  object DeleteTests extends DeleteTests with HsqlDbSuite
   object SelectTests extends SelectTests with HsqlDbSuite
   object SubQueryTests extends SubQueryTests with HsqlDbSuite
   object UpdateTests extends UpdateTests with HsqlDbSuite
@@ -110,6 +117,7 @@ package h2 {
   object ExprSeqOpsTests extends ExprSeqOpsTests with H2Suite
   object ExprStringOpsTests extends ExprStringOpsTests with H2Suite
   object InsertTests extends InsertTests with H2Suite
+  object DeleteTests extends DeleteTests with H2Suite
   object SelectTests extends SelectTests with H2Suite
   object SubQueryTests extends SubQueryTests with H2Suite
   object UpdateTests extends UpdateTests with H2Suite
