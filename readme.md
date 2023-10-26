@@ -154,7 +154,7 @@ strongly-typed collection-like API.
            |                               ^
            |                               |
   {Expr[Int],Select[Q],Update[Q]      {Int,Seq[R],
-   CaseCls[Expr],Tuple[Q]}         CaseCls[Val],Tuple[R]}
+   CaseCls[Expr],Tuple[Q]}         CaseCls[Id],Tuple[R]}
            |                               |
            |                               |
            +-----------+       +-----------+

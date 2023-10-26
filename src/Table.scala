@@ -15,8 +15,8 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
 
   def initMetadata[V[_[_]]](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Val]] =
-    metadata.queryable.asInstanceOf[Queryable[V[E], V[Val]]]
+  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Id]] =
+    metadata.queryable.asInstanceOf[Queryable[V[E], V[Id]]]
 
   def tableRef = new scalasql.query.TableRef(this)
 }
@@ -28,7 +28,7 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val queryable: Queryable[V[Expr], V[Val]],
+      val queryable: Queryable[V[Expr], V[Id]],
       val vExpr: TableRef => V[Column.ColumnExpr]
   )
 

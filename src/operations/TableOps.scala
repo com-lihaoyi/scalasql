@@ -1,20 +1,20 @@
 package scalasql.operations
 
-import scalasql.{Column, Table, Val}
+import scalasql.{Column, Id, Table}
 import scalasql.query.{Expr, Insert, Joinable, Select, Update}
 
-class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Val]] {
-  def select: Select[V[Expr], V[Val]] = {
+class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
+  def select: Select[V[Expr], V[Id]] = {
     val ref = t.tableRef
     Select.fromTable(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], ref)(t.containerQr)
   }
 
-  def update: Update[V[Column.ColumnExpr], V[Val]] = {
+  def update: Update[V[Column.ColumnExpr], V[Id]] = {
     val ref = t.tableRef
     Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
   }
 
-  def insert: Insert[V[Column.ColumnExpr], V[Val]] = {
+  def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
     val ref = t.tableRef
     Insert.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
   }

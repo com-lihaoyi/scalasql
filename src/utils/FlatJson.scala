@@ -55,10 +55,9 @@ object FlatJson {
         endIndex: Int,
         depth: Int,
         visitor: Visitor[_, _],
-        inObj: Boolean
     ): Any = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
-        if (inObj) scalasql.Val(values(startIndex)) else values(startIndex)
+        values(startIndex)
       } else {
         // Hack to check if a random key looks like a number,
         // in which case this data represents an array
@@ -66,7 +65,7 @@ object FlatJson {
           val arrVisitor = visitor.visitArray(-1, -1).narrow
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
             arrVisitor.visitValue(
-              rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor, false),
+              rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor),
               -1
             )
           }
@@ -78,7 +77,7 @@ object FlatJson {
             val keyVisitor = objVisitor.visitKey(-1)
             objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
             objVisitor.visitValue(
-              rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor, true),
+              rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor),
               -1
             )
           }
@@ -88,6 +87,6 @@ object FlatJson {
       }
     }
 
-    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]], false).asInstanceOf[V]
+    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]]).asInstanceOf[V]
   }
 }

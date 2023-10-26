@@ -15,7 +15,7 @@ object MySqlDialect extends MySqlDialect {
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
-    override def update: Update[V[Column.ColumnExpr], V[Val]] = {
+    override def update: Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = t.tableRef
       new Update(Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr))
     }

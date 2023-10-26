@@ -105,7 +105,6 @@ object TestDb {
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(
     additionalHandlers = {
-      case v: Val[_] => pprinter.treeify(v.apply(), false, true)
       case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)
       case v: Expr[_] if !v.isInstanceOf[scala.Product] =>
         pprinter.treeify(v.exprToString, false, true)

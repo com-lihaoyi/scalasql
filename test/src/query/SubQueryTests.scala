@@ -162,7 +162,7 @@ trait SubQueryTests extends ScalaSqlSuite {
             FROM shipping_info shipping_info0
             WHERE buyer0.id = shipping_info0.buyer_id) = ?
       """,
-      value = Seq(Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+      value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     test("subqueryInMap") - checker(
       query =
@@ -177,9 +177,9 @@ trait SubQueryTests extends ScalaSqlSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
-        (Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
-        (Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
+        (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
+        (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
+        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
       )
     )
     test("subqueryInMapNested") - checker(
@@ -198,9 +198,9 @@ trait SubQueryTests extends ScalaSqlSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")), true),
-        (Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
-        (Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
+        (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), true),
+        (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
+        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
       )
     )
 

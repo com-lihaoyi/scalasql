@@ -111,7 +111,7 @@
 //
 //      val res = db.run(query).take(5)
 //
-//      val expected = Seq[City[Val]](
+//      val expected = Seq[City[Id]](
 //        City(
 //          id = 1,
 //          name = "Kabul",
@@ -179,7 +179,7 @@
 //      )
 //
 //      val res = db.run(Country.select).take(2)
-//      val expected = Seq[Country[Val]](
+//      val expected = Seq[Country[Id]](
 //        Country(
 //          code = "ABW",
 //          name = "Aruba",
@@ -235,7 +235,7 @@
 //      )
 //
 //      val res = db.run(query).take(5)
-//      val expected = Seq[CountryLanguage[Val]](
+//      val expected = Seq[CountryLanguage[Id]](
 //        CountryLanguage(
 //          countryCode = "ABW",
 //          language = "Dutch",
@@ -290,7 +290,7 @@
 //        )
 //
 //        val res = db.run(query)
-//        val expected = Seq[City[Val]](
+//        val expected = Seq[City[Id]](
 //          City(
 //            id = 3208,
 //            name = "Singapore",
@@ -321,7 +321,7 @@
 //        )
 //
 //        val res = db.run(query)
-//        val expected = Seq[City[Val]](
+//        val expected = Seq[City[Id]](
 //          City(
 //            id = 3208,
 //            name = "Singapore",
@@ -352,7 +352,7 @@
 //        )
 //
 //        val res = db.run(query).take(5)
-//        val expected = Seq[City[Val]](
+//        val expected = Seq[City[Id]](
 //          City(
 //            id = 206,
 //            name = "S�o Paulo",
@@ -393,7 +393,7 @@
 //      }
 //
 //      test("multiple") {
-//        val expected = Seq[City[Val]](
+//        val expected = Seq[City[Id]](
 //          City(
 //            id = 1890,
 //            name = "Shanghai",
@@ -475,8 +475,8 @@
 //    test("lifting") {
 //      def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 //
-//      assert(find(3208) == List(City[Val](3208, "Singapore", "SGP", "�", 4017733)))
-//      assert(find(3209) == List(City[Val](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+//      assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "�", 4017733)))
+//      assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
 //    }
 //
 //    test("mapping") {
@@ -594,7 +594,7 @@
 //        val res = db.run(query)
 //        val expected = Seq(
 //          (
-//            City[Val](
+//            City[Id](
 //              id = 3208,
 //              name = "Singapore",
 //              countryCode = "SGP",
@@ -805,7 +805,7 @@
 //
 //        val res = db.run(query)
 //
-//        val expected = Seq[(City[Val], Country[Val])](
+//        val expected = Seq[(City[Id], Country[Id])](
 //          (
 //            City(
 //              id = 129,

@@ -25,10 +25,10 @@ trait SelectTests extends ScalaSqlSuite {
           buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
       """,
-      value = Seq[Buyer[Val]](
-        Buyer(id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
-        Buyer(id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
-        Buyer(id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
+      value = Seq(
+        Buyer[Id](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
+        Buyer[Id](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
+        Buyer[Id](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
       )
     )
 
@@ -43,9 +43,9 @@ trait SelectTests extends ScalaSqlSuite {
         FROM shipping_info shipping_info0
         WHERE shipping_info0.buyer_id = ?
         """,
-        value = Seq[ShippingInfo[Val]](
-          ShippingInfo(1, 2, LocalDate.parse("2010-02-03")),
-          ShippingInfo(3, 2, LocalDate.parse("2012-05-06"))
+        value = Seq(
+          ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
         )
       )
 
@@ -64,7 +64,7 @@ trait SelectTests extends ScalaSqlSuite {
         AND shipping_info0.shipping_date = ?
       """,
         value = Seq(
-          ShippingInfo[Val](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
+          ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
         )
       )
 
@@ -83,7 +83,7 @@ trait SelectTests extends ScalaSqlSuite {
           AND shipping_info0.shipping_date = ?
         """,
         value = Seq(
-          ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
+          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
         )
       )
     }
@@ -134,9 +134,9 @@ trait SelectTests extends ScalaSqlSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          (1, Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))),
-          (2, Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))),
-          (3, Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+          (1, Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))),
+          (2, Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))),
+          (3, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
         )
       )
     }
@@ -281,12 +281,12 @@ trait SelectTests extends ScalaSqlSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            ShippingInfo[Val](1, 2, LocalDate.parse("2010-02-03"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
           )
         )
       )
@@ -309,12 +309,12 @@ trait SelectTests extends ScalaSqlSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            ShippingInfo[Val](1, 2, LocalDate.parse("2010-02-03"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            ShippingInfo[Val](3, 2, LocalDate.parse("2012-05-06"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
           )
         )
       )
@@ -348,16 +348,16 @@ trait SelectTests extends ScalaSqlSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           )
         )
       )
@@ -377,31 +377,31 @@ trait SelectTests extends ScalaSqlSuite {
         """,
         value = Seq(
           (
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
           ),
           (
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03"))
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
           ),
           (
-            Buyer[Val](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
+            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         ),
-        normalize = (x: Seq[(Buyer[Val], Buyer[Val])]) => x.sortBy(t => (t._1.id(), t._2.id()))
+        normalize = (x: Seq[(Buyer[Id], Buyer[Id])]) => x.sortBy(t => (t._1.id, t._2.id))
       )
 
       test("flatMap") - checker(
@@ -459,8 +459,8 @@ trait SelectTests extends ScalaSqlSuite {
         WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
       """,
       value = Seq(
-        Buyer[Val](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Buyer[Val](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
       )
     )
 
