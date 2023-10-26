@@ -66,20 +66,38 @@ typed `Table` descriptions.
 | Query Optimizer                 | No       | Yes       | Yes        | No      | No          | No      |
 | ORM/ActiveRecord-esque Features | No       | No        | No         | Yes     | Yes         | No      |
 
+ScalaSql aims to be a stripped-down version of the more sophisticated database libraries
+in the Scala ecosystem, focused purely on converting scala "query" data structures to SQL
+and SQL ResultSets back to Scala data types. It does not provide more sophisticated
+asynchronous, monadic, or compile-time operations, nor does it provide the "ORM/ActiveRecord"
+style of emulating mutable objects via database operations.
 
 ## Quill
 
 Quill focuses a lot on compile-time query generation, while ScalaSql does not.
 Compile-time query generation has a ton of advantages - zero runtime overhead, compile
 time query logging, etc. - but also comes with a lot of complexity, both in
-maintainability and in the user-facing API. ScalaSql aims for a lower bar: convenient
-classes and methods that generate SQL queries at runtime.
+maintainability and in the user-facing API. Quill naturally does not support the entire
+Scala language as part of its queries, and my experience using it is that the boundary
+between what's "supported" vs "not" is often not clear.
+
+ScalaSql aims for a lower bar: convenient classes and methods that generate SQL queries 
+at runtime. The "database" operations are clearly separated from "Scala" operations
+by working on `Expr[T]` types, making it straightforward to understand what operations
+you can perform in a query and how to extend them with your own custom logic.
 
 ## SLICK
 
 SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
 transactions, and query optimization. These areas result in a lot of user-facing and
-internal complexity for the library. ScalaSql aims to do without them.
+internal complexity for the library. Whil it is possible to paper over some of this
+complexity with libraries such as [Blocking Slick](https://github.com/gitbucket/blocking-slick),
+the essential complexity remains to cause confusion for users and burden for maintainers.
+For example, the book _Essential Slick_ contains a whole
+[chapter on manipulating `DBIO[T]` values](https://books.underscore.io/essential-slick/essential-slick-3.html#combining),
+which distracts from the essential task of _querying the database_.
+
+ScalaSql aims to do without them.
 
 ## Squeryl
 
