@@ -1,68 +1,40 @@
 package scalasql.utils
 
-import java.sql.Date
-import java.time.{
-  Instant,
-  LocalDate,
-  LocalDateTime,
-  LocalTime,
-  OffsetDateTime,
-  OffsetTime,
-  ZoneId,
-  ZonedDateTime
-}
+import scalasql.{MappedType, Val}
+import upickle.core.{ArrVisitor, Visitor}
+import upickle.core.compat.Factory
 
-object OptionPickler extends upickle.AttributeTagged {
-  override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
-    implicitly[Writer[T]].comap[Option[T]] {
-      case None => null.asInstanceOf[T]
-      case Some(x) => x
+
+object OptionPickler extends upickle.core.Types
+  with upickle.implicits.CaseClassReadWriters
+  with upickle.implicits.Generated
+  with upickle.implicits.MacroImplicits {
+
+  implicit def reader[T: MappedType] = new SimpleReader[T] {
+    override def expectedMsg: String = ???
+  }
+  implicit def readerVal[T: MappedType] = new SimpleReader[Val[T]] {
+    override def expectedMsg: String = ???
+  }
+  override def taggedExpectedMsg: String = ???
+
+  override def taggedWrite[T, R](w: OptionPickler.ObjectWriter[T], tag: String, out: Visitor[_, R], v: T): R = ???
+
+  implicit def SeqLikeReader[C[_], T](implicit r: Reader[T],
+                                      factory: Factory[T, C[T]]): Reader[C[T]] = new SeqLikeReader[C, T]()
+
+  class SeqLikeReader[C[_], T](implicit r: Reader[T],
+                               factory: Factory[T, C[T]]) extends SimpleReader[C[T]] {
+    override def expectedMsg = "expected sequence"
+
+    override def visitArray(length: Int, index: Int) = new ArrVisitor[Any, C[T]] {
+      val b = factory.newBuilder
+
+      def visitValue(v: Any, index: Int): Unit = b += v.asInstanceOf[T]
+
+      def visitEnd(index: Int) = b.result()
+
+      def subVisitor = r
     }
-
-  override implicit def OptionReader[T: Reader]: Reader[Option[T]] = {
-    new Reader.Delegate[Any, Option[T]](implicitly[Reader[T]].map(Some(_))) {
-      override def visitNull(index: Int) = None
-    }
   }
-
-  override implicit val BooleanReader: Reader[Boolean] = new SimpleReader[Boolean] {
-    override def expectedMsg = "expected boolean"
-
-    override def visitTrue(index: Int) = true
-
-    override def visitFalse(index: Int) = false
-
-    override def visitString(s: CharSequence, index: Int) = s match {
-      case "0" | "f" | "false" | "FALSE" => false
-      case "1" | "t" | "true" | "TRUE" => true
-    }
-
-  }
-
-  implicit val LocalDateReader: Reader[LocalDate] = new SimpleReader[LocalDate] {
-    override def expectedMsg = "expected local date"
-  }
-  implicit val LocalTimeReader: Reader[LocalTime] = new SimpleReader[LocalTime] {
-    override def expectedMsg = "expected local time"
-  }
-  implicit val LocalDateTimeReader: Reader[LocalDateTime] = new SimpleReader[LocalDateTime] {
-    override def expectedMsg = "expected local date time"
-  }
-
-  implicit val ZonedDateTimeReader: Reader[ZonedDateTime] = new SimpleReader[ZonedDateTime] {
-    override def expectedMsg = "expected zoned time"
-  }
-
-  implicit val InstantReader: Reader[Instant] = new SimpleReader[Instant] {
-    override def expectedMsg = "expected instant"
-  }
-
-  implicit val OffsetTimeReader: Reader[OffsetTime] = new SimpleReader[OffsetTime] {
-    override def expectedMsg = "expected offset time"
-  }
-
-  implicit val OffsetDateTimeReader: Reader[OffsetDateTime] = new SimpleReader[OffsetDateTime] {
-    override def expectedMsg = "expected offset datetime"
-  }
-
 }

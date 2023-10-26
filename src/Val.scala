@@ -17,5 +17,4 @@ class Val[T](value: T) {
 
 object Val {
   implicit def apply[T](value: T): Val[T] = new Val(value)
-  implicit def reader[T: Reader]: Reader[Val[T]] = OptionPickler.reader[T].map(Val(_))
 }

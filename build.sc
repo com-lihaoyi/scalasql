@@ -6,7 +6,7 @@ object scalasql extends RootModule with ScalaModule {
   def ivyDeps = Agg(
     ivy"com.lihaoyi::mainargs:0.4.0",
     ivy"com.lihaoyi::sourcecode:0.3.1",
-    ivy"com.lihaoyi::upickle:3.1.3",
+    ivy"com.lihaoyi::upickle-implicits:3.1.3",
     ivy"com.lihaoyi::os-lib:0.9.1",
     ivy"org.scala-lang:scala-reflect:$scalaVersion",
     ivy"com.github.vertical-blank:sql-formatter:2.0.4",
