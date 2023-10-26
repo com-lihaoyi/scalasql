@@ -106,7 +106,7 @@ object SelectToSql {
       qr: Queryable[Q, R],
       prevContext: Context
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-    val (namedFromsMap, fromSelectables, exprNaming, ctx) = computeContext(
+    val (namedFromsMap, fromSelectables, exprNaming, ctx) = Context.computeContext(
       prevContext,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
       None
@@ -149,51 +149,5 @@ object SelectToSql {
       ctx,
       flattenedExpr.map(_._2.mappedType)
     )
-  }
-
-  def computeContext(
-      prevContext: Context,
-      selectables: Seq[From],
-      updateTable: Option[TableRef]
-  ) = {
-    val namedFromsMap0 = selectables
-      .zipWithIndex
-      .map {
-        case (t: TableRef, i) => (t, prevContext.tableNameMapper(t.value.tableName) + i)
-        case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
-        case x => throw new Exception("wtf " + x)
-      }
-      .toMap
-
-    val namedFromsMap = prevContext.fromNaming ++ namedFromsMap0 ++ updateTable.map(t =>
-      t -> prevContext.tableNameMapper(t.value.tableName)
-    )
-
-    def computeSelectable(t: From) = t match {
-      case t: TableRef =>
-        (
-          Map.empty[Expr.Identity, SqlStr],
-          SqlStr.raw(prevContext.tableNameMapper(t.value.tableName)) + sql" " + SqlStr.raw(
-            namedFromsMap(t)
-          )
-        )
-
-      case t: SubqueryRef[_, _] =>
-        val (subNameMapping, sqlStr, _, _) =
-          apply(t.value, t.qr, prevContext)
-        (subNameMapping, sql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
-    }
-
-    val fromSelectables = selectables
-      .map(f => (f, computeSelectable(f)))
-      .toMap
-
-    val exprNaming = fromSelectables.flatMap { case (k, vs) =>
-      vs._1.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k))}.$s") }
-    }
-
-    val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)
-
-    (namedFromsMap, fromSelectables, exprNaming, ctx)
   }
 }

@@ -1,6 +1,6 @@
 package scalasql.query
 
-import renderer.InsertToSql
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{Column, MappedType, Queryable}
@@ -10,19 +10,40 @@ import scalasql.{Column, MappedType, Queryable}
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class InsertValues[Q, R](
-    insert: Insert[Q, R],
-    columns: Seq[Column.ColumnExpr[_]],
-    valuesLists: Seq[Seq[Expr[_]]]
-)(implicit val qr: Queryable[Q, R]) extends Returnable[Q] with Query[Int] {
-  def table = insert.table
-  def expr: Q = insert.expr
+trait InsertValues[Q, R] extends Returnable[Q] with Query[Int]{
+  def columns: Seq[Column.ColumnExpr[_]]
+  def valuesLists: Seq[Seq[Expr[_]]]
+}
+object InsertValues{
+  case class Impl[Q, R](
+      insert: Insert[Q, R],
+      columns: Seq[Column.ColumnExpr[_]],
+      valuesLists: Seq[Seq[Expr[_]]]
+  )(implicit val qr: Queryable[Q, R]) extends InsertValues[Q, R]{
+    def table = insert.table
+    def expr: Q = insert.expr
 
-  override def toSqlQuery(implicit ctx: Context) =
-    (InsertToSql.values(this, ctx), Seq(MappedType.IntType))
-  def walk() = Nil
-  override def singleRow = true
-  override def isExecuteUpdate = true
+    override def toSqlQuery(implicit ctx: Context) =
+      (InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName), Seq(MappedType.IntType))
+    def walk() = Nil
+    override def singleRow = true
+    override def isExecuteUpdate = true
 
-  override def valueReader: OptionPickler.Reader[Int] = implicitly
+    override def valueReader: OptionPickler.Reader[Int] = implicitly
+  }
+
+  def toSqlStr(columns0: Seq[Column.ColumnExpr[_]],
+               prevContext: Context,
+               valuesLists: Seq[Seq[Expr[_]]],
+               tableName: String): SqlStr = {
+
+    implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
+    val columns = SqlStr.join(columns0.map(c => SqlStr.raw(ctx.columnNameMapper(c.name))), sql", ")
+    val values = SqlStr.join(
+      valuesLists
+        .map(values => sql"(" + SqlStr.join(values.map(_.toSqlQuery._1), sql", ") + sql")"),
+      sql", "
+    )
+    sql"INSERT INTO ${SqlStr.raw(ctx.tableNameMapper(tableName))} ($columns) VALUES $values"
+  }
 }

@@ -1,8 +1,8 @@
 package scalasql.query
 
-import renderer.InsertToSql
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.Queryable
+import scalasql.{Column, MappedType, Queryable}
 import scalasql.utils.OptionPickler
 
 /**
@@ -10,19 +10,49 @@ import scalasql.utils.OptionPickler
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-case class InsertSelect[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
-    extends Returnable[Q] with Query[Int] {
-  def expr = insert.expr
-  def table = insert.table
+trait InsertSelect[Q, C, R, R2]
+    extends Returnable[Q] with Query[Int]
 
-  override def toSqlQuery(implicit ctx: Context) =
-    InsertToSql.select(this, select.qr.walk(columns).map(_._2), ctx)
+object InsertSelect{
+  case class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
+    extends InsertSelect[Q, C, R, R2] {
+    def expr = insert.expr
 
-  override def isExecuteUpdate = true
+    def table = insert.table
 
-  def walk() = Nil
+    override def toSqlQuery(implicit ctx: Context) =
+      toSqlStr(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName)
 
-  override def singleRow = true
+    override def isExecuteUpdate = true
 
-  override def valueReader: OptionPickler.Reader[Int] = implicitly
+    def walk() = Nil
+
+    override def singleRow = true
+
+    override def valueReader: OptionPickler.Reader[Int] = implicitly
+  }
+
+
+  def toSqlStr(
+              select: Select[_, _],
+              exprs: Seq[Expr[_]],
+              prevContext: Context,
+              tableName: String
+            ): (SqlStr, Seq[MappedType[_]]) = {
+
+    implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
+
+    val columns = SqlStr.join(
+      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]]).map(c =>
+        SqlStr.raw(ctx.columnNameMapper(c.name))
+      ),
+      sql", "
+    )
+
+    val (selectSql, mappedTypes) = select.toSqlQuery
+    (
+      sql"INSERT INTO ${SqlStr.raw(ctx.tableNameMapper(tableName))} ($columns) ${selectSql.withCompleteQuery(false)}",
+      mappedTypes
+    )
+  }
 }

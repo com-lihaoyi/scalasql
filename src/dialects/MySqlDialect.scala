@@ -44,7 +44,7 @@ object MySqlDialect extends MySqlDialect {
         q: Update.Impl[Q, R],
         prevContext: Context
     ): (SqlStr, Seq[MappedType[_]]) = {
-      val (namedFromsMap, fromSelectables, exprNaming, context) = SelectToSql.computeContext(
+      val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
         prevContext,
         q.joins.flatMap(_.from).map(_.from),
         Some(q.table)
