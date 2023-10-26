@@ -144,5 +144,26 @@ trait ReturningTests extends ScalaSqlSuite with ReturningDialect {
         )
       }
     }
+
+    test("delete") {
+      checker(
+        query = Purchase.delete(_.shippingInfoId === 1).returning(_.total),
+        sqls = Seq(
+          "DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res",
+        ),
+        value = Seq(888.0, 900.0, 15.7)
+      )
+
+      checker(
+        query = Purchase.select,
+        value = Seq(
+          // id=1,2,3 had shippingInfoId=1 and thus got deleted
+          Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+          Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+          Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+          Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+        )
+      )
+    }
   }
 }

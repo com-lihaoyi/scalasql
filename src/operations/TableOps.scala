@@ -19,9 +19,9 @@ class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
     Insert.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr)
   }
 
-  def delete(f: V[Column.ColumnExpr] => Expr[Boolean]): Delete = {
+  def delete(f: V[Column.ColumnExpr] => Expr[Boolean]): Delete[V[Column.ColumnExpr]] = {
     val ref = t.tableRef
-    Delete.fromTable(f(t.metadata.vExpr(ref)), ref)(t.containerQr)
+    Delete.fromTable(t.metadata.vExpr(ref), f(t.metadata.vExpr(ref)), ref)
   }
 
   def isTrivialJoin = true
