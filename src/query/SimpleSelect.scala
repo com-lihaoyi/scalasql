@@ -1,8 +1,10 @@
 package scalasql.query
 
+import scalasql.renderer.SelectToSql.joinsToSqlStr
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{MappedType, Queryable}
-import scalasql.renderer.{Context, SqlStr}
-import scalasql.utils.OptionPickler
+import scalasql.renderer.{Context, ExprsToSql, SqlStr}
+import scalasql.utils.{FlatJson, OptionPickler}
 
 /**
  * Models the various components of a SQL query:
@@ -128,5 +130,55 @@ object SimpleSelect {
     case s: SimpleSelect[Q, R] => s
     case s: CompoundSelect[Q, R] =>
       SimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
+  }
+
+  def toSqlStr[Q, R](
+                    query: SimpleSelect[Q, R],
+                    qr: Queryable[Q, R],
+                    prevContext: Context
+                  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
+    val (namedFromsMap, fromSelectables, exprNaming, ctx) = Context.computeContext(
+      prevContext,
+      query.from ++ query.joins.flatMap(_.from.map(_.from)),
+      None
+    )
+
+    implicit val context: Context = ctx
+
+    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+    val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, context)
+
+    val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), sql", ")
+
+    val joins = joinsToSqlStr(query.joins, fromSelectables)
+
+    val filtersOpt = SqlStr.optSeq(query.where) { where =>
+      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
+    }
+
+    val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
+      val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
+        sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
+      }
+      sql" GROUP BY ${groupBy.expr}${havingOpt}"
+    }
+
+    val jsonQueryMap = flattenedExpr
+      .map { case (k, v) =>
+        (
+          v.exprIdentity,
+          SqlStr.raw((FlatJson.basePrefix +: k).map(prevContext.columnNameMapper).mkString(
+            FlatJson.delimiter
+          ))
+        )
+      }
+      .toMap
+
+    (
+      jsonQueryMap,
+      exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt,
+      ctx,
+      flattenedExpr.map(_._2.mappedType)
+    )
   }
 }
