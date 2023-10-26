@@ -30,7 +30,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalTime = LocalTime.parse("10:15:30"),
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
 //        myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
-//        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
+        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
 //        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
 //        myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00"),
       )
@@ -46,7 +46,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalTime -> value.myLocalTime(),
           _.myLocalDateTime -> value.myLocalDateTime(),
 //          _.myZonedDateTime -> value.myZonedDateTime(),
-//          _.myInstant -> value.myInstant(),
+          _.myInstant -> value.myInstant(),
 //          _.myOffsetTime -> value.myOffsetTime(),
 //          _.myOffsetDateTime -> value.myOffsetDateTime(),
         ),

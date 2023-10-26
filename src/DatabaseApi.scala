@@ -64,7 +64,7 @@ class DatabaseApi(
 
     for ((p, n) <- params.zipWithIndex) {
       p.mappedType.asInstanceOf[scalasql.MappedType[Any]].put(statement, n + 1, p.value)
-      statement.setObject(n + 1, p.value)
+//      statement.setObject(n + 1, p.value)
     }
 
     if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]

@@ -49,7 +49,7 @@ case class DataTypes[+T[_]](
     myLocalTime: T[LocalTime],
     myLocalDateTime: T[LocalDateTime],
 //    myZonedDateTime: T[ZonedDateTime],
-//  myInstant: T[Instant],
+    myInstant: T[Instant],
 //  myOffsetTime: T[OffsetTime],
 //  myOffsetDateTime: T[OffsetDateTime],
 )
