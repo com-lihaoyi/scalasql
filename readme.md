@@ -170,7 +170,7 @@ strongly-typed collection-like API.
 
 - `Q` -> `R` given `Queryable[Q, R]`
    - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
-   - `Query[R]` -> `R`
+   - `Query[R]` -> `Seq[R]`
    - `CaseClass[Expr]` -> `CaseClass[Id]`
    - `Expr[T]` -> `T`
 
