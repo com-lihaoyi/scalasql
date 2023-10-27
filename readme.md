@@ -166,6 +166,16 @@ strongly-typed collection-like API.
 
 # Design
 
+**Queryable Hierarchy**:
+
+- `Q` -> `R` given `Queryable[Q, R]`
+   - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
+   - `Query[R]` -> `R`
+   - `CaseClass[Expr]` -> `CaseClass[Id]`
+
+
+**Dataflow**:
+
 ```
    {Table.select,update,map,
     filter,join,aggregate}
