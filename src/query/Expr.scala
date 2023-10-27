@@ -9,12 +9,12 @@ import scalasql.utils.OptionPickler
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  def mappedType: MappedType[T]
+  protected def mappedType: MappedType[T]
   final def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
     (ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0), Seq(mappedType))
   }
 
-  def toSqlExpr0(implicit ctx: Context): SqlStr
+  protected def toSqlExpr0(implicit ctx: Context): SqlStr
 
   override def toString: String = throw new Exception(
     "Expr#toString is not defined. Use Expr#exprToString"
@@ -23,11 +23,15 @@ trait Expr[T] extends SqlStr.Renderable {
   override def equals(other: Any): Boolean = throw new Exception(
     "Expr#equals is not defined. Use Expr#exprIdentity for your equality checks"
   )
-  lazy val exprIdentity: Expr.Identity = new Expr.Identity()
-  def exprToString: String = super.toString
+  private lazy val exprIdentity: Expr.Identity = new Expr.Identity()
+  private def exprToString: String = super.toString
 }
 
 object Expr {
+  def getMappedType[T](e: Expr[T]): MappedType[T] = e.mappedType
+  def getToString[T](e: Expr[T]): String = e.exprToString
+
+  def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](implicit

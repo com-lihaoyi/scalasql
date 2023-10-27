@@ -168,7 +168,7 @@ object SimpleSelect {
     val jsonQueryMap = flattenedExpr
       .map { case (k, v) =>
         (
-          v.exprIdentity,
+          Expr.getIdentity(v),
           SqlStr.raw((FlatJson.basePrefix +: k).map(prevContext.columnNameMapper).mkString(
             FlatJson.delimiter
           ))
@@ -180,7 +180,7 @@ object SimpleSelect {
       jsonQueryMap,
       exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt,
       ctx,
-      flattenedExpr.map(_._2.mappedType)
+      flattenedExpr.map(t => Expr.getMappedType(t._2))
     )
   }
 }

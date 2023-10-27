@@ -24,7 +24,7 @@ trait Queryable[-Q, R] {
     (
       if (res.isCompleteQuery) res
       else res + SqlStr.raw(ctx.defaultQueryableSuffix),
-      walked.map(_._2.mappedType)
+      walked.map(t => Expr.getMappedType(t._2))
     )
   }
 }

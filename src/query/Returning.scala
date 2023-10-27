@@ -32,7 +32,7 @@ object Returning {
       val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(returning), ctx, sql"")
       val suffix = sql" RETURNING $exprStr"
 
-      (prefix + suffix, flattenedExpr.map(_._2.mappedType))
+      (prefix + suffix, flattenedExpr.map(t => Expr.getMappedType(t._2)))
     }
   }
 

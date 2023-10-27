@@ -107,7 +107,7 @@ object TestDb {
     additionalHandlers = {
       case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)
       case v: Expr[_] if !v.isInstanceOf[scala.Product] =>
-        pprinter.treeify(v.exprToString, false, true)
+        pprinter.treeify(Expr.getToString(v), false, true)
     }
   )
 }
