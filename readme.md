@@ -172,6 +172,7 @@ strongly-typed collection-like API.
    - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
    - `Query[R]` -> `R`
    - `CaseClass[Expr]` -> `CaseClass[Id]`
+   - `Expr[T]` -> `T`
 
 
 **Dataflow**:
