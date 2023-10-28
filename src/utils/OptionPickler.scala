@@ -18,9 +18,9 @@ object OptionPickler extends upickle.core.Types
   override def taggedWrite[T, R](w: OptionPickler.ObjectWriter[T], tag: String, out: Visitor[_, R], v: T): R = ???
 
   implicit def SeqLikeReader[C[_], T](implicit r: Reader[T],
-                                      factory: Factory[T, C[T]]): Reader[C[T]] = new SeqLikeReader[C, T]()
+                                      factory: Factory[T, C[T]]): SeqLikeReader[C, T] = new SeqLikeReader[C, T]()
 
-  class SeqLikeReader[C[_], T](implicit r: Reader[T],
+  class SeqLikeReader[C[_], T](implicit val r: Reader[T],
                                factory: Factory[T, C[T]]) extends SimpleReader[C[T]] {
     override def expectedMsg = "expected sequence"
 

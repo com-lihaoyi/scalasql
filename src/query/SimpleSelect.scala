@@ -121,8 +121,7 @@ case class SimpleSelect[Q, R](
   def drop(n: Int) = CompoundSelect(this, Nil, None, None, Some(n))
   def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
 
-  def valueReader: OptionPickler.Reader[Seq[R]] =
-    OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def toSqlQuery0(prevContext: Context) = SimpleSelect.toSqlStr(this, qr, prevContext)
 }

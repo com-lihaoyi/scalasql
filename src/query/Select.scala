@@ -11,7 +11,7 @@ trait Select[Q, R]
     with From
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query[Seq[R]] {
+    with Query.Multiple[R] {
 
   def qr: Queryable[Q, R]
   def isTrivialJoin: Boolean = false
@@ -58,6 +58,8 @@ trait Select[Q, R]
   override def singleRow = false
 
   def toSqlQuery0(prevContext: Context): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
+
+  def single: Query.Single[R] = new Query.Single(this)
 }
 
 object Select {

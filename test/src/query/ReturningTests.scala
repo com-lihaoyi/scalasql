@@ -29,6 +29,23 @@ trait ReturningTests extends ScalaSqlSuite with ReturningDialect {
         )
       }
 
+      test("dotSingle") - {
+        checker(
+          query = Buyer.insert
+            .values(_.name -> "test buyer", _.dateOfBirth -> LocalDate.parse("2023-09-09"))
+            .returning(_.id)
+            .single,
+          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
+          value = 4
+        )
+
+        checker(
+          query = Buyer.select.filter(_.name === "test buyer"),
+          // id=4 comes from auto increment
+          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+        )
+      }
+
       test("multiple") - {
         checker(
           query = Buyer.insert

@@ -82,8 +82,7 @@ case class CompoundSelect[Q, R](
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  def valueReader: OptionPickler.Reader[Seq[R]] =
-    OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def toSqlQuery0(prevContext: Context) = CompoundSelect.toSqlStr(this, qr, prevContext)
 }

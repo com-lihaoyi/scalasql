@@ -68,6 +68,32 @@ trait SelectTests extends ScalaSqlSuite {
         )
       )
 
+      test("dotSingle") {
+        test("pass") - checker(
+          query =
+            ShippingInfo.select
+              .filter(_.buyerId === 2)
+              .filter(_.shippingDate === LocalDate.parse("2012-05-06"))
+              .single,
+          sql = """
+            SELECT
+              shipping_info0.id as res__id,
+              shipping_info0.buyer_id as res__buyer_id,
+              shipping_info0.shipping_date as res__shipping_date
+            FROM shipping_info shipping_info0
+            WHERE shipping_info0.buyer_id = ?
+            AND shipping_info0.shipping_date = ?
+          """,
+          value = ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
+        )
+        test("fail") - intercept[java.lang.AssertionError]{
+          checker(
+            query = ShippingInfo.select.filter(_.buyerId === 2).single,
+            value = null.asInstanceOf[ShippingInfo[Id]]
+          )
+        }
+      }
+
       test("combined") - checker(
         query =
           ShippingInfo.select.filter(p =>

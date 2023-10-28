@@ -11,12 +11,14 @@ trait Returnable[Q] {
   def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
 }
 
-trait Returning[Q, R] extends Query[Seq[R]]
+trait Returning[Q, R] extends Query.Multiple[R]{
+  def single(implicit valueReader0: OptionPickler.Reader[R]): Query.Single[R] = new Query.Single(this)
+}
 object Returning {
   case class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit
                                                                   val qr: Queryable[Q, R]
   ) extends Returning[Q, R] {
-    def valueReader: OptionPickler.Reader[Seq[R]] =
+    def valueReader =
       OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
 
     def walk() = qr.walk(returning)
