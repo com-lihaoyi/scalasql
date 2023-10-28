@@ -14,6 +14,20 @@ class Txn(connection: java.sql.Connection,
           autoCommit: Boolean,
           rollBack0: () => Unit) {
 
+  def transaction[T](t: => T): T = {
+    val savePoint = connection.setSavepoint()
+
+    try {
+      val res = t
+      connection.releaseSavepoint(savePoint)
+      res
+    } catch{
+      case e =>
+        connection.rollback(savePoint)
+        throw e
+    }
+  }
+
   def rollBack() = rollBack0()
   def runRaw(sql: String) = {
     if (autoCommit) connection.setAutoCommit(true)
