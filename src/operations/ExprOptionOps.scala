@@ -10,7 +10,7 @@ class ExprOptionOps[T](v: Expr[Option[T]]) {
 
   def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"$v IS NULL" }
 
-//  def map[V: MappedType](f: T => V): Expr[V] = Expr{ implicit ctx =>
-//    sql"CASE WHEN $v IS NOT NULL THEN ${f(v)} ELSE NULL"
-//  }
+  def map[V: MappedType](f: Expr[T] => Expr[V]): Expr[Option[V]] = Expr{ implicit ctx =>
+    sql"CASE WHEN $v IS NOT NULL THEN ${f(v.asInstanceOf[Expr[T]])} ELSE NULL"
+  }
 }

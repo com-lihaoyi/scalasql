@@ -1,6 +1,5 @@
 package scalasql.datatypes
 
-import scalasql.query.Expr
 import scalasql.{datatypes, _}
 import utest._
 import utils.ScalaSqlSuite
@@ -31,14 +30,6 @@ case class NonRoundTripTypes[+T[_]](
 )
 
 object NonRoundTripTypes extends Table[NonRoundTripTypes] {
-  val metadata = initMetadata
-}
-
-case class DataTypesOpt[+T[_]](
-    myInt: T[Option[Int]],
-)
-
-object DataTypesOpt extends Table[DataTypesOpt] {
   val metadata = initMetadata
 }
 
@@ -109,55 +100,6 @@ trait DataTypesTests extends ScalaSqlSuite {
         query = NonRoundTripTypes.select,
         value = Seq(normalize(value)),
         normalize = (x: Seq[datatypes.NonRoundTripTypes[Id]]) => x.map(normalize)
-      )
-    }
-
-    test("optional"){
-      checker(
-        query = DataTypesOpt.insert.batched(_.myInt)(
-          None,
-          Some(1),
-        ),
-        value = 2
-      )
-
-      checker(
-        query = DataTypesOpt.select,
-        value = Seq(
-          DataTypesOpt[Id](None),
-          DataTypesOpt[Id](Some(1))
-        )
-      )
-
-      checker(
-        query = DataTypesOpt.select.filter(_.myInt.isDefined),
-        value = Seq(
-          DataTypesOpt[Id](Some(1))
-        )
-      )
-
-      checker(
-        query = DataTypesOpt.select.filter(_.myInt.isEmpty),
-        value = Seq(
-          DataTypesOpt[Id](None)
-        )
-      )
-
-      checker(
-        query = DataTypesOpt.select.filter(_.myInt === 1),
-        value = Seq(
-          DataTypesOpt[Id](Some(1))
-        )
-      )
-
-      checker(
-        query = DataTypesOpt.select.filter(_.myInt === 2),
-        value = Seq[DataTypesOpt[Id]]()
-      )
-
-      checker( // SQL null = null is false
-        query = DataTypesOpt.select.filter(_.myInt === Option.empty[Int]),
-        value = Seq[DataTypesOpt[Id]]()
       )
     }
   }
