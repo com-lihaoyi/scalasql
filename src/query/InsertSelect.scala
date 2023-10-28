@@ -11,7 +11,7 @@ import scalasql.utils.OptionPickler
  * https://www.postgresql.org/docs/current/sql-update.html
  */
 trait InsertSelect[Q, C, R, R2]
-    extends Returnable[Q] with Query[Int]
+    extends InsertReturnable[Q] with Query[Int]
 
 object InsertSelect{
   case class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])

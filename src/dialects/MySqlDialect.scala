@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{Expr, Joinable, TableRef, Update}
+import scalasql.query.{Expr, InsertReturning, InsertSelect, InsertValues, Joinable, OnConflictable, Query, TableRef, Update}
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, SelectToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -72,10 +72,40 @@ object MySqlDialect extends MySqlDialect {
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
+
+
+  class OnConflictable[Q, R](query: Query[R], expr: Q) extends scalasql.query.OnConflictable(query, expr){
+
+    override def onConflictIgnore(c: (Q => Column.ColumnExpr[_])*) =
+      new OnConflictIgnore(this, c.map(_(expr)))
+  }
+
+  class OnConflictIgnore[Q, R](insert: OnConflictable[Q, R],
+                               columns: Seq[Column.ColumnExpr[_]])
+    extends scalasql.query.OnConflictIgnore[Q, R](insert, columns) {
+
+    override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+      val (str, mapped) = insert.query.toSqlQuery
+      val columnSqls = columns.map(c => SqlStr.raw(c.name) + sql" = " + SqlStr.raw(c.name))
+      (
+        str + sql" ON DUPLICATE KEY UPDATE ${SqlStr.join(columnSqls, sql", ")}",
+        mapped
+      )
+    }
+
+  }
 }
 trait MySqlDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new MySqlDialect.TableOps(t)
+
+
+  override implicit def OnConflictableInsertValues[Q, R](query: InsertValues[Q, R]) =
+    new MySqlDialect.OnConflictable[Q, Int](query, query.expr)
+
+  override implicit def OnConflictableInsertSelect[Q, C, R, R2](query: InsertSelect[Q, C, R, R2]) =
+    new MySqlDialect.OnConflictable[Q, Int](query, query.expr)
+
 }

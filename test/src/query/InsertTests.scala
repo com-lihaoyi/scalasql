@@ -46,7 +46,18 @@ trait InsertTests extends ScalaSqlSuite {
           value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
+    }
 
+    test("conflict") - intercept[Exception]{
+      checker(
+        query =
+          Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 1 // This should cause a primary key conflict
+          ),
+        value = 1
+      )
     }
 
     test("batch") {

@@ -14,7 +14,8 @@ import query.{
   UpdateTests,
   UpdateJoinTests,
   UpdateSubQueryTests,
-  ReturningTests
+  ReturningTests,
+  OnConflictTests
 }
 import scalasql.dialects.{
   HsqlDbDialectTests,
@@ -25,8 +26,6 @@ import scalasql.dialects.{
 }
 
 package mysql {
-
-
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
   object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
@@ -42,6 +41,7 @@ package mysql {
   // object UpdateSubQueryTests extends UpdateSubQueryTests with MySqlSuite
   // MySql does not support INSERT/UPDATE RETURNING
   // object ReturningTests extends ReturningTests with MySqlSuite
+  object OnConflictTests extends OnConflictTests with MySqlSuite
 
   object MySqlDialectTests extends MySqlDialectTests
 
@@ -62,6 +62,7 @@ package postgres {
   object UpdateJoinTests extends UpdateJoinTests with PostgresSuite
   object UpdateSubQueryTests extends UpdateSubQueryTests with PostgresSuite
   object ReturningTests extends ReturningTests with PostgresSuite
+  object OnConflictTests extends OnConflictTests with PostgresSuite
 
   object PostgresDialectTests extends PostgresDialectTests
 
@@ -82,6 +83,7 @@ package sqlite {
   object UpdateJoinTests extends UpdateJoinTests with SqliteSuite
   object UpdateSubQueryTests extends UpdateSubQueryTests with SqliteSuite
   object ReturningTests extends ReturningTests with SqliteSuite
+  object OnConflictTests extends OnConflictTests with SqliteSuite
 
   object SqliteDialectTests extends SqliteDialectTests
 
@@ -104,6 +106,8 @@ package hsqldb {
   object UpdateSubQueryTests extends UpdateSubQueryTests with HsqlDbSuite
   // HSql does not support RETURNING keyword
   // object ReturningTests extends ReturningTests with HsqlSuite
+  // HSql does not support ON CONFLICT IGNORE
+  // object OnConflictTests extends OnConflictTests with H2Suite
 
   object HsqlDbDialectTests extends HsqlDbDialectTests
 
@@ -125,6 +129,8 @@ package h2 {
   object UpdateSubQueryTests extends UpdateSubQueryTests with H2Suite
   // H2 does not support RETURNING keyword
   // object ReturningTests extends ReturningTests with H2Suite
+  // H2 does not support ON CONFLICT IGNORE unless in postgres mode
+  // object OnConflictTests extends OnConflictTests with H2Suite
 
   object HsqlDbDialectTests extends H2DialectTests
 

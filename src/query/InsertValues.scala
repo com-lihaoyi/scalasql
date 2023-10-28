@@ -10,7 +10,7 @@ import scalasql.{Column, MappedType, Queryable}
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-trait InsertValues[Q, R] extends Returnable[Q] with Query[Int]{
+trait InsertValues[Q, R] extends InsertReturnable[Q] with Query[Int] {
   def columns: Seq[Column.ColumnExpr[_]]
   def valuesLists: Seq[Seq[Expr[_]]]
 }

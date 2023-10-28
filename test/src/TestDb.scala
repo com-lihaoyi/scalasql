@@ -60,8 +60,6 @@ class TestDb(
     if (sql != null) {
       val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
-//      pprint.log(sqlResult)
-//      pprint.log(expectedSql)
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {

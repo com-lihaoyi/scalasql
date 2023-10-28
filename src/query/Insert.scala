@@ -2,6 +2,7 @@ package scalasql.query
 
 import scalasql.{Column, Queryable}
 
+
 trait Insert[Q, R] {
   def expr: Q
   def table: TableRef

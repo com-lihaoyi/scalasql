@@ -1,7 +1,9 @@
 package scalasql.dialects
 
 import scalasql.operations.TableOps
-import scalasql.query.{Aggregatable, Expr, Select}
+import scalasql.query.{Aggregatable, Expr, InsertReturning, InsertSelect, InsertValues, OnConflictable, Select}
+import scalasql.renderer.{Context, SqlStr}
+import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table, operations}
 
 trait Dialect {
@@ -27,4 +29,10 @@ trait Dialect {
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
 
+  implicit def OnConflictableInsertValues[Q, R](query: InsertValues[Q, R]) = new OnConflictable[Q, Int](query, query.expr)
+
+  implicit def OnConflictableInsertSelect[Q, C, R, R2](query: InsertSelect[Q, C, R, R2]) = new OnConflictable[Q, Int](query, query.expr)
+
+  //  implicit def OnConflictableInsertReturning[Q, R](query: InsertReturning[Q, R]) =
+//    new OnConflictable[Q, Seq[R]](query, query.expr)
 }
