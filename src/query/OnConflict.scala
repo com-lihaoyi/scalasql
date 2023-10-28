@@ -4,19 +4,19 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{Column, MappedType}
 import scalasql.renderer.{Context, SqlStr}
 
-class OnConflict[Q, R](query: Query[R], expr: Q, table: TableRef) {
-  def onConflictIgnore(c: (Q => Column.ColumnExpr[_])*) = new OnConflict.Ignore(query, c.map(_(expr)))
+class OnConflict[Q, R](query: Query[R] with InsertReturnable[Q], expr: Q, table: TableRef) {
+  def onConflictIgnore(c: (Q => Column.ColumnExpr[_])*) = new OnConflict.Ignore(query, c.map(_(expr)), table)
   def onConflictUpdate(c: (Q => Column.ColumnExpr[_])*)(c2: (Q => (Column.ColumnExpr[_], Expr[_]))*) =
     new OnConflict.Update(query, c.map(_(expr)), c2.map(_(expr)), table)
 }
 
 object OnConflict {
-  class Ignore[Q, R](query: Query[R],
-                     columns: Seq[Column.ColumnExpr[_]]) extends Query[R] {
+  class Ignore[Q, R](query: Query[R] with InsertReturnable[Q],
+                     columns: Seq[Column.ColumnExpr[_]],
+                     val table: TableRef) extends Query[R] with InsertReturnable [Q]{
+    def expr = query.expr
     def walk() = query.walk()
-
     def singleRow = query.singleRow
-
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val (str, mapped) = query.toSqlQuery
       (
@@ -28,16 +28,16 @@ object OnConflict {
     override def isExecuteUpdate = true
 
     def valueReader = query.valueReader
+
   }
 
-  class Update[Q, R](query: Query[R],
+  class Update[Q, R](query: Query[R] with InsertReturnable[Q],
                      columns: Seq[Column.ColumnExpr[_]],
                      updates: Seq[(Column.ColumnExpr[_], Expr[_])],
-                     table: TableRef) extends Query[R] {
+                     val table: TableRef) extends Query[R] with InsertReturnable [Q]{
+    def expr = query.expr
     def walk() = query.walk()
-
     def singleRow = query.singleRow
-
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
     def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
@@ -54,9 +54,7 @@ object OnConflict {
         mapped
       )
     }
-
     override def isExecuteUpdate = true
-
     def valueReader = query.valueReader
   }
 }

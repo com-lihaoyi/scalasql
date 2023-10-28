@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.Queryable
-import scalasql.query.{InsertReturnable, InsertReturning, Returnable, Returning}
+import scalasql.query.{InsertReturnable, InsertReturning, OnConflict, Returnable, Returning}
 
 trait ReturningDialect extends Dialect {
   implicit class InsertReturningConv[Q](r: InsertReturnable[Q]) {
@@ -11,6 +11,16 @@ trait ReturningDialect extends Dialect {
   }
 
   implicit class ReturningConv[Q](r: Returnable[Q]) {
+    def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): Returning[Q2, R] = {
+      Returning.Impl(r, f(r.expr))
+    }
+  }
+  implicit class OnConflictUpdateConv[Q, R](r: OnConflict.Update[Q, R]) {
+    def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): Returning[Q2, R] = {
+      Returning.Impl(r, f(r.expr))
+    }
+  }
+  implicit class OnConflictIgnoreConv[Q, R](r: OnConflict.Ignore[Q, R]) {
     def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable[Q2, R]): Returning[Q2, R] = {
       Returning.Impl(r, f(r.expr))
     }
