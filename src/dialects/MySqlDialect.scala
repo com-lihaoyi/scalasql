@@ -74,14 +74,15 @@ object MySqlDialect extends MySqlDialect {
   }
 
 
-  class OnConflictable[Q, R](val query: Query[R], expr: Q) {
+  class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
 
     def onConflictUpdate(c2: Q => (Column.ColumnExpr[_], Expr[_])*): OnConflictUpdate[Q, R] =
-      new OnConflictUpdate(this, c2.map(_(expr)))
+      new OnConflictUpdate(this, c2.map(_(expr)), table)
   }
 
   class OnConflictUpdate[Q, R](insert: OnConflictable[Q, R],
-                               updates: Seq[(Column.ColumnExpr[_], Expr[_])])
+                               updates: Seq[(Column.ColumnExpr[_], Expr[_])],
+                               table: TableRef)
     extends Query[R]{
 
     override def isExecuteUpdate = true
@@ -91,7 +92,14 @@ object MySqlDialect extends MySqlDialect {
 
     def valueReader = insert.query.valueReader
 
-    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
+    def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+      val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
+        ctx,
+        Nil,
+        Some(table)
+      )
+      implicit val ctx2 = context
       val (str, mapped) = insert.query.toSqlQuery
       val updatesStr = SqlStr.join(updates.map{case (c, e) => SqlStr.raw(c.name) + sql" = $e"}, sql", ")
       (
@@ -99,7 +107,6 @@ object MySqlDialect extends MySqlDialect {
         mapped
       )
     }
-
   }
 }
 trait MySqlDialect extends Dialect  {
@@ -110,5 +117,5 @@ trait MySqlDialect extends Dialect  {
     new MySqlDialect.TableOps(t)
 
   implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]) =
-    new MySqlDialect.OnConflictable[Q, Int](query, query.expr)
+    new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
 }
