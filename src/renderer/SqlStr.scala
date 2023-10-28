@@ -96,6 +96,8 @@ object SqlStr {
     implicit def doubleInterp(value: Double): Interp = typeInterp(value)
     implicit def longInterp(value: Long): Interp = typeInterp(value)
 
+    implicit def optionInterp[T: MappedType](value: Option[T]): Interp = typeInterp(value)(MappedType.OptionType)
+
     implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
     case class TypeInterp[T: MappedType](value: T) extends Interp {
       def mappedType: MappedType[T] = implicitly[MappedType[T]]

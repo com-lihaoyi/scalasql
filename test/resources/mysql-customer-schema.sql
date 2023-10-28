@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS `shipping_info` CASCADE;
 DROP TABLE IF EXISTS `purchase` CASCADE;
 DROP TABLE IF EXISTS `data_types` CASCADE;
 DROP TABLE IF EXISTS `non_round_trip_types` CASCADE;
+DROP TABLE IF EXISTS `data_types_opt` CASCADE;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE buyer (
@@ -55,4 +56,8 @@ CREATE TABLE data_types (
 CREATE TABLE non_round_trip_types(
     my_zoned_date_time TIMESTAMP,
     my_offset_date_time TIMESTAMP
+);
+
+CREATE TABLE data_types_opt(
+    my_int INTEGER
 )
