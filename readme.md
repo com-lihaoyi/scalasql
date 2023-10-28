@@ -4,7 +4,10 @@ ScalaSql is a small SQL library that allows type-safe low-boilerplate querying o
 SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
-# Goals
+
+# Why ScalaSql? 
+
+## Goals
 
 1. **A database library suitable for use for "getting started"**: prioritizing ease
    of use and simplicity over performance, flexibility, or purity.
@@ -31,7 +34,7 @@ typed `Table` descriptions.
    them. That ensures the library is both easy to get started with and can scale beyond
    toy examples.
 
-# Non-Goals
+## Non-Goals
 
 1. **Reactive support like or deep IO-Monad integration**, like
    [SLICK](https://github.com/slick/slick) or
@@ -55,7 +58,7 @@ typed `Table` descriptions.
    to extend the library to support.
 
 
-# Comparisons
+## Comparisons
 
 
 |                                 | ScalaSql | Quill     | SLICK      | Squeryl | ScalikeJDBC | Doobie  |
@@ -72,34 +75,53 @@ and SQL ResultSets back to Scala data types. It does not provide more sophistica
 asynchronous, monadic, or compile-time operations, nor does it provide the "ORM/ActiveRecord"
 style of emulating mutable objects via database operations.
 
-## Quill
+### Quill
 
 Quill focuses a lot on compile-time query generation, while ScalaSql does not.
 Compile-time query generation has a ton of advantages - zero runtime overhead, compile
 time query logging, etc. - but also comes with a lot of complexity, both in
-maintainability and in the user-facing API. Quill naturally does not support the entire
-Scala language as part of its queries, and my experience using it is that the boundary
-between what's "supported" vs "not" is often not clear.
+user-facing complexity and internal maintainability: 
 
-ScalaSql aims for a lower bar: convenient classes and methods that generate SQL queries 
-at runtime. The "database" operations are clearly separated from "Scala" operations
-by working on `Expr[T]` types, making it straightforward to understand what operations
-you can perform in a query and how to extend them with your own custom logic.
+1. From a user perspective, Quill naturally does not support the entire
+   Scala language as part of its queries, and my experience using it is that the boundary
+   between what's "supported" vs "not" is often not clear. Exactly how the translation
+   to SQL happens is also relatively opaque. In contrast, ScalaSql has database operations 
+   clearly separated from Scala operations via the `Expr[T]` vs `T` types, and the translation
+   to SQL is handled via normal classes with `.toSqlStr` and `.toSqlQuery` methods that are 
+   composed and invoked at runtime.
 
-## SLICK
+2. From a maintainers perspective, Quill's compile-time approach means it needs two 
+   completely distinct implementations for Scala 2 and Scala 3, and is largely implemented  
+   via relatively advanced compile-time metaprogramming techniques. In contrast, ScalaSql
+   shares the vast majority of its logic between Scala 2 and Scala 3, and is implemented
+   mostly via vanilla classes and methods that should be familiar even to those without
+   deep expertise in the Scala language
+
+### SLICK
 
 SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
 transactions, and query optimization. These areas result in a lot of user-facing and
-internal complexity for the library. Whil it is possible to paper over some of this
+internal complexity for the library. While it is possible to paper over some of this
 complexity with libraries such as [Blocking Slick](https://github.com/gitbucket/blocking-slick),
 the essential complexity remains to cause confusion for users and burden for maintainers.
 For example, the book _Essential Slick_ contains a whole
 [chapter on manipulating `DBIO[T]` values](https://books.underscore.io/essential-slick/essential-slick-3.html#combining),
 which distracts from the essential task of _querying the database_.
 
-ScalaSql aims to do without them.
+ScalaSql aims to do without these two things:
 
-## Squeryl
+1. We assume that most applications are not ultra-high-concurrency, and blocking database
+   operations are fine. If slow languages with blocking operations are enough for 
+   ultra-large-scale systems like Dropbox (Python), Github (Ruby), or Instagram (Youtube),
+   they should be enough for the vast majority of systems a developer may want to build.
+
+2. We assume that most queries are relatively simple, most database query optimizers do
+   a reasonable job, and the increased _predictability_ and _simplicity_ of not doing 
+   advanced query optimizations in the application layer more than make up from the
+   increased performance from the optimized database queries. For the rare scenarios where
+   this is not true, the developer can fall back to raw SQL queries.
+
+### Squeryl
 
 ScalaSql uses a different DSL design from Squeryl, focusing on a Scala-collection-like
 API rather than a SQL-like API:
@@ -125,7 +147,7 @@ hopefully result in a library much more familiar to Scala programmers. Squeryl's
 the other hand is unlike Scala collections, but as an embedded DSL is unlike raw SQL as
 well, making it unfamiliar to people with either Scala or raw SQL expertise
 
-## ScalikeJDBC
+### ScalikeJDBC
 
 Like Squeryl, ScalikeJDBC has a SQL-like DSL, while ScalaSql aims to have a
 Scala-collections-like DSL:
@@ -156,7 +178,7 @@ val programmers = DB.readOnly { implicit session =>
 }
 ```
 
-## Doobie
+### Doobie
 
 Doobie aims to let you write raw SQL strings, with some niceties around parameter
 interpolation and parsing SQL result sets into Scala data structures, but without
@@ -165,6 +187,8 @@ you write raw `sql"..."` strings, but the primary interface is meant to be the
 strongly-typed collection-like API.
 
 # Design
+
+The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
 
 **Queryable Hierarchy**:
 
