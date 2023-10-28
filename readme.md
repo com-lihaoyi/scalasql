@@ -170,9 +170,20 @@ strongly-typed collection-like API.
 
 - `Q` -> `R` given `Queryable[Q, R]`
    - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
-   - `Query[R]` -> `Seq[R]`
+   - `Query[R]` -> `R`
    - `CaseClass[Expr]` -> `CaseClass[Id]`
    - `Expr[T]` -> `T`
+
+We need to use a `Queryable` typeclass here for two reasons:
+
+1. We do not control some of the types that can be queryable: `TupleN` and `CaseClass`
+   are "vanilla" types which happen to have members which a queryable, and cannot be
+   made to inherit from any ScalaSql base class the way `Query` and `Expr` can.
+
+2. We need to control the return type: the mapping from `Q` to `R` is somewhat
+   arbitrary, with `Query[R] -> R` and `Expr[T] -> T` being straightforward unwrapping
+   of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
+   following that pattern. Thus we need to use the typeclass to encode this logic
 
 
 **Dataflow**:
