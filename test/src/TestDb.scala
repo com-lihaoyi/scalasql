@@ -2,28 +2,23 @@ package scalasql
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
+import scalasql.dialects.DialectConfig
 import scalasql.query.{Expr, SubqueryRef}
-import scalasql.renderer.SqlStr
-import utest.TestSuite
 
-import java.sql.{Connection, DriverManager}
+import java.sql.Connection
+
 
 class TestDb(
     connection: Connection,
     testSchemaFileName: String,
     testDataFileName: String,
-    defaultQueryableSuffix: String,
-    castParams: Boolean
+    dialectConfig: DialectConfig
 ) {
 
   val db = new DatabaseApi(
     connection,
-    tableNameMapper = camelToSnake,
-    tableNameUnMapper = snakeToCamel,
-    columnNameMapper = camelToSnake,
-    columnNameUnMapper = snakeToCamel,
-    defaultQueryableSuffix = defaultQueryableSuffix,
-    castParams = castParams
+    dialectConfig = dialectConfig,
+    config = TestDb.Config,
   )
 
   def reset() = {
@@ -31,23 +26,6 @@ class TestDb(
     db.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
-  def camelToSnake(s: String) = {
-    s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
-  }
-
-  def snakeToCamel(s: String) = {
-    val out = new StringBuilder()
-    val chunks = s.split("_", -1)
-    for (i <- Range(0, chunks.length)) {
-      val chunk = chunks(i)
-      if (i == 0) out.append(chunk)
-      else {
-        out.append(chunk(0).toUpper)
-        out.append(chunk.drop(1))
-      }
-    }
-    out.toString()
-  }
 
   def apply[T, V](
       query: T,
@@ -58,12 +36,12 @@ class TestDb(
       normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
-      val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
+      val sqlResult = db.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {
-      val sqlResult = db.toSqlQuery(query).stripSuffix(defaultQueryableSuffix)
+      val sqlResult = db.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
       assert(
@@ -82,6 +60,7 @@ class TestDb(
 }
 
 object TestDb {
+  object Config extends Config
   lazy val pg = {
     println("Initializing Postgres")
     val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")

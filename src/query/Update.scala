@@ -71,9 +71,9 @@ object Update {
 
     import computed.implicitCtx
 
-    val tableName = SqlStr.raw(implicitCtx.tableNameMapper(table.value.tableName))
+    val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
     val updateList = set0.map { case (k, v) =>
-      val kStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
+      val kStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
       sql"$kStr = $v"
     }
     val sets = SqlStr.join(updateList, sql", ")

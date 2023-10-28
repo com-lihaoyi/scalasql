@@ -3,23 +3,33 @@ package scalasql
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import scalasql.DatabaseApi.handleResultRow
-import scalasql.query.Expr
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.dialects.DialectConfig
 import scalasql.utils.FlatJson
 
 import java.sql.{JDBCType, ResultSet, Statement}
-import scala.collection.mutable
 
 class DatabaseApi(
     connection: java.sql.Connection,
-    tableNameMapper: String => String = identity,
-    tableNameUnMapper: String => String = identity,
-    columnNameMapper: String => String = identity,
-    columnNameUnMapper: String => String = identity,
-    defaultQueryableSuffix: String,
-    castParams: Boolean
+    config: Config,
+    dialectConfig: DialectConfig
 ) {
-
+  var rolledBack = false
+  def transaction[T](t: => T) = {
+    connection.setAutoCommit(false)
+    try {
+      val res = t
+      if (rolledBack) connection.rollback()
+      else connection.commit()
+      res
+    }
+    catch{case e: Throwable =>
+      connection.rollback()
+      throw e
+    } finally{
+      rolledBack = false
+      connection.setAutoCommit(true)
+    }
+  }
   def runRaw(sql: String) = {
     val statement: Statement = connection.createStatement()
 
@@ -37,7 +47,7 @@ class DatabaseApi(
   def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
       implicit qr: Queryable[Q, R]
   ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[MappedType[_]]) = {
-    val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
+    val ctx = Context(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
     val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
     val flattened = SqlStr.flatten(sqlStr)
     val queryStr = flattened.queryParts.zipAll(flattened.params, "", null).map {
@@ -56,7 +66,7 @@ class DatabaseApi(
 
   def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
 
-    val (str, params, exprs) = toSqlQuery0(query, castParams)
+    val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
     val statement = connection.prepareStatement(str)
 
     for ((p, n) <- params.zipWithIndex) {
@@ -71,14 +81,13 @@ class DatabaseApi(
       try {
         if (qr.singleRow(query)) {
           assert(resultSet.next())
-          val res = handleResultRow(resultSet, columnNameUnMapper, qr.valueReader(query), exprs)
+          val res = handleResultRow(resultSet, qr.valueReader(query), exprs, config)
           assert(!resultSet.next())
           res
         } else {
           val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
           while (resultSet.next()) {
-            val rowRes =
-              handleResultRow(resultSet, columnNameUnMapper, arrVisitor.subVisitor, exprs)
+            val rowRes = handleResultRow(resultSet, arrVisitor.subVisitor, exprs, config)
             arrVisitor.visitValue(rowRes, -1)
           }
           arrVisitor.visitEnd(-1)
@@ -94,9 +103,9 @@ class DatabaseApi(
 object DatabaseApi {
   def handleResultRow[V](
       resultSet: ResultSet,
-      columnNameUnMapper: String => String,
       rowVisitor: Visitor[_, V],
-      exprs: Seq[MappedType[_]]
+      exprs: Seq[MappedType[_]],
+      config: Config
   ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
@@ -104,8 +113,8 @@ object DatabaseApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = metadata.getColumnLabel(i + 1).split(FlatJson.delimiter)
-        .map(s => columnNameUnMapper(s.toLowerCase)).drop(1)
+      val k = metadata.getColumnLabel(i + 1).split(config.columnLabelDelimiter)
+        .map(s => config.columnNameUnMapper(s.toLowerCase)).drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
 

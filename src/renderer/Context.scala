@@ -1,13 +1,13 @@
 package scalasql.renderer
 
+import scalasql.Config
 import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 case class Context(
     fromNaming: Map[From, String],
     exprNaming: Map[Expr.Identity, SqlStr],
-    tableNameMapper: String => String,
-    columnNameMapper: String => String,
+    config: Config,
     defaultQueryableSuffix: String
 )
 
@@ -22,18 +22,18 @@ object Context {
   }
   def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
     val namedFromsMap0 = selectables.zipWithIndex.map {
-      case (t: TableRef, i) => (t, prevContext.tableNameMapper(t.value.tableName) + i)
+      case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + i)
       case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
       case x => throw new Exception("wtf " + x)
     }.toMap
 
     val namedFromsMap = prevContext.fromNaming ++ namedFromsMap0 ++
-      updateTable.map(t => t -> prevContext.tableNameMapper(t.value.tableName))
+      updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
     def computeSelectable(t: From) = t match {
       case t: TableRef => (
           Map.empty[Expr.Identity, SqlStr],
-          SqlStr.raw(prevContext.tableNameMapper(t.value.tableName)) + sql" " +
+          SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
             SqlStr.raw(namedFromsMap(t))
         )
 

@@ -9,13 +9,13 @@ import java.sql.DriverManager
 trait ScalaSqlSuite extends TestSuite with Dialect {
   val checker: TestDb
 }
+
 trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     "sqlite-customer-schema.sql",
     "customer-data.sql",
-    "",
-    castParams = false
+    dialects.SqliteDialect
   )
 
   checker.reset()
@@ -26,8 +26,7 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
     "hsqldb-customer-schema.sql",
     "customer-data.sql",
-    " FROM (VALUES (0))",
-    castParams = true
+    dialects.HsqlDbDialect
   )
 
   checker.reset()
@@ -38,8 +37,7 @@ trait H2Suite extends TestSuite with H2Dialect {
     DriverManager.getConnection("jdbc:h2:mem:mydb"),
     "h2-customer-schema.sql",
     "customer-data.sql",
-    "",
-    castParams = true
+    dialects.H2Dialect
   )
 
   checker.reset()
@@ -52,8 +50,7 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
     ),
     "postgres-customer-schema.sql",
     "customer-data.sql",
-    "",
-    castParams = false
+    dialects.PostgresDialect
   )
 
   checker.reset()
@@ -68,8 +65,7 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
     ),
     "mysql-customer-schema.sql",
     "customer-data.sql",
-    "",
-    castParams = false
+    dialects.MySqlDialect
   )
 
   checker.reset()

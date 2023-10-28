@@ -101,7 +101,7 @@ object Column {
         case s => SqlStr.raw(s) + sql"."
       }
 
-      prefix + SqlStr.raw(ctx.columnNameMapper(name))
+      prefix + SqlStr.raw(ctx.config.columnNameMapper(name))
     }
   }
 }

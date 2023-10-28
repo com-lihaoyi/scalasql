@@ -1,5 +1,6 @@
 package scalasql.utils
 
+import scalasql.Config
 import upickle.core.Visitor
 import scalasql.query.Expr
 import scalasql.renderer.{Context, SqlStr}
@@ -9,11 +10,9 @@ import scalasql.renderer.{Context, SqlStr}
  */
 object FlatJson {
 
-  val delimiter = "__"
-  val basePrefix = "res"
-
-  def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
-    x.map { case (k, v) => ((basePrefix +: k).mkString(delimiter), v.toSqlQuery(context)._1) }
+  def flatten(x: Seq[(List[String], Expr[_])],
+              context: Context): Seq[(String, SqlStr)] = {
+    x.map { case (k, v) => ((context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter), v.toSqlQuery(context)._1) }
   }
 
   /**

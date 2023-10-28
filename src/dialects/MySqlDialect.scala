@@ -16,6 +16,20 @@ import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, SelectToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
+trait MySqlDialect extends Dialect {
+  def defaultQueryableSuffix = ""
+  def castParams = false
+
+  override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
+    new MySqlDialect.ExprStringOps(v)
+
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
+    new MySqlDialect.TableOps(t)
+
+  implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]) =
+    new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
+}
+
 object MySqlDialect extends MySqlDialect {
   class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
@@ -56,9 +70,9 @@ object MySqlDialect extends MySqlDialect {
         .compute(prevContext, q.joins.flatMap(_.from).map(_.from), Some(q.table))
       import computed.implicitCtx
 
-      val tableName = SqlStr.raw(prevContext.tableNameMapper(q.table.value.tableName))
+      val tableName = SqlStr.raw(prevContext.config.tableNameMapper(q.table.value.tableName))
       val updateList = q.set0.map { case (k, v) =>
-        val colStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
+        val colStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
         sql"$tableName.$colStr = $v"
       }
       val sets = SqlStr.join(updateList, sql", ")
@@ -106,14 +120,4 @@ object MySqlDialect extends MySqlDialect {
       (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
     }
   }
-}
-trait MySqlDialect extends Dialect {
-  override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
-    new MySqlDialect.ExprStringOps(v)
-
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
-    new MySqlDialect.TableOps(t)
-
-  implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]) =
-    new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
 }

@@ -11,12 +11,14 @@ object ExprsToSql {
 
   def apply0(flattenedExpr: Seq[(List[String], Expr[_])], context: Context, prefix: SqlStr) = {
     FlatJson.flatten(flattenedExpr, context) match {
-      case Seq((FlatJson.basePrefix, singleExpr)) if singleExpr.isCompleteQuery =>
+      case Seq((prefix, singleExpr))
+        if prefix == context.config.columnLabelPrefix
+          && singleExpr.isCompleteQuery =>
         (flattenedExpr, singleExpr)
 
       case flatQuery =>
         val exprsStr = SqlStr.join(
-          flatQuery.map { case (k, v) => sql"$v as ${SqlStr.raw(context.tableNameMapper(k))}" },
+          flatQuery.map { case (k, v) => sql"$v as ${SqlStr.raw(context.config.tableNameMapper(k))}" },
           sql", "
         )
 

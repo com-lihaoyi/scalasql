@@ -25,7 +25,7 @@ object Delete {
     import computed.implicitCtx
 
     (
-      sql"DELETE FROM ${SqlStr.raw(prevContext.tableNameMapper(table.value.tableName))} WHERE ${expr}",
+      sql"DELETE FROM ${SqlStr.raw(prevContext.config.tableNameMapper(table.value.tableName))} WHERE ${expr}",
       Seq(MappedType.IntType)
     )
   }

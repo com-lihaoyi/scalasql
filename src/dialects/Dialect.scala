@@ -4,17 +4,14 @@ import scalasql.operations.TableOps
 import scalasql.query.{
   Aggregatable,
   Expr,
-  InsertReturning,
-  InsertSelect,
-  InsertValues,
-  OnConflict,
   Select
 }
-import scalasql.renderer.{Context, SqlStr}
-import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table, operations}
 
-trait Dialect {
+object Dialect{
+
+}
+trait Dialect extends DialectConfig{
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
   implicit def ExprNumericOpsConv[T: Numeric: MappedType](

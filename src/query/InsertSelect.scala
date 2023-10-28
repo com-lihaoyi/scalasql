@@ -42,13 +42,13 @@ object InsertSelect {
 
     val columns = SqlStr.join(
       exprs.map(_.asInstanceOf[Column.ColumnExpr[_]])
-        .map(c => SqlStr.raw(ctx.columnNameMapper(c.name))),
+        .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
       sql", "
     )
 
     val (selectSql, mappedTypes) = select.toSqlQuery
     (
-      sql"INSERT INTO ${SqlStr.raw(ctx.tableNameMapper(tableName))} ($columns) ${selectSql
+      sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) ${selectSql
           .withCompleteQuery(false)}",
       mappedTypes
     )
