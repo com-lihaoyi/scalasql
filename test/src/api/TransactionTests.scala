@@ -205,6 +205,31 @@ trait TransactionTests extends ScalaSqlSuite {
           checker.db.autoCommit.run(Purchase.select.size) ==> 5
         }
 
+        test("throwRollbackdMiddleAndOuter") {
+          try {
+            checker.db.transaction { implicit db =>
+              db.run(Purchase.select.size) ==> 7
+
+              db.run(Purchase.delete(_.id <= 2)) ==> 2
+              db.run(Purchase.select.size) ==> 5
+
+              db.transaction {
+                db.run(Purchase.delete(_.id <= 4)) ==> 2
+                db.run(Purchase.select.size) ==> 3
+
+                db.transaction {
+                  db.run(Purchase.delete(_.id <= 6)) ==> 2
+                  db.run(Purchase.select.size) ==> 1
+                }
+                db.run(Purchase.select.size) ==> 1
+                throw new FooException
+              }
+            }
+          } catch { case e: FooException => /*donothing*/ }
+
+          checker.db.autoCommit.run(Purchase.select.size) ==> 7
+        }
+
         test("throwRollbackInnerAndMiddleAndOuter") {
           try {
             checker.db.transaction { implicit db =>
