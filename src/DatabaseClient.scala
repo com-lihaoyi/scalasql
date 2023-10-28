@@ -1,9 +1,13 @@
 package scalasql
 import scalasql.dialects.DialectConfig
 
-class DatabaseClient(connection: java.sql.Connection, config: Config, dialectConfig: DialectConfig){
+class DatabaseClient(
+    connection: java.sql.Connection,
+    config: Config,
+    dialectConfig: DialectConfig
+) {
 
-  def transaction[T](t: Txn => T): T  = {
+  def transaction[T](t: Txn => T): T = {
     connection.setAutoCommit(false)
     val txn = new Txn(connection, config, dialectConfig, false, () => connection.rollback())
     try t(txn)

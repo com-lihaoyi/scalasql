@@ -8,11 +8,13 @@ import scalasql.utils.FlatJson
 
 import java.sql.{JDBCType, ResultSet, Statement}
 
-class Txn(connection: java.sql.Connection,
-          config: Config,
-          dialectConfig: DialectConfig,
-          autoCommit: Boolean,
-          rollBack0: () => Unit) {
+class Txn(
+    connection: java.sql.Connection,
+    config: Config,
+    dialectConfig: DialectConfig,
+    autoCommit: Boolean,
+    rollBack0: () => Unit
+) {
 
   def transaction[T](t: => T): T = {
     val savePoint = connection.setSavepoint()
@@ -21,7 +23,7 @@ class Txn(connection: java.sql.Connection,
       val res = t
       connection.releaseSavepoint(savePoint)
       res
-    } catch{
+    } catch {
       case e =>
         connection.rollback(savePoint)
         throw e

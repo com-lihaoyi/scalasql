@@ -32,12 +32,14 @@ class TestDb(
       normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
-      val sqlResult = db.autoCommit.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
+      val sqlResult = db.autoCommit.toSqlQuery(query)
+        .stripSuffix(dialectConfig.defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {
-      val sqlResult = db.autoCommit.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
+      val sqlResult = db.autoCommit.toSqlQuery(query)
+        .stripSuffix(dialectConfig.defaultQueryableSuffix)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
       assert(

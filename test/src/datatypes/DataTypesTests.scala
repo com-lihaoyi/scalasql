@@ -4,7 +4,17 @@ import scalasql.{datatypes, _}
 import utest._
 import utils.ScalaSqlSuite
 
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZoneId,
+  ZoneOffset,
+  ZonedDateTime
+}
 
 case class DataTypes[+T[_]](
     myTinyInt: T[Byte],
