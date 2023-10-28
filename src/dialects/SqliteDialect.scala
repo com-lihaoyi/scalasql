@@ -10,7 +10,7 @@ object SqliteDialect extends SqliteDialect {
     def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"GLOB($v, $x)" }
   }
 }
-trait SqliteDialect extends Dialect with ReturningDialect {
+trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
 }

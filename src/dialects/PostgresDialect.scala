@@ -12,7 +12,7 @@ object PostgresDialect extends PostgresDialect {
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 }
-trait PostgresDialect extends Dialect with ReturningDialect {
+trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def ExprStringOpsConv(v: Expr[String]): PostgresDialect.ExprStringOps =
     new PostgresDialect.ExprStringOps(v)
 }

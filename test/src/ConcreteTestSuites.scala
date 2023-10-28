@@ -41,7 +41,8 @@ package mysql {
   // object UpdateSubQueryTests extends UpdateSubQueryTests with MySqlSuite
   // MySql does not support INSERT/UPDATE RETURNING
   // object ReturningTests extends ReturningTests with MySqlSuite
-  object OnConflictTests extends OnConflictTests with MySqlSuite
+  // MySql does not support onConflictIgnore and onConflictUpdate does not take columns
+  // object OnConflictTests extends OnConflictTests with MySqlSuite
 
   object MySqlDialectTests extends MySqlDialectTests
 
