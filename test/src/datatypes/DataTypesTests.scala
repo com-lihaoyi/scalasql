@@ -3,7 +3,17 @@ package scalasql.datatypes
 import scalasql.{datatypes, _}
 import utest._
 
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZoneId,
+  ZoneOffset,
+  ZonedDateTime
+}
 
 case class DataTypes[+T[_]](
     myTinyInt: T[Byte],
@@ -15,7 +25,7 @@ case class DataTypes[+T[_]](
     myLocalDate: T[LocalDate],
     myLocalTime: T[LocalTime],
     myLocalDateTime: T[LocalDateTime],
-    myInstant: T[Instant],
+    myInstant: T[Instant]
 //  myOffsetTime: T[OffsetTime],
 )
 
@@ -24,14 +34,13 @@ object DataTypes extends Table[DataTypes] {
 }
 
 case class NonRoundTripTypes[+T[_]](
-  myZonedDateTime: T[ZonedDateTime],
-  myOffsetDateTime: T[OffsetDateTime],
+    myZonedDateTime: T[ZonedDateTime],
+    myOffsetDateTime: T[OffsetDateTime]
 )
 
 object NonRoundTripTypes extends Table[NonRoundTripTypes] {
   val metadata = initMetadata
 }
-
 
 /**
  * Tests for basic query operations: map, filter, join, etc.
@@ -50,7 +59,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalTime = LocalTime.parse("10:15:30"),
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
 //        ,
-        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
+        myInstant = Instant.parse("2011-12-03T10:15:30Z")
 //        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
       )
       checker(
@@ -65,7 +74,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalTime -> value.myLocalTime,
           _.myLocalDateTime -> value.myLocalDateTime,
 //          _.myZonedDateTime -> value.myZonedDateTime,
-          _.myInstant -> value.myInstant,
+          _.myInstant -> value.myInstant
         ),
         value = 1
       )
@@ -80,7 +89,7 @@ trait DataTypesTests extends ScalaSqlSuite {
     // "TIMESTAMP WITH TIMEZONE" is a lie and it actually stores UTC and renders to whatever
     // timezone the client queries it from. Thus values of type `OffsetDateTime` can preserve
     // their instant, but cannot be round-tripped preserving the offset.
-    test("nonRoundTrip"){
+    test("nonRoundTrip") {
       val value = NonRoundTripTypes[Id](
         myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
         myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
@@ -88,13 +97,13 @@ trait DataTypesTests extends ScalaSqlSuite {
 
       def normalize(v: NonRoundTripTypes[Id]) = v.copy[Id](
         myZonedDateTime = v.myZonedDateTime.withZoneSameInstant(ZoneId.systemDefault),
-        myOffsetDateTime = v.myOffsetDateTime.withOffsetSameInstant(OffsetDateTime.now.getOffset),
+        myOffsetDateTime = v.myOffsetDateTime.withOffsetSameInstant(OffsetDateTime.now.getOffset)
       )
 
       checker(
         query = NonRoundTripTypes.insert.values(
           _.myOffsetDateTime -> value.myOffsetDateTime,
-          _.myZonedDateTime -> value.myZonedDateTime,
+          _.myZonedDateTime -> value.myZonedDateTime
         ),
         value = 1
       )
@@ -102,7 +111,8 @@ trait DataTypesTests extends ScalaSqlSuite {
       checker(
         query = NonRoundTripTypes.select,
         value = Seq(normalize(value)),
-        normalize = (x: Seq[datatypes.NonRoundTripTypes[Id]]) => x.map(normalize))
+        normalize = (x: Seq[datatypes.NonRoundTripTypes[Id]]) => x.map(normalize)
+      )
     }
   }
 }

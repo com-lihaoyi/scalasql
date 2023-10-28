@@ -1,7 +1,15 @@
 package scalasql.dialects
 
 import scalasql.operations.TableOps
-import scalasql.query.{Aggregatable, Expr, InsertReturning, InsertSelect, InsertValues, OnConflict, Select}
+import scalasql.query.{
+  Aggregatable,
+  Expr,
+  InsertReturning,
+  InsertSelect,
+  InsertValues,
+  OnConflict,
+  Select
+}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table, operations}

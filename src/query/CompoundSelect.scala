@@ -90,12 +90,11 @@ case class CompoundSelect[Q, R](
 object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
-
   def toSqlStr[Q, R](
-                      query: CompoundSelect[Q, R],
-                      qr: Queryable[Q, R],
-                      prevContext: Context
-                    ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
+      query: CompoundSelect[Q, R],
+      qr: Queryable[Q, R],
+      prevContext: Context
+  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
     val (lhsMap, lhsStr0, context, mappedTypes) = query.lhs.toSqlQuery0(prevContext)
 
     val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"($lhsStr0)" else lhsStr0

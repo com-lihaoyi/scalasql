@@ -13,9 +13,9 @@ import scalasql.utils.OptionPickler
 trait InsertSelect[Q, C, R, R2]
     extends InsertReturnable[Q] with Query[Int]
 
-object InsertSelect{
+object InsertSelect {
   case class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
-    extends InsertSelect[Q, C, R, R2] {
+      extends InsertSelect[Q, C, R, R2] {
     def expr = insert.expr
 
     def table = insert.table
@@ -32,13 +32,12 @@ object InsertSelect{
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-
   def toSqlStr(
-              select: Select[_, _],
-              exprs: Seq[Expr[_]],
-              prevContext: Context,
-              tableName: String
-            ): (SqlStr, Seq[MappedType[_]]) = {
+      select: Select[_, _],
+      exprs: Seq[Expr[_]],
+      prevContext: Context,
+      tableName: String
+  ): (SqlStr, Seq[MappedType[_]]) = {
 
     implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
 

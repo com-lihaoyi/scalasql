@@ -14,17 +14,20 @@ trait InsertValues[Q, R] extends InsertReturnable[Q] with Query[Int] {
   def columns: Seq[Column.ColumnExpr[_]]
   def valuesLists: Seq[Seq[Expr[_]]]
 }
-object InsertValues{
+object InsertValues {
   case class Impl[Q, R](
       insert: Insert[Q, R],
       columns: Seq[Column.ColumnExpr[_]],
       valuesLists: Seq[Seq[Expr[_]]]
-  )(implicit val qr: Queryable[Q, R]) extends InsertValues[Q, R]{
+  )(implicit val qr: Queryable[Q, R]) extends InsertValues[Q, R] {
     def table = insert.table
     def expr: Q = insert.expr
 
     override def toSqlQuery(implicit ctx: Context) =
-      (InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName), Seq(MappedType.IntType))
+      (
+        InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName),
+        Seq(MappedType.IntType)
+      )
     def walk() = Nil
     override def singleRow = true
     override def isExecuteUpdate = true
@@ -32,10 +35,12 @@ object InsertValues{
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-  def toSqlStr(columns0: Seq[Column.ColumnExpr[_]],
-               prevContext: Context,
-               valuesLists: Seq[Seq[Expr[_]]],
-               tableName: String): SqlStr = {
+  def toSqlStr(
+      columns0: Seq[Column.ColumnExpr[_]],
+      prevContext: Context,
+      valuesLists: Seq[Seq[Expr[_]]],
+      tableName: String
+  ): SqlStr = {
 
     implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
     val columns = SqlStr.join(columns0.map(c => SqlStr.raw(ctx.columnNameMapper(c.name))), sql", ")

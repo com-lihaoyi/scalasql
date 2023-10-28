@@ -48,7 +48,7 @@ trait InsertTests extends ScalaSqlSuite {
       }
     }
 
-    test("conflict") - intercept[Exception]{
+    test("conflict") - intercept[Exception] {
       checker(
         query =
           Buyer.insert.values(

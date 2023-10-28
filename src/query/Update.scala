@@ -60,21 +60,18 @@ object Update {
   }
 
   def toSqlStr(
-                   joins0: Seq[Join],
-                   table: TableRef,
-                   set0: Seq[(Column.ColumnExpr[_], Expr[_])],
-                   where0: Seq[Expr[_]],
-                   prevContext: Context,
-                 ) = {
-    val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
-      prevContext,
-      joins0.flatMap(_.from).map(_.from),
-      Some(table)
-    )
+      joins0: Seq[Join],
+      table: TableRef,
+      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      where0: Seq[Expr[_]],
+      prevContext: Context
+  ) = {
+    val computed =
+      Context.compute(prevContext, joins0.flatMap(_.from).map(_.from), Some(table))
 
-    implicit val ctx: Context = context
+    import computed.implicitCtx
 
-    val tableName = SqlStr.raw(ctx.tableNameMapper(table.value.tableName))
+    val tableName = SqlStr.raw(implicitCtx.tableNameMapper(table.value.tableName))
     val updateList = set0.map { case (k, v) =>
       val kStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
       sql"$kStr = $v"
@@ -84,7 +81,9 @@ object Update {
     val (from, fromOns) = joins0.headOption match {
       case None => (sql"", Nil)
       case Some(firstJoin) =>
-        val (froms, ons) = firstJoin.from.map { jf => (fromSelectables(jf.from)._2, jf.on) }.unzip
+        val (froms, ons) = firstJoin.from.map { jf =>
+          (computed.fromSelectables(jf.from)._2, jf.on)
+        }.unzip
         (sql" FROM " + SqlStr.join(froms, sql", "), ons.flatten)
     }
 
@@ -92,7 +91,7 @@ object Update {
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
     }
 
-    val joins = optSeq(joins0.drop(1))(SelectToSql.joinsToSqlStr(_, fromSelectables))
+    val joins = optSeq(joins0.drop(1))(SelectToSql.joinsToSqlStr(_, computed.fromSelectables))
 
     (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
 

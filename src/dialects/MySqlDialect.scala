@@ -1,7 +1,17 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{Expr, InsertReturning, InsertSelect, InsertValues, Joinable, OnConflict, Query, TableRef, Update}
+import scalasql.query.{
+  Expr,
+  InsertReturning,
+  InsertSelect,
+  InsertValues,
+  Joinable,
+  OnConflict,
+  Query,
+  TableRef,
+  Update
+}
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, SelectToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -44,15 +54,11 @@ object MySqlDialect extends MySqlDialect {
         q: Update.Impl[Q, R],
         prevContext: Context
     ): (SqlStr, Seq[MappedType[_]]) = {
-      val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
-        prevContext,
-        q.joins.flatMap(_.from).map(_.from),
-        Some(q.table)
-      )
+      val computed =
+        Context.compute(prevContext, q.joins.flatMap(_.from).map(_.from), Some(q.table))
+      import computed.implicitCtx
 
-      implicit val ctx: Context = context
-
-      val tableName = SqlStr.raw(ctx.tableNameMapper(q.table.value.tableName))
+      val tableName = SqlStr.raw(prevContext.tableNameMapper(q.table.value.tableName))
       val updateList = q.set0.map { case (k, v) =>
         val colStr = SqlStr.raw(prevContext.columnNameMapper(k.name))
         sql"$tableName.$colStr = $v"
@@ -63,7 +69,7 @@ object MySqlDialect extends MySqlDialect {
         sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
       }
 
-      val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, fromSelectables))
+      val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, computed.fromSelectables))
 
       (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
     }
@@ -73,17 +79,17 @@ object MySqlDialect extends MySqlDialect {
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
 
     def onConflictUpdate(c2: Q => (Column.ColumnExpr[_], Expr[_])*): OnConflictUpdate[Q, R] =
       new OnConflictUpdate(this, c2.map(_(expr)), table)
   }
 
-  class OnConflictUpdate[Q, R](insert: OnConflictable[Q, R],
-                               updates: Seq[(Column.ColumnExpr[_], Expr[_])],
-                               table: TableRef)
-    extends Query[R]{
+  class OnConflictUpdate[Q, R](
+      insert: OnConflictable[Q, R],
+      updates: Seq[(Column.ColumnExpr[_], Expr[_])],
+      table: TableRef
+  ) extends Query[R] {
 
     override def isExecuteUpdate = true
     def walk() = insert.query.walk()
@@ -94,14 +100,11 @@ object MySqlDialect extends MySqlDialect {
 
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
     def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-      val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
-        ctx,
-        Nil,
-        Some(table)
-      )
-      implicit val ctx2 = context
+      val computed = Context.compute(ctx, Nil, Some(table))
+      import computed.implicitCtx
       val (str, mapped) = insert.query.toSqlQuery
-      val updatesStr = SqlStr.join(updates.map{case (c, e) => SqlStr.raw(c.name) + sql" = $e"}, sql", ")
+      val updatesStr =
+        SqlStr.join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
       (
         str + sql" ON DUPLICATE KEY UPDATE $updatesStr",
         mapped
@@ -109,7 +112,7 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 }
-trait MySqlDialect extends Dialect  {
+trait MySqlDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
 

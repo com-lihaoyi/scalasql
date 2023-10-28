@@ -24,11 +24,11 @@ object Query {
     override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = q.toSqlQuery(ctx)
   }
 
-  trait Multiple[R] extends Query[Seq[R]]{
+  trait Multiple[R] extends Query[Seq[R]] {
     def valueReader: OptionPickler.SeqLikeReader[Seq, R]
   }
 
-  class Single[R](query: Multiple[R]) extends Query[R]{
+  class Single[R](query: Multiple[R]) extends Query[R] {
     override def isExecuteUpdate = query.isExecuteUpdate
     def walk() = query.walk()
 

@@ -6,9 +6,8 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait Delete[Q] extends Query[Int] with Returnable[Q]
 
-
 object Delete {
-  case class Impl[Q](expr: Q, filter: Expr[Boolean], table: TableRef) extends Delete[Q]{
+  case class Impl[Q](expr: Q, filter: Expr[Boolean], table: TableRef) extends Delete[Q] {
     override def isExecuteUpdate = true
     def walk() = Nil
     def singleRow = true
@@ -22,13 +21,9 @@ object Delete {
   }
 
   def toSqlStr(table: TableRef, expr: Expr[Boolean], prevContext: Context) = {
-    val (namedFromsMap, fromSelectables, exprNaming, context) = Context.computeContext(
-      prevContext,
-      Nil,
-      Some(table)
-    )
+    val computed = Context.compute(prevContext, Nil, Some(table))
+    import computed.implicitCtx
 
-    implicit val ctx = context
     (
       sql"DELETE FROM ${SqlStr.raw(prevContext.tableNameMapper(table.value.tableName))} WHERE ${expr}",
       Seq(MappedType.IntType)

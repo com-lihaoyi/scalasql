@@ -82,7 +82,8 @@ case class SimpleSelect[Q, R](
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
       implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery,
-      selectProxyExpr)(qr)
+      selectProxyExpr
+    )(qr)
   }
 
   def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
@@ -134,24 +135,24 @@ object SimpleSelect {
   }
 
   def toSqlStr[Q, R](
-                    query: SimpleSelect[Q, R],
-                    qr: Queryable[Q, R],
-                    prevContext: Context
-                  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-    val (namedFromsMap, fromSelectables, exprNaming, ctx) = Context.computeContext(
+      query: SimpleSelect[Q, R],
+      qr: Queryable[Q, R],
+      prevContext: Context
+  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
+    val computed = Context.compute(
       prevContext,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
       None
     )
 
-    implicit val context: Context = ctx
+    import computed.implicitCtx
 
     val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
-    val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, context)
+    val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, implicitCtx)
 
-    val tables = SqlStr.join(query.from.map(fromSelectables(_)._2), sql", ")
+    val tables = SqlStr.join(query.from.map(computed.fromSelectables(_)._2), sql", ")
 
-    val joins = joinsToSqlStr(query.joins, fromSelectables)
+    val joins = joinsToSqlStr(query.joins, computed.fromSelectables)
 
     val filtersOpt = SqlStr.optSeq(query.where) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
@@ -178,7 +179,7 @@ object SimpleSelect {
     (
       jsonQueryMap,
       exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt,
-      ctx,
+      implicitCtx,
       flattenedExpr.map(t => Expr.getMappedType(t._2))
     )
   }

@@ -166,7 +166,7 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
       checker(
         query = Purchase.delete(_.shippingInfoId === 1).returning(_.total),
         sqls = Seq(
-          "DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res",
+          "DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res"
         ),
         value = Seq(888.0, 900.0, 15.7)
       )

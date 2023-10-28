@@ -11,12 +11,20 @@ case class Context(
     defaultQueryableSuffix: String
 )
 
-object Context{
-  def computeContext(
-                      prevContext: Context,
-                      selectables: Seq[From],
-                      updateTable: Option[TableRef]
-                    ) = {
+object Context {
+  case class Computed(
+      namedFromsMap: Map[From, String],
+      fromSelectables: Map[From, (Map[Expr.Identity, SqlStr], SqlStr)],
+      exprNaming: Map[Expr.Identity, SqlStr],
+      ctx: Context
+  ) {
+    implicit def implicitCtx: Context = ctx
+  }
+  def compute(
+      prevContext: Context,
+      selectables: Seq[From],
+      updateTable: Option[TableRef]
+  ) = {
     val namedFromsMap0 = selectables
       .zipWithIndex
       .map {
@@ -55,7 +63,7 @@ object Context{
 
     val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)
 
-    (namedFromsMap, fromSelectables, exprNaming, ctx)
+    Computed(namedFromsMap, fromSelectables, exprNaming, ctx)
   }
 
 }

@@ -57,7 +57,8 @@ trait Select[Q, R]
   def walk() = qr.walk(expr)
   override def singleRow = false
 
-  def toSqlQuery0(prevContext: Context): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
+  def toSqlQuery0(prevContext: Context)
+      : (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
 
   def single: Query.Single[R] = new Query.Single(this)
 }

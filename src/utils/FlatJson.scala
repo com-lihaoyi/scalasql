@@ -54,7 +54,7 @@ object FlatJson {
         startIndex: Int,
         endIndex: Int,
         depth: Int,
-        visitor: Visitor[_, _],
+        visitor: Visitor[_, _]
     ): Any = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
         values(startIndex)
