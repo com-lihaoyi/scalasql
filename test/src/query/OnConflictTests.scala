@@ -3,6 +3,7 @@ package scalasql.query
 import scalasql._
 import scalasql.dialects.{OnConflictOps, ReturningDialect}
 import utest._
+import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 

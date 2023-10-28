@@ -1,7 +1,7 @@
 package scalasql.dialects
 
-import scalasql.HsqlDbSuite
 import scalasql.query.Expr
+import scalasql.utils.HsqlDbSuite
 import utest._
 
 trait HsqlDbDialectTests extends HsqlDbSuite {

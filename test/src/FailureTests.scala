@@ -1,6 +1,7 @@
 package scalasql
 import scalasql.query.Expr
 import utest._
+import utils.SqliteSuite
 
 /**
  * Tests for all the aggregate operators that we provide by default

@@ -3,6 +3,7 @@ package scalasql.dialects
 import scalasql._
 import scalasql.query.Expr
 import utest._
+import utils.SqliteSuite
 
 trait SqliteDialectTests extends SqliteSuite {
   def tests = Tests {

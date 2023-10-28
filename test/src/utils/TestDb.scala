@@ -1,9 +1,11 @@
-package scalasql
+package scalasql.utils
+
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import scalasql.dialects.DialectConfig
 import scalasql.query.{Expr, SubqueryRef}
+import scalasql.{Config, DatabaseClient, Queryable}
 
 import java.sql.Connection
 
@@ -14,11 +16,11 @@ class TestDb(
     dialectConfig: DialectConfig
 ) {
 
-  val db = new DatabaseApi(connection, dialectConfig = dialectConfig, config = TestDb.Config)
+  val db = new DatabaseClient(connection, dialectConfig = dialectConfig, config = TestDb.Config)
 
   def reset() = {
-    db.runRaw(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
-    db.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
+    db.autoCommit.runRaw(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
+    db.autoCommit.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
   def apply[T, V](
@@ -30,12 +32,12 @@ class TestDb(
       normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
-      val sqlResult = db.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
+      val sqlResult = db.autoCommit.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {
-      val sqlResult = db.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
+      val sqlResult = db.autoCommit.toSqlQuery(query).stripSuffix(dialectConfig.defaultQueryableSuffix)
 //      pprint.log(sqlResult)
 //      pprint.log(sqls.map(_.trim.replaceAll("\\s+", " ")))
       assert(
@@ -45,7 +47,7 @@ class TestDb(
 
     }
 
-    val result = db.run(query)
+    val result = db.autoCommit.run(query)
 
     val values = Option(value) ++ moreValues
     val normalized = normalize(result)

@@ -1,7 +1,7 @@
 package scalasql.dialects
 
-import scalasql.H2Suite
 import scalasql.query.Expr
+import scalasql.utils.H2Suite
 import utest._
 
 trait H2DialectTests extends H2Suite {

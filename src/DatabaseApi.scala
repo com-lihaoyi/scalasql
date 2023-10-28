@@ -2,30 +2,21 @@ package scalasql
 
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
-import scalasql.DatabaseApi.handleResultRow
+import scalasql.Txn.handleResultRow
 import scalasql.dialects.DialectConfig
 import scalasql.utils.FlatJson
 
 import java.sql.{JDBCType, ResultSet, Statement}
 
-class DatabaseApi(connection: java.sql.Connection, config: Config, dialectConfig: DialectConfig) {
-  var rolledBack = false
-  def transaction[T](t: => T) = {
-    connection.setAutoCommit(false)
-    try {
-      val res = t
-      if (rolledBack) connection.rollback() else connection.commit()
-      res
-    } catch {
-      case e: Throwable =>
-        connection.rollback()
-        throw e
-    } finally {
-      rolledBack = false
-      connection.setAutoCommit(true)
-    }
-  }
+class Txn(connection: java.sql.Connection,
+          config: Config,
+          dialectConfig: DialectConfig,
+          autoCommit: Boolean,
+          rollBack0: () => Unit) {
+
+  def rollBack() = rollBack0()
   def runRaw(sql: String) = {
+    if (autoCommit) connection.setAutoCommit(true)
     val statement: Statement = connection.createStatement()
 
     try statement.executeUpdate(sql)
@@ -60,7 +51,7 @@ class DatabaseApi(connection: java.sql.Connection, config: Config, dialectConfig
   }
 
   def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
-
+    if (autoCommit) connection.setAutoCommit(true)
     val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
     val statement = connection.prepareStatement(str)
 
@@ -95,7 +86,7 @@ class DatabaseApi(connection: java.sql.Connection, config: Config, dialectConfig
   }
 }
 
-object DatabaseApi {
+object Txn {
   def handleResultRow[V](
       resultSet: ResultSet,
       rowVisitor: Visitor[_, V],

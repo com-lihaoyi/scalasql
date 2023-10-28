@@ -1,4 +1,5 @@
 package scalasql
+import scaalsql.api.TransactionTests
 import operations.{
   ExprBooleanOpsTests,
   ExprNumericOpsTests,
@@ -26,6 +27,9 @@ import scalasql.dialects.{
 }
 
 package mysql {
+
+  import utils.MySqlSuite
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
   object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
@@ -47,9 +51,14 @@ package mysql {
   object MySqlDialectTests extends MySqlDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
+
+  object TransactionTests extends TransactionTests with MySqlSuite
 }
 
 package postgres {
+
+  import utils.PostgresSuite
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
   object ExprExprIntOpsTests extends ExprNumericOpsTests with PostgresSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
@@ -68,9 +77,14 @@ package postgres {
   object PostgresDialectTests extends PostgresDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
+
+  object TransactionTests extends TransactionTests with PostgresSuite
 }
 
 package sqlite {
+
+  import utils.SqliteSuite
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
   object ExprIntOpsTests extends ExprNumericOpsTests with SqliteSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
@@ -89,9 +103,14 @@ package sqlite {
   object SqliteDialectTests extends SqliteDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
+
+  object TransactionTests extends TransactionTests with SqliteSuite
 }
 
 package hsqldb {
+
+  import utils.HsqlDbSuite
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with HsqlDbSuite
   object ExprIntOpsTests extends ExprNumericOpsTests with HsqlDbSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HsqlDbSuite
@@ -113,9 +132,14 @@ package hsqldb {
   object HsqlDbDialectTests extends HsqlDbDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
+
+  object TransactionTests extends TransactionTests with HsqlDbSuite
 }
 
 package h2 {
+
+  import utils.H2Suite
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
   object ExprIntOpsTests extends ExprNumericOpsTests with H2Suite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with H2Suite
@@ -136,4 +160,6 @@ package h2 {
   object HsqlDbDialectTests extends H2DialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
+
+  object TransactionTests extends TransactionTests with H2Suite
 }

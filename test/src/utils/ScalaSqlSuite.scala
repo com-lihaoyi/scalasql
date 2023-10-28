@@ -1,7 +1,7 @@
-package scalasql
+package scalasql.utils
 
-import dialects.{Dialect, H2Dialect, HsqlDbDialect, MySqlDialect, PostgresDialect, SqliteDialect}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.dialects
+import scalasql.dialects._
 import utest.TestSuite
 
 import java.sql.DriverManager

@@ -1,5 +1,7 @@
 package scalasql
 
+import utils.TestDb
+
 object Main {
 
   def main(args: Array[String]): Unit = {

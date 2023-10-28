@@ -3,6 +3,7 @@ package scalasql.operations
 import scalasql._
 import scalasql.query.Expr
 import utest._
+import utils.ScalaSqlSuite
 
 /**
  * Tests for all the individual symbolic operators and functions that we provide by default

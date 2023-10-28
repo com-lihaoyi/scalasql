@@ -2,6 +2,7 @@ package scalasql.query
 
 import scalasql._
 import utest._
+import utils.ScalaSqlSuite
 
 import java.sql.Date
 

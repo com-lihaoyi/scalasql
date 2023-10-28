@@ -2,6 +2,7 @@ package scalasql.operations
 
 import scalasql._
 import utest._
+import utils.ScalaSqlSuite
 
 /**
  * Tests for all the aggregate operators that we provide by default
