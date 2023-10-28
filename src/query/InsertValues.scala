@@ -43,7 +43,8 @@ object InsertValues {
   ): SqlStr = {
 
     implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
-    val columns = SqlStr.join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
+    val columns = SqlStr
+      .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
     val values = SqlStr.join(
       valuesLists
         .map(values => sql"(" + SqlStr.join(values.map(_.toSqlQuery._1), sql", ") + sql")"),

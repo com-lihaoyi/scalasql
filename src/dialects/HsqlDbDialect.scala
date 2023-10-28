@@ -11,8 +11,8 @@ trait HsqlDbDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): HsqlDbDialect.ExprStringOps =
     new HsqlDbDialect.ExprStringOps(v)
   override implicit def ExprNumericOpsConv[T: Numeric: MappedType](
-                                                                    v: Expr[T]
-                                                                  ): HsqlDbDialect.ExprNumericOps[T] = new HsqlDbDialect.ExprNumericOps(v)
+      v: Expr[T]
+  ): HsqlDbDialect.ExprNumericOps[T] = new HsqlDbDialect.ExprNumericOps(v)
 }
 
 object HsqlDbDialect extends HsqlDbDialect {

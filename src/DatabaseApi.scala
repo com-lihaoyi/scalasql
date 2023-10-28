@@ -8,24 +8,19 @@ import scalasql.utils.FlatJson
 
 import java.sql.{JDBCType, ResultSet, Statement}
 
-class DatabaseApi(
-    connection: java.sql.Connection,
-    config: Config,
-    dialectConfig: DialectConfig
-) {
+class DatabaseApi(connection: java.sql.Connection, config: Config, dialectConfig: DialectConfig) {
   var rolledBack = false
   def transaction[T](t: => T) = {
     connection.setAutoCommit(false)
     try {
       val res = t
-      if (rolledBack) connection.rollback()
-      else connection.commit()
+      if (rolledBack) connection.rollback() else connection.commit()
       res
-    }
-    catch{case e: Throwable =>
-      connection.rollback()
-      throw e
-    } finally{
+    } catch {
+      case e: Throwable =>
+        connection.rollback()
+        throw e
+    } finally {
       rolledBack = false
       connection.setAutoCommit(true)
     }

@@ -1,5 +1,4 @@
-package  scalasql
-
+package scalasql
 
 trait Config {
   def columnLabelPrefix = "res"
@@ -10,7 +9,7 @@ trait Config {
   def columnNameMapper(v: String): String = Config.camelToSnake(v)
   def columnNameUnMapper(v: String): String = Config.snakeToCamel(v)
 }
-object Config{
+object Config {
   def camelToSnake(s: String) = {
     s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
   }

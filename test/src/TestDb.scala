@@ -7,7 +7,6 @@ import scalasql.query.{Expr, SubqueryRef}
 
 import java.sql.Connection
 
-
 class TestDb(
     connection: Connection,
     testSchemaFileName: String,
@@ -15,17 +14,12 @@ class TestDb(
     dialectConfig: DialectConfig
 ) {
 
-  val db = new DatabaseApi(
-    connection,
-    dialectConfig = dialectConfig,
-    config = TestDb.Config,
-  )
+  val db = new DatabaseApi(connection, dialectConfig = dialectConfig, config = TestDb.Config)
 
   def reset() = {
     db.runRaw(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
     db.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
-
 
   def apply[T, V](
       query: T,

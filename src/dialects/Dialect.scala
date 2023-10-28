@@ -1,17 +1,11 @@
 package scalasql.dialects
 
 import scalasql.operations.TableOps
-import scalasql.query.{
-  Aggregatable,
-  Expr,
-  Select
-}
+import scalasql.query.{Aggregatable, Expr, Select}
 import scalasql.{MappedType, Queryable, Table, operations}
 
-object Dialect{
-
-}
-trait Dialect extends DialectConfig{
+object Dialect {}
+trait Dialect extends DialectConfig {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
   implicit def ExprNumericOpsConv[T: Numeric: MappedType](

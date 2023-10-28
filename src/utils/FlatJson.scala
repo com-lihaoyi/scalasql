@@ -10,9 +10,13 @@ import scalasql.renderer.{Context, SqlStr}
  */
 object FlatJson {
 
-  def flatten(x: Seq[(List[String], Expr[_])],
-              context: Context): Seq[(String, SqlStr)] = {
-    x.map { case (k, v) => ((context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter), v.toSqlQuery(context)._1) }
+  def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
+    x.map { case (k, v) =>
+      (
+        (context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter),
+        v.toSqlQuery(context)._1
+      )
+    }
   }
 
   /**

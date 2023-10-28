@@ -166,7 +166,8 @@ object SimpleSelect {
       (
         Expr.getIdentity(v),
         SqlStr.raw(
-          (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper).mkString(prevContext.config.columnLabelDelimiter)
+          (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
+            .mkString(prevContext.config.columnLabelDelimiter)
         )
       )
     }.toMap
