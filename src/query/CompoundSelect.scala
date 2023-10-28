@@ -11,7 +11,8 @@ case class CompoundSelect[Q, R](
     orderBy: Option[OrderBy],
     limit: Option[Int],
     offset: Option[Int]
-)(implicit val qr: Queryable[Q, R]) extends Select[Q, R] {
+)(implicit val qr: Queryable[Q, R])
+    extends Select[Q, R] {
 
   def expr = lhs.select.expr
 
@@ -19,8 +20,8 @@ case class CompoundSelect[Q, R](
 
   def distinct: Select[Q, R] = ???
 
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit
-      qr: Queryable[Expr[V], V]
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
+      implicit qr: Queryable[Expr[V], V]
   ): Expr[V] = ???
 
   def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable[Q2, R2]): Select[Q2, R2] = {
@@ -44,20 +45,17 @@ case class CompoundSelect[Q, R](
     }
   }
 
-  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
-      joinQr: Queryable[Q2, R2]
-  ): Select[(Q, Q2), (R, R2)] = {
-    SimpleSelect.from(this).join0(other, on)
-  }
+  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+      implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Q, Q2), (R, R2)] = { SimpleSelect.from(this).join0(other, on) }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     SimpleSelect.from(this).aggregate(f)
   }
 
-  def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
-      qrk: Queryable[K, R1],
-      qrv: Queryable[V, R2]
-  ): Select[(K, V), (R1, R2)] = {
+  def groupBy[K, V, R1, R2](groupKey: Q => K)(
+      groupAggregate: SelectProxy[Q] => V
+  )(implicit qrk: Queryable[K, R1], qrv: Queryable[V, R2]): Select[(K, V), (R1, R2)] = {
     SimpleSelect.from(this).groupBy(groupKey)(groupAggregate)
   }
 
@@ -102,8 +100,8 @@ object CompoundSelect {
 
     val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
       val compoundStrs = compoundOps.map { op =>
-        val (compoundMapping, compoundStr, compoundCtx, compoundMappedTypes) =
-          op.rhs.toSqlQuery0(prevContext)
+        val (compoundMapping, compoundStr, compoundCtx, compoundMappedTypes) = op.rhs
+          .toSqlQuery0(prevContext)
 
         sql" ${SqlStr.raw(op.op)} $compoundStr"
       }
@@ -128,9 +126,7 @@ object CompoundSelect {
       sql" ORDER BY " + orderBy.expr.toSqlQuery(newCtx)._1 + ascDesc + nulls
     }
 
-    val limitOpt = SqlStr.opt(query.limit) { limit =>
-      sql" LIMIT " + SqlStr.raw(limit.toString)
-    }
+    val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
 
     val offsetOpt = SqlStr.opt(query.offset) { offset =>
       sql" OFFSET " + SqlStr.raw(offset.toString)

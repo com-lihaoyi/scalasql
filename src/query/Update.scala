@@ -10,8 +10,8 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
 
   def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q, R]
 
-  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
-      joinQr: Queryable[Q2, R2]
+  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+      implicit joinQr: Queryable[Q2, R2]
   ): Update[(Q, Q2), (R, R2)]
 
   def qr: Queryable[Q, R]
@@ -33,7 +33,8 @@ object Update {
       set0: Seq[(Column.ColumnExpr[_], Expr[_])],
       joins: Seq[Join],
       where: Seq[Expr[_]]
-  )(implicit val qr: Queryable[Q, R]) extends Update[Q, R] {
+  )(implicit val qr: Queryable[Q, R])
+      extends Update[Q, R] {
     def filter(f: Q => Expr[Boolean]): Update.Impl[Q, R] = {
       this.copy(where = where ++ Seq(f(expr)))
     }
@@ -42,8 +43,8 @@ object Update {
       this.copy(set0 = f.map(_(expr)))
     }
 
-    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
-        joinQr: Queryable[Q2, R2]
+    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+        implicit joinQr: Queryable[Q2, R2]
     ): Update.Impl[(Q, Q2), (R, R2)] = {
       val (otherJoin, otherSelect) = joinInfo(other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
@@ -66,8 +67,7 @@ object Update {
       where0: Seq[Expr[_]],
       prevContext: Context
   ) = {
-    val computed =
-      Context.compute(prevContext, joins0.flatMap(_.from).map(_.from), Some(table))
+    val computed = Context.compute(prevContext, joins0.flatMap(_.from).map(_.from), Some(table))
 
     import computed.implicitCtx
 

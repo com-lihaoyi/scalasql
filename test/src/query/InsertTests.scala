@@ -14,12 +14,11 @@ trait InsertTests extends ScalaSqlSuite {
     test("single") {
       test("simple") - {
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 4
-            ),
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 4
+          ),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
           value = 1
         )
@@ -32,10 +31,8 @@ trait InsertTests extends ScalaSqlSuite {
 
       test("partial") - {
         checker(
-          query = Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09")
-          ),
+          query = Buyer.insert
+            .values(_.name -> "test buyer", _.dateOfBirth -> LocalDate.parse("2023-09-09")),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
           value = 1
         )
@@ -50,12 +47,11 @@ trait InsertTests extends ScalaSqlSuite {
 
     test("conflict") - intercept[Exception] {
       checker(
-        query =
-          Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 1 // This should cause a primary key conflict
-          ),
+        query = Buyer.insert.values(
+          _.name -> "test buyer",
+          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+          _.id -> 1 // This should cause a primary key conflict
+        ),
         value = 1
       )
     }
@@ -126,8 +122,7 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.insert.select(
             identity,
-            Buyer.select
-              .filter(_.name !== "Li Haoyi")
+            Buyer.select.filter(_.name !== "Li Haoyi")
               .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
           ),
           sql = """

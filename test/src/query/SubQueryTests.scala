@@ -11,10 +11,9 @@ import java.time.LocalDate
 trait SubQueryTests extends ScalaSqlSuite {
   def tests = Tests {
     test("sortTakeJoin") - checker(
-      query =
-        Purchase.select
-          .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
-          .map { case (purchase, product) => purchase.total },
+      query = Purchase.select
+        .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
+        .map { case (purchase, product) => purchase.total },
       sql = """
         SELECT purchase0.total as res
         FROM purchase purchase0
@@ -32,10 +31,8 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("sortTakeFrom") - checker(
-      query =
-        Product.select.sortBy(_.price).desc.take(1)
-          .joinOn(Purchase)(_.id === _.productId)
-          .map { case (product, purchase) => purchase.total },
+      query = Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id === _.productId)
+        .map { case (product, purchase) => purchase.total },
       sql = """
         SELECT purchase1.total as res
         FROM (SELECT
@@ -52,10 +49,9 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("sortTakeFromAndJoin") - checker(
-      query =
-        Product.select.sortBy(_.price).desc.take(3)
-          .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
-          .map { case (product, purchase) => (product.name, purchase.count) },
+      query = Product.select.sortBy(_.price).desc.take(3)
+        .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
+        .map { case (product, purchase) => (product.name, purchase.count) },
       sql = """
         SELECT
           subquery0.res__name as res__0,
@@ -83,8 +79,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("sortLimitSortLimit") - checker(
-      query =
-        Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name),
+      query = Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name),
       sql = """
         SELECT subquery0.res__name as res
         FROM (SELECT
@@ -102,8 +97,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("sortGroupBy") - checker(
-      query =
-        Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total)),
+      query = Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total)),
       sql = """
         SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
         FROM (SELECT
@@ -122,9 +116,8 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("groupByJoin") - checker(
-      query =
-        Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
-          .map { case ((productId, total), product) => (product.name, total) },
+      query = Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
+        .map { case ((productId, total), product) => (product.name, total) },
       sql = """
         SELECT
           product1.name as res__0,
@@ -148,10 +141,9 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("subqueryInFilter") - checker(
-      query =
-        Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0),
-      sql =
-        """
+      query = Buyer.select
+        .filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0),
+      sql = """
         SELECT
           buyer0.id as res__id,
           buyer0.name as res__name,
@@ -165,10 +157,8 @@ trait SubQueryTests extends ScalaSqlSuite {
       value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     test("subqueryInMap") - checker(
-      query =
-        Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size)),
-      sql =
-        """
+      query = Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size)),
+      sql = """
         SELECT
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
@@ -183,10 +173,9 @@ trait SubQueryTests extends ScalaSqlSuite {
       )
     )
     test("subqueryInMapNested") - checker(
-      query =
-        Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1)),
-      sql =
-        """
+      query = Buyer.select
+        .map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1)),
+      sql = """
         SELECT
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
@@ -205,10 +194,8 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("selectLimitUnionSelect") - checker(
-      query =
-        Buyer.select.map(_.name.toLowerCase).take(2).unionAll(Product.select.map(
-          _.kebabCaseName.toLowerCase
-        )),
+      query = Buyer.select.map(_.name.toLowerCase).take(2)
+        .unionAll(Product.select.map(_.kebabCaseName.toLowerCase)),
       sql = """
         SELECT subquery0.res as res
         FROM (SELECT
@@ -219,23 +206,13 @@ trait SubQueryTests extends ScalaSqlSuite {
         SELECT LOWER(product0.kebab_case_name) as res
         FROM product product0
       """,
-      value = Seq(
-        "james bond",
-        "叉烧包",
-        "face-mask",
-        "guitar",
-        "socks",
-        "skate-board",
-        "camera",
-        "cookie"
-      )
+      value =
+        Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
     )
 
     test("selectUnionSelectLimit") - checker(
-      query =
-        Buyer.select.map(_.name.toLowerCase).unionAll(
-          Product.select.map(_.kebabCaseName.toLowerCase).take(2)
-        ),
+      query = Buyer.select.map(_.name.toLowerCase)
+        .unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2)),
       sql = """
         SELECT LOWER(buyer0.name) as res
         FROM buyer buyer0
@@ -246,13 +223,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           FROM product product0
           LIMIT 2) subquery0
       """,
-      value = Seq(
-        "james bond",
-        "叉烧包",
-        "li haoyi",
-        "face-mask",
-        "guitar"
-      )
+      value = Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
     )
   }
 }

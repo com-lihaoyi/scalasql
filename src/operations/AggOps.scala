@@ -26,12 +26,12 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable[T, _]) {
     v.queryExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
 
   /** TRUE if any value in a set is TRUE */
-  def any(f: T => Expr[Boolean]): Expr[Boolean] =
-    v.queryExpr(expr => implicit ctx => sql"ANY(${f(expr)})")
+  def any(f: T => Expr[Boolean]): Expr[Boolean] = v
+    .queryExpr(expr => implicit ctx => sql"ANY(${f(expr)})")
 
   /** TRUE if all values in a set are TRUE */
-  def all(f: T => Expr[Boolean]): Expr[Boolean] =
-    v.queryExpr(expr => implicit ctx => sql"ALL(${f(expr)})")
+  def all(f: T => Expr[Boolean]): Expr[Boolean] = v
+    .queryExpr(expr => implicit ctx => sql"ALL(${f(expr)})")
 
   /** TRUE if the operand is equal to one of a list of expressions or one or more rows returned by a subquery */
   //    def contains(e: Expr[_]): Expr[Boolean] = v.queryExpr(implicit ctx => sql"ALL($e in $v})")

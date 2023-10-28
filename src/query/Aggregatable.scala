@@ -9,15 +9,14 @@ import scalasql.utils.OptionPickler
  */
 trait Aggregatable[Q] {
   def expr: Q
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit
-      qr: Queryable[Expr[V], V]
+  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
+      implicit qr: Queryable[Expr[V], V]
   ): Expr[V]
 }
 
-class Aggregate[Q, R](toSqlQuery0: Context => (SqlStr, Seq[MappedType[_]]), expr: Q)(qr: Queryable[
-  Q,
-  R
-]) extends Query[R] {
+class Aggregate[Q, R](toSqlQuery0: Context => (SqlStr, Seq[MappedType[_]]), expr: Q)(
+    qr: Queryable[Q, R]
+) extends Query[R] {
 
   def walk(): Seq[(List[String], Expr[_])] = qr.walk(expr)
   def singleRow: Boolean = true

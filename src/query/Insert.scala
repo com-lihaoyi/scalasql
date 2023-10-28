@@ -10,10 +10,9 @@ trait Insert[Q, R] {
   def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q, R]
 
   def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q, R]
-  def batched[T1, T2](
-      f1: Q => Column.ColumnExpr[T1],
-      f2: Q => Column.ColumnExpr[T2]
-  )(items: (Expr[T1], Expr[T2])*): InsertValues[Q, R]
+  def batched[T1, T2](f1: Q => Column.ColumnExpr[T1], f2: Q => Column.ColumnExpr[T2])(
+      items: (Expr[T1], Expr[T2])*
+  ): InsertValues[Q, R]
 
   def batched[T1, T2, T3](
       f1: Q => Column.ColumnExpr[T1],
@@ -60,17 +59,12 @@ object Insert {
     }
 
     def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q, R] = {
-      InsertValues.Impl(
-        this,
-        columns = Seq(f1(expr)),
-        valuesLists = items.map(Seq(_))
-      )
+      InsertValues.Impl(this, columns = Seq(f1(expr)), valuesLists = items.map(Seq(_)))
     }
 
-    def batched[T1, T2](
-        f1: Q => Column.ColumnExpr[T1],
-        f2: Q => Column.ColumnExpr[T2]
-    )(items: (Expr[T1], Expr[T2])*) = {
+    def batched[T1, T2](f1: Q => Column.ColumnExpr[T1], f2: Q => Column.ColumnExpr[T2])(
+        items: (Expr[T1], Expr[T2])*
+    ) = {
       InsertValues.Impl(
         this,
         columns = Seq(f1(expr), f2(expr)),

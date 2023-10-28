@@ -10,11 +10,7 @@ import java.time.LocalDate
  */
 trait SelectTests extends ScalaSqlSuite {
   def tests = Tests {
-    test("constant") - checker(
-      query = Expr(1),
-      sql = "SELECT ? as res",
-      value = 1
-    )
+    test("constant") - checker(query = Expr(1), sql = "SELECT ? as res", value = 1)
 
     test("table") - checker(
       query = Buyer.select,
@@ -50,10 +46,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("multiple") - checker(
-        query =
-          ShippingInfo.select.filter(_.buyerId === 2).filter(
-            _.shippingDate === LocalDate.parse("2012-05-06")
-          ),
+        query = ShippingInfo.select.filter(_.buyerId === 2)
+          .filter(_.shippingDate === LocalDate.parse("2012-05-06")),
         sql = """
         SELECT
           shipping_info0.id as res__id,
@@ -63,18 +57,14 @@ trait SelectTests extends ScalaSqlSuite {
         WHERE shipping_info0.buyer_id = ?
         AND shipping_info0.shipping_date = ?
       """,
-        value = Seq(
-          ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
-        )
+        value =
+          Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
       )
 
       test("dotSingle") {
         test("pass") - checker(
-          query =
-            ShippingInfo.select
-              .filter(_.buyerId === 2)
-              .filter(_.shippingDate === LocalDate.parse("2012-05-06"))
-              .single,
+          query = ShippingInfo.select.filter(_.buyerId === 2)
+            .filter(_.shippingDate === LocalDate.parse("2012-05-06")).single,
           sql = """
             SELECT
               shipping_info0.id as res__id,
@@ -102,10 +92,8 @@ trait SelectTests extends ScalaSqlSuite {
       }
 
       test("combined") - checker(
-        query =
-          ShippingInfo.select.filter(p =>
-            p.buyerId === 2 && p.shippingDate === LocalDate.parse("2012-05-06")
-          ),
+        query = ShippingInfo.select
+          .filter(p => p.buyerId === 2 && p.shippingDate === LocalDate.parse("2012-05-06")),
         sql = """
           SELECT
             shipping_info0.id as res__id,
@@ -115,9 +103,7 @@ trait SelectTests extends ScalaSqlSuite {
           WHERE shipping_info0.buyer_id = ?
           AND shipping_info0.shipping_date = ?
         """,
-        value = Seq(
-          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
-        )
+        value = Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
       )
     }
 
@@ -182,15 +168,13 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("aggregate") {
       test("single") - checker(
-        query =
-          Purchase.select.aggregate(_.sumBy(_.total)),
+        query = Purchase.select.aggregate(_.sumBy(_.total)),
         sql = "SELECT SUM(purchase0.total) as res FROM purchase purchase0",
         value = 12343.2
       )
 
       test("multiple") - checker(
-        query =
-          Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total))),
+        query = Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total))),
         sql =
           "SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0",
         value = (12343.2, 10000.0)
@@ -199,8 +183,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("groupBy") - {
       test("simple") - checker(
-        query =
-          Purchase.select.groupBy(_.productId)(_.sumBy(_.total)),
+        query = Purchase.select.groupBy(_.productId)(_.sumBy(_.total)),
         sql = """
           SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
           FROM purchase purchase0
@@ -211,10 +194,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("having") - checker(
-        query =
-          Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(
-            _._1 > 1
-          ),
+        query = Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
+          .filter(_._1 > 1),
         sql = """
           SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
           FROM purchase purchase0
@@ -226,10 +207,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("filterHaving") - checker(
-        query =
-          Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(
-            _._2 > 100
-          ),
+        query = Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total))
+          .filter(_._2 > 100),
         sql = """
           SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
           FROM purchase purchase0
@@ -298,8 +277,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("joins") {
       test("joinFilter") - checker(
-        query =
-          Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId).filter(_._1.name === "叉烧包"),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId).filter(_._1.name === "叉烧包"),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -325,9 +303,7 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("joinSelectFilter") - checker(
-        query =
-          Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
-            .filter(_._1.name === "叉烧包"),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId).filter(_._1.name === "叉烧包"),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -353,10 +329,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("joinFilterMap") - checker(
-        query =
-          Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
-            .filter(_._1.name === "James Bond")
-            .map(_._2.shippingDate),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
+          .filter(_._1.name === "James Bond").map(_._2.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
           FROM buyer buyer0
@@ -438,10 +412,9 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("flatMap") - checker(
-        query =
-          Buyer.select.flatMap(c => ShippingInfo.select.map((c, _)))
-            .filter { case (c, p) => c.id === p.buyerId && c.name === "James Bond" }
-            .map(_._2.shippingDate),
+        query = Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
+          c.id === p.buyerId && c.name === "James Bond"
+        }.map(_._2.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
           FROM buyer buyer0, shipping_info shipping_info1
@@ -452,11 +425,9 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("flatMap2") - checker(
-        query =
-          Buyer.select.flatMap(c =>
-            ShippingInfo.select
-              .filter { p => c.id === p.buyerId && c.name === "James Bond" }
-          ).map(_.shippingDate),
+        query = Buyer.select.flatMap(c =>
+          ShippingInfo.select.filter { p => c.id === p.buyerId && c.name === "James Bond" }
+        ).map(_.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
           FROM buyer buyer0, shipping_info shipping_info1
@@ -469,8 +440,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("distinct") {
       test("nondistinct") - checker(
-        query =
-          Purchase.select.map(_.shippingInfoId),
+        query = Purchase.select.map(_.shippingInfoId),
         sql = "SELECT purchase0.shipping_info_id as res FROM purchase purchase0",
         value = Seq(1, 1, 1, 2, 2, 3, 3)
       )
@@ -484,8 +454,7 @@ trait SelectTests extends ScalaSqlSuite {
     }
 
     test("contains") - checker(
-      query =
-        Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id)),
+      query = Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id)),
       sql = """
         SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
@@ -498,10 +467,8 @@ trait SelectTests extends ScalaSqlSuite {
     )
 
     test("nonEmpty") - checker(
-      query =
-        Buyer.select.map(b =>
-          (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).nonEmpty)
-        ),
+      query = Buyer.select
+        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).nonEmpty)),
       sql = """
         SELECT
           buyer0.name as res__0,
@@ -515,10 +482,8 @@ trait SelectTests extends ScalaSqlSuite {
     )
 
     test("isEmpty") - checker(
-      query =
-        Buyer.select.map(b =>
-          (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).isEmpty)
-        ),
+      query = Buyer.select
+        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).isEmpty)),
       sql = """
         SELECT
           buyer0.name as res__0,
@@ -533,10 +498,8 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("compound") {
       test("union") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase).union(
-            Product.select.map(_.kebabCaseName.toLowerCase)
-          ),
+        query = Product.select.map(_.name.toLowerCase)
+          .union(Product.select.map(_.kebabCaseName.toLowerCase)),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -558,10 +521,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("unionAll") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase).unionAll(
-            Product.select.map(_.kebabCaseName.toLowerCase)
-          ),
+        query = Product.select.map(_.name.toLowerCase)
+          .unionAll(Product.select.map(_.kebabCaseName.toLowerCase)),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -586,10 +547,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("intersect") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase).intersect(
-            Product.select.map(_.kebabCaseName.toLowerCase)
-          ),
+        query = Product.select.map(_.name.toLowerCase)
+          .intersect(Product.select.map(_.kebabCaseName.toLowerCase)),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -602,10 +561,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("except") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase).except(
-            Product.select.map(_.kebabCaseName.toLowerCase)
-          ),
+        query = Product.select.map(_.name.toLowerCase)
+          .except(Product.select.map(_.kebabCaseName.toLowerCase)),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -617,11 +574,9 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("unionAllUnionSort") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase)
-            .unionAll(Buyer.select.map(_.name.toLowerCase))
-            .union(Product.select.map(_.kebabCaseName.toLowerCase))
-            .sortBy(identity),
+        query = Product.select.map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -649,13 +604,9 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("unionAllUnionSortLimit") - checker(
-        query =
-          Product.select.map(_.name.toLowerCase)
-            .unionAll(Buyer.select.map(_.name.toLowerCase))
-            .union(Product.select.map(_.kebabCaseName.toLowerCase))
-            .sortBy(identity)
-            .drop(4)
-            .take(4),
+        query = Product.select.map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity).drop(4).take(4),
         sql = """
           SELECT LOWER(product0.name) as res
           FROM product product0
@@ -673,11 +624,9 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("intersectAggregate") - checker(
-        query =
-          Product.select
-            .map(p => (p.name.toLowerCase, p.price))
-            .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-            .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
+        query = Product.select.map(p => (p.name.toLowerCase, p.price))
+          .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
         sql = """
           SELECT
             MAX(subquery0.res__1) as res__0,

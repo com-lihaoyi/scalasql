@@ -40,17 +40,12 @@ trait DeleteTests extends ScalaSqlSuite {
 
       checker(
         query = Purchase.select,
-        value = Seq(
-          Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0)
-        )
+        value =
+          Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
       )
     }
     test("all") {
-      checker(
-        query = Purchase.delete(_ => true),
-        sql = "DELETE FROM purchase WHERE ?",
-        value = 7
-      )
+      checker(query = Purchase.delete(_ => true), sql = "DELETE FROM purchase WHERE ?", value = 7)
 
       checker(
         query = Purchase.select,

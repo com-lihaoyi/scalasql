@@ -91,15 +91,15 @@ object MappedType {
   implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant.atZone(ZoneId.systemDefault())
-    def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) =
-      r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
+    def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r
+      .setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
   }
 
   implicit object InstantType extends MappedType[Instant] {
     def jdbcType = JDBCType.TIMESTAMP
     def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant
-    def put(r: PreparedStatement, idx: Int, v: Instant) =
-      r.setTimestamp(idx, java.sql.Timestamp.from(v))
+    def put(r: PreparedStatement, idx: Int, v: Instant) = r
+      .setTimestamp(idx, java.sql.Timestamp.from(v))
   }
 
   implicit object OffsetTimeType extends MappedType[OffsetTime] {

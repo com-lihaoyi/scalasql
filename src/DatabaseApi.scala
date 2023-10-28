@@ -27,32 +27,29 @@ class DatabaseApi(
     finally statement.close()
   }
 
-  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit
-      qr: Queryable[Q, R]
+  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(
+      implicit qr: Queryable[Q, R]
   ): String = {
     val (str, params, mappedTypes) = toSqlQuery0(query)
     str
   }
 
-  def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(implicit
-      qr: Queryable[Q, R]
+  def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
+      implicit qr: Queryable[Q, R]
   ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[MappedType[_]]) = {
     val ctx = Context(Map(), Map(), tableNameMapper, columnNameMapper, defaultQueryableSuffix)
     val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
     val flattened = SqlStr.flatten(sqlStr)
-    val queryStr = flattened.queryParts.zipAll(flattened.params, "", null)
-      .map {
-        case (part, null) => part
-        case (part, param) =>
-          val jdbcTypeString = param.mappedType.jdbcType match {
-            case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
-            case JDBCType.TIME_WITH_TIMEZONE => "TIME WITH TIME ZONE"
-            case n => n.toString
-          }
-          if (castParams) part + s"CAST(? AS $jdbcTypeString)"
-          else part + "?"
-      }
-      .mkString
+    val queryStr = flattened.queryParts.zipAll(flattened.params, "", null).map {
+      case (part, null) => part
+      case (part, param) =>
+        val jdbcTypeString = param.mappedType.jdbcType match {
+          case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
+          case JDBCType.TIME_WITH_TIMEZONE => "TIME WITH TIME ZONE"
+          case n => n.toString
+        }
+        if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
+    }.mkString
 
     (queryStr, flattened.params, mappedTypes)
   }
@@ -107,10 +104,8 @@ object DatabaseApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = metadata.getColumnLabel(i + 1)
-        .split(FlatJson.delimiter)
-        .map(s => columnNameUnMapper(s.toLowerCase))
-        .drop(1)
+      val k = metadata.getColumnLabel(i + 1).split(FlatJson.delimiter)
+        .map(s => columnNameUnMapper(s.toLowerCase)).drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
 

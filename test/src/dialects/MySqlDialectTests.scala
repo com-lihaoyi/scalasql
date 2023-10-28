@@ -9,11 +9,8 @@ import java.time.LocalDate
 trait MySqlDialectTests extends MySqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
-    test("reverse") - checker(
-      query = Expr("Hello").reverse,
-      sql = "SELECT REVERSE(?) as res",
-      value = "olleH"
-    )
+    test("reverse") -
+      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) as res", value = "olleH")
 
     test("lpad") - checker(
       query = Expr("Hello").lpad(10, "xy"),
@@ -32,12 +29,11 @@ trait MySqlDialectTests extends MySqlSuite {
       test("ignore") - {
 
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 1 // This should cause a primary key conflict
-            ).onConflictUpdate(x => x.id -> x.id),
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 1 // This should cause a primary key conflict
+          ).onConflictUpdate(x => x.id -> x.id),
           // MySql does not support ON CONFLICT IGNORE, but you can emulate it using
           // update (id = id)
           sql =
@@ -48,12 +44,11 @@ trait MySqlDialectTests extends MySqlSuite {
 
       test("update") - {
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 1 // This should cause a primary key conflict
-            ).onConflictUpdate(_.name -> "TEST BUYER CONFLICT"),
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 1 // This should cause a primary key conflict
+          ).onConflictUpdate(_.name -> "TEST BUYER CONFLICT"),
           sql =
             "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?",
           value = 2
@@ -72,12 +67,11 @@ trait MySqlDialectTests extends MySqlSuite {
 
       test("updateComputed") - {
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 1 // This should cause a primary key conflict
-            ).onConflictUpdate(v => v.name -> v.name.toUpperCase),
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 1 // This should cause a primary key conflict
+          ).onConflictUpdate(v => v.name -> v.name.toUpperCase),
           sql =
             "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = UPPER(buyer.name)",
           value = 2

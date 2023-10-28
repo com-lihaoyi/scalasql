@@ -11,22 +11,13 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),
-      sqls = Seq(
-        "SELECT ? || ? as res",
-        "SELECT CONCAT(?, ?) as res"
-      ),
+      sqls = Seq("SELECT ? || ? as res", "SELECT CONCAT(?, ?) as res"),
       value = "helloworld"
     )
-    test("like") - checker(
-      query = Expr("hello").like("he%"),
-      sql = "SELECT ? LIKE ? as res",
-      value = true
-    )
-    test("length") - checker(
-      query = Expr("hello").length,
-      sql = "SELECT LENGTH(?) as res",
-      value = 5
-    )
+    test("like") -
+      checker(query = Expr("hello").like("he%"), sql = "SELECT ? LIKE ? as res", value = true)
+    test("length") -
+      checker(query = Expr("hello").length, sql = "SELECT LENGTH(?) as res", value = 5)
     test("octetLength") - checker(
       query = Expr("叉烧包").octetLength,
       sql = "SELECT OCTET_LENGTH(?) as res",
@@ -36,36 +27,21 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
 
     test("position") - checker(
       query = Expr("hello").indexOf("ll"),
-      sqls = Seq(
-        "SELECT POSITION(? IN ?) as res",
-        "SELECT INSTR(?, ?) as res"
-      ),
+      sqls = Seq("SELECT POSITION(? IN ?) as res", "SELECT INSTR(?, ?) as res"),
       value = 3
     )
 
-    test("toLowerCase") - checker(
-      query = Expr("Hello").toLowerCase,
-      sql = "SELECT LOWER(?) as res",
-      value = "hello"
-    )
+    test("toLowerCase") -
+      checker(query = Expr("Hello").toLowerCase, sql = "SELECT LOWER(?) as res", value = "hello")
 
-    test("trim") - checker(
-      query = Expr("  Hello ").trim,
-      sql = "SELECT TRIM(?) as res",
-      value = "Hello"
-    )
+    test("trim") -
+      checker(query = Expr("  Hello ").trim, sql = "SELECT TRIM(?) as res", value = "Hello")
 
-    test("ltrim") - checker(
-      query = Expr("  Hello ").ltrim,
-      sql = "SELECT LTRIM(?) as res",
-      value = "Hello "
-    )
+    test("ltrim") -
+      checker(query = Expr("  Hello ").ltrim, sql = "SELECT LTRIM(?) as res", value = "Hello ")
 
-    test("rtrim") - checker(
-      query = Expr("  Hello ").rtrim,
-      sql = "SELECT RTRIM(?) as res",
-      value = "  Hello"
-    )
+    test("rtrim") -
+      checker(query = Expr("  Hello ").rtrim, sql = "SELECT RTRIM(?) as res", value = "  Hello")
 
     test("substring") - checker(
       query = Expr("Hello").substring(2, 2),

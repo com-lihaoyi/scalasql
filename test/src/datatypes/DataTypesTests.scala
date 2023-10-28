@@ -79,10 +79,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         value = 1
       )
 
-      checker(
-        query = DataTypes.select,
-        value = Seq(value)
-      )
+      checker(query = DataTypes.select, value = Seq(value))
     }
 
     // In general, databases do not store timezones and offsets together with their timestamps:

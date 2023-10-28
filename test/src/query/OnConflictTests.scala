@@ -9,18 +9,18 @@ import java.time.LocalDate
 /**
  * Tests for basic insert operations
  */
-trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with ReturningDialect =>
+trait OnConflictTests extends ScalaSqlSuite {
+  this: OnConflictOps with ReturningDialect =>
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 
     test("ignore") - {
       checker(
-        query =
-          Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 1 // This should cause a primary key conflict
-          ).onConflictIgnore(_.id),
+        query = Buyer.insert.values(
+          _.name -> "test buyer",
+          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+          _.id -> 1 // This should cause a primary key conflict
+        ).onConflictIgnore(_.id),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING",
         value = 0
@@ -28,15 +28,12 @@ trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with Returning
 
       test("returningEmpty") - {
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 1 // This should cause a primary key conflict
-            ).onConflictIgnore(_.id)
-              .returning(_.name),
-          sql =
-            """
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 1 // This should cause a primary key conflict
+          ).onConflictIgnore(_.id).returning(_.name),
+          sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
             RETURNING buyer.name as res""",
@@ -46,15 +43,12 @@ trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with Returning
 
       test("returningOne") - {
         checker(
-          query =
-            Buyer.insert.values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 4 // This should cause a primary key conflict
-            ).onConflictIgnore(_.id)
-              .returning(_.name),
-          sql =
-            """
+          query = Buyer.insert.values(
+            _.name -> "test buyer",
+            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+            _.id -> 4 // This should cause a primary key conflict
+          ).onConflictIgnore(_.id).returning(_.name),
+          sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
             RETURNING buyer.name as res""",
@@ -66,12 +60,11 @@ trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with Returning
 
     test("update") - {
       checker(
-        query =
-          Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 1 // This should cause a primary key conflict
-          ).onConflictUpdate(_.id)(_.name -> "TEST BUYER CONFLICT"),
+        query = Buyer.insert.values(
+          _.name -> "test buyer",
+          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+          _.id -> 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(_.name -> "TEST BUYER CONFLICT"),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?",
         value = 1
@@ -90,12 +83,11 @@ trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with Returning
 
     test("computed") - {
       checker(
-        query =
-          Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 1 // This should cause a primary key conflict
-          ).onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase),
+        query = Buyer.insert.values(
+          _.name -> "test buyer",
+          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+          _.id -> 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)",
         value = 1
@@ -114,16 +106,11 @@ trait OnConflictTests extends ScalaSqlSuite { this: OnConflictOps with Returning
 
     test("returning") - {
       checker(
-        query =
-          Buyer.insert
-            .values(
-              _.name -> "test buyer",
-              _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-              _.id -> 1 // This should cause a primary key conflict
-            )
-            .onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase)
-            .returning(_.name)
-            .single,
+        query = Buyer.insert.values(
+          _.name -> "test buyer",
+          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
+          _.id -> 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase).returning(_.name).single,
         sql = """
           INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
           ON CONFLICT (id) DO UPDATE

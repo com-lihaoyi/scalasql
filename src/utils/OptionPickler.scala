@@ -4,7 +4,8 @@ import scalasql.MappedType
 import upickle.core.{ArrVisitor, Visitor}
 import upickle.core.compat.Factory
 
-object OptionPickler extends upickle.core.Types
+object OptionPickler
+    extends upickle.core.Types
     with upickle.implicits.CaseClassReadWriters
     with upickle.implicits.Generated
     with upickle.implicits.MacroImplicits {
@@ -21,8 +22,8 @@ object OptionPickler extends upickle.core.Types
       v: T
   ): R = ???
 
-  implicit def SeqLikeReader[C[_], T](implicit
-      r: Reader[T],
+  implicit def SeqLikeReader[C[_], T](
+      implicit r: Reader[T],
       factory: Factory[T, C[T]]
   ): SeqLikeReader[C, T] = new SeqLikeReader[C, T]()
 

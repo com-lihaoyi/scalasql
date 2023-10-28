@@ -13,14 +13,12 @@ trait UpdateTests extends ScalaSqlSuite {
   def tests = Tests {
     test("update") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond").set(
-          _.dateOfBirth -> LocalDate.parse("2019-04-07")
+        query = Buyer.update.filter(_.name === "James Bond")
+          .set(_.dateOfBirth -> LocalDate.parse("2019-04-07")),
+        sqls = Seq(
+          "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?"
         ),
-        sqls =
-          Seq(
-            "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
-            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?"
-          ),
         value = 1
       )
 
@@ -38,10 +36,8 @@ trait UpdateTests extends ScalaSqlSuite {
     test("bulk") - {
       checker(
         query = Buyer.update.set(_.dateOfBirth -> LocalDate.parse("2019-04-07")),
-        sqls = Seq(
-          "UPDATE buyer SET date_of_birth = ?",
-          "UPDATE buyer SET buyer.date_of_birth = ?"
-        ),
+        sqls =
+          Seq("UPDATE buyer SET date_of_birth = ?", "UPDATE buyer SET buyer.date_of_birth = ?"),
         value = 3
       )
 
@@ -57,10 +53,8 @@ trait UpdateTests extends ScalaSqlSuite {
 
     test("multiple") - {
       checker(
-        query =
-          Buyer.update
-            .filter(_.name === "James Bond")
-            .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee"),
+        query = Buyer.update.filter(_.name === "James Bond")
+          .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee"),
         sqls = Seq(
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?"
@@ -81,10 +75,7 @@ trait UpdateTests extends ScalaSqlSuite {
 
     test("dynamic") - {
       checker(
-        query =
-          Buyer.update
-            .filter(_.name === "James Bond")
-            .set(c => c.name -> c.name.toUpperCase),
+        query = Buyer.update.filter(_.name === "James Bond").set(c => c.name -> c.name.toUpperCase),
         sqls = Seq(
           "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?"

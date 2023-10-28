@@ -29,10 +29,9 @@ trait Select[Q, R]
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V]
 
-  def groupBy[K, V, R2, R3](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
-      qrk: Queryable[K, R2],
-      qrv: Queryable[V, R3]
-  ): Select[(K, V), (R2, R3)]
+  def groupBy[K, V, R2, R3](groupKey: Q => K)(
+      groupAggregate: SelectProxy[Q] => V
+  )(implicit qrk: Queryable[K, R2], qrv: Queryable[V, R3]): Select[(K, V), (R2, R3)]
 
   def sortBy(f: Q => Expr[_]): Select[Q, R]
   def asc: Select[Q, R]
@@ -57,8 +56,9 @@ trait Select[Q, R]
   def walk() = qr.walk(expr)
   override def singleRow = false
 
-  def toSqlQuery0(prevContext: Context)
-      : (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
+  def toSqlQuery0(
+      prevContext: Context
+  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
 
   def single: Query.Single[R] = new Query.Single(this)
 }

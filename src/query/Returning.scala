@@ -19,8 +19,8 @@ trait Returning[Q, R] extends Query.Multiple[R] {
 
 trait InsertReturning[Q, R] extends Returning[Q, R]
 object InsertReturning {
-  case class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(implicit
-      val qr: Queryable[Q, R]
+  case class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(
+      implicit val qr: Queryable[Q, R]
   ) extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
     def expr: Q = returning
   }
@@ -28,8 +28,7 @@ object InsertReturning {
 object Returning {
   class Impl0[Q, R](qr: Queryable[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
-    def valueReader =
-      OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
+    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
 
     def walk() = qr.walk(returning)
 

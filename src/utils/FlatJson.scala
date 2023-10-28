@@ -50,24 +50,15 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(
-        startIndex: Int,
-        endIndex: Int,
-        depth: Int,
-        visitor: Visitor[_, _]
-    ): Any = {
-      if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
-        values(startIndex)
-      } else {
+    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _]): Any = {
+      if (startIndex == endIndex - 1 && depth == keys(startIndex).length) { values(startIndex) }
+      else {
         // Hack to check if a random key looks like a number,
         // in which case this data represents an array
         if (keys(startIndex)(depth).head.isDigit) {
           val arrVisitor = visitor.visitArray(-1, -1).narrow
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-            arrVisitor.visitValue(
-              rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor),
-              -1
-            )
+            arrVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor), -1)
           }
 
           arrVisitor.visitEnd(-1)
@@ -76,10 +67,7 @@ object FlatJson {
           groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
             val keyVisitor = objVisitor.visitKey(-1)
             objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
-            objVisitor.visitValue(
-              rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor),
-              -1
-            )
+            objVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor), -1)
           }
 
           objVisitor.visitEnd(-1)

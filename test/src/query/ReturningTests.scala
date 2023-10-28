@@ -9,7 +9,8 @@ import java.time.LocalDate
 /**
  * Tests for basic update operations
  */
-trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
+trait ReturningTests extends ScalaSqlSuite {
+  this: ReturningDialect =>
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("insert") {
@@ -33,8 +34,7 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
         checker(
           query = Buyer.insert
             .values(_.name -> "test buyer", _.dateOfBirth -> LocalDate.parse("2023-09-09"))
-            .returning(_.id)
-            .single,
+            .returning(_.id).single,
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
           value = 4
         )
@@ -48,15 +48,12 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
 
       test("multiple") - {
         checker(
-          query = Buyer.insert
-            .batched(_.name, _.dateOfBirth)(
-              ("test buyer A", LocalDate.parse("2001-04-07")),
-              ("test buyer B", LocalDate.parse("2002-05-08")),
-              ("test buyer C", LocalDate.parse("2003-06-09"))
-            )
-            .returning(_.id),
-          sql =
-            """
+          query = Buyer.insert.batched(_.name, _.dateOfBirth)(
+            ("test buyer A", LocalDate.parse("2001-04-07")),
+            ("test buyer B", LocalDate.parse("2002-05-08")),
+            ("test buyer C", LocalDate.parse("2003-06-09"))
+          ).returning(_.id),
+          sql = """
             INSERT INTO buyer (name, date_of_birth)
             VALUES
               (?, ?),
@@ -83,14 +80,11 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
 
       test("select") {
         checker(
-          query = Buyer.insert
-            .select(
-              x => (x.name, x.dateOfBirth),
-              Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
-            )
-            .returning(_.id),
-          sql =
-            """
+          query = Buyer.insert.select(
+            x => (x.name, x.dateOfBirth),
+            Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
+          ).returning(_.id),
+          sql = """
             INSERT INTO buyer (name, date_of_birth)
             SELECT
               buyer0.name as res__0,
@@ -120,11 +114,8 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
     test("update") {
       test("single") - {
         checker(
-          query =
-            Buyer.update
-              .filter(_.name === "James Bond")
-              .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"))
-              .returning(_.id),
+          query = Buyer.update.filter(_.name === "James Bond")
+            .set(_.dateOfBirth -> LocalDate.parse("2019-04-07")).returning(_.id),
           sqls = Seq(
             "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
             "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res"
@@ -140,11 +131,9 @@ trait ReturningTests extends ScalaSqlSuite { this: ReturningDialect =>
 
       test("multiple") - {
         checker(
-          query =
-            Buyer.update
-              .filter(_.name === "James Bond")
-              .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee")
-              .returning(c => (c.id, c.name, c.dateOfBirth)),
+          query = Buyer.update.filter(_.name === "James Bond")
+            .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee")
+            .returning(c => (c.id, c.name, c.dateOfBirth)),
           sqls = Seq(
             """
             UPDATE buyer

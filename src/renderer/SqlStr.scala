@@ -71,8 +71,7 @@ object SqlStr {
   }
 
   def join(strs: Seq[SqlStr], sep: SqlStr = sql""): SqlStr = {
-    if (strs.isEmpty) sql""
-    else strs.reduce(_ + sep + _)
+    if (strs.isEmpty) sql"" else strs.reduce(_ + sep + _)
   }
 
   def raw(s: String) = new SqlStr(Seq(s), Nil, false)

@@ -19,15 +19,15 @@ object InsertValues {
       insert: Insert[Q, R],
       columns: Seq[Column.ColumnExpr[_]],
       valuesLists: Seq[Seq[Expr[_]]]
-  )(implicit val qr: Queryable[Q, R]) extends InsertValues[Q, R] {
+  )(implicit val qr: Queryable[Q, R])
+      extends InsertValues[Q, R] {
     def table = insert.table
     def expr: Q = insert.expr
 
-    override def toSqlQuery(implicit ctx: Context) =
-      (
-        InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName),
-        Seq(MappedType.IntType)
-      )
+    override def toSqlQuery(implicit ctx: Context) = (
+      InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName),
+      Seq(MappedType.IntType)
+    )
     def walk() = Nil
     override def singleRow = true
     override def isExecuteUpdate = true

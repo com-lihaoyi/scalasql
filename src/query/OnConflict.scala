@@ -9,8 +9,7 @@ class OnConflict[Q, R](query: Query[R] with InsertReturnable[Q], expr: Q, table:
     new OnConflict.Ignore(query, c.map(_(expr)), table)
   def onConflictUpdate(c: (Q => Column.ColumnExpr[_])*)(
       c2: (Q => (Column.ColumnExpr[_], Expr[_]))*
-  ) =
-    new OnConflict.Update(query, c.map(_(expr)), c2.map(_(expr)), table)
+  ) = new OnConflict.Update(query, c.map(_(expr)), c2.map(_(expr)), table)
 }
 
 object OnConflict {
@@ -25,7 +24,8 @@ object OnConflict {
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val (str, mapped) = query.toSqlQuery
       (
-        str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING",
+        str +
+          sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING",
         mapped
       )
     }
@@ -51,12 +51,9 @@ object OnConflict {
       import computed.implicitCtx
       val (str, mapped) = query.toSqlQuery
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
-      val updatesStr =
-        SqlStr.join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
-      (
-        str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr",
-        mapped
-      )
+      val updatesStr = SqlStr
+        .join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
+      (str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr", mapped)
     }
     override def isExecuteUpdate = true
     def valueReader = query.valueReader

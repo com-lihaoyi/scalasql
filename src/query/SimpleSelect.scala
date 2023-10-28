@@ -31,14 +31,15 @@ case class SimpleSelect[Q, R](
     joins: Seq[Join],
     where: Seq[Expr[_]],
     groupBy0: Option[GroupBy]
-)(implicit val qr: Queryable[Q, R]) extends Select[Q, R] {
+)(implicit val qr: Queryable[Q, R])
+    extends Select[Q, R] {
   override def select = this
 
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(implicit
-      qr2: Queryable[Expr[V], V]
-  ): Expr[V] = {
+  def queryExpr[V: MappedType](
+      f: Q => Context => SqlStr
+  )(implicit qr2: Queryable[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy(expr = Expr[V] { implicit ctx: Context =>
         val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
@@ -61,8 +62,8 @@ case class SimpleSelect[Q, R](
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
-  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
-      joinQr: Queryable[Q2, R2]
+  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+      implicit joinQr: Queryable[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = {
 
     val thisTrivial = groupBy0.isEmpty
@@ -86,10 +87,9 @@ case class SimpleSelect[Q, R](
     )(qr)
   }
 
-  def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(implicit
-      qrk: Queryable[K, R1],
-      qrv: Queryable[V, R2]
-  ): Select[(K, V), (R1, R2)] = {
+  def groupBy[K, V, R1, R2](groupKey: Q => K)(
+      groupAggregate: SelectProxy[Q] => V
+  )(implicit qrk: Queryable[K, R1], qrv: Queryable[V, R2]): Select[(K, V), (R1, R2)] = {
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
@@ -139,11 +139,8 @@ object SimpleSelect {
       qr: Queryable[Q, R],
       prevContext: Context
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-    val computed = Context.compute(
-      prevContext,
-      query.from ++ query.joins.flatMap(_.from.map(_.from)),
-      None
-    )
+    val computed = Context
+      .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
 
     import computed.implicitCtx
 
@@ -165,16 +162,14 @@ object SimpleSelect {
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
     }
 
-    val jsonQueryMap = flattenedExpr
-      .map { case (k, v) =>
-        (
-          Expr.getIdentity(v),
-          SqlStr.raw((FlatJson.basePrefix +: k).map(prevContext.columnNameMapper).mkString(
-            FlatJson.delimiter
-          ))
+    val jsonQueryMap = flattenedExpr.map { case (k, v) =>
+      (
+        Expr.getIdentity(v),
+        SqlStr.raw(
+          (FlatJson.basePrefix +: k).map(prevContext.columnNameMapper).mkString(FlatJson.delimiter)
         )
-      }
-      .toMap
+      )
+    }.toMap
 
     (
       jsonQueryMap,

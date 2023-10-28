@@ -19,11 +19,8 @@ trait HsqlDbDialectTests extends HsqlDbSuite {
       value = "xxHello"
     )
 
-    test("reverse") - checker(
-      query = Expr("Hello").reverse,
-      sql = "SELECT REVERSE(?) as res",
-      value = "olleH"
-    )
+    test("reverse") -
+      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) as res", value = "olleH")
 
     test("lpad") - checker(
       query = Expr("Hello").lpad(10, "xy"),

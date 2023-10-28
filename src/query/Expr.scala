@@ -16,9 +16,8 @@ trait Expr[T] extends SqlStr.Renderable {
 
   protected def toSqlExpr0(implicit ctx: Context): SqlStr
 
-  override def toString: String = throw new Exception(
-    "Expr#toString is not defined. Use Expr#exprToString"
-  )
+  override def toString: String =
+    throw new Exception("Expr#toString is not defined. Use Expr#exprToString")
 
   override def equals(other: Any): Boolean = throw new Exception(
     "Expr#equals is not defined. Use Expr#exprIdentity for your equality checks"
@@ -34,10 +33,9 @@ object Expr {
   def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
-  implicit def ExprQueryable[E[_] <: Expr[_], T](implicit
-      valueReader0: OptionPickler.Reader[T]
-  ): Queryable[E[T], T] =
-    new ExprQueryable[E, T]()
+  implicit def ExprQueryable[E[_] <: Expr[_], T](
+      implicit valueReader0: OptionPickler.Reader[T]
+  ): Queryable[E[T], T] = new ExprQueryable[E, T]()
 
   class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
       extends Queryable[E[T], T] {
@@ -58,10 +56,9 @@ object Expr {
   implicit def from(x: Boolean): Expr[Boolean] = apply(x)
   implicit def from(x: Double): Expr[Double] = apply(x)
   implicit def from(x: String): Expr[String] = apply(x)
-  implicit def apply[T](x: T)(implicit
-      conv: T => SqlStr.Interp,
-      mappedType0: MappedType[T]
-  ): Expr[T] = new Expr[T] {
+  implicit def apply[T](
+      x: T
+  )(implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
       new SqlStr(Seq("", ""), Seq(conv(x)), false)

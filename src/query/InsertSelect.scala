@@ -10,8 +10,7 @@ import scalasql.utils.OptionPickler
  *
  * https://www.postgresql.org/docs/current/sql-update.html
  */
-trait InsertSelect[Q, C, R, R2]
-    extends InsertReturnable[Q] with Query[Int]
+trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
 
 object InsertSelect {
   case class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
@@ -42,15 +41,15 @@ object InsertSelect {
     implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
 
     val columns = SqlStr.join(
-      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]]).map(c =>
-        SqlStr.raw(ctx.columnNameMapper(c.name))
-      ),
+      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]])
+        .map(c => SqlStr.raw(ctx.columnNameMapper(c.name))),
       sql", "
     )
 
     val (selectSql, mappedTypes) = select.toSqlQuery
     (
-      sql"INSERT INTO ${SqlStr.raw(ctx.tableNameMapper(tableName))} ($columns) ${selectSql.withCompleteQuery(false)}",
+      sql"INSERT INTO ${SqlStr.raw(ctx.tableNameMapper(tableName))} ($columns) ${selectSql
+          .withCompleteQuery(false)}",
       mappedTypes
     )
   }

@@ -5,8 +5,7 @@ import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, U
 import renderer.SqlStr.SqlStringSyntax
 import scalasql.utils.OptionPickler
 
-abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
-    extends Table.Base {
+abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
 
   val tableName = name.value
   implicit def self: Table[V] = this
@@ -15,8 +14,8 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
 
   def initMetadata[V[_[_]]](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Id]] =
-    metadata.queryable.asInstanceOf[Queryable[V[E], V[Id]]]
+  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Id]] = metadata.queryable
+    .asInstanceOf[Queryable[V[E], V[Id]]]
 
   def tableRef = new scalasql.query.TableRef(this)
 }
@@ -34,9 +33,9 @@ object Table {
 
   object Metadata {
 
-    def applyImpl[V[_[_]]](c: scala.reflect.macros.blackbox.Context)()(implicit
-        wtt: c.WeakTypeTag[V[Any]]
-    ): c.Expr[Metadata[V]] = {
+    def applyImpl[V[_[_]]](
+        c: scala.reflect.macros.blackbox.Context
+    )()(implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
       import c.universe._
 
       val tableRef = TermName(c.freshName("tableRef"))
@@ -47,7 +46,8 @@ object Table {
         if (c.prefix.actualType.member(name) != NoSymbol) {
           q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
         } else {
-          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
+          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name
+              .toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 
@@ -59,8 +59,7 @@ object Table {
 
       val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
 
-      c.Expr[Metadata[V]](
-        q"""
+      c.Expr[Metadata[V]](q"""
         new _root_.scalasql.Table.Metadata[$wtt](
           new _root_.scalasql.Table.Internal.TableQueryable(
             table => $allFlattenedExprs,
@@ -68,8 +67,7 @@ object Table {
           ),
           ($tableRef: _root_.scalasql.query.TableRef) => new $wtt(..$queryParams)
         )
-        """
-      )
+        """)
     }
   }
 
@@ -83,11 +81,9 @@ object Table {
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
     }
 
-    def flattenPrefixed[T](t: T, prefix: String)(implicit
-        q: Queryable[T, _]
-    ): Seq[(List[String], Expr[_])] = {
-      q.walk(t).map { case (k, v) => (prefix +: k, v) }
-    }
+    def flattenPrefixed[T](t: T, prefix: String)(
+        implicit q: Queryable[T, _]
+    ): Seq[(List[String], Expr[_])] = { q.walk(t).map { case (k, v) => (prefix +: k, v) } }
   }
 }
 

@@ -34,13 +34,11 @@ object MySqlDialect extends MySqlDialect {
   class Update[Q, R](update: Update.Impl[Q, R]) extends scalasql.query.Update[Q, R] {
     def filter(f: Q => Expr[Boolean]): Update[Q, R] = new Update(update.filter(f))
 
-    def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q, R] =
-      new Update(update.set(f: _*))
+    def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q, R] = new Update(update.set(f: _*))
 
-    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit
-        joinQr: Queryable[Q2, R2]
-    ): Update[(Q, Q2), (R, R2)] =
-      new Update(update.join0(other, on))
+    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+        implicit joinQr: Queryable[Q2, R2]
+    ): Update[(Q, Q2), (R, R2)] = new Update(update.join0(other, on))
 
     def expr: Q = update.expr
 
@@ -54,8 +52,8 @@ object MySqlDialect extends MySqlDialect {
         q: Update.Impl[Q, R],
         prevContext: Context
     ): (SqlStr, Seq[MappedType[_]]) = {
-      val computed =
-        Context.compute(prevContext, q.joins.flatMap(_.from).map(_.from), Some(q.table))
+      val computed = Context
+        .compute(prevContext, q.joins.flatMap(_.from).map(_.from), Some(q.table))
       import computed.implicitCtx
 
       val tableName = SqlStr.raw(prevContext.tableNameMapper(q.table.value.tableName))
@@ -103,12 +101,9 @@ object MySqlDialect extends MySqlDialect {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
       val (str, mapped) = insert.query.toSqlQuery
-      val updatesStr =
-        SqlStr.join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
-      (
-        str + sql" ON DUPLICATE KEY UPDATE $updatesStr",
-        mapped
-      )
+      val updatesStr = SqlStr
+        .join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
+      (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
     }
   }
 }
