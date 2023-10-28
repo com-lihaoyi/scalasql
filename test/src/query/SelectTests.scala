@@ -86,9 +86,15 @@ trait SelectTests extends ScalaSqlSuite {
           """,
           value = ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
         )
-        test("fail") - intercept[java.lang.AssertionError]{
+        test("failTooMany") - intercept[java.lang.AssertionError]{
           checker(
             query = ShippingInfo.select.filter(_.buyerId === 2).single,
+            value = null.asInstanceOf[ShippingInfo[Id]]
+          )
+        }
+        test("failNotEnough") - intercept[java.lang.AssertionError]{
+          checker(
+            query = ShippingInfo.select.filter(_.buyerId === 123).single,
             value = null.asInstanceOf[ShippingInfo[Id]]
           )
         }
