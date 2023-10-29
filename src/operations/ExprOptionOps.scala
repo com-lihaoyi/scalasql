@@ -2,6 +2,7 @@ package scalasql.operations
 
 import scalasql.MappedType
 import scalasql.query.Expr
+import scalasql.renderer.Context
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 class ExprOptionOps[T](v: Expr[Option[T]]) {
@@ -19,4 +20,6 @@ class ExprOptionOps[T](v: Expr[Option[T]]) {
 
   def flatMap[V: MappedType](f: Expr[T] => Expr[Option[V]]): Expr[Option[V]] =
     Expr { implicit ctx => sql"${f(v.asInstanceOf[Expr[T]])}" }
+
+  def get(implicit mt: MappedType[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"$v"}
 }
