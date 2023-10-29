@@ -11,10 +11,9 @@ class ExprOps(v: Expr[_]) {
   /** Not equal to */
   def <>[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"$v <> $x" }
 
-
   /** Equals to */
   def ===[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-    (Expr.getMappedType(v).nullable, Expr.getMappedType(x).nullable) match{
+    (Expr.getMappedType(v).nullable, Expr.getMappedType(x).nullable) match {
       case (true, true) => sql"($v IS NULL AND $x IS NULL) OR $v = $x"
       case _ => sql"$v = $x"
     }

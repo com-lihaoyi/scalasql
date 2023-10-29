@@ -51,6 +51,7 @@ package mysql {
   object MySqlDialectTests extends MySqlDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
+  object OptionalTests extends datatypes.OptionalTests with MySqlSuite
 
   object TransactionTests extends TransactionTests with MySqlSuite
 }
@@ -77,6 +78,7 @@ package postgres {
   object PostgresDialectTests extends PostgresDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
+  object OptionalTests extends datatypes.OptionalTests with PostgresSuite
 
   object TransactionTests extends TransactionTests with PostgresSuite
 }
@@ -103,6 +105,7 @@ package sqlite {
   object SqliteDialectTests extends SqliteDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
+  object OptionalTests extends datatypes.OptionalTests with SqliteSuite
 
   object TransactionTests extends TransactionTests with SqliteSuite
 }
@@ -132,6 +135,7 @@ package hsqldb {
   object HsqlDbDialectTests extends HsqlDbDialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
+  object OptionalTests extends datatypes.OptionalTests with HsqlDbSuite
 
   object TransactionTests extends TransactionTests with HsqlDbSuite
 }
@@ -157,9 +161,9 @@ package h2 {
   // H2 does not support ON CONFLICT IGNORE unless in postgres mode
   // object OnConflictTests extends OnConflictTests with H2Suite
 
-  object HsqlDbDialectTests extends H2DialectTests
+  object H2DialectTests extends H2DialectTests
 
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
-
+  object OptionalTests extends datatypes.OptionalTests with H2Suite
   object TransactionTests extends TransactionTests with H2Suite
 }

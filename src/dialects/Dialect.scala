@@ -12,7 +12,8 @@ trait Dialect extends DialectConfig {
       v: Expr[T]
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
   implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
-  implicit def ExprOptionOpsConv[T](v: Expr[Option[T]]): operations.ExprOptionOps[T] = new operations.ExprOptionOps(v)
+  implicit def ExprOptionOpsConv[T](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
+    new operations.ExprOptionOps(v)
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
   implicit def AggNumericOpsConv[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(
       implicit qr: Queryable[Expr[V], V]

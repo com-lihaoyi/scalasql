@@ -119,19 +119,19 @@ object MappedType {
     }
   }
 
-  implicit def OptionType[T](implicit inner: MappedType[T]): MappedType[Option[T]] = new MappedType[Option[T]] {
-    def jdbcType: JDBCType = inner.jdbcType
-    override def nullable = true
-    def get(r: ResultSet, idx: Int): Option[T] = {
-      if (r.getObject(idx) == null) None
-      else Some(inner.get(r, idx))
-    }
+  implicit def OptionType[T](implicit inner: MappedType[T]): MappedType[Option[T]] =
+    new MappedType[Option[T]] {
+      def jdbcType: JDBCType = inner.jdbcType
+      override def nullable = true
+      def get(r: ResultSet, idx: Int): Option[T] = {
+        if (r.getObject(idx) == null) None else Some(inner.get(r, idx))
+      }
 
-    def put(r: PreparedStatement, idx: Int, v: Option[T]): Unit = {
-      v match{
-        case None => r.setNull(idx, jdbcType.getVendorTypeNumber)
-        case Some(value) => inner.put(r, idx, value)
+      def put(r: PreparedStatement, idx: Int, v: Option[T]): Unit = {
+        v match {
+          case None => r.setNull(idx, jdbcType.getVendorTypeNumber)
+          case Some(value) => inner.put(r, idx, value)
+        }
       }
     }
-  }
 }
