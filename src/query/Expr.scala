@@ -47,6 +47,9 @@ object Expr {
   }
 
   def apply[T](f: Context => SqlStr)(implicit mappedType: MappedType[T]): Expr[T] = new Simple[T](f)
+  implicit def optionalize[T](e: Expr[T]): Expr[Option[T]] = {
+    new Simple[Option[T]](e.toSqlExpr0(_))(MappedType.OptionType(getMappedType(e)))
+  }
   class Simple[T](f: Context => SqlStr)(implicit val mappedType: MappedType[T]) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }

@@ -193,9 +193,28 @@ trait OptionalTests extends ScalaSqlSuite {
       )
     )
 
-    test("get") - checker(
+    test("mapGet") - checker(
       query = OptCols.select
         .map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1))),
+      sql = """
+        SELECT
+          opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+          opt_cols0.my_int2 as res__my_int2
+        FROM opt_cols opt_cols0
+      """,
+      value = Seq(
+        OptCols[Id](None, None),
+        OptCols[Id](Some(4), Some(2)),
+        // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
+        OptCols[Id](None, None),
+        OptCols[Id](None, Some(4))
+      )
+    )
+
+
+    test("rawGet") - checker(
+      query = OptCols.select
+        .map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1)),
       sql = """
         SELECT
           opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
