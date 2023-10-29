@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.operations.TableOps
+import scalasql.operations.{CaseWhen, TableOps}
 import scalasql.query.{Aggregatable, Expr, Select}
 import scalasql.{MappedType, Queryable, Table, operations}
 
@@ -28,17 +28,5 @@ trait Dialect extends DialectConfig {
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
 
-  case class caseWhen[T: MappedType](values: (Expr[Boolean], Expr[T])*) extends Expr[T] {
-
-    import scalasql.renderer.SqlStr.SqlStringSyntax
-    import scalasql.renderer.{Context, SqlStr}
-
-    def mappedType = implicitly
-
-    def toSqlExpr0(implicit ctx: Context): SqlStr = {
-      val whens = SqlStr
-        .join(values.map { case (when, then) => sql"WHEN $when THEN $then" }, sql" ")
-      sql"CASE $whens END"
-    }
-  }
+  def caseWhen[T: MappedType](values: (Expr[Boolean], Expr[T])*) = new CaseWhen(values)
 }

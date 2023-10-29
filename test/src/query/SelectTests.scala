@@ -655,16 +655,26 @@ trait SelectTests extends ScalaSqlSuite {
             (p.price <= 5) -> (p.name + " CHEAP")
           )
         ),
-        sql = """
-          SELECT
-            CASE
-              WHEN product0.price > ? THEN product0.name || ?
-              WHEN product0.price > ? THEN product0.name || ?
-              WHEN product0.price <= ? THEN product0.name || ?
-            END as res
-          FROM
-            product product0
-        """,
+        sqls = Seq(
+          """
+            SELECT
+              CASE
+                WHEN product0.price > ? THEN product0.name || ?
+                WHEN product0.price > ? THEN product0.name || ?
+                WHEN product0.price <= ? THEN product0.name || ?
+              END as res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
+                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
+                WHEN product0.price <= ? THEN CONCAT(product0.name, ?)
+              END as res
+            FROM product product0
+          """
+        ),
         value = Seq(
           "Face Mask NORMAL",
           "Guitar EXPENSIVE",
@@ -674,18 +684,44 @@ trait SelectTests extends ScalaSqlSuite {
           "Cookie CHEAP"
         )
       )
-//      test("else") - checker(
-//        query = Product.select.map(p =>
-//          caseWhen(
-//            ??? -> ???,
-//            ??? -> ???
-//          ).`else`{
-//
-//          }
-//        ),
-//        sql = """""",
-//        value = (123.45, 8.88)
-//      )
+      test("else") - checker(
+        query = Product.select.map(p =>
+          caseWhen(
+            (p.price > 200) -> (p.name + " EXPENSIVE"),
+            (p.price > 5) -> (p.name + " NORMAL"),
+          ).`else`{
+            p.name + " UNKNOWN"
+          }
+        ),
+        sqls = Seq(
+          """
+            SELECT
+              CASE
+                WHEN product0.price > ? THEN product0.name || ?
+                WHEN product0.price > ? THEN product0.name || ?
+                ELSE product0.name || ?
+              END as res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
+                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
+                ELSE CONCAT(product0.name, ?)
+              END as res
+            FROM product product0
+          """
+        ),
+        value = Seq(
+          "Face Mask NORMAL",
+          "Guitar EXPENSIVE",
+          "Socks UNKNOWN",
+          "Skate Board NORMAL",
+          "Camera EXPENSIVE",
+          "Cookie UNKNOWN"
+        )
+      )
     }
 
   }
