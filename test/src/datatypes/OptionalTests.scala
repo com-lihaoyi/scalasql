@@ -35,15 +35,15 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("groupByMaxGet") - checker(
-      query = OptCols.select.groupBy(_.myInt)(_.maxBy(_.myInt2.get)),
+      query = OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get)),
       sql = """
         SELECT opt_cols0.my_int as res__0, MAX(opt_cols0.my_int2) as res__1
         FROM opt_cols opt_cols0
         GROUP BY opt_cols0.my_int
       """,
       value = Seq(
-        None -> 0,
-        Some(1) -> 2
+        None -> None,
+        Some(1) -> Some(2)
       )
     )
 
