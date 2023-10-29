@@ -264,5 +264,27 @@ trait OptionalTests extends ScalaSqlSuite {
       )
     )
 
+
+    test("filter") - checker(
+      query = OptCols.select
+        .map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2))),
+      sql = """
+        SELECT
+          CASE
+            WHEN opt_cols0.my_int < ? THEN opt_cols0.my_int
+            ELSE NULL
+          END as res__my_int,
+          opt_cols0.my_int2 as res__my_int2
+        FROM opt_cols opt_cols0
+      """,
+      value = Seq(
+        OptCols[Id](None, None),
+        OptCols[Id](Some(1), Some(2)),
+        OptCols[Id](None, None),
+        OptCols[Id](None, Some(4))
+      )
+    )
+
+
   }
 }

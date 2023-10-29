@@ -5,7 +5,7 @@ import scalasql.query.Expr
 import scalasql.renderer.Context
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
-class ExprOptionOps[T](v: Expr[Option[T]]) {
+class ExprOptionOps[T: MappedType](v: Expr[Option[T]]) {
 
   def isDefined: Expr[Boolean] = Expr { implicit ctx => sql"$v IS NOT NULL" }
 
@@ -21,9 +21,14 @@ class ExprOptionOps[T](v: Expr[Option[T]]) {
   def flatMap[V: MappedType](f: Expr[T] => Expr[Option[V]]): Expr[Option[V]] =
     Expr { implicit ctx => sql"${f(v.asInstanceOf[Expr[T]])}" }
 
-  def get(implicit mt: MappedType[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"$v"}
+  def get: Expr[T] = Expr[T]{implicit ctx: Context => sql"$v"}
 
-  def getOrElse(other: Expr[T])(implicit mt: MappedType[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
+  def getOrElse(other: Expr[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
 
-  def orElse(other: Expr[Option[T]])(implicit mt: MappedType[T]): Expr[Option[T]] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
+  def orElse(other: Expr[Option[T]]): Expr[Option[T]] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
+
+  def filter(other: Expr[T] => Expr[Boolean]): Expr[Option[T]] = new CaseWhen.Else[Option[T]](
+    Seq(other(Expr[T]{implicit ctx: Context => sql"$v"}) -> v),
+    Expr{implicit ctx => sql"NULL"}
+  )
 }
