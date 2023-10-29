@@ -14,7 +14,7 @@ trait DeleteTests extends ScalaSqlSuite {
   def tests = Tests {
     test("single") {
       checker(
-        query = Purchase.delete(_.id === 2),
+        query = Purchase.delete(_.id `=` 2),
         sql = "DELETE FROM purchase WHERE purchase.id = ?",
         value = 1
       )
@@ -34,7 +34,7 @@ trait DeleteTests extends ScalaSqlSuite {
     }
     test("multiple") {
       checker(
-        query = Purchase.delete(_.id !== 2),
+        query = Purchase.delete(_.id <> 2),
         sql = "DELETE FROM purchase WHERE purchase.id <> ?",
         value = 6
       )

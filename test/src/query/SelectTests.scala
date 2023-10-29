@@ -31,7 +31,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("filter") {
       test("single") - checker(
-        query = ShippingInfo.select.filter(_.buyerId === 2),
+        query = ShippingInfo.select.filter(_.buyerId `=` 2),
         sql = """
         SELECT
           shipping_info0.id as res__id,
@@ -47,8 +47,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("multiple") - checker(
-        query = ShippingInfo.select.filter(_.buyerId === 2)
-          .filter(_.shippingDate === LocalDate.parse("2012-05-06")),
+        query = ShippingInfo.select.filter(_.buyerId `=` 2)
+          .filter(_.shippingDate `=` LocalDate.parse("2012-05-06")),
         sql = """
         SELECT
           shipping_info0.id as res__id,
@@ -64,8 +64,8 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("dotSingle") {
         test("pass") - checker(
-          query = ShippingInfo.select.filter(_.buyerId === 2)
-            .filter(_.shippingDate === LocalDate.parse("2012-05-06")).single,
+          query = ShippingInfo.select.filter(_.buyerId `=` 2)
+            .filter(_.shippingDate `=` LocalDate.parse("2012-05-06")).single,
           sql = """
             SELECT
               shipping_info0.id as res__id,
@@ -80,13 +80,13 @@ trait SelectTests extends ScalaSqlSuite {
         )
         test("failTooMany") - intercept[java.lang.AssertionError] {
           checker(
-            query = ShippingInfo.select.filter(_.buyerId === 2).single,
+            query = ShippingInfo.select.filter(_.buyerId `=` 2).single,
             value = null.asInstanceOf[ShippingInfo[Id]]
           )
         }
         test("failNotEnough") - intercept[java.lang.AssertionError] {
           checker(
-            query = ShippingInfo.select.filter(_.buyerId === 123).single,
+            query = ShippingInfo.select.filter(_.buyerId `=` 123).single,
             value = null.asInstanceOf[ShippingInfo[Id]]
           )
         }
@@ -94,7 +94,7 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("combined") - checker(
         query = ShippingInfo.select
-          .filter(p => p.buyerId === 2 && p.shippingDate === LocalDate.parse("2012-05-06")),
+          .filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06")),
         sql = """
           SELECT
             shipping_info0.id as res__id,
@@ -278,7 +278,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("joins") {
       test("joinFilter") - checker(
-        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId).filter(_._1.name === "叉烧包"),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包"),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -304,7 +304,7 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("joinSelectFilter") - checker(
-        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId).filter(_._1.name === "叉烧包"),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包"),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -330,8 +330,8 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("joinFilterMap") - checker(
-        query = Buyer.select.joinOn(ShippingInfo)(_.id === _.buyerId)
-          .filter(_._1.name === "James Bond").map(_._2.shippingDate),
+        query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId)
+          .filter(_._1.name `=` "James Bond").map(_._2.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
           FROM buyer buyer0
@@ -342,7 +342,7 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("selfJoin") - checker(
-        query = Buyer.select.joinOn(Buyer)(_.id === _.id),
+        query = Buyer.select.joinOn(Buyer)(_.id `=` _.id),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -371,7 +371,7 @@ trait SelectTests extends ScalaSqlSuite {
       )
 
       test("selfJoin2") - checker(
-        query = Buyer.select.joinOn(Buyer)(_.id !== _.id),
+        query = Buyer.select.joinOn(Buyer)(_.id <> _.id),
         sql = """
           SELECT
             buyer0.id as res__0__id,
@@ -414,7 +414,7 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("flatMap") - checker(
         query = Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
-          c.id === p.buyerId && c.name === "James Bond"
+          c.id `=` p.buyerId && c.name `=` "James Bond"
         }.map(_._2.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
@@ -427,7 +427,7 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("flatMap2") - checker(
         query = Buyer.select.flatMap(c =>
-          ShippingInfo.select.filter { p => c.id === p.buyerId && c.name === "James Bond" }
+          ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" }
         ).map(_.shippingDate),
         sql = """
           SELECT shipping_info1.shipping_date as res
@@ -469,7 +469,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("nonEmpty") - checker(
       query = Buyer.select
-        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).nonEmpty)),
+        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty)),
       sql = """
         SELECT
           buyer0.name as res__0,
@@ -484,7 +484,7 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("isEmpty") - checker(
       query = Buyer.select
-        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId === b.id).map(_.id).isEmpty)),
+        .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty)),
       sql = """
         SELECT
           buyer0.name as res__0,

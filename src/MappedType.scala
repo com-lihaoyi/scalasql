@@ -24,6 +24,7 @@ import java.time.{
 // https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
 sealed trait MappedType[T] {
   def jdbcType: JDBCType
+  def nullable: Boolean = false
   def get(r: ResultSet, idx: Int): T
   def put(r: PreparedStatement, idx: Int, v: T): Unit
 }
@@ -120,7 +121,7 @@ object MappedType {
 
   implicit def OptionType[T](implicit inner: MappedType[T]): MappedType[Option[T]] = new MappedType[Option[T]] {
     def jdbcType: JDBCType = inner.jdbcType
-
+    override def nullable = true
     def get(r: ResultSet, idx: Int): Option[T] = {
       if (r.getObject(idx) == null) None
       else Some(inner.get(r, idx))

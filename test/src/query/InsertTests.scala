@@ -25,7 +25,7 @@ trait InsertTests extends ScalaSqlSuite {
         )
 
         checker(
-          query = Buyer.select.filter(_.name === "test buyer"),
+          query = Buyer.select.filter(_.name `=` "test buyer"),
           value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
@@ -39,7 +39,7 @@ trait InsertTests extends ScalaSqlSuite {
         )
 
         checker(
-          query = Buyer.select.filter(_.name === "test buyer"),
+          query = Buyer.select.filter(_.name `=` "test buyer"),
           // id=4 comes from auto increment
           value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
@@ -123,7 +123,7 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.insert.select(
             identity,
-            Buyer.select.filter(_.name !== "Li Haoyi")
+            Buyer.select.filter(_.name <> "Li Haoyi")
               .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
           ),
           sql = """
@@ -154,7 +154,7 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.insert.select(
             x => (x.name, x.dateOfBirth),
-            Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 !== "Li Haoyi")
+            Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 <> "Li Haoyi")
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)

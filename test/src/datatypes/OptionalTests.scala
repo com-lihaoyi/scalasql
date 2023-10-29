@@ -49,21 +49,36 @@ trait OptionalTests extends ScalaSqlSuite {
       )
     )
 
-    test("tripleEqualsNonOptionHit") - checker(
-      query = DataTypesOpt.select.filter(_.myInt === 1),
+    test("sqlEqualsNonOptionHit") - checker(
+      query = DataTypesOpt.select.filter(_.myInt `=` 1),
       value = Seq(
         DataTypesOpt[Id](Some(1))
       )
     )
 
-    test("tripleEqualsNonOptionMiss") - checker(
-      query = DataTypesOpt.select.filter(_.myInt === 2),
+    test("sqlEqualsNonOptionMiss") - checker(
+      query = DataTypesOpt.select.filter(_.myInt `=` 2),
       value = Seq[DataTypesOpt[Id]]()
     )
 
-    test("tripleEqualsOptionMiss") - checker( // SQL null = null is false
-      query = DataTypesOpt.select.filter(_.myInt === Option.empty[Int]),
+    test("sqlEqualsOptionMiss") - checker( // SQL null = null is false
+      query = DataTypesOpt.select.filter(_.myInt `=` Option.empty[Int]),
       value = Seq[DataTypesOpt[Id]]()
+    )
+
+
+    test("scalaEqualsSomeHit") - checker(
+      query = DataTypesOpt.select.filter(_.myInt === Option(1)),
+      value = Seq(
+        DataTypesOpt[Id](Some(1))
+      )
+    )
+
+    test("scalaEqualsNoneHit") - checker(
+      query = DataTypesOpt.select.filter(_.myInt === Option.empty[Int]),
+      value = Seq(
+        DataTypesOpt[Id](None)
+      )
     )
 
     test("map") - checker(

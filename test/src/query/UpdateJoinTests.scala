@@ -14,8 +14,8 @@ trait UpdateJoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("join") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond")
-          .joinOn(ShippingInfo)(_.id === _.buyerId).set(c => c._1.dateOfBirth -> c._2.shippingDate),
+        query = Buyer.update.filter(_.name `=` "James Bond")
+          .joinOn(ShippingInfo)(_.id `=` _.buyerId).set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sqls = Seq(
           """
             UPDATE buyer
@@ -34,17 +34,17 @@ trait UpdateJoinTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
+        query = Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth),
         value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
 
     test("multijoin") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond")
-          .joinOn(ShippingInfo)(_.id === _.buyerId).joinOn(Purchase)(_._2.id === _.shippingInfoId)
-          .joinOn(Product)(_._2.productId === _.id)
-          .filter(t => t._2.name.toLowerCase === t._2.kebabCaseName.toLowerCase)
+        query = Buyer.update.filter(_.name `=` "James Bond")
+          .joinOn(ShippingInfo)(_.id `=` _.buyerId).joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
+          .joinOn(Product)(_._2.productId `=` _.id)
+          .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
           .set(c => c._1._1._1.name -> c._2.name),
         sqls = Seq(
           """
@@ -70,13 +70,13 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         value = 1
       )
 
-      checker(query = Buyer.select.filter(_.id === 1).map(_.name), value = Seq("Camera"))
+      checker(query = Buyer.select.filter(_.id `=` 1).map(_.name), value = Seq("Camera"))
     }
 
     test("joinSubquery") - {
       checker(
-        query = Buyer.update.filter(_.name === "James Bond")
-          .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id === _.buyerId)
+        query = Buyer.update.filter(_.name `=` "James Bond")
+          .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
           .set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sqls = Seq(
           """
@@ -108,7 +108,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Buyer.select.filter(_.name === "James Bond").map(_.dateOfBirth),
+        query = Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth),
         value = Seq(LocalDate.parse("2012-04-05"))
       )
     }

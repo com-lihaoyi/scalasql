@@ -13,7 +13,7 @@ trait SubQueryTests extends ScalaSqlSuite {
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query = Purchase.select
-        .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId === _.id)
+        .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
         .map { case (purchase, product) => purchase.total },
       sql = """
         SELECT purchase0.total as res
@@ -32,7 +32,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("sortTakeFrom") - checker(
-      query = Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id === _.productId)
+      query = Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId)
         .map { case (product, purchase) => purchase.total },
       sql = """
         SELECT purchase1.total as res
@@ -51,7 +51,7 @@ trait SubQueryTests extends ScalaSqlSuite {
 
     test("sortTakeFromAndJoin") - checker(
       query = Product.select.sortBy(_.price).desc.take(3)
-        .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id === _.productId)
+        .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
         .map { case (product, purchase) => (product.name, purchase.count) },
       sql = """
         SELECT
@@ -117,7 +117,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("groupByJoin") - checker(
-      query = Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 === _.id)
+      query = Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id)
         .map { case ((productId, total), product) => (product.name, total) },
       sql = """
         SELECT
@@ -143,7 +143,7 @@ trait SubQueryTests extends ScalaSqlSuite {
 
     test("subqueryInFilter") - checker(
       query = Buyer.select
-        .filter(c => ShippingInfo.select.filter(p => c.id === p.buyerId).size === 0),
+        .filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0),
       sql = """
         SELECT
           buyer0.id as res__id,
@@ -158,7 +158,7 @@ trait SubQueryTests extends ScalaSqlSuite {
       value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     test("subqueryInMap") - checker(
-      query = Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size)),
+      query = Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size)),
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -175,7 +175,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
     test("subqueryInMapNested") - checker(
       query = Buyer.select
-        .map(c => (c, ShippingInfo.select.filter(p => c.id === p.buyerId).size === 1)),
+        .map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1)),
       sql = """
         SELECT
           buyer0.id as res__0__id,
