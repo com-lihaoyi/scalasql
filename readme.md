@@ -5,7 +5,7 @@ SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
 
-# Why ScalaSql? 
+# Why ScalaSql?
 
 ## Goals
 
@@ -80,18 +80,18 @@ style of emulating mutable objects via database operations.
 Quill focuses a lot on compile-time query generation, while ScalaSql does not.
 Compile-time query generation has a ton of advantages - zero runtime overhead, compile
 time query logging, etc. - but also comes with a lot of complexity, both in
-user-facing complexity and internal maintainability: 
+user-facing complexity and internal maintainability:
 
 1. From a user perspective, Quill naturally does not support the entire
    Scala language as part of its queries, and my experience using it is that the boundary
    between what's "supported" vs "not" is often not clear. Exactly how the translation
-   to SQL happens is also relatively opaque. In contrast, ScalaSql has database operations 
+   to SQL happens is also relatively opaque. In contrast, ScalaSql has database operations
    clearly separated from Scala operations via the `Expr[T]` vs `T` types, and the translation
-   to SQL is handled via normal classes with `.toSqlStr` and `.toSqlQuery` methods that are 
+   to SQL is handled via normal classes with `.toSqlStr` and `.toSqlQuery` methods that are
    composed and invoked at runtime.
 
-2. From a maintainers perspective, Quill's compile-time approach means it needs two 
-   completely distinct implementations for Scala 2 and Scala 3, and is largely implemented  
+2. From a maintainers perspective, Quill's compile-time approach means it needs two
+   completely distinct implementations for Scala 2 and Scala 3, and is largely implemented
    via relatively advanced compile-time metaprogramming techniques. In contrast, ScalaSql
    shares the vast majority of its logic between Scala 2 and Scala 3, and is implemented
    mostly via vanilla classes and methods that should be familiar even to those without
@@ -111,12 +111,12 @@ which distracts from the essential task of _querying the database_.
 ScalaSql aims to do without these two things:
 
 1. We assume that most applications are not ultra-high-concurrency, and blocking database
-   operations are fine. If slow languages with blocking operations are enough for 
+   operations are fine. If slow languages with blocking operations are enough for
    ultra-large-scale systems like Dropbox (Python), Github (Ruby), or Instagram (Youtube),
    they should be enough for the vast majority of systems a developer may want to build.
 
 2. We assume that most queries are relatively simple, most database query optimizers do
-   a reasonable job, and the increased _predictability_ and _simplicity_ of not doing 
+   a reasonable job, and the increased _predictability_ and _simplicity_ of not doing
    advanced query optimizations in the application layer more than make up from the
    increased performance from the optimized database queries. For the rare scenarios where
    this is not true, the developer can fall back to raw SQL queries.
@@ -188,34 +188,12 @@ strongly-typed collection-like API.
 
 # Design
 
-The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
-
-**Queryable Hierarchy**:
-
-- `Q` -> `R` given `Queryable[Q, R]`
-   - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
-   - `Query[R]` -> `R`
-   - `CaseClass[Expr]` -> `CaseClass[Id]`
-   - `Expr[T]` -> `T`
-
-We need to use a `Queryable` typeclass here for two reasons:
-
-1. We do not control some of the types that can be queryable: `TupleN` and `CaseClass`
-   are "vanilla" types which happen to have members which a queryable, and cannot be
-   made to inherit from any ScalaSql base class the way `Query` and `Expr` can.
-
-2. We need to control the return type: the mapping from `Q` to `R` is somewhat
-   arbitrary, with `Query[R] -> R` and `Expr[T] -> T` being straightforward unwrapping
-   of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
-   following that pattern. Thus we need to use the typeclass to encode this logic
-
-
-**Dataflow**:
+The rough dataflow of how ScalaSql works is given by the following diagram:
 
 ```
    {Table.select,update,map,
-    filter,join,aggregate}
-           |                               ^
+    filter,join,aggregate}                 +-------->
+           |                               |
            |                               |
   {Expr[Int],Select[Q],Update[Q]      {Int,Seq[R],
    CaseCls[Expr],Tuple[Q]}         CaseCls[Id],Tuple[R]}
@@ -237,3 +215,59 @@ We need to use a `Queryable` typeclass here for two reasons:
            |                               |
            +-------> java.sql.execute -----+
 ```
+
+1. We start off constructing a query of type `Q`: an expression, query, or
+   case-class/tuple containing expressions.
+
+2. These get converted into a `SqlStr` using the `Queryable[Q, R]` typeclass
+
+3. We execute the `SqlStr` using JDBC/`java.sql` APIs and get back a `ResultSet`
+
+4. We use `Queryable[Q, R]#valueReader` to convert the `ResultSet` back into
+  a Scala type `R`: typically primitive types, collections, or case-classes/tuples
+  containing primitive types
+
+5. That Scala value of type `R` is returned to the application for use
+
+## Queryable Hierarchy
+
+The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
+
+- `Q` -> `R` given `Queryable[Q, R]`
+   - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
+   - `Query[R]` -> `R`
+   - `CaseClass[Expr]` -> `CaseClass[Id]`
+   - `Expr[T]` -> `T`
+
+We need to use a `Queryable` typeclass here for two reasons:
+
+1. We do not control some of the types that can be queryable: `TupleN` and `CaseClass`
+   are "vanilla" types which happen to have members which a queryable, and cannot be
+   made to inherit from any ScalaSql base class the way `Query` and `Expr` can.
+
+2. We need to control the return type: the mapping from `Q` to `R` is somewhat
+   arbitrary, with `Query[R] -> R` and `Expr[T] -> T` being straightforward unwrapping
+   of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
+   following that pattern. Thus we need to use the typeclass to encode this logic
+
+Unlike `Queryable[Q, R]`,`Query[R]` and `Expr[T]` are open class hierarchies. This is
+done intentionally to allow users to easily `override` portions of this logic at runtime:
+e.g. MySql has a different syntax for `UPDATE`/`JOIN` commands than most other databases,
+and it can easily subclass `scalasql.query.Update` and override `toSqlQuery`. In general,
+this allows the various SQL dialects to modify or extend ScalaSql's core classes
+independently of each other, and lets users further customize ScalaSql in their own
+downstream code.
+
+## Operations
+
+`Expr[T]` is a type with no built-in members, as its operations depend on entirely what
+`T` is: `Expr[Int]` allows arithmetic, `Expr[String]` allows string operations, and so on.
+All of these `Expr[T]` operations are thus provided as extension methods that are
+imported with the SQL dialect and apply depending on the type `T`.
+
+These extension methods are provided via implicit conversions to classes implementing
+these methods, and can also be overriden or extended by the various SQL dialects: e.g.
+MySQL uses `CONCAT` rather than `||` for string concatenation, Postgres provides
+`.reverse`/`REVERSE` while MySQL doesn't. Again, this allows each dialect to customize
+the APIs they expose independently of each other, and makes it easy for users to define
+their own operations not provided by the base library.
