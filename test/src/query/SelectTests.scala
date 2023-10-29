@@ -645,5 +645,48 @@ trait SelectTests extends ScalaSqlSuite {
         value = (123.45, 8.88)
       )
     }
+
+    test("case") {
+      test("when") - checker(
+        query = Product.select.map(p =>
+          caseWhen(
+            (p.price > 200) -> (p.name + " EXPENSIVE"),
+            (p.price > 5) -> (p.name + " NORMAL"),
+            (p.price <= 5) -> (p.name + " CHEAP")
+          )
+        ),
+        sql = """
+          SELECT
+            CASE
+              WHEN product0.price > ? THEN product0.name || ?
+              WHEN product0.price > ? THEN product0.name || ?
+              WHEN product0.price <= ? THEN product0.name || ?
+            END as res
+          FROM
+            product product0
+        """,
+        value = Seq(
+          "Face Mask NORMAL",
+          "Guitar EXPENSIVE",
+          "Socks CHEAP",
+          "Skate Board NORMAL",
+          "Camera EXPENSIVE",
+          "Cookie CHEAP"
+        )
+      )
+//      test("else") - checker(
+//        query = Product.select.map(p =>
+//          caseWhen(
+//            ??? -> ???,
+//            ??? -> ???
+//          ).`else`{
+//
+//          }
+//        ),
+//        sql = """""",
+//        value = (123.45, 8.88)
+//      )
+    }
+
   }
 }
