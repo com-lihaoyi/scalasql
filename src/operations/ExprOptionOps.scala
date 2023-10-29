@@ -22,4 +22,8 @@ class ExprOptionOps[T](v: Expr[Option[T]]) {
     Expr { implicit ctx => sql"${f(v.asInstanceOf[Expr[T]])}" }
 
   def get(implicit mt: MappedType[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"$v"}
+
+  def getOrElse(other: Expr[T])(implicit mt: MappedType[T]): Expr[T] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
+
+  def orElse(other: Expr[Option[T]])(implicit mt: MappedType[T]): Expr[Option[T]] = Expr[T]{implicit ctx: Context => sql"COALESCE($v, $other)"}
 }
