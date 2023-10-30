@@ -127,7 +127,4 @@ object Insert {
       )
     }
   }
-  def fromTable[Q, R](expr: Q, table: TableRef)(implicit qr: Queryable[Q, R]): Insert[Q, R] = {
-    Insert.Impl(expr, table)
-  }
 }

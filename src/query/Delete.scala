@@ -16,9 +16,6 @@ object Delete {
 
     def valueReader = implicitly
   }
-  def fromTable[Q, R](expr: Q, filter: Expr[Boolean], table: TableRef): Delete[Q] = {
-    Delete.Impl(expr, filter, table)
-  }
 
   def toSqlStr(table: TableRef, expr: Expr[Boolean], prevContext: Context) = {
     val computed = Context.compute(prevContext, Nil, Some(table))

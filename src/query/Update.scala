@@ -56,10 +56,6 @@ object Update {
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-  def fromTable[Q, R](expr: Q, table: TableRef)(implicit qr: Queryable[Q, R]): Update.Impl[Q, R] = {
-    Update.Impl(expr, table, Nil, Nil, Nil)
-  }
-
   def toSqlStr(
       joins0: Seq[Join],
       table: TableRef,

@@ -88,8 +88,3 @@ trait Select[Q, R]
   }
 }
 
-object Select {
-  def fromTable[T, R](e: T, table: TableRef)(implicit qr: Queryable[T, R]) = {
-    new SimpleSelect(e, None, Seq(table), Nil, Nil, None)
-  }
-}
