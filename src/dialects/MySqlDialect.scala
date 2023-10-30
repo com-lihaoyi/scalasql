@@ -191,10 +191,6 @@ object MySqlDialect extends MySqlDialect {
     ) = {
       SqlStr.opt(query.orderBy) { orderBy =>
         val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
-        // case OrderByCriteria(prop, AscNullsFirst | Asc)  => stmt"${prop.token} ASC"
-        // case OrderByCriteria(prop, DescNullsFirst)       => stmt"ISNULL(${prop.token}) DESC, ${prop.token} DESC"
-        // case OrderByCriteria(prop, AscNullsLast)         => stmt"ISNULL(${prop.token}) ASC, ${prop.token} ASC"
-        // case OrderByCriteria(prop, DescNullsLast | Desc) => stmt"${prop.token} DESC"
         val str = (orderBy.ascDesc, orderBy.nulls) match{
           case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
           case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
