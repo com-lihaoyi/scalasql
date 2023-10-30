@@ -272,3 +272,13 @@ MySQL uses `CONCAT` rather than `||` for string concatenation, Postgres provides
 `.reverse`/`REVERSE` while MySQL doesn't. Again, this allows each dialect to customize
 the APIs they expose independently of each other, and makes it easy for users to define
 their own operations not provided by the base library.
+
+
+# TODO
+
+* Scala 3 support
+* Extend sortBy to allow multiple columns each with their own ASC/DESC/NULLS handling
+* Tutorial Docs and Reference Docs
+* Fix `???`s in `CompoundSelect`
+* `.forceSubquery` support
+* Flat joins (Quill Style)

@@ -7,7 +7,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 trait Delete[Q] extends Query[Int] with Returnable[Q]
 
 object Delete {
-  case class Impl[Q](expr: Q, filter: Expr[Boolean], table: TableRef) extends Delete[Q] {
+  class Impl[Q](val expr: Q, filter: Expr[Boolean], val table: TableRef) extends Delete[Q] {
     override def isExecuteUpdate = true
     def walk() = Nil
     def singleRow = true

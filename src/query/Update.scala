@@ -36,26 +36,16 @@ object Update {
   )(implicit val qr: Queryable[Q, R])
       extends Update[Q, R] {
     def copy[Q, R](
-                    expr: Q = this.expr,
-                    table: TableRef = this.table,
-                    set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
-                    joins: Seq[Join] = this.joins,
-                    where: Seq[Expr[_]] = this.where)
-                  (implicit qr: Queryable[Q, R]): Update[Q, R] = new Impl(expr,
-      table,
-      set0,
-      joins,
-      where
-    )
+        expr: Q = this.expr,
+        table: TableRef = this.table,
+        set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+        joins: Seq[Join] = this.joins,
+        where: Seq[Expr[_]] = this.where
+    )(implicit qr: Queryable[Q, R]): Update[Q, R] = new Impl(expr, table, set0, joins, where)
 
+    def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
-    def filter(f: Q => Expr[Boolean]) = {
-      this.copy(where = where ++ Seq(f(expr)))
-    }
-
-    def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*) = {
-      this.copy(set0 = f.map(_(expr)))
-    }
+    def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
         implicit joinQr: Queryable[Q2, R2]

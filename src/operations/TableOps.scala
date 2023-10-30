@@ -6,7 +6,9 @@ import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Upd
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
   def select: Select[V[Expr], V[Id]] = {
     val ref = t.tableRef
-    new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(t.containerQr)
+    new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
+      t.containerQr
+    )
   }
 
   def update: Update[V[Column.ColumnExpr], V[Id]] = {

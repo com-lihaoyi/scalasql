@@ -44,10 +44,7 @@ class TestDb(
       val simplifiedSqls = sqls.map(_.trim.replaceAll("\\s+", " "))
 //      pprint.log(simplifiedSqls)
 //      pprint.log(sqlResult)
-      assert(
-        simplifiedSqls.exists(_ == sqlResult),
-        pprint.apply(SqlFormatter.format(sqlResult))
-      )
+      assert(simplifiedSqls.exists(_ == sqlResult), pprint.apply(SqlFormatter.format(sqlResult)))
 
     }
 

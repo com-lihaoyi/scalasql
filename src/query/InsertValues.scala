@@ -15,10 +15,10 @@ trait InsertValues[Q, R] extends InsertReturnable[Q] with Query[Int] {
   def valuesLists: Seq[Seq[Expr[_]]]
 }
 object InsertValues {
-  case class Impl[Q, R](
+  class Impl[Q, R](
       insert: Insert[Q, R],
-      columns: Seq[Column.ColumnExpr[_]],
-      valuesLists: Seq[Seq[Expr[_]]]
+      val columns: Seq[Column.ColumnExpr[_]],
+      val valuesLists: Seq[Seq[Expr[_]]]
   )(implicit val qr: Queryable[Q, R])
       extends InsertValues[Q, R] {
     def table = insert.table

@@ -56,25 +56,22 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class Update[Q, R](expr: Q,
-                     table: TableRef,
-                     set0: Seq[(Column.ColumnExpr[_], Expr[_])],
-                     joins: Seq[Join],
-                     where: Seq[Expr[_]])
-                    (implicit qr: Queryable[Q, R])extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
+  class Update[Q, R](
+      expr: Q,
+      table: TableRef,
+      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      joins: Seq[Join],
+      where: Seq[Expr[_]]
+  )(implicit qr: Queryable[Q, R])
+      extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
     override def copy[Q, R](
-                    expr: Q = this.expr,
-                    table: TableRef = this.table,
-                    set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
-                    joins: Seq[Join] = this.joins,
-                    where: Seq[Expr[_]] = this.where)
-                  (implicit qr: Queryable[Q, R]) = new Update(expr,
-      table,
-      set0,
-      joins,
-      where
-    )
+        expr: Q = this.expr,
+        table: TableRef = this.table,
+        set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+        joins: Seq[Join] = this.joins,
+        where: Seq[Expr[_]] = this.where
+    )(implicit qr: Queryable[Q, R]) = new Update(expr, table, set0, joins, where)
 
     override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       toSqlQuery0(this, ctx)
@@ -195,7 +192,7 @@ object MySqlDialect extends MySqlDialect {
     ) = {
       SqlStr.opt(query.orderBy) { orderBy =>
         val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
-        val str = (orderBy.ascDesc, orderBy.nulls) match{
+        val str = (orderBy.ascDesc, orderBy.nulls) match {
           case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
           case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
           case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr ASC"
@@ -205,7 +202,7 @@ object MySqlDialect extends MySqlDialect {
           case (None, Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr"
         }
 
-      sql" ORDER BY $str"
+        sql" ORDER BY $str"
       }
     }
   }

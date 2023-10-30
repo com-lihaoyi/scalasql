@@ -13,7 +13,7 @@ import scalasql.utils.OptionPickler
 trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
 
 object InsertSelect {
-  case class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
+  class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
       extends InsertSelect[Q, C, R, R2] {
     def expr = insert.expr
 

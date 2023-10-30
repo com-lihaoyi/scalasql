@@ -277,7 +277,7 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
             ORDER BY res__my_int IS NULL ASC, res__my_int
-          """,
+          """
         ),
         value = Seq(
           OptCols[Id](Some(1), Some(2)),

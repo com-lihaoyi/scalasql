@@ -87,4 +87,3 @@ trait Select[Q, R]
       newSimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
   }
 }
-

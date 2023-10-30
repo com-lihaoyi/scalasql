@@ -19,9 +19,8 @@ trait Returning[Q, R] extends Query.Multiple[R] {
 
 trait InsertReturning[Q, R] extends Returning[Q, R]
 object InsertReturning {
-  case class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(
-      implicit val qr: Queryable[Q, R]
-  ) extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
+  class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
+      extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
     def expr: Q = returning
   }
 }
@@ -48,7 +47,7 @@ object Returning {
       (prefix + suffix, flattenedExpr.map(t => Expr.getMappedType(t._2)))
     }
   }
-  case class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
+  class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
       extends Impl0[Q, R](qr, returnable, returning) with Returning[Q, R]
 
 }
