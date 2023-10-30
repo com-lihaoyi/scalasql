@@ -27,25 +27,39 @@ object Update {
    *
    * https://www.postgresql.org/docs/current/sql-update.html
    */
-  case class Impl[Q, R](
-      expr: Q,
-      table: TableRef,
-      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
-      joins: Seq[Join],
-      where: Seq[Expr[_]]
+  class Impl[Q, R](
+      val expr: Q,
+      val table: TableRef,
+      val set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      val joins: Seq[Join],
+      val where: Seq[Expr[_]]
   )(implicit val qr: Queryable[Q, R])
       extends Update[Q, R] {
-    def filter(f: Q => Expr[Boolean]): Update.Impl[Q, R] = {
+    def copy[Q, R](
+                    expr: Q = this.expr,
+                    table: TableRef = this.table,
+                    set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+                    joins: Seq[Join] = this.joins,
+                    where: Seq[Expr[_]] = this.where)
+                  (implicit qr: Queryable[Q, R]): Update[Q, R] = new Impl(expr,
+      table,
+      set0,
+      joins,
+      where
+    )
+
+
+    def filter(f: Q => Expr[Boolean]) = {
       this.copy(where = where ++ Seq(f(expr)))
     }
 
-    def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update.Impl[Q, R] = {
+    def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*) = {
       this.copy(set0 = f.map(_(expr)))
     }
 
     def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
         implicit joinQr: Queryable[Q2, R2]
-    ): Update.Impl[(Q, Q2), (R, R2)] = {
+    ) = {
       val (otherJoin, otherSelect) = joinInfo(other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }

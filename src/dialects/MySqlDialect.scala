@@ -45,7 +45,7 @@ object MySqlDialect extends MySqlDialect {
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     override def update: Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = t.tableRef
-      new Update(new scalasql.query.Update.Impl(t.metadata.vExpr(ref), ref, Nil, Nil, Nil)(t.containerQr))
+      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Nil)(t.containerQr)
     }
 
     override def select: Select[V[Expr], V[Id]] = {
@@ -56,21 +56,28 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class Update[Q, R](update: Update.Impl[Q, R]) extends scalasql.query.Update[Q, R] {
-    def filter(f: Q => Expr[Boolean]): Update[Q, R] = new Update(update.filter(f))
+  class Update[Q, R](expr: Q,
+                     table: TableRef,
+                     set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+                     joins: Seq[Join],
+                     where: Seq[Expr[_]])
+                    (implicit qr: Queryable[Q, R])extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
-    def set(f: Q => (Column.ColumnExpr[_], Expr[_])*): Update[Q, R] = new Update(update.set(f: _*))
-
-    def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-        implicit joinQr: Queryable[Q2, R2]
-    ): Update[(Q, Q2), (R, R2)] = new Update(update.join0(other, on))
-
-    def expr: Q = update.expr
-
-    def table: TableRef = update.table
+    override def copy[Q, R](
+                    expr: Q = this.expr,
+                    table: TableRef = this.table,
+                    set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+                    joins: Seq[Join] = this.joins,
+                    where: Seq[Expr[_]] = this.where)
+                  (implicit qr: Queryable[Q, R]) = new Update(expr,
+      table,
+      set0,
+      joins,
+      where
+    )
 
     override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-      toSqlQuery0(update, ctx)
+      toSqlQuery0(this, ctx)
     }
 
     def toSqlQuery0[Q, R](
@@ -97,9 +104,6 @@ object MySqlDialect extends MySqlDialect {
       (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
     }
 
-    def qr: Queryable[Q, R] = update.qr
-
-    override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
