@@ -115,20 +115,25 @@ object CompoundSelect {
 
       val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
 
-      val sortOpt = orderToToSqlStr(query, newCtx)
+      val sortOpt = orderToToSqlStr(newCtx)
 
-      val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
-
-      val offsetOpt = SqlStr.opt(query.offset) { offset =>
-        sql" OFFSET " + SqlStr.raw(offset.toString)
-      }
+      val (limitOpt, offsetOpt) = limitOffsetToSqlStr
 
       val res = lhsStr + compound + sortOpt + limitOpt + offsetOpt
 
       (lhsMap, res, context, mappedTypes)
     }
 
-    def orderToToSqlStr[R, Q](query: CompoundSelect[Q, R], newCtx: Context) = {
+    def limitOffsetToSqlStr = {
+      val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
+
+      val offsetOpt = SqlStr.opt(query.offset) { offset =>
+        sql" OFFSET " + SqlStr.raw(offset.toString)
+      }
+      (limitOpt, offsetOpt)
+    }
+
+    def orderToToSqlStr[R, Q](newCtx: Context) = {
       SqlStr.opt(query.orderBy) { orderBy =>
         val ascDesc = orderBy.ascDesc match {
           case None => sql""

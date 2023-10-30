@@ -154,8 +154,8 @@ object MySqlDialect extends MySqlDialect {
     )(implicit qr: Queryable[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
-
   }
+
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[String],
@@ -186,10 +186,10 @@ object MySqlDialect extends MySqlDialect {
       prevContext: Context
   ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
 
-    override def orderToToSqlStr[R, Q](
-        query: scalasql.query.CompoundSelect[Q, R],
-        newCtx: Context
-    ) = {
+    override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
+      .limitOffsetToSqlStr(query.limit, query.offset)
+
+    override def orderToToSqlStr[R, Q](newCtx: Context) = {
       SqlStr.opt(query.orderBy) { orderBy =>
         val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
         val str = (orderBy.ascDesc, orderBy.nulls) match {

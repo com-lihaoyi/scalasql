@@ -234,6 +234,14 @@ trait SelectTests extends ScalaSqlSuite {
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Seq("Cookie", "Socks")
       )
+      test("sortOffset") - checker(
+        query = Product.select.sortBy(_.price).map(_.name).drop(2),
+        sqls = Seq(
+          "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2",
+          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2"
+        ),
+        value = Seq("Face Mask", "Skate Board", "Guitar", "Camera")
+      )
 
       test("sortLimitTwiceHigher") - checker(
         query = Product.select.sortBy(_.price).map(_.name).take(2).take(3),
