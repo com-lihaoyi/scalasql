@@ -3,6 +3,8 @@ package scalasql
 trait Config {
   def columnLabelPrefix = "res"
   def columnLabelDelimiter = "__"
+  def defaultFetchSize: Int = -1
+  def defaultQueryTimeoutSeconds: Int = -1
 
   def tableNameMapper(v: String): String = Config.camelToSnake(v)
   def tableNameUnMapper(v: String): String = Config.snakeToCamel(v)

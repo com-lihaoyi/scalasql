@@ -13,8 +13,8 @@ trait DbApi {
   def rollback(): Unit
 
   def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
-  def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R
-  def stream[Q, R](query: Q)(implicit qr: Queryable[Q, Seq[R]]): Generator[R]
+  def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, R]): R
+  def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, Seq[R]]): Generator[R]
   def runRaw(sql: String): Unit
 }
 
@@ -102,8 +102,8 @@ object DbApi {
       (queryStr, flattened.params, mappedTypes)
     }
 
-    def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
-      val (exprs, statement) = prepareRun(query)
+    def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, R]): R = {
+      val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
       else {
@@ -130,10 +130,14 @@ object DbApi {
       }
     }
 
-    private def prepareRun[Q, R](query: Q)(implicit qr: Queryable[Q, R]) = {
+    private def prepareRun[Q, R](query: Q, fetchSize: Int, queryTimeoutSeconds: Int)(implicit qr: Queryable[Q, R]) = {
+
       if (autoCommit) connection.setAutoCommit(true)
       val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
       val statement = connection.prepareStatement(str)
+
+      Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
+      Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds).find(_ != -1).foreach(statement.setQueryTimeout)
 
       for ((p, n) <- params.zipWithIndex) {
         p.mappedType.asInstanceOf[MappedType[Any]].put(statement, n + 1, p.value)
@@ -141,9 +145,9 @@ object DbApi {
       (exprs, statement)
     }
 
-    def stream[Q, R](query: Q)(implicit qr: Queryable[Q, Seq[R]]): Generator[R] = new Generator[R] {
+    def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, Seq[R]]): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val (exprs, statement) = prepareRun(query)
+        val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
         val resultSet: ResultSet = statement.executeQuery()
         try {
