@@ -16,14 +16,13 @@ class DbApi(
     rollBack0: () => Unit
 ) {
   val savepoints = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
-  def savepointTransaction[T](block: DbApi.SavepointApi => T): T = {
+  def savepointTransaction[T](block: DbApi.Savepoint => T): T = {
     val savepoint = connection.setSavepoint()
     savepoints.append(savepoint)
 
     try {
       val res = block(new DbApi.SavepointApiImpl(
-        () => savepoint.getSavepointId,
-        () => savepoint.getSavepointName,
+        savepoint,
         () => rollbackSavepoint(savepoint)
       ))
       if (savepoints.lastOption.exists(_ eq savepoint)) {
@@ -123,19 +122,18 @@ class DbApi(
 }
 
 object DbApi {
-  trait SavepointApi {
+  trait Savepoint {
     def savepointId: Int
     def savepointName: String
     def rollback(): Unit
   }
 
   class SavepointApiImpl(
-      savepointId0: () => Int,
-      savepointName0: () => String,
+      savepoint: java.sql.Savepoint,
       rollback0: () => Unit
-  ) extends SavepointApi {
-    def savepointId = savepointId0()
-    def savepointName = savepointName0()
+  ) extends Savepoint {
+    def savepointId = savepoint.getSavepointId
+    def savepointName = savepoint.getSavepointName
     def rollback() = rollback0()
   }
 
