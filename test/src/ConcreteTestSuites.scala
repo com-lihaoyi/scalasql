@@ -1,5 +1,5 @@
 package scalasql
-import scaalsql.api.TransactionTests
+import scalasql.api.{TransactionTests, DbApiTests}
 import operations.{
   ExprBooleanOpsTests,
   ExprNumericOpsTests,
@@ -54,6 +54,7 @@ package mysql {
   object OptionalTests extends datatypes.OptionalTests with MySqlSuite
 
   object TransactionTests extends TransactionTests with MySqlSuite
+  object DbApiTests extends DbApiTests with MySqlSuite
 }
 
 package postgres {
@@ -81,6 +82,7 @@ package postgres {
   object OptionalTests extends datatypes.OptionalTests with PostgresSuite
 
   object TransactionTests extends TransactionTests with PostgresSuite
+  object DbApiTests extends DbApiTests with PostgresSuite
 }
 
 package sqlite {
@@ -108,6 +110,7 @@ package sqlite {
   object OptionalTests extends datatypes.OptionalTests with SqliteSuite
 
   object TransactionTests extends TransactionTests with SqliteSuite
+  object DbApiTests extends DbApiTests with SqliteSuite
 }
 
 package hsqldb {
@@ -138,6 +141,7 @@ package hsqldb {
   object OptionalTests extends datatypes.OptionalTests with HsqlDbSuite
 
   object TransactionTests extends TransactionTests with HsqlDbSuite
+  object DbApiTests extends DbApiTests with HsqlDbSuite
 }
 
 package h2 {
@@ -166,4 +170,5 @@ package h2 {
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
   object OptionalTests extends datatypes.OptionalTests with H2Suite
   object TransactionTests extends TransactionTests with H2Suite
+  object DbApiTests extends DbApiTests with H2Suite
 }

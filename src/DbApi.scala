@@ -1,11 +1,12 @@
 package scalasql
 
+import geny.Generator
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import scalasql.dialects.DialectConfig
-import scalasql.utils.FlatJson
+import scalasql.utils.{FlatJson, OptionPickler}
 
-import java.sql.{ResultSet, Statement}
+import java.sql.{PreparedStatement, ResultSet, Statement}
 
 trait DbApi {
   def savepoint[T](block: DbApi.Savepoint => T): T
@@ -13,6 +14,7 @@ trait DbApi {
 
   def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
   def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R
+  def stream[Q, R](query: Q)(implicit qr: Queryable[Q, Seq[R]]): Generator[R]
   def runRaw(sql: String): Unit
 }
 
@@ -101,13 +103,7 @@ object DbApi {
     }
 
     def run[Q, R](query: Q)(implicit qr: Queryable[Q, R]): R = {
-      if (autoCommit) connection.setAutoCommit(true)
-      val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
-      val statement = connection.prepareStatement(str)
-
-      for ((p, n) <- params.zipWithIndex) {
-        p.mappedType.asInstanceOf[scalasql.MappedType[Any]].put(statement, n + 1, p.value)
-      }
+      val (exprs, statement) = prepareRun(query)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
       else {
@@ -127,6 +123,39 @@ object DbApi {
             }
             arrVisitor.visitEnd(-1)
           }
+        } finally {
+          resultSet.close()
+          statement.close()
+        }
+      }
+    }
+
+    private def prepareRun[Q, R](query: Q)(implicit qr: Queryable[Q, R]) = {
+      if (autoCommit) connection.setAutoCommit(true)
+      val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
+      val statement = connection.prepareStatement(str)
+
+      for ((p, n) <- params.zipWithIndex) {
+        p.mappedType.asInstanceOf[MappedType[Any]].put(statement, n + 1, p.value)
+      }
+      (exprs, statement)
+    }
+
+    def stream[Q, R](query: Q)(implicit qr: Queryable[Q, Seq[R]]): Generator[R] = new Generator[R] {
+      def generate(handleItem: R => Generator.Action): Generator.Action = {
+        val (exprs, statement) = prepareRun(query)
+
+        val resultSet: ResultSet = statement.executeQuery()
+        try {
+          val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader[Seq, R]].r
+          var action: Generator.Action = Generator.Continue
+          while (resultSet.next() && action == Generator.Continue) {
+
+            val rowRes = handleResultRow(resultSet, visitor, exprs, config)
+            action = handleItem(rowRes)
+          }
+
+          action
         } finally {
           resultSet.close()
           statement.close()

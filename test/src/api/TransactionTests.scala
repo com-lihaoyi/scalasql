@@ -1,4 +1,4 @@
-package scaalsql.api
+package scalasql.api
 
 import scalasql.Purchase
 import scalasql.utils.ScalaSqlSuite
