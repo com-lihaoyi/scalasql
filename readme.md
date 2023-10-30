@@ -192,28 +192,28 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
 
 ```
    {Table.select,update,map,
-    filter,join,aggregate}                 +-------->
-           |                               |
-           |                               |
-  {Expr[Int],Select[Q],Update[Q]      {Int,Seq[R],
-   CaseCls[Expr],Tuple[Q]}         CaseCls[Id],Tuple[R]}
-           |                               |
-           |                               |
-           +-----------+       +-----------+
-                       |       |
-                       v       |
-           +-- DatabaseApi#run(q: Q): R <--+
-           |                               |
-         Q |                               | R
-           |                               |
-           v                               |
- Queryable#{walk,toSqlQuery}       Queryable#valueReader
-           |    |                     ^    ^
-           |    |                     |    |
-    SqlStr |    +---Seq[MappedType]---+    | ResultSet
-           |                               |
-           |                               |
-           +-----> java.sql.execute -------+
+    filter,join,aggregate}                         +-------->
+           |                                       |
+           |                                       |
+  {Expr[Int],Select[Q],Update[Q]              {Int,Seq[R],
+   CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
+           |                                       |
+           |                                       |
+           +-------------+           +-------------+
+                         |           |
+                         v           |
+           +------ DatabaseApi#run(q: Q): R <------+
+           |                                       |
+         Q |                                       | R
+           |                                       |
+           v                                       |
+ Queryable#{walk,toSqlQuery}           Queryable#valueReader
+           |    |                            ^     ^
+           |    |                            |     |
+    SqlStr |    +------Seq[MappedType]-------+     | ResultSet
+           |                                       |
+           |                                       |
+           +---------> java.sql.execute -----------+
 ```
 
 1. We start off constructing a query of type `Q`: an expression, query, or
