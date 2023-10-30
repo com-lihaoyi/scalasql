@@ -231,15 +231,15 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("orElse") - checker(
-      query = OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2).getOrElse(-1))),
+      query = OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2))),
       sql = """
         SELECT
-          COALESCE(COALESCE(opt_cols0.my_int, opt_cols0.my_int2), ?) as res__my_int,
+          COALESCE(opt_cols0.my_int, opt_cols0.my_int2) as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
-        OptCols[Id](Some(-1), None),
+        OptCols[Id](None, None),
         OptCols[Id](Some(1), Some(2)),
         OptCols[Id](Some(3), None),
         OptCols[Id](Some(4), Some(4))
