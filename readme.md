@@ -283,3 +283,4 @@ their own operations not provided by the base library.
 * `.forceSubquery` support
 * Flat joins (Quill Style)
 * Dot-delimited result names
+* Operator to turn a generic `Select[R]` into an `Expr[V]`, assuming it's a single row and column
