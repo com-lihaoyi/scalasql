@@ -64,7 +64,7 @@ trait TransactionTests extends ScalaSqlSuite {
           db.run(Purchase.delete(_.id <= 3)) ==> 3
           db.run(Purchase.select.size) ==> 4
 
-          db.savepointTransaction { sp =>
+          db.savepoint { sp =>
             db.run(Purchase.delete(_ => true)) ==> 4
             db.run(Purchase.select.size) ==> 0
           }
@@ -83,7 +83,7 @@ trait TransactionTests extends ScalaSqlSuite {
           db.run(Purchase.select.size) ==> 4
 
           try {
-            db.savepointTransaction { sp =>
+            db.savepoint { sp =>
               db.run(Purchase.delete(_ => true)) ==> 4
               db.run(Purchase.select.size) ==> 0
               throw new FooException
@@ -104,7 +104,7 @@ trait TransactionTests extends ScalaSqlSuite {
           db.run(Purchase.delete(_.id <= 3)) ==> 3
           db.run(Purchase.select.size) ==> 4
 
-          db.savepointTransaction { sp =>
+          db.savepoint { sp =>
             db.run(Purchase.delete(_ => true)) ==> 4
             db.run(Purchase.select.size) ==> 0
             sp.rollback()
@@ -126,7 +126,7 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.select.size) ==> 4
 
             try {
-              db.savepointTransaction { sp =>
+              db.savepoint { sp =>
                 db.run(Purchase.delete(_ => true)) ==> 4
                 db.run(Purchase.select.size) ==> 0
                 throw new FooException
@@ -153,7 +153,7 @@ trait TransactionTests extends ScalaSqlSuite {
           db.run(Purchase.delete(_.id <= 3)) ==> 3
           db.run(Purchase.select.size) ==> 4
 
-          db.savepointTransaction { sp =>
+          db.savepoint { sp =>
             db.run(Purchase.delete(_ => true)) ==> 4
             db.run(Purchase.select.size) ==> 0
             db.rollback()
@@ -175,11 +175,11 @@ trait TransactionTests extends ScalaSqlSuite {
           db.run(Purchase.delete(_.id <= 2)) ==> 2
           db.run(Purchase.select.size) ==> 5
 
-          db.savepointTransaction { sp1 =>
+          db.savepoint { sp1 =>
             db.run(Purchase.delete(_.id <= 4)) ==> 2
             db.run(Purchase.select.size) ==> 3
 
-            db.savepointTransaction { sp2 =>
+            db.savepoint { sp2 =>
               db.run(Purchase.delete(_.id <= 6)) ==> 2
               db.run(Purchase.select.size) ==> 1
             }
@@ -201,12 +201,12 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
               try {
-                db.savepointTransaction { sp2 =>
+                db.savepoint { sp2 =>
                   db.run(Purchase.delete(_.id <= 6)) ==> 2
                   db.run(Purchase.select.size) ==> 1
                   throw new FooException
@@ -230,11 +230,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.select.size) ==> 5
 
             try {
-              db.savepointTransaction { sp1 =>
+              db.savepoint { sp1 =>
                 db.run(Purchase.delete(_.id <= 4)) ==> 2
                 db.run(Purchase.select.size) ==> 3
 
-                db.savepointTransaction { sp2 =>
+                db.savepoint { sp2 =>
                   db.run(Purchase.delete(_.id <= 6)) ==> 2
                   db.run(Purchase.select.size) ==> 1
                 }
@@ -258,11 +258,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.select.size) ==> 5
 
             try {
-              db.savepointTransaction { sp1 =>
+              db.savepoint { sp1 =>
                 db.run(Purchase.delete(_.id <= 4)) ==> 2
                 db.run(Purchase.select.size) ==> 3
 
-                db.savepointTransaction { sp2 =>
+                db.savepoint { sp2 =>
                   db.run(Purchase.delete(_.id <= 6)) ==> 2
                   db.run(Purchase.select.size) ==> 1
                   throw new FooException
@@ -284,11 +284,11 @@ trait TransactionTests extends ScalaSqlSuite {
               db.run(Purchase.delete(_.id <= 2)) ==> 2
               db.run(Purchase.select.size) ==> 5
 
-              db.savepointTransaction { sp1 =>
+              db.savepoint { sp1 =>
                 db.run(Purchase.delete(_.id <= 4)) ==> 2
                 db.run(Purchase.select.size) ==> 3
 
-                db.savepointTransaction { sp2 =>
+                db.savepoint { sp2 =>
                   db.run(Purchase.delete(_.id <= 6)) ==> 2
                   db.run(Purchase.select.size) ==> 1
                 }
@@ -309,11 +309,11 @@ trait TransactionTests extends ScalaSqlSuite {
               db.run(Purchase.delete(_.id <= 2)) ==> 2
               db.run(Purchase.select.size) ==> 5
 
-              db.savepointTransaction { sp1 =>
+              db.savepoint { sp1 =>
                 db.run(Purchase.delete(_.id <= 4)) ==> 2
                 db.run(Purchase.select.size) ==> 3
 
-                db.savepointTransaction { sp2 =>
+                db.savepoint { sp2 =>
                   db.run(Purchase.delete(_.id <= 6)) ==> 2
                   db.run(Purchase.select.size) ==> 1
                   throw new FooException
@@ -336,11 +336,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
-              db.savepointTransaction { sp2 =>
+              db.savepoint { sp2 =>
                 db.run(Purchase.delete(_.id <= 6)) ==> 2
                 db.run(Purchase.select.size) ==> 1
                 sp2.rollback()
@@ -362,11 +362,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
-              db.savepointTransaction { sp2 =>
+              db.savepoint { sp2 =>
                 db.run(Purchase.delete(_.id <= 6)) ==> 2
                 db.run(Purchase.select.size) ==> 1
               }
@@ -389,11 +389,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
-              db.savepointTransaction { sp2 =>
+              db.savepoint { sp2 =>
                 db.run(Purchase.delete(_.id <= 6)) ==> 2
                 db.run(Purchase.select.size) ==> 1
                 sp1.rollback()
@@ -415,11 +415,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
-              db.savepointTransaction { sp2 =>
+              db.savepoint { sp2 =>
                 db.run(Purchase.delete(_.id <= 6)) ==> 2
                 db.run(Purchase.select.size) ==> 1
               }
@@ -441,11 +441,11 @@ trait TransactionTests extends ScalaSqlSuite {
             db.run(Purchase.delete(_.id <= 2)) ==> 2
             db.run(Purchase.select.size) ==> 5
 
-            db.savepointTransaction { sp1 =>
+            db.savepoint { sp1 =>
               db.run(Purchase.delete(_.id <= 4)) ==> 2
               db.run(Purchase.select.size) ==> 3
 
-              db.savepointTransaction { sp2 =>
+              db.savepoint { sp2 =>
                 db.run(Purchase.delete(_.id <= 6)) ==> 2
                 db.run(Purchase.select.size) ==> 1
                 db.rollback()

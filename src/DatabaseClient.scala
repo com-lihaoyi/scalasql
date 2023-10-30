@@ -9,7 +9,7 @@ class DatabaseClient(
 
   def transaction[T](block: DbApi => T): T = {
     connection.setAutoCommit(false)
-    val txn = new DbApi(connection, config, dialectConfig, false, () => connection.rollback())
+    val txn = new DbApi.Impl(connection, config, dialectConfig, false, () => connection.rollback())
     try block(txn)
     catch {
       case e: Throwable =>
@@ -20,6 +20,6 @@ class DatabaseClient(
 
   def autoCommit: DbApi = {
     connection.setAutoCommit(true)
-    new DbApi(connection, config, dialectConfig, autoCommit = true, () => ())
+    new DbApi.Impl(connection, config, dialectConfig, autoCommit = true, () => ())
   }
 }
