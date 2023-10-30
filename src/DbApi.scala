@@ -6,7 +6,7 @@ import scalasql.DbApi.handleResultRow
 import scalasql.dialects.DialectConfig
 import scalasql.utils.FlatJson
 
-import java.sql.{JDBCType, ResultSet, Savepoint, Statement}
+import java.sql.{ResultSet, Savepoint, Statement}
 
 class DbApi(
     connection: java.sql.Connection,
