@@ -55,11 +55,7 @@ class Txn(
     val queryStr = flattened.queryParts.zipAll(flattened.params, "", null).map {
       case (part, null) => part
       case (part, param) =>
-        val jdbcTypeString = param.mappedType.jdbcType match {
-          case JDBCType.TIMESTAMP_WITH_TIMEZONE => "TIMESTAMP WITH TIME ZONE"
-          case JDBCType.TIME_WITH_TIMEZONE => "TIME WITH TIME ZONE"
-          case n => n.toString
-        }
+        val jdbcTypeString = param.mappedType.typeString
         if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
     }.mkString
 

@@ -24,6 +24,7 @@ import java.time.{
 // https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
 sealed trait MappedType[T] {
   def jdbcType: JDBCType
+  def typeString: String = jdbcType.toString
   def nullable: Boolean = false
   def get(r: ResultSet, idx: Int): T
   def put(r: PreparedStatement, idx: Int, v: T): Unit
@@ -91,6 +92,7 @@ object MappedType {
 
   implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
+    override def typeString = "TIMESTAMP WITH TIME ZONE"
     def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant.atZone(ZoneId.systemDefault())
     def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r
       .setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
@@ -105,12 +107,15 @@ object MappedType {
 
   implicit object OffsetTimeType extends MappedType[OffsetTime] {
     def jdbcType = JDBCType.TIME_WITH_TIMEZONE
+    override def typeString = "TIME WITH TIME ZONE"
     def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[OffsetTime])
     def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setObject(idx, v)
   }
 
   implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
+    override def typeString = "TIMESTAMP WITH TIME ZONE"
+
     def get(r: ResultSet, idx: Int) = {
       r.getTimestamp(idx).toInstant.atOffset(OffsetDateTime.now().getOffset)
     }
