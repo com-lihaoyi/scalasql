@@ -2,12 +2,16 @@ package scalasql.dialects
 
 import scalasql._
 import scalasql.query.{
+  AscDesc,
+  CompoundSelect,
   Expr,
-  InsertReturning,
-  InsertSelect,
+  From,
+  GroupBy,
   InsertValues,
+  Join,
   Joinable,
-  OnConflict,
+  Nulls,
+  OrderBy,
   Query,
   TableRef,
   Update
@@ -42,6 +46,13 @@ object MySqlDialect extends MySqlDialect {
     override def update: Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = t.tableRef
       new Update(Update.fromTable(t.metadata.vExpr(ref), ref)(t.containerQr))
+    }
+
+    override def select: Select[V[Expr], V[Id]] = {
+      val ref = t.tableRef
+      new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
+        t.containerQr
+      )
     }
   }
 
@@ -120,4 +131,83 @@ object MySqlDialect extends MySqlDialect {
       (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
     }
   }
+
+  trait Select[Q, R] extends scalasql.query.Select[Q, R] {
+    override def newCompoundSelect[Q, R](
+        lhs: scalasql.query.SimpleSelect[Q, R],
+        compoundOps: Seq[CompoundSelect.Op[Q, R]],
+        orderBy: Option[OrderBy],
+        limit: Option[Int],
+        offset: Option[Int]
+    )(implicit qr: Queryable[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+      new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+    }
+
+    override def newSimpleSelect[Q, R](
+        expr: Q,
+        exprPrefix: Option[String],
+        from: Seq[From],
+        joins: Seq[Join],
+        where: Seq[Expr[_]],
+        groupBy0: Option[GroupBy]
+    )(implicit qr: Queryable[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+      new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+    }
+
+  }
+  class SimpleSelect[Q, R](
+      expr: Q,
+      exprPrefix: Option[String],
+      from: Seq[From],
+      joins: Seq[Join],
+      where: Seq[Expr[_]],
+      groupBy0: Option[GroupBy]
+  )(implicit qr: Queryable[Q, R])
+      extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+      with Select[Q, R]
+
+  class CompoundSelect[Q, R](
+      lhs: scalasql.query.SimpleSelect[Q, R],
+      compoundOps: Seq[CompoundSelect.Op[Q, R]],
+      orderBy: Option[OrderBy],
+      limit: Option[Int],
+      offset: Option[Int]
+  )(implicit qr: Queryable[Q, R])
+      extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+      with Select[Q, R] {
+    override def toSqlQuery0(prevContext: Context) = {
+      new CompoundSelectRenderer(this, prevContext).toSqlStr()
+    }
+  }
+
+  class CompoundSelectRenderer[Q, R](
+      query: scalasql.query.CompoundSelect[Q, R],
+      prevContext: Context
+  ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
+
+    override def orderToToSqlStr[R, Q](
+        query: scalasql.query.CompoundSelect[Q, R],
+        newCtx: Context
+    ) = {
+      SqlStr.opt(query.orderBy) { orderBy =>
+        val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
+        // case OrderByCriteria(prop, AscNullsFirst | Asc)  => stmt"${prop.token} ASC"
+        // case OrderByCriteria(prop, DescNullsFirst)       => stmt"ISNULL(${prop.token}) DESC, ${prop.token} DESC"
+        // case OrderByCriteria(prop, AscNullsLast)         => stmt"ISNULL(${prop.token}) ASC, ${prop.token} ASC"
+        // case OrderByCriteria(prop, DescNullsLast | Desc) => stmt"${prop.token} DESC"
+        val str = (orderBy.ascDesc, orderBy.nulls) match{
+          case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
+          case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
+          case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr ASC"
+          case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
+          case (None, None) => exprStr
+          case (None, Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr"
+          case (None, Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr"
+        }
+
+      sql" ORDER BY $str"
+      }
+    }
+  }
+
 }

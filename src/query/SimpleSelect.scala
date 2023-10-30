@@ -24,17 +24,25 @@ import scalasql.utils.{FlatJson, OptionPickler}
  * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
  * https://www.postgresql.org/docs/current/sql-select.html
  */
-case class SimpleSelect[Q, R](
-    expr: Q,
-    exprPrefix: Option[String],
-    from: Seq[From],
-    joins: Seq[Join],
-    where: Seq[Expr[_]],
-    groupBy0: Option[GroupBy]
+class SimpleSelect[Q, R](
+    val expr: Q,
+    val exprPrefix: Option[String],
+    val from: Seq[From],
+    val joins: Seq[Join],
+    val where: Seq[Expr[_]],
+    val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable[Q, R])
     extends Select[Q, R] {
   override def select = this
 
+  def copy[Q, R](
+      expr: Q = this.expr,
+      exprPrefix: Option[String] = this.exprPrefix,
+      from: Seq[From] = this.from,
+      joins: Seq[Join] = this.joins,
+      where: Seq[Expr[_]] = this.where,
+      groupBy0: Option[GroupBy] = this.groupBy0
+  )(implicit qr: Queryable[Q, R]) = newSimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
   def queryExpr[V: MappedType](
@@ -53,7 +61,7 @@ case class SimpleSelect[Q, R](
 
   def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr2: Queryable[Q2, R2]): Select[Q2, R2] = {
     val other = f(expr)
-    val simple = SimpleSelect.from(other)
+    val simple = simpleFrom(other)
     simple.copy(from = this.from ++ simple.from)
   }
 
@@ -69,7 +77,7 @@ case class SimpleSelect[Q, R](
     val thisTrivial = groupBy0.isEmpty
     val (otherJoin, otherSelect) = joinInfo(other, on)
 
-    SimpleSelect(
+    copy(
       expr = (expr, otherSelect.expr),
       exprPrefix = if (thisTrivial) exprPrefix else None,
       from = if (thisTrivial) from else Seq(this.subquery),
@@ -95,7 +103,7 @@ case class SimpleSelect[Q, R](
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
     val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
     if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
-    else SimpleSelect(
+    else copy(
       expr = newExpr,
       exprPrefix = exprPrefix,
       from = Seq(this.subquery),
@@ -106,7 +114,7 @@ case class SimpleSelect[Q, R](
   }
 
   def sortBy(f: Q => Expr[_]) = {
-    CompoundSelect(this, Nil, Some(OrderBy(f(expr), None, None)), None, None)
+    newCompoundSelect(this, Nil, Some(OrderBy(f(expr), None, None)), None, None)
   }
 
   def asc = throw new Exception(".asc must follow .sortBy")
@@ -115,24 +123,20 @@ case class SimpleSelect[Q, R](
   def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q, R]) = {
-    val op2 = CompoundSelect.Op(op, SimpleSelect.from(other))
-    CompoundSelect(this, Seq(op2), None, None, None)
+    val op2 = CompoundSelect.Op(op, simpleFrom(other))
+    newCompoundSelect(this, Seq(op2), None, None, None)
   }
 
-  def drop(n: Int) = CompoundSelect(this, Nil, None, None, Some(n))
-  def take(n: Int) = CompoundSelect(this, Nil, None, Some(n), None)
+  def drop(n: Int) = newCompoundSelect(this, Nil, None, None, Some(n))
+  def take(n: Int) = newCompoundSelect(this, Nil, None, Some(n), None)
 
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def toSqlQuery0(prevContext: Context) = SimpleSelect.toSqlStr(this, qr, prevContext)
+
 }
 
 object SimpleSelect {
-  def from[Q, R](s: Select[Q, R]) = s match {
-    case s: SimpleSelect[Q, R] => s
-    case s: CompoundSelect[Q, R] =>
-      SimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
-  }
 
   def toSqlStr[Q, R](
       query: SimpleSelect[Q, R],

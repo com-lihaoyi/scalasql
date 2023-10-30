@@ -264,72 +264,107 @@ trait OptionalTests extends ScalaSqlSuite {
         OptCols[Id](None, Some(4))
       )
     )
-    test("sorting"){
+    test("sorting") {
       test("nullsLast") - checker(
         query = OptCols.select.sortBy(_.myInt).nullsLast,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int NULLS LAST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int NULLS LAST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int IS NULL ASC, res__my_int
+          """,
+        ),
         value = Seq(
           OptCols[Id](Some(1), Some(2)),
-          OptCols[Id](Some(3),  None),
+          OptCols[Id](Some(3), None),
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4))
         )
       )
       test("nullsFirst") - checker(
         query = OptCols.select.sortBy(_.myInt).nullsFirst,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int NULLS FIRST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int NULLS FIRST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int IS NULL DESC, res__my_int
+          """
+        ),
         value = Seq(
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4)),
           OptCols[Id](Some(1), Some(2)),
-          OptCols[Id](Some(3),  None),
+          OptCols[Id](Some(3), None)
         )
       )
-      test("nullsLast") - checker(
+      test("ascNullsLast") - checker(
         query = OptCols.select.sortBy(_.myInt).asc.nullsLast,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int ASC NULLS LAST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int ASC NULLS LAST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int IS NULL ASC, res__my_int ASC
+          """
+        ),
         value = Seq(
           OptCols[Id](Some(1), Some(2)),
-          OptCols[Id](Some(3),  None),
+          OptCols[Id](Some(3), None),
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4))
         )
       )
-      test("nullsFirst") - checker(
+      test("ascNullsFirst") - checker(
         query = OptCols.select.sortBy(_.myInt).asc.nullsFirst,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int ASC NULLS FIRST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int ASC NULLS FIRST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int ASC
+          """
+        ),
         value = Seq(
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4)),
           OptCols[Id](Some(1), Some(2)),
-          OptCols[Id](Some(3),  None),
+          OptCols[Id](Some(3), None)
         )
       )
       test("descNullsLast") - checker(
         query = OptCols.select.sortBy(_.myInt).desc.nullsLast,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int DESC NULLS LAST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int DESC NULLS LAST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int DESC
+          """
+        ),
         value = Seq(
-          OptCols[Id](Some(3),  None),
+          OptCols[Id](Some(3), None),
           OptCols[Id](Some(1), Some(2)),
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4))
@@ -337,16 +372,23 @@ trait OptionalTests extends ScalaSqlSuite {
       )
       test("descNullsFirst") - checker(
         query = OptCols.select.sortBy(_.myInt).desc.nullsFirst,
-        sql = """
-          SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          ORDER BY res__my_int DESC NULLS FIRST
-        """,
+        sqls = Seq(
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int DESC NULLS FIRST
+          """,
+          """
+            SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY res__my_int IS NULL DESC, res__my_int DESC
+          """
+        ),
         value = Seq(
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4)),
-          OptCols[Id](Some(3),  None),
-          OptCols[Id](Some(1), Some(2)),
+          OptCols[Id](Some(3), None),
+          OptCols[Id](Some(1), Some(2))
         )
       )
     }

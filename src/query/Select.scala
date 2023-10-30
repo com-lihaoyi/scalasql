@@ -13,6 +13,25 @@ trait Select[Q, R]
     with JoinOps[Select, Q, R]
     with Query.Multiple[R] {
 
+  def newCompoundSelect[Q, R](
+      lhs: SimpleSelect[Q, R],
+      compoundOps: Seq[CompoundSelect.Op[Q, R]],
+      orderBy: Option[OrderBy],
+      limit: Option[Int],
+      offset: Option[Int]
+  )(implicit qr: Queryable[Q, R]): CompoundSelect[Q, R] =
+    new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+
+  def newSimpleSelect[Q, R](
+      expr: Q,
+      exprPrefix: Option[String],
+      from: Seq[From],
+      joins: Seq[Join],
+      where: Seq[Expr[_]],
+      groupBy0: Option[GroupBy]
+  )(implicit qr: Queryable[Q, R]): SimpleSelect[Q, R] =
+    new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+
   def qr: Queryable[Q, R]
   def isTrivialJoin: Boolean = false
   def select = this
@@ -61,10 +80,16 @@ trait Select[Q, R]
   ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
 
   def single: Query.Single[R] = new Query.Single(this)
+
+  def simpleFrom[Q, R](s: Select[Q, R]) = s match {
+    case s: SimpleSelect[Q, R] => s
+    case s: CompoundSelect[Q, R] =>
+      newSimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
+  }
 }
 
 object Select {
   def fromTable[T, R](e: T, table: TableRef)(implicit qr: Queryable[T, R]) = {
-    SimpleSelect(e, None, Seq(table), Nil, Nil, None)
+    new SimpleSelect(e, None, Seq(table), Nil, Nil, None)
   }
 }
