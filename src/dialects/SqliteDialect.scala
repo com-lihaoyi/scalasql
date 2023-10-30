@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{Id, Queryable, Table, operations}
+import scalasql.{Id, Queryable, Table, dialects, operations}
 import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, Join, Nulls, OrderBy, Select}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
@@ -13,7 +13,7 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
     new SqliteDialect.ExprStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
-    new MySqlDialect.TableOps(t)
+    new SqliteDialect.TableOps(t)
 }
 
 object SqliteDialect extends SqliteDialect {
