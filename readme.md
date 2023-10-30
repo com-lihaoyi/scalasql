@@ -282,3 +282,4 @@ their own operations not provided by the base library.
 * Fix `???`s in `CompoundSelect`
 * `.forceSubquery` support
 * Flat joins (Quill Style)
+* Dot-delimited result names
