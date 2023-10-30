@@ -2,35 +2,60 @@ package scalasql
 
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
-import scalasql.Txn.handleResultRow
+import scalasql.DbApi.handleResultRow
 import scalasql.dialects.DialectConfig
 import scalasql.utils.FlatJson
 
-import java.sql.{JDBCType, ResultSet, Statement}
+import java.sql.{JDBCType, ResultSet, Savepoint, Statement}
 
-class Txn(
+class DbApi(
     connection: java.sql.Connection,
     config: Config,
     dialectConfig: DialectConfig,
     autoCommit: Boolean,
     rollBack0: () => Unit
 ) {
-
-  def transaction[T](t: => T): T = {
-    val savePoint = connection.setSavepoint()
+  val savepoints = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
+  def savepointTransaction[T](block: DbApi.SavepointApi => T): T = {
+    val savepoint = connection.setSavepoint()
+    savepoints.append(savepoint)
 
     try {
-      val res = t
-      connection.releaseSavepoint(savePoint)
+      val res = block(new DbApi.SavepointApiImpl(
+        () => savepoint.getSavepointId,
+        () => savepoint.getSavepointName,
+        () => rollbackSavepoint(savepoint)
+      ))
+      if (savepoints.lastOption.exists(_ eq savepoint)) {
+        // Only release if this savepoint has not been rolled back,
+        // directly or indirectly
+        connection.releaseSavepoint(savepoint)
+      }
       res
     } catch {
-      case e =>
-        connection.rollback(savePoint)
+      case e: Throwable =>
+        rollbackSavepoint(savepoint)
         throw e
     }
   }
 
-  def rollBack() = rollBack0()
+  // Make sure we keep track of what savepoints are active on the stack, so we do
+  // not release or rollback the same savepoint multiple times even in the case of
+  // exceptions or explicit rollbacks
+  def rollbackSavepoint(savepoint: Savepoint) = {
+    savepoints.indexOf(savepoint) match {
+      case -1 => // do nothing
+      case savepointIndex =>
+        connection.rollback(savepoints(savepointIndex))
+        savepoints.takeInPlace(savepointIndex)
+    }
+  }
+
+  def rollback() = {
+    savepoints.clear()
+    rollBack0()
+  }
+
   def runRaw(sql: String) = {
     if (autoCommit) connection.setAutoCommit(true)
     val statement: Statement = connection.createStatement()
@@ -97,7 +122,23 @@ class Txn(
   }
 }
 
-object Txn {
+object DbApi {
+  trait SavepointApi {
+    def savepointId: Int
+    def savepointName: String
+    def rollback(): Unit
+  }
+
+  class SavepointApiImpl(
+      savepointId0: () => Int,
+      savepointName0: () => String,
+      rollback0: () => Unit
+  ) extends SavepointApi {
+    def savepointId = savepointId0()
+    def savepointName = savepointName0()
+    def rollback() = rollback0()
+  }
+
   def handleResultRow[V](
       resultSet: ResultSet,
       rowVisitor: Visitor[_, V],

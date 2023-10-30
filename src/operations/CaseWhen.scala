@@ -15,11 +15,10 @@ class CaseWhen[T: MappedType](values: Seq[(Expr[Boolean], Expr[T])]) extends Exp
   def `else`(other: Expr[T]) = new CaseWhen.Else(values, other)
 }
 object CaseWhen {
-  private def renderWhens[T](values: Seq[(Expr[Boolean], Expr[T])])(implicit ctx: Context) = SqlStr.join(
-    values.map { case (when, then) => sql"WHEN $when THEN $then" },
-    sql" "
-  )
-  class Else[T: MappedType](values: Seq[(Expr[Boolean], Expr[T])], `else`: Expr[T]) extends Expr[T] {
+  private def renderWhens[T](values: Seq[(Expr[Boolean], Expr[T])])(implicit ctx: Context) = SqlStr
+    .join(values.map { case (when, then) => sql"WHEN $when THEN $then" }, sql" ")
+  class Else[T: MappedType](values: Seq[(Expr[Boolean], Expr[T])], `else`: Expr[T])
+      extends Expr[T] {
     def mappedType = implicitly
 
     def toSqlExpr0(implicit ctx: Context): SqlStr = {

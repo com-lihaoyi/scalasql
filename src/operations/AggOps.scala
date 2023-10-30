@@ -26,20 +26,24 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable[T, _]) {
     v.queryExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
 
   /** Computes the sum of column values */
-  def sumByOpt[V: Numeric: MappedType](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[Option[V]] =
-    v.queryExpr(expr => implicit ctx => sql"SUM(${f(expr)})")
+  def sumByOpt[V: Numeric: MappedType](f: T => Expr[V])(
+      implicit qr: Queryable[Expr[V], V]
+  ): Expr[Option[V]] = v.queryExpr(expr => implicit ctx => sql"SUM(${f(expr)})")
 
   /** Finds the minimum value in a column */
-  def minByOpt[V: Numeric: MappedType](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[Option[V]] =
-    v.queryExpr(expr => implicit ctx => sql"MIN(${f(expr)})")
+  def minByOpt[V: Numeric: MappedType](f: T => Expr[V])(
+      implicit qr: Queryable[Expr[V], V]
+  ): Expr[Option[V]] = v.queryExpr(expr => implicit ctx => sql"MIN(${f(expr)})")
 
   /** Finds the maximum value in a column */
-  def maxByOpt[V: Numeric: MappedType](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[Option[V]] =
-    v.queryExpr(expr => implicit ctx => sql"MAX(${f(expr)})")
+  def maxByOpt[V: Numeric: MappedType](f: T => Expr[V])(
+      implicit qr: Queryable[Expr[V], V]
+  ): Expr[Option[V]] = v.queryExpr(expr => implicit ctx => sql"MAX(${f(expr)})")
 
   /** Computes the average value of a column */
-  def avgByOpt[V: Numeric: MappedType](f: T => Expr[V])(implicit qr: Queryable[Expr[V], V]): Expr[Option[V]] =
-    v.queryExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
+  def avgByOpt[V: Numeric: MappedType](f: T => Expr[V])(
+      implicit qr: Queryable[Expr[V], V]
+  ): Expr[Option[V]] = v.queryExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
 
   /** TRUE if any value in a set is TRUE */
   def any(f: T => Expr[Boolean]): Expr[Boolean] = v

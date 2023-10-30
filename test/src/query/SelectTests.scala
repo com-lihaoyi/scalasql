@@ -688,10 +688,8 @@ trait SelectTests extends ScalaSqlSuite {
         query = Product.select.map(p =>
           caseWhen(
             (p.price > 200) -> (p.name + " EXPENSIVE"),
-            (p.price > 5) -> (p.name + " NORMAL"),
-          ).`else`{
-            p.name + " UNKNOWN"
-          }
+            (p.price > 5) -> (p.name + " NORMAL")
+          ).`else` { p.name + " UNKNOWN" }
         ),
         sqls = Seq(
           """
