@@ -195,7 +195,7 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
     filter,join,aggregate}                         +-------->
            |                                       |
            |                                       |
-{Expr[Int],Select[Q],Update[Q]              {Int,Seq[R],
+{Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
    CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
            |                                       |
            |                                       |
