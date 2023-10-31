@@ -30,7 +30,7 @@ object SqlStr {
       queryParts: Seq[String],
       params: Seq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
-      referencedExprs: Seq[Expr.Identity],
+      referencedExprs: Seq[Expr.Identity]
   )
 
   def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
@@ -80,7 +80,8 @@ object SqlStr {
     if (strs.isEmpty) sql"" else strs.reduce(_ + sep + _)
   }
 
-  def raw(s: String, referencedExprs: Seq[Expr.Identity] = Nil) = new SqlStr(Seq(s), Nil, false, referencedExprs)
+  def raw(s: String, referencedExprs: Seq[Expr.Identity] = Nil) =
+    new SqlStr(Seq(s), Nil, false, referencedExprs)
 
   trait Renderable {
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])

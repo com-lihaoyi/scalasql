@@ -275,8 +275,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       value = Seq("guitar", "james bond", "li haoyi", "skate board")
     )
 
-    test("intersectAggregate") - checker(
+    test("exceptAggregate") - checker(
       query = Product.select.map(p => (p.name.toLowerCase, p.price))
+        // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
+        // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
         .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
         .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
       sql = """
@@ -294,6 +296,25 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           FROM product product0) subquery0
       """,
       value = (123.45, 8.88)
+    )
+
+    test("unionAllAggregate") - checker(
+      query = Product.select.map(p => (p.name.toLowerCase, p.price))
+        // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
+        // as they are not selected by the enclosing query, and cannot affect the UNION ALL
+        .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+        .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))),
+      sql = """
+        SELECT
+          MAX(subquery0.res__1) as res__0,
+          MIN(subquery0.res__1) as res__1
+        FROM (SELECT product0.price as res__1
+          FROM product product0
+          UNION ALL
+          SELECT product0.price as res__1
+          FROM product product0) subquery0
+      """,
+      value = (1000.0, 0.1)
     )
 
   }

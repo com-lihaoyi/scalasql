@@ -139,67 +139,58 @@ class SimpleSelect[Q, R](
 
 object SimpleSelect {
 
-  def toSqlStr[Q, R](
-      query: SimpleSelect[Q, R],
-      prevContext: Context
-  ): Select.Info = new Select.Info {
-    lazy val computed = Context
-      .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
+  def toSqlStr[Q, R](query: SimpleSelect[Q, R], prevContext: Context): Select.Info =
+    new Select.Info {
+      lazy val computed = Context
+        .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
 
-    import computed.implicitCtx
+      import computed.implicitCtx
 
-
-
-    lazy val filtersOpt = SqlStr.optSeq(query.where) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
-    }
-
-    lazy val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
-      val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
-        sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
+      lazy val filtersOpt = SqlStr.optSeq(query.where) { where =>
+        sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
       }
-      sql" GROUP BY ${groupBy.expr}${havingOpt}"
-    }
 
-    lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
-      val str = (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
-        .mkString(prevContext.config.columnLabelDelimiter)
-      val exprId = Expr.getIdentity(v)
+      lazy val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
+        val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
+          sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
+        }
+        sql" GROUP BY ${groupBy.expr}${havingOpt}"
+      }
 
-      (exprId, SqlStr.raw(str, Seq(exprId)))
-    }.toMap
-    lazy val lhsMap = jsonQueryMap
+      lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
+        val str = (prevContext.config.columnLabelPrefix +: k)
+          .map(prevContext.config.columnNameMapper)
+          .mkString(prevContext.config.columnLabelDelimiter)
+        val exprId = Expr.getIdentity(v)
 
-    def render(liveExprs: Option[Set[Expr.Identity]]) = {
+        (exprId, SqlStr.raw(str, Seq(exprId)))
+      }.toMap
+      lazy val lhsMap = jsonQueryMap
 
-      val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
-      val exprStr = ExprsToSql(
-        query.flattenedExpr.filter(e => liveExprs.fold(true)(_.contains(Expr.getIdentity(e._2)))),
-        exprPrefix,
-        implicitCtx
-      )
+      def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
-
-      val innerLiveExprs = SqlStr
-        .flatten(
-          exprStr + filtersOpt + groupByOpt +
-          SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
+        val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+        val exprStr = ExprsToSql(
+          query.flattenedExpr.filter(e => liveExprs.fold(true)(_.contains(Expr.getIdentity(e._2)))),
+          exprPrefix,
+          implicitCtx
         )
-        .referencedExprs
-        .toSet
 
-      val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
+        val innerLiveExprs = liveExprs.getOrElse(Set()) ++ SqlStr.flatten(
+          exprStr + filtersOpt + groupByOpt +
+            SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
+        ).referencedExprs.toSet
 
-      val tables = SqlStr.join(
-        query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))),
-        sql", "
-      )
+        val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
 
-      exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+        val tables = SqlStr
+          .join(query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
+
+        exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+      }
+
+      lazy val context = implicitCtx
+
+      lazy val mappedTypes = query.flattenedExpr.map(t => Expr.getMappedType(t._2))
     }
-
-    lazy val context = implicitCtx
-
-    lazy val mappedTypes = query.flattenedExpr.map(t => Expr.getMappedType(t._2))
-  }
 }

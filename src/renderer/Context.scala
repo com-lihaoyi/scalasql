@@ -14,7 +14,10 @@ case class Context(
 object Context {
   case class Computed(
       namedFromsMap: Map[From, String],
-      fromSelectables: Map[From, (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)],
+      fromSelectables: Map[
+        From,
+        (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)
+      ],
       exprNaming: Map[Expr.Identity, SqlStr],
       ctx: Context
   ) {
@@ -38,15 +41,19 @@ object Context {
 
     def computeSelectable(t: From) = t match {
       case t: TableRef => (
-        Map.empty[Expr.Identity, SqlStr],
-        (liveExprs: Option[Set[Expr.Identity]]) =>
+          Map.empty[Expr.Identity, SqlStr],
+          (liveExprs: Option[Set[Expr.Identity]]) =>
             SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
               SqlStr.raw(namedFromsMap(t))
         )
 
       case t: SubqueryRef[_, _] =>
         val toSqlQuery = t.value.toSqlQuery0(prevContext)
-        (toSqlQuery.lhsMap, (liveExprs: Option[Set[Expr.Identity]]) => sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}")
+        (
+          toSqlQuery.lhsMap,
+          (liveExprs: Option[Set[Expr.Identity]]) =>
+            sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
+        )
     }
 
     val fromSelectables = selectables.map(f => (f, computeSelectable(f))).toMap

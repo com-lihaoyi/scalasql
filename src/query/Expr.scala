@@ -22,9 +22,7 @@ trait Expr[T] extends SqlStr.Renderable {
   override def equals(other: Any): Boolean = throw new Exception(
     "Expr#equals is not defined. Use Expr#exprIdentity for your equality checks"
   )
-  private lazy val exprIdentity: Expr.Identity = new Expr.Identity(() =>
-    SqlStr.flatten(toSqlExpr0(Context(Map(), Map(), new Config{}, ""))).queryParts.mkString("?")
-  )
+  private lazy val exprIdentity: Expr.Identity = new Expr.Identity()
   private def exprToString: String = super.toString
 }
 
@@ -33,9 +31,7 @@ object Expr {
   def getToString[T](e: Expr[T]): String = e.exprToString
 
   def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
-  class Identity(toString0: () => String){
-    override def toString() = toString0()
-  }
+  class Identity()
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](
       implicit valueReader0: OptionPickler.Reader[T]

@@ -20,7 +20,10 @@ object SelectToSql {
 
   def joinsToSqlStr(
       joins: Seq[Join],
-      fromSelectables: Map[From, (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)],
+      fromSelectables: Map[
+        From,
+        (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)
+      ],
       liveExprs: Option[Set[Expr.Identity]]
   )(implicit ctx: Context) = {
     SqlStr.join(joins.map { join =>
