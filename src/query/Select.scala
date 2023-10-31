@@ -75,9 +75,7 @@ trait Select[Q, R]
   def walk() = qr.walk(expr)
   override def singleRow = false
 
-  def toSqlQuery0(
-      prevContext: Context
-  ): Select.Info
+  def toSqlQuery0(prevContext: Context): Select.Info
 
   def single: Query.Single[R] = new Query.Single(this)
 
@@ -92,8 +90,8 @@ trait Select[Q, R]
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
 }
 
-object Select{
-  trait Info{
+object Select {
+  trait Info {
     def lhsMap: Map[Expr.Identity, SqlStr]
     def res: SqlStr
     def context: Context
