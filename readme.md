@@ -279,7 +279,6 @@ their own operations not provided by the base library.
 * Scala 3 support
 * Extend sortBy to allow multiple columns each with their own ASC/DESC/NULLS handling
 * Tutorial Docs and Reference Docs
-* `.forceSubquery` support
 * Flat joins (Quill Style)
 * Dot-delimited result names
 * Operator to turn a generic `Select[R]` into an `Expr[V]`, assuming it's a single row and column

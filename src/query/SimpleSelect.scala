@@ -80,7 +80,7 @@ class SimpleSelect[Q, R](
     copy(
       expr = (expr, otherSelect.expr),
       exprPrefix = if (thisTrivial) exprPrefix else None,
-      from = if (thisTrivial) from else Seq(this.subquery),
+      from = if (thisTrivial) from else Seq(this.subqueryRef),
       joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
       where = if (thisTrivial) where else Nil,
       groupBy0 = if (thisTrivial) groupBy0 else None
@@ -106,7 +106,7 @@ class SimpleSelect[Q, R](
     else copy(
       expr = newExpr,
       exprPrefix = exprPrefix,
-      from = Seq(this.subquery),
+      from = Seq(this.subqueryRef),
       joins = Nil,
       where = Nil,
       groupBy0 = groupByOpt

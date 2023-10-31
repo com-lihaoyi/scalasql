@@ -161,6 +161,19 @@ trait SelectTests extends ScalaSqlSuite {
       )
     }
 
+    test("subquery") - checker(
+      query = Buyer.select.subquery.map(_.name),
+      sql = """
+        SELECT subquery0.res__name as res
+        FROM (SELECT
+            buyer0.id as res__id,
+            buyer0.name as res__name,
+            buyer0.date_of_birth as res__date_of_birth
+          FROM buyer buyer0) subquery0
+      """,
+      value = Seq("James Bond", "叉烧包", "Li Haoyi")
+    )
+
     test("filterMap") - checker(
       query = Product.select.filter(_.price < 100).map(_.name),
       sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",

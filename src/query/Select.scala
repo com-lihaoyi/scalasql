@@ -40,7 +40,7 @@ trait Select[Q, R]
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
-  def subquery(implicit qr: Queryable[Q, R]) = new SubqueryRef[Q, R](this, qr)
+  def subqueryRef(implicit qr: Queryable[Q, R]) = new SubqueryRef[Q, R](this, qr)
 
   def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
   def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
@@ -81,9 +81,11 @@ trait Select[Q, R]
 
   def single: Query.Single[R] = new Query.Single(this)
 
-  def simpleFrom[Q, R](s: Select[Q, R]) = s match {
+  def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s
-    case s: CompoundSelect[Q, R] =>
-      newSimpleSelect(s.expr, None, Seq(s.subquery(s.qr)), Nil, Nil, None)(s.qr)
+    case s: CompoundSelect[Q, R] => s.subquery
   }
+
+  def subquery: SimpleSelect[Q, R] =
+    newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
 }
