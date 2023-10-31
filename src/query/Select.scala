@@ -81,6 +81,8 @@ trait Select[Q, R]
 
   def single: Query.Single[R] = new Query.Single(this)
 
+  def exprQuery(implicit mt: MappedType[R]): Expr[R] = Expr { implicit ctx => this.toSqlQuery._1 }
+
   def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s
     case s: CompoundSelect[Q, R] => s.subquery

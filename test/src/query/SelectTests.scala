@@ -161,6 +161,33 @@ trait SelectTests extends ScalaSqlSuite {
       )
     }
 
+    test("exprQuery") - checker(
+      query = Product.select.map(p =>
+        (
+          p.name,
+          Purchase.select.filter(_.productId === p.id).sortBy(_.total).desc.take(1).map(_.total)
+            .exprQuery
+        )
+      ),
+      sql = """
+        SELECT
+          product0.name as res__0,
+          (SELECT purchase0.total as res
+            FROM purchase purchase0
+            WHERE purchase0.product_id = product0.id
+            ORDER BY res DESC
+            LIMIT 1) as res__1
+        FROM product product0""",
+      value = Seq(
+        ("Face Mask", 888.0),
+        ("Guitar", 900.0),
+        ("Socks", 15.7),
+        ("Skate Board", 493.8),
+        ("Camera", 10000.0),
+        ("Cookie", 1.3)
+      )
+    )
+
     test("subquery") - checker(
       query = Buyer.select.subquery.map(_.name),
       sql = """
