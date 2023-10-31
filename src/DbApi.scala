@@ -15,7 +15,11 @@ trait DbApi {
   def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
   def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, R]): R
   def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, Seq[R]]): Generator[R]
-  def runRaw(sql: String): Unit
+  def runUpdate(sql: SqlStr): Int
+  def runRawUpdate(sql: String, variables: Any*): Int
+  def runRawUpdateBatch(sql: Seq[String]): Seq[Int]
+  def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
+  def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T
 }
 
 object DbApi {
@@ -71,12 +75,54 @@ object DbApi {
       rollBack0()
     }
 
-    def runRaw(sql: String) = {
+    def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T = {
+      if (autoCommit) connection.setAutoCommit(true)
+      val statement = connection.prepareStatement(sql)
+      for((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
+
+      try block(statement.executeQuery())
+      finally statement.close()
+    }
+
+    def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
+      if (autoCommit) connection.setAutoCommit(true)
+      val flattened = SqlStr.flatten(sql)
+      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value):_*)(block)
+    }
+
+    def runRawUpdate(sql: String, variables: Any*): Int = {
+      if (autoCommit) connection.setAutoCommit(true)
+
+      // Sqlite and HsqlDb for some reason blow up if you try to do DDL
+      // like DROP TABLE or CREATE TABLE inside a prepared statement, so
+      // fall back to vanilla `createStatement`
+      if (variables.isEmpty){
+        val statement = connection.createStatement()
+        try statement.executeUpdate(sql)
+        finally statement.close()
+      }else{
+        val statement = connection.prepareStatement(sql)
+        for ((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
+        try statement.executeUpdate()
+        finally statement.close()
+      }
+    }
+
+    def runUpdate(sql: SqlStr): Int = {
+      if (autoCommit) connection.setAutoCommit(true)
+      val flattened = SqlStr.flatten(sql)
+      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value):_*)
+    }
+
+    def runRawUpdateBatch(sqls: Seq[String]) = {
+
       if (autoCommit) connection.setAutoCommit(true)
       val statement: Statement = connection.createStatement()
 
-      try statement.executeUpdate(sql)
-      finally statement.close()
+      try {
+        sqls.foreach(statement.addBatch)
+        statement.executeBatch()
+      } finally statement.close()
     }
 
     def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(

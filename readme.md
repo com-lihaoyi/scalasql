@@ -285,4 +285,3 @@ their own operations not provided by the base library.
 * Dot-delimited result names
 * Operator to turn a generic `Select[R]` into an `Expr[V]`, assuming it's a single row and column
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
-* Flesh out `.runRaw` to allow takin `SqlStr`s, returning `ResultSet`s, and custom result parsing

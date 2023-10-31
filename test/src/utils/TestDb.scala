@@ -19,8 +19,8 @@ class TestDb(
   val db = new DatabaseClient(connection, dialectConfig = dialectConfig, config = TestDb.Config)
 
   def reset() = {
-    db.autoCommit.runRaw(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
-    db.autoCommit.runRaw(os.read(os.pwd / "test" / "resources" / testDataFileName))
+    db.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
+    db.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
   def apply[T, V](
