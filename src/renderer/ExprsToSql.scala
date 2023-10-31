@@ -13,7 +13,7 @@ object ExprsToSql {
     FlatJson.flatten(flattenedExpr, context) match {
       case Seq((prefix, singleExpr))
           if prefix == context.config.columnLabelPrefix && singleExpr.isCompleteQuery =>
-        (flattenedExpr, singleExpr)
+        singleExpr
 
       case flatQuery =>
         val exprsStr = SqlStr.join(
@@ -23,7 +23,7 @@ object ExprsToSql {
           sql", "
         )
 
-        (flattenedExpr, prefix + exprsStr)
+        prefix + exprsStr
     }
   }
 }

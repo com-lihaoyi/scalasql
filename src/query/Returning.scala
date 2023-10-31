@@ -41,7 +41,8 @@ object Returning {
       import computed.implicitCtx
 
       val (prefix, prevExprs) = returnable.toSqlQuery
-      val (flattenedExpr, exprStr) = ExprsToSql.apply0(qr.walk(returning), implicitCtx, sql"")
+      val flattenedExpr = qr.walk(returning)
+      val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"
 
       (prefix + suffix, flattenedExpr.map(t => Expr.getMappedType(t._2)))

@@ -142,31 +142,32 @@ object SimpleSelect {
       query: SimpleSelect[Q, R],
       qr: Queryable[Q, R],
       prevContext: Context
-  ): Select.Info = {
-    val computed = Context
+  ): Select.Info = new Select.Info {
+    lazy val computed = Context
       .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
 
     import computed.implicitCtx
 
-    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
-    val (flattenedExpr, exprStr) = ExprsToSql(qr.walk(query.expr), exprPrefix, implicitCtx)
+    lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+    lazy val flattenedExpr = qr.walk(query.expr)
+    lazy val exprStr = ExprsToSql(flattenedExpr, exprPrefix, implicitCtx)
 
-    val tables = SqlStr.join(query.from.map(computed.fromSelectables(_)._2), sql", ")
+    lazy val tables = SqlStr.join(query.from.map(computed.fromSelectables(_)._2), sql", ")
 
-    val joins = joinsToSqlStr(query.joins, computed.fromSelectables)
+    lazy val joins = joinsToSqlStr(query.joins, computed.fromSelectables)
 
-    val filtersOpt = SqlStr.optSeq(query.where) { where =>
+    lazy val filtersOpt = SqlStr.optSeq(query.where) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
     }
 
-    val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
+    lazy val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
         sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
       }
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
     }
 
-    val jsonQueryMap = flattenedExpr.map { case (k, v) =>
+    lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
       (
         Expr.getIdentity(v),
         SqlStr.raw(
@@ -175,15 +176,12 @@ object SimpleSelect {
         )
       )
     }.toMap
+    lazy val lhsMap = jsonQueryMap
 
-    new Select.Info {
-      def lhsMap = jsonQueryMap
+    lazy val res = exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
 
-      def res = exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+    lazy val context = implicitCtx
 
-      def context = implicitCtx
-
-      def mappedTypes = flattenedExpr.map(t => Expr.getMappedType(t._2))
-    }
+    lazy val mappedTypes = flattenedExpr.map(t => Expr.getMappedType(t._2))
   }
 }

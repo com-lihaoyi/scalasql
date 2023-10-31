@@ -20,7 +20,7 @@ trait Queryable[-Q, R] {
 
   def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
     val walked = this.walk(q)
-    val res = ExprsToSql(walked, sql"", ctx)._2
+    val res = ExprsToSql(walked, sql"", ctx)
     (
       if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
       walked.map(t => Expr.getMappedType(t._2))
