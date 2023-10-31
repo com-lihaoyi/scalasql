@@ -102,29 +102,21 @@ object CompoundSelect {
 
     val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
 
-
-    val lhsMap = lhsToSqlQuery.lhsMap
-
-
-    val mappedTypes = lhsToSqlQuery.mappedTypes
-
-
     val newCtx = lhsToSqlQuery.context.copy(exprNaming = lhsToSqlQuery.context.exprNaming ++ lhsMap)
 
     val sortOpt = orderToSqlStr(newCtx)
 
     val (limitOpt, offsetOpt) = limitOffsetToSqlStr
 
+    val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt)
+      .referencedExprs
+
+    val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
+
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
-      val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt)
-        .referencedExprs
-      val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
       val innerLiveExprs = if (preserveAll) None else liveExprs.map(_ ++ newReferencedExpressions)
-      val lhsStr =
-        if (query.lhs.isInstanceOf[CompoundSelect[_, _]])
-          sql"(${lhsToSqlQuery.render(innerLiveExprs)})"
-        else lhsToSqlQuery.render(innerLiveExprs)
+      val lhsStr = lhsToSqlQuery.render(innerLiveExprs)
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
@@ -160,6 +152,11 @@ object CompoundSelect {
       }
       (limitOpt, offsetOpt)
     }
+
+    def lhsMap = lhsToSqlQuery.lhsMap
+
+
+    def mappedTypes = lhsToSqlQuery.mappedTypes
 
     def orderToSqlStr(newCtx: Context) = {
 

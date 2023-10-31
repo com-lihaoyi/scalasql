@@ -167,26 +167,37 @@ object SimpleSelect {
 
     val lhsMap = jsonQueryMap
 
+    val exprsStrs = {
+      FlatJson.flatten(query.flattenedExpr, implicitCtx).map { case (k, v) =>
+        sql"$v as ${SqlStr.raw(implicitCtx.config.tableNameMapper(k))}"
+      }
+    }
+
+    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
-      val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
-      val exprStr = ExprsToSql(
-        query.flattenedExpr.filter(e => liveExprs.fold(true)(_.contains(Expr.getIdentity(e._2)))),
-        exprPrefix,
-        implicitCtx
+      val exprStr = SqlStr.join(
+        query.flattenedExpr.zip(exprsStrs).collect{
+          case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
+        },
+        sql", "
       )
 
-      val innerLiveExprs = liveExprs.getOrElse(Set()) ++ SqlStr.flatten(
-        exprStr + filtersOpt + groupByOpt +
-          SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
-      ).referencedExprs.toSet
+      val innerLiveExprs = SqlStr
+        .flatten(
+          exprStr + filtersOpt + groupByOpt +
+            SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
+        )
+        .referencedExprs
+        .toSet
 
       val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
 
       val tables = SqlStr
         .join(query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
 
-      exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+      sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }
 
     val context = implicitCtx
