@@ -176,15 +176,13 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    override def toSqlQuery0(prevContext: Context) = {
-      new CompoundSelectRenderer(this, prevContext).toSqlStr()
-    }
+    override def toSqlQuery0(prevContext: Context) = new CompoundSelectRenderer(this, prevContext)
   }
 
   class CompoundSelectRenderer[Q, R](
       query: scalasql.query.CompoundSelect[Q, R],
       prevContext: Context
-  ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
+  ) extends scalasql.query.CompoundSelect.RenderInfo(query, prevContext) {
 
     override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
       .limitOffsetToSqlStr(query.limit, query.offset)

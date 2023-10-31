@@ -75,7 +75,7 @@ trait Select[Q, R]
   def walk() = qr.walk(expr)
   override def singleRow = false
 
-  def toSqlQuery0(prevContext: Context): Select.Info
+  def toSqlQuery0(prevContext: Context): Select.RenderInfo
 
   def single: Query.Single[R] = new Query.Single(this)
 
@@ -91,7 +91,7 @@ trait Select[Q, R]
 }
 
 object Select {
-  trait Info {
+  trait RenderInfo {
     def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
     def context: Context

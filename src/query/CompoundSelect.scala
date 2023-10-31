@@ -92,65 +92,66 @@ class CompoundSelect[Q, R](
 
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
-  def toSqlQuery0(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext).toSqlStr()
+  def toSqlQuery0(prevContext: Context) = new CompoundSelect.RenderInfo(this, prevContext)
 }
 
 object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
-  class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) {
+  class RenderInfo[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.RenderInfo {
 
-    def toSqlStr(): Select.Info = new Select.Info {
-      lazy val lhsToSqlQuery = query.lhs.toSqlQuery0(prevContext)
+    val lhsToSqlQuery = query.lhs.toSqlQuery0(prevContext)
 
-      lazy val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
 
-      lazy val sortOpt = orderToSqlStr(newCtx)
+    val lhsMap = lhsToSqlQuery.lhsMap
 
-      lazy val (limitOpt, offsetOpt) = limitOffsetToSqlStr
+    val context = lhsToSqlQuery.context
 
-      def render(liveExprs: Option[Set[Expr.Identity]]) = {
-        val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt)
-          .referencedExprs
-        val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
+    val mappedTypes = lhsToSqlQuery.mappedTypes
 
-        val innerLiveExprs = if (preserveAll) None else liveExprs.map(_ ++ newReferencedExpressions)
-        lazy val lhsStr =
-          if (query.lhs.isInstanceOf[CompoundSelect[_, _]])
-            sql"(${lhsToSqlQuery.render(innerLiveExprs)})"
-          else lhsToSqlQuery.render(innerLiveExprs)
 
-        lazy val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
-          val compoundStrs = compoundOps.map { op =>
-            val rhsToSqlQuery = op.rhs.toSqlQuery0(prevContext)
+    val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
 
-            // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
-            // because the expressions in the CompoundSelect's lhsMap correspond to those
-            // belonging to the LHS SimpleSelect, but we need the corresponding expressions
-            // belongong to the RHS SimpleSelect `liveExprs` analysis to work
-            val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-              val strs = l
-                .map(e => SqlStr.flatten(lhsToSqlQuery.lhsMap(e)).queryParts.mkString("?"))
+    val sortOpt = orderToSqlStr(newCtx)
 
-              rhsToSqlQuery.lhsMap.collect {
-                case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
-              }.toSet
-            }
-            sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(rhsInnerLiveExprs)}"
+    val (limitOpt, offsetOpt) = limitOffsetToSqlStr
+
+    def render(liveExprs: Option[Set[Expr.Identity]]) = {
+      val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt)
+        .referencedExprs
+      val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
+
+      val innerLiveExprs = if (preserveAll) None else liveExprs.map(_ ++ newReferencedExpressions)
+      val lhsStr =
+        if (query.lhs.isInstanceOf[CompoundSelect[_, _]])
+          sql"(${lhsToSqlQuery.render(innerLiveExprs)})"
+        else lhsToSqlQuery.render(innerLiveExprs)
+
+      val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
+        val compoundStrs = compoundOps.map { op =>
+          val rhsToSqlQuery = op.rhs.toSqlQuery0(prevContext)
+
+          // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
+          // because the expressions in the CompoundSelect's lhsMap correspond to those
+          // belonging to the LHS SimpleSelect, but we need the corresponding expressions
+          // belongong to the RHS SimpleSelect `liveExprs` analysis to work
+          val rhsInnerLiveExprs = innerLiveExprs.map { l =>
+            val strs = l
+              .map(e => SqlStr.flatten(lhsToSqlQuery.lhsMap(e)).queryParts.mkString("?"))
+
+            rhsToSqlQuery.lhsMap.collect {
+              case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
+            }.toSet
           }
-
-          SqlStr.join(compoundStrs)
+          sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(rhsInnerLiveExprs)}"
         }
 
-        lhsStr + compound + sortOpt + limitOpt + offsetOpt
+        SqlStr.join(compoundStrs)
       }
 
-      lazy val lhsMap = lhsToSqlQuery.lhsMap
-
-      lazy val context = lhsToSqlQuery.context
-
-      lazy val mappedTypes = lhsToSqlQuery.mappedTypes
+      lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
+
 
     def limitOffsetToSqlStr = {
       val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
@@ -183,6 +184,7 @@ object CompoundSelect {
 
         sql" ORDER BY " + orderStr
       }
+
     }
   }
 }
