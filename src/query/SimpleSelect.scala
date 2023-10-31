@@ -132,14 +132,14 @@ class SimpleSelect[Q, R](
 
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
-  def toSqlQuery0(prevContext: Context) = new SimpleSelect.RenderInfo(this, prevContext)
+  def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
 
   lazy val flattenedExpr = qr.walk(expr)
 }
 
 object SimpleSelect {
 
-  class RenderInfo[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.RenderInfo {
+  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     val computed = Context
       .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
 

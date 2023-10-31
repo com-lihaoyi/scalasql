@@ -30,7 +30,7 @@ trait MySqlDialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new MySqlDialect.TableOps(t)
 
-  implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]) =
+  implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
 }
 
@@ -176,13 +176,13 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    override def toSqlQuery0(prevContext: Context) = new CompoundSelectRenderer(this, prevContext)
+    override def getRenderer(prevContext: Context) = new CompoundSelectRenderer(this, prevContext)
   }
 
   class CompoundSelectRenderer[Q, R](
       query: scalasql.query.CompoundSelect[Q, R],
       prevContext: Context
-  ) extends scalasql.query.CompoundSelect.RenderInfo(query, prevContext) {
+  ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
 
     override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
       .limitOffsetToSqlStr(query.limit, query.offset)

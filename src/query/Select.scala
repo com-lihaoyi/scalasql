@@ -68,14 +68,14 @@ trait Select[Q, R]
   def take(n: Int): Select[Q, R]
 
   def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-    val to = toSqlQuery0(ctx)
+    val renderer = getRenderer(ctx)
 
-    (to.render(None).withCompleteQuery(true), to.mappedTypes)
+    (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)
   }
   def walk() = qr.walk(expr)
   override def singleRow = false
 
-  def toSqlQuery0(prevContext: Context): Select.RenderInfo
+  def getRenderer(prevContext: Context): Select.Renderer
 
   def single: Query.Single[R] = new Query.Single(this)
 
@@ -91,10 +91,9 @@ trait Select[Q, R]
 }
 
 object Select {
-  trait RenderInfo {
+  trait Renderer {
     def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
-    def context: Context
     def mappedTypes: Seq[MappedType[_]]
   }
 }

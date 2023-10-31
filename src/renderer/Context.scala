@@ -36,7 +36,7 @@ object Context {
 
     def computeSelectable0(t: From) = t match {
       case t: TableRef => Map.empty[Expr.Identity, SqlStr]
-      case t: SubqueryRef[_, _] => t.value.toSqlQuery0(prevContext).lhsMap
+      case t: SubqueryRef[_, _] => t.value.getRenderer(prevContext).lhsMap
     }
 
     def computeSelectable(t: From) = t match {
@@ -48,7 +48,7 @@ object Context {
         )
 
       case t: SubqueryRef[_, _] =>
-        val toSqlQuery = t.value.toSqlQuery0(prevContext)
+        val toSqlQuery = t.value.getRenderer(prevContext)
         (
           toSqlQuery.lhsMap,
           (liveExprs: Option[Set[Expr.Identity]]) =>

@@ -92,25 +92,24 @@ class CompoundSelect[Q, R](
 
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
-  def toSqlQuery0(prevContext: Context) = new CompoundSelect.RenderInfo(this, prevContext)
+  def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
 }
 
 object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
-  class RenderInfo[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.RenderInfo {
+  class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.Renderer {
 
-    val lhsToSqlQuery = query.lhs.toSqlQuery0(prevContext)
+    val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
 
 
     val lhsMap = lhsToSqlQuery.lhsMap
 
-    val context = lhsToSqlQuery.context
 
     val mappedTypes = lhsToSqlQuery.mappedTypes
 
 
-    val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
+    val newCtx = lhsToSqlQuery.context.copy(exprNaming = lhsToSqlQuery.context.exprNaming ++ lhsMap)
 
     val sortOpt = orderToSqlStr(newCtx)
 
@@ -129,7 +128,7 @@ object CompoundSelect {
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
-          val rhsToSqlQuery = op.rhs.toSqlQuery0(prevContext)
+          val rhsToSqlQuery = op.rhs.getRenderer(prevContext)
 
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
