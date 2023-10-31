@@ -13,10 +13,31 @@ trait CompoundSelectTests extends ScalaSqlSuite {
   def tests = Tests {
 
     test("sort") {
-      test("sort") - checker(
+      test("simple") - checker(
         query = Product.select.sortBy(_.price).map(_.name),
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
         value = Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
+      )
+      test("twice") - checker(
+        query = Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc,
+        sql = """
+          SELECT
+            purchase0.id as res__id,
+            purchase0.shipping_info_id as res__shipping_info_id,
+            purchase0.product_id as res__product_id,
+            purchase0.count as res__count,
+            purchase0.total as res__total
+          FROM purchase purchase0
+          ORDER BY res__shipping_info_id DESC, res__product_id ASC""",
+        value = Seq(
+          Purchase[Id](6, 3, 1, 5, 44.4),
+          Purchase[Id](7, 3, 6, 13, 1.3),
+          Purchase[Id](4, 2, 4, 4, 493.8),
+          Purchase[Id](5, 2, 5, 10, 10000.0),
+          Purchase[Id](1, 1, 1, 100, 888.0),
+          Purchase[Id](2, 1, 2, 3, 900.0),
+          Purchase[Id](3, 1, 3, 5, 15.7),
+        )
       )
 
       test("sortLimit") - checker(

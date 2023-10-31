@@ -114,7 +114,7 @@ class SimpleSelect[Q, R](
   }
 
   def sortBy(f: Q => Expr[_]) = {
-    newCompoundSelect(this, Nil, Some(OrderBy(f(expr), None, None)), None, None)
+    newCompoundSelect(this, Nil, Seq(OrderBy(f(expr), None, None)), None, None)
   }
 
   def asc = throw new Exception(".asc must follow .sortBy")
@@ -124,11 +124,11 @@ class SimpleSelect[Q, R](
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, simpleFrom(other))
-    newCompoundSelect(this, Seq(op2), None, None, None)
+    newCompoundSelect(this, Seq(op2), Nil, None, None)
   }
 
-  def drop(n: Int) = newCompoundSelect(this, Nil, None, None, Some(n))
-  def take(n: Int) = newCompoundSelect(this, Nil, None, Some(n), None)
+  def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
+  def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 

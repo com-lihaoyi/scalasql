@@ -37,7 +37,7 @@ object SqliteDialect extends SqliteDialect {
     override def newCompoundSelect[Q, R](
         lhs: scalasql.query.SimpleSelect[Q, R],
         compoundOps: Seq[CompoundSelect.Op[Q, R]],
-        orderBy: Option[OrderBy],
+        orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
     )(implicit qr: Queryable[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
@@ -70,7 +70,7 @@ object SqliteDialect extends SqliteDialect {
   class CompoundSelect[Q, R](
       lhs: scalasql.query.SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
-      orderBy: Option[OrderBy],
+      orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
   )(implicit qr: Queryable[Q, R])

@@ -137,7 +137,7 @@ object MySqlDialect extends MySqlDialect {
     override def newCompoundSelect[Q, R](
         lhs: scalasql.query.SimpleSelect[Q, R],
         compoundOps: Seq[CompoundSelect.Op[Q, R]],
-        orderBy: Option[OrderBy],
+        orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
     )(implicit qr: Queryable[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
@@ -170,7 +170,7 @@ object MySqlDialect extends MySqlDialect {
   class CompoundSelect[Q, R](
       lhs: scalasql.query.SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
-      orderBy: Option[OrderBy],
+      orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
   )(implicit qr: Queryable[Q, R])
@@ -190,19 +190,25 @@ object MySqlDialect extends MySqlDialect {
       .limitOffsetToSqlStr(query.limit, query.offset)
 
     override def orderToToSqlStr[R, Q](newCtx: Context) = {
-      SqlStr.opt(query.orderBy) { orderBy =>
-        val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
-        val str = (orderBy.ascDesc, orderBy.nulls) match {
-          case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
-          case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
-          case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr ASC"
-          case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
-          case (None, None) => exprStr
-          case (None, Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr"
-          case (None, Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr"
-        }
+      SqlStr.optSeq(query.orderBy) { orderBys =>
+        val orderStr = SqlStr.join(
+          orderBys.map { orderBy =>
+            val exprStr = orderBy.expr.toSqlQuery(newCtx)._1
 
-        sql" ORDER BY $str"
+            (orderBy.ascDesc, orderBy.nulls) match {
+              case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
+              case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
+              case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr ASC"
+              case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
+              case (None, None) => exprStr
+              case (None, Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr"
+              case (None, Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr"
+            }
+          },
+          sql", "
+        )
+
+        sql" ORDER BY $orderStr"
       }
     }
   }

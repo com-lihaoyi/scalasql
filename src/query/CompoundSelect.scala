@@ -8,7 +8,7 @@ import scalasql.{MappedType, Queryable, Table}
 class CompoundSelect[Q, R](
     val lhs: SimpleSelect[Q, R],
     val compoundOps: Seq[CompoundSelect.Op[Q, R]],
-    val orderBy: Option[OrderBy],
+    val orderBy: Seq[OrderBy],
     val limit: Option[Int],
     val offset: Option[Int]
 )(implicit val qr: Queryable[Q, R])
@@ -17,7 +17,7 @@ class CompoundSelect[Q, R](
   protected def copy[Q, R](
       lhs: SimpleSelect[Q, R] = this.lhs,
       compoundOps: Seq[CompoundSelect.Op[Q, R]] = this.compoundOps,
-      orderBy: Option[OrderBy] = this.orderBy,
+      orderBy: Seq[OrderBy] = this.orderBy,
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
@@ -66,21 +66,21 @@ class CompoundSelect[Q, R](
   }
 
   def sortBy(f: Q => Expr[_]) = {
-    val newOrder = Some(OrderBy(f(expr), None, None))
+    val newOrder = Seq(OrderBy(f(expr), None, None))
 
-    if (simple(limit, offset)) copy(orderBy = newOrder)
+    if (simple(limit, offset)) copy(orderBy = newOrder ++ orderBy)
     else newCompoundSelect(simpleFrom(this), compoundOps, newOrder, None, None)
   }
 
-  def asc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Asc))))
-  def desc = copy(orderBy = Some(orderBy.get.copy(ascDesc = Some(AscDesc.Desc))))
-  def nullsFirst = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.First))))
-  def nullsLast = copy(orderBy = Some(orderBy.get.copy(nulls = Some(Nulls.Last))))
+  def asc = copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Asc))) ++ orderBy.drop(1))
+  def desc = copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Desc))) ++ orderBy.drop(1))
+  def nullsFirst = copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.First))) ++ orderBy.drop(1))
+  def nullsLast = copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, simpleFrom(other))
     if (simple(orderBy, limit, offset)) copy(compoundOps = compoundOps ++ Seq(op2))
-    else newCompoundSelect(simpleFrom(this), Seq(op2), None, None, None)
+    else newCompoundSelect(simpleFrom(this), Seq(op2), Nil, None, None)
   }
 
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
@@ -134,19 +134,26 @@ object CompoundSelect {
     }
 
     def orderToToSqlStr[R, Q](newCtx: Context) = {
-      SqlStr.opt(query.orderBy) { orderBy =>
-        val ascDesc = orderBy.ascDesc match {
-          case None => sql""
-          case Some(AscDesc.Asc) => sql" ASC"
-          case Some(AscDesc.Desc) => sql" DESC"
-        }
+      SqlStr.optSeq(query.orderBy) { orderBys =>
+        val orderStr = SqlStr.join(
+          orderBys.map{orderBy =>
 
-        val nulls = SqlStr.opt(orderBy.nulls) {
-          case Nulls.First => sql" NULLS FIRST"
-          case Nulls.Last => sql" NULLS LAST"
-        }
+            val ascDesc = orderBy.ascDesc match {
+              case None => sql""
+              case Some(AscDesc.Asc) => sql" ASC"
+              case Some(AscDesc.Desc) => sql" DESC"
+            }
 
-        sql" ORDER BY " + orderBy.expr.toSqlQuery(newCtx)._1 + ascDesc + nulls
+            val nulls = SqlStr.opt(orderBy.nulls) {
+              case Nulls.First => sql" NULLS FIRST"
+              case Nulls.Last => sql" NULLS LAST"
+            }
+            orderBy.expr.toSqlQuery(newCtx)._1 + ascDesc + nulls
+          },
+          sql", "
+        )
+
+        sql" ORDER BY " + orderStr
       }
     }
   }

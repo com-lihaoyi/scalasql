@@ -16,7 +16,7 @@ trait Select[Q, R]
   def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
-      orderBy: Option[OrderBy],
+      orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
   )(implicit qr: Queryable[Q, R]): CompoundSelect[Q, R] =

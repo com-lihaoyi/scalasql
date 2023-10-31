@@ -277,7 +277,6 @@ their own operations not provided by the base library.
 # TODO
 
 * Scala 3 support
-* Extend sortBy to allow multiple columns each with their own ASC/DESC/NULLS handling
 * Tutorial Docs and Reference Docs
 * Flat joins (Quill Style)
 * Dot-delimited result names
