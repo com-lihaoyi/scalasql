@@ -38,8 +38,8 @@ object Context {
         )
 
       case t: SubqueryRef[_, _] =>
-        val (subNameMapping, sqlStr, _, _) = t.value.toSqlQuery0(prevContext)
-        (subNameMapping, sql"($sqlStr) ${SqlStr.raw(namedFromsMap(t))}")
+        val toSqlQuery = t.value.toSqlQuery0(prevContext)
+        (toSqlQuery.lhsMap, sql"(${toSqlQuery.res}) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
     val fromSelectables = selectables.map(f => (f, computeSelectable(f))).toMap

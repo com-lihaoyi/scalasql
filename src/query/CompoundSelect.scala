@@ -100,18 +100,17 @@ object CompoundSelect {
 
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) {
 
-    def toSqlStr(): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
-      val (lhsMap, lhsStr0, context, mappedTypes) = query.lhs.toSqlQuery0(prevContext)
+    def toSqlStr(): Select.Info = new Select.Info{
+      val lhsToSqlQuery = query.lhs.toSqlQuery0(prevContext)
 
-      val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"($lhsStr0)" else lhsStr0
+      val lhsStr = if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"(${lhsToSqlQuery.res})" else lhsToSqlQuery.res
       implicit val ctx = context
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
-          val (compoundMapping, compoundStr, compoundCtx, compoundMappedTypes) = op.rhs
-            .toSqlQuery0(prevContext)
+          val rhsToSqlQuery = op.rhs.toSqlQuery0(prevContext)
 
-          sql" ${SqlStr.raw(op.op)} $compoundStr"
+          sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.res}"
         }
 
         SqlStr.join(compoundStrs)
@@ -123,10 +122,16 @@ object CompoundSelect {
 
       val (limitOpt, offsetOpt) = limitOffsetToSqlStr
 
-      val res = lhsStr + compound + sortOpt + limitOpt + offsetOpt
 
-      (lhsMap, res, context, mappedTypes)
+      lazy val res = lhsStr + compound + sortOpt + limitOpt + offsetOpt
+
+      def lhsMap = lhsToSqlQuery.lhsMap
+
+      def context = lhsToSqlQuery.context
+
+      def mappedTypes = lhsToSqlQuery.mappedTypes
     }
+
 
     def limitOffsetToSqlStr = {
       val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }

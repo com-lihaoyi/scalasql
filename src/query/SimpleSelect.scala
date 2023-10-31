@@ -142,7 +142,7 @@ object SimpleSelect {
       query: SimpleSelect[Q, R],
       qr: Queryable[Q, R],
       prevContext: Context
-  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]]) = {
+  ): Select.Info = {
     val computed = Context
       .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
 
@@ -176,11 +176,14 @@ object SimpleSelect {
       )
     }.toMap
 
-    (
-      jsonQueryMap,
-      exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt,
-      implicitCtx,
-      flattenedExpr.map(t => Expr.getMappedType(t._2))
-    )
+    new Select.Info {
+      def lhsMap = jsonQueryMap
+
+      def res = exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+
+      def context = implicitCtx
+
+      def mappedTypes = flattenedExpr.map(t => Expr.getMappedType(t._2))
+    }
   }
 }

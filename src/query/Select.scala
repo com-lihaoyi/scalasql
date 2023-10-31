@@ -68,16 +68,16 @@ trait Select[Q, R]
   def take(n: Int): Select[Q, R]
 
   def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-    val (_, sqlStr, _, mappedTypes) = toSqlQuery0(ctx)
+    val to = toSqlQuery0(ctx)
 
-    (sqlStr.withCompleteQuery(true), mappedTypes)
+    (to.res.withCompleteQuery(true), to.mappedTypes)
   }
   def walk() = qr.walk(expr)
   override def singleRow = false
 
   def toSqlQuery0(
       prevContext: Context
-  ): (Map[Expr.Identity, SqlStr], SqlStr, Context, Seq[MappedType[_]])
+  ): Select.Info
 
   def single: Query.Single[R] = new Query.Single(this)
 
@@ -90,4 +90,13 @@ trait Select[Q, R]
 
   def subquery: SimpleSelect[Q, R] =
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
+}
+
+object Select{
+  trait Info{
+    def lhsMap: Map[Expr.Identity, SqlStr]
+    def res: SqlStr
+    def context: Context
+    def mappedTypes: Seq[MappedType[_]]
+  }
 }
