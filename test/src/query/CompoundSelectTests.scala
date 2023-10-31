@@ -36,7 +36,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           Purchase[Id](5, 2, 5, 10, 10000.0),
           Purchase[Id](1, 1, 1, 100, 888.0),
           Purchase[Id](2, 1, 2, 3, 900.0),
-          Purchase[Id](3, 1, 3, 5, 15.7),
+          Purchase[Id](3, 1, 3, 5, 15.7)
         )
       )
 

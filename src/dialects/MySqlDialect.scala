@@ -197,7 +197,8 @@ object MySqlDialect extends MySqlDialect {
 
             (orderBy.ascDesc, orderBy.nulls) match {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
-              case (Some(AscDesc.Desc), Some(Nulls.First)) => sql"$exprStr IS NULL DESC, $exprStr DESC"
+              case (Some(AscDesc.Desc), Some(Nulls.First)) =>
+                sql"$exprStr IS NULL DESC, $exprStr DESC"
               case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr ASC"
               case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
               case (None, None) => exprStr

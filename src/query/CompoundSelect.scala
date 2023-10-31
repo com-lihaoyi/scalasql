@@ -72,10 +72,14 @@ class CompoundSelect[Q, R](
     else newCompoundSelect(simpleFrom(this), compoundOps, newOrder, None, None)
   }
 
-  def asc = copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Asc))) ++ orderBy.drop(1))
-  def desc = copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Desc))) ++ orderBy.drop(1))
-  def nullsFirst = copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.First))) ++ orderBy.drop(1))
-  def nullsLast = copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
+  def asc =
+    copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Asc))) ++ orderBy.drop(1))
+  def desc =
+    copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Desc))) ++ orderBy.drop(1))
+  def nullsFirst =
+    copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.First))) ++ orderBy.drop(1))
+  def nullsLast =
+    copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, simpleFrom(other))
@@ -136,8 +140,7 @@ object CompoundSelect {
     def orderToToSqlStr[R, Q](newCtx: Context) = {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
-          orderBys.map{orderBy =>
-
+          orderBys.map { orderBy =>
             val ascDesc = orderBy.ascDesc match {
               case None => sql""
               case Some(AscDesc.Asc) => sql" ASC"
