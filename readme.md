@@ -280,6 +280,5 @@ their own operations not provided by the base library.
 * Tutorial Docs and Reference Docs
 * Flat joins (Quill Style)
 * left/right/inner/outer joins
-* Eliminate unused columns in subqueries
 * Dot-delimited result names
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
