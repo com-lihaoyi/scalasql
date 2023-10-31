@@ -31,6 +31,11 @@ object Context {
     val namedFromsMap = prevContext.fromNaming ++ namedFromsMap0 ++
       updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
+    def computeSelectable0(t: From) = t match {
+      case t: TableRef => Map.empty[Expr.Identity, SqlStr]
+      case t: SubqueryRef[_, _] => t.value.toSqlQuery0(prevContext).lhsMap
+    }
+
     def computeSelectable(t: From) = t match {
       case t: TableRef => (
         Map.empty[Expr.Identity, SqlStr],
@@ -41,13 +46,14 @@ object Context {
 
       case t: SubqueryRef[_, _] =>
         val toSqlQuery = t.value.toSqlQuery0(prevContext)
-        (toSqlQuery.lhsMap, (liveExprs: Option[Set[Expr.Identity]]) => sql"(${toSqlQuery.res(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}")
+        (toSqlQuery.lhsMap, (liveExprs: Option[Set[Expr.Identity]]) => sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}")
     }
 
     val fromSelectables = selectables.map(f => (f, computeSelectable(f))).toMap
+    val fromSelectables0 = selectables.map(f => (f, computeSelectable0(f))).toMap
 
-    val exprNaming = fromSelectables.flatMap { case (k, vs) =>
-      vs._1.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
+    val exprNaming = fromSelectables0.flatMap { case (k, vs) =>
+      vs.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
     }
 
     val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)

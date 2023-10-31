@@ -189,7 +189,7 @@ object MySqlDialect extends MySqlDialect {
     override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
       .limitOffsetToSqlStr(query.limit, query.offset)
 
-    override def orderToToSqlStr[R, Q](newCtx: Context) = {
+    override def orderToSqlStr(newCtx: Context) = {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>

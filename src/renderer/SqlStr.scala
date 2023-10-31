@@ -42,6 +42,7 @@ object SqlStr {
     val finalExprs = collection.mutable.Buffer[Expr.Identity]()
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
+      finalExprs.appendAll(self.referencedExprs)
       var boundary = true
       if (!topLevel && self.isCompleteQuery) addFinalPart("(")
       boundary = true
@@ -57,7 +58,6 @@ object SqlStr {
         a match {
           case si: Interp.SqlStrInterp =>
             rec(si.s, false)
-            finalExprs.appendAll(si.s.referencedExprs)
             boundary = true
 
           case s: Interp.TypeInterp[_] => finalArgs.append(s)

@@ -162,17 +162,15 @@ object SimpleSelect {
     }
 
     lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
-      (
-        Expr.getIdentity(v),
-        SqlStr.raw(
-          (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
-            .mkString(prevContext.config.columnLabelDelimiter)
-        )
-      )
+      val str = (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
+        .mkString(prevContext.config.columnLabelDelimiter)
+      val exprId = Expr.getIdentity(v)
+
+      (exprId, SqlStr.raw(str, Seq(exprId)))
     }.toMap
     lazy val lhsMap = jsonQueryMap
 
-    def res(liveExprs: Option[Set[Expr.Identity]]) = {
+    def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
       val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
       val exprStr = ExprsToSql(
@@ -181,7 +179,14 @@ object SimpleSelect {
         implicitCtx
       )
 
-      val innerLiveExprs = SqlStr.flatten(exprStr + filtersOpt + groupByOpt).referencedExprs.toSet
+
+      val innerLiveExprs = SqlStr
+        .flatten(
+          exprStr + filtersOpt + groupByOpt +
+          SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
+        )
+        .referencedExprs
+        .toSet
 
       val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
 

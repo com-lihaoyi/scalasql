@@ -18,11 +18,7 @@ trait SubQueryTests extends ScalaSqlSuite {
       sql = """
         SELECT purchase0.total as res
         FROM purchase purchase0
-        JOIN (SELECT
-            product0.id as res__id,
-            product0.kebab_case_name as res__kebab_case_name,
-            product0.name as res__name,
-            product0.price as res__price
+        JOIN (SELECT product0.id as res__id, product0.price as res__price
           FROM product product0
           ORDER BY res__price DESC
           LIMIT 1) subquery1
@@ -36,11 +32,7 @@ trait SubQueryTests extends ScalaSqlSuite {
         .map { case (product, purchase) => purchase.total },
       sql = """
         SELECT purchase1.total as res
-        FROM (SELECT
-            product0.id as res__id,
-            product0.kebab_case_name as res__kebab_case_name,
-            product0.name as res__name,
-            product0.price as res__price
+        FROM (SELECT product0.id as res__id, product0.price as res__price
           FROM product product0
           ORDER BY res__price DESC
           LIMIT 1) subquery0
@@ -59,18 +51,14 @@ trait SubQueryTests extends ScalaSqlSuite {
           subquery1.res__count as res__1
         FROM (SELECT
             product0.id as res__id,
-            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
           ORDER BY res__price DESC
           LIMIT 3) subquery0
         JOIN (SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
             purchase0.product_id as res__product_id,
-            purchase0.count as res__count,
-            purchase0.total as res__total
+            purchase0.count as res__count
           FROM purchase purchase0
           ORDER BY res__count DESC
           LIMIT 3) subquery1
@@ -84,8 +72,6 @@ trait SubQueryTests extends ScalaSqlSuite {
       sql = """
         SELECT subquery0.res__name as res
         FROM (SELECT
-            product0.id as res__id,
-            product0.kebab_case_name as res__kebab_case_name,
             product0.name as res__name,
             product0.price as res__price
           FROM product product0
@@ -102,8 +88,6 @@ trait SubQueryTests extends ScalaSqlSuite {
       sql = """
         SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
         FROM (SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
             purchase0.product_id as res__product_id,
             purchase0.count as res__count,
             purchase0.total as res__total

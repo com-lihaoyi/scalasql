@@ -104,25 +104,27 @@ object CompoundSelect {
       lazy val lhsToSqlQuery = query.lhs.toSqlQuery0(prevContext)
 
 
-      import lhsToSqlQuery.context
-
-
       lazy val newCtx = context.copy(exprNaming = context.exprNaming ++ lhsMap)
 
-      lazy val sortOpt = orderToToSqlStr(newCtx)
+      lazy val sortOpt = orderToSqlStr(newCtx)
 
       lazy val (limitOpt, offsetOpt) = limitOffsetToSqlStr
 
-      def res(liveExprs: Option[Set[Expr.Identity]]) = {
+      def render(liveExprs: Option[Set[Expr.Identity]]) = {
+        val innerLiveExprs = liveExprs.map{l =>
+          l ++
+          SqlStr.flatten(limitOpt + offsetOpt + sortOpt).referencedExprs
+        }
+
         lazy val lhsStr =
-          if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"(${lhsToSqlQuery.res(liveExprs)})"
-          else lhsToSqlQuery.res(liveExprs)
+          if (query.lhs.isInstanceOf[CompoundSelect[_, _]]) sql"(${lhsToSqlQuery.render(innerLiveExprs)})"
+          else lhsToSqlQuery.render(innerLiveExprs)
 
         lazy val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
           val compoundStrs = compoundOps.map { op =>
             val rhsToSqlQuery = op.rhs.toSqlQuery0(prevContext)
 
-            sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.res(liveExprs)}"
+            sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(innerLiveExprs)}"
           }
 
           SqlStr.join(compoundStrs)
@@ -147,7 +149,8 @@ object CompoundSelect {
       (limitOpt, offsetOpt)
     }
 
-    def orderToToSqlStr[R, Q](newCtx: Context) = {
+    def orderToSqlStr(newCtx: Context) = {
+
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>
