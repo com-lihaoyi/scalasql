@@ -13,8 +13,12 @@ trait DbApi {
   def rollback(): Unit
 
   def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
-  def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, R]): R
-  def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, Seq[R]]): Generator[R]
+  def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+      implicit qr: Queryable[Q, R]
+  ): R
+  def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+      implicit qr: Queryable[Q, Seq[R]]
+  ): Generator[R]
   def runUpdate(sql: SqlStr): Int
   def runRawUpdate(sql: String, variables: Any*): Int
   def runRawUpdateBatch(sql: Seq[String]): Seq[Int]
@@ -78,7 +82,7 @@ object DbApi {
     def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val statement = connection.prepareStatement(sql)
-      for((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
+      for ((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
 
       try block(statement.executeQuery())
       finally statement.close()
@@ -87,7 +91,7 @@ object DbApi {
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
-      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value):_*)(block)
+      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value): _*)(block)
     }
 
     def runRawUpdate(sql: String, variables: Any*): Int = {
@@ -96,11 +100,11 @@ object DbApi {
       // Sqlite and HsqlDb for some reason blow up if you try to do DDL
       // like DROP TABLE or CREATE TABLE inside a prepared statement, so
       // fall back to vanilla `createStatement`
-      if (variables.isEmpty){
+      if (variables.isEmpty) {
         val statement = connection.createStatement()
         try statement.executeUpdate(sql)
         finally statement.close()
-      }else{
+      } else {
         val statement = connection.prepareStatement(sql)
         for ((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
         try statement.executeUpdate()
@@ -111,7 +115,7 @@ object DbApi {
     def runUpdate(sql: SqlStr): Int = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
-      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value):_*)
+      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value): _*)
     }
 
     def runRawUpdateBatch(sqls: Seq[String]) = {
@@ -148,7 +152,9 @@ object DbApi {
       (queryStr, flattened.params, mappedTypes)
     }
 
-    def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, R]): R = {
+    def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable[Q, R]
+    ): R = {
       val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
@@ -176,14 +182,17 @@ object DbApi {
       }
     }
 
-    private def prepareRun[Q, R](query: Q, fetchSize: Int, queryTimeoutSeconds: Int)(implicit qr: Queryable[Q, R]) = {
+    private def prepareRun[Q, R](query: Q, fetchSize: Int, queryTimeoutSeconds: Int)(
+        implicit qr: Queryable[Q, R]
+    ) = {
 
       if (autoCommit) connection.setAutoCommit(true)
       val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
       val statement = connection.prepareStatement(str)
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
-      Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds).find(_ != -1).foreach(statement.setQueryTimeout)
+      Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds).find(_ != -1)
+        .foreach(statement.setQueryTimeout)
 
       for ((p, n) <- params.zipWithIndex) {
         p.mappedType.asInstanceOf[MappedType[Any]].put(statement, n + 1, p.value)
@@ -191,7 +200,9 @@ object DbApi {
       (exprs, statement)
     }
 
-    def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable[Q, Seq[R]]): Generator[R] = new Generator[R] {
+    def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable[Q, Seq[R]]
+    ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
         val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 

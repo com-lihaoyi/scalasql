@@ -11,6 +11,7 @@ import query.{
   InsertTests,
   DeleteTests,
   SelectTests,
+  CompoundSelectTests,
   SubQueryTests,
   UpdateTests,
   UpdateJoinTests,
@@ -38,6 +39,7 @@ package mysql {
   object InsertTests extends InsertTests with MySqlSuite
   object DeleteTests extends DeleteTests with MySqlSuite
   object SelectTests extends SelectTests with MySqlSuite
+  object CompoundSelectTests extends CompoundSelectTests with MySqlSuite
   object SubQueryTests extends SubQueryTests with MySqlSuite
   object UpdateTests extends UpdateTests with MySqlSuite
   object UpdateJoinTests extends UpdateJoinTests with MySqlSuite
@@ -69,6 +71,7 @@ package postgres {
   object InsertTests extends InsertTests with PostgresSuite
   object DeleteTests extends DeleteTests with PostgresSuite
   object SelectTests extends SelectTests with PostgresSuite
+  object CompoundSelectTests extends CompoundSelectTests with PostgresSuite
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object UpdateTests extends UpdateTests with PostgresSuite
   object UpdateJoinTests extends UpdateJoinTests with PostgresSuite
@@ -97,6 +100,7 @@ package sqlite {
   object InsertTests extends InsertTests with SqliteSuite
   object DeleteTests extends DeleteTests with SqliteSuite
   object SelectTests extends SelectTests with SqliteSuite
+  object CompoundSelectTests extends CompoundSelectTests with SqliteSuite
   object SubQueryTests extends SubQueryTests with SqliteSuite
   object UpdateTests extends UpdateTests with SqliteSuite
   object UpdateJoinTests extends UpdateJoinTests with SqliteSuite
@@ -125,6 +129,7 @@ package hsqldb {
   object InsertTests extends InsertTests with HsqlDbSuite
   object DeleteTests extends DeleteTests with HsqlDbSuite
   object SelectTests extends SelectTests with HsqlDbSuite
+  object CompoundSelectTests extends CompoundSelectTests with HsqlDbSuite
   object SubQueryTests extends SubQueryTests with HsqlDbSuite
   object UpdateTests extends UpdateTests with HsqlDbSuite
   // HSql does not support UPDATE/JOIN keywords
@@ -156,6 +161,7 @@ package h2 {
   object InsertTests extends InsertTests with H2Suite
   object DeleteTests extends DeleteTests with H2Suite
   object SelectTests extends SelectTests with H2Suite
+  object CompoundSelectTests extends CompoundSelectTests with H2Suite
   object SubQueryTests extends SubQueryTests with H2Suite
   object UpdateTests extends UpdateTests with H2Suite
   object UpdateJoinTests extends UpdateTests with H2Suite

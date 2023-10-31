@@ -25,11 +25,11 @@ class CompoundSelect[Q, R](
 
   override def select = this
 
-  def distinct: Select[Q, R] = ???
+  def distinct: Select[Q, R] = simpleFrom(this).distinct
 
   def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
       implicit qr: Queryable[Expr[V], V]
-  ): Expr[V] = ???
+  ): Expr[V] = simpleFrom(this).queryExpr[V](f)
 
   def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable[Q2, R2]): Select[Q2, R2] = {
     (lhs, compoundOps) match {
@@ -40,7 +40,7 @@ class CompoundSelect[Q, R](
   }
 
   def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2] = {
-    ???
+    simpleFrom(this).flatMap(f)
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
