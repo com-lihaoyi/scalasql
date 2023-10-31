@@ -64,6 +64,6 @@ object Expr {
   )(implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
-      new SqlStr(Seq("", ""), Seq(conv(x)), false)
+      new SqlStr(Seq("", ""), Seq(conv(x)), false, Nil)
   }
 }

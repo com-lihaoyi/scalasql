@@ -96,7 +96,7 @@ object MySqlDialect extends MySqlDialect {
         sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
       }
 
-      val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, computed.fromSelectables))
+      val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, computed.fromSelectables, None))
 
       (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
     }

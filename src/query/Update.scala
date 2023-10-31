@@ -84,14 +84,14 @@ object Update {
         val (froms, ons) = firstJoin.from.map { jf =>
           (computed.fromSelectables(jf.from)._2, jf.on)
         }.unzip
-        (sql" FROM " + SqlStr.join(froms, sql", "), ons.flatten)
+        (sql" FROM " + SqlStr.join(froms.map(_(None)), sql", "), ons.flatten)
     }
 
     val where = SqlStr.optSeq(fromOns ++ where0) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
     }
 
-    val joins = optSeq(joins0.drop(1))(SelectToSql.joinsToSqlStr(_, computed.fromSelectables))
+    val joins = optSeq(joins0.drop(1))(SelectToSql.joinsToSqlStr(_, computed.fromSelectables, None))
 
     (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
 

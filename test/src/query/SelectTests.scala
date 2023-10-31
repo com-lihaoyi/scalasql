@@ -192,11 +192,7 @@ trait SelectTests extends ScalaSqlSuite {
       query = Buyer.select.subquery.map(_.name),
       sql = """
         SELECT subquery0.res__name as res
-        FROM (SELECT
-            buyer0.id as res__id,
-            buyer0.name as res__name,
-            buyer0.date_of_birth as res__date_of_birth
-          FROM buyer buyer0) subquery0
+        FROM (SELECT buyer0.name as res__name FROM buyer buyer0) subquery0
       """,
       value = Seq("James Bond", "叉烧包", "Li Haoyi")
     )
