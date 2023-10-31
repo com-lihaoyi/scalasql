@@ -114,12 +114,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT product1.name as res
-        FROM (SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
-            purchase0.product_id as res__product_id,
-            purchase0.count as res__count,
-            purchase0.total as res__total
+        FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0, product product1
@@ -133,12 +128,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       query = Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total),
       sql = """
         SELECT SUM(subquery0.res__total) as res
-        FROM (SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
-            purchase0.product_id as res__product_id,
-            purchase0.count as res__count,
-            purchase0.total as res__total
+        FROM (SELECT purchase0.total as res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0
@@ -152,12 +142,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total))),
       sql = """
         SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
-        FROM (SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
-            purchase0.product_id as res__product_id,
-            purchase0.count as res__count,
-            purchase0.total as res__total
+        FROM (SELECT purchase0.total as res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0
