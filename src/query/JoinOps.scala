@@ -15,18 +15,6 @@ trait JoinOps[C[_, _], Q, R] {
       implicit joinQr: Queryable[Q2, R2]
   ): C[(Q, Q2), (R, R2)]
 
-  def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
-  ): C[(Q, Option[Q2]), (R, Option[R2])]
-
-  def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
-  ): C[(Option[Q], Q2), (Option[R], R2)]
-
-  def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
-  ): C[(Option[Q], Option[Q2]), (Option[R], Option[R2])]
-
   def joinInfo[Q2, R2](
       joinPrefix: Option[String],
       other: Joinable[Q2, R2],
