@@ -47,6 +47,7 @@ object InsertSelect {
     )
 
     val (selectSql, mappedTypes) = select.toSqlQuery
+
     (
       sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) ${selectSql
           .withCompleteQuery(false)}",

@@ -112,5 +112,44 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
+    test("joinSubqueryEliminatedColumn") - {
+      checker(
+        query = Buyer.update.filter(_.name `=` "James Bond")
+          // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
+          // column gets eliminated since it is not used outside the subquery
+          .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+          .set(c => c._1.dateOfBirth -> LocalDate.parse("2000-01-01")),
+        sqls = Seq(
+          """
+            UPDATE buyer SET date_of_birth = ?
+            FROM (SELECT
+                shipping_info0.id as res__id,
+                shipping_info0.buyer_id as res__buyer_id
+              FROM shipping_info shipping_info0
+              ORDER BY res__id ASC
+              LIMIT 2) subquery0
+            WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+          """,
+          """
+            UPDATE
+              buyer
+              JOIN (SELECT
+                  shipping_info0.id as res__id,
+                  shipping_info0.buyer_id as res__buyer_id
+                FROM shipping_info shipping_info0
+                ORDER BY res__id ASC
+                LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
+            SET buyer.date_of_birth = ?
+            WHERE buyer.name = ?
+          """
+        ),
+        value = 1
+      )
+
+      checker(
+        query = Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth),
+        value = Seq(LocalDate.parse("2000-01-01"))
+      )
+    }
   }
 }

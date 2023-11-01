@@ -17,7 +17,7 @@ import scalasql.query.{
   Update
 }
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
-import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 trait MySqlDialect extends Dialect {
@@ -83,26 +83,34 @@ object MySqlDialect extends MySqlDialect {
         q: Update.Impl[Q, R],
         prevContext: Context
     ): (SqlStr, Seq[MappedType[_]]) = {
-      val computed = Context
-        .compute(prevContext, q.joins.flatMap(_.from).map(_.from), Some(q.table))
-      import computed.implicitCtx
-
-      val tableName = SqlStr.raw(prevContext.config.tableNameMapper(q.table.value.tableName))
-      val updateList = q.set0.map { case (k, v) =>
-        val colStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
-        sql"$tableName.$colStr = $v"
-      }
-      val sets = SqlStr.join(updateList, sql", ")
-
-      val where = SqlStr.optSeq(q.where) { where =>
-        sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
-      }
-
-      val joins = optSeq(q.joins)(SelectToSql.joinsToSqlStr(_, computed.fromSelectables, None))
-
-      (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
+      new UpdateRenderer(q.joins, q.table, q.set0, q.where, prevContext).render()
     }
 
+  }
+
+  class UpdateRenderer(
+      joins0: Seq[Join],
+      table: TableRef,
+      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      where0: Seq[Expr[_]],
+      prevContext: Context
+  ) extends scalasql.query.Update.Renderer(joins0, table, set0, where0, prevContext) {
+    import computed.implicitCtx
+    override lazy val updateList = set0.map { case (k, v) =>
+      val colStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
+      sql"$tableName.$colStr = $v"
+    }
+
+    override lazy val where = SqlStr.flatten(SqlStr.optSeq(where0) { where =>
+      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
+    })
+    override lazy val joinOns = joins0
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
+
+    override lazy val joins = optSeq(joins0)(
+      JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
+    )
+    override def render() = (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
   }
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
@@ -194,8 +202,8 @@ object MySqlDialect extends MySqlDialect {
       prevContext: Context
   ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
 
-    override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
-      .limitOffsetToSqlStr(query.limit, query.offset)
+    override lazy val limitOpt = SqlStr
+      .flatten(CompoundSelectRendererForceLimit.limitToSqlStr(query.limit, query.offset))
 
     override def orderToSqlStr(newCtx: Context) = {
       SqlStr.optSeq(query.orderBy) { orderBys =>

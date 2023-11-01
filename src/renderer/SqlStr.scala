@@ -26,12 +26,12 @@ class SqlStr(
 }
 
 object SqlStr {
-  case class Flattened(
-      queryParts: Seq[String],
-      params: Seq[Interp.TypeInterp[_]],
+  class Flattened(
+      val queryParts: Seq[String],
+      val params: Seq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
-      referencedExprs: Seq[Expr.Identity]
-  )
+      val referencedExprs: Seq[Expr.Identity]
+  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
 
   def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
   def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else sql""
@@ -69,7 +69,7 @@ object SqlStr {
     }
 
     rec(self, true)
-    Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery, finalExprs.toSeq)
+    new Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery, finalExprs.toSeq)
   }
 
   implicit class SqlStringSyntax(sc: StringContext) {

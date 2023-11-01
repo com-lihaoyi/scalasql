@@ -85,8 +85,8 @@ object SqliteDialect extends SqliteDialect {
       query: scalasql.query.CompoundSelect[Q, R],
       prevContext: Context
   ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
-    override def limitOffsetToSqlStr = CompoundSelectRendererForceLimit
-      .limitOffsetToSqlStr(query.limit, query.offset)
+    override lazy val limitOpt = SqlStr
+      .flatten(CompoundSelectRendererForceLimit.limitToSqlStr(query.limit, query.offset))
   }
 
 }

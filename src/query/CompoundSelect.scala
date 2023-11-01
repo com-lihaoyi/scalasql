@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table}
 
@@ -114,17 +114,23 @@ object CompoundSelect {
 
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.Renderer {
 
-    val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
+    lazy val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
 
-    val newCtx = lhsToSqlQuery.context.copy(exprNaming = lhsToSqlQuery.context.exprNaming ++ lhsMap)
+    lazy val newCtx = lhsToSqlQuery.context
+      .copy(exprNaming = lhsToSqlQuery.context.exprNaming ++ lhsMap)
 
-    val sortOpt = orderToSqlStr(newCtx)
+    lazy val sortOpt = SqlStr.flatten(orderToSqlStr(newCtx))
 
-    val (limitOpt, offsetOpt) = limitOffsetToSqlStr
+    lazy val limitOpt = SqlStr.flatten(SqlStr.opt(query.limit) { limit =>
+      sql" LIMIT " + SqlStr.raw(limit.toString)
+    })
+    lazy val offsetOpt = SqlStr.flatten(SqlStr.opt(query.offset) { offset =>
+      sql" OFFSET " + SqlStr.raw(offset.toString)
+    })
 
-    val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt).referencedExprs
+    lazy val newReferencedExpressions = Seq(limitOpt, offsetOpt, sortOpt).flatMap(_.referencedExprs)
 
-    val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
+    lazy val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
@@ -155,18 +161,9 @@ object CompoundSelect {
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
 
-    def limitOffsetToSqlStr = {
-      val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
+    lazy val lhsMap = lhsToSqlQuery.lhsMap
 
-      val offsetOpt = SqlStr.opt(query.offset) { offset =>
-        sql" OFFSET " + SqlStr.raw(offset.toString)
-      }
-      (limitOpt, offsetOpt)
-    }
-
-    def lhsMap = lhsToSqlQuery.lhsMap
-
-    def mappedTypes = lhsToSqlQuery.mappedTypes
+    lazy val mappedTypes = lhsToSqlQuery.mappedTypes
 
     def orderToSqlStr(newCtx: Context) = {
 

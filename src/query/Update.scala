@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.{Column, MappedType, Queryable}
-import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
@@ -55,46 +55,54 @@ object Update {
     }
 
     override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
-      toSqlStr(joins, table, set0, where, ctx)
+      new Renderer(joins, table, set0, where, ctx).render()
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
 
   }
 
-  def toSqlStr(
+  class Renderer(
       joins0: Seq[Join],
       table: TableRef,
       set0: Seq[(Column.ColumnExpr[_], Expr[_])],
       where0: Seq[Expr[_]],
       prevContext: Context
-  ) = {
+  ) {
     val computed = Context.compute(prevContext, joins0.flatMap(_.from).map(_.from), Some(table))
 
     import computed.implicitCtx
 
-    val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
-    val updateList = set0.map { case (k, v) =>
+    lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
+
+    lazy val updateList = set0.map { case (k, v) =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
       sql"$kStr = $v"
     }
-    val sets = SqlStr.join(updateList, sql", ")
+    lazy val sets = SqlStr.flatten(SqlStr.join(updateList, sql", "))
 
-    val (from, fromOns) = joins0.headOption match {
-      case None => (sql"", Nil)
-      case Some(firstJoin) =>
-        val (froms, ons) = firstJoin.from.map { jf =>
-          (computed.fromSelectables(jf.from)._2, jf.on)
-        }.unzip
-        (sql" FROM " + SqlStr.join(froms.map(_(None)), sql", "), ons.flatten)
+    lazy val liveExprs = sets.referencedExprs.toSet ++ where.referencedExprs
+    lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
+      val froms = firstJoin.from.map { jf => computed.fromSelectables(jf.from)._2 }
+      sql" FROM " + SqlStr.join(froms.map(_(Some(liveExprs))), sql", ")
+    }
+    lazy val fromOns = joins0.headOption match {
+      case None => Nil
+      case Some(firstJoin) => firstJoin.from.flatMap(_.on)
     }
 
-    val where = SqlStr.optSeq(fromOns ++ where0) { where =>
+    lazy val where = SqlStr.flatten(SqlStr.optSeq(fromOns ++ where0) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
-    }
+    })
 
-    val joins = optSeq(joins0.drop(1))(SelectToSql.joinsToSqlStr(_, computed.fromSelectables, None))
+    lazy val joinOns = joins0.drop(1)
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
 
-    (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
+    lazy val joins = optSeq(joins0.drop(1))(
+      JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
+    )
+
+    def render() =
+      (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
 
   }
 }

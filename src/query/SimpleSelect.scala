@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SelectToSql.joinsToSqlStr
+import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{MappedType, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
@@ -168,18 +168,18 @@ object SimpleSelect {
 
     import computed.implicitCtx
 
-    val filtersOpt = SqlStr.optSeq(query.where) { where =>
+    lazy val filtersOpt = SqlStr.flatten(SqlStr.optSeq(query.where) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
-    }
+    })
 
-    val groupByOpt = SqlStr.opt(query.groupBy0) { groupBy =>
+    lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
         sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
       }
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
-    }
+    })
 
-    val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
+    lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
       val str = (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
         .mkString(prevContext.config.columnLabelDelimiter)
       val exprId = Expr.getIdentity(v)
@@ -187,31 +187,31 @@ object SimpleSelect {
       (exprId, SqlStr.raw(str, Seq(exprId)))
     }.toMap
 
-    val lhsMap = jsonQueryMap
+    lazy val lhsMap = jsonQueryMap
 
-    val exprsStrs = {
+    lazy val exprsStrs = {
       FlatJson.flatten(query.flattenedExpr, implicitCtx).map { case (k, v) =>
         sql"$v as ${SqlStr.raw(implicitCtx.config.tableNameMapper(k))}"
       }
     }
 
-    val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+    lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
 
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
-      val exprStr = SqlStr.join(
+      val exprStr = SqlStr.flatten(SqlStr.join(
         query.flattenedExpr.zip(exprsStrs).collect {
           case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
         },
         sql", "
-      )
+      ))
 
-      val innerLiveExprs = SqlStr.flatten(
-        exprStr + filtersOpt + groupByOpt +
-          SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
-      ).referencedExprs.toSet
+      val joinOns = query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
 
-      val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
+      val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
+        groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
+
+      val joins = joinsToSqlStr(query.joins, computed.fromSelectables, liveExprs, joinOns)
 
       val tables = SqlStr
         .join(query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
@@ -219,8 +219,8 @@ object SimpleSelect {
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }
 
-    val context = implicitCtx
+    lazy val context = implicitCtx
 
-    val mappedTypes = query.flattenedExpr.map(t => Expr.getMappedType(t._2))
+    lazy val mappedTypes = query.flattenedExpr.map(t => Expr.getMappedType(t._2))
   }
 }

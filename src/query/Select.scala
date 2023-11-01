@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.renderer.{Context, SelectToSql, SqlStr}
+import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.{MappedType, Queryable}
 import scalasql.utils.OptionPickler
 
