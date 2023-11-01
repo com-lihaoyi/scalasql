@@ -66,7 +66,8 @@ object FlatJson {
         var nulls = 0
         var nonNulls = 0
         groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-          val (v, subNulls, subNonNulls) = rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor)
+          val (v, subNulls, subNonNulls) =
+            rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor)
           arrVisitor.visitValue(v, -1)
           nulls += subNulls
           nonNulls += subNonNulls
@@ -75,17 +76,19 @@ object FlatJson {
         val result0 = arrVisitor.visitEnd(-1)
         val result =
           if (!arrVisitor.isInstanceOf[OptionPickler.NullableArrVisitor[_, _]]) result0
-          else (if (nulls != 0 && nonNulls == 0) None else Some(result0))
+          else (if (nulls != 0 && nonNulls == 0) None
+                else Some(result0))
         (result, nulls, nonNulls)
       } else {
 
         val objVisitor = visitor.visitObject(-1, true, -1).narrow
-        var nulls =  0
+        var nulls = 0
         var nonNulls = 0
         groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
           val keyVisitor = objVisitor.visitKey(-1)
           objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
-          val (v, subNulls, subNonNulls) = rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor)
+          val (v, subNulls, subNonNulls) =
+            rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor)
           objVisitor.visitValue(v, -1)
           nulls += subNulls
           nonNulls += subNonNulls
@@ -95,7 +98,8 @@ object FlatJson {
 
         val result =
           if (!objVisitor.isInstanceOf[OptionPickler.NullableObjVisitor[_, _]]) result0
-          else (if (nulls != 0 && nonNulls == 0) None else Some(result0 ))
+          else (if (nulls != 0 && nonNulls == 0) None
+                else Some(result0))
 
         (result, nulls, nonNulls)
       }

@@ -56,15 +56,11 @@ class CompoundSelect[Q, R](
   ): Select[(Q, Q2), (R, R2)] = { simpleFrom(this).join0(other, on) }
 
   def leftJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-    implicit joinQr: Queryable[Q2, R2]
-  ): Select[(Q, Option[Q2]), (R, Option[R2])] = {
-    simpleFrom(this).leftJoin0(other, on)
-  }
-def rightJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-    implicit joinQr: Queryable[Q2, R2]
-  ): Select[(Option[Q], Q2), (Option[R], R2)] = {
-    simpleFrom(this).rightJoin0(other, on)
-  }
+      implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Q, Option[Q2]), (R, Option[R2])] = { simpleFrom(this).leftJoin0(other, on) }
+  def rightJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+      implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Option[Q], Q2), (Option[R], R2)] = { simpleFrom(this).rightJoin0(other, on) }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     simpleFrom(this).aggregate(f)
@@ -119,8 +115,7 @@ object CompoundSelect {
 
     val (limitOpt, offsetOpt) = limitOffsetToSqlStr
 
-    val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt)
-      .referencedExprs
+    val newReferencedExpressions = SqlStr.flatten(limitOpt + offsetOpt + sortOpt).referencedExprs
 
     val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
@@ -138,8 +133,7 @@ object CompoundSelect {
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
           // belongong to the RHS SimpleSelect `liveExprs` analysis to work
           val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-            val strs = l
-              .map(e => SqlStr.flatten(lhsToSqlQuery.lhsMap(e)).queryParts.mkString("?"))
+            val strs = l.map(e => SqlStr.flatten(lhsToSqlQuery.lhsMap(e)).queryParts.mkString("?"))
 
             rhsToSqlQuery.lhsMap.collect {
               case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
@@ -154,7 +148,6 @@ object CompoundSelect {
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
 
-
     def limitOffsetToSqlStr = {
       val limitOpt = SqlStr.opt(query.limit) { limit => sql" LIMIT " + SqlStr.raw(limit.toString) }
 
@@ -165,7 +158,6 @@ object CompoundSelect {
     }
 
     def lhsMap = lhsToSqlQuery.lhsMap
-
 
     def mappedTypes = lhsToSqlQuery.mappedTypes
 

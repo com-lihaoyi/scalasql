@@ -29,7 +29,9 @@ trait Queryable[-Q, R] {
 }
 
 object Queryable {
-  implicit def OptionQueryable[Q, R](implicit qr: Queryable[Q, R]): Queryable[Option[Q], Option[R]] = new Queryable[Option[Q], Option[R]] {
+  implicit def OptionQueryable[Q, R](
+      implicit qr: Queryable[Q, R]
+  ): Queryable[Option[Q], Option[R]] = new Queryable[Option[Q], Option[R]] {
     def walk(q: Option[Q]): Seq[(List[String], Expr[_])] = qr.walk(q.get)
 
     def valueReader(q: Option[Q]): OptionPickler.Reader[Option[R]] = {

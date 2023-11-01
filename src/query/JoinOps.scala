@@ -31,11 +31,11 @@ trait JoinOps[C[_, _], Q, R] {
       implicit joinQr: Queryable[Q2, R2]
   ): C[(Option[Q], Q2), (Option[R], R2)]
 
-  def joinInfo[Q2, R2](joinPrefix: Option[String],
-                       other: Joinable[Q2, R2],
-                       on: Option[(Q, Q2) => Expr[Boolean]])(
-      implicit joinQr: Queryable[Q2, _]
-  ) = {
+  def joinInfo[Q2, R2](
+      joinPrefix: Option[String],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(implicit joinQr: Queryable[Q2, _]) = {
     val otherSelect = other.select
 
     val otherJoin =
@@ -48,7 +48,10 @@ trait JoinOps[C[_, _], Q, R] {
       )
       else Join(
         joinPrefix,
-        Seq(JoinFrom(new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable[Q2, R2]]), on.map(_(expr, otherSelect.expr))))
+        Seq(JoinFrom(
+          new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable[Q2, R2]]),
+          on.map(_(expr, otherSelect.expr))
+        ))
       )
 
     (Seq(otherJoin), otherSelect)

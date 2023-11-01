@@ -200,7 +200,8 @@ trait JoinTests extends ScalaSqlSuite {
         ),
         (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
       ),
-      normalize = (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id))
+      normalize =
+        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id))
     )
 
     test("rightJoin") - checker(
@@ -219,19 +220,20 @@ trait JoinTests extends ScalaSqlSuite {
       value = Seq(
         (
           Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         (
           Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
         (
           Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
         (None, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
       ),
-      normalize = (x: Seq[(Option[ShippingInfo[Id]], Buyer[Id])]) => x.sortBy(t => t._2.id -> t._1.map(_.id))
+      normalize =
+        (x: Seq[(Option[ShippingInfo[Id]], Buyer[Id])]) => x.sortBy(t => t._2.id -> t._1.map(_.id))
     )
   }
 }

@@ -121,7 +121,6 @@ class SimpleSelect[Q, R](
     )
   }
 
-
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
@@ -192,8 +191,7 @@ object SimpleSelect {
     }
 
     val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
-      val str = (prevContext.config.columnLabelPrefix +: k)
-        .map(prevContext.config.columnNameMapper)
+      val str = (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
         .mkString(prevContext.config.columnLabelDelimiter)
       val exprId = Expr.getIdentity(v)
 
@@ -213,19 +211,16 @@ object SimpleSelect {
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
       val exprStr = SqlStr.join(
-        query.flattenedExpr.zip(exprsStrs).collect{
+        query.flattenedExpr.zip(exprsStrs).collect {
           case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
         },
         sql", "
       )
 
-      val innerLiveExprs = SqlStr
-        .flatten(
-          exprStr + filtersOpt + groupByOpt +
-            SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
-        )
-        .referencedExprs
-        .toSet
+      val innerLiveExprs = SqlStr.flatten(
+        exprStr + filtersOpt + groupByOpt +
+          SqlStr.join(query.joins.flatMap(_.from).flatMap(_.on).map(_.toSqlQuery._1), sql"")
+      ).referencedExprs.toSet
 
       val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs))
 

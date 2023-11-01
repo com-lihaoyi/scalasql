@@ -30,7 +30,9 @@ trait MySqlDialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new MySqlDialect.TableOps(t)
 
-  implicit def OnConflictableUpdate[Q, R](query: InsertValues[Q, R]): MySqlDialect.OnConflictable[Q, Int] =
+  implicit def OnConflictableUpdate[Q, R](
+      query: InsertValues[Q, R]
+  ): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
 }
 
