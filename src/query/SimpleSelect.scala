@@ -104,6 +104,23 @@ class SimpleSelect[Q, R](
     )
   }
 
+  def rightJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+      implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Option[Q], Q2), (Option[R], R2)] = {
+
+    val thisTrivial = groupBy0.isEmpty
+    val (otherJoin, otherSelect) = joinInfo(Some("RIGHT"), other, on)
+
+    copy(
+      expr = (Option(expr), otherSelect.expr),
+      exprPrefix = if (thisTrivial) exprPrefix else None,
+      from = if (thisTrivial) from else Seq(this.subqueryRef),
+      joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
+      where = if (thisTrivial) where else Nil,
+      groupBy0 = if (thisTrivial) groupBy0 else None
+    )
+  }
+
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
