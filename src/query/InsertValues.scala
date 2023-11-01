@@ -25,7 +25,7 @@ object InsertValues {
     def expr: Q = insert.expr
 
     override def toSqlQuery(implicit ctx: Context) = (
-      InsertValues.toSqlStr(columns, ctx, valuesLists, table.value.tableName),
+      new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),
       Seq(MappedType.IntType)
     )
     def walk() = Nil
@@ -35,21 +35,23 @@ object InsertValues {
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-  def toSqlStr(
+  class Renderer(
       columns0: Seq[Column.ColumnExpr[_]],
       prevContext: Context,
       valuesLists: Seq[Seq[Expr[_]]],
       tableName: String
-  ): SqlStr = {
+  ){
 
-    implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
-    val columns = SqlStr
+    implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
+    lazy val columns = SqlStr
       .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
-    val values = SqlStr.join(
+    lazy val values = SqlStr.join(
       valuesLists
         .map(values => sql"(" + SqlStr.join(values.map(_.toSqlQuery._1), sql", ") + sql")"),
       sql", "
     )
-    sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) VALUES $values"
+    def render() = {
+      sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) VALUES $values"
+    }
   }
 }

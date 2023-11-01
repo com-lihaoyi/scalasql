@@ -19,8 +19,10 @@ object InsertSelect {
 
     def table = insert.table
 
-    override def toSqlQuery(implicit ctx: Context) =
-      toSqlStr(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName)
+    override def toSqlQuery(implicit ctx: Context) = (
+      new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render(),
+      Seq(MappedType.IntType)
+    )
 
     override def isExecuteUpdate = true
 
@@ -31,27 +33,24 @@ object InsertSelect {
     override def valueReader: OptionPickler.Reader[Int] = implicitly
   }
 
-  def toSqlStr(
+  class Renderer(
       select: Select[_, _],
       exprs: Seq[Expr[_]],
       prevContext: Context,
       tableName: String
-  ): (SqlStr, Seq[MappedType[_]]) = {
+  ){
 
-    implicit val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
+    implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
 
-    val columns = SqlStr.join(
+    lazy val columns = SqlStr.join(
       exprs.map(_.asInstanceOf[Column.ColumnExpr[_]])
         .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
       sql", "
     )
 
-    val (selectSql, mappedTypes) = select.toSqlQuery
+    lazy val selectSql = select.toSqlQuery._1.withCompleteQuery(false)
 
-    (
-      sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) ${selectSql
-          .withCompleteQuery(false)}",
-      mappedTypes
-    )
+    lazy val tableNameStr = SqlStr.raw(ctx.config.tableNameMapper(tableName))
+    def render() = sql"INSERT INTO $tableNameStr ($columns) $selectSql"
   }
 }

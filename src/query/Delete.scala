@@ -12,18 +12,19 @@ object Delete {
     def walk() = Nil
     def singleRow = true
 
-    def toSqlQuery(implicit ctx: Context) = toSqlStr(table, filter, ctx)
+    def toSqlQuery(implicit ctx: Context) = (
+      new Renderer(table, filter, ctx).render(),
+      Seq(MappedType.IntType)
+    )
 
     def valueReader = implicitly
   }
 
-  def toSqlStr(table: TableRef, expr: Expr[Boolean], prevContext: Context) = {
-    val computed = Context.compute(prevContext, Nil, Some(table))
+  class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context)  {
+    lazy val tableNameStr = SqlStr.raw(prevContext.config.tableNameMapper(table.value.tableName))
+    lazy val computed = Context.compute(prevContext, Nil, Some(table))
     import computed.implicitCtx
 
-    (
-      sql"DELETE FROM ${SqlStr.raw(prevContext.config.tableNameMapper(table.value.tableName))} WHERE ${expr}",
-      Seq(MappedType.IntType)
-    )
+    def render() = sql"DELETE FROM $tableNameStr WHERE $expr"
   }
 }
