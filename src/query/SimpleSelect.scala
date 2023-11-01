@@ -72,16 +72,13 @@ class SimpleSelect[Q, R](
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
       implicit joinQr: Queryable[Q2, R2]
-  ): Select[(Q, Q2), (R, R2)] = {
-    joinCopy(other, on, None)((_, _))
-  }
+  ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, None)((_, _)) }
 
-  private def joinCopy[Q2, R2, Q3, R3](other: Joinable[Q2, R2],
-                                       on: Option[(Q, Q2) => Expr[Boolean]],
-                                       joinPrefix: Option[String])
-                                      (f: (Q, Q2) => Q3)
-                                      (implicit joinQr: Queryable[Q2, _],
-                                       jqr: Queryable[Q3, R3]) = {
+  protected def joinCopy[Q2, R2, Q3, R3](
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]],
+      joinPrefix: Option[String]
+  )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable[Q2, _], jqr: Queryable[Q3, R3]) = {
     val thisTrivial = groupBy0.isEmpty
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
@@ -95,18 +92,17 @@ class SimpleSelect[Q, R](
     )
   }
 
-  def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
-  ): Select[(Q, Option[Q2]), (R, Option[R2])] = {
+  def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
+      on: (Q, Q2) => Expr[Boolean]
+  )(implicit joinQr: Queryable[Q2, R2]): Select[(Q, Option[Q2]), (R, Option[R2])] = {
     joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Option(o)))
   }
 
-  def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
-  ): Select[(Option[Q], Q2), (Option[R], R2)] = {
+  def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
+      on: (Q, Q2) => Expr[Boolean]
+  )(implicit joinQr: Queryable[Q2, R2]): Select[(Option[Q], Q2), (Option[R], R2)] = {
     joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Option(e), o))
   }
-
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable[Q2, R2]

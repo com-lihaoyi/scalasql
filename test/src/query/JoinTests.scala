@@ -238,17 +238,39 @@ trait JoinTests extends ScalaSqlSuite {
 
     test("outerJoin") - checker(
       query = ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id),
-      sql = """
-        SELECT
-          shipping_info0.id as res__0__id,
-          shipping_info0.buyer_id as res__0__buyer_id,
-          shipping_info0.shipping_date as res__0__shipping_date,
-          buyer1.id as res__1__id,
-          buyer1.name as res__1__name,
-          buyer1.date_of_birth as res__1__date_of_birth
-        FROM shipping_info shipping_info0
-        FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
-      """,
+      sqls = Seq(
+        """
+          SELECT
+            shipping_info0.id as res__0__id,
+            shipping_info0.buyer_id as res__0__buyer_id,
+            shipping_info0.shipping_date as res__0__shipping_date,
+            buyer1.id as res__1__id,
+            buyer1.name as res__1__name,
+            buyer1.date_of_birth as res__1__date_of_birth
+          FROM shipping_info shipping_info0
+          FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+        """,
+        """
+          SELECT
+            shipping_info0.id as res__0__id,
+            shipping_info0.buyer_id as res__0__buyer_id,
+            shipping_info0.shipping_date as res__0__shipping_date,
+            buyer1.id as res__1__id,
+            buyer1.name as res__1__name,
+            buyer1.date_of_birth as res__1__date_of_birth
+          FROM shipping_info shipping_info0
+          LEFT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+          UNION
+          SELECT
+            shipping_info0.id as res__0__id,
+            shipping_info0.buyer_id as res__0__buyer_id,
+            shipping_info0.shipping_date as res__0__shipping_date,
+            buyer1.id as res__1__id,
+            buyer1.name as res__1__name,
+            buyer1.date_of_birth as res__1__date_of_birth
+          FROM shipping_info shipping_info0
+          RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id"""
+      ),
       value = Seq(
         (
           Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
@@ -264,8 +286,8 @@ trait JoinTests extends ScalaSqlSuite {
         ),
         (None, Some(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
       ),
-      normalize =
-        (x: Seq[(Option[ShippingInfo[Id]], Option[Buyer[Id]])]) => x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
+      normalize = (x: Seq[(Option[ShippingInfo[Id]], Option[Buyer[Id]])]) =>
+        x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
     )
   }
 }

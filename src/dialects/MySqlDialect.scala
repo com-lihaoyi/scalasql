@@ -167,7 +167,15 @@ object MySqlDialect extends MySqlDialect {
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable[Q, R])
       extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
-      with Select[Q, R]
+      with Select[Q, R] {
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+        implicit joinQr: Queryable[Q2, R2]
+    ): scalasql.query.Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
+      leftJoin(other)(on).map { case (l, r) => (Option(l), r) }.union(rightJoin(other)(on).map {
+        case (l, r) => (l, Option(r))
+      })
+    }
+  }
 
   class CompoundSelect[Q, R](
       lhs: scalasql.query.SimpleSelect[Q, R],
