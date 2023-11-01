@@ -1,7 +1,7 @@
 package scalasql.utils
 
 import scalasql.MappedType
-import upickle.core.{ArrVisitor, Visitor}
+import upickle.core.{ArrVisitor, ObjVisitor, Visitor}
 import upickle.core.compat.Factory
 
 object OptionPickler
@@ -39,6 +39,30 @@ object OptionPickler
       def visitEnd(index: Int) = b.result()
 
       def subVisitor = r
+    }
+  }
+
+  class NullableArrVisitor[-K, +T](v0: ArrVisitor[K, T]) extends ArrVisitor[K, T]{
+    def subVisitor: Visitor[_, _] = new NullableReader(v0.subVisitor.asInstanceOf[Reader[_]])
+    def visitValue(v: K, index: Int) = v0.visitValue(v, index)
+    def visitEnd(index: Int) = v0.visitEnd(index)
+  }
+
+  class NullableObjVisitor[-K, +T](v0: ObjVisitor[K, T]) extends ObjVisitor[K, T]{
+    def subVisitor: Visitor[_, _] = new NullableReader(v0.subVisitor.asInstanceOf[Reader[_]])
+    def visitValue(v: K, index: Int) = v0.visitValue(v, index)
+    def visitEnd(index: Int) = v0.visitEnd(index)
+    def visitKey(index: Int): Visitor[_, _] = v0.visitKey(index)
+    def visitKeyValue(v: Any) = v0.visitKeyValue(v)
+  }
+
+  class NullableReader[T](reader: Reader[T]) extends Reader.Delegate(reader){
+    override def visitArray(length: Int, index: Int): ArrVisitor[Any, T] = {
+      new NullableArrVisitor(super.visitArray(length, index))
+    }
+
+    override def visitObject(length: Int, jsonableKeys: Boolean, index: Int): ObjVisitor[Any, T] = {
+      new NullableObjVisitor(super.visitObject(length, jsonableKeys, index))
     }
   }
 }

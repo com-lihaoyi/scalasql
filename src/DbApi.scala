@@ -240,6 +240,7 @@ object DbApi {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
     val values = Array.newBuilder[Object]
+    val nulls = Array.newBuilder[Boolean]
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
@@ -247,11 +248,13 @@ object DbApi {
         .map(s => config.columnNameUnMapper(s.toLowerCase)).drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
+      val isNull = resultSet.getObject(i + 1) == null
 
       keys.addOne(k)
       values.addOne(v)
+      nulls.addOne(isNull)
     }
 
-    FlatJson.unflatten[V](keys.result(), values.result(), rowVisitor)
+    FlatJson.unflatten[V](keys.result(), values.result(), nulls.result(), rowVisitor)
   }
 }

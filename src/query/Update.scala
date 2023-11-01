@@ -50,7 +50,7 @@ object Update {
     def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
         implicit joinQr: Queryable[Q2, R2]
     ) = {
-      val (otherJoin, otherSelect) = joinInfo(other, on)
+      val (otherJoin, otherSelect) = joinInfo(None, other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }
 
@@ -58,6 +58,8 @@ object Update {
       toSqlStr(joins, table, set0, where, ctx)
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
+
+    override def leftJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(implicit joinQr: Queryable[Q2, R2]): Update[(Q, Option[Q2]), (R, Option[R2])] = ???
   }
 
   def toSqlStr(

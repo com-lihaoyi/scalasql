@@ -27,12 +27,12 @@ object SelectToSql {
       liveExprs: Option[Set[Expr.Identity]]
   )(implicit ctx: Context) = {
     SqlStr.join(joins.map { join =>
-      val joinPrefix = SqlStr.opt(join.prefix)(s => sql" ${SqlStr.raw(s)} ")
+      val joinPrefix = SqlStr.opt(join.prefix)(s => sql" ${SqlStr.raw(s)}")
       val joinSelectables = SqlStr.join(join.from.map { jf =>
         fromSelectables(jf.from)._2(liveExprs) + SqlStr.opt(jf.on)(on => sql" ON $on")
       })
 
-      sql"$joinPrefix JOIN $joinSelectables"
+      sql"${joinPrefix} JOIN $joinSelectables"
     })
   }
 

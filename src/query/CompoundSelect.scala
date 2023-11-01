@@ -55,6 +55,12 @@ class CompoundSelect[Q, R](
       implicit joinQr: Queryable[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { simpleFrom(this).join0(other, on) }
 
+  def leftJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+    implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Q, Option[Q2]), (R, Option[R2])] = {
+    simpleFrom(this).leftJoin0(other, on)
+  }
+
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
     simpleFrom(this).aggregate(f)
   }

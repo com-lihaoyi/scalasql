@@ -35,6 +35,8 @@ class TestDb(
       val sqlResult = db.autoCommit.toSqlQuery(query)
         .stripSuffix(dialectConfig.defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
+//      pprint.log(sqlResult)
+//      pprint.log(expectedSql)
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {
@@ -44,7 +46,7 @@ class TestDb(
       val simplifiedSqls = sqls.map(_.trim.replaceAll("\\s+", " "))
 //      pprint.log(simplifiedSqls)
 //      pprint.log(sqlResult)
-      assert(simplifiedSqls.exists(_ == sqlResult), pprint.apply(SqlFormatter.format(sqlResult)))
+      assert(simplifiedSqls.contains(sqlResult), pprint.apply(SqlFormatter.format(sqlResult)))
 
     }
 

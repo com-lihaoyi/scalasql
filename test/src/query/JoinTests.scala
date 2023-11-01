@@ -171,5 +171,36 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(LocalDate.parse("2012-04-05"))
     )
+
+    test("leftJoin") - checker(
+      query = Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId),
+      sql = """
+        SELECT
+          buyer0.id as res__0__id,
+          buyer0.name as res__0__name,
+          buyer0.date_of_birth as res__0__date_of_birth,
+          shipping_info1.id as res__1__id,
+          shipping_info1.buyer_id as res__1__buyer_id,
+          shipping_info1.shipping_date as res__1__shipping_date
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+      """,
+      value = Seq(
+        (
+          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+        ),
+        (
+          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+        ),
+        (
+          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+        ),
+        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+      ),
+      normalize = (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id))
+    )
   }
 }

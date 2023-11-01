@@ -26,6 +26,7 @@ object FlatJson {
   def unflatten[V](
       keys: IndexedSeq[IndexedSeq[String]],
       values: IndexedSeq[Object],
+      nulls: IndexedSeq[Boolean],
       rowVisitor: Visitor[_, _]
   ): V = {
 
@@ -53,31 +54,53 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _]): Any = {
-      if (startIndex == endIndex - 1 && depth == keys(startIndex).length) { values(startIndex) }
-      else {
+    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _]): (Any, Int, Int) = {
+      if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
+        val v = values(startIndex)
+        (v, if (nulls(startIndex)) 1 else 0, if (nulls(startIndex)) 0 else 1)
+
         // Hack to check if a random key looks like a number,
         // in which case this data represents an array
-        if (keys(startIndex)(depth).head.isDigit) {
-          val arrVisitor = visitor.visitArray(-1, -1).narrow
-          groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-            arrVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor), -1)
-          }
-
-          arrVisitor.visitEnd(-1)
-        } else {
-          val objVisitor = visitor.visitObject(-1, true, -1).narrow
-          groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
-            val keyVisitor = objVisitor.visitKey(-1)
-            objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
-            objVisitor.visitValue(rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor), -1)
-          }
-
-          objVisitor.visitEnd(-1)
+      } else if (keys(startIndex)(depth).head.isDigit) {
+        val arrVisitor = visitor.visitArray(-1, -1).narrow
+        var nulls = 0
+        var nonNulls = 0
+        groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
+          val (v, subNulls, subNonNulls) = rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor)
+          arrVisitor.visitValue(v, -1)
+          nulls += subNulls
+          nonNulls += subNonNulls
         }
+
+        val result0 = arrVisitor.visitEnd(-1)
+        val result =
+          if (!arrVisitor.isInstanceOf[OptionPickler.NullableArrVisitor[_, _]]) result0
+          else (if (nulls != 0 && nonNulls == 0) None else Some(result0))
+        (result, nulls, nonNulls)
+      } else {
+
+        val objVisitor = visitor.visitObject(-1, true, -1).narrow
+        var nulls =  0
+        var nonNulls = 0
+        groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
+          val keyVisitor = objVisitor.visitKey(-1)
+          objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
+          val (v, subNulls, subNonNulls) = rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor)
+          objVisitor.visitValue(v, -1)
+          nulls += subNulls
+          nonNulls += subNonNulls
+        }
+
+        val result0 = objVisitor.visitEnd(-1)
+
+        val result =
+          if (!objVisitor.isInstanceOf[OptionPickler.NullableObjVisitor[_, _]]) result0
+          else (if (nulls != 0 && nonNulls == 0) None else Some(result0 ))
+
+        (result, nulls, nonNulls)
       }
     }
 
-    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]]).asInstanceOf[V]
+    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]])._1.asInstanceOf[V]
   }
 }
