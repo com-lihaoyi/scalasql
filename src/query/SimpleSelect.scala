@@ -73,12 +73,20 @@ class SimpleSelect[Q, R](
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
       implicit joinQr: Queryable[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = {
+    joinCopy(other, on, None)((_, _))
+  }
 
+  private def joinCopy[Q2, R2, Q3, R3](other: Joinable[Q2, R2],
+                                       on: Option[(Q, Q2) => Expr[Boolean]],
+                                       joinPrefix: Option[String])
+                                      (f: (Q, Q2) => Q3)
+                                      (implicit joinQr: Queryable[Q2, _],
+                                       jqr: Queryable[Q3, R3]) = {
     val thisTrivial = groupBy0.isEmpty
-    val (otherJoin, otherSelect) = joinInfo(None, other, on)
+    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
     copy(
-      expr = (expr, otherSelect.expr),
+      expr = f(expr, otherSelect.expr),
       exprPrefix = if (thisTrivial) exprPrefix else None,
       from = if (thisTrivial) from else Seq(this.subqueryRef),
       joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
@@ -87,38 +95,23 @@ class SimpleSelect[Q, R](
     )
   }
 
-  def leftJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable[Q2, R2]
   ): Select[(Q, Option[Q2]), (R, Option[R2])] = {
-
-    val thisTrivial = groupBy0.isEmpty
-    val (otherJoin, otherSelect) = joinInfo(Some("LEFT"), other, on)
-
-    copy(
-      expr = (expr, Option(otherSelect.expr)),
-      exprPrefix = if (thisTrivial) exprPrefix else None,
-      from = if (thisTrivial) from else Seq(this.subqueryRef),
-      joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
-      where = if (thisTrivial) where else Nil,
-      groupBy0 = if (thisTrivial) groupBy0 else None
-    )
+    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Option(o)))
   }
 
-  def rightJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable[Q2, R2]
   ): Select[(Option[Q], Q2), (Option[R], R2)] = {
+    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Option(e), o))
+  }
 
-    val thisTrivial = groupBy0.isEmpty
-    val (otherJoin, otherSelect) = joinInfo(Some("RIGHT"), other, on)
 
-    copy(
-      expr = (Option(expr), otherSelect.expr),
-      exprPrefix = if (thisTrivial) exprPrefix else None,
-      from = if (thisTrivial) from else Seq(this.subqueryRef),
-      joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
-      where = if (thisTrivial) where else Nil,
-      groupBy0 = if (thisTrivial) groupBy0 else None
-    )
+  def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+      implicit joinQr: Queryable[Q2, R2]
+  ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
+    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (Option(e), Option(o)))
   }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {

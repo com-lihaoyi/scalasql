@@ -59,12 +59,17 @@ object Update {
 
     override def valueReader: OptionPickler.Reader[Int] = implicitly
 
-    override def leftJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+    override def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable[Q2, R2]
     ): Update[(Q, Option[Q2]), (R, Option[R2])] = ???
-    override def rightJoin0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+
+    override def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable[Q2, R2]
     ): Update[(Option[Q], Q2), (Option[R], R2)] = ???
+
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+        implicit joinQr: Queryable[Q2, R2]
+    ): Update[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = ???
   }
 
   def toSqlStr(
