@@ -63,13 +63,13 @@ object MainTests extends TestSuite {
   def tests = Tests {
 
     // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
-    test("constant") {
-      val query = Expr(1)
+    test("expr") {
+      val query = Expr(1) + Expr(3)
       val sql = db.toSqlQuery(query)
-      assert(sql == """SELECT ? as res""")
+      assert(sql == """SELECT ? + ? as res""")
 
       val res = db.run(query)
-      val expected = 1
+      val expected = 4
       assert(res == expected)
     }
 
