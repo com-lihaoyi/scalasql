@@ -10,13 +10,12 @@ import scalasql.{Config, DatabaseClient, Queryable}
 import java.sql.Connection
 
 class TestDb(
-    connection: Connection,
+    val db: DatabaseClient,
     testSchemaFileName: String,
     testDataFileName: String,
     dialectConfig: DialectConfig
 ) {
 
-  val db = new DatabaseClient(connection, dialectConfig = dialectConfig, config = TestDb.Config)
 
   def reset() = {
     db.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
@@ -59,21 +58,7 @@ class TestDb(
 }
 
 object TestDb {
-  object Config extends Config
-  lazy val pg = {
-    println("Initializing Postgres")
-    val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
-    pg.start()
-    pg
-  }
 
-  lazy val mysql = {
-    println("Initializing MySql")
-    val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
-      .withCommand("mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin")
-    mysql.start()
-    mysql
-  }
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(additionalHandlers = {
     case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)

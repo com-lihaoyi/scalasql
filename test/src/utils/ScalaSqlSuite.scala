@@ -12,7 +12,7 @@ trait ScalaSqlSuite extends TestSuite with Dialect {
 
 trait SqliteSuite extends TestSuite with SqliteDialect {
   val checker = new TestDb(
-    DriverManager.getConnection("jdbc:sqlite::memory:"),
+    TestClients.sqliteClient,
     "sqlite-customer-schema.sql",
     "customer-data.sql",
     dialects.SqliteDialect
@@ -23,7 +23,7 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
 
 trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
   val checker = new TestDb(
-    DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
+    TestClients.hsqlDbClient,
     "hsqldb-customer-schema.sql",
     "customer-data.sql",
     dialects.HsqlDbDialect
@@ -34,7 +34,7 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
 
 trait H2Suite extends TestSuite with H2Dialect {
   val checker = new TestDb(
-    DriverManager.getConnection("jdbc:h2:mem:mydb"),
+    TestClients.h2Client,
     "h2-customer-schema.sql",
     "customer-data.sql",
     dialects.H2Dialect
@@ -45,9 +45,7 @@ trait H2Suite extends TestSuite with H2Dialect {
 
 trait PostgresSuite extends TestSuite with PostgresDialect {
   val checker = new TestDb(
-    DriverManager.getConnection(
-      s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
-    ),
+    TestClients.postgresClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
     dialects.PostgresDialect
@@ -58,11 +56,7 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
 
 trait MySqlSuite extends TestSuite with MySqlDialect {
   val checker = new TestDb(
-    DriverManager.getConnection(
-      TestDb.mysql.getJdbcUrl + "?allowMultiQueries=true",
-      TestDb.mysql.getUsername,
-      TestDb.mysql.getPassword
-    ),
+    TestClients.mysqlClient,
     "mysql-customer-schema.sql",
     "customer-data.sql",
     dialects.MySqlDialect

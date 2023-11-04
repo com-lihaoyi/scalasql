@@ -1,13 +1,13 @@
 package scalasql
 
-import utils.TestDb
+import utils.{TestClients, TestDb}
 
 object Main {
 
   def main(args: Array[String]): Unit = {
     // org.xerial:sqlite-jdbc:3.43.0.0
     val conn = java.sql.DriverManager.getConnection(
-      s"${TestDb.pg.getJdbcUrl}&user=${TestDb.pg.getUsername}&password=${TestDb.pg.getPassword}"
+      s"${TestClients.postgres.getJdbcUrl}&user=${TestClients.postgres.getUsername}&password=${TestClients.postgres.getPassword}"
     )
     val statement = conn.createStatement()
     statement.executeUpdate(
