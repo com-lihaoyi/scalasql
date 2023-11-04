@@ -61,13 +61,14 @@ typed `Table` descriptions.
 ## Comparisons
 
 
-|                                 | ScalaSql | Quill     | SLICK      | Squeryl | ScalikeJDBC | Doobie  |
-|---------------------------------|----------|-----------|------------|---------|-------------|---------|
-| Async/Monadic                   | No       | Yes (ZIO) | Yes (DBIO) | No      | No          | Yes     |
-| Compile-Time Query Generation   | No       | Yes       | No         | No      | No          | No      |
-| Scala-collection-like Query DSL | Yes      | Yes       | Yes        | No      | No          | No      |
-| Query Optimizer                 | No       | Yes       | Yes        | No      | No          | No      |
-| ORM/ActiveRecord-esque Features | No       | No        | No         | Yes     | Yes         | No      |
+|                                     | ScalaSql | Quill     | SLICK      | Squeryl | ScalikeJDBC | Doobie |
+|-------------------------------------|----------|-----------|------------|---------|-------------|--------|
+| Async/Monadic                       | No       | Yes (ZIO) | Yes (DBIO) | No      | No          | Yes    |
+| Compile-Time Query Generation       | No       | Yes       | No         | No      | No          | No     |
+| Scala-collection-like Query DSL     | Yes      | Yes       | Yes        | No      | No          | No     |
+| Query Optimizer                     | No       | Yes       | Yes        | No      | No          | No     |
+| ORM/ActiveRecord-esque Features     | No       | No        | No         | Yes     | Yes         | No     |
+| Lighteweight Model Class Definition | Yes      | Yes       | No         | No      | No          | Yes    |
 
 ScalaSql aims to be a stripped-down version of the more sophisticated database libraries
 in the Scala ecosystem, focused purely on converting scala "query" data structures to SQL
