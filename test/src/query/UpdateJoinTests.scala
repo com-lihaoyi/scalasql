@@ -14,7 +14,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("join") - {
       checker(
-        query = Buyer.update.filter(_.name `=` "James Bond")
+        query = Buyer.update(_.name `=` "James Bond")
           .joinOn(ShippingInfo)(_.id `=` _.buyerId).set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sqls = Seq(
           """
@@ -41,7 +41,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
 
     test("multijoin") - {
       checker(
-        query = Buyer.update.filter(_.name `=` "James Bond")
+        query = Buyer.update(_.name `=` "James Bond")
           .joinOn(ShippingInfo)(_.id `=` _.buyerId).joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
           .joinOn(Product)(_._2.productId `=` _.id)
           .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
@@ -75,7 +75,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
 
     test("joinSubquery") - {
       checker(
-        query = Buyer.update.filter(_.name `=` "James Bond")
+        query = Buyer.update(_.name `=` "James Bond")
           .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
           .set(c => c._1.dateOfBirth -> c._2.shippingDate),
         sqls = Seq(
@@ -114,7 +114,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
     }
     test("joinSubqueryEliminatedColumn") - {
       checker(
-        query = Buyer.update.filter(_.name `=` "James Bond")
+        query = Buyer.update(_.name `=` "James Bond")
           // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
           // column gets eliminated since it is not used outside the subquery
           .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)

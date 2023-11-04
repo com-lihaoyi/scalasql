@@ -5,7 +5,7 @@
 --
 
 CREATE TABLE IF NOT EXISTS city (
-    id integer NOT NULL,
+    id integer AUTO_INCREMENT NOT NULL,
     name varchar NOT NULL,
     countrycode character(3) NOT NULL,
     district varchar NOT NULL,
@@ -38,4085 +38,4085 @@ CREATE TABLE IF NOT EXISTS countrylanguage (
 );
 
 -- COPY city (id, name, countrycode, district, population) FROM stdin;
-INSERT INTO city VALUES (1, 'Kabul', 'AFG', 'Kabol', 1780000);
-INSERT INTO city VALUES (2, 'Qandahar', 'AFG', 'Qandahar', 237500);
-INSERT INTO city VALUES (3, 'Herat', 'AFG', 'Herat', 186800);
-INSERT INTO city VALUES (4, 'Mazar-e-Sharif', 'AFG', 'Balkh', 127800);
-INSERT INTO city VALUES (5, 'Amsterdam', 'NLD', 'Noord-Holland', 731200);
-INSERT INTO city VALUES (6, 'Rotterdam', 'NLD', 'Zuid-Holland', 593321);
-INSERT INTO city VALUES (7, 'Haag', 'NLD', 'Zuid-Holland', 440900);
-INSERT INTO city VALUES (8, 'Utrecht', 'NLD', 'Utrecht', 234323);
-INSERT INTO city VALUES (9, 'Eindhoven', 'NLD', 'Noord-Brabant', 201843);
-INSERT INTO city VALUES (10, 'Tilburg', 'NLD', 'Noord-Brabant', 193238);
-INSERT INTO city VALUES (11, 'Groningen', 'NLD', 'Groningen', 172701);
-INSERT INTO city VALUES (12, 'Breda', 'NLD', 'Noord-Brabant', 160398);
-INSERT INTO city VALUES (13, 'Apeldoorn', 'NLD', 'Gelderland', 153491);
-INSERT INTO city VALUES (14, 'Nijmegen', 'NLD', 'Gelderland', 152463);
-INSERT INTO city VALUES (15, 'Enschede', 'NLD', 'Overijssel', 149544);
-INSERT INTO city VALUES (16, 'Haarlem', 'NLD', 'Noord-Holland', 148772);
-INSERT INTO city VALUES (17, 'Almere', 'NLD', 'Flevoland', 142465);
-INSERT INTO city VALUES (18, 'Arnhem', 'NLD', 'Gelderland', 138020);
-INSERT INTO city VALUES (19, 'Zaanstad', 'NLD', 'Noord-Holland', 135621);
-INSERT INTO city VALUES (20, '´s-Hertogenbosch', 'NLD', 'Noord-Brabant', 129170);
-INSERT INTO city VALUES (21, 'Amersfoort', 'NLD', 'Utrecht', 126270);
-INSERT INTO city VALUES (22, 'Maastricht', 'NLD', 'Limburg', 122087);
-INSERT INTO city VALUES (23, 'Dordrecht', 'NLD', 'Zuid-Holland', 119811);
-INSERT INTO city VALUES (24, 'Leiden', 'NLD', 'Zuid-Holland', 117196);
-INSERT INTO city VALUES (25, 'Haarlemmermeer', 'NLD', 'Noord-Holland', 110722);
-INSERT INTO city VALUES (26, 'Zoetermeer', 'NLD', 'Zuid-Holland', 110214);
-INSERT INTO city VALUES (27, 'Emmen', 'NLD', 'Drenthe', 105853);
-INSERT INTO city VALUES (28, 'Zwolle', 'NLD', 'Overijssel', 105819);
-INSERT INTO city VALUES (29, 'Ede', 'NLD', 'Gelderland', 101574);
-INSERT INTO city VALUES (30, 'Delft', 'NLD', 'Zuid-Holland', 95268);
-INSERT INTO city VALUES (31, 'Heerlen', 'NLD', 'Limburg', 95052);
-INSERT INTO city VALUES (32, 'Alkmaar', 'NLD', 'Noord-Holland', 92713);
-INSERT INTO city VALUES (33, 'Willemstad', 'ANT', 'Curaçao', 2345);
-INSERT INTO city VALUES (34, 'Tirana', 'ALB', 'Tirana', 270000);
-INSERT INTO city VALUES (35, 'Alger', 'DZA', 'Alger', 2168000);
-INSERT INTO city VALUES (36, 'Oran', 'DZA', 'Oran', 609823);
-INSERT INTO city VALUES (37, 'Constantine', 'DZA', 'Constantine', 443727);
-INSERT INTO city VALUES (38, 'Annaba', 'DZA', 'Annaba', 222518);
-INSERT INTO city VALUES (39, 'Batna', 'DZA', 'Batna', 183377);
-INSERT INTO city VALUES (40, 'Sétif', 'DZA', 'Sétif', 179055);
-INSERT INTO city VALUES (41, 'Sidi Bel Abbès', 'DZA', 'Sidi Bel Abbès', 153106);
-INSERT INTO city VALUES (42, 'Skikda', 'DZA', 'Skikda', 128747);
-INSERT INTO city VALUES (43, 'Biskra', 'DZA', 'Biskra', 128281);
-INSERT INTO city VALUES (44, 'Blida (el-Boulaida)', 'DZA', 'Blida', 127284);
-INSERT INTO city VALUES (45, 'Béjaïa', 'DZA', 'Béjaïa', 117162);
-INSERT INTO city VALUES (46, 'Mostaganem', 'DZA', 'Mostaganem', 115212);
-INSERT INTO city VALUES (47, 'Tébessa', 'DZA', 'Tébessa', 112007);
-INSERT INTO city VALUES (48, 'Tlemcen (Tilimsen)', 'DZA', 'Tlemcen', 110242);
-INSERT INTO city VALUES (49, 'Béchar', 'DZA', 'Béchar', 107311);
-INSERT INTO city VALUES (50, 'Tiaret', 'DZA', 'Tiaret', 100118);
-INSERT INTO city VALUES (51, 'Ech-Chleff (el-Asnam)', 'DZA', 'Chlef', 96794);
-INSERT INTO city VALUES (52, 'Ghardaïa', 'DZA', 'Ghardaïa', 89415);
-INSERT INTO city VALUES (53, 'Tafuna', 'ASM', 'Tutuila', 5200);
-INSERT INTO city VALUES (54, 'Fagatogo', 'ASM', 'Tutuila', 2323);
-INSERT INTO city VALUES (55, 'Andorra la Vella', 'AND', 'Andorra la Vella', 21189);
-INSERT INTO city VALUES (56, 'Luanda', 'AGO', 'Luanda', 2022000);
-INSERT INTO city VALUES (57, 'Huambo', 'AGO', 'Huambo', 163100);
-INSERT INTO city VALUES (58, 'Lobito', 'AGO', 'Benguela', 130000);
-INSERT INTO city VALUES (59, 'Benguela', 'AGO', 'Benguela', 128300);
-INSERT INTO city VALUES (60, 'Namibe', 'AGO', 'Namibe', 118200);
-INSERT INTO city VALUES (61, 'South Hill', 'AIA', '', 961);
-INSERT INTO city VALUES (62, 'The Valley', 'AIA', '', 595);
-INSERT INTO city VALUES (63, 'Saint John´s', 'ATG', 'St John', 24000);
-INSERT INTO city VALUES (64, 'Dubai', 'ARE', 'Dubai', 669181);
-INSERT INTO city VALUES (65, 'Abu Dhabi', 'ARE', 'Abu Dhabi', 398695);
-INSERT INTO city VALUES (66, 'Sharja', 'ARE', 'Sharja', 320095);
-INSERT INTO city VALUES (67, 'al-Ayn', 'ARE', 'Abu Dhabi', 225970);
-INSERT INTO city VALUES (68, 'Ajman', 'ARE', 'Ajman', 114395);
-INSERT INTO city VALUES (69, 'Buenos Aires', 'ARG', 'Distrito Federal', 2982146);
-INSERT INTO city VALUES (70, 'La Matanza', 'ARG', 'Buenos Aires', 1266461);
-INSERT INTO city VALUES (71, 'Córdoba', 'ARG', 'Córdoba', 1157507);
-INSERT INTO city VALUES (72, 'Rosario', 'ARG', 'Santa Fé', 907718);
-INSERT INTO city VALUES (73, 'Lomas de Zamora', 'ARG', 'Buenos Aires', 622013);
-INSERT INTO city VALUES (74, 'Quilmes', 'ARG', 'Buenos Aires', 559249);
-INSERT INTO city VALUES (75, 'Almirante Brown', 'ARG', 'Buenos Aires', 538918);
-INSERT INTO city VALUES (76, 'La Plata', 'ARG', 'Buenos Aires', 521936);
-INSERT INTO city VALUES (77, 'Mar del Plata', 'ARG', 'Buenos Aires', 512880);
-INSERT INTO city VALUES (78, 'San Miguel de Tucumán', 'ARG', 'Tucumán', 470809);
-INSERT INTO city VALUES (79, 'Lanús', 'ARG', 'Buenos Aires', 469735);
-INSERT INTO city VALUES (80, 'Merlo', 'ARG', 'Buenos Aires', 463846);
-INSERT INTO city VALUES (81, 'General San Martín', 'ARG', 'Buenos Aires', 422542);
-INSERT INTO city VALUES (82, 'Salta', 'ARG', 'Salta', 367550);
-INSERT INTO city VALUES (83, 'Moreno', 'ARG', 'Buenos Aires', 356993);
-INSERT INTO city VALUES (84, 'Santa Fé', 'ARG', 'Santa Fé', 353063);
-INSERT INTO city VALUES (85, 'Avellaneda', 'ARG', 'Buenos Aires', 353046);
-INSERT INTO city VALUES (86, 'Tres de Febrero', 'ARG', 'Buenos Aires', 352311);
-INSERT INTO city VALUES (87, 'Morón', 'ARG', 'Buenos Aires', 349246);
-INSERT INTO city VALUES (88, 'Florencio Varela', 'ARG', 'Buenos Aires', 315432);
-INSERT INTO city VALUES (89, 'San Isidro', 'ARG', 'Buenos Aires', 306341);
-INSERT INTO city VALUES (90, 'Tigre', 'ARG', 'Buenos Aires', 296226);
-INSERT INTO city VALUES (91, 'Malvinas Argentinas', 'ARG', 'Buenos Aires', 290335);
-INSERT INTO city VALUES (92, 'Vicente López', 'ARG', 'Buenos Aires', 288341);
-INSERT INTO city VALUES (93, 'Berazategui', 'ARG', 'Buenos Aires', 276916);
-INSERT INTO city VALUES (94, 'Corrientes', 'ARG', 'Corrientes', 258103);
-INSERT INTO city VALUES (95, 'San Miguel', 'ARG', 'Buenos Aires', 248700);
-INSERT INTO city VALUES (96, 'Bahía Blanca', 'ARG', 'Buenos Aires', 239810);
-INSERT INTO city VALUES (97, 'Esteban Echeverría', 'ARG', 'Buenos Aires', 235760);
-INSERT INTO city VALUES (98, 'Resistencia', 'ARG', 'Chaco', 229212);
-INSERT INTO city VALUES (99, 'José C. Paz', 'ARG', 'Buenos Aires', 221754);
-INSERT INTO city VALUES (100, 'Paraná', 'ARG', 'Entre Rios', 207041);
-INSERT INTO city VALUES (101, 'Godoy Cruz', 'ARG', 'Mendoza', 206998);
-INSERT INTO city VALUES (102, 'Posadas', 'ARG', 'Misiones', 201273);
-INSERT INTO city VALUES (103, 'Guaymallén', 'ARG', 'Mendoza', 200595);
-INSERT INTO city VALUES (104, 'Santiago del Estero', 'ARG', 'Santiago del Estero', 189947);
-INSERT INTO city VALUES (105, 'San Salvador de Jujuy', 'ARG', 'Jujuy', 178748);
-INSERT INTO city VALUES (106, 'Hurlingham', 'ARG', 'Buenos Aires', 170028);
-INSERT INTO city VALUES (107, 'Neuquén', 'ARG', 'Neuquén', 167296);
-INSERT INTO city VALUES (108, 'Ituzaingó', 'ARG', 'Buenos Aires', 158197);
-INSERT INTO city VALUES (109, 'San Fernando', 'ARG', 'Buenos Aires', 153036);
-INSERT INTO city VALUES (110, 'Formosa', 'ARG', 'Formosa', 147636);
-INSERT INTO city VALUES (111, 'Las Heras', 'ARG', 'Mendoza', 145823);
-INSERT INTO city VALUES (112, 'La Rioja', 'ARG', 'La Rioja', 138117);
-INSERT INTO city VALUES (113, 'San Fernando del Valle de Cata', 'ARG', 'Catamarca', 134935);
-INSERT INTO city VALUES (114, 'Río Cuarto', 'ARG', 'Córdoba', 134355);
-INSERT INTO city VALUES (115, 'Comodoro Rivadavia', 'ARG', 'Chubut', 124104);
-INSERT INTO city VALUES (116, 'Mendoza', 'ARG', 'Mendoza', 123027);
-INSERT INTO city VALUES (117, 'San Nicolás de los Arroyos', 'ARG', 'Buenos Aires', 119302);
-INSERT INTO city VALUES (118, 'San Juan', 'ARG', 'San Juan', 119152);
-INSERT INTO city VALUES (119, 'Escobar', 'ARG', 'Buenos Aires', 116675);
-INSERT INTO city VALUES (120, 'Concordia', 'ARG', 'Entre Rios', 116485);
-INSERT INTO city VALUES (121, 'Pilar', 'ARG', 'Buenos Aires', 113428);
-INSERT INTO city VALUES (122, 'San Luis', 'ARG', 'San Luis', 110136);
-INSERT INTO city VALUES (123, 'Ezeiza', 'ARG', 'Buenos Aires', 99578);
-INSERT INTO city VALUES (124, 'San Rafael', 'ARG', 'Mendoza', 94651);
-INSERT INTO city VALUES (125, 'Tandil', 'ARG', 'Buenos Aires', 91101);
-INSERT INTO city VALUES (126, 'Yerevan', 'ARM', 'Yerevan', 1248700);
-INSERT INTO city VALUES (127, 'Gjumri', 'ARM', 'irak', 211700);
-INSERT INTO city VALUES (128, 'Vanadzor', 'ARM', 'Lori', 172700);
-INSERT INTO city VALUES (129, 'Oranjestad', 'ABW', '', 29034);
-INSERT INTO city VALUES (130, 'Sydney', 'AUS', 'New South Wales', 3276207);
-INSERT INTO city VALUES (131, 'Melbourne', 'AUS', 'Victoria', 2865329);
-INSERT INTO city VALUES (132, 'Brisbane', 'AUS', 'Queensland', 1291117);
-INSERT INTO city VALUES (133, 'Perth', 'AUS', 'West Australia', 1096829);
-INSERT INTO city VALUES (134, 'Adelaide', 'AUS', 'South Australia', 978100);
-INSERT INTO city VALUES (135, 'Canberra', 'AUS', 'Capital Region', 322723);
-INSERT INTO city VALUES (136, 'Gold Coast', 'AUS', 'Queensland', 311932);
-INSERT INTO city VALUES (137, 'Newcastle', 'AUS', 'New South Wales', 270324);
-INSERT INTO city VALUES (138, 'Central Coast', 'AUS', 'New South Wales', 227657);
-INSERT INTO city VALUES (139, 'Wollongong', 'AUS', 'New South Wales', 219761);
-INSERT INTO city VALUES (140, 'Hobart', 'AUS', 'Tasmania', 126118);
-INSERT INTO city VALUES (141, 'Geelong', 'AUS', 'Victoria', 125382);
-INSERT INTO city VALUES (142, 'Townsville', 'AUS', 'Queensland', 109914);
-INSERT INTO city VALUES (143, 'Cairns', 'AUS', 'Queensland', 92273);
-INSERT INTO city VALUES (144, 'Baku', 'AZE', 'Baki', 1787800);
-INSERT INTO city VALUES (145, 'Gäncä', 'AZE', 'Gäncä', 299300);
-INSERT INTO city VALUES (146, 'Sumqayit', 'AZE', 'Sumqayit', 283000);
-INSERT INTO city VALUES (147, 'Mingäçevir', 'AZE', 'Mingäçevir', 93900);
-INSERT INTO city VALUES (148, 'Nassau', 'BHS', 'New Providence', 172000);
-INSERT INTO city VALUES (149, 'al-Manama', 'BHR', 'al-Manama', 148000);
-INSERT INTO city VALUES (150, 'Dhaka', 'BGD', 'Dhaka', 3612850);
-INSERT INTO city VALUES (151, 'Chittagong', 'BGD', 'Chittagong', 1392860);
-INSERT INTO city VALUES (152, 'Khulna', 'BGD', 'Khulna', 663340);
-INSERT INTO city VALUES (153, 'Rajshahi', 'BGD', 'Rajshahi', 294056);
-INSERT INTO city VALUES (154, 'Narayanganj', 'BGD', 'Dhaka', 202134);
-INSERT INTO city VALUES (155, 'Rangpur', 'BGD', 'Rajshahi', 191398);
-INSERT INTO city VALUES (156, 'Mymensingh', 'BGD', 'Dhaka', 188713);
-INSERT INTO city VALUES (157, 'Barisal', 'BGD', 'Barisal', 170232);
-INSERT INTO city VALUES (158, 'Tungi', 'BGD', 'Dhaka', 168702);
-INSERT INTO city VALUES (159, 'Jessore', 'BGD', 'Khulna', 139710);
-INSERT INTO city VALUES (160, 'Comilla', 'BGD', 'Chittagong', 135313);
-INSERT INTO city VALUES (161, 'Nawabganj', 'BGD', 'Rajshahi', 130577);
-INSERT INTO city VALUES (162, 'Dinajpur', 'BGD', 'Rajshahi', 127815);
-INSERT INTO city VALUES (163, 'Bogra', 'BGD', 'Rajshahi', 120170);
-INSERT INTO city VALUES (164, 'Sylhet', 'BGD', 'Sylhet', 117396);
-INSERT INTO city VALUES (165, 'Brahmanbaria', 'BGD', 'Chittagong', 109032);
-INSERT INTO city VALUES (166, 'Tangail', 'BGD', 'Dhaka', 106004);
-INSERT INTO city VALUES (167, 'Jamalpur', 'BGD', 'Dhaka', 103556);
-INSERT INTO city VALUES (168, 'Pabna', 'BGD', 'Rajshahi', 103277);
-INSERT INTO city VALUES (169, 'Naogaon', 'BGD', 'Rajshahi', 101266);
-INSERT INTO city VALUES (170, 'Sirajganj', 'BGD', 'Rajshahi', 99669);
-INSERT INTO city VALUES (171, 'Narsinghdi', 'BGD', 'Dhaka', 98342);
-INSERT INTO city VALUES (172, 'Saidpur', 'BGD', 'Rajshahi', 96777);
-INSERT INTO city VALUES (173, 'Gazipur', 'BGD', 'Dhaka', 96717);
-INSERT INTO city VALUES (174, 'Bridgetown', 'BRB', 'St Michael', 6070);
-INSERT INTO city VALUES (175, 'Antwerpen', 'BEL', 'Antwerpen', 446525);
-INSERT INTO city VALUES (176, 'Gent', 'BEL', 'East Flanderi', 224180);
-INSERT INTO city VALUES (177, 'Charleroi', 'BEL', 'Hainaut', 200827);
-INSERT INTO city VALUES (178, 'Liège', 'BEL', 'Liège', 185639);
-INSERT INTO city VALUES (179, 'Bruxelles [Brussel]', 'BEL', 'Bryssel', 133859);
-INSERT INTO city VALUES (180, 'Brugge', 'BEL', 'West Flanderi', 116246);
-INSERT INTO city VALUES (181, 'Schaerbeek', 'BEL', 'Bryssel', 105692);
-INSERT INTO city VALUES (182, 'Namur', 'BEL', 'Namur', 105419);
-INSERT INTO city VALUES (183, 'Mons', 'BEL', 'Hainaut', 90935);
-INSERT INTO city VALUES (184, 'Belize City', 'BLZ', 'Belize City', 55810);
-INSERT INTO city VALUES (185, 'Belmopan', 'BLZ', 'Cayo', 7105);
-INSERT INTO city VALUES (186, 'Cotonou', 'BEN', 'Atlantique', 536827);
-INSERT INTO city VALUES (187, 'Porto-Novo', 'BEN', 'Ouémé', 194000);
-INSERT INTO city VALUES (188, 'Djougou', 'BEN', 'Atacora', 134099);
-INSERT INTO city VALUES (189, 'Parakou', 'BEN', 'Borgou', 103577);
-INSERT INTO city VALUES (190, 'Saint George', 'BMU', 'Saint George´s', 1800);
-INSERT INTO city VALUES (191, 'Hamilton', 'BMU', 'Hamilton', 1200);
-INSERT INTO city VALUES (192, 'Thimphu', 'BTN', 'Thimphu', 22000);
-INSERT INTO city VALUES (193, 'Santa Cruz de la Sierra', 'BOL', 'Santa Cruz', 935361);
-INSERT INTO city VALUES (194, 'La Paz', 'BOL', 'La Paz', 758141);
-INSERT INTO city VALUES (195, 'El Alto', 'BOL', 'La Paz', 534466);
-INSERT INTO city VALUES (196, 'Cochabamba', 'BOL', 'Cochabamba', 482800);
-INSERT INTO city VALUES (197, 'Oruro', 'BOL', 'Oruro', 223553);
-INSERT INTO city VALUES (198, 'Sucre', 'BOL', 'Chuquisaca', 178426);
-INSERT INTO city VALUES (199, 'Potosí', 'BOL', 'Potosí', 140642);
-INSERT INTO city VALUES (200, 'Tarija', 'BOL', 'Tarija', 125255);
-INSERT INTO city VALUES (201, 'Sarajevo', 'BIH', 'Federaatio', 360000);
-INSERT INTO city VALUES (202, 'Banja Luka', 'BIH', 'Republika Srpska', 143079);
-INSERT INTO city VALUES (203, 'Zenica', 'BIH', 'Federaatio', 96027);
-INSERT INTO city VALUES (204, 'Gaborone', 'BWA', 'Gaborone', 213017);
-INSERT INTO city VALUES (205, 'Francistown', 'BWA', 'Francistown', 101805);
-INSERT INTO city VALUES (206, 'São Paulo', 'BRA', 'São Paulo', 9968485);
-INSERT INTO city VALUES (207, 'Rio de Janeiro', 'BRA', 'Rio de Janeiro', 5598953);
-INSERT INTO city VALUES (208, 'Salvador', 'BRA', 'Bahia', 2302832);
-INSERT INTO city VALUES (209, 'Belo Horizonte', 'BRA', 'Minas Gerais', 2139125);
-INSERT INTO city VALUES (210, 'Fortaleza', 'BRA', 'Ceará', 2097757);
-INSERT INTO city VALUES (211, 'Brasília', 'BRA', 'Distrito Federal', 1969868);
-INSERT INTO city VALUES (212, 'Curitiba', 'BRA', 'Paraná', 1584232);
-INSERT INTO city VALUES (213, 'Recife', 'BRA', 'Pernambuco', 1378087);
-INSERT INTO city VALUES (214, 'Porto Alegre', 'BRA', 'Rio Grande do Sul', 1314032);
-INSERT INTO city VALUES (215, 'Manaus', 'BRA', 'Amazonas', 1255049);
-INSERT INTO city VALUES (216, 'Belém', 'BRA', 'Pará', 1186926);
-INSERT INTO city VALUES (217, 'Guarulhos', 'BRA', 'São Paulo', 1095874);
-INSERT INTO city VALUES (218, 'Goiânia', 'BRA', 'Goiás', 1056330);
-INSERT INTO city VALUES (219, 'Campinas', 'BRA', 'São Paulo', 950043);
-INSERT INTO city VALUES (220, 'São Gonçalo', 'BRA', 'Rio de Janeiro', 869254);
-INSERT INTO city VALUES (221, 'Nova Iguaçu', 'BRA', 'Rio de Janeiro', 862225);
-INSERT INTO city VALUES (222, 'São Luís', 'BRA', 'Maranhão', 837588);
-INSERT INTO city VALUES (223, 'Maceió', 'BRA', 'Alagoas', 786288);
-INSERT INTO city VALUES (224, 'Duque de Caxias', 'BRA', 'Rio de Janeiro', 746758);
-INSERT INTO city VALUES (225, 'São Bernardo do Campo', 'BRA', 'São Paulo', 723132);
-INSERT INTO city VALUES (226, 'Teresina', 'BRA', 'Piauí', 691942);
-INSERT INTO city VALUES (227, 'Natal', 'BRA', 'Rio Grande do Norte', 688955);
-INSERT INTO city VALUES (228, 'Osasco', 'BRA', 'São Paulo', 659604);
-INSERT INTO city VALUES (229, 'Campo Grande', 'BRA', 'Mato Grosso do Sul', 649593);
-INSERT INTO city VALUES (230, 'Santo André', 'BRA', 'São Paulo', 630073);
-INSERT INTO city VALUES (231, 'João Pessoa', 'BRA', 'Paraíba', 584029);
-INSERT INTO city VALUES (232, 'Jaboatão dos Guararapes', 'BRA', 'Pernambuco', 558680);
-INSERT INTO city VALUES (233, 'Contagem', 'BRA', 'Minas Gerais', 520801);
-INSERT INTO city VALUES (234, 'São José dos Campos', 'BRA', 'São Paulo', 515553);
-INSERT INTO city VALUES (235, 'Uberlândia', 'BRA', 'Minas Gerais', 487222);
-INSERT INTO city VALUES (236, 'Feira de Santana', 'BRA', 'Bahia', 479992);
-INSERT INTO city VALUES (237, 'Ribeirão Preto', 'BRA', 'São Paulo', 473276);
-INSERT INTO city VALUES (238, 'Sorocaba', 'BRA', 'São Paulo', 466823);
-INSERT INTO city VALUES (239, 'Niterói', 'BRA', 'Rio de Janeiro', 459884);
-INSERT INTO city VALUES (240, 'Cuiabá', 'BRA', 'Mato Grosso', 453813);
-INSERT INTO city VALUES (241, 'Juiz de Fora', 'BRA', 'Minas Gerais', 450288);
-INSERT INTO city VALUES (242, 'Aracaju', 'BRA', 'Sergipe', 445555);
-INSERT INTO city VALUES (243, 'São João de Meriti', 'BRA', 'Rio de Janeiro', 440052);
-INSERT INTO city VALUES (244, 'Londrina', 'BRA', 'Paraná', 432257);
-INSERT INTO city VALUES (245, 'Joinville', 'BRA', 'Santa Catarina', 428011);
-INSERT INTO city VALUES (246, 'Belford Roxo', 'BRA', 'Rio de Janeiro', 425194);
-INSERT INTO city VALUES (247, 'Santos', 'BRA', 'São Paulo', 408748);
-INSERT INTO city VALUES (248, 'Ananindeua', 'BRA', 'Pará', 400940);
-INSERT INTO city VALUES (249, 'Campos dos Goytacazes', 'BRA', 'Rio de Janeiro', 398418);
-INSERT INTO city VALUES (250, 'Mauá', 'BRA', 'São Paulo', 375055);
-INSERT INTO city VALUES (251, 'Carapicuíba', 'BRA', 'São Paulo', 357552);
-INSERT INTO city VALUES (252, 'Olinda', 'BRA', 'Pernambuco', 354732);
-INSERT INTO city VALUES (253, 'Campina Grande', 'BRA', 'Paraíba', 352497);
-INSERT INTO city VALUES (254, 'São José do Rio Preto', 'BRA', 'São Paulo', 351944);
-INSERT INTO city VALUES (255, 'Caxias do Sul', 'BRA', 'Rio Grande do Sul', 349581);
-INSERT INTO city VALUES (256, 'Moji das Cruzes', 'BRA', 'São Paulo', 339194);
-INSERT INTO city VALUES (257, 'Diadema', 'BRA', 'São Paulo', 335078);
-INSERT INTO city VALUES (258, 'Aparecida de Goiânia', 'BRA', 'Goiás', 324662);
-INSERT INTO city VALUES (259, 'Piracicaba', 'BRA', 'São Paulo', 319104);
-INSERT INTO city VALUES (260, 'Cariacica', 'BRA', 'Espírito Santo', 319033);
-INSERT INTO city VALUES (261, 'Vila Velha', 'BRA', 'Espírito Santo', 318758);
-INSERT INTO city VALUES (262, 'Pelotas', 'BRA', 'Rio Grande do Sul', 315415);
-INSERT INTO city VALUES (263, 'Bauru', 'BRA', 'São Paulo', 313670);
-INSERT INTO city VALUES (264, 'Porto Velho', 'BRA', 'Rondônia', 309750);
-INSERT INTO city VALUES (265, 'Serra', 'BRA', 'Espírito Santo', 302666);
-INSERT INTO city VALUES (266, 'Betim', 'BRA', 'Minas Gerais', 302108);
-INSERT INTO city VALUES (267, 'Jundíaí', 'BRA', 'São Paulo', 296127);
-INSERT INTO city VALUES (268, 'Canoas', 'BRA', 'Rio Grande do Sul', 294125);
-INSERT INTO city VALUES (269, 'Franca', 'BRA', 'São Paulo', 290139);
-INSERT INTO city VALUES (270, 'São Vicente', 'BRA', 'São Paulo', 286848);
-INSERT INTO city VALUES (271, 'Maringá', 'BRA', 'Paraná', 286461);
-INSERT INTO city VALUES (272, 'Montes Claros', 'BRA', 'Minas Gerais', 286058);
-INSERT INTO city VALUES (273, 'Anápolis', 'BRA', 'Goiás', 282197);
-INSERT INTO city VALUES (274, 'Florianópolis', 'BRA', 'Santa Catarina', 281928);
-INSERT INTO city VALUES (275, 'Petrópolis', 'BRA', 'Rio de Janeiro', 279183);
-INSERT INTO city VALUES (276, 'Itaquaquecetuba', 'BRA', 'São Paulo', 270874);
-INSERT INTO city VALUES (277, 'Vitória', 'BRA', 'Espírito Santo', 270626);
-INSERT INTO city VALUES (278, 'Ponta Grossa', 'BRA', 'Paraná', 268013);
-INSERT INTO city VALUES (279, 'Rio Branco', 'BRA', 'Acre', 259537);
-INSERT INTO city VALUES (280, 'Foz do Iguaçu', 'BRA', 'Paraná', 259425);
-INSERT INTO city VALUES (281, 'Macapá', 'BRA', 'Amapá', 256033);
-INSERT INTO city VALUES (282, 'Ilhéus', 'BRA', 'Bahia', 254970);
-INSERT INTO city VALUES (283, 'Vitória da Conquista', 'BRA', 'Bahia', 253587);
-INSERT INTO city VALUES (284, 'Uberaba', 'BRA', 'Minas Gerais', 249225);
-INSERT INTO city VALUES (285, 'Paulista', 'BRA', 'Pernambuco', 248473);
-INSERT INTO city VALUES (286, 'Limeira', 'BRA', 'São Paulo', 245497);
-INSERT INTO city VALUES (287, 'Blumenau', 'BRA', 'Santa Catarina', 244379);
-INSERT INTO city VALUES (288, 'Caruaru', 'BRA', 'Pernambuco', 244247);
-INSERT INTO city VALUES (289, 'Santarém', 'BRA', 'Pará', 241771);
-INSERT INTO city VALUES (290, 'Volta Redonda', 'BRA', 'Rio de Janeiro', 240315);
-INSERT INTO city VALUES (291, 'Novo Hamburgo', 'BRA', 'Rio Grande do Sul', 239940);
-INSERT INTO city VALUES (292, 'Caucaia', 'BRA', 'Ceará', 238738);
-INSERT INTO city VALUES (293, 'Santa Maria', 'BRA', 'Rio Grande do Sul', 238473);
-INSERT INTO city VALUES (294, 'Cascavel', 'BRA', 'Paraná', 237510);
-INSERT INTO city VALUES (295, 'Guarujá', 'BRA', 'São Paulo', 237206);
-INSERT INTO city VALUES (296, 'Ribeirão das Neves', 'BRA', 'Minas Gerais', 232685);
-INSERT INTO city VALUES (297, 'Governador Valadares', 'BRA', 'Minas Gerais', 231724);
-INSERT INTO city VALUES (298, 'Taubaté', 'BRA', 'São Paulo', 229130);
-INSERT INTO city VALUES (299, 'Imperatriz', 'BRA', 'Maranhão', 224564);
-INSERT INTO city VALUES (300, 'Gravataí', 'BRA', 'Rio Grande do Sul', 223011);
-INSERT INTO city VALUES (301, 'Embu', 'BRA', 'São Paulo', 222223);
-INSERT INTO city VALUES (302, 'Mossoró', 'BRA', 'Rio Grande do Norte', 214901);
-INSERT INTO city VALUES (303, 'Várzea Grande', 'BRA', 'Mato Grosso', 214435);
-INSERT INTO city VALUES (304, 'Petrolina', 'BRA', 'Pernambuco', 210540);
-INSERT INTO city VALUES (305, 'Barueri', 'BRA', 'São Paulo', 208426);
-INSERT INTO city VALUES (306, 'Viamão', 'BRA', 'Rio Grande do Sul', 207557);
-INSERT INTO city VALUES (307, 'Ipatinga', 'BRA', 'Minas Gerais', 206338);
-INSERT INTO city VALUES (308, 'Juazeiro', 'BRA', 'Bahia', 201073);
-INSERT INTO city VALUES (309, 'Juazeiro do Norte', 'BRA', 'Ceará', 199636);
-INSERT INTO city VALUES (310, 'Taboão da Serra', 'BRA', 'São Paulo', 197550);
-INSERT INTO city VALUES (311, 'São José dos Pinhais', 'BRA', 'Paraná', 196884);
-INSERT INTO city VALUES (312, 'Magé', 'BRA', 'Rio de Janeiro', 196147);
-INSERT INTO city VALUES (313, 'Suzano', 'BRA', 'São Paulo', 195434);
-INSERT INTO city VALUES (314, 'São Leopoldo', 'BRA', 'Rio Grande do Sul', 189258);
-INSERT INTO city VALUES (315, 'Marília', 'BRA', 'São Paulo', 188691);
-INSERT INTO city VALUES (316, 'São Carlos', 'BRA', 'São Paulo', 187122);
-INSERT INTO city VALUES (317, 'Sumaré', 'BRA', 'São Paulo', 186205);
-INSERT INTO city VALUES (318, 'Presidente Prudente', 'BRA', 'São Paulo', 185340);
-INSERT INTO city VALUES (319, 'Divinópolis', 'BRA', 'Minas Gerais', 185047);
-INSERT INTO city VALUES (320, 'Sete Lagoas', 'BRA', 'Minas Gerais', 182984);
-INSERT INTO city VALUES (321, 'Rio Grande', 'BRA', 'Rio Grande do Sul', 182222);
-INSERT INTO city VALUES (322, 'Itabuna', 'BRA', 'Bahia', 182148);
-INSERT INTO city VALUES (323, 'Jequié', 'BRA', 'Bahia', 179128);
-INSERT INTO city VALUES (324, 'Arapiraca', 'BRA', 'Alagoas', 178988);
-INSERT INTO city VALUES (325, 'Colombo', 'BRA', 'Paraná', 177764);
-INSERT INTO city VALUES (326, 'Americana', 'BRA', 'São Paulo', 177409);
-INSERT INTO city VALUES (327, 'Alvorada', 'BRA', 'Rio Grande do Sul', 175574);
-INSERT INTO city VALUES (328, 'Araraquara', 'BRA', 'São Paulo', 174381);
-INSERT INTO city VALUES (329, 'Itaboraí', 'BRA', 'Rio de Janeiro', 173977);
-INSERT INTO city VALUES (330, 'Santa Bárbara d´Oeste', 'BRA', 'São Paulo', 171657);
-INSERT INTO city VALUES (331, 'Nova Friburgo', 'BRA', 'Rio de Janeiro', 170697);
-INSERT INTO city VALUES (332, 'Jacareí', 'BRA', 'São Paulo', 170356);
-INSERT INTO city VALUES (333, 'Araçatuba', 'BRA', 'São Paulo', 169303);
-INSERT INTO city VALUES (334, 'Barra Mansa', 'BRA', 'Rio de Janeiro', 168953);
-INSERT INTO city VALUES (335, 'Praia Grande', 'BRA', 'São Paulo', 168434);
-INSERT INTO city VALUES (336, 'Marabá', 'BRA', 'Pará', 167795);
-INSERT INTO city VALUES (337, 'Criciúma', 'BRA', 'Santa Catarina', 167661);
-INSERT INTO city VALUES (338, 'Boa Vista', 'BRA', 'Roraima', 167185);
-INSERT INTO city VALUES (339, 'Passo Fundo', 'BRA', 'Rio Grande do Sul', 166343);
-INSERT INTO city VALUES (340, 'Dourados', 'BRA', 'Mato Grosso do Sul', 164716);
-INSERT INTO city VALUES (341, 'Santa Luzia', 'BRA', 'Minas Gerais', 164704);
-INSERT INTO city VALUES (342, 'Rio Claro', 'BRA', 'São Paulo', 163551);
-INSERT INTO city VALUES (343, 'Maracanaú', 'BRA', 'Ceará', 162022);
-INSERT INTO city VALUES (344, 'Guarapuava', 'BRA', 'Paraná', 160510);
-INSERT INTO city VALUES (345, 'Rondonópolis', 'BRA', 'Mato Grosso', 155115);
-INSERT INTO city VALUES (346, 'São José', 'BRA', 'Santa Catarina', 155105);
-INSERT INTO city VALUES (347, 'Cachoeiro de Itapemirim', 'BRA', 'Espírito Santo', 155024);
-INSERT INTO city VALUES (348, 'Nilópolis', 'BRA', 'Rio de Janeiro', 153383);
-INSERT INTO city VALUES (349, 'Itapevi', 'BRA', 'São Paulo', 150664);
-INSERT INTO city VALUES (350, 'Cabo de Santo Agostinho', 'BRA', 'Pernambuco', 149964);
-INSERT INTO city VALUES (351, 'Camaçari', 'BRA', 'Bahia', 149146);
-INSERT INTO city VALUES (352, 'Sobral', 'BRA', 'Ceará', 146005);
-INSERT INTO city VALUES (353, 'Itajaí', 'BRA', 'Santa Catarina', 145197);
-INSERT INTO city VALUES (354, 'Chapecó', 'BRA', 'Santa Catarina', 144158);
-INSERT INTO city VALUES (355, 'Cotia', 'BRA', 'São Paulo', 140042);
-INSERT INTO city VALUES (356, 'Lages', 'BRA', 'Santa Catarina', 139570);
-INSERT INTO city VALUES (357, 'Ferraz de Vasconcelos', 'BRA', 'São Paulo', 139283);
-INSERT INTO city VALUES (358, 'Indaiatuba', 'BRA', 'São Paulo', 135968);
-INSERT INTO city VALUES (359, 'Hortolândia', 'BRA', 'São Paulo', 135755);
-INSERT INTO city VALUES (360, 'Caxias', 'BRA', 'Maranhão', 133980);
-INSERT INTO city VALUES (361, 'São Caetano do Sul', 'BRA', 'São Paulo', 133321);
-INSERT INTO city VALUES (362, 'Itu', 'BRA', 'São Paulo', 132736);
-INSERT INTO city VALUES (363, 'Nossa Senhora do Socorro', 'BRA', 'Sergipe', 131351);
-INSERT INTO city VALUES (364, 'Parnaíba', 'BRA', 'Piauí', 129756);
-INSERT INTO city VALUES (365, 'Poços de Caldas', 'BRA', 'Minas Gerais', 129683);
-INSERT INTO city VALUES (366, 'Teresópolis', 'BRA', 'Rio de Janeiro', 128079);
-INSERT INTO city VALUES (367, 'Barreiras', 'BRA', 'Bahia', 127801);
-INSERT INTO city VALUES (368, 'Castanhal', 'BRA', 'Pará', 127634);
-INSERT INTO city VALUES (369, 'Alagoinhas', 'BRA', 'Bahia', 126820);
-INSERT INTO city VALUES (370, 'Itapecerica da Serra', 'BRA', 'São Paulo', 126672);
-INSERT INTO city VALUES (371, 'Uruguaiana', 'BRA', 'Rio Grande do Sul', 126305);
-INSERT INTO city VALUES (372, 'Paranaguá', 'BRA', 'Paraná', 126076);
-INSERT INTO city VALUES (373, 'Ibirité', 'BRA', 'Minas Gerais', 125982);
-INSERT INTO city VALUES (374, 'Timon', 'BRA', 'Maranhão', 125812);
-INSERT INTO city VALUES (375, 'Luziânia', 'BRA', 'Goiás', 125597);
-INSERT INTO city VALUES (376, 'Macaé', 'BRA', 'Rio de Janeiro', 125597);
-INSERT INTO city VALUES (377, 'Teófilo Otoni', 'BRA', 'Minas Gerais', 124489);
-INSERT INTO city VALUES (378, 'Moji-Guaçu', 'BRA', 'São Paulo', 123782);
-INSERT INTO city VALUES (379, 'Palmas', 'BRA', 'Tocantins', 121919);
-INSERT INTO city VALUES (380, 'Pindamonhangaba', 'BRA', 'São Paulo', 121904);
-INSERT INTO city VALUES (381, 'Francisco Morato', 'BRA', 'São Paulo', 121197);
-INSERT INTO city VALUES (382, 'Bagé', 'BRA', 'Rio Grande do Sul', 120793);
-INSERT INTO city VALUES (383, 'Sapucaia do Sul', 'BRA', 'Rio Grande do Sul', 120217);
-INSERT INTO city VALUES (384, 'Cabo Frio', 'BRA', 'Rio de Janeiro', 119503);
-INSERT INTO city VALUES (385, 'Itapetininga', 'BRA', 'São Paulo', 119391);
-INSERT INTO city VALUES (386, 'Patos de Minas', 'BRA', 'Minas Gerais', 119262);
-INSERT INTO city VALUES (387, 'Camaragibe', 'BRA', 'Pernambuco', 118968);
-INSERT INTO city VALUES (388, 'Bragança Paulista', 'BRA', 'São Paulo', 116929);
-INSERT INTO city VALUES (389, 'Queimados', 'BRA', 'Rio de Janeiro', 115020);
-INSERT INTO city VALUES (390, 'Araguaína', 'BRA', 'Tocantins', 114948);
-INSERT INTO city VALUES (391, 'Garanhuns', 'BRA', 'Pernambuco', 114603);
-INSERT INTO city VALUES (392, 'Vitória de Santo Antão', 'BRA', 'Pernambuco', 113595);
-INSERT INTO city VALUES (393, 'Santa Rita', 'BRA', 'Paraíba', 113135);
-INSERT INTO city VALUES (394, 'Barbacena', 'BRA', 'Minas Gerais', 113079);
-INSERT INTO city VALUES (395, 'Abaetetuba', 'BRA', 'Pará', 111258);
-INSERT INTO city VALUES (396, 'Jaú', 'BRA', 'São Paulo', 109965);
-INSERT INTO city VALUES (397, 'Lauro de Freitas', 'BRA', 'Bahia', 109236);
-INSERT INTO city VALUES (398, 'Franco da Rocha', 'BRA', 'São Paulo', 108964);
-INSERT INTO city VALUES (399, 'Teixeira de Freitas', 'BRA', 'Bahia', 108441);
-INSERT INTO city VALUES (400, 'Varginha', 'BRA', 'Minas Gerais', 108314);
-INSERT INTO city VALUES (401, 'Ribeirão Pires', 'BRA', 'São Paulo', 108121);
-INSERT INTO city VALUES (402, 'Sabará', 'BRA', 'Minas Gerais', 107781);
-INSERT INTO city VALUES (403, 'Catanduva', 'BRA', 'São Paulo', 107761);
-INSERT INTO city VALUES (404, 'Rio Verde', 'BRA', 'Goiás', 107755);
-INSERT INTO city VALUES (405, 'Botucatu', 'BRA', 'São Paulo', 107663);
-INSERT INTO city VALUES (406, 'Colatina', 'BRA', 'Espírito Santo', 107354);
-INSERT INTO city VALUES (407, 'Santa Cruz do Sul', 'BRA', 'Rio Grande do Sul', 106734);
-INSERT INTO city VALUES (408, 'Linhares', 'BRA', 'Espírito Santo', 106278);
-INSERT INTO city VALUES (409, 'Apucarana', 'BRA', 'Paraná', 105114);
-INSERT INTO city VALUES (410, 'Barretos', 'BRA', 'São Paulo', 104156);
-INSERT INTO city VALUES (411, 'Guaratinguetá', 'BRA', 'São Paulo', 103433);
-INSERT INTO city VALUES (412, 'Cachoeirinha', 'BRA', 'Rio Grande do Sul', 103240);
-INSERT INTO city VALUES (413, 'Codó', 'BRA', 'Maranhão', 103153);
-INSERT INTO city VALUES (414, 'Jaraguá do Sul', 'BRA', 'Santa Catarina', 102580);
-INSERT INTO city VALUES (415, 'Cubatão', 'BRA', 'São Paulo', 102372);
-INSERT INTO city VALUES (416, 'Itabira', 'BRA', 'Minas Gerais', 102217);
-INSERT INTO city VALUES (417, 'Itaituba', 'BRA', 'Pará', 101320);
-INSERT INTO city VALUES (418, 'Araras', 'BRA', 'São Paulo', 101046);
-INSERT INTO city VALUES (419, 'Resende', 'BRA', 'Rio de Janeiro', 100627);
-INSERT INTO city VALUES (420, 'Atibaia', 'BRA', 'São Paulo', 100356);
-INSERT INTO city VALUES (421, 'Pouso Alegre', 'BRA', 'Minas Gerais', 100028);
-INSERT INTO city VALUES (422, 'Toledo', 'BRA', 'Paraná', 99387);
-INSERT INTO city VALUES (423, 'Crato', 'BRA', 'Ceará', 98965);
-INSERT INTO city VALUES (424, 'Passos', 'BRA', 'Minas Gerais', 98570);
-INSERT INTO city VALUES (425, 'Araguari', 'BRA', 'Minas Gerais', 98399);
-INSERT INTO city VALUES (426, 'São José de Ribamar', 'BRA', 'Maranhão', 98318);
-INSERT INTO city VALUES (427, 'Pinhais', 'BRA', 'Paraná', 98198);
-INSERT INTO city VALUES (428, 'Sertãozinho', 'BRA', 'São Paulo', 98140);
-INSERT INTO city VALUES (429, 'Conselheiro Lafaiete', 'BRA', 'Minas Gerais', 97507);
-INSERT INTO city VALUES (430, 'Paulo Afonso', 'BRA', 'Bahia', 97291);
-INSERT INTO city VALUES (431, 'Angra dos Reis', 'BRA', 'Rio de Janeiro', 96864);
-INSERT INTO city VALUES (432, 'Eunápolis', 'BRA', 'Bahia', 96610);
-INSERT INTO city VALUES (433, 'Salto', 'BRA', 'São Paulo', 96348);
-INSERT INTO city VALUES (434, 'Ourinhos', 'BRA', 'São Paulo', 96291);
-INSERT INTO city VALUES (435, 'Parnamirim', 'BRA', 'Rio Grande do Norte', 96210);
-INSERT INTO city VALUES (436, 'Jacobina', 'BRA', 'Bahia', 96131);
-INSERT INTO city VALUES (437, 'Coronel Fabriciano', 'BRA', 'Minas Gerais', 95933);
-INSERT INTO city VALUES (438, 'Birigui', 'BRA', 'São Paulo', 94685);
-INSERT INTO city VALUES (439, 'Tatuí', 'BRA', 'São Paulo', 93897);
-INSERT INTO city VALUES (440, 'Ji-Paraná', 'BRA', 'Rondônia', 93346);
-INSERT INTO city VALUES (441, 'Bacabal', 'BRA', 'Maranhão', 93121);
-INSERT INTO city VALUES (442, 'Cametá', 'BRA', 'Pará', 92779);
-INSERT INTO city VALUES (443, 'Guaíba', 'BRA', 'Rio Grande do Sul', 92224);
-INSERT INTO city VALUES (444, 'São Lourenço da Mata', 'BRA', 'Pernambuco', 91999);
-INSERT INTO city VALUES (445, 'Santana do Livramento', 'BRA', 'Rio Grande do Sul', 91779);
-INSERT INTO city VALUES (446, 'Votorantim', 'BRA', 'São Paulo', 91777);
-INSERT INTO city VALUES (447, 'Campo Largo', 'BRA', 'Paraná', 91203);
-INSERT INTO city VALUES (448, 'Patos', 'BRA', 'Paraíba', 90519);
-INSERT INTO city VALUES (449, 'Ituiutaba', 'BRA', 'Minas Gerais', 90507);
-INSERT INTO city VALUES (450, 'Corumbá', 'BRA', 'Mato Grosso do Sul', 90111);
-INSERT INTO city VALUES (451, 'Palhoça', 'BRA', 'Santa Catarina', 89465);
-INSERT INTO city VALUES (452, 'Barra do Piraí', 'BRA', 'Rio de Janeiro', 89388);
-INSERT INTO city VALUES (453, 'Bento Gonçalves', 'BRA', 'Rio Grande do Sul', 89254);
-INSERT INTO city VALUES (454, 'Poá', 'BRA', 'São Paulo', 89236);
-INSERT INTO city VALUES (455, 'Águas Lindas de Goiás', 'BRA', 'Goiás', 89200);
-INSERT INTO city VALUES (456, 'London', 'GBR', 'England', 7285000);
-INSERT INTO city VALUES (457, 'Birmingham', 'GBR', 'England', 1013000);
-INSERT INTO city VALUES (458, 'Glasgow', 'GBR', 'Scotland', 619680);
-INSERT INTO city VALUES (459, 'Liverpool', 'GBR', 'England', 461000);
-INSERT INTO city VALUES (460, 'Edinburgh', 'GBR', 'Scotland', 450180);
-INSERT INTO city VALUES (461, 'Sheffield', 'GBR', 'England', 431607);
-INSERT INTO city VALUES (462, 'Manchester', 'GBR', 'England', 430000);
-INSERT INTO city VALUES (463, 'Leeds', 'GBR', 'England', 424194);
-INSERT INTO city VALUES (464, 'Bristol', 'GBR', 'England', 402000);
-INSERT INTO city VALUES (465, 'Cardiff', 'GBR', 'Wales', 321000);
-INSERT INTO city VALUES (466, 'Coventry', 'GBR', 'England', 304000);
-INSERT INTO city VALUES (467, 'Leicester', 'GBR', 'England', 294000);
-INSERT INTO city VALUES (468, 'Bradford', 'GBR', 'England', 289376);
-INSERT INTO city VALUES (469, 'Belfast', 'GBR', 'North Ireland', 287500);
-INSERT INTO city VALUES (470, 'Nottingham', 'GBR', 'England', 287000);
-INSERT INTO city VALUES (471, 'Kingston upon Hull', 'GBR', 'England', 262000);
-INSERT INTO city VALUES (472, 'Plymouth', 'GBR', 'England', 253000);
-INSERT INTO city VALUES (473, 'Stoke-on-Trent', 'GBR', 'England', 252000);
-INSERT INTO city VALUES (474, 'Wolverhampton', 'GBR', 'England', 242000);
-INSERT INTO city VALUES (475, 'Derby', 'GBR', 'England', 236000);
-INSERT INTO city VALUES (476, 'Swansea', 'GBR', 'Wales', 230000);
-INSERT INTO city VALUES (477, 'Southampton', 'GBR', 'England', 216000);
-INSERT INTO city VALUES (478, 'Aberdeen', 'GBR', 'Scotland', 213070);
-INSERT INTO city VALUES (479, 'Northampton', 'GBR', 'England', 196000);
-INSERT INTO city VALUES (480, 'Dudley', 'GBR', 'England', 192171);
-INSERT INTO city VALUES (481, 'Portsmouth', 'GBR', 'England', 190000);
-INSERT INTO city VALUES (482, 'Newcastle upon Tyne', 'GBR', 'England', 189150);
-INSERT INTO city VALUES (483, 'Sunderland', 'GBR', 'England', 183310);
-INSERT INTO city VALUES (484, 'Luton', 'GBR', 'England', 183000);
-INSERT INTO city VALUES (485, 'Swindon', 'GBR', 'England', 180000);
-INSERT INTO city VALUES (486, 'Southend-on-Sea', 'GBR', 'England', 176000);
-INSERT INTO city VALUES (487, 'Walsall', 'GBR', 'England', 174739);
-INSERT INTO city VALUES (488, 'Bournemouth', 'GBR', 'England', 162000);
-INSERT INTO city VALUES (489, 'Peterborough', 'GBR', 'England', 156000);
-INSERT INTO city VALUES (490, 'Brighton', 'GBR', 'England', 156124);
-INSERT INTO city VALUES (491, 'Blackpool', 'GBR', 'England', 151000);
-INSERT INTO city VALUES (492, 'Dundee', 'GBR', 'Scotland', 146690);
-INSERT INTO city VALUES (493, 'West Bromwich', 'GBR', 'England', 146386);
-INSERT INTO city VALUES (494, 'Reading', 'GBR', 'England', 148000);
-INSERT INTO city VALUES (495, 'Oldbury/Smethwick (Warley)', 'GBR', 'England', 145542);
-INSERT INTO city VALUES (496, 'Middlesbrough', 'GBR', 'England', 145000);
-INSERT INTO city VALUES (497, 'Huddersfield', 'GBR', 'England', 143726);
-INSERT INTO city VALUES (498, 'Oxford', 'GBR', 'England', 144000);
-INSERT INTO city VALUES (499, 'Poole', 'GBR', 'England', 141000);
-INSERT INTO city VALUES (500, 'Bolton', 'GBR', 'England', 139020);
-INSERT INTO city VALUES (501, 'Blackburn', 'GBR', 'England', 140000);
-INSERT INTO city VALUES (502, 'Newport', 'GBR', 'Wales', 139000);
-INSERT INTO city VALUES (503, 'Preston', 'GBR', 'England', 135000);
-INSERT INTO city VALUES (504, 'Stockport', 'GBR', 'England', 132813);
-INSERT INTO city VALUES (505, 'Norwich', 'GBR', 'England', 124000);
-INSERT INTO city VALUES (506, 'Rotherham', 'GBR', 'England', 121380);
-INSERT INTO city VALUES (507, 'Cambridge', 'GBR', 'England', 121000);
-INSERT INTO city VALUES (508, 'Watford', 'GBR', 'England', 113080);
-INSERT INTO city VALUES (509, 'Ipswich', 'GBR', 'England', 114000);
-INSERT INTO city VALUES (510, 'Slough', 'GBR', 'England', 112000);
-INSERT INTO city VALUES (511, 'Exeter', 'GBR', 'England', 111000);
-INSERT INTO city VALUES (512, 'Cheltenham', 'GBR', 'England', 106000);
-INSERT INTO city VALUES (513, 'Gloucester', 'GBR', 'England', 107000);
-INSERT INTO city VALUES (514, 'Saint Helens', 'GBR', 'England', 106293);
-INSERT INTO city VALUES (515, 'Sutton Coldfield', 'GBR', 'England', 106001);
-INSERT INTO city VALUES (516, 'York', 'GBR', 'England', 104425);
-INSERT INTO city VALUES (517, 'Oldham', 'GBR', 'England', 103931);
-INSERT INTO city VALUES (518, 'Basildon', 'GBR', 'England', 100924);
-INSERT INTO city VALUES (519, 'Worthing', 'GBR', 'England', 100000);
-INSERT INTO city VALUES (520, 'Chelmsford', 'GBR', 'England', 97451);
-INSERT INTO city VALUES (521, 'Colchester', 'GBR', 'England', 96063);
-INSERT INTO city VALUES (522, 'Crawley', 'GBR', 'England', 97000);
-INSERT INTO city VALUES (523, 'Gillingham', 'GBR', 'England', 92000);
-INSERT INTO city VALUES (524, 'Solihull', 'GBR', 'England', 94531);
-INSERT INTO city VALUES (525, 'Rochdale', 'GBR', 'England', 94313);
-INSERT INTO city VALUES (526, 'Birkenhead', 'GBR', 'England', 93087);
-INSERT INTO city VALUES (527, 'Worcester', 'GBR', 'England', 95000);
-INSERT INTO city VALUES (528, 'Hartlepool', 'GBR', 'England', 92000);
-INSERT INTO city VALUES (529, 'Halifax', 'GBR', 'England', 91069);
-INSERT INTO city VALUES (530, 'Woking/Byfleet', 'GBR', 'England', 92000);
-INSERT INTO city VALUES (531, 'Southport', 'GBR', 'England', 90959);
-INSERT INTO city VALUES (532, 'Maidstone', 'GBR', 'England', 90878);
-INSERT INTO city VALUES (533, 'Eastbourne', 'GBR', 'England', 90000);
-INSERT INTO city VALUES (534, 'Grimsby', 'GBR', 'England', 89000);
-INSERT INTO city VALUES (535, 'Saint Helier', 'GBR', 'Jersey', 27523);
-INSERT INTO city VALUES (536, 'Douglas', 'GBR', '', 23487);
-INSERT INTO city VALUES (537, 'Road Town', 'VGB', 'Tortola', 8000);
-INSERT INTO city VALUES (538, 'Bandar Seri Begawan', 'BRN', 'Brunei and Muara', 21484);
-INSERT INTO city VALUES (539, 'Sofija', 'BGR', 'Grad Sofija', 1122302);
-INSERT INTO city VALUES (540, 'Plovdiv', 'BGR', 'Plovdiv', 342584);
-INSERT INTO city VALUES (541, 'Varna', 'BGR', 'Varna', 299801);
-INSERT INTO city VALUES (542, 'Burgas', 'BGR', 'Burgas', 195255);
-INSERT INTO city VALUES (543, 'Ruse', 'BGR', 'Ruse', 166467);
-INSERT INTO city VALUES (544, 'Stara Zagora', 'BGR', 'Haskovo', 147939);
-INSERT INTO city VALUES (545, 'Pleven', 'BGR', 'Lovec', 121952);
-INSERT INTO city VALUES (546, 'Sliven', 'BGR', 'Burgas', 105530);
-INSERT INTO city VALUES (547, 'Dobric', 'BGR', 'Varna', 100399);
-INSERT INTO city VALUES (548, 'umen', 'BGR', 'Varna', 94686);
-INSERT INTO city VALUES (549, 'Ouagadougou', 'BFA', 'Kadiogo', 824000);
-INSERT INTO city VALUES (550, 'Bobo-Dioulasso', 'BFA', 'Houet', 300000);
-INSERT INTO city VALUES (551, 'Koudougou', 'BFA', 'Boulkiemdé', 105000);
-INSERT INTO city VALUES (552, 'Bujumbura', 'BDI', 'Bujumbura', 300000);
-INSERT INTO city VALUES (553, 'George Town', 'CYM', 'Grand Cayman', 19600);
-INSERT INTO city VALUES (554, 'Santiago de Chile', 'CHL', 'Santiago', 4703954);
-INSERT INTO city VALUES (555, 'Puente Alto', 'CHL', 'Santiago', 386236);
-INSERT INTO city VALUES (556, 'Viña del Mar', 'CHL', 'Valparaíso', 312493);
-INSERT INTO city VALUES (557, 'Valparaíso', 'CHL', 'Valparaíso', 293800);
-INSERT INTO city VALUES (558, 'Talcahuano', 'CHL', 'Bíobío', 277752);
-INSERT INTO city VALUES (559, 'Antofagasta', 'CHL', 'Antofagasta', 251429);
-INSERT INTO city VALUES (560, 'San Bernardo', 'CHL', 'Santiago', 241910);
-INSERT INTO city VALUES (561, 'Temuco', 'CHL', 'La Araucanía', 233041);
-INSERT INTO city VALUES (562, 'Concepción', 'CHL', 'Bíobío', 217664);
-INSERT INTO city VALUES (563, 'Rancagua', 'CHL', 'O´Higgins', 212977);
-INSERT INTO city VALUES (564, 'Arica', 'CHL', 'Tarapacá', 189036);
-INSERT INTO city VALUES (565, 'Talca', 'CHL', 'Maule', 187557);
-INSERT INTO city VALUES (566, 'Chillán', 'CHL', 'Bíobío', 178182);
-INSERT INTO city VALUES (567, 'Iquique', 'CHL', 'Tarapacá', 177892);
-INSERT INTO city VALUES (568, 'Los Angeles', 'CHL', 'Bíobío', 158215);
-INSERT INTO city VALUES (569, 'Puerto Montt', 'CHL', 'Los Lagos', 152194);
-INSERT INTO city VALUES (570, 'Coquimbo', 'CHL', 'Coquimbo', 143353);
-INSERT INTO city VALUES (571, 'Osorno', 'CHL', 'Los Lagos', 141468);
-INSERT INTO city VALUES (572, 'La Serena', 'CHL', 'Coquimbo', 137409);
-INSERT INTO city VALUES (573, 'Calama', 'CHL', 'Antofagasta', 137265);
-INSERT INTO city VALUES (574, 'Valdivia', 'CHL', 'Los Lagos', 133106);
-INSERT INTO city VALUES (575, 'Punta Arenas', 'CHL', 'Magallanes', 125631);
-INSERT INTO city VALUES (576, 'Copiapó', 'CHL', 'Atacama', 120128);
-INSERT INTO city VALUES (577, 'Quilpué', 'CHL', 'Valparaíso', 118857);
-INSERT INTO city VALUES (578, 'Curicó', 'CHL', 'Maule', 115766);
-INSERT INTO city VALUES (579, 'Ovalle', 'CHL', 'Coquimbo', 94854);
-INSERT INTO city VALUES (580, 'Coronel', 'CHL', 'Bíobío', 93061);
-INSERT INTO city VALUES (581, 'San Pedro de la Paz', 'CHL', 'Bíobío', 91684);
-INSERT INTO city VALUES (582, 'Melipilla', 'CHL', 'Santiago', 91056);
-INSERT INTO city VALUES (583, 'Avarua', 'COK', 'Rarotonga', 11900);
-INSERT INTO city VALUES (584, 'San José', 'CRI', 'San José', 339131);
-INSERT INTO city VALUES (585, 'Djibouti', 'DJI', 'Djibouti', 383000);
-INSERT INTO city VALUES (586, 'Roseau', 'DMA', 'St George', 16243);
-INSERT INTO city VALUES (587, 'Santo Domingo de Guzmán', 'DOM', 'Distrito Nacional', 1609966);
-INSERT INTO city VALUES (588, 'Santiago de los Caballeros', 'DOM', 'Santiago', 365463);
-INSERT INTO city VALUES (589, 'La Romana', 'DOM', 'La Romana', 140204);
-INSERT INTO city VALUES (590, 'San Pedro de Macorís', 'DOM', 'San Pedro de Macorís', 124735);
-INSERT INTO city VALUES (591, 'San Francisco de Macorís', 'DOM', 'Duarte', 108485);
-INSERT INTO city VALUES (592, 'San Felipe de Puerto Plata', 'DOM', 'Puerto Plata', 89423);
-INSERT INTO city VALUES (593, 'Guayaquil', 'ECU', 'Guayas', 2070040);
-INSERT INTO city VALUES (594, 'Quito', 'ECU', 'Pichincha', 1573458);
-INSERT INTO city VALUES (595, 'Cuenca', 'ECU', 'Azuay', 270353);
-INSERT INTO city VALUES (596, 'Machala', 'ECU', 'El Oro', 210368);
-INSERT INTO city VALUES (597, 'Santo Domingo de los Colorados', 'ECU', 'Pichincha', 202111);
-INSERT INTO city VALUES (598, 'Portoviejo', 'ECU', 'Manabí', 176413);
-INSERT INTO city VALUES (599, 'Ambato', 'ECU', 'Tungurahua', 169612);
-INSERT INTO city VALUES (600, 'Manta', 'ECU', 'Manabí', 164739);
-INSERT INTO city VALUES (601, 'Duran [Eloy Alfaro]', 'ECU', 'Guayas', 152514);
-INSERT INTO city VALUES (602, 'Ibarra', 'ECU', 'Imbabura', 130643);
-INSERT INTO city VALUES (603, 'Quevedo', 'ECU', 'Los Ríos', 129631);
-INSERT INTO city VALUES (604, 'Milagro', 'ECU', 'Guayas', 124177);
-INSERT INTO city VALUES (605, 'Loja', 'ECU', 'Loja', 123875);
-INSERT INTO city VALUES (606, 'Ríobamba', 'ECU', 'Chimborazo', 123163);
-INSERT INTO city VALUES (607, 'Esmeraldas', 'ECU', 'Esmeraldas', 123045);
-INSERT INTO city VALUES (608, 'Cairo', 'EGY', 'Kairo', 6789479);
-INSERT INTO city VALUES (609, 'Alexandria', 'EGY', 'Aleksandria', 3328196);
-INSERT INTO city VALUES (610, 'Giza', 'EGY', 'Giza', 2221868);
-INSERT INTO city VALUES (611, 'Shubra al-Khayma', 'EGY', 'al-Qalyubiya', 870716);
-INSERT INTO city VALUES (612, 'Port Said', 'EGY', 'Port Said', 469533);
-INSERT INTO city VALUES (613, 'Suez', 'EGY', 'Suez', 417610);
-INSERT INTO city VALUES (614, 'al-Mahallat al-Kubra', 'EGY', 'al-Gharbiya', 395402);
-INSERT INTO city VALUES (615, 'Tanta', 'EGY', 'al-Gharbiya', 371010);
-INSERT INTO city VALUES (616, 'al-Mansura', 'EGY', 'al-Daqahliya', 369621);
-INSERT INTO city VALUES (617, 'Luxor', 'EGY', 'Luxor', 360503);
-INSERT INTO city VALUES (618, 'Asyut', 'EGY', 'Asyut', 343498);
-INSERT INTO city VALUES (619, 'Bahtim', 'EGY', 'al-Qalyubiya', 275807);
-INSERT INTO city VALUES (620, 'Zagazig', 'EGY', 'al-Sharqiya', 267351);
-INSERT INTO city VALUES (621, 'al-Faiyum', 'EGY', 'al-Faiyum', 260964);
-INSERT INTO city VALUES (622, 'Ismailia', 'EGY', 'Ismailia', 254477);
-INSERT INTO city VALUES (623, 'Kafr al-Dawwar', 'EGY', 'al-Buhayra', 231978);
-INSERT INTO city VALUES (624, 'Assuan', 'EGY', 'Assuan', 219017);
-INSERT INTO city VALUES (625, 'Damanhur', 'EGY', 'al-Buhayra', 212203);
-INSERT INTO city VALUES (626, 'al-Minya', 'EGY', 'al-Minya', 201360);
-INSERT INTO city VALUES (627, 'Bani Suwayf', 'EGY', 'Bani Suwayf', 172032);
-INSERT INTO city VALUES (628, 'Qina', 'EGY', 'Qina', 171275);
-INSERT INTO city VALUES (629, 'Sawhaj', 'EGY', 'Sawhaj', 170125);
-INSERT INTO city VALUES (630, 'Shibin al-Kawm', 'EGY', 'al-Minufiya', 159909);
-INSERT INTO city VALUES (631, 'Bulaq al-Dakrur', 'EGY', 'Giza', 148787);
-INSERT INTO city VALUES (632, 'Banha', 'EGY', 'al-Qalyubiya', 145792);
-INSERT INTO city VALUES (633, 'Warraq al-Arab', 'EGY', 'Giza', 127108);
-INSERT INTO city VALUES (634, 'Kafr al-Shaykh', 'EGY', 'Kafr al-Shaykh', 124819);
-INSERT INTO city VALUES (635, 'Mallawi', 'EGY', 'al-Minya', 119283);
-INSERT INTO city VALUES (636, 'Bilbays', 'EGY', 'al-Sharqiya', 113608);
-INSERT INTO city VALUES (637, 'Mit Ghamr', 'EGY', 'al-Daqahliya', 101801);
-INSERT INTO city VALUES (638, 'al-Arish', 'EGY', 'Shamal Sina', 100447);
-INSERT INTO city VALUES (639, 'Talkha', 'EGY', 'al-Daqahliya', 97700);
-INSERT INTO city VALUES (640, 'Qalyub', 'EGY', 'al-Qalyubiya', 97200);
-INSERT INTO city VALUES (641, 'Jirja', 'EGY', 'Sawhaj', 95400);
-INSERT INTO city VALUES (642, 'Idfu', 'EGY', 'Qina', 94200);
-INSERT INTO city VALUES (643, 'al-Hawamidiya', 'EGY', 'Giza', 91700);
-INSERT INTO city VALUES (644, 'Disuq', 'EGY', 'Kafr al-Shaykh', 91300);
-INSERT INTO city VALUES (645, 'San Salvador', 'SLV', 'San Salvador', 415346);
-INSERT INTO city VALUES (646, 'Santa Ana', 'SLV', 'Santa Ana', 139389);
-INSERT INTO city VALUES (647, 'Mejicanos', 'SLV', 'San Salvador', 138800);
-INSERT INTO city VALUES (648, 'Soyapango', 'SLV', 'San Salvador', 129800);
-INSERT INTO city VALUES (649, 'San Miguel', 'SLV', 'San Miguel', 127696);
-INSERT INTO city VALUES (650, 'Nueva San Salvador', 'SLV', 'La Libertad', 98400);
-INSERT INTO city VALUES (651, 'Apopa', 'SLV', 'San Salvador', 88800);
-INSERT INTO city VALUES (652, 'Asmara', 'ERI', 'Maekel', 431000);
-INSERT INTO city VALUES (653, 'Madrid', 'ESP', 'Madrid', 2879052);
-INSERT INTO city VALUES (654, 'Barcelona', 'ESP', 'Katalonia', 1503451);
-INSERT INTO city VALUES (655, 'Valencia', 'ESP', 'Valencia', 739412);
-INSERT INTO city VALUES (656, 'Sevilla', 'ESP', 'Andalusia', 701927);
-INSERT INTO city VALUES (657, 'Zaragoza', 'ESP', 'Aragonia', 603367);
-INSERT INTO city VALUES (658, 'Málaga', 'ESP', 'Andalusia', 530553);
-INSERT INTO city VALUES (659, 'Bilbao', 'ESP', 'Baskimaa', 357589);
-INSERT INTO city VALUES (660, 'Las Palmas de Gran Canaria', 'ESP', 'Canary Islands', 354757);
-INSERT INTO city VALUES (661, 'Murcia', 'ESP', 'Murcia', 353504);
-INSERT INTO city VALUES (662, 'Palma de Mallorca', 'ESP', 'Balears', 326993);
-INSERT INTO city VALUES (663, 'Valladolid', 'ESP', 'Castilla and León', 319998);
-INSERT INTO city VALUES (664, 'Córdoba', 'ESP', 'Andalusia', 311708);
-INSERT INTO city VALUES (665, 'Vigo', 'ESP', 'Galicia', 283670);
-INSERT INTO city VALUES (666, 'Alicante [Alacant]', 'ESP', 'Valencia', 272432);
-INSERT INTO city VALUES (667, 'Gijón', 'ESP', 'Asturia', 267980);
-INSERT INTO city VALUES (668, 'L´Hospitalet de Llobregat', 'ESP', 'Katalonia', 247986);
-INSERT INTO city VALUES (669, 'Granada', 'ESP', 'Andalusia', 244767);
-INSERT INTO city VALUES (670, 'A Coruña (La Coruña)', 'ESP', 'Galicia', 243402);
-INSERT INTO city VALUES (671, 'Vitoria-Gasteiz', 'ESP', 'Baskimaa', 217154);
-INSERT INTO city VALUES (672, 'Santa Cruz de Tenerife', 'ESP', 'Canary Islands', 213050);
-INSERT INTO city VALUES (673, 'Badalona', 'ESP', 'Katalonia', 209635);
-INSERT INTO city VALUES (674, 'Oviedo', 'ESP', 'Asturia', 200453);
-INSERT INTO city VALUES (675, 'Móstoles', 'ESP', 'Madrid', 195351);
-INSERT INTO city VALUES (676, 'Elche [Elx]', 'ESP', 'Valencia', 193174);
-INSERT INTO city VALUES (677, 'Sabadell', 'ESP', 'Katalonia', 184859);
-INSERT INTO city VALUES (678, 'Santander', 'ESP', 'Cantabria', 184165);
-INSERT INTO city VALUES (679, 'Jerez de la Frontera', 'ESP', 'Andalusia', 182660);
-INSERT INTO city VALUES (680, 'Pamplona [Iruña]', 'ESP', 'Navarra', 180483);
-INSERT INTO city VALUES (681, 'Donostia-San Sebastián', 'ESP', 'Baskimaa', 179208);
-INSERT INTO city VALUES (682, 'Cartagena', 'ESP', 'Murcia', 177709);
-INSERT INTO city VALUES (683, 'Leganés', 'ESP', 'Madrid', 173163);
-INSERT INTO city VALUES (684, 'Fuenlabrada', 'ESP', 'Madrid', 171173);
-INSERT INTO city VALUES (685, 'Almería', 'ESP', 'Andalusia', 169027);
-INSERT INTO city VALUES (686, 'Terrassa', 'ESP', 'Katalonia', 168695);
-INSERT INTO city VALUES (687, 'Alcalá de Henares', 'ESP', 'Madrid', 164463);
-INSERT INTO city VALUES (688, 'Burgos', 'ESP', 'Castilla and León', 162802);
-INSERT INTO city VALUES (689, 'Salamanca', 'ESP', 'Castilla and León', 158720);
-INSERT INTO city VALUES (690, 'Albacete', 'ESP', 'Kastilia-La Mancha', 147527);
-INSERT INTO city VALUES (691, 'Getafe', 'ESP', 'Madrid', 145371);
-INSERT INTO city VALUES (692, 'Cádiz', 'ESP', 'Andalusia', 142449);
-INSERT INTO city VALUES (693, 'Alcorcón', 'ESP', 'Madrid', 142048);
-INSERT INTO city VALUES (694, 'Huelva', 'ESP', 'Andalusia', 140583);
-INSERT INTO city VALUES (695, 'León', 'ESP', 'Castilla and León', 139809);
-INSERT INTO city VALUES (696, 'Castellón de la Plana [Castell', 'ESP', 'Valencia', 139712);
-INSERT INTO city VALUES (697, 'Badajoz', 'ESP', 'Extremadura', 136613);
-INSERT INTO city VALUES (698, '[San Cristóbal de] la Laguna', 'ESP', 'Canary Islands', 127945);
-INSERT INTO city VALUES (699, 'Logroño', 'ESP', 'La Rioja', 127093);
-INSERT INTO city VALUES (700, 'Santa Coloma de Gramenet', 'ESP', 'Katalonia', 120802);
-INSERT INTO city VALUES (701, 'Tarragona', 'ESP', 'Katalonia', 113016);
-INSERT INTO city VALUES (702, 'Lleida (Lérida)', 'ESP', 'Katalonia', 112207);
-INSERT INTO city VALUES (703, 'Jaén', 'ESP', 'Andalusia', 109247);
-INSERT INTO city VALUES (704, 'Ourense (Orense)', 'ESP', 'Galicia', 109120);
-INSERT INTO city VALUES (705, 'Mataró', 'ESP', 'Katalonia', 104095);
-INSERT INTO city VALUES (706, 'Algeciras', 'ESP', 'Andalusia', 103106);
-INSERT INTO city VALUES (707, 'Marbella', 'ESP', 'Andalusia', 101144);
-INSERT INTO city VALUES (708, 'Barakaldo', 'ESP', 'Baskimaa', 98212);
-INSERT INTO city VALUES (709, 'Dos Hermanas', 'ESP', 'Andalusia', 94591);
-INSERT INTO city VALUES (710, 'Santiago de Compostela', 'ESP', 'Galicia', 93745);
-INSERT INTO city VALUES (711, 'Torrejón de Ardoz', 'ESP', 'Madrid', 92262);
-INSERT INTO city VALUES (712, 'Cape Town', 'ZAF', 'Western Cape', 2352121);
-INSERT INTO city VALUES (713, 'Soweto', 'ZAF', 'Gauteng', 904165);
-INSERT INTO city VALUES (714, 'Johannesburg', 'ZAF', 'Gauteng', 756653);
-INSERT INTO city VALUES (715, 'Port Elizabeth', 'ZAF', 'Eastern Cape', 752319);
-INSERT INTO city VALUES (716, 'Pretoria', 'ZAF', 'Gauteng', 658630);
-INSERT INTO city VALUES (717, 'Inanda', 'ZAF', 'KwaZulu-Natal', 634065);
-INSERT INTO city VALUES (718, 'Durban', 'ZAF', 'KwaZulu-Natal', 566120);
-INSERT INTO city VALUES (719, 'Vanderbijlpark', 'ZAF', 'Gauteng', 468931);
-INSERT INTO city VALUES (720, 'Kempton Park', 'ZAF', 'Gauteng', 442633);
-INSERT INTO city VALUES (721, 'Alberton', 'ZAF', 'Gauteng', 410102);
-INSERT INTO city VALUES (722, 'Pinetown', 'ZAF', 'KwaZulu-Natal', 378810);
-INSERT INTO city VALUES (723, 'Pietermaritzburg', 'ZAF', 'KwaZulu-Natal', 370190);
-INSERT INTO city VALUES (724, 'Benoni', 'ZAF', 'Gauteng', 365467);
-INSERT INTO city VALUES (725, 'Randburg', 'ZAF', 'Gauteng', 341288);
-INSERT INTO city VALUES (726, 'Umlazi', 'ZAF', 'KwaZulu-Natal', 339233);
-INSERT INTO city VALUES (727, 'Bloemfontein', 'ZAF', 'Free State', 334341);
-INSERT INTO city VALUES (728, 'Vereeniging', 'ZAF', 'Gauteng', 328535);
-INSERT INTO city VALUES (729, 'Wonderboom', 'ZAF', 'Gauteng', 283289);
-INSERT INTO city VALUES (730, 'Roodepoort', 'ZAF', 'Gauteng', 279340);
-INSERT INTO city VALUES (731, 'Boksburg', 'ZAF', 'Gauteng', 262648);
-INSERT INTO city VALUES (732, 'Klerksdorp', 'ZAF', 'North West', 261911);
-INSERT INTO city VALUES (733, 'Soshanguve', 'ZAF', 'Gauteng', 242727);
-INSERT INTO city VALUES (734, 'Newcastle', 'ZAF', 'KwaZulu-Natal', 222993);
-INSERT INTO city VALUES (735, 'East London', 'ZAF', 'Eastern Cape', 221047);
-INSERT INTO city VALUES (736, 'Welkom', 'ZAF', 'Free State', 203296);
-INSERT INTO city VALUES (737, 'Kimberley', 'ZAF', 'Northern Cape', 197254);
-INSERT INTO city VALUES (738, 'Uitenhage', 'ZAF', 'Eastern Cape', 192120);
-INSERT INTO city VALUES (739, 'Chatsworth', 'ZAF', 'KwaZulu-Natal', 189885);
-INSERT INTO city VALUES (740, 'Mdantsane', 'ZAF', 'Eastern Cape', 182639);
-INSERT INTO city VALUES (741, 'Krugersdorp', 'ZAF', 'Gauteng', 181503);
-INSERT INTO city VALUES (742, 'Botshabelo', 'ZAF', 'Free State', 177971);
-INSERT INTO city VALUES (743, 'Brakpan', 'ZAF', 'Gauteng', 171363);
-INSERT INTO city VALUES (744, 'Witbank', 'ZAF', 'Mpumalanga', 167183);
-INSERT INTO city VALUES (745, 'Oberholzer', 'ZAF', 'Gauteng', 164367);
-INSERT INTO city VALUES (746, 'Germiston', 'ZAF', 'Gauteng', 164252);
-INSERT INTO city VALUES (747, 'Springs', 'ZAF', 'Gauteng', 162072);
-INSERT INTO city VALUES (748, 'Westonaria', 'ZAF', 'Gauteng', 159632);
-INSERT INTO city VALUES (749, 'Randfontein', 'ZAF', 'Gauteng', 120838);
-INSERT INTO city VALUES (750, 'Paarl', 'ZAF', 'Western Cape', 105768);
-INSERT INTO city VALUES (751, 'Potchefstroom', 'ZAF', 'North West', 101817);
-INSERT INTO city VALUES (752, 'Rustenburg', 'ZAF', 'North West', 97008);
-INSERT INTO city VALUES (753, 'Nigel', 'ZAF', 'Gauteng', 96734);
-INSERT INTO city VALUES (754, 'George', 'ZAF', 'Western Cape', 93818);
-INSERT INTO city VALUES (755, 'Ladysmith', 'ZAF', 'KwaZulu-Natal', 89292);
-INSERT INTO city VALUES (756, 'Addis Abeba', 'ETH', 'Addis Abeba', 2495000);
-INSERT INTO city VALUES (757, 'Dire Dawa', 'ETH', 'Dire Dawa', 164851);
-INSERT INTO city VALUES (758, 'Nazret', 'ETH', 'Oromia', 127842);
-INSERT INTO city VALUES (759, 'Gonder', 'ETH', 'Amhara', 112249);
-INSERT INTO city VALUES (760, 'Dese', 'ETH', 'Amhara', 97314);
-INSERT INTO city VALUES (761, 'Mekele', 'ETH', 'Tigray', 96938);
-INSERT INTO city VALUES (762, 'Bahir Dar', 'ETH', 'Amhara', 96140);
-INSERT INTO city VALUES (763, 'Stanley', 'FLK', 'East Falkland', 1636);
-INSERT INTO city VALUES (764, 'Suva', 'FJI', 'Central', 77366);
-INSERT INTO city VALUES (765, 'Quezon', 'PHL', 'National Capital Reg', 2173831);
-INSERT INTO city VALUES (766, 'Manila', 'PHL', 'National Capital Reg', 1581082);
-INSERT INTO city VALUES (767, 'Kalookan', 'PHL', 'National Capital Reg', 1177604);
-INSERT INTO city VALUES (768, 'Davao', 'PHL', 'Southern Mindanao', 1147116);
-INSERT INTO city VALUES (769, 'Cebu', 'PHL', 'Central Visayas', 718821);
-INSERT INTO city VALUES (770, 'Zamboanga', 'PHL', 'Western Mindanao', 601794);
-INSERT INTO city VALUES (771, 'Pasig', 'PHL', 'National Capital Reg', 505058);
-INSERT INTO city VALUES (772, 'Valenzuela', 'PHL', 'National Capital Reg', 485433);
-INSERT INTO city VALUES (773, 'Las Piñas', 'PHL', 'National Capital Reg', 472780);
-INSERT INTO city VALUES (774, 'Antipolo', 'PHL', 'Southern Tagalog', 470866);
-INSERT INTO city VALUES (775, 'Taguig', 'PHL', 'National Capital Reg', 467375);
-INSERT INTO city VALUES (776, 'Cagayan de Oro', 'PHL', 'Northern Mindanao', 461877);
-INSERT INTO city VALUES (777, 'Parañaque', 'PHL', 'National Capital Reg', 449811);
-INSERT INTO city VALUES (778, 'Makati', 'PHL', 'National Capital Reg', 444867);
-INSERT INTO city VALUES (779, 'Bacolod', 'PHL', 'Western Visayas', 429076);
-INSERT INTO city VALUES (780, 'General Santos', 'PHL', 'Southern Mindanao', 411822);
-INSERT INTO city VALUES (781, 'Marikina', 'PHL', 'National Capital Reg', 391170);
-INSERT INTO city VALUES (782, 'Dasmariñas', 'PHL', 'Southern Tagalog', 379520);
-INSERT INTO city VALUES (783, 'Muntinlupa', 'PHL', 'National Capital Reg', 379310);
-INSERT INTO city VALUES (784, 'Iloilo', 'PHL', 'Western Visayas', 365820);
-INSERT INTO city VALUES (785, 'Pasay', 'PHL', 'National Capital Reg', 354908);
-INSERT INTO city VALUES (786, 'Malabon', 'PHL', 'National Capital Reg', 338855);
-INSERT INTO city VALUES (787, 'San José del Monte', 'PHL', 'Central Luzon', 315807);
-INSERT INTO city VALUES (788, 'Bacoor', 'PHL', 'Southern Tagalog', 305699);
-INSERT INTO city VALUES (789, 'Iligan', 'PHL', 'Central Mindanao', 285061);
-INSERT INTO city VALUES (790, 'Calamba', 'PHL', 'Southern Tagalog', 281146);
-INSERT INTO city VALUES (791, 'Mandaluyong', 'PHL', 'National Capital Reg', 278474);
-INSERT INTO city VALUES (792, 'Butuan', 'PHL', 'Caraga', 267279);
-INSERT INTO city VALUES (793, 'Angeles', 'PHL', 'Central Luzon', 263971);
-INSERT INTO city VALUES (794, 'Tarlac', 'PHL', 'Central Luzon', 262481);
-INSERT INTO city VALUES (795, 'Mandaue', 'PHL', 'Central Visayas', 259728);
-INSERT INTO city VALUES (796, 'Baguio', 'PHL', 'CAR', 252386);
-INSERT INTO city VALUES (797, 'Batangas', 'PHL', 'Southern Tagalog', 247588);
-INSERT INTO city VALUES (798, 'Cainta', 'PHL', 'Southern Tagalog', 242511);
-INSERT INTO city VALUES (799, 'San Pedro', 'PHL', 'Southern Tagalog', 231403);
-INSERT INTO city VALUES (800, 'Navotas', 'PHL', 'National Capital Reg', 230403);
-INSERT INTO city VALUES (801, 'Cabanatuan', 'PHL', 'Central Luzon', 222859);
-INSERT INTO city VALUES (802, 'San Fernando', 'PHL', 'Central Luzon', 221857);
-INSERT INTO city VALUES (803, 'Lipa', 'PHL', 'Southern Tagalog', 218447);
-INSERT INTO city VALUES (804, 'Lapu-Lapu', 'PHL', 'Central Visayas', 217019);
-INSERT INTO city VALUES (805, 'San Pablo', 'PHL', 'Southern Tagalog', 207927);
-INSERT INTO city VALUES (806, 'Biñan', 'PHL', 'Southern Tagalog', 201186);
-INSERT INTO city VALUES (807, 'Taytay', 'PHL', 'Southern Tagalog', 198183);
-INSERT INTO city VALUES (808, 'Lucena', 'PHL', 'Southern Tagalog', 196075);
-INSERT INTO city VALUES (809, 'Imus', 'PHL', 'Southern Tagalog', 195482);
-INSERT INTO city VALUES (810, 'Olongapo', 'PHL', 'Central Luzon', 194260);
-INSERT INTO city VALUES (811, 'Binangonan', 'PHL', 'Southern Tagalog', 187691);
-INSERT INTO city VALUES (812, 'Santa Rosa', 'PHL', 'Southern Tagalog', 185633);
-INSERT INTO city VALUES (813, 'Tagum', 'PHL', 'Southern Mindanao', 179531);
-INSERT INTO city VALUES (814, 'Tacloban', 'PHL', 'Eastern Visayas', 178639);
-INSERT INTO city VALUES (815, 'Malolos', 'PHL', 'Central Luzon', 175291);
-INSERT INTO city VALUES (816, 'Mabalacat', 'PHL', 'Central Luzon', 171045);
-INSERT INTO city VALUES (817, 'Cotabato', 'PHL', 'Central Mindanao', 163849);
-INSERT INTO city VALUES (818, 'Meycauayan', 'PHL', 'Central Luzon', 163037);
-INSERT INTO city VALUES (819, 'Puerto Princesa', 'PHL', 'Southern Tagalog', 161912);
-INSERT INTO city VALUES (820, 'Legazpi', 'PHL', 'Bicol', 157010);
-INSERT INTO city VALUES (821, 'Silang', 'PHL', 'Southern Tagalog', 156137);
-INSERT INTO city VALUES (822, 'Ormoc', 'PHL', 'Eastern Visayas', 154297);
-INSERT INTO city VALUES (823, 'San Carlos', 'PHL', 'Ilocos', 154264);
-INSERT INTO city VALUES (824, 'Kabankalan', 'PHL', 'Western Visayas', 149769);
-INSERT INTO city VALUES (825, 'Talisay', 'PHL', 'Central Visayas', 148110);
-INSERT INTO city VALUES (826, 'Valencia', 'PHL', 'Northern Mindanao', 147924);
-INSERT INTO city VALUES (827, 'Calbayog', 'PHL', 'Eastern Visayas', 147187);
-INSERT INTO city VALUES (828, 'Santa Maria', 'PHL', 'Central Luzon', 144282);
-INSERT INTO city VALUES (829, 'Pagadian', 'PHL', 'Western Mindanao', 142515);
-INSERT INTO city VALUES (830, 'Cadiz', 'PHL', 'Western Visayas', 141954);
-INSERT INTO city VALUES (831, 'Bago', 'PHL', 'Western Visayas', 141721);
-INSERT INTO city VALUES (832, 'Toledo', 'PHL', 'Central Visayas', 141174);
-INSERT INTO city VALUES (833, 'Naga', 'PHL', 'Bicol', 137810);
-INSERT INTO city VALUES (834, 'San Mateo', 'PHL', 'Southern Tagalog', 135603);
-INSERT INTO city VALUES (835, 'Panabo', 'PHL', 'Southern Mindanao', 133950);
-INSERT INTO city VALUES (836, 'Koronadal', 'PHL', 'Southern Mindanao', 133786);
-INSERT INTO city VALUES (837, 'Marawi', 'PHL', 'Central Mindanao', 131090);
-INSERT INTO city VALUES (838, 'Dagupan', 'PHL', 'Ilocos', 130328);
-INSERT INTO city VALUES (839, 'Sagay', 'PHL', 'Western Visayas', 129765);
-INSERT INTO city VALUES (840, 'Roxas', 'PHL', 'Western Visayas', 126352);
-INSERT INTO city VALUES (841, 'Lubao', 'PHL', 'Central Luzon', 125699);
-INSERT INTO city VALUES (842, 'Digos', 'PHL', 'Southern Mindanao', 125171);
-INSERT INTO city VALUES (843, 'San Miguel', 'PHL', 'Central Luzon', 123824);
-INSERT INTO city VALUES (844, 'Malaybalay', 'PHL', 'Northern Mindanao', 123672);
-INSERT INTO city VALUES (845, 'Tuguegarao', 'PHL', 'Cagayan Valley', 120645);
-INSERT INTO city VALUES (846, 'Ilagan', 'PHL', 'Cagayan Valley', 119990);
-INSERT INTO city VALUES (847, 'Baliuag', 'PHL', 'Central Luzon', 119675);
-INSERT INTO city VALUES (848, 'Surigao', 'PHL', 'Caraga', 118534);
-INSERT INTO city VALUES (849, 'San Carlos', 'PHL', 'Western Visayas', 118259);
-INSERT INTO city VALUES (850, 'San Juan del Monte', 'PHL', 'National Capital Reg', 117680);
-INSERT INTO city VALUES (851, 'Tanauan', 'PHL', 'Southern Tagalog', 117539);
-INSERT INTO city VALUES (852, 'Concepcion', 'PHL', 'Central Luzon', 115171);
-INSERT INTO city VALUES (853, 'Rodriguez (Montalban)', 'PHL', 'Southern Tagalog', 115167);
-INSERT INTO city VALUES (854, 'Sariaya', 'PHL', 'Southern Tagalog', 114568);
-INSERT INTO city VALUES (855, 'Malasiqui', 'PHL', 'Ilocos', 113190);
-INSERT INTO city VALUES (856, 'General Mariano Alvarez', 'PHL', 'Southern Tagalog', 112446);
-INSERT INTO city VALUES (857, 'Urdaneta', 'PHL', 'Ilocos', 111582);
-INSERT INTO city VALUES (858, 'Hagonoy', 'PHL', 'Central Luzon', 111425);
-INSERT INTO city VALUES (859, 'San Jose', 'PHL', 'Southern Tagalog', 111009);
-INSERT INTO city VALUES (860, 'Polomolok', 'PHL', 'Southern Mindanao', 110709);
-INSERT INTO city VALUES (861, 'Santiago', 'PHL', 'Cagayan Valley', 110531);
-INSERT INTO city VALUES (862, 'Tanza', 'PHL', 'Southern Tagalog', 110517);
-INSERT INTO city VALUES (863, 'Ozamis', 'PHL', 'Northern Mindanao', 110420);
-INSERT INTO city VALUES (864, 'Mexico', 'PHL', 'Central Luzon', 109481);
-INSERT INTO city VALUES (865, 'San Jose', 'PHL', 'Central Luzon', 108254);
-INSERT INTO city VALUES (866, 'Silay', 'PHL', 'Western Visayas', 107722);
-INSERT INTO city VALUES (867, 'General Trias', 'PHL', 'Southern Tagalog', 107691);
-INSERT INTO city VALUES (868, 'Tabaco', 'PHL', 'Bicol', 107166);
-INSERT INTO city VALUES (869, 'Cabuyao', 'PHL', 'Southern Tagalog', 106630);
-INSERT INTO city VALUES (870, 'Calapan', 'PHL', 'Southern Tagalog', 105910);
-INSERT INTO city VALUES (871, 'Mati', 'PHL', 'Southern Mindanao', 105908);
-INSERT INTO city VALUES (872, 'Midsayap', 'PHL', 'Central Mindanao', 105760);
-INSERT INTO city VALUES (873, 'Cauayan', 'PHL', 'Cagayan Valley', 103952);
-INSERT INTO city VALUES (874, 'Gingoog', 'PHL', 'Northern Mindanao', 102379);
-INSERT INTO city VALUES (875, 'Dumaguete', 'PHL', 'Central Visayas', 102265);
-INSERT INTO city VALUES (876, 'San Fernando', 'PHL', 'Ilocos', 102082);
-INSERT INTO city VALUES (877, 'Arayat', 'PHL', 'Central Luzon', 101792);
-INSERT INTO city VALUES (878, 'Bayawan (Tulong)', 'PHL', 'Central Visayas', 101391);
-INSERT INTO city VALUES (879, 'Kidapawan', 'PHL', 'Central Mindanao', 101205);
-INSERT INTO city VALUES (880, 'Daraga (Locsin)', 'PHL', 'Bicol', 101031);
-INSERT INTO city VALUES (881, 'Marilao', 'PHL', 'Central Luzon', 101017);
-INSERT INTO city VALUES (882, 'Malita', 'PHL', 'Southern Mindanao', 100000);
-INSERT INTO city VALUES (883, 'Dipolog', 'PHL', 'Western Mindanao', 99862);
-INSERT INTO city VALUES (884, 'Cavite', 'PHL', 'Southern Tagalog', 99367);
-INSERT INTO city VALUES (885, 'Danao', 'PHL', 'Central Visayas', 98781);
-INSERT INTO city VALUES (886, 'Bislig', 'PHL', 'Caraga', 97860);
-INSERT INTO city VALUES (887, 'Talavera', 'PHL', 'Central Luzon', 97329);
-INSERT INTO city VALUES (888, 'Guagua', 'PHL', 'Central Luzon', 96858);
-INSERT INTO city VALUES (889, 'Bayambang', 'PHL', 'Ilocos', 96609);
-INSERT INTO city VALUES (890, 'Nasugbu', 'PHL', 'Southern Tagalog', 96113);
-INSERT INTO city VALUES (891, 'Baybay', 'PHL', 'Eastern Visayas', 95630);
-INSERT INTO city VALUES (892, 'Capas', 'PHL', 'Central Luzon', 95219);
-INSERT INTO city VALUES (893, 'Sultan Kudarat', 'PHL', 'ARMM', 94861);
-INSERT INTO city VALUES (894, 'Laoag', 'PHL', 'Ilocos', 94466);
-INSERT INTO city VALUES (895, 'Bayugan', 'PHL', 'Caraga', 93623);
-INSERT INTO city VALUES (896, 'Malungon', 'PHL', 'Southern Mindanao', 93232);
-INSERT INTO city VALUES (897, 'Santa Cruz', 'PHL', 'Southern Tagalog', 92694);
-INSERT INTO city VALUES (898, 'Sorsogon', 'PHL', 'Bicol', 92512);
-INSERT INTO city VALUES (899, 'Candelaria', 'PHL', 'Southern Tagalog', 92429);
-INSERT INTO city VALUES (900, 'Ligao', 'PHL', 'Bicol', 90603);
-INSERT INTO city VALUES (901, 'Tórshavn', 'FRO', 'Streymoyar', 14542);
-INSERT INTO city VALUES (902, 'Libreville', 'GAB', 'Estuaire', 419000);
-INSERT INTO city VALUES (903, 'Serekunda', 'GMB', 'Kombo St Mary', 102600);
-INSERT INTO city VALUES (904, 'Banjul', 'GMB', 'Banjul', 42326);
-INSERT INTO city VALUES (905, 'Tbilisi', 'GEO', 'Tbilisi', 1235200);
-INSERT INTO city VALUES (906, 'Kutaisi', 'GEO', 'Imereti', 240900);
-INSERT INTO city VALUES (907, 'Rustavi', 'GEO', 'Kvemo Kartli', 155400);
-INSERT INTO city VALUES (908, 'Batumi', 'GEO', 'Adzaria [Atara]', 137700);
-INSERT INTO city VALUES (909, 'Sohumi', 'GEO', 'Abhasia [Aphazeti]', 111700);
-INSERT INTO city VALUES (910, 'Accra', 'GHA', 'Greater Accra', 1070000);
-INSERT INTO city VALUES (911, 'Kumasi', 'GHA', 'Ashanti', 385192);
-INSERT INTO city VALUES (912, 'Tamale', 'GHA', 'Northern', 151069);
-INSERT INTO city VALUES (913, 'Tema', 'GHA', 'Greater Accra', 109975);
-INSERT INTO city VALUES (914, 'Sekondi-Takoradi', 'GHA', 'Western', 103653);
-INSERT INTO city VALUES (915, 'Gibraltar', 'GIB', '', 27025);
-INSERT INTO city VALUES (916, 'Saint George´s', 'GRD', 'St George', 4621);
-INSERT INTO city VALUES (917, 'Nuuk', 'GRL', 'Kitaa', 13445);
-INSERT INTO city VALUES (918, 'Les Abymes', 'GLP', 'Grande-Terre', 62947);
-INSERT INTO city VALUES (919, 'Basse-Terre', 'GLP', 'Basse-Terre', 12433);
-INSERT INTO city VALUES (920, 'Tamuning', 'GUM', '', 9500);
-INSERT INTO city VALUES (921, 'Agaña', 'GUM', '', 1139);
-INSERT INTO city VALUES (922, 'Ciudad de Guatemala', 'GTM', 'Guatemala', 823301);
-INSERT INTO city VALUES (923, 'Mixco', 'GTM', 'Guatemala', 209791);
-INSERT INTO city VALUES (924, 'Villa Nueva', 'GTM', 'Guatemala', 101295);
-INSERT INTO city VALUES (925, 'Quetzaltenango', 'GTM', 'Quetzaltenango', 90801);
-INSERT INTO city VALUES (926, 'Conakry', 'GIN', 'Conakry', 1090610);
-INSERT INTO city VALUES (927, 'Bissau', 'GNB', 'Bissau', 241000);
-INSERT INTO city VALUES (928, 'Georgetown', 'GUY', 'Georgetown', 254000);
-INSERT INTO city VALUES (929, 'Port-au-Prince', 'HTI', 'Ouest', 884472);
-INSERT INTO city VALUES (930, 'Carrefour', 'HTI', 'Ouest', 290204);
-INSERT INTO city VALUES (931, 'Delmas', 'HTI', 'Ouest', 240429);
-INSERT INTO city VALUES (932, 'Le-Cap-Haïtien', 'HTI', 'Nord', 102233);
-INSERT INTO city VALUES (933, 'Tegucigalpa', 'HND', 'Distrito Central', 813900);
-INSERT INTO city VALUES (934, 'San Pedro Sula', 'HND', 'Cortés', 383900);
-INSERT INTO city VALUES (935, 'La Ceiba', 'HND', 'Atlántida', 89200);
-INSERT INTO city VALUES (936, 'Kowloon and New Kowloon', 'HKG', 'Kowloon and New Kowl', 1987996);
-INSERT INTO city VALUES (937, 'Victoria', 'HKG', 'Hongkong', 1312637);
-INSERT INTO city VALUES (938, 'Longyearbyen', 'SJM', 'Länsimaa', 1438);
-INSERT INTO city VALUES (939, 'Jakarta', 'IDN', 'Jakarta Raya', 9604900);
-INSERT INTO city VALUES (940, 'Surabaya', 'IDN', 'East Java', 2663820);
-INSERT INTO city VALUES (941, 'Bandung', 'IDN', 'West Java', 2429000);
-INSERT INTO city VALUES (942, 'Medan', 'IDN', 'Sumatera Utara', 1843919);
-INSERT INTO city VALUES (943, 'Palembang', 'IDN', 'Sumatera Selatan', 1222764);
-INSERT INTO city VALUES (944, 'Tangerang', 'IDN', 'West Java', 1198300);
-INSERT INTO city VALUES (945, 'Semarang', 'IDN', 'Central Java', 1104405);
-INSERT INTO city VALUES (946, 'Ujung Pandang', 'IDN', 'Sulawesi Selatan', 1060257);
-INSERT INTO city VALUES (947, 'Malang', 'IDN', 'East Java', 716862);
-INSERT INTO city VALUES (948, 'Bandar Lampung', 'IDN', 'Lampung', 680332);
-INSERT INTO city VALUES (949, 'Bekasi', 'IDN', 'West Java', 644300);
-INSERT INTO city VALUES (950, 'Padang', 'IDN', 'Sumatera Barat', 534474);
-INSERT INTO city VALUES (951, 'Surakarta', 'IDN', 'Central Java', 518600);
-INSERT INTO city VALUES (952, 'Banjarmasin', 'IDN', 'Kalimantan Selatan', 482931);
-INSERT INTO city VALUES (953, 'Pekan Baru', 'IDN', 'Riau', 438638);
-INSERT INTO city VALUES (954, 'Denpasar', 'IDN', 'Bali', 435000);
-INSERT INTO city VALUES (955, 'Yogyakarta', 'IDN', 'Yogyakarta', 418944);
-INSERT INTO city VALUES (956, 'Pontianak', 'IDN', 'Kalimantan Barat', 409632);
-INSERT INTO city VALUES (957, 'Samarinda', 'IDN', 'Kalimantan Timur', 399175);
-INSERT INTO city VALUES (958, 'Jambi', 'IDN', 'Jambi', 385201);
-INSERT INTO city VALUES (959, 'Depok', 'IDN', 'West Java', 365200);
-INSERT INTO city VALUES (960, 'Cimahi', 'IDN', 'West Java', 344600);
-INSERT INTO city VALUES (961, 'Balikpapan', 'IDN', 'Kalimantan Timur', 338752);
-INSERT INTO city VALUES (962, 'Manado', 'IDN', 'Sulawesi Utara', 332288);
-INSERT INTO city VALUES (963, 'Mataram', 'IDN', 'Nusa Tenggara Barat', 306600);
-INSERT INTO city VALUES (964, 'Pekalongan', 'IDN', 'Central Java', 301504);
-INSERT INTO city VALUES (965, 'Tegal', 'IDN', 'Central Java', 289744);
-INSERT INTO city VALUES (966, 'Bogor', 'IDN', 'West Java', 285114);
-INSERT INTO city VALUES (967, 'Ciputat', 'IDN', 'West Java', 270800);
-INSERT INTO city VALUES (968, 'Pondokgede', 'IDN', 'West Java', 263200);
-INSERT INTO city VALUES (969, 'Cirebon', 'IDN', 'West Java', 254406);
-INSERT INTO city VALUES (970, 'Kediri', 'IDN', 'East Java', 253760);
-INSERT INTO city VALUES (971, 'Ambon', 'IDN', 'Molukit', 249312);
-INSERT INTO city VALUES (972, 'Jember', 'IDN', 'East Java', 218500);
-INSERT INTO city VALUES (973, 'Cilacap', 'IDN', 'Central Java', 206900);
-INSERT INTO city VALUES (974, 'Cimanggis', 'IDN', 'West Java', 205100);
-INSERT INTO city VALUES (975, 'Pematang Siantar', 'IDN', 'Sumatera Utara', 203056);
-INSERT INTO city VALUES (976, 'Purwokerto', 'IDN', 'Central Java', 202500);
-INSERT INTO city VALUES (977, 'Ciomas', 'IDN', 'West Java', 187400);
-INSERT INTO city VALUES (978, 'Tasikmalaya', 'IDN', 'West Java', 179800);
-INSERT INTO city VALUES (979, 'Madiun', 'IDN', 'East Java', 171532);
-INSERT INTO city VALUES (980, 'Bengkulu', 'IDN', 'Bengkulu', 146439);
-INSERT INTO city VALUES (981, 'Karawang', 'IDN', 'West Java', 145000);
-INSERT INTO city VALUES (982, 'Banda Aceh', 'IDN', 'Aceh', 143409);
-INSERT INTO city VALUES (983, 'Palu', 'IDN', 'Sulawesi Tengah', 142800);
-INSERT INTO city VALUES (984, 'Pasuruan', 'IDN', 'East Java', 134019);
-INSERT INTO city VALUES (985, 'Kupang', 'IDN', 'Nusa Tenggara Timur', 129300);
-INSERT INTO city VALUES (986, 'Tebing Tinggi', 'IDN', 'Sumatera Utara', 129300);
-INSERT INTO city VALUES (987, 'Percut Sei Tuan', 'IDN', 'Sumatera Utara', 129000);
-INSERT INTO city VALUES (988, 'Binjai', 'IDN', 'Sumatera Utara', 127222);
-INSERT INTO city VALUES (989, 'Sukabumi', 'IDN', 'West Java', 125766);
-INSERT INTO city VALUES (990, 'Waru', 'IDN', 'East Java', 124300);
-INSERT INTO city VALUES (991, 'Pangkal Pinang', 'IDN', 'Sumatera Selatan', 124000);
-INSERT INTO city VALUES (992, 'Magelang', 'IDN', 'Central Java', 123800);
-INSERT INTO city VALUES (993, 'Blitar', 'IDN', 'East Java', 122600);
-INSERT INTO city VALUES (994, 'Serang', 'IDN', 'West Java', 122400);
-INSERT INTO city VALUES (995, 'Probolinggo', 'IDN', 'East Java', 120770);
-INSERT INTO city VALUES (996, 'Cilegon', 'IDN', 'West Java', 117000);
-INSERT INTO city VALUES (997, 'Cianjur', 'IDN', 'West Java', 114300);
-INSERT INTO city VALUES (998, 'Ciparay', 'IDN', 'West Java', 111500);
-INSERT INTO city VALUES (999, 'Lhokseumawe', 'IDN', 'Aceh', 109600);
-INSERT INTO city VALUES (1000, 'Taman', 'IDN', 'East Java', 107000);
-INSERT INTO city VALUES (1001, 'Depok', 'IDN', 'Yogyakarta', 106800);
-INSERT INTO city VALUES (1002, 'Citeureup', 'IDN', 'West Java', 105100);
-INSERT INTO city VALUES (1003, 'Pemalang', 'IDN', 'Central Java', 103500);
-INSERT INTO city VALUES (1004, 'Klaten', 'IDN', 'Central Java', 103300);
-INSERT INTO city VALUES (1005, 'Salatiga', 'IDN', 'Central Java', 103000);
-INSERT INTO city VALUES (1006, 'Cibinong', 'IDN', 'West Java', 101300);
-INSERT INTO city VALUES (1007, 'Palangka Raya', 'IDN', 'Kalimantan Tengah', 99693);
-INSERT INTO city VALUES (1008, 'Mojokerto', 'IDN', 'East Java', 96626);
-INSERT INTO city VALUES (1009, 'Purwakarta', 'IDN', 'West Java', 95900);
-INSERT INTO city VALUES (1010, 'Garut', 'IDN', 'West Java', 95800);
-INSERT INTO city VALUES (1011, 'Kudus', 'IDN', 'Central Java', 95300);
-INSERT INTO city VALUES (1012, 'Kendari', 'IDN', 'Sulawesi Tenggara', 94800);
-INSERT INTO city VALUES (1013, 'Jaya Pura', 'IDN', 'West Irian', 94700);
-INSERT INTO city VALUES (1014, 'Gorontalo', 'IDN', 'Sulawesi Utara', 94058);
-INSERT INTO city VALUES (1015, 'Majalaya', 'IDN', 'West Java', 93200);
-INSERT INTO city VALUES (1016, 'Pondok Aren', 'IDN', 'West Java', 92700);
-INSERT INTO city VALUES (1017, 'Jombang', 'IDN', 'East Java', 92600);
-INSERT INTO city VALUES (1018, 'Sunggal', 'IDN', 'Sumatera Utara', 92300);
-INSERT INTO city VALUES (1019, 'Batam', 'IDN', 'Riau', 91871);
-INSERT INTO city VALUES (1020, 'Padang Sidempuan', 'IDN', 'Sumatera Utara', 91200);
-INSERT INTO city VALUES (1021, 'Sawangan', 'IDN', 'West Java', 91100);
-INSERT INTO city VALUES (1022, 'Banyuwangi', 'IDN', 'East Java', 89900);
-INSERT INTO city VALUES (1023, 'Tanjung Pinang', 'IDN', 'Riau', 89900);
-INSERT INTO city VALUES (1024, 'Mumbai (Bombay)', 'IND', 'Maharashtra', 10500000);
-INSERT INTO city VALUES (1025, 'Delhi', 'IND', 'Delhi', 7206704);
-INSERT INTO city VALUES (1026, 'Calcutta [Kolkata]', 'IND', 'West Bengali', 4399819);
-INSERT INTO city VALUES (1027, 'Chennai (Madras)', 'IND', 'Tamil Nadu', 3841396);
-INSERT INTO city VALUES (1028, 'Hyderabad', 'IND', 'Andhra Pradesh', 2964638);
-INSERT INTO city VALUES (1029, 'Ahmedabad', 'IND', 'Gujarat', 2876710);
-INSERT INTO city VALUES (1030, 'Bangalore', 'IND', 'Karnataka', 2660088);
-INSERT INTO city VALUES (1031, 'Kanpur', 'IND', 'Uttar Pradesh', 1874409);
-INSERT INTO city VALUES (1032, 'Nagpur', 'IND', 'Maharashtra', 1624752);
-INSERT INTO city VALUES (1033, 'Lucknow', 'IND', 'Uttar Pradesh', 1619115);
-INSERT INTO city VALUES (1034, 'Pune', 'IND', 'Maharashtra', 1566651);
-INSERT INTO city VALUES (1035, 'Surat', 'IND', 'Gujarat', 1498817);
-INSERT INTO city VALUES (1036, 'Jaipur', 'IND', 'Rajasthan', 1458483);
-INSERT INTO city VALUES (1037, 'Indore', 'IND', 'Madhya Pradesh', 1091674);
-INSERT INTO city VALUES (1038, 'Bhopal', 'IND', 'Madhya Pradesh', 1062771);
-INSERT INTO city VALUES (1039, 'Ludhiana', 'IND', 'Punjab', 1042740);
-INSERT INTO city VALUES (1040, 'Vadodara (Baroda)', 'IND', 'Gujarat', 1031346);
-INSERT INTO city VALUES (1041, 'Kalyan', 'IND', 'Maharashtra', 1014557);
-INSERT INTO city VALUES (1042, 'Madurai', 'IND', 'Tamil Nadu', 977856);
-INSERT INTO city VALUES (1043, 'Haora (Howrah)', 'IND', 'West Bengali', 950435);
-INSERT INTO city VALUES (1044, 'Varanasi (Benares)', 'IND', 'Uttar Pradesh', 929270);
-INSERT INTO city VALUES (1045, 'Patna', 'IND', 'Bihar', 917243);
-INSERT INTO city VALUES (1046, 'Srinagar', 'IND', 'Jammu and Kashmir', 892506);
-INSERT INTO city VALUES (1047, 'Agra', 'IND', 'Uttar Pradesh', 891790);
-INSERT INTO city VALUES (1048, 'Coimbatore', 'IND', 'Tamil Nadu', 816321);
-INSERT INTO city VALUES (1049, 'Thane (Thana)', 'IND', 'Maharashtra', 803389);
-INSERT INTO city VALUES (1050, 'Allahabad', 'IND', 'Uttar Pradesh', 792858);
-INSERT INTO city VALUES (1051, 'Meerut', 'IND', 'Uttar Pradesh', 753778);
-INSERT INTO city VALUES (1052, 'Vishakhapatnam', 'IND', 'Andhra Pradesh', 752037);
-INSERT INTO city VALUES (1053, 'Jabalpur', 'IND', 'Madhya Pradesh', 741927);
-INSERT INTO city VALUES (1054, 'Amritsar', 'IND', 'Punjab', 708835);
-INSERT INTO city VALUES (1055, 'Faridabad', 'IND', 'Haryana', 703592);
-INSERT INTO city VALUES (1056, 'Vijayawada', 'IND', 'Andhra Pradesh', 701827);
-INSERT INTO city VALUES (1057, 'Gwalior', 'IND', 'Madhya Pradesh', 690765);
-INSERT INTO city VALUES (1058, 'Jodhpur', 'IND', 'Rajasthan', 666279);
-INSERT INTO city VALUES (1059, 'Nashik (Nasik)', 'IND', 'Maharashtra', 656925);
-INSERT INTO city VALUES (1060, 'Hubli-Dharwad', 'IND', 'Karnataka', 648298);
-INSERT INTO city VALUES (1061, 'Solapur (Sholapur)', 'IND', 'Maharashtra', 604215);
-INSERT INTO city VALUES (1062, 'Ranchi', 'IND', 'Jharkhand', 599306);
-INSERT INTO city VALUES (1063, 'Bareilly', 'IND', 'Uttar Pradesh', 587211);
-INSERT INTO city VALUES (1064, 'Guwahati (Gauhati)', 'IND', 'Assam', 584342);
-INSERT INTO city VALUES (1065, 'Shambajinagar (Aurangabad)', 'IND', 'Maharashtra', 573272);
-INSERT INTO city VALUES (1066, 'Cochin (Kochi)', 'IND', 'Kerala', 564589);
-INSERT INTO city VALUES (1067, 'Rajkot', 'IND', 'Gujarat', 559407);
-INSERT INTO city VALUES (1068, 'Kota', 'IND', 'Rajasthan', 537371);
-INSERT INTO city VALUES (1069, 'Thiruvananthapuram (Trivandrum', 'IND', 'Kerala', 524006);
-INSERT INTO city VALUES (1070, 'Pimpri-Chinchwad', 'IND', 'Maharashtra', 517083);
-INSERT INTO city VALUES (1071, 'Jalandhar (Jullundur)', 'IND', 'Punjab', 509510);
-INSERT INTO city VALUES (1072, 'Gorakhpur', 'IND', 'Uttar Pradesh', 505566);
-INSERT INTO city VALUES (1073, 'Chandigarh', 'IND', 'Chandigarh', 504094);
-INSERT INTO city VALUES (1074, 'Mysore', 'IND', 'Karnataka', 480692);
-INSERT INTO city VALUES (1075, 'Aligarh', 'IND', 'Uttar Pradesh', 480520);
-INSERT INTO city VALUES (1076, 'Guntur', 'IND', 'Andhra Pradesh', 471051);
-INSERT INTO city VALUES (1077, 'Jamshedpur', 'IND', 'Jharkhand', 460577);
-INSERT INTO city VALUES (1078, 'Ghaziabad', 'IND', 'Uttar Pradesh', 454156);
-INSERT INTO city VALUES (1079, 'Warangal', 'IND', 'Andhra Pradesh', 447657);
-INSERT INTO city VALUES (1080, 'Raipur', 'IND', 'Chhatisgarh', 438639);
-INSERT INTO city VALUES (1081, 'Moradabad', 'IND', 'Uttar Pradesh', 429214);
-INSERT INTO city VALUES (1082, 'Durgapur', 'IND', 'West Bengali', 425836);
-INSERT INTO city VALUES (1083, 'Amravati', 'IND', 'Maharashtra', 421576);
-INSERT INTO city VALUES (1084, 'Calicut (Kozhikode)', 'IND', 'Kerala', 419831);
-INSERT INTO city VALUES (1085, 'Bikaner', 'IND', 'Rajasthan', 416289);
-INSERT INTO city VALUES (1086, 'Bhubaneswar', 'IND', 'Orissa', 411542);
-INSERT INTO city VALUES (1087, 'Kolhapur', 'IND', 'Maharashtra', 406370);
-INSERT INTO city VALUES (1088, 'Kataka (Cuttack)', 'IND', 'Orissa', 403418);
-INSERT INTO city VALUES (1089, 'Ajmer', 'IND', 'Rajasthan', 402700);
-INSERT INTO city VALUES (1090, 'Bhavnagar', 'IND', 'Gujarat', 402338);
-INSERT INTO city VALUES (1091, 'Tiruchirapalli', 'IND', 'Tamil Nadu', 387223);
-INSERT INTO city VALUES (1092, 'Bhilai', 'IND', 'Chhatisgarh', 386159);
-INSERT INTO city VALUES (1093, 'Bhiwandi', 'IND', 'Maharashtra', 379070);
-INSERT INTO city VALUES (1094, 'Saharanpur', 'IND', 'Uttar Pradesh', 374945);
-INSERT INTO city VALUES (1095, 'Ulhasnagar', 'IND', 'Maharashtra', 369077);
-INSERT INTO city VALUES (1096, 'Salem', 'IND', 'Tamil Nadu', 366712);
-INSERT INTO city VALUES (1097, 'Ujjain', 'IND', 'Madhya Pradesh', 362266);
-INSERT INTO city VALUES (1098, 'Malegaon', 'IND', 'Maharashtra', 342595);
-INSERT INTO city VALUES (1099, 'Jamnagar', 'IND', 'Gujarat', 341637);
-INSERT INTO city VALUES (1100, 'Bokaro Steel City', 'IND', 'Jharkhand', 333683);
-INSERT INTO city VALUES (1101, 'Akola', 'IND', 'Maharashtra', 328034);
-INSERT INTO city VALUES (1102, 'Belgaum', 'IND', 'Karnataka', 326399);
-INSERT INTO city VALUES (1103, 'Rajahmundry', 'IND', 'Andhra Pradesh', 324851);
-INSERT INTO city VALUES (1104, 'Nellore', 'IND', 'Andhra Pradesh', 316606);
-INSERT INTO city VALUES (1105, 'Udaipur', 'IND', 'Rajasthan', 308571);
-INSERT INTO city VALUES (1106, 'New Bombay', 'IND', 'Maharashtra', 307297);
-INSERT INTO city VALUES (1107, 'Bhatpara', 'IND', 'West Bengali', 304952);
-INSERT INTO city VALUES (1108, 'Gulbarga', 'IND', 'Karnataka', 304099);
-INSERT INTO city VALUES (1109, 'New Delhi', 'IND', 'Delhi', 301297);
-INSERT INTO city VALUES (1110, 'Jhansi', 'IND', 'Uttar Pradesh', 300850);
-INSERT INTO city VALUES (1111, 'Gaya', 'IND', 'Bihar', 291675);
-INSERT INTO city VALUES (1112, 'Kakinada', 'IND', 'Andhra Pradesh', 279980);
-INSERT INTO city VALUES (1113, 'Dhule (Dhulia)', 'IND', 'Maharashtra', 278317);
-INSERT INTO city VALUES (1114, 'Panihati', 'IND', 'West Bengali', 275990);
-INSERT INTO city VALUES (1115, 'Nanded (Nander)', 'IND', 'Maharashtra', 275083);
-INSERT INTO city VALUES (1116, 'Mangalore', 'IND', 'Karnataka', 273304);
-INSERT INTO city VALUES (1117, 'Dehra Dun', 'IND', 'Uttaranchal', 270159);
-INSERT INTO city VALUES (1118, 'Kamarhati', 'IND', 'West Bengali', 266889);
-INSERT INTO city VALUES (1119, 'Davangere', 'IND', 'Karnataka', 266082);
-INSERT INTO city VALUES (1120, 'Asansol', 'IND', 'West Bengali', 262188);
-INSERT INTO city VALUES (1121, 'Bhagalpur', 'IND', 'Bihar', 253225);
-INSERT INTO city VALUES (1122, 'Bellary', 'IND', 'Karnataka', 245391);
-INSERT INTO city VALUES (1123, 'Barddhaman (Burdwan)', 'IND', 'West Bengali', 245079);
-INSERT INTO city VALUES (1124, 'Rampur', 'IND', 'Uttar Pradesh', 243742);
-INSERT INTO city VALUES (1125, 'Jalgaon', 'IND', 'Maharashtra', 242193);
-INSERT INTO city VALUES (1126, 'Muzaffarpur', 'IND', 'Bihar', 241107);
-INSERT INTO city VALUES (1127, 'Nizamabad', 'IND', 'Andhra Pradesh', 241034);
-INSERT INTO city VALUES (1128, 'Muzaffarnagar', 'IND', 'Uttar Pradesh', 240609);
-INSERT INTO city VALUES (1129, 'Patiala', 'IND', 'Punjab', 238368);
-INSERT INTO city VALUES (1130, 'Shahjahanpur', 'IND', 'Uttar Pradesh', 237713);
-INSERT INTO city VALUES (1131, 'Kurnool', 'IND', 'Andhra Pradesh', 236800);
-INSERT INTO city VALUES (1132, 'Tiruppur (Tirupper)', 'IND', 'Tamil Nadu', 235661);
-INSERT INTO city VALUES (1133, 'Rohtak', 'IND', 'Haryana', 233400);
-INSERT INTO city VALUES (1134, 'South Dum Dum', 'IND', 'West Bengali', 232811);
-INSERT INTO city VALUES (1135, 'Mathura', 'IND', 'Uttar Pradesh', 226691);
-INSERT INTO city VALUES (1136, 'Chandrapur', 'IND', 'Maharashtra', 226105);
-INSERT INTO city VALUES (1137, 'Barahanagar (Baranagar)', 'IND', 'West Bengali', 224821);
-INSERT INTO city VALUES (1138, 'Darbhanga', 'IND', 'Bihar', 218391);
-INSERT INTO city VALUES (1139, 'Siliguri (Shiliguri)', 'IND', 'West Bengali', 216950);
-INSERT INTO city VALUES (1140, 'Raurkela', 'IND', 'Orissa', 215489);
-INSERT INTO city VALUES (1141, 'Ambattur', 'IND', 'Tamil Nadu', 215424);
-INSERT INTO city VALUES (1142, 'Panipat', 'IND', 'Haryana', 215218);
-INSERT INTO city VALUES (1143, 'Firozabad', 'IND', 'Uttar Pradesh', 215128);
-INSERT INTO city VALUES (1144, 'Ichalkaranji', 'IND', 'Maharashtra', 214950);
-INSERT INTO city VALUES (1145, 'Jammu', 'IND', 'Jammu and Kashmir', 214737);
-INSERT INTO city VALUES (1146, 'Ramagundam', 'IND', 'Andhra Pradesh', 214384);
-INSERT INTO city VALUES (1147, 'Eluru', 'IND', 'Andhra Pradesh', 212866);
-INSERT INTO city VALUES (1148, 'Brahmapur', 'IND', 'Orissa', 210418);
-INSERT INTO city VALUES (1149, 'Alwar', 'IND', 'Rajasthan', 205086);
-INSERT INTO city VALUES (1150, 'Pondicherry', 'IND', 'Pondicherry', 203065);
-INSERT INTO city VALUES (1151, 'Thanjavur', 'IND', 'Tamil Nadu', 202013);
-INSERT INTO city VALUES (1152, 'Bihar Sharif', 'IND', 'Bihar', 201323);
-INSERT INTO city VALUES (1153, 'Tuticorin', 'IND', 'Tamil Nadu', 199854);
-INSERT INTO city VALUES (1154, 'Imphal', 'IND', 'Manipur', 198535);
-INSERT INTO city VALUES (1155, 'Latur', 'IND', 'Maharashtra', 197408);
-INSERT INTO city VALUES (1156, 'Sagar', 'IND', 'Madhya Pradesh', 195346);
-INSERT INTO city VALUES (1157, 'Farrukhabad-cum-Fatehgarh', 'IND', 'Uttar Pradesh', 194567);
-INSERT INTO city VALUES (1158, 'Sangli', 'IND', 'Maharashtra', 193197);
-INSERT INTO city VALUES (1159, 'Parbhani', 'IND', 'Maharashtra', 190255);
-INSERT INTO city VALUES (1160, 'Nagar Coil', 'IND', 'Tamil Nadu', 190084);
-INSERT INTO city VALUES (1161, 'Bijapur', 'IND', 'Karnataka', 186939);
-INSERT INTO city VALUES (1162, 'Kukatpalle', 'IND', 'Andhra Pradesh', 185378);
-INSERT INTO city VALUES (1163, 'Bally', 'IND', 'West Bengali', 184474);
-INSERT INTO city VALUES (1164, 'Bhilwara', 'IND', 'Rajasthan', 183965);
-INSERT INTO city VALUES (1165, 'Ratlam', 'IND', 'Madhya Pradesh', 183375);
-INSERT INTO city VALUES (1166, 'Avadi', 'IND', 'Tamil Nadu', 183215);
-INSERT INTO city VALUES (1167, 'Dindigul', 'IND', 'Tamil Nadu', 182477);
-INSERT INTO city VALUES (1168, 'Ahmadnagar', 'IND', 'Maharashtra', 181339);
-INSERT INTO city VALUES (1169, 'Bilaspur', 'IND', 'Chhatisgarh', 179833);
-INSERT INTO city VALUES (1170, 'Shimoga', 'IND', 'Karnataka', 179258);
-INSERT INTO city VALUES (1171, 'Kharagpur', 'IND', 'West Bengali', 177989);
-INSERT INTO city VALUES (1172, 'Mira Bhayandar', 'IND', 'Maharashtra', 175372);
-INSERT INTO city VALUES (1173, 'Vellore', 'IND', 'Tamil Nadu', 175061);
-INSERT INTO city VALUES (1174, 'Jalna', 'IND', 'Maharashtra', 174985);
-INSERT INTO city VALUES (1175, 'Burnpur', 'IND', 'West Bengali', 174933);
-INSERT INTO city VALUES (1176, 'Anantapur', 'IND', 'Andhra Pradesh', 174924);
-INSERT INTO city VALUES (1177, 'Allappuzha (Alleppey)', 'IND', 'Kerala', 174666);
-INSERT INTO city VALUES (1178, 'Tirupati', 'IND', 'Andhra Pradesh', 174369);
-INSERT INTO city VALUES (1179, 'Karnal', 'IND', 'Haryana', 173751);
-INSERT INTO city VALUES (1180, 'Burhanpur', 'IND', 'Madhya Pradesh', 172710);
-INSERT INTO city VALUES (1181, 'Hisar (Hissar)', 'IND', 'Haryana', 172677);
-INSERT INTO city VALUES (1182, 'Tiruvottiyur', 'IND', 'Tamil Nadu', 172562);
-INSERT INTO city VALUES (1183, 'Mirzapur-cum-Vindhyachal', 'IND', 'Uttar Pradesh', 169336);
-INSERT INTO city VALUES (1184, 'Secunderabad', 'IND', 'Andhra Pradesh', 167461);
-INSERT INTO city VALUES (1185, 'Nadiad', 'IND', 'Gujarat', 167051);
-INSERT INTO city VALUES (1186, 'Dewas', 'IND', 'Madhya Pradesh', 164364);
-INSERT INTO city VALUES (1187, 'Murwara (Katni)', 'IND', 'Madhya Pradesh', 163431);
-INSERT INTO city VALUES (1188, 'Ganganagar', 'IND', 'Rajasthan', 161482);
-INSERT INTO city VALUES (1189, 'Vizianagaram', 'IND', 'Andhra Pradesh', 160359);
-INSERT INTO city VALUES (1190, 'Erode', 'IND', 'Tamil Nadu', 159232);
-INSERT INTO city VALUES (1191, 'Machilipatnam (Masulipatam)', 'IND', 'Andhra Pradesh', 159110);
-INSERT INTO city VALUES (1192, 'Bhatinda (Bathinda)', 'IND', 'Punjab', 159042);
-INSERT INTO city VALUES (1193, 'Raichur', 'IND', 'Karnataka', 157551);
-INSERT INTO city VALUES (1194, 'Agartala', 'IND', 'Tripura', 157358);
-INSERT INTO city VALUES (1195, 'Arrah (Ara)', 'IND', 'Bihar', 157082);
-INSERT INTO city VALUES (1196, 'Satna', 'IND', 'Madhya Pradesh', 156630);
-INSERT INTO city VALUES (1197, 'Lalbahadur Nagar', 'IND', 'Andhra Pradesh', 155500);
-INSERT INTO city VALUES (1198, 'Aizawl', 'IND', 'Mizoram', 155240);
-INSERT INTO city VALUES (1199, 'Uluberia', 'IND', 'West Bengali', 155172);
-INSERT INTO city VALUES (1200, 'Katihar', 'IND', 'Bihar', 154367);
-INSERT INTO city VALUES (1201, 'Cuddalore', 'IND', 'Tamil Nadu', 153086);
-INSERT INTO city VALUES (1202, 'Hugli-Chinsurah', 'IND', 'West Bengali', 151806);
-INSERT INTO city VALUES (1203, 'Dhanbad', 'IND', 'Jharkhand', 151789);
-INSERT INTO city VALUES (1204, 'Raiganj', 'IND', 'West Bengali', 151045);
-INSERT INTO city VALUES (1205, 'Sambhal', 'IND', 'Uttar Pradesh', 150869);
-INSERT INTO city VALUES (1206, 'Durg', 'IND', 'Chhatisgarh', 150645);
-INSERT INTO city VALUES (1207, 'Munger (Monghyr)', 'IND', 'Bihar', 150112);
-INSERT INTO city VALUES (1208, 'Kanchipuram', 'IND', 'Tamil Nadu', 150100);
-INSERT INTO city VALUES (1209, 'North Dum Dum', 'IND', 'West Bengali', 149965);
-INSERT INTO city VALUES (1210, 'Karimnagar', 'IND', 'Andhra Pradesh', 148583);
-INSERT INTO city VALUES (1211, 'Bharatpur', 'IND', 'Rajasthan', 148519);
-INSERT INTO city VALUES (1212, 'Sikar', 'IND', 'Rajasthan', 148272);
-INSERT INTO city VALUES (1213, 'Hardwar (Haridwar)', 'IND', 'Uttaranchal', 147305);
-INSERT INTO city VALUES (1214, 'Dabgram', 'IND', 'West Bengali', 147217);
-INSERT INTO city VALUES (1215, 'Morena', 'IND', 'Madhya Pradesh', 147124);
-INSERT INTO city VALUES (1216, 'Noida', 'IND', 'Uttar Pradesh', 146514);
-INSERT INTO city VALUES (1217, 'Hapur', 'IND', 'Uttar Pradesh', 146262);
-INSERT INTO city VALUES (1218, 'Bhusawal', 'IND', 'Maharashtra', 145143);
-INSERT INTO city VALUES (1219, 'Khandwa', 'IND', 'Madhya Pradesh', 145133);
-INSERT INTO city VALUES (1220, 'Yamuna Nagar', 'IND', 'Haryana', 144346);
-INSERT INTO city VALUES (1221, 'Sonipat (Sonepat)', 'IND', 'Haryana', 143922);
-INSERT INTO city VALUES (1222, 'Tenali', 'IND', 'Andhra Pradesh', 143726);
-INSERT INTO city VALUES (1223, 'Raurkela Civil Township', 'IND', 'Orissa', 140408);
-INSERT INTO city VALUES (1224, 'Kollam (Quilon)', 'IND', 'Kerala', 139852);
-INSERT INTO city VALUES (1225, 'Kumbakonam', 'IND', 'Tamil Nadu', 139483);
-INSERT INTO city VALUES (1226, 'Ingraj Bazar (English Bazar)', 'IND', 'West Bengali', 139204);
-INSERT INTO city VALUES (1227, 'Timkur', 'IND', 'Karnataka', 138903);
-INSERT INTO city VALUES (1228, 'Amroha', 'IND', 'Uttar Pradesh', 137061);
-INSERT INTO city VALUES (1229, 'Serampore', 'IND', 'West Bengali', 137028);
-INSERT INTO city VALUES (1230, 'Chapra', 'IND', 'Bihar', 136877);
-INSERT INTO city VALUES (1231, 'Pali', 'IND', 'Rajasthan', 136842);
-INSERT INTO city VALUES (1232, 'Maunath Bhanjan', 'IND', 'Uttar Pradesh', 136697);
-INSERT INTO city VALUES (1233, 'Adoni', 'IND', 'Andhra Pradesh', 136182);
-INSERT INTO city VALUES (1234, 'Jaunpur', 'IND', 'Uttar Pradesh', 136062);
-INSERT INTO city VALUES (1235, 'Tirunelveli', 'IND', 'Tamil Nadu', 135825);
-INSERT INTO city VALUES (1236, 'Bahraich', 'IND', 'Uttar Pradesh', 135400);
-INSERT INTO city VALUES (1237, 'Gadag Betigeri', 'IND', 'Karnataka', 134051);
-INSERT INTO city VALUES (1238, 'Proddatur', 'IND', 'Andhra Pradesh', 133914);
-INSERT INTO city VALUES (1239, 'Chittoor', 'IND', 'Andhra Pradesh', 133462);
-INSERT INTO city VALUES (1240, 'Barrackpur', 'IND', 'West Bengali', 133265);
-INSERT INTO city VALUES (1241, 'Bharuch (Broach)', 'IND', 'Gujarat', 133102);
-INSERT INTO city VALUES (1242, 'Naihati', 'IND', 'West Bengali', 132701);
-INSERT INTO city VALUES (1243, 'Shillong', 'IND', 'Meghalaya', 131719);
-INSERT INTO city VALUES (1244, 'Sambalpur', 'IND', 'Orissa', 131138);
-INSERT INTO city VALUES (1245, 'Junagadh', 'IND', 'Gujarat', 130484);
-INSERT INTO city VALUES (1246, 'Rae Bareli', 'IND', 'Uttar Pradesh', 129904);
-INSERT INTO city VALUES (1247, 'Rewa', 'IND', 'Madhya Pradesh', 128981);
-INSERT INTO city VALUES (1248, 'Gurgaon', 'IND', 'Haryana', 128608);
-INSERT INTO city VALUES (1249, 'Khammam', 'IND', 'Andhra Pradesh', 127992);
-INSERT INTO city VALUES (1250, 'Bulandshahr', 'IND', 'Uttar Pradesh', 127201);
-INSERT INTO city VALUES (1251, 'Navsari', 'IND', 'Gujarat', 126089);
-INSERT INTO city VALUES (1252, 'Malkajgiri', 'IND', 'Andhra Pradesh', 126066);
-INSERT INTO city VALUES (1253, 'Midnapore (Medinipur)', 'IND', 'West Bengali', 125498);
-INSERT INTO city VALUES (1254, 'Miraj', 'IND', 'Maharashtra', 125407);
-INSERT INTO city VALUES (1255, 'Raj Nandgaon', 'IND', 'Chhatisgarh', 125371);
-INSERT INTO city VALUES (1256, 'Alandur', 'IND', 'Tamil Nadu', 125244);
-INSERT INTO city VALUES (1257, 'Puri', 'IND', 'Orissa', 125199);
-INSERT INTO city VALUES (1258, 'Navadwip', 'IND', 'West Bengali', 125037);
-INSERT INTO city VALUES (1259, 'Sirsa', 'IND', 'Haryana', 125000);
-INSERT INTO city VALUES (1260, 'Korba', 'IND', 'Chhatisgarh', 124501);
-INSERT INTO city VALUES (1261, 'Faizabad', 'IND', 'Uttar Pradesh', 124437);
-INSERT INTO city VALUES (1262, 'Etawah', 'IND', 'Uttar Pradesh', 124072);
-INSERT INTO city VALUES (1263, 'Pathankot', 'IND', 'Punjab', 123930);
-INSERT INTO city VALUES (1264, 'Gandhinagar', 'IND', 'Gujarat', 123359);
-INSERT INTO city VALUES (1265, 'Palghat (Palakkad)', 'IND', 'Kerala', 123289);
-INSERT INTO city VALUES (1266, 'Veraval', 'IND', 'Gujarat', 123000);
-INSERT INTO city VALUES (1267, 'Hoshiarpur', 'IND', 'Punjab', 122705);
-INSERT INTO city VALUES (1268, 'Ambala', 'IND', 'Haryana', 122596);
-INSERT INTO city VALUES (1269, 'Sitapur', 'IND', 'Uttar Pradesh', 121842);
-INSERT INTO city VALUES (1270, 'Bhiwani', 'IND', 'Haryana', 121629);
-INSERT INTO city VALUES (1271, 'Cuddapah', 'IND', 'Andhra Pradesh', 121463);
-INSERT INTO city VALUES (1272, 'Bhimavaram', 'IND', 'Andhra Pradesh', 121314);
-INSERT INTO city VALUES (1273, 'Krishnanagar', 'IND', 'West Bengali', 121110);
-INSERT INTO city VALUES (1274, 'Chandannagar', 'IND', 'West Bengali', 120378);
-INSERT INTO city VALUES (1275, 'Mandya', 'IND', 'Karnataka', 120265);
-INSERT INTO city VALUES (1276, 'Dibrugarh', 'IND', 'Assam', 120127);
-INSERT INTO city VALUES (1277, 'Nandyal', 'IND', 'Andhra Pradesh', 119813);
-INSERT INTO city VALUES (1278, 'Balurghat', 'IND', 'West Bengali', 119796);
-INSERT INTO city VALUES (1279, 'Neyveli', 'IND', 'Tamil Nadu', 118080);
-INSERT INTO city VALUES (1280, 'Fatehpur', 'IND', 'Uttar Pradesh', 117675);
-INSERT INTO city VALUES (1281, 'Mahbubnagar', 'IND', 'Andhra Pradesh', 116833);
-INSERT INTO city VALUES (1282, 'Budaun', 'IND', 'Uttar Pradesh', 116695);
-INSERT INTO city VALUES (1283, 'Porbandar', 'IND', 'Gujarat', 116671);
-INSERT INTO city VALUES (1284, 'Silchar', 'IND', 'Assam', 115483);
-INSERT INTO city VALUES (1285, 'Berhampore (Baharampur)', 'IND', 'West Bengali', 115144);
-INSERT INTO city VALUES (1286, 'Purnea (Purnia)', 'IND', 'Jharkhand', 114912);
-INSERT INTO city VALUES (1287, 'Bankura', 'IND', 'West Bengali', 114876);
-INSERT INTO city VALUES (1288, 'Rajapalaiyam', 'IND', 'Tamil Nadu', 114202);
-INSERT INTO city VALUES (1289, 'Titagarh', 'IND', 'West Bengali', 114085);
-INSERT INTO city VALUES (1290, 'Halisahar', 'IND', 'West Bengali', 114028);
-INSERT INTO city VALUES (1291, 'Hathras', 'IND', 'Uttar Pradesh', 113285);
-INSERT INTO city VALUES (1292, 'Bhir (Bid)', 'IND', 'Maharashtra', 112434);
-INSERT INTO city VALUES (1293, 'Pallavaram', 'IND', 'Tamil Nadu', 111866);
-INSERT INTO city VALUES (1294, 'Anand', 'IND', 'Gujarat', 110266);
-INSERT INTO city VALUES (1295, 'Mango', 'IND', 'Jharkhand', 110024);
-INSERT INTO city VALUES (1296, 'Santipur', 'IND', 'West Bengali', 109956);
-INSERT INTO city VALUES (1297, 'Bhind', 'IND', 'Madhya Pradesh', 109755);
-INSERT INTO city VALUES (1298, 'Gondiya', 'IND', 'Maharashtra', 109470);
-INSERT INTO city VALUES (1299, 'Tiruvannamalai', 'IND', 'Tamil Nadu', 109196);
-INSERT INTO city VALUES (1300, 'Yeotmal (Yavatmal)', 'IND', 'Maharashtra', 108578);
-INSERT INTO city VALUES (1301, 'Kulti-Barakar', 'IND', 'West Bengali', 108518);
-INSERT INTO city VALUES (1302, 'Moga', 'IND', 'Punjab', 108304);
-INSERT INTO city VALUES (1303, 'Shivapuri', 'IND', 'Madhya Pradesh', 108277);
-INSERT INTO city VALUES (1304, 'Bidar', 'IND', 'Karnataka', 108016);
-INSERT INTO city VALUES (1305, 'Guntakal', 'IND', 'Andhra Pradesh', 107592);
-INSERT INTO city VALUES (1306, 'Unnao', 'IND', 'Uttar Pradesh', 107425);
-INSERT INTO city VALUES (1307, 'Barasat', 'IND', 'West Bengali', 107365);
-INSERT INTO city VALUES (1308, 'Tambaram', 'IND', 'Tamil Nadu', 107187);
-INSERT INTO city VALUES (1309, 'Abohar', 'IND', 'Punjab', 107163);
-INSERT INTO city VALUES (1310, 'Pilibhit', 'IND', 'Uttar Pradesh', 106605);
-INSERT INTO city VALUES (1311, 'Valparai', 'IND', 'Tamil Nadu', 106523);
-INSERT INTO city VALUES (1312, 'Gonda', 'IND', 'Uttar Pradesh', 106078);
-INSERT INTO city VALUES (1313, 'Surendranagar', 'IND', 'Gujarat', 105973);
-INSERT INTO city VALUES (1314, 'Qutubullapur', 'IND', 'Andhra Pradesh', 105380);
-INSERT INTO city VALUES (1315, 'Beawar', 'IND', 'Rajasthan', 105363);
-INSERT INTO city VALUES (1316, 'Hindupur', 'IND', 'Andhra Pradesh', 104651);
-INSERT INTO city VALUES (1317, 'Gandhidham', 'IND', 'Gujarat', 104585);
-INSERT INTO city VALUES (1318, 'Haldwani-cum-Kathgodam', 'IND', 'Uttaranchal', 104195);
-INSERT INTO city VALUES (1319, 'Tellicherry (Thalassery)', 'IND', 'Kerala', 103579);
-INSERT INTO city VALUES (1320, 'Wardha', 'IND', 'Maharashtra', 102985);
-INSERT INTO city VALUES (1321, 'Rishra', 'IND', 'West Bengali', 102649);
-INSERT INTO city VALUES (1322, 'Bhuj', 'IND', 'Gujarat', 102176);
-INSERT INTO city VALUES (1323, 'Modinagar', 'IND', 'Uttar Pradesh', 101660);
-INSERT INTO city VALUES (1324, 'Gudivada', 'IND', 'Andhra Pradesh', 101656);
-INSERT INTO city VALUES (1325, 'Basirhat', 'IND', 'West Bengali', 101409);
-INSERT INTO city VALUES (1326, 'Uttarpara-Kotrung', 'IND', 'West Bengali', 100867);
-INSERT INTO city VALUES (1327, 'Ongole', 'IND', 'Andhra Pradesh', 100836);
-INSERT INTO city VALUES (1328, 'North Barrackpur', 'IND', 'West Bengali', 100513);
-INSERT INTO city VALUES (1329, 'Guna', 'IND', 'Madhya Pradesh', 100490);
-INSERT INTO city VALUES (1330, 'Haldia', 'IND', 'West Bengali', 100347);
-INSERT INTO city VALUES (1331, 'Habra', 'IND', 'West Bengali', 100223);
-INSERT INTO city VALUES (1332, 'Kanchrapara', 'IND', 'West Bengali', 100194);
-INSERT INTO city VALUES (1333, 'Tonk', 'IND', 'Rajasthan', 100079);
-INSERT INTO city VALUES (1334, 'Champdani', 'IND', 'West Bengali', 98818);
-INSERT INTO city VALUES (1335, 'Orai', 'IND', 'Uttar Pradesh', 98640);
-INSERT INTO city VALUES (1336, 'Pudukkottai', 'IND', 'Tamil Nadu', 98619);
-INSERT INTO city VALUES (1337, 'Sasaram', 'IND', 'Bihar', 98220);
-INSERT INTO city VALUES (1338, 'Hazaribag', 'IND', 'Jharkhand', 97712);
-INSERT INTO city VALUES (1339, 'Palayankottai', 'IND', 'Tamil Nadu', 97662);
-INSERT INTO city VALUES (1340, 'Banda', 'IND', 'Uttar Pradesh', 97227);
-INSERT INTO city VALUES (1341, 'Godhra', 'IND', 'Gujarat', 96813);
-INSERT INTO city VALUES (1342, 'Hospet', 'IND', 'Karnataka', 96322);
-INSERT INTO city VALUES (1343, 'Ashoknagar-Kalyangarh', 'IND', 'West Bengali', 96315);
-INSERT INTO city VALUES (1344, 'Achalpur', 'IND', 'Maharashtra', 96216);
-INSERT INTO city VALUES (1345, 'Patan', 'IND', 'Gujarat', 96109);
-INSERT INTO city VALUES (1346, 'Mandasor', 'IND', 'Madhya Pradesh', 95758);
-INSERT INTO city VALUES (1347, 'Damoh', 'IND', 'Madhya Pradesh', 95661);
-INSERT INTO city VALUES (1348, 'Satara', 'IND', 'Maharashtra', 95133);
-INSERT INTO city VALUES (1349, 'Meerut Cantonment', 'IND', 'Uttar Pradesh', 94876);
-INSERT INTO city VALUES (1350, 'Dehri', 'IND', 'Bihar', 94526);
-INSERT INTO city VALUES (1351, 'Delhi Cantonment', 'IND', 'Delhi', 94326);
-INSERT INTO city VALUES (1352, 'Chhindwara', 'IND', 'Madhya Pradesh', 93731);
-INSERT INTO city VALUES (1353, 'Bansberia', 'IND', 'West Bengali', 93447);
-INSERT INTO city VALUES (1354, 'Nagaon', 'IND', 'Assam', 93350);
-INSERT INTO city VALUES (1355, 'Kanpur Cantonment', 'IND', 'Uttar Pradesh', 93109);
-INSERT INTO city VALUES (1356, 'Vidisha', 'IND', 'Madhya Pradesh', 92917);
-INSERT INTO city VALUES (1357, 'Bettiah', 'IND', 'Bihar', 92583);
-INSERT INTO city VALUES (1358, 'Purulia', 'IND', 'Jharkhand', 92574);
-INSERT INTO city VALUES (1359, 'Hassan', 'IND', 'Karnataka', 90803);
-INSERT INTO city VALUES (1360, 'Ambala Sadar', 'IND', 'Haryana', 90712);
-INSERT INTO city VALUES (1361, 'Baidyabati', 'IND', 'West Bengali', 90601);
-INSERT INTO city VALUES (1362, 'Morvi', 'IND', 'Gujarat', 90357);
-INSERT INTO city VALUES (1363, 'Raigarh', 'IND', 'Chhatisgarh', 89166);
-INSERT INTO city VALUES (1364, 'Vejalpur', 'IND', 'Gujarat', 89053);
-INSERT INTO city VALUES (1365, 'Baghdad', 'IRQ', 'Baghdad', 4336000);
-INSERT INTO city VALUES (1366, 'Mosul', 'IRQ', 'Ninawa', 879000);
-INSERT INTO city VALUES (1367, 'Irbil', 'IRQ', 'Irbil', 485968);
-INSERT INTO city VALUES (1368, 'Kirkuk', 'IRQ', 'al-Tamim', 418624);
-INSERT INTO city VALUES (1369, 'Basra', 'IRQ', 'Basra', 406296);
-INSERT INTO city VALUES (1370, 'al-Sulaymaniya', 'IRQ', 'al-Sulaymaniya', 364096);
-INSERT INTO city VALUES (1371, 'al-Najaf', 'IRQ', 'al-Najaf', 309010);
-INSERT INTO city VALUES (1372, 'Karbala', 'IRQ', 'Karbala', 296705);
-INSERT INTO city VALUES (1373, 'al-Hilla', 'IRQ', 'Babil', 268834);
-INSERT INTO city VALUES (1374, 'al-Nasiriya', 'IRQ', 'DhiQar', 265937);
-INSERT INTO city VALUES (1375, 'al-Amara', 'IRQ', 'Maysan', 208797);
-INSERT INTO city VALUES (1376, 'al-Diwaniya', 'IRQ', 'al-Qadisiya', 196519);
-INSERT INTO city VALUES (1377, 'al-Ramadi', 'IRQ', 'al-Anbar', 192556);
-INSERT INTO city VALUES (1378, 'al-Kut', 'IRQ', 'Wasit', 183183);
-INSERT INTO city VALUES (1379, 'Baquba', 'IRQ', 'Diyala', 114516);
-INSERT INTO city VALUES (1380, 'Teheran', 'IRN', 'Teheran', 6758845);
-INSERT INTO city VALUES (1381, 'Mashhad', 'IRN', 'Khorasan', 1887405);
-INSERT INTO city VALUES (1382, 'Esfahan', 'IRN', 'Esfahan', 1266072);
-INSERT INTO city VALUES (1383, 'Tabriz', 'IRN', 'East Azerbaidzan', 1191043);
-INSERT INTO city VALUES (1384, 'Shiraz', 'IRN', 'Fars', 1053025);
-INSERT INTO city VALUES (1385, 'Karaj', 'IRN', 'Teheran', 940968);
-INSERT INTO city VALUES (1386, 'Ahvaz', 'IRN', 'Khuzestan', 804980);
-INSERT INTO city VALUES (1387, 'Qom', 'IRN', 'Qom', 777677);
-INSERT INTO city VALUES (1388, 'Kermanshah', 'IRN', 'Kermanshah', 692986);
-INSERT INTO city VALUES (1389, 'Urmia', 'IRN', 'West Azerbaidzan', 435200);
-INSERT INTO city VALUES (1390, 'Zahedan', 'IRN', 'Sistan va Baluchesta', 419518);
-INSERT INTO city VALUES (1391, 'Rasht', 'IRN', 'Gilan', 417748);
-INSERT INTO city VALUES (1392, 'Hamadan', 'IRN', 'Hamadan', 401281);
-INSERT INTO city VALUES (1393, 'Kerman', 'IRN', 'Kerman', 384991);
-INSERT INTO city VALUES (1394, 'Arak', 'IRN', 'Markazi', 380755);
-INSERT INTO city VALUES (1395, 'Ardebil', 'IRN', 'Ardebil', 340386);
-INSERT INTO city VALUES (1396, 'Yazd', 'IRN', 'Yazd', 326776);
-INSERT INTO city VALUES (1397, 'Qazvin', 'IRN', 'Qazvin', 291117);
-INSERT INTO city VALUES (1398, 'Zanjan', 'IRN', 'Zanjan', 286295);
-INSERT INTO city VALUES (1399, 'Sanandaj', 'IRN', 'Kordestan', 277808);
-INSERT INTO city VALUES (1400, 'Bandar-e-Abbas', 'IRN', 'Hormozgan', 273578);
-INSERT INTO city VALUES (1401, 'Khorramabad', 'IRN', 'Lorestan', 272815);
-INSERT INTO city VALUES (1402, 'Eslamshahr', 'IRN', 'Teheran', 265450);
-INSERT INTO city VALUES (1403, 'Borujerd', 'IRN', 'Lorestan', 217804);
-INSERT INTO city VALUES (1404, 'Abadan', 'IRN', 'Khuzestan', 206073);
-INSERT INTO city VALUES (1405, 'Dezful', 'IRN', 'Khuzestan', 202639);
-INSERT INTO city VALUES (1406, 'Kashan', 'IRN', 'Esfahan', 201372);
-INSERT INTO city VALUES (1407, 'Sari', 'IRN', 'Mazandaran', 195882);
-INSERT INTO city VALUES (1408, 'Gorgan', 'IRN', 'Golestan', 188710);
-INSERT INTO city VALUES (1409, 'Najafabad', 'IRN', 'Esfahan', 178498);
-INSERT INTO city VALUES (1410, 'Sabzevar', 'IRN', 'Khorasan', 170738);
-INSERT INTO city VALUES (1411, 'Khomeynishahr', 'IRN', 'Esfahan', 165888);
-INSERT INTO city VALUES (1412, 'Amol', 'IRN', 'Mazandaran', 159092);
-INSERT INTO city VALUES (1413, 'Neyshabur', 'IRN', 'Khorasan', 158847);
-INSERT INTO city VALUES (1414, 'Babol', 'IRN', 'Mazandaran', 158346);
-INSERT INTO city VALUES (1415, 'Khoy', 'IRN', 'West Azerbaidzan', 148944);
-INSERT INTO city VALUES (1416, 'Malayer', 'IRN', 'Hamadan', 144373);
-INSERT INTO city VALUES (1417, 'Bushehr', 'IRN', 'Bushehr', 143641);
-INSERT INTO city VALUES (1418, 'Qaemshahr', 'IRN', 'Mazandaran', 143286);
-INSERT INTO city VALUES (1419, 'Qarchak', 'IRN', 'Teheran', 142690);
-INSERT INTO city VALUES (1420, 'Qods', 'IRN', 'Teheran', 138278);
-INSERT INTO city VALUES (1421, 'Sirjan', 'IRN', 'Kerman', 135024);
-INSERT INTO city VALUES (1422, 'Bojnurd', 'IRN', 'Khorasan', 134835);
-INSERT INTO city VALUES (1423, 'Maragheh', 'IRN', 'East Azerbaidzan', 132318);
-INSERT INTO city VALUES (1424, 'Birjand', 'IRN', 'Khorasan', 127608);
-INSERT INTO city VALUES (1425, 'Ilam', 'IRN', 'Ilam', 126346);
-INSERT INTO city VALUES (1426, 'Bukan', 'IRN', 'West Azerbaidzan', 120020);
-INSERT INTO city VALUES (1427, 'Masjed-e-Soleyman', 'IRN', 'Khuzestan', 116883);
-INSERT INTO city VALUES (1428, 'Saqqez', 'IRN', 'Kordestan', 115394);
-INSERT INTO city VALUES (1429, 'Gonbad-e Qabus', 'IRN', 'Mazandaran', 111253);
-INSERT INTO city VALUES (1430, 'Saveh', 'IRN', 'Qom', 111245);
-INSERT INTO city VALUES (1431, 'Mahabad', 'IRN', 'West Azerbaidzan', 107799);
-INSERT INTO city VALUES (1432, 'Varamin', 'IRN', 'Teheran', 107233);
-INSERT INTO city VALUES (1433, 'Andimeshk', 'IRN', 'Khuzestan', 106923);
-INSERT INTO city VALUES (1434, 'Khorramshahr', 'IRN', 'Khuzestan', 105636);
-INSERT INTO city VALUES (1435, 'Shahrud', 'IRN', 'Semnan', 104765);
-INSERT INTO city VALUES (1436, 'Marv Dasht', 'IRN', 'Fars', 103579);
-INSERT INTO city VALUES (1437, 'Zabol', 'IRN', 'Sistan va Baluchesta', 100887);
-INSERT INTO city VALUES (1438, 'Shahr-e Kord', 'IRN', 'Chaharmahal va Bakht', 100477);
-INSERT INTO city VALUES (1439, 'Bandar-e Anzali', 'IRN', 'Gilan', 98500);
-INSERT INTO city VALUES (1440, 'Rafsanjan', 'IRN', 'Kerman', 98300);
-INSERT INTO city VALUES (1441, 'Marand', 'IRN', 'East Azerbaidzan', 96400);
-INSERT INTO city VALUES (1442, 'Torbat-e Heydariyeh', 'IRN', 'Khorasan', 94600);
-INSERT INTO city VALUES (1443, 'Jahrom', 'IRN', 'Fars', 94200);
-INSERT INTO city VALUES (1444, 'Semnan', 'IRN', 'Semnan', 91045);
-INSERT INTO city VALUES (1445, 'Miandoab', 'IRN', 'West Azerbaidzan', 90100);
-INSERT INTO city VALUES (1446, 'Qomsheh', 'IRN', 'Esfahan', 89800);
-INSERT INTO city VALUES (1447, 'Dublin', 'IRL', 'Leinster', 481854);
-INSERT INTO city VALUES (1448, 'Cork', 'IRL', 'Munster', 127187);
-INSERT INTO city VALUES (1449, 'Reykjavík', 'ISL', 'Höfuðborgarsvæði', 109184);
-INSERT INTO city VALUES (1450, 'Jerusalem', 'ISR', 'Jerusalem', 633700);
-INSERT INTO city VALUES (1451, 'Tel Aviv-Jaffa', 'ISR', 'Tel Aviv', 348100);
-INSERT INTO city VALUES (1452, 'Haifa', 'ISR', 'Haifa', 265700);
-INSERT INTO city VALUES (1453, 'Rishon Le Ziyyon', 'ISR', 'Ha Merkaz', 188200);
-INSERT INTO city VALUES (1454, 'Beerseba', 'ISR', 'Ha Darom', 163700);
-INSERT INTO city VALUES (1455, 'Holon', 'ISR', 'Tel Aviv', 163100);
-INSERT INTO city VALUES (1456, 'Petah Tiqwa', 'ISR', 'Ha Merkaz', 159400);
-INSERT INTO city VALUES (1457, 'Ashdod', 'ISR', 'Ha Darom', 155800);
-INSERT INTO city VALUES (1458, 'Netanya', 'ISR', 'Ha Merkaz', 154900);
-INSERT INTO city VALUES (1459, 'Bat Yam', 'ISR', 'Tel Aviv', 137000);
-INSERT INTO city VALUES (1460, 'Bene Beraq', 'ISR', 'Tel Aviv', 133900);
-INSERT INTO city VALUES (1461, 'Ramat Gan', 'ISR', 'Tel Aviv', 126900);
-INSERT INTO city VALUES (1462, 'Ashqelon', 'ISR', 'Ha Darom', 92300);
-INSERT INTO city VALUES (1463, 'Rehovot', 'ISR', 'Ha Merkaz', 90300);
-INSERT INTO city VALUES (1464, 'Roma', 'ITA', 'Latium', 2643581);
-INSERT INTO city VALUES (1465, 'Milano', 'ITA', 'Lombardia', 1300977);
-INSERT INTO city VALUES (1466, 'Napoli', 'ITA', 'Campania', 1002619);
-INSERT INTO city VALUES (1467, 'Torino', 'ITA', 'Piemonte', 903705);
-INSERT INTO city VALUES (1468, 'Palermo', 'ITA', 'Sisilia', 683794);
-INSERT INTO city VALUES (1469, 'Genova', 'ITA', 'Liguria', 636104);
-INSERT INTO city VALUES (1470, 'Bologna', 'ITA', 'Emilia-Romagna', 381161);
-INSERT INTO city VALUES (1471, 'Firenze', 'ITA', 'Toscana', 376662);
-INSERT INTO city VALUES (1472, 'Catania', 'ITA', 'Sisilia', 337862);
-INSERT INTO city VALUES (1473, 'Bari', 'ITA', 'Apulia', 331848);
-INSERT INTO city VALUES (1474, 'Venezia', 'ITA', 'Veneto', 277305);
-INSERT INTO city VALUES (1475, 'Messina', 'ITA', 'Sisilia', 259156);
-INSERT INTO city VALUES (1476, 'Verona', 'ITA', 'Veneto', 255268);
-INSERT INTO city VALUES (1477, 'Trieste', 'ITA', 'Friuli-Venezia Giuli', 216459);
-INSERT INTO city VALUES (1478, 'Padova', 'ITA', 'Veneto', 211391);
-INSERT INTO city VALUES (1479, 'Taranto', 'ITA', 'Apulia', 208214);
-INSERT INTO city VALUES (1480, 'Brescia', 'ITA', 'Lombardia', 191317);
-INSERT INTO city VALUES (1481, 'Reggio di Calabria', 'ITA', 'Calabria', 179617);
-INSERT INTO city VALUES (1482, 'Modena', 'ITA', 'Emilia-Romagna', 176022);
-INSERT INTO city VALUES (1483, 'Prato', 'ITA', 'Toscana', 172473);
-INSERT INTO city VALUES (1484, 'Parma', 'ITA', 'Emilia-Romagna', 168717);
-INSERT INTO city VALUES (1485, 'Cagliari', 'ITA', 'Sardinia', 165926);
-INSERT INTO city VALUES (1486, 'Livorno', 'ITA', 'Toscana', 161673);
-INSERT INTO city VALUES (1487, 'Perugia', 'ITA', 'Umbria', 156673);
-INSERT INTO city VALUES (1488, 'Foggia', 'ITA', 'Apulia', 154891);
-INSERT INTO city VALUES (1489, 'Reggio nell´ Emilia', 'ITA', 'Emilia-Romagna', 143664);
-INSERT INTO city VALUES (1490, 'Salerno', 'ITA', 'Campania', 142055);
-INSERT INTO city VALUES (1491, 'Ravenna', 'ITA', 'Emilia-Romagna', 138418);
-INSERT INTO city VALUES (1492, 'Ferrara', 'ITA', 'Emilia-Romagna', 132127);
-INSERT INTO city VALUES (1493, 'Rimini', 'ITA', 'Emilia-Romagna', 131062);
-INSERT INTO city VALUES (1494, 'Syrakusa', 'ITA', 'Sisilia', 126282);
-INSERT INTO city VALUES (1495, 'Sassari', 'ITA', 'Sardinia', 120803);
-INSERT INTO city VALUES (1496, 'Monza', 'ITA', 'Lombardia', 119516);
-INSERT INTO city VALUES (1497, 'Bergamo', 'ITA', 'Lombardia', 117837);
-INSERT INTO city VALUES (1498, 'Pescara', 'ITA', 'Abruzzit', 115698);
-INSERT INTO city VALUES (1499, 'Latina', 'ITA', 'Latium', 114099);
-INSERT INTO city VALUES (1500, 'Vicenza', 'ITA', 'Veneto', 109738);
-INSERT INTO city VALUES (1501, 'Terni', 'ITA', 'Umbria', 107770);
-INSERT INTO city VALUES (1502, 'Forlì', 'ITA', 'Emilia-Romagna', 107475);
-INSERT INTO city VALUES (1503, 'Trento', 'ITA', 'Trentino-Alto Adige', 104906);
-INSERT INTO city VALUES (1504, 'Novara', 'ITA', 'Piemonte', 102037);
-INSERT INTO city VALUES (1505, 'Piacenza', 'ITA', 'Emilia-Romagna', 98384);
-INSERT INTO city VALUES (1506, 'Ancona', 'ITA', 'Marche', 98329);
-INSERT INTO city VALUES (1507, 'Lecce', 'ITA', 'Apulia', 98208);
-INSERT INTO city VALUES (1508, 'Bolzano', 'ITA', 'Trentino-Alto Adige', 97232);
-INSERT INTO city VALUES (1509, 'Catanzaro', 'ITA', 'Calabria', 96700);
-INSERT INTO city VALUES (1510, 'La Spezia', 'ITA', 'Liguria', 95504);
-INSERT INTO city VALUES (1511, 'Udine', 'ITA', 'Friuli-Venezia Giuli', 94932);
-INSERT INTO city VALUES (1512, 'Torre del Greco', 'ITA', 'Campania', 94505);
-INSERT INTO city VALUES (1513, 'Andria', 'ITA', 'Apulia', 94443);
-INSERT INTO city VALUES (1514, 'Brindisi', 'ITA', 'Apulia', 93454);
-INSERT INTO city VALUES (1515, 'Giugliano in Campania', 'ITA', 'Campania', 93286);
-INSERT INTO city VALUES (1516, 'Pisa', 'ITA', 'Toscana', 92379);
-INSERT INTO city VALUES (1517, 'Barletta', 'ITA', 'Apulia', 91904);
-INSERT INTO city VALUES (1518, 'Arezzo', 'ITA', 'Toscana', 91729);
-INSERT INTO city VALUES (1519, 'Alessandria', 'ITA', 'Piemonte', 90289);
-INSERT INTO city VALUES (1520, 'Cesena', 'ITA', 'Emilia-Romagna', 89852);
-INSERT INTO city VALUES (1521, 'Pesaro', 'ITA', 'Marche', 88987);
-INSERT INTO city VALUES (1522, 'Dili', 'TMP', 'Dili', 47900);
-INSERT INTO city VALUES (1523, 'Wien', 'AUT', 'Wien', 1608144);
-INSERT INTO city VALUES (1524, 'Graz', 'AUT', 'Steiermark', 240967);
-INSERT INTO city VALUES (1525, 'Linz', 'AUT', 'North Austria', 188022);
-INSERT INTO city VALUES (1526, 'Salzburg', 'AUT', 'Salzburg', 144247);
-INSERT INTO city VALUES (1527, 'Innsbruck', 'AUT', 'Tiroli', 111752);
-INSERT INTO city VALUES (1528, 'Klagenfurt', 'AUT', 'Kärnten', 91141);
-INSERT INTO city VALUES (1529, 'Spanish Town', 'JAM', 'St. Catherine', 110379);
-INSERT INTO city VALUES (1530, 'Kingston', 'JAM', 'St. Andrew', 103962);
-INSERT INTO city VALUES (1531, 'Portmore', 'JAM', 'St. Andrew', 99799);
-INSERT INTO city VALUES (1532, 'Tokyo', 'JPN', 'Tokyo-to', 7980230);
-INSERT INTO city VALUES (1533, 'Jokohama [Yokohama]', 'JPN', 'Kanagawa', 3339594);
-INSERT INTO city VALUES (1534, 'Osaka', 'JPN', 'Osaka', 2595674);
-INSERT INTO city VALUES (1535, 'Nagoya', 'JPN', 'Aichi', 2154376);
-INSERT INTO city VALUES (1536, 'Sapporo', 'JPN', 'Hokkaido', 1790886);
-INSERT INTO city VALUES (1537, 'Kioto', 'JPN', 'Kyoto', 1461974);
-INSERT INTO city VALUES (1538, 'Kobe', 'JPN', 'Hyogo', 1425139);
-INSERT INTO city VALUES (1539, 'Fukuoka', 'JPN', 'Fukuoka', 1308379);
-INSERT INTO city VALUES (1540, 'Kawasaki', 'JPN', 'Kanagawa', 1217359);
-INSERT INTO city VALUES (1541, 'Hiroshima', 'JPN', 'Hiroshima', 1119117);
-INSERT INTO city VALUES (1542, 'Kitakyushu', 'JPN', 'Fukuoka', 1016264);
-INSERT INTO city VALUES (1543, 'Sendai', 'JPN', 'Miyagi', 989975);
-INSERT INTO city VALUES (1544, 'Chiba', 'JPN', 'Chiba', 863930);
-INSERT INTO city VALUES (1545, 'Sakai', 'JPN', 'Osaka', 797735);
-INSERT INTO city VALUES (1546, 'Kumamoto', 'JPN', 'Kumamoto', 656734);
-INSERT INTO city VALUES (1547, 'Okayama', 'JPN', 'Okayama', 624269);
-INSERT INTO city VALUES (1548, 'Sagamihara', 'JPN', 'Kanagawa', 586300);
-INSERT INTO city VALUES (1549, 'Hamamatsu', 'JPN', 'Shizuoka', 568796);
-INSERT INTO city VALUES (1550, 'Kagoshima', 'JPN', 'Kagoshima', 549977);
-INSERT INTO city VALUES (1551, 'Funabashi', 'JPN', 'Chiba', 545299);
-INSERT INTO city VALUES (1552, 'Higashiosaka', 'JPN', 'Osaka', 517785);
-INSERT INTO city VALUES (1553, 'Hachioji', 'JPN', 'Tokyo-to', 513451);
-INSERT INTO city VALUES (1554, 'Niigata', 'JPN', 'Niigata', 497464);
-INSERT INTO city VALUES (1555, 'Amagasaki', 'JPN', 'Hyogo', 481434);
-INSERT INTO city VALUES (1556, 'Himeji', 'JPN', 'Hyogo', 475167);
-INSERT INTO city VALUES (1557, 'Shizuoka', 'JPN', 'Shizuoka', 473854);
-INSERT INTO city VALUES (1558, 'Urawa', 'JPN', 'Saitama', 469675);
-INSERT INTO city VALUES (1559, 'Matsuyama', 'JPN', 'Ehime', 466133);
-INSERT INTO city VALUES (1560, 'Matsudo', 'JPN', 'Chiba', 461126);
-INSERT INTO city VALUES (1561, 'Kanazawa', 'JPN', 'Ishikawa', 455386);
-INSERT INTO city VALUES (1562, 'Kawaguchi', 'JPN', 'Saitama', 452155);
-INSERT INTO city VALUES (1563, 'Ichikawa', 'JPN', 'Chiba', 441893);
-INSERT INTO city VALUES (1564, 'Omiya', 'JPN', 'Saitama', 441649);
-INSERT INTO city VALUES (1565, 'Utsunomiya', 'JPN', 'Tochigi', 440353);
-INSERT INTO city VALUES (1566, 'Oita', 'JPN', 'Oita', 433401);
-INSERT INTO city VALUES (1567, 'Nagasaki', 'JPN', 'Nagasaki', 432759);
-INSERT INTO city VALUES (1568, 'Yokosuka', 'JPN', 'Kanagawa', 430200);
-INSERT INTO city VALUES (1569, 'Kurashiki', 'JPN', 'Okayama', 425103);
-INSERT INTO city VALUES (1570, 'Gifu', 'JPN', 'Gifu', 408007);
-INSERT INTO city VALUES (1571, 'Hirakata', 'JPN', 'Osaka', 403151);
-INSERT INTO city VALUES (1572, 'Nishinomiya', 'JPN', 'Hyogo', 397618);
-INSERT INTO city VALUES (1573, 'Toyonaka', 'JPN', 'Osaka', 396689);
-INSERT INTO city VALUES (1574, 'Wakayama', 'JPN', 'Wakayama', 391233);
-INSERT INTO city VALUES (1575, 'Fukuyama', 'JPN', 'Hiroshima', 376921);
-INSERT INTO city VALUES (1576, 'Fujisawa', 'JPN', 'Kanagawa', 372840);
-INSERT INTO city VALUES (1577, 'Asahikawa', 'JPN', 'Hokkaido', 364813);
-INSERT INTO city VALUES (1578, 'Machida', 'JPN', 'Tokyo-to', 364197);
-INSERT INTO city VALUES (1579, 'Nara', 'JPN', 'Nara', 362812);
-INSERT INTO city VALUES (1580, 'Takatsuki', 'JPN', 'Osaka', 361747);
-INSERT INTO city VALUES (1581, 'Iwaki', 'JPN', 'Fukushima', 361737);
-INSERT INTO city VALUES (1582, 'Nagano', 'JPN', 'Nagano', 361391);
-INSERT INTO city VALUES (1583, 'Toyohashi', 'JPN', 'Aichi', 360066);
-INSERT INTO city VALUES (1584, 'Toyota', 'JPN', 'Aichi', 346090);
-INSERT INTO city VALUES (1585, 'Suita', 'JPN', 'Osaka', 345750);
-INSERT INTO city VALUES (1586, 'Takamatsu', 'JPN', 'Kagawa', 332471);
-INSERT INTO city VALUES (1587, 'Koriyama', 'JPN', 'Fukushima', 330335);
-INSERT INTO city VALUES (1588, 'Okazaki', 'JPN', 'Aichi', 328711);
-INSERT INTO city VALUES (1589, 'Kawagoe', 'JPN', 'Saitama', 327211);
-INSERT INTO city VALUES (1590, 'Tokorozawa', 'JPN', 'Saitama', 325809);
-INSERT INTO city VALUES (1591, 'Toyama', 'JPN', 'Toyama', 325790);
-INSERT INTO city VALUES (1592, 'Kochi', 'JPN', 'Kochi', 324710);
-INSERT INTO city VALUES (1593, 'Kashiwa', 'JPN', 'Chiba', 320296);
-INSERT INTO city VALUES (1594, 'Akita', 'JPN', 'Akita', 314440);
-INSERT INTO city VALUES (1595, 'Miyazaki', 'JPN', 'Miyazaki', 303784);
-INSERT INTO city VALUES (1596, 'Koshigaya', 'JPN', 'Saitama', 301446);
-INSERT INTO city VALUES (1597, 'Naha', 'JPN', 'Okinawa', 299851);
-INSERT INTO city VALUES (1598, 'Aomori', 'JPN', 'Aomori', 295969);
-INSERT INTO city VALUES (1599, 'Hakodate', 'JPN', 'Hokkaido', 294788);
-INSERT INTO city VALUES (1600, 'Akashi', 'JPN', 'Hyogo', 292253);
-INSERT INTO city VALUES (1601, 'Yokkaichi', 'JPN', 'Mie', 288173);
-INSERT INTO city VALUES (1602, 'Fukushima', 'JPN', 'Fukushima', 287525);
-INSERT INTO city VALUES (1603, 'Morioka', 'JPN', 'Iwate', 287353);
-INSERT INTO city VALUES (1604, 'Maebashi', 'JPN', 'Gumma', 284473);
-INSERT INTO city VALUES (1605, 'Kasugai', 'JPN', 'Aichi', 282348);
-INSERT INTO city VALUES (1606, 'Otsu', 'JPN', 'Shiga', 282070);
-INSERT INTO city VALUES (1607, 'Ichihara', 'JPN', 'Chiba', 279280);
-INSERT INTO city VALUES (1608, 'Yao', 'JPN', 'Osaka', 276421);
-INSERT INTO city VALUES (1609, 'Ichinomiya', 'JPN', 'Aichi', 270828);
-INSERT INTO city VALUES (1610, 'Tokushima', 'JPN', 'Tokushima', 269649);
-INSERT INTO city VALUES (1611, 'Kakogawa', 'JPN', 'Hyogo', 266281);
-INSERT INTO city VALUES (1612, 'Ibaraki', 'JPN', 'Osaka', 261020);
-INSERT INTO city VALUES (1613, 'Neyagawa', 'JPN', 'Osaka', 257315);
-INSERT INTO city VALUES (1614, 'Shimonoseki', 'JPN', 'Yamaguchi', 257263);
-INSERT INTO city VALUES (1615, 'Yamagata', 'JPN', 'Yamagata', 255617);
-INSERT INTO city VALUES (1616, 'Fukui', 'JPN', 'Fukui', 254818);
-INSERT INTO city VALUES (1617, 'Hiratsuka', 'JPN', 'Kanagawa', 254207);
-INSERT INTO city VALUES (1618, 'Mito', 'JPN', 'Ibaragi', 246559);
-INSERT INTO city VALUES (1619, 'Sasebo', 'JPN', 'Nagasaki', 244240);
-INSERT INTO city VALUES (1620, 'Hachinohe', 'JPN', 'Aomori', 242979);
-INSERT INTO city VALUES (1621, 'Takasaki', 'JPN', 'Gumma', 239124);
-INSERT INTO city VALUES (1622, 'Shimizu', 'JPN', 'Shizuoka', 239123);
-INSERT INTO city VALUES (1623, 'Kurume', 'JPN', 'Fukuoka', 235611);
-INSERT INTO city VALUES (1624, 'Fuji', 'JPN', 'Shizuoka', 231527);
-INSERT INTO city VALUES (1625, 'Soka', 'JPN', 'Saitama', 222768);
-INSERT INTO city VALUES (1626, 'Fuchu', 'JPN', 'Tokyo-to', 220576);
-INSERT INTO city VALUES (1627, 'Chigasaki', 'JPN', 'Kanagawa', 216015);
-INSERT INTO city VALUES (1628, 'Atsugi', 'JPN', 'Kanagawa', 212407);
-INSERT INTO city VALUES (1629, 'Numazu', 'JPN', 'Shizuoka', 211382);
-INSERT INTO city VALUES (1630, 'Ageo', 'JPN', 'Saitama', 209442);
-INSERT INTO city VALUES (1631, 'Yamato', 'JPN', 'Kanagawa', 208234);
-INSERT INTO city VALUES (1632, 'Matsumoto', 'JPN', 'Nagano', 206801);
-INSERT INTO city VALUES (1633, 'Kure', 'JPN', 'Hiroshima', 206504);
-INSERT INTO city VALUES (1634, 'Takarazuka', 'JPN', 'Hyogo', 205993);
-INSERT INTO city VALUES (1635, 'Kasukabe', 'JPN', 'Saitama', 201838);
-INSERT INTO city VALUES (1636, 'Chofu', 'JPN', 'Tokyo-to', 201585);
-INSERT INTO city VALUES (1637, 'Odawara', 'JPN', 'Kanagawa', 200171);
-INSERT INTO city VALUES (1638, 'Kofu', 'JPN', 'Yamanashi', 199753);
-INSERT INTO city VALUES (1639, 'Kushiro', 'JPN', 'Hokkaido', 197608);
-INSERT INTO city VALUES (1640, 'Kishiwada', 'JPN', 'Osaka', 197276);
-INSERT INTO city VALUES (1641, 'Hitachi', 'JPN', 'Ibaragi', 196622);
-INSERT INTO city VALUES (1642, 'Nagaoka', 'JPN', 'Niigata', 192407);
-INSERT INTO city VALUES (1643, 'Itami', 'JPN', 'Hyogo', 190886);
-INSERT INTO city VALUES (1644, 'Uji', 'JPN', 'Kyoto', 188735);
-INSERT INTO city VALUES (1645, 'Suzuka', 'JPN', 'Mie', 184061);
-INSERT INTO city VALUES (1646, 'Hirosaki', 'JPN', 'Aomori', 177522);
-INSERT INTO city VALUES (1647, 'Ube', 'JPN', 'Yamaguchi', 175206);
-INSERT INTO city VALUES (1648, 'Kodaira', 'JPN', 'Tokyo-to', 174984);
-INSERT INTO city VALUES (1649, 'Takaoka', 'JPN', 'Toyama', 174380);
-INSERT INTO city VALUES (1650, 'Obihiro', 'JPN', 'Hokkaido', 173685);
-INSERT INTO city VALUES (1651, 'Tomakomai', 'JPN', 'Hokkaido', 171958);
-INSERT INTO city VALUES (1652, 'Saga', 'JPN', 'Saga', 170034);
-INSERT INTO city VALUES (1653, 'Sakura', 'JPN', 'Chiba', 168072);
-INSERT INTO city VALUES (1654, 'Kamakura', 'JPN', 'Kanagawa', 167661);
-INSERT INTO city VALUES (1655, 'Mitaka', 'JPN', 'Tokyo-to', 167268);
-INSERT INTO city VALUES (1656, 'Izumi', 'JPN', 'Osaka', 166979);
-INSERT INTO city VALUES (1657, 'Hino', 'JPN', 'Tokyo-to', 166770);
-INSERT INTO city VALUES (1658, 'Hadano', 'JPN', 'Kanagawa', 166512);
-INSERT INTO city VALUES (1659, 'Ashikaga', 'JPN', 'Tochigi', 165243);
-INSERT INTO city VALUES (1660, 'Tsu', 'JPN', 'Mie', 164543);
-INSERT INTO city VALUES (1661, 'Sayama', 'JPN', 'Saitama', 162472);
-INSERT INTO city VALUES (1662, 'Yachiyo', 'JPN', 'Chiba', 161222);
-INSERT INTO city VALUES (1663, 'Tsukuba', 'JPN', 'Ibaragi', 160768);
-INSERT INTO city VALUES (1664, 'Tachikawa', 'JPN', 'Tokyo-to', 159430);
-INSERT INTO city VALUES (1665, 'Kumagaya', 'JPN', 'Saitama', 157171);
-INSERT INTO city VALUES (1666, 'Moriguchi', 'JPN', 'Osaka', 155941);
-INSERT INTO city VALUES (1667, 'Otaru', 'JPN', 'Hokkaido', 155784);
-INSERT INTO city VALUES (1668, 'Anjo', 'JPN', 'Aichi', 153823);
-INSERT INTO city VALUES (1669, 'Narashino', 'JPN', 'Chiba', 152849);
-INSERT INTO city VALUES (1670, 'Oyama', 'JPN', 'Tochigi', 152820);
-INSERT INTO city VALUES (1671, 'Ogaki', 'JPN', 'Gifu', 151758);
-INSERT INTO city VALUES (1672, 'Matsue', 'JPN', 'Shimane', 149821);
-INSERT INTO city VALUES (1673, 'Kawanishi', 'JPN', 'Hyogo', 149794);
-INSERT INTO city VALUES (1674, 'Hitachinaka', 'JPN', 'Tokyo-to', 148006);
-INSERT INTO city VALUES (1675, 'Niiza', 'JPN', 'Saitama', 147744);
-INSERT INTO city VALUES (1676, 'Nagareyama', 'JPN', 'Chiba', 147738);
-INSERT INTO city VALUES (1677, 'Tottori', 'JPN', 'Tottori', 147523);
-INSERT INTO city VALUES (1678, 'Tama', 'JPN', 'Ibaragi', 146712);
-INSERT INTO city VALUES (1679, 'Iruma', 'JPN', 'Saitama', 145922);
-INSERT INTO city VALUES (1680, 'Ota', 'JPN', 'Gumma', 145317);
-INSERT INTO city VALUES (1681, 'Omuta', 'JPN', 'Fukuoka', 142889);
-INSERT INTO city VALUES (1682, 'Komaki', 'JPN', 'Aichi', 139827);
-INSERT INTO city VALUES (1683, 'Ome', 'JPN', 'Tokyo-to', 139216);
-INSERT INTO city VALUES (1684, 'Kadoma', 'JPN', 'Osaka', 138953);
-INSERT INTO city VALUES (1685, 'Yamaguchi', 'JPN', 'Yamaguchi', 138210);
-INSERT INTO city VALUES (1686, 'Higashimurayama', 'JPN', 'Tokyo-to', 136970);
-INSERT INTO city VALUES (1687, 'Yonago', 'JPN', 'Tottori', 136461);
-INSERT INTO city VALUES (1688, 'Matsubara', 'JPN', 'Osaka', 135010);
-INSERT INTO city VALUES (1689, 'Musashino', 'JPN', 'Tokyo-to', 134426);
-INSERT INTO city VALUES (1690, 'Tsuchiura', 'JPN', 'Ibaragi', 134072);
-INSERT INTO city VALUES (1691, 'Joetsu', 'JPN', 'Niigata', 133505);
-INSERT INTO city VALUES (1692, 'Miyakonojo', 'JPN', 'Miyazaki', 133183);
-INSERT INTO city VALUES (1693, 'Misato', 'JPN', 'Saitama', 132957);
-INSERT INTO city VALUES (1694, 'Kakamigahara', 'JPN', 'Gifu', 131831);
-INSERT INTO city VALUES (1695, 'Daito', 'JPN', 'Osaka', 130594);
-INSERT INTO city VALUES (1696, 'Seto', 'JPN', 'Aichi', 130470);
-INSERT INTO city VALUES (1697, 'Kariya', 'JPN', 'Aichi', 127969);
-INSERT INTO city VALUES (1698, 'Urayasu', 'JPN', 'Chiba', 127550);
-INSERT INTO city VALUES (1699, 'Beppu', 'JPN', 'Oita', 127486);
-INSERT INTO city VALUES (1700, 'Niihama', 'JPN', 'Ehime', 127207);
-INSERT INTO city VALUES (1701, 'Minoo', 'JPN', 'Osaka', 127026);
-INSERT INTO city VALUES (1702, 'Fujieda', 'JPN', 'Shizuoka', 126897);
-INSERT INTO city VALUES (1703, 'Abiko', 'JPN', 'Chiba', 126670);
-INSERT INTO city VALUES (1704, 'Nobeoka', 'JPN', 'Miyazaki', 125547);
-INSERT INTO city VALUES (1705, 'Tondabayashi', 'JPN', 'Osaka', 125094);
-INSERT INTO city VALUES (1706, 'Ueda', 'JPN', 'Nagano', 124217);
-INSERT INTO city VALUES (1707, 'Kashihara', 'JPN', 'Nara', 124013);
-INSERT INTO city VALUES (1708, 'Matsusaka', 'JPN', 'Mie', 123582);
-INSERT INTO city VALUES (1709, 'Isesaki', 'JPN', 'Gumma', 123285);
-INSERT INTO city VALUES (1710, 'Zama', 'JPN', 'Kanagawa', 122046);
-INSERT INTO city VALUES (1711, 'Kisarazu', 'JPN', 'Chiba', 121967);
-INSERT INTO city VALUES (1712, 'Noda', 'JPN', 'Chiba', 121030);
-INSERT INTO city VALUES (1713, 'Ishinomaki', 'JPN', 'Miyagi', 120963);
-INSERT INTO city VALUES (1714, 'Fujinomiya', 'JPN', 'Shizuoka', 119714);
-INSERT INTO city VALUES (1715, 'Kawachinagano', 'JPN', 'Osaka', 119666);
-INSERT INTO city VALUES (1716, 'Imabari', 'JPN', 'Ehime', 119357);
-INSERT INTO city VALUES (1717, 'Aizuwakamatsu', 'JPN', 'Fukushima', 119287);
-INSERT INTO city VALUES (1718, 'Higashihiroshima', 'JPN', 'Hiroshima', 119166);
-INSERT INTO city VALUES (1719, 'Habikino', 'JPN', 'Osaka', 118968);
-INSERT INTO city VALUES (1720, 'Ebetsu', 'JPN', 'Hokkaido', 118805);
-INSERT INTO city VALUES (1721, 'Hofu', 'JPN', 'Yamaguchi', 118751);
-INSERT INTO city VALUES (1722, 'Kiryu', 'JPN', 'Gumma', 118326);
-INSERT INTO city VALUES (1723, 'Okinawa', 'JPN', 'Okinawa', 117748);
-INSERT INTO city VALUES (1724, 'Yaizu', 'JPN', 'Shizuoka', 117258);
-INSERT INTO city VALUES (1725, 'Toyokawa', 'JPN', 'Aichi', 115781);
-INSERT INTO city VALUES (1726, 'Ebina', 'JPN', 'Kanagawa', 115571);
-INSERT INTO city VALUES (1727, 'Asaka', 'JPN', 'Saitama', 114815);
-INSERT INTO city VALUES (1728, 'Higashikurume', 'JPN', 'Tokyo-to', 111666);
-INSERT INTO city VALUES (1729, 'Ikoma', 'JPN', 'Nara', 111645);
-INSERT INTO city VALUES (1730, 'Kitami', 'JPN', 'Hokkaido', 111295);
-INSERT INTO city VALUES (1731, 'Koganei', 'JPN', 'Tokyo-to', 110969);
-INSERT INTO city VALUES (1732, 'Iwatsuki', 'JPN', 'Saitama', 110034);
-INSERT INTO city VALUES (1733, 'Mishima', 'JPN', 'Shizuoka', 109699);
-INSERT INTO city VALUES (1734, 'Handa', 'JPN', 'Aichi', 108600);
-INSERT INTO city VALUES (1735, 'Muroran', 'JPN', 'Hokkaido', 108275);
-INSERT INTO city VALUES (1736, 'Komatsu', 'JPN', 'Ishikawa', 107937);
-INSERT INTO city VALUES (1737, 'Yatsushiro', 'JPN', 'Kumamoto', 107661);
-INSERT INTO city VALUES (1738, 'Iida', 'JPN', 'Nagano', 107583);
-INSERT INTO city VALUES (1739, 'Tokuyama', 'JPN', 'Yamaguchi', 107078);
-INSERT INTO city VALUES (1740, 'Kokubunji', 'JPN', 'Tokyo-to', 106996);
-INSERT INTO city VALUES (1741, 'Akishima', 'JPN', 'Tokyo-to', 106914);
-INSERT INTO city VALUES (1742, 'Iwakuni', 'JPN', 'Yamaguchi', 106647);
-INSERT INTO city VALUES (1743, 'Kusatsu', 'JPN', 'Shiga', 106232);
-INSERT INTO city VALUES (1744, 'Kuwana', 'JPN', 'Mie', 106121);
-INSERT INTO city VALUES (1745, 'Sanda', 'JPN', 'Hyogo', 105643);
-INSERT INTO city VALUES (1746, 'Hikone', 'JPN', 'Shiga', 105508);
-INSERT INTO city VALUES (1747, 'Toda', 'JPN', 'Saitama', 103969);
-INSERT INTO city VALUES (1748, 'Tajimi', 'JPN', 'Gifu', 103171);
-INSERT INTO city VALUES (1749, 'Ikeda', 'JPN', 'Osaka', 102710);
-INSERT INTO city VALUES (1750, 'Fukaya', 'JPN', 'Saitama', 102156);
-INSERT INTO city VALUES (1751, 'Ise', 'JPN', 'Mie', 101732);
-INSERT INTO city VALUES (1752, 'Sakata', 'JPN', 'Yamagata', 101651);
-INSERT INTO city VALUES (1753, 'Kasuga', 'JPN', 'Fukuoka', 101344);
-INSERT INTO city VALUES (1754, 'Kamagaya', 'JPN', 'Chiba', 100821);
-INSERT INTO city VALUES (1755, 'Tsuruoka', 'JPN', 'Yamagata', 100713);
-INSERT INTO city VALUES (1756, 'Hoya', 'JPN', 'Tokyo-to', 100313);
-INSERT INTO city VALUES (1757, 'Nishio', 'JPN', 'Chiba', 100032);
-INSERT INTO city VALUES (1758, 'Tokai', 'JPN', 'Aichi', 99738);
-INSERT INTO city VALUES (1759, 'Inazawa', 'JPN', 'Aichi', 98746);
-INSERT INTO city VALUES (1760, 'Sakado', 'JPN', 'Saitama', 98221);
-INSERT INTO city VALUES (1761, 'Isehara', 'JPN', 'Kanagawa', 98123);
-INSERT INTO city VALUES (1762, 'Takasago', 'JPN', 'Hyogo', 97632);
-INSERT INTO city VALUES (1763, 'Fujimi', 'JPN', 'Saitama', 96972);
-INSERT INTO city VALUES (1764, 'Urasoe', 'JPN', 'Okinawa', 96002);
-INSERT INTO city VALUES (1765, 'Yonezawa', 'JPN', 'Yamagata', 95592);
-INSERT INTO city VALUES (1766, 'Konan', 'JPN', 'Aichi', 95521);
-INSERT INTO city VALUES (1767, 'Yamatokoriyama', 'JPN', 'Nara', 95165);
-INSERT INTO city VALUES (1768, 'Maizuru', 'JPN', 'Kyoto', 94784);
-INSERT INTO city VALUES (1769, 'Onomichi', 'JPN', 'Hiroshima', 93756);
-INSERT INTO city VALUES (1770, 'Higashimatsuyama', 'JPN', 'Saitama', 93342);
-INSERT INTO city VALUES (1771, 'Kimitsu', 'JPN', 'Chiba', 93216);
-INSERT INTO city VALUES (1772, 'Isahaya', 'JPN', 'Nagasaki', 93058);
-INSERT INTO city VALUES (1773, 'Kanuma', 'JPN', 'Tochigi', 93053);
-INSERT INTO city VALUES (1774, 'Izumisano', 'JPN', 'Osaka', 92583);
-INSERT INTO city VALUES (1775, 'Kameoka', 'JPN', 'Kyoto', 92398);
-INSERT INTO city VALUES (1776, 'Mobara', 'JPN', 'Chiba', 91664);
-INSERT INTO city VALUES (1777, 'Narita', 'JPN', 'Chiba', 91470);
-INSERT INTO city VALUES (1778, 'Kashiwazaki', 'JPN', 'Niigata', 91229);
-INSERT INTO city VALUES (1779, 'Tsuyama', 'JPN', 'Okayama', 91170);
-INSERT INTO city VALUES (1780, 'Sanaa', 'YEM', 'Sanaa', 503600);
-INSERT INTO city VALUES (1781, 'Aden', 'YEM', 'Aden', 398300);
-INSERT INTO city VALUES (1782, 'Taizz', 'YEM', 'Taizz', 317600);
-INSERT INTO city VALUES (1783, 'Hodeida', 'YEM', 'Hodeida', 298500);
-INSERT INTO city VALUES (1784, 'al-Mukalla', 'YEM', 'Hadramawt', 122400);
-INSERT INTO city VALUES (1785, 'Ibb', 'YEM', 'Ibb', 103300);
-INSERT INTO city VALUES (1786, 'Amman', 'JOR', 'Amman', 1000000);
-INSERT INTO city VALUES (1787, 'al-Zarqa', 'JOR', 'al-Zarqa', 389815);
-INSERT INTO city VALUES (1788, 'Irbid', 'JOR', 'Irbid', 231511);
-INSERT INTO city VALUES (1789, 'al-Rusayfa', 'JOR', 'al-Zarqa', 137247);
-INSERT INTO city VALUES (1790, 'Wadi al-Sir', 'JOR', 'Amman', 89104);
-INSERT INTO city VALUES (1791, 'Flying Fish Cove', 'CXR', '', 700);
-INSERT INTO city VALUES (1792, 'Beograd', 'YUG', 'Central Serbia', 1204000);
-INSERT INTO city VALUES (1793, 'Novi Sad', 'YUG', 'Vojvodina', 179626);
-INSERT INTO city VALUES (1794, 'Ni', 'YUG', 'Central Serbia', 175391);
-INSERT INTO city VALUES (1795, 'Pritina', 'YUG', 'Kosovo and Metohija', 155496);
-INSERT INTO city VALUES (1796, 'Kragujevac', 'YUG', 'Central Serbia', 147305);
-INSERT INTO city VALUES (1797, 'Podgorica', 'YUG', 'Montenegro', 135000);
-INSERT INTO city VALUES (1798, 'Subotica', 'YUG', 'Vojvodina', 100386);
-INSERT INTO city VALUES (1799, 'Prizren', 'YUG', 'Kosovo and Metohija', 92303);
-INSERT INTO city VALUES (1800, 'Phnom Penh', 'KHM', 'Phnom Penh', 570155);
-INSERT INTO city VALUES (1801, 'Battambang', 'KHM', 'Battambang', 129800);
-INSERT INTO city VALUES (1802, 'Siem Reap', 'KHM', 'Siem Reap', 105100);
-INSERT INTO city VALUES (1803, 'Douala', 'CMR', 'Littoral', 1448300);
-INSERT INTO city VALUES (1804, 'Yaoundé', 'CMR', 'Centre', 1372800);
-INSERT INTO city VALUES (1805, 'Garoua', 'CMR', 'Nord', 177000);
-INSERT INTO city VALUES (1806, 'Maroua', 'CMR', 'Extrême-Nord', 143000);
-INSERT INTO city VALUES (1807, 'Bamenda', 'CMR', 'Nord-Ouest', 138000);
-INSERT INTO city VALUES (1808, 'Bafoussam', 'CMR', 'Ouest', 131000);
-INSERT INTO city VALUES (1809, 'Nkongsamba', 'CMR', 'Littoral', 112454);
-INSERT INTO city VALUES (1810, 'Montréal', 'CAN', 'Québec', 1016376);
-INSERT INTO city VALUES (1811, 'Calgary', 'CAN', 'Alberta', 768082);
-INSERT INTO city VALUES (1812, 'Toronto', 'CAN', 'Ontario', 688275);
-INSERT INTO city VALUES (1813, 'North York', 'CAN', 'Ontario', 622632);
-INSERT INTO city VALUES (1814, 'Winnipeg', 'CAN', 'Manitoba', 618477);
-INSERT INTO city VALUES (1815, 'Edmonton', 'CAN', 'Alberta', 616306);
-INSERT INTO city VALUES (1816, 'Mississauga', 'CAN', 'Ontario', 608072);
-INSERT INTO city VALUES (1817, 'Scarborough', 'CAN', 'Ontario', 594501);
-INSERT INTO city VALUES (1818, 'Vancouver', 'CAN', 'British Colombia', 514008);
-INSERT INTO city VALUES (1819, 'Etobicoke', 'CAN', 'Ontario', 348845);
-INSERT INTO city VALUES (1820, 'London', 'CAN', 'Ontario', 339917);
-INSERT INTO city VALUES (1821, 'Hamilton', 'CAN', 'Ontario', 335614);
-INSERT INTO city VALUES (1822, 'Ottawa', 'CAN', 'Ontario', 335277);
-INSERT INTO city VALUES (1823, 'Laval', 'CAN', 'Québec', 330393);
-INSERT INTO city VALUES (1824, 'Surrey', 'CAN', 'British Colombia', 304477);
-INSERT INTO city VALUES (1825, 'Brampton', 'CAN', 'Ontario', 296711);
-INSERT INTO city VALUES (1826, 'Windsor', 'CAN', 'Ontario', 207588);
-INSERT INTO city VALUES (1827, 'Saskatoon', 'CAN', 'Saskatchewan', 193647);
-INSERT INTO city VALUES (1828, 'Kitchener', 'CAN', 'Ontario', 189959);
-INSERT INTO city VALUES (1829, 'Markham', 'CAN', 'Ontario', 189098);
-INSERT INTO city VALUES (1830, 'Regina', 'CAN', 'Saskatchewan', 180400);
-INSERT INTO city VALUES (1831, 'Burnaby', 'CAN', 'British Colombia', 179209);
-INSERT INTO city VALUES (1832, 'Québec', 'CAN', 'Québec', 167264);
-INSERT INTO city VALUES (1833, 'York', 'CAN', 'Ontario', 154980);
-INSERT INTO city VALUES (1834, 'Richmond', 'CAN', 'British Colombia', 148867);
-INSERT INTO city VALUES (1835, 'Vaughan', 'CAN', 'Ontario', 147889);
-INSERT INTO city VALUES (1836, 'Burlington', 'CAN', 'Ontario', 145150);
-INSERT INTO city VALUES (1837, 'Oshawa', 'CAN', 'Ontario', 140173);
-INSERT INTO city VALUES (1838, 'Oakville', 'CAN', 'Ontario', 139192);
-INSERT INTO city VALUES (1839, 'Saint Catharines', 'CAN', 'Ontario', 136216);
-INSERT INTO city VALUES (1840, 'Longueuil', 'CAN', 'Québec', 127977);
-INSERT INTO city VALUES (1841, 'Richmond Hill', 'CAN', 'Ontario', 116428);
-INSERT INTO city VALUES (1842, 'Thunder Bay', 'CAN', 'Ontario', 115913);
-INSERT INTO city VALUES (1843, 'Nepean', 'CAN', 'Ontario', 115100);
-INSERT INTO city VALUES (1844, 'Cape Breton', 'CAN', 'Nova Scotia', 114733);
-INSERT INTO city VALUES (1845, 'East York', 'CAN', 'Ontario', 114034);
-INSERT INTO city VALUES (1846, 'Halifax', 'CAN', 'Nova Scotia', 113910);
-INSERT INTO city VALUES (1847, 'Cambridge', 'CAN', 'Ontario', 109186);
-INSERT INTO city VALUES (1848, 'Gloucester', 'CAN', 'Ontario', 107314);
-INSERT INTO city VALUES (1849, 'Abbotsford', 'CAN', 'British Colombia', 105403);
-INSERT INTO city VALUES (1850, 'Guelph', 'CAN', 'Ontario', 103593);
-INSERT INTO city VALUES (1851, 'Saint John´s', 'CAN', 'Newfoundland', 101936);
-INSERT INTO city VALUES (1852, 'Coquitlam', 'CAN', 'British Colombia', 101820);
-INSERT INTO city VALUES (1853, 'Saanich', 'CAN', 'British Colombia', 101388);
-INSERT INTO city VALUES (1854, 'Gatineau', 'CAN', 'Québec', 100702);
-INSERT INTO city VALUES (1855, 'Delta', 'CAN', 'British Colombia', 95411);
-INSERT INTO city VALUES (1856, 'Sudbury', 'CAN', 'Ontario', 92686);
-INSERT INTO city VALUES (1857, 'Kelowna', 'CAN', 'British Colombia', 89442);
-INSERT INTO city VALUES (1858, 'Barrie', 'CAN', 'Ontario', 89269);
-INSERT INTO city VALUES (1859, 'Praia', 'CPV', 'São Tiago', 94800);
-INSERT INTO city VALUES (1860, 'Almaty', 'KAZ', 'Almaty Qalasy', 1129400);
-INSERT INTO city VALUES (1861, 'Qaraghandy', 'KAZ', 'Qaraghandy', 436900);
-INSERT INTO city VALUES (1862, 'Shymkent', 'KAZ', 'South Kazakstan', 360100);
-INSERT INTO city VALUES (1863, 'Taraz', 'KAZ', 'Taraz', 330100);
-INSERT INTO city VALUES (1864, 'Astana', 'KAZ', 'Astana', 311200);
-INSERT INTO city VALUES (1865, 'Öskemen', 'KAZ', 'East Kazakstan', 311000);
-INSERT INTO city VALUES (1866, 'Pavlodar', 'KAZ', 'Pavlodar', 300500);
-INSERT INTO city VALUES (1867, 'Semey', 'KAZ', 'East Kazakstan', 269600);
-INSERT INTO city VALUES (1868, 'Aqtöbe', 'KAZ', 'Aqtöbe', 253100);
-INSERT INTO city VALUES (1869, 'Qostanay', 'KAZ', 'Qostanay', 221400);
-INSERT INTO city VALUES (1870, 'Petropavl', 'KAZ', 'North Kazakstan', 203500);
-INSERT INTO city VALUES (1871, 'Oral', 'KAZ', 'West Kazakstan', 195500);
-INSERT INTO city VALUES (1872, 'Temirtau', 'KAZ', 'Qaraghandy', 170500);
-INSERT INTO city VALUES (1873, 'Qyzylorda', 'KAZ', 'Qyzylorda', 157400);
-INSERT INTO city VALUES (1874, 'Aqtau', 'KAZ', 'Mangghystau', 143400);
-INSERT INTO city VALUES (1875, 'Atyrau', 'KAZ', 'Atyrau', 142500);
-INSERT INTO city VALUES (1876, 'Ekibastuz', 'KAZ', 'Pavlodar', 127200);
-INSERT INTO city VALUES (1877, 'Kökshetau', 'KAZ', 'North Kazakstan', 123400);
-INSERT INTO city VALUES (1878, 'Rudnyy', 'KAZ', 'Qostanay', 109500);
-INSERT INTO city VALUES (1879, 'Taldyqorghan', 'KAZ', 'Almaty', 98000);
-INSERT INTO city VALUES (1880, 'Zhezqazghan', 'KAZ', 'Qaraghandy', 90000);
-INSERT INTO city VALUES (1881, 'Nairobi', 'KEN', 'Nairobi', 2290000);
-INSERT INTO city VALUES (1882, 'Mombasa', 'KEN', 'Coast', 461753);
-INSERT INTO city VALUES (1883, 'Kisumu', 'KEN', 'Nyanza', 192733);
-INSERT INTO city VALUES (1884, 'Nakuru', 'KEN', 'Rift Valley', 163927);
-INSERT INTO city VALUES (1885, 'Machakos', 'KEN', 'Eastern', 116293);
-INSERT INTO city VALUES (1886, 'Eldoret', 'KEN', 'Rift Valley', 111882);
-INSERT INTO city VALUES (1887, 'Meru', 'KEN', 'Eastern', 94947);
-INSERT INTO city VALUES (1888, 'Nyeri', 'KEN', 'Central', 91258);
-INSERT INTO city VALUES (1889, 'Bangui', 'CAF', 'Bangui', 524000);
-INSERT INTO city VALUES (1890, 'Shanghai', 'CHN', 'Shanghai', 9696300);
-INSERT INTO city VALUES (1891, 'Peking', 'CHN', 'Peking', 7472000);
-INSERT INTO city VALUES (1892, 'Chongqing', 'CHN', 'Chongqing', 6351600);
-INSERT INTO city VALUES (1893, 'Tianjin', 'CHN', 'Tianjin', 5286800);
-INSERT INTO city VALUES (1894, 'Wuhan', 'CHN', 'Hubei', 4344600);
-INSERT INTO city VALUES (1895, 'Harbin', 'CHN', 'Heilongjiang', 4289800);
-INSERT INTO city VALUES (1896, 'Shenyang', 'CHN', 'Liaoning', 4265200);
-INSERT INTO city VALUES (1897, 'Kanton [Guangzhou]', 'CHN', 'Guangdong', 4256300);
-INSERT INTO city VALUES (1898, 'Chengdu', 'CHN', 'Sichuan', 3361500);
-INSERT INTO city VALUES (1899, 'Nanking [Nanjing]', 'CHN', 'Jiangsu', 2870300);
-INSERT INTO city VALUES (1900, 'Changchun', 'CHN', 'Jilin', 2812000);
-INSERT INTO city VALUES (1901, 'Xi´an', 'CHN', 'Shaanxi', 2761400);
-INSERT INTO city VALUES (1902, 'Dalian', 'CHN', 'Liaoning', 2697000);
-INSERT INTO city VALUES (1903, 'Qingdao', 'CHN', 'Shandong', 2596000);
-INSERT INTO city VALUES (1904, 'Jinan', 'CHN', 'Shandong', 2278100);
-INSERT INTO city VALUES (1905, 'Hangzhou', 'CHN', 'Zhejiang', 2190500);
-INSERT INTO city VALUES (1906, 'Zhengzhou', 'CHN', 'Henan', 2107200);
-INSERT INTO city VALUES (1907, 'Shijiazhuang', 'CHN', 'Hebei', 2041500);
-INSERT INTO city VALUES (1908, 'Taiyuan', 'CHN', 'Shanxi', 1968400);
-INSERT INTO city VALUES (1909, 'Kunming', 'CHN', 'Yunnan', 1829500);
-INSERT INTO city VALUES (1910, 'Changsha', 'CHN', 'Hunan', 1809800);
-INSERT INTO city VALUES (1911, 'Nanchang', 'CHN', 'Jiangxi', 1691600);
-INSERT INTO city VALUES (1912, 'Fuzhou', 'CHN', 'Fujian', 1593800);
-INSERT INTO city VALUES (1913, 'Lanzhou', 'CHN', 'Gansu', 1565800);
-INSERT INTO city VALUES (1914, 'Guiyang', 'CHN', 'Guizhou', 1465200);
-INSERT INTO city VALUES (1915, 'Ningbo', 'CHN', 'Zhejiang', 1371200);
-INSERT INTO city VALUES (1916, 'Hefei', 'CHN', 'Anhui', 1369100);
-INSERT INTO city VALUES (1917, 'Urumti [Ürümqi]', 'CHN', 'Xinxiang', 1310100);
-INSERT INTO city VALUES (1918, 'Anshan', 'CHN', 'Liaoning', 1200000);
-INSERT INTO city VALUES (1919, 'Fushun', 'CHN', 'Liaoning', 1200000);
-INSERT INTO city VALUES (1920, 'Nanning', 'CHN', 'Guangxi', 1161800);
-INSERT INTO city VALUES (1921, 'Zibo', 'CHN', 'Shandong', 1140000);
-INSERT INTO city VALUES (1922, 'Qiqihar', 'CHN', 'Heilongjiang', 1070000);
-INSERT INTO city VALUES (1923, 'Jilin', 'CHN', 'Jilin', 1040000);
-INSERT INTO city VALUES (1924, 'Tangshan', 'CHN', 'Hebei', 1040000);
-INSERT INTO city VALUES (1925, 'Baotou', 'CHN', 'Inner Mongolia', 980000);
-INSERT INTO city VALUES (1926, 'Shenzhen', 'CHN', 'Guangdong', 950500);
-INSERT INTO city VALUES (1927, 'Hohhot', 'CHN', 'Inner Mongolia', 916700);
-INSERT INTO city VALUES (1928, 'Handan', 'CHN', 'Hebei', 840000);
-INSERT INTO city VALUES (1929, 'Wuxi', 'CHN', 'Jiangsu', 830000);
-INSERT INTO city VALUES (1930, 'Xuzhou', 'CHN', 'Jiangsu', 810000);
-INSERT INTO city VALUES (1931, 'Datong', 'CHN', 'Shanxi', 800000);
-INSERT INTO city VALUES (1932, 'Yichun', 'CHN', 'Heilongjiang', 800000);
-INSERT INTO city VALUES (1933, 'Benxi', 'CHN', 'Liaoning', 770000);
-INSERT INTO city VALUES (1934, 'Luoyang', 'CHN', 'Henan', 760000);
-INSERT INTO city VALUES (1935, 'Suzhou', 'CHN', 'Jiangsu', 710000);
-INSERT INTO city VALUES (1936, 'Xining', 'CHN', 'Qinghai', 700200);
-INSERT INTO city VALUES (1937, 'Huainan', 'CHN', 'Anhui', 700000);
-INSERT INTO city VALUES (1938, 'Jixi', 'CHN', 'Heilongjiang', 683885);
-INSERT INTO city VALUES (1939, 'Daqing', 'CHN', 'Heilongjiang', 660000);
-INSERT INTO city VALUES (1940, 'Fuxin', 'CHN', 'Liaoning', 640000);
-INSERT INTO city VALUES (1941, 'Amoy [Xiamen]', 'CHN', 'Fujian', 627500);
-INSERT INTO city VALUES (1942, 'Liuzhou', 'CHN', 'Guangxi', 610000);
-INSERT INTO city VALUES (1943, 'Shantou', 'CHN', 'Guangdong', 580000);
-INSERT INTO city VALUES (1944, 'Jinzhou', 'CHN', 'Liaoning', 570000);
-INSERT INTO city VALUES (1945, 'Mudanjiang', 'CHN', 'Heilongjiang', 570000);
-INSERT INTO city VALUES (1946, 'Yinchuan', 'CHN', 'Ningxia', 544500);
-INSERT INTO city VALUES (1947, 'Changzhou', 'CHN', 'Jiangsu', 530000);
-INSERT INTO city VALUES (1948, 'Zhangjiakou', 'CHN', 'Hebei', 530000);
-INSERT INTO city VALUES (1949, 'Dandong', 'CHN', 'Liaoning', 520000);
-INSERT INTO city VALUES (1950, 'Hegang', 'CHN', 'Heilongjiang', 520000);
-INSERT INTO city VALUES (1951, 'Kaifeng', 'CHN', 'Henan', 510000);
-INSERT INTO city VALUES (1952, 'Jiamusi', 'CHN', 'Heilongjiang', 493409);
-INSERT INTO city VALUES (1953, 'Liaoyang', 'CHN', 'Liaoning', 492559);
-INSERT INTO city VALUES (1954, 'Hengyang', 'CHN', 'Hunan', 487148);
-INSERT INTO city VALUES (1955, 'Baoding', 'CHN', 'Hebei', 483155);
-INSERT INTO city VALUES (1956, 'Hunjiang', 'CHN', 'Jilin', 482043);
-INSERT INTO city VALUES (1957, 'Xinxiang', 'CHN', 'Henan', 473762);
-INSERT INTO city VALUES (1958, 'Huangshi', 'CHN', 'Hubei', 457601);
-INSERT INTO city VALUES (1959, 'Haikou', 'CHN', 'Hainan', 454300);
-INSERT INTO city VALUES (1960, 'Yantai', 'CHN', 'Shandong', 452127);
-INSERT INTO city VALUES (1961, 'Bengbu', 'CHN', 'Anhui', 449245);
-INSERT INTO city VALUES (1962, 'Xiangtan', 'CHN', 'Hunan', 441968);
-INSERT INTO city VALUES (1963, 'Weifang', 'CHN', 'Shandong', 428522);
-INSERT INTO city VALUES (1964, 'Wuhu', 'CHN', 'Anhui', 425740);
-INSERT INTO city VALUES (1965, 'Pingxiang', 'CHN', 'Jiangxi', 425579);
-INSERT INTO city VALUES (1966, 'Yingkou', 'CHN', 'Liaoning', 421589);
-INSERT INTO city VALUES (1967, 'Anyang', 'CHN', 'Henan', 420332);
-INSERT INTO city VALUES (1968, 'Panzhihua', 'CHN', 'Sichuan', 415466);
-INSERT INTO city VALUES (1969, 'Pingdingshan', 'CHN', 'Henan', 410775);
-INSERT INTO city VALUES (1970, 'Xiangfan', 'CHN', 'Hubei', 410407);
-INSERT INTO city VALUES (1971, 'Zhuzhou', 'CHN', 'Hunan', 409924);
-INSERT INTO city VALUES (1972, 'Jiaozuo', 'CHN', 'Henan', 409100);
-INSERT INTO city VALUES (1973, 'Wenzhou', 'CHN', 'Zhejiang', 401871);
-INSERT INTO city VALUES (1974, 'Zhangjiang', 'CHN', 'Guangdong', 400997);
-INSERT INTO city VALUES (1975, 'Zigong', 'CHN', 'Sichuan', 393184);
-INSERT INTO city VALUES (1976, 'Shuangyashan', 'CHN', 'Heilongjiang', 386081);
-INSERT INTO city VALUES (1977, 'Zaozhuang', 'CHN', 'Shandong', 380846);
-INSERT INTO city VALUES (1978, 'Yakeshi', 'CHN', 'Inner Mongolia', 377869);
-INSERT INTO city VALUES (1979, 'Yichang', 'CHN', 'Hubei', 371601);
-INSERT INTO city VALUES (1980, 'Zhenjiang', 'CHN', 'Jiangsu', 368316);
-INSERT INTO city VALUES (1981, 'Huaibei', 'CHN', 'Anhui', 366549);
-INSERT INTO city VALUES (1982, 'Qinhuangdao', 'CHN', 'Hebei', 364972);
-INSERT INTO city VALUES (1983, 'Guilin', 'CHN', 'Guangxi', 364130);
-INSERT INTO city VALUES (1984, 'Liupanshui', 'CHN', 'Guizhou', 363954);
-INSERT INTO city VALUES (1985, 'Panjin', 'CHN', 'Liaoning', 362773);
-INSERT INTO city VALUES (1986, 'Yangquan', 'CHN', 'Shanxi', 362268);
-INSERT INTO city VALUES (1987, 'Jinxi', 'CHN', 'Liaoning', 357052);
-INSERT INTO city VALUES (1988, 'Liaoyuan', 'CHN', 'Jilin', 354141);
-INSERT INTO city VALUES (1989, 'Lianyungang', 'CHN', 'Jiangsu', 354139);
-INSERT INTO city VALUES (1990, 'Xianyang', 'CHN', 'Shaanxi', 352125);
-INSERT INTO city VALUES (1991, 'Tai´an', 'CHN', 'Shandong', 350696);
-INSERT INTO city VALUES (1992, 'Chifeng', 'CHN', 'Inner Mongolia', 350077);
-INSERT INTO city VALUES (1993, 'Shaoguan', 'CHN', 'Guangdong', 350043);
-INSERT INTO city VALUES (1994, 'Nantong', 'CHN', 'Jiangsu', 343341);
-INSERT INTO city VALUES (1995, 'Leshan', 'CHN', 'Sichuan', 341128);
-INSERT INTO city VALUES (1996, 'Baoji', 'CHN', 'Shaanxi', 337765);
-INSERT INTO city VALUES (1997, 'Linyi', 'CHN', 'Shandong', 324720);
-INSERT INTO city VALUES (1998, 'Tonghua', 'CHN', 'Jilin', 324600);
-INSERT INTO city VALUES (1999, 'Siping', 'CHN', 'Jilin', 317223);
-INSERT INTO city VALUES (2000, 'Changzhi', 'CHN', 'Shanxi', 317144);
-INSERT INTO city VALUES (2001, 'Tengzhou', 'CHN', 'Shandong', 315083);
-INSERT INTO city VALUES (2002, 'Chaozhou', 'CHN', 'Guangdong', 313469);
-INSERT INTO city VALUES (2003, 'Yangzhou', 'CHN', 'Jiangsu', 312892);
-INSERT INTO city VALUES (2004, 'Dongwan', 'CHN', 'Guangdong', 308669);
-INSERT INTO city VALUES (2005, 'Ma´anshan', 'CHN', 'Anhui', 305421);
-INSERT INTO city VALUES (2006, 'Foshan', 'CHN', 'Guangdong', 303160);
-INSERT INTO city VALUES (2007, 'Yueyang', 'CHN', 'Hunan', 302800);
-INSERT INTO city VALUES (2008, 'Xingtai', 'CHN', 'Hebei', 302789);
-INSERT INTO city VALUES (2009, 'Changde', 'CHN', 'Hunan', 301276);
-INSERT INTO city VALUES (2010, 'Shihezi', 'CHN', 'Xinxiang', 299676);
-INSERT INTO city VALUES (2011, 'Yancheng', 'CHN', 'Jiangsu', 296831);
-INSERT INTO city VALUES (2012, 'Jiujiang', 'CHN', 'Jiangxi', 291187);
-INSERT INTO city VALUES (2013, 'Dongying', 'CHN', 'Shandong', 281728);
-INSERT INTO city VALUES (2014, 'Shashi', 'CHN', 'Hubei', 281352);
-INSERT INTO city VALUES (2015, 'Xintai', 'CHN', 'Shandong', 281248);
-INSERT INTO city VALUES (2016, 'Jingdezhen', 'CHN', 'Jiangxi', 281183);
-INSERT INTO city VALUES (2017, 'Tongchuan', 'CHN', 'Shaanxi', 280657);
-INSERT INTO city VALUES (2018, 'Zhongshan', 'CHN', 'Guangdong', 278829);
-INSERT INTO city VALUES (2019, 'Shiyan', 'CHN', 'Hubei', 273786);
-INSERT INTO city VALUES (2020, 'Tieli', 'CHN', 'Heilongjiang', 265683);
-INSERT INTO city VALUES (2021, 'Jining', 'CHN', 'Shandong', 265248);
-INSERT INTO city VALUES (2022, 'Wuhai', 'CHN', 'Inner Mongolia', 264081);
-INSERT INTO city VALUES (2023, 'Mianyang', 'CHN', 'Sichuan', 262947);
-INSERT INTO city VALUES (2024, 'Luzhou', 'CHN', 'Sichuan', 262892);
-INSERT INTO city VALUES (2025, 'Zunyi', 'CHN', 'Guizhou', 261862);
-INSERT INTO city VALUES (2026, 'Shizuishan', 'CHN', 'Ningxia', 257862);
-INSERT INTO city VALUES (2027, 'Neijiang', 'CHN', 'Sichuan', 256012);
-INSERT INTO city VALUES (2028, 'Tongliao', 'CHN', 'Inner Mongolia', 255129);
-INSERT INTO city VALUES (2029, 'Tieling', 'CHN', 'Liaoning', 254842);
-INSERT INTO city VALUES (2030, 'Wafangdian', 'CHN', 'Liaoning', 251733);
-INSERT INTO city VALUES (2031, 'Anqing', 'CHN', 'Anhui', 250718);
-INSERT INTO city VALUES (2032, 'Shaoyang', 'CHN', 'Hunan', 247227);
-INSERT INTO city VALUES (2033, 'Laiwu', 'CHN', 'Shandong', 246833);
-INSERT INTO city VALUES (2034, 'Chengde', 'CHN', 'Hebei', 246799);
-INSERT INTO city VALUES (2035, 'Tianshui', 'CHN', 'Gansu', 244974);
-INSERT INTO city VALUES (2036, 'Nanyang', 'CHN', 'Henan', 243303);
-INSERT INTO city VALUES (2037, 'Cangzhou', 'CHN', 'Hebei', 242708);
-INSERT INTO city VALUES (2038, 'Yibin', 'CHN', 'Sichuan', 241019);
-INSERT INTO city VALUES (2039, 'Huaiyin', 'CHN', 'Jiangsu', 239675);
-INSERT INTO city VALUES (2040, 'Dunhua', 'CHN', 'Jilin', 235100);
-INSERT INTO city VALUES (2041, 'Yanji', 'CHN', 'Jilin', 230892);
-INSERT INTO city VALUES (2042, 'Jiangmen', 'CHN', 'Guangdong', 230587);
-INSERT INTO city VALUES (2043, 'Tongling', 'CHN', 'Anhui', 228017);
-INSERT INTO city VALUES (2044, 'Suihua', 'CHN', 'Heilongjiang', 227881);
-INSERT INTO city VALUES (2045, 'Gongziling', 'CHN', 'Jilin', 226569);
-INSERT INTO city VALUES (2046, 'Xiantao', 'CHN', 'Hubei', 222884);
-INSERT INTO city VALUES (2047, 'Chaoyang', 'CHN', 'Liaoning', 222394);
-INSERT INTO city VALUES (2048, 'Ganzhou', 'CHN', 'Jiangxi', 220129);
-INSERT INTO city VALUES (2049, 'Huzhou', 'CHN', 'Zhejiang', 218071);
-INSERT INTO city VALUES (2050, 'Baicheng', 'CHN', 'Jilin', 217987);
-INSERT INTO city VALUES (2051, 'Shangzi', 'CHN', 'Heilongjiang', 215373);
-INSERT INTO city VALUES (2052, 'Yangjiang', 'CHN', 'Guangdong', 215196);
-INSERT INTO city VALUES (2053, 'Qitaihe', 'CHN', 'Heilongjiang', 214957);
-INSERT INTO city VALUES (2054, 'Gejiu', 'CHN', 'Yunnan', 214294);
-INSERT INTO city VALUES (2055, 'Jiangyin', 'CHN', 'Jiangsu', 213659);
-INSERT INTO city VALUES (2056, 'Hebi', 'CHN', 'Henan', 212976);
-INSERT INTO city VALUES (2057, 'Jiaxing', 'CHN', 'Zhejiang', 211526);
-INSERT INTO city VALUES (2058, 'Wuzhou', 'CHN', 'Guangxi', 210452);
-INSERT INTO city VALUES (2059, 'Meihekou', 'CHN', 'Jilin', 209038);
-INSERT INTO city VALUES (2060, 'Xuchang', 'CHN', 'Henan', 208815);
-INSERT INTO city VALUES (2061, 'Liaocheng', 'CHN', 'Shandong', 207844);
-INSERT INTO city VALUES (2062, 'Haicheng', 'CHN', 'Liaoning', 205560);
-INSERT INTO city VALUES (2063, 'Qianjiang', 'CHN', 'Hubei', 205504);
-INSERT INTO city VALUES (2064, 'Baiyin', 'CHN', 'Gansu', 204970);
-INSERT INTO city VALUES (2065, 'Bei´an', 'CHN', 'Heilongjiang', 204899);
-INSERT INTO city VALUES (2066, 'Yixing', 'CHN', 'Jiangsu', 200824);
-INSERT INTO city VALUES (2067, 'Laizhou', 'CHN', 'Shandong', 198664);
-INSERT INTO city VALUES (2068, 'Qaramay', 'CHN', 'Xinxiang', 197602);
-INSERT INTO city VALUES (2069, 'Acheng', 'CHN', 'Heilongjiang', 197595);
-INSERT INTO city VALUES (2070, 'Dezhou', 'CHN', 'Shandong', 195485);
-INSERT INTO city VALUES (2071, 'Nanping', 'CHN', 'Fujian', 195064);
-INSERT INTO city VALUES (2072, 'Zhaoqing', 'CHN', 'Guangdong', 194784);
-INSERT INTO city VALUES (2073, 'Beipiao', 'CHN', 'Liaoning', 194301);
-INSERT INTO city VALUES (2074, 'Fengcheng', 'CHN', 'Jiangxi', 193784);
-INSERT INTO city VALUES (2075, 'Fuyu', 'CHN', 'Jilin', 192981);
-INSERT INTO city VALUES (2076, 'Xinyang', 'CHN', 'Henan', 192509);
-INSERT INTO city VALUES (2077, 'Dongtai', 'CHN', 'Jiangsu', 192247);
-INSERT INTO city VALUES (2078, 'Yuci', 'CHN', 'Shanxi', 191356);
-INSERT INTO city VALUES (2079, 'Honghu', 'CHN', 'Hubei', 190772);
-INSERT INTO city VALUES (2080, 'Ezhou', 'CHN', 'Hubei', 190123);
-INSERT INTO city VALUES (2081, 'Heze', 'CHN', 'Shandong', 189293);
-INSERT INTO city VALUES (2082, 'Daxian', 'CHN', 'Sichuan', 188101);
-INSERT INTO city VALUES (2083, 'Linfen', 'CHN', 'Shanxi', 187309);
-INSERT INTO city VALUES (2084, 'Tianmen', 'CHN', 'Hubei', 186332);
-INSERT INTO city VALUES (2085, 'Yiyang', 'CHN', 'Hunan', 185818);
-INSERT INTO city VALUES (2086, 'Quanzhou', 'CHN', 'Fujian', 185154);
-INSERT INTO city VALUES (2087, 'Rizhao', 'CHN', 'Shandong', 185048);
-INSERT INTO city VALUES (2088, 'Deyang', 'CHN', 'Sichuan', 182488);
-INSERT INTO city VALUES (2089, 'Guangyuan', 'CHN', 'Sichuan', 182241);
-INSERT INTO city VALUES (2090, 'Changshu', 'CHN', 'Jiangsu', 181805);
-INSERT INTO city VALUES (2091, 'Zhangzhou', 'CHN', 'Fujian', 181424);
-INSERT INTO city VALUES (2092, 'Hailar', 'CHN', 'Inner Mongolia', 180650);
-INSERT INTO city VALUES (2093, 'Nanchong', 'CHN', 'Sichuan', 180273);
-INSERT INTO city VALUES (2094, 'Jiutai', 'CHN', 'Jilin', 180130);
-INSERT INTO city VALUES (2095, 'Zhaodong', 'CHN', 'Heilongjiang', 179976);
-INSERT INTO city VALUES (2096, 'Shaoxing', 'CHN', 'Zhejiang', 179818);
-INSERT INTO city VALUES (2097, 'Fuyang', 'CHN', 'Anhui', 179572);
-INSERT INTO city VALUES (2098, 'Maoming', 'CHN', 'Guangdong', 178683);
-INSERT INTO city VALUES (2099, 'Qujing', 'CHN', 'Yunnan', 178669);
-INSERT INTO city VALUES (2100, 'Ghulja', 'CHN', 'Xinxiang', 177193);
-INSERT INTO city VALUES (2101, 'Jiaohe', 'CHN', 'Jilin', 176367);
-INSERT INTO city VALUES (2102, 'Puyang', 'CHN', 'Henan', 175988);
-INSERT INTO city VALUES (2103, 'Huadian', 'CHN', 'Jilin', 175873);
-INSERT INTO city VALUES (2104, 'Jiangyou', 'CHN', 'Sichuan', 175753);
-INSERT INTO city VALUES (2105, 'Qashqar', 'CHN', 'Xinxiang', 174570);
-INSERT INTO city VALUES (2106, 'Anshun', 'CHN', 'Guizhou', 174142);
-INSERT INTO city VALUES (2107, 'Fuling', 'CHN', 'Sichuan', 173878);
-INSERT INTO city VALUES (2108, 'Xinyu', 'CHN', 'Jiangxi', 173524);
-INSERT INTO city VALUES (2109, 'Hanzhong', 'CHN', 'Shaanxi', 169930);
-INSERT INTO city VALUES (2110, 'Danyang', 'CHN', 'Jiangsu', 169603);
-INSERT INTO city VALUES (2111, 'Chenzhou', 'CHN', 'Hunan', 169400);
-INSERT INTO city VALUES (2112, 'Xiaogan', 'CHN', 'Hubei', 166280);
-INSERT INTO city VALUES (2113, 'Shangqiu', 'CHN', 'Henan', 164880);
-INSERT INTO city VALUES (2114, 'Zhuhai', 'CHN', 'Guangdong', 164747);
-INSERT INTO city VALUES (2115, 'Qingyuan', 'CHN', 'Guangdong', 164641);
-INSERT INTO city VALUES (2116, 'Aqsu', 'CHN', 'Xinxiang', 164092);
-INSERT INTO city VALUES (2117, 'Jining', 'CHN', 'Inner Mongolia', 163552);
-INSERT INTO city VALUES (2118, 'Xiaoshan', 'CHN', 'Zhejiang', 162930);
-INSERT INTO city VALUES (2119, 'Zaoyang', 'CHN', 'Hubei', 162198);
-INSERT INTO city VALUES (2120, 'Xinghua', 'CHN', 'Jiangsu', 161910);
-INSERT INTO city VALUES (2121, 'Hami', 'CHN', 'Xinxiang', 161315);
-INSERT INTO city VALUES (2122, 'Huizhou', 'CHN', 'Guangdong', 161023);
-INSERT INTO city VALUES (2123, 'Jinmen', 'CHN', 'Hubei', 160794);
-INSERT INTO city VALUES (2124, 'Sanming', 'CHN', 'Fujian', 160691);
-INSERT INTO city VALUES (2125, 'Ulanhot', 'CHN', 'Inner Mongolia', 159538);
-INSERT INTO city VALUES (2126, 'Korla', 'CHN', 'Xinxiang', 159344);
-INSERT INTO city VALUES (2127, 'Wanxian', 'CHN', 'Sichuan', 156823);
-INSERT INTO city VALUES (2128, 'Rui´an', 'CHN', 'Zhejiang', 156468);
-INSERT INTO city VALUES (2129, 'Zhoushan', 'CHN', 'Zhejiang', 156317);
-INSERT INTO city VALUES (2130, 'Liangcheng', 'CHN', 'Shandong', 156307);
-INSERT INTO city VALUES (2131, 'Jiaozhou', 'CHN', 'Shandong', 153364);
-INSERT INTO city VALUES (2132, 'Taizhou', 'CHN', 'Jiangsu', 152442);
-INSERT INTO city VALUES (2133, 'Suzhou', 'CHN', 'Anhui', 151862);
-INSERT INTO city VALUES (2134, 'Yichun', 'CHN', 'Jiangxi', 151585);
-INSERT INTO city VALUES (2135, 'Taonan', 'CHN', 'Jilin', 150168);
-INSERT INTO city VALUES (2136, 'Pingdu', 'CHN', 'Shandong', 150123);
-INSERT INTO city VALUES (2137, 'Ji´an', 'CHN', 'Jiangxi', 148583);
-INSERT INTO city VALUES (2138, 'Longkou', 'CHN', 'Shandong', 148362);
-INSERT INTO city VALUES (2139, 'Langfang', 'CHN', 'Hebei', 148105);
-INSERT INTO city VALUES (2140, 'Zhoukou', 'CHN', 'Henan', 146288);
-INSERT INTO city VALUES (2141, 'Suining', 'CHN', 'Sichuan', 146086);
-INSERT INTO city VALUES (2142, 'Yulin', 'CHN', 'Guangxi', 144467);
-INSERT INTO city VALUES (2143, 'Jinhua', 'CHN', 'Zhejiang', 144280);
-INSERT INTO city VALUES (2144, 'Liu´an', 'CHN', 'Anhui', 144248);
-INSERT INTO city VALUES (2145, 'Shuangcheng', 'CHN', 'Heilongjiang', 142659);
-INSERT INTO city VALUES (2146, 'Suizhou', 'CHN', 'Hubei', 142302);
-INSERT INTO city VALUES (2147, 'Ankang', 'CHN', 'Shaanxi', 142170);
-INSERT INTO city VALUES (2148, 'Weinan', 'CHN', 'Shaanxi', 140169);
-INSERT INTO city VALUES (2149, 'Longjing', 'CHN', 'Jilin', 139417);
-INSERT INTO city VALUES (2150, 'Da´an', 'CHN', 'Jilin', 138963);
-INSERT INTO city VALUES (2151, 'Lengshuijiang', 'CHN', 'Hunan', 137994);
-INSERT INTO city VALUES (2152, 'Laiyang', 'CHN', 'Shandong', 137080);
-INSERT INTO city VALUES (2153, 'Xianning', 'CHN', 'Hubei', 136811);
-INSERT INTO city VALUES (2154, 'Dali', 'CHN', 'Yunnan', 136554);
-INSERT INTO city VALUES (2155, 'Anda', 'CHN', 'Heilongjiang', 136446);
-INSERT INTO city VALUES (2156, 'Jincheng', 'CHN', 'Shanxi', 136396);
-INSERT INTO city VALUES (2157, 'Longyan', 'CHN', 'Fujian', 134481);
-INSERT INTO city VALUES (2158, 'Xichang', 'CHN', 'Sichuan', 134419);
-INSERT INTO city VALUES (2159, 'Wendeng', 'CHN', 'Shandong', 133910);
-INSERT INTO city VALUES (2160, 'Hailun', 'CHN', 'Heilongjiang', 133565);
-INSERT INTO city VALUES (2161, 'Binzhou', 'CHN', 'Shandong', 133555);
-INSERT INTO city VALUES (2162, 'Linhe', 'CHN', 'Inner Mongolia', 133183);
-INSERT INTO city VALUES (2163, 'Wuwei', 'CHN', 'Gansu', 133101);
-INSERT INTO city VALUES (2164, 'Duyun', 'CHN', 'Guizhou', 132971);
-INSERT INTO city VALUES (2165, 'Mishan', 'CHN', 'Heilongjiang', 132744);
-INSERT INTO city VALUES (2166, 'Shangrao', 'CHN', 'Jiangxi', 132455);
-INSERT INTO city VALUES (2167, 'Changji', 'CHN', 'Xinxiang', 132260);
-INSERT INTO city VALUES (2168, 'Meixian', 'CHN', 'Guangdong', 132156);
-INSERT INTO city VALUES (2169, 'Yushu', 'CHN', 'Jilin', 131861);
-INSERT INTO city VALUES (2170, 'Tiefa', 'CHN', 'Liaoning', 131807);
-INSERT INTO city VALUES (2171, 'Huai´an', 'CHN', 'Jiangsu', 131149);
-INSERT INTO city VALUES (2172, 'Leiyang', 'CHN', 'Hunan', 130115);
-INSERT INTO city VALUES (2173, 'Zalantun', 'CHN', 'Inner Mongolia', 130031);
-INSERT INTO city VALUES (2174, 'Weihai', 'CHN', 'Shandong', 128888);
-INSERT INTO city VALUES (2175, 'Loudi', 'CHN', 'Hunan', 128418);
-INSERT INTO city VALUES (2176, 'Qingzhou', 'CHN', 'Shandong', 128258);
-INSERT INTO city VALUES (2177, 'Qidong', 'CHN', 'Jiangsu', 126872);
-INSERT INTO city VALUES (2178, 'Huaihua', 'CHN', 'Hunan', 126785);
-INSERT INTO city VALUES (2179, 'Luohe', 'CHN', 'Henan', 126438);
-INSERT INTO city VALUES (2180, 'Chuzhou', 'CHN', 'Anhui', 125341);
-INSERT INTO city VALUES (2181, 'Kaiyuan', 'CHN', 'Liaoning', 124219);
-INSERT INTO city VALUES (2182, 'Linqing', 'CHN', 'Shandong', 123958);
-INSERT INTO city VALUES (2183, 'Chaohu', 'CHN', 'Anhui', 123676);
-INSERT INTO city VALUES (2184, 'Laohekou', 'CHN', 'Hubei', 123366);
-INSERT INTO city VALUES (2185, 'Dujiangyan', 'CHN', 'Sichuan', 123357);
-INSERT INTO city VALUES (2186, 'Zhumadian', 'CHN', 'Henan', 123232);
-INSERT INTO city VALUES (2187, 'Linchuan', 'CHN', 'Jiangxi', 121949);
-INSERT INTO city VALUES (2188, 'Jiaonan', 'CHN', 'Shandong', 121397);
-INSERT INTO city VALUES (2189, 'Sanmenxia', 'CHN', 'Henan', 120523);
-INSERT INTO city VALUES (2190, 'Heyuan', 'CHN', 'Guangdong', 120101);
-INSERT INTO city VALUES (2191, 'Manzhouli', 'CHN', 'Inner Mongolia', 120023);
-INSERT INTO city VALUES (2192, 'Lhasa', 'CHN', 'Tibet', 120000);
-INSERT INTO city VALUES (2193, 'Lianyuan', 'CHN', 'Hunan', 118858);
-INSERT INTO city VALUES (2194, 'Kuytun', 'CHN', 'Xinxiang', 118553);
-INSERT INTO city VALUES (2195, 'Puqi', 'CHN', 'Hubei', 117264);
-INSERT INTO city VALUES (2196, 'Hongjiang', 'CHN', 'Hunan', 116188);
-INSERT INTO city VALUES (2197, 'Qinzhou', 'CHN', 'Guangxi', 114586);
-INSERT INTO city VALUES (2198, 'Renqiu', 'CHN', 'Hebei', 114256);
-INSERT INTO city VALUES (2199, 'Yuyao', 'CHN', 'Zhejiang', 114065);
-INSERT INTO city VALUES (2200, 'Guigang', 'CHN', 'Guangxi', 114025);
-INSERT INTO city VALUES (2201, 'Kaili', 'CHN', 'Guizhou', 113958);
-INSERT INTO city VALUES (2202, 'Yan´an', 'CHN', 'Shaanxi', 113277);
-INSERT INTO city VALUES (2203, 'Beihai', 'CHN', 'Guangxi', 112673);
-INSERT INTO city VALUES (2204, 'Xuangzhou', 'CHN', 'Anhui', 112673);
-INSERT INTO city VALUES (2205, 'Quzhou', 'CHN', 'Zhejiang', 112373);
-INSERT INTO city VALUES (2206, 'Yong´an', 'CHN', 'Fujian', 111762);
-INSERT INTO city VALUES (2207, 'Zixing', 'CHN', 'Hunan', 110048);
-INSERT INTO city VALUES (2208, 'Liyang', 'CHN', 'Jiangsu', 109520);
-INSERT INTO city VALUES (2209, 'Yizheng', 'CHN', 'Jiangsu', 109268);
-INSERT INTO city VALUES (2210, 'Yumen', 'CHN', 'Gansu', 109234);
-INSERT INTO city VALUES (2211, 'Liling', 'CHN', 'Hunan', 108504);
-INSERT INTO city VALUES (2212, 'Yuncheng', 'CHN', 'Shanxi', 108359);
-INSERT INTO city VALUES (2213, 'Shanwei', 'CHN', 'Guangdong', 107847);
-INSERT INTO city VALUES (2214, 'Cixi', 'CHN', 'Zhejiang', 107329);
-INSERT INTO city VALUES (2215, 'Yuanjiang', 'CHN', 'Hunan', 107004);
-INSERT INTO city VALUES (2216, 'Bozhou', 'CHN', 'Anhui', 106346);
-INSERT INTO city VALUES (2217, 'Jinchang', 'CHN', 'Gansu', 105287);
-INSERT INTO city VALUES (2218, 'Fu´an', 'CHN', 'Fujian', 105265);
-INSERT INTO city VALUES (2219, 'Suqian', 'CHN', 'Jiangsu', 105021);
-INSERT INTO city VALUES (2220, 'Shishou', 'CHN', 'Hubei', 104571);
-INSERT INTO city VALUES (2221, 'Hengshui', 'CHN', 'Hebei', 104269);
-INSERT INTO city VALUES (2222, 'Danjiangkou', 'CHN', 'Hubei', 103211);
-INSERT INTO city VALUES (2223, 'Fujin', 'CHN', 'Heilongjiang', 103104);
-INSERT INTO city VALUES (2224, 'Sanya', 'CHN', 'Hainan', 102820);
-INSERT INTO city VALUES (2225, 'Guangshui', 'CHN', 'Hubei', 102770);
-INSERT INTO city VALUES (2226, 'Huangshan', 'CHN', 'Anhui', 102628);
-INSERT INTO city VALUES (2227, 'Xingcheng', 'CHN', 'Liaoning', 102384);
-INSERT INTO city VALUES (2228, 'Zhucheng', 'CHN', 'Shandong', 102134);
-INSERT INTO city VALUES (2229, 'Kunshan', 'CHN', 'Jiangsu', 102052);
-INSERT INTO city VALUES (2230, 'Haining', 'CHN', 'Zhejiang', 100478);
-INSERT INTO city VALUES (2231, 'Pingliang', 'CHN', 'Gansu', 99265);
-INSERT INTO city VALUES (2232, 'Fuqing', 'CHN', 'Fujian', 99193);
-INSERT INTO city VALUES (2233, 'Xinzhou', 'CHN', 'Shanxi', 98667);
-INSERT INTO city VALUES (2234, 'Jieyang', 'CHN', 'Guangdong', 98531);
-INSERT INTO city VALUES (2235, 'Zhangjiagang', 'CHN', 'Jiangsu', 97994);
-INSERT INTO city VALUES (2236, 'Tong Xian', 'CHN', 'Peking', 97168);
-INSERT INTO city VALUES (2237, 'Ya´an', 'CHN', 'Sichuan', 95900);
-INSERT INTO city VALUES (2238, 'Jinzhou', 'CHN', 'Liaoning', 95761);
-INSERT INTO city VALUES (2239, 'Emeishan', 'CHN', 'Sichuan', 94000);
-INSERT INTO city VALUES (2240, 'Enshi', 'CHN', 'Hubei', 93056);
-INSERT INTO city VALUES (2241, 'Bose', 'CHN', 'Guangxi', 93009);
-INSERT INTO city VALUES (2242, 'Yuzhou', 'CHN', 'Henan', 92889);
-INSERT INTO city VALUES (2243, 'Kaiyuan', 'CHN', 'Yunnan', 91999);
-INSERT INTO city VALUES (2244, 'Tumen', 'CHN', 'Jilin', 91471);
-INSERT INTO city VALUES (2245, 'Putian', 'CHN', 'Fujian', 91030);
-INSERT INTO city VALUES (2246, 'Linhai', 'CHN', 'Zhejiang', 90870);
-INSERT INTO city VALUES (2247, 'Xilin Hot', 'CHN', 'Inner Mongolia', 90646);
-INSERT INTO city VALUES (2248, 'Shaowu', 'CHN', 'Fujian', 90286);
-INSERT INTO city VALUES (2249, 'Junan', 'CHN', 'Shandong', 90222);
-INSERT INTO city VALUES (2250, 'Huaying', 'CHN', 'Sichuan', 89400);
-INSERT INTO city VALUES (2251, 'Pingyi', 'CHN', 'Shandong', 89373);
-INSERT INTO city VALUES (2252, 'Huangyan', 'CHN', 'Zhejiang', 89288);
-INSERT INTO city VALUES (2253, 'Bishkek', 'KGZ', 'Bishkek shaary', 589400);
-INSERT INTO city VALUES (2254, 'Osh', 'KGZ', 'Osh', 222700);
-INSERT INTO city VALUES (2255, 'Bikenibeu', 'KIR', 'South Tarawa', 5055);
-INSERT INTO city VALUES (2256, 'Bairiki', 'KIR', 'South Tarawa', 2226);
-INSERT INTO city VALUES (2257, 'Santafé de Bogotá', 'COL', 'Santafé de Bogotá', 6260862);
-INSERT INTO city VALUES (2258, 'Cali', 'COL', 'Valle', 2077386);
-INSERT INTO city VALUES (2259, 'Medellín', 'COL', 'Antioquia', 1861265);
-INSERT INTO city VALUES (2260, 'Barranquilla', 'COL', 'Atlántico', 1223260);
-INSERT INTO city VALUES (2261, 'Cartagena', 'COL', 'Bolívar', 805757);
-INSERT INTO city VALUES (2262, 'Cúcuta', 'COL', 'Norte de Santander', 606932);
-INSERT INTO city VALUES (2263, 'Bucaramanga', 'COL', 'Santander', 515555);
-INSERT INTO city VALUES (2264, 'Ibagué', 'COL', 'Tolima', 393664);
-INSERT INTO city VALUES (2265, 'Pereira', 'COL', 'Risaralda', 381725);
-INSERT INTO city VALUES (2266, 'Santa Marta', 'COL', 'Magdalena', 359147);
-INSERT INTO city VALUES (2267, 'Manizales', 'COL', 'Caldas', 337580);
-INSERT INTO city VALUES (2268, 'Bello', 'COL', 'Antioquia', 333470);
-INSERT INTO city VALUES (2269, 'Pasto', 'COL', 'Nariño', 332396);
-INSERT INTO city VALUES (2270, 'Neiva', 'COL', 'Huila', 300052);
-INSERT INTO city VALUES (2271, 'Soledad', 'COL', 'Atlántico', 295058);
-INSERT INTO city VALUES (2272, 'Armenia', 'COL', 'Quindío', 288977);
-INSERT INTO city VALUES (2273, 'Villavicencio', 'COL', 'Meta', 273140);
-INSERT INTO city VALUES (2274, 'Soacha', 'COL', 'Cundinamarca', 272058);
-INSERT INTO city VALUES (2275, 'Valledupar', 'COL', 'Cesar', 263247);
-INSERT INTO city VALUES (2276, 'Montería', 'COL', 'Córdoba', 248245);
-INSERT INTO city VALUES (2277, 'Itagüí', 'COL', 'Antioquia', 228985);
-INSERT INTO city VALUES (2278, 'Palmira', 'COL', 'Valle', 226509);
-INSERT INTO city VALUES (2279, 'Buenaventura', 'COL', 'Valle', 224336);
-INSERT INTO city VALUES (2280, 'Floridablanca', 'COL', 'Santander', 221913);
-INSERT INTO city VALUES (2281, 'Sincelejo', 'COL', 'Sucre', 220704);
-INSERT INTO city VALUES (2282, 'Popayán', 'COL', 'Cauca', 200719);
-INSERT INTO city VALUES (2283, 'Barrancabermeja', 'COL', 'Santander', 178020);
-INSERT INTO city VALUES (2284, 'Dos Quebradas', 'COL', 'Risaralda', 159363);
-INSERT INTO city VALUES (2285, 'Tuluá', 'COL', 'Valle', 152488);
-INSERT INTO city VALUES (2286, 'Envigado', 'COL', 'Antioquia', 135848);
-INSERT INTO city VALUES (2287, 'Cartago', 'COL', 'Valle', 125884);
-INSERT INTO city VALUES (2288, 'Girardot', 'COL', 'Cundinamarca', 110963);
-INSERT INTO city VALUES (2289, 'Buga', 'COL', 'Valle', 110699);
-INSERT INTO city VALUES (2290, 'Tunja', 'COL', 'Boyacá', 109740);
-INSERT INTO city VALUES (2291, 'Florencia', 'COL', 'Caquetá', 108574);
-INSERT INTO city VALUES (2292, 'Maicao', 'COL', 'La Guajira', 108053);
-INSERT INTO city VALUES (2293, 'Sogamoso', 'COL', 'Boyacá', 107728);
-INSERT INTO city VALUES (2294, 'Giron', 'COL', 'Santander', 90688);
-INSERT INTO city VALUES (2295, 'Moroni', 'COM', 'Njazidja', 36000);
-INSERT INTO city VALUES (2296, 'Brazzaville', 'COG', 'Brazzaville', 950000);
-INSERT INTO city VALUES (2297, 'Pointe-Noire', 'COG', 'Kouilou', 500000);
-INSERT INTO city VALUES (2298, 'Kinshasa', 'COD', 'Kinshasa', 5064000);
-INSERT INTO city VALUES (2299, 'Lubumbashi', 'COD', 'Shaba', 851381);
-INSERT INTO city VALUES (2300, 'Mbuji-Mayi', 'COD', 'East Kasai', 806475);
-INSERT INTO city VALUES (2301, 'Kolwezi', 'COD', 'Shaba', 417810);
-INSERT INTO city VALUES (2302, 'Kisangani', 'COD', 'Haute-Zaïre', 417517);
-INSERT INTO city VALUES (2303, 'Kananga', 'COD', 'West Kasai', 393030);
-INSERT INTO city VALUES (2304, 'Likasi', 'COD', 'Shaba', 299118);
-INSERT INTO city VALUES (2305, 'Bukavu', 'COD', 'South Kivu', 201569);
-INSERT INTO city VALUES (2306, 'Kikwit', 'COD', 'Bandundu', 182142);
-INSERT INTO city VALUES (2307, 'Tshikapa', 'COD', 'West Kasai', 180860);
-INSERT INTO city VALUES (2308, 'Matadi', 'COD', 'Bas-Zaïre', 172730);
-INSERT INTO city VALUES (2309, 'Mbandaka', 'COD', 'Equateur', 169841);
-INSERT INTO city VALUES (2310, 'Mwene-Ditu', 'COD', 'East Kasai', 137459);
-INSERT INTO city VALUES (2311, 'Boma', 'COD', 'Bas-Zaïre', 135284);
-INSERT INTO city VALUES (2312, 'Uvira', 'COD', 'South Kivu', 115590);
-INSERT INTO city VALUES (2313, 'Butembo', 'COD', 'North Kivu', 109406);
-INSERT INTO city VALUES (2314, 'Goma', 'COD', 'North Kivu', 109094);
-INSERT INTO city VALUES (2315, 'Kalemie', 'COD', 'Shaba', 101309);
-INSERT INTO city VALUES (2316, 'Bantam', 'CCK', 'Home Island', 503);
-INSERT INTO city VALUES (2317, 'West Island', 'CCK', 'West Island', 167);
-INSERT INTO city VALUES (2318, 'Pyongyang', 'PRK', 'Pyongyang-si', 2484000);
-INSERT INTO city VALUES (2319, 'Hamhung', 'PRK', 'Hamgyong N', 709730);
-INSERT INTO city VALUES (2320, 'Chongjin', 'PRK', 'Hamgyong P', 582480);
-INSERT INTO city VALUES (2321, 'Nampo', 'PRK', 'Nampo-si', 566200);
-INSERT INTO city VALUES (2322, 'Sinuiju', 'PRK', 'Pyongan P', 326011);
-INSERT INTO city VALUES (2323, 'Wonsan', 'PRK', 'Kangwon', 300148);
-INSERT INTO city VALUES (2324, 'Phyongsong', 'PRK', 'Pyongan N', 272934);
-INSERT INTO city VALUES (2325, 'Sariwon', 'PRK', 'Hwanghae P', 254146);
-INSERT INTO city VALUES (2326, 'Haeju', 'PRK', 'Hwanghae N', 229172);
-INSERT INTO city VALUES (2327, 'Kanggye', 'PRK', 'Chagang', 223410);
-INSERT INTO city VALUES (2328, 'Kimchaek', 'PRK', 'Hamgyong P', 179000);
-INSERT INTO city VALUES (2329, 'Hyesan', 'PRK', 'Yanggang', 178020);
-INSERT INTO city VALUES (2330, 'Kaesong', 'PRK', 'Kaesong-si', 171500);
-INSERT INTO city VALUES (2331, 'Seoul', 'KOR', 'Seoul', 9981619);
-INSERT INTO city VALUES (2332, 'Pusan', 'KOR', 'Pusan', 3804522);
-INSERT INTO city VALUES (2333, 'Inchon', 'KOR', 'Inchon', 2559424);
-INSERT INTO city VALUES (2334, 'Taegu', 'KOR', 'Taegu', 2548568);
-INSERT INTO city VALUES (2335, 'Taejon', 'KOR', 'Taejon', 1425835);
-INSERT INTO city VALUES (2336, 'Kwangju', 'KOR', 'Kwangju', 1368341);
-INSERT INTO city VALUES (2337, 'Ulsan', 'KOR', 'Kyongsangnam', 1084891);
-INSERT INTO city VALUES (2338, 'Songnam', 'KOR', 'Kyonggi', 869094);
-INSERT INTO city VALUES (2339, 'Puchon', 'KOR', 'Kyonggi', 779412);
-INSERT INTO city VALUES (2340, 'Suwon', 'KOR', 'Kyonggi', 755550);
-INSERT INTO city VALUES (2341, 'Anyang', 'KOR', 'Kyonggi', 591106);
-INSERT INTO city VALUES (2342, 'Chonju', 'KOR', 'Chollabuk', 563153);
-INSERT INTO city VALUES (2343, 'Chongju', 'KOR', 'Chungchongbuk', 531376);
-INSERT INTO city VALUES (2344, 'Koyang', 'KOR', 'Kyonggi', 518282);
-INSERT INTO city VALUES (2345, 'Ansan', 'KOR', 'Kyonggi', 510314);
-INSERT INTO city VALUES (2346, 'Pohang', 'KOR', 'Kyongsangbuk', 508899);
-INSERT INTO city VALUES (2347, 'Chang-won', 'KOR', 'Kyongsangnam', 481694);
-INSERT INTO city VALUES (2348, 'Masan', 'KOR', 'Kyongsangnam', 441242);
-INSERT INTO city VALUES (2349, 'Kwangmyong', 'KOR', 'Kyonggi', 350914);
-INSERT INTO city VALUES (2350, 'Chonan', 'KOR', 'Chungchongnam', 330259);
-INSERT INTO city VALUES (2351, 'Chinju', 'KOR', 'Kyongsangnam', 329886);
-INSERT INTO city VALUES (2352, 'Iksan', 'KOR', 'Chollabuk', 322685);
-INSERT INTO city VALUES (2353, 'Pyongtaek', 'KOR', 'Kyonggi', 312927);
-INSERT INTO city VALUES (2354, 'Kumi', 'KOR', 'Kyongsangbuk', 311431);
-INSERT INTO city VALUES (2355, 'Uijongbu', 'KOR', 'Kyonggi', 276111);
-INSERT INTO city VALUES (2356, 'Kyongju', 'KOR', 'Kyongsangbuk', 272968);
-INSERT INTO city VALUES (2357, 'Kunsan', 'KOR', 'Chollabuk', 266569);
-INSERT INTO city VALUES (2358, 'Cheju', 'KOR', 'Cheju', 258511);
-INSERT INTO city VALUES (2359, 'Kimhae', 'KOR', 'Kyongsangnam', 256370);
-INSERT INTO city VALUES (2360, 'Sunchon', 'KOR', 'Chollanam', 249263);
-INSERT INTO city VALUES (2361, 'Mokpo', 'KOR', 'Chollanam', 247452);
-INSERT INTO city VALUES (2362, 'Yong-in', 'KOR', 'Kyonggi', 242643);
-INSERT INTO city VALUES (2363, 'Wonju', 'KOR', 'Kang-won', 237460);
-INSERT INTO city VALUES (2364, 'Kunpo', 'KOR', 'Kyonggi', 235233);
-INSERT INTO city VALUES (2365, 'Chunchon', 'KOR', 'Kang-won', 234528);
-INSERT INTO city VALUES (2366, 'Namyangju', 'KOR', 'Kyonggi', 229060);
-INSERT INTO city VALUES (2367, 'Kangnung', 'KOR', 'Kang-won', 220403);
-INSERT INTO city VALUES (2368, 'Chungju', 'KOR', 'Chungchongbuk', 205206);
-INSERT INTO city VALUES (2369, 'Andong', 'KOR', 'Kyongsangbuk', 188443);
-INSERT INTO city VALUES (2370, 'Yosu', 'KOR', 'Chollanam', 183596);
-INSERT INTO city VALUES (2371, 'Kyongsan', 'KOR', 'Kyongsangbuk', 173746);
-INSERT INTO city VALUES (2372, 'Paju', 'KOR', 'Kyonggi', 163379);
-INSERT INTO city VALUES (2373, 'Yangsan', 'KOR', 'Kyongsangnam', 163351);
-INSERT INTO city VALUES (2374, 'Ichon', 'KOR', 'Kyonggi', 155332);
-INSERT INTO city VALUES (2375, 'Asan', 'KOR', 'Chungchongnam', 154663);
-INSERT INTO city VALUES (2376, 'Koje', 'KOR', 'Kyongsangnam', 147562);
-INSERT INTO city VALUES (2377, 'Kimchon', 'KOR', 'Kyongsangbuk', 147027);
-INSERT INTO city VALUES (2378, 'Nonsan', 'KOR', 'Chungchongnam', 146619);
-INSERT INTO city VALUES (2379, 'Kuri', 'KOR', 'Kyonggi', 142173);
-INSERT INTO city VALUES (2380, 'Chong-up', 'KOR', 'Chollabuk', 139111);
-INSERT INTO city VALUES (2381, 'Chechon', 'KOR', 'Chungchongbuk', 137070);
-INSERT INTO city VALUES (2382, 'Sosan', 'KOR', 'Chungchongnam', 134746);
-INSERT INTO city VALUES (2383, 'Shihung', 'KOR', 'Kyonggi', 133443);
-INSERT INTO city VALUES (2384, 'Tong-yong', 'KOR', 'Kyongsangnam', 131717);
-INSERT INTO city VALUES (2385, 'Kongju', 'KOR', 'Chungchongnam', 131229);
-INSERT INTO city VALUES (2386, 'Yongju', 'KOR', 'Kyongsangbuk', 131097);
-INSERT INTO city VALUES (2387, 'Chinhae', 'KOR', 'Kyongsangnam', 125997);
-INSERT INTO city VALUES (2388, 'Sangju', 'KOR', 'Kyongsangbuk', 124116);
-INSERT INTO city VALUES (2389, 'Poryong', 'KOR', 'Chungchongnam', 122604);
-INSERT INTO city VALUES (2390, 'Kwang-yang', 'KOR', 'Chollanam', 122052);
-INSERT INTO city VALUES (2391, 'Miryang', 'KOR', 'Kyongsangnam', 121501);
-INSERT INTO city VALUES (2392, 'Hanam', 'KOR', 'Kyonggi', 115812);
-INSERT INTO city VALUES (2393, 'Kimje', 'KOR', 'Chollabuk', 115427);
-INSERT INTO city VALUES (2394, 'Yongchon', 'KOR', 'Kyongsangbuk', 113511);
-INSERT INTO city VALUES (2395, 'Sachon', 'KOR', 'Kyongsangnam', 113494);
-INSERT INTO city VALUES (2396, 'Uiwang', 'KOR', 'Kyonggi', 108788);
-INSERT INTO city VALUES (2397, 'Naju', 'KOR', 'Chollanam', 107831);
-INSERT INTO city VALUES (2398, 'Namwon', 'KOR', 'Chollabuk', 103544);
-INSERT INTO city VALUES (2399, 'Tonghae', 'KOR', 'Kang-won', 95472);
-INSERT INTO city VALUES (2400, 'Mun-gyong', 'KOR', 'Kyongsangbuk', 92239);
-INSERT INTO city VALUES (2401, 'Athenai', 'GRC', 'Attika', 772072);
-INSERT INTO city VALUES (2402, 'Thessaloniki', 'GRC', 'Central Macedonia', 383967);
-INSERT INTO city VALUES (2403, 'Pireus', 'GRC', 'Attika', 182671);
-INSERT INTO city VALUES (2404, 'Patras', 'GRC', 'West Greece', 153344);
-INSERT INTO city VALUES (2405, 'Peristerion', 'GRC', 'Attika', 137288);
-INSERT INTO city VALUES (2406, 'Herakleion', 'GRC', 'Crete', 116178);
-INSERT INTO city VALUES (2407, 'Kallithea', 'GRC', 'Attika', 114233);
-INSERT INTO city VALUES (2408, 'Larisa', 'GRC', 'Thessalia', 113090);
-INSERT INTO city VALUES (2409, 'Zagreb', 'HRV', 'Grad Zagreb', 706770);
-INSERT INTO city VALUES (2410, 'Split', 'HRV', 'Split-Dalmatia', 189388);
-INSERT INTO city VALUES (2411, 'Rijeka', 'HRV', 'Primorje-Gorski Kota', 167964);
-INSERT INTO city VALUES (2412, 'Osijek', 'HRV', 'Osijek-Baranja', 104761);
-INSERT INTO city VALUES (2413, 'La Habana', 'CUB', 'La Habana', 2256000);
-INSERT INTO city VALUES (2414, 'Santiago de Cuba', 'CUB', 'Santiago de Cuba', 433180);
-INSERT INTO city VALUES (2415, 'Camagüey', 'CUB', 'Camagüey', 298726);
-INSERT INTO city VALUES (2416, 'Holguín', 'CUB', 'Holguín', 249492);
-INSERT INTO city VALUES (2417, 'Santa Clara', 'CUB', 'Villa Clara', 207350);
-INSERT INTO city VALUES (2418, 'Guantánamo', 'CUB', 'Guantánamo', 205078);
-INSERT INTO city VALUES (2419, 'Pinar del Río', 'CUB', 'Pinar del Río', 142100);
-INSERT INTO city VALUES (2420, 'Bayamo', 'CUB', 'Granma', 141000);
-INSERT INTO city VALUES (2421, 'Cienfuegos', 'CUB', 'Cienfuegos', 132770);
-INSERT INTO city VALUES (2422, 'Victoria de las Tunas', 'CUB', 'Las Tunas', 132350);
-INSERT INTO city VALUES (2423, 'Matanzas', 'CUB', 'Matanzas', 123273);
-INSERT INTO city VALUES (2424, 'Manzanillo', 'CUB', 'Granma', 109350);
-INSERT INTO city VALUES (2425, 'Sancti-Spíritus', 'CUB', 'Sancti-Spíritus', 100751);
-INSERT INTO city VALUES (2426, 'Ciego de Ávila', 'CUB', 'Ciego de Ávila', 98505);
-INSERT INTO city VALUES (2427, 'al-Salimiya', 'KWT', 'Hawalli', 130215);
-INSERT INTO city VALUES (2428, 'Jalib al-Shuyukh', 'KWT', 'Hawalli', 102178);
-INSERT INTO city VALUES (2429, 'Kuwait', 'KWT', 'al-Asima', 28859);
-INSERT INTO city VALUES (2430, 'Nicosia', 'CYP', 'Nicosia', 195000);
-INSERT INTO city VALUES (2431, 'Limassol', 'CYP', 'Limassol', 154400);
-INSERT INTO city VALUES (2432, 'Vientiane', 'LAO', 'Viangchan', 531800);
-INSERT INTO city VALUES (2433, 'Savannakhet', 'LAO', 'Savannakhet', 96652);
-INSERT INTO city VALUES (2434, 'Riga', 'LVA', 'Riika', 764328);
-INSERT INTO city VALUES (2435, 'Daugavpils', 'LVA', 'Daugavpils', 114829);
-INSERT INTO city VALUES (2436, 'Liepaja', 'LVA', 'Liepaja', 89439);
-INSERT INTO city VALUES (2437, 'Maseru', 'LSO', 'Maseru', 297000);
-INSERT INTO city VALUES (2438, 'Beirut', 'LBN', 'Beirut', 1100000);
-INSERT INTO city VALUES (2439, 'Tripoli', 'LBN', 'al-Shamal', 240000);
-INSERT INTO city VALUES (2440, 'Monrovia', 'LBR', 'Montserrado', 850000);
-INSERT INTO city VALUES (2441, 'Tripoli', 'LBY', 'Tripoli', 1682000);
-INSERT INTO city VALUES (2442, 'Bengasi', 'LBY', 'Bengasi', 804000);
-INSERT INTO city VALUES (2443, 'Misrata', 'LBY', 'Misrata', 121669);
-INSERT INTO city VALUES (2444, 'al-Zawiya', 'LBY', 'al-Zawiya', 89338);
-INSERT INTO city VALUES (2445, 'Schaan', 'LIE', 'Schaan', 5346);
-INSERT INTO city VALUES (2446, 'Vaduz', 'LIE', 'Vaduz', 5043);
-INSERT INTO city VALUES (2447, 'Vilnius', 'LTU', 'Vilna', 577969);
-INSERT INTO city VALUES (2448, 'Kaunas', 'LTU', 'Kaunas', 412639);
-INSERT INTO city VALUES (2449, 'Klaipeda', 'LTU', 'Klaipeda', 202451);
-INSERT INTO city VALUES (2450, 'iauliai', 'LTU', 'iauliai', 146563);
-INSERT INTO city VALUES (2451, 'Panevezys', 'LTU', 'Panevezys', 133695);
-INSERT INTO city VALUES (2452, 'Luxembourg [Luxemburg/Lëtzebuerg]', 'LUX', 'Luxembourg', 80700);
-INSERT INTO city VALUES (2453, 'El-Aaiún', 'ESH', 'El-Aaiún', 169000);
-INSERT INTO city VALUES (2454, 'Macao', 'MAC', 'Macau', 437500);
-INSERT INTO city VALUES (2455, 'Antananarivo', 'MDG', 'Antananarivo', 675669);
-INSERT INTO city VALUES (2456, 'Toamasina', 'MDG', 'Toamasina', 127441);
-INSERT INTO city VALUES (2457, 'Antsirabé', 'MDG', 'Antananarivo', 120239);
-INSERT INTO city VALUES (2458, 'Mahajanga', 'MDG', 'Mahajanga', 100807);
-INSERT INTO city VALUES (2459, 'Fianarantsoa', 'MDG', 'Fianarantsoa', 99005);
-INSERT INTO city VALUES (2460, 'Skopje', 'MKD', 'Skopje', 444299);
-INSERT INTO city VALUES (2461, 'Blantyre', 'MWI', 'Blantyre', 478155);
-INSERT INTO city VALUES (2462, 'Lilongwe', 'MWI', 'Lilongwe', 435964);
-INSERT INTO city VALUES (2463, 'Male', 'MDV', 'Maale', 71000);
-INSERT INTO city VALUES (2464, 'Kuala Lumpur', 'MYS', 'Wilayah Persekutuan', 1297526);
-INSERT INTO city VALUES (2465, 'Ipoh', 'MYS', 'Perak', 382853);
-INSERT INTO city VALUES (2466, 'Johor Baharu', 'MYS', 'Johor', 328436);
-INSERT INTO city VALUES (2467, 'Petaling Jaya', 'MYS', 'Selangor', 254350);
-INSERT INTO city VALUES (2468, 'Kelang', 'MYS', 'Selangor', 243355);
-INSERT INTO city VALUES (2469, 'Kuala Terengganu', 'MYS', 'Terengganu', 228119);
-INSERT INTO city VALUES (2470, 'Pinang', 'MYS', 'Pulau Pinang', 219603);
-INSERT INTO city VALUES (2471, 'Kota Bharu', 'MYS', 'Kelantan', 219582);
-INSERT INTO city VALUES (2472, 'Kuantan', 'MYS', 'Pahang', 199484);
-INSERT INTO city VALUES (2473, 'Taiping', 'MYS', 'Perak', 183261);
-INSERT INTO city VALUES (2474, 'Seremban', 'MYS', 'Negeri Sembilan', 182869);
-INSERT INTO city VALUES (2475, 'Kuching', 'MYS', 'Sarawak', 148059);
-INSERT INTO city VALUES (2476, 'Sibu', 'MYS', 'Sarawak', 126381);
-INSERT INTO city VALUES (2477, 'Sandakan', 'MYS', 'Sabah', 125841);
-INSERT INTO city VALUES (2478, 'Alor Setar', 'MYS', 'Kedah', 124412);
-INSERT INTO city VALUES (2479, 'Selayang Baru', 'MYS', 'Selangor', 124228);
-INSERT INTO city VALUES (2480, 'Sungai Petani', 'MYS', 'Kedah', 114763);
-INSERT INTO city VALUES (2481, 'Shah Alam', 'MYS', 'Selangor', 102019);
-INSERT INTO city VALUES (2482, 'Bamako', 'MLI', 'Bamako', 809552);
-INSERT INTO city VALUES (2483, 'Birkirkara', 'MLT', 'Outer Harbour', 21445);
-INSERT INTO city VALUES (2484, 'Valletta', 'MLT', 'Inner Harbour', 7073);
-INSERT INTO city VALUES (2485, 'Casablanca', 'MAR', 'Casablanca', 2940623);
-INSERT INTO city VALUES (2486, 'Rabat', 'MAR', 'Rabat-Salé-Zammour-Z', 623457);
-INSERT INTO city VALUES (2487, 'Marrakech', 'MAR', 'Marrakech-Tensift-Al', 621914);
-INSERT INTO city VALUES (2488, 'Fès', 'MAR', 'Fès-Boulemane', 541162);
-INSERT INTO city VALUES (2489, 'Tanger', 'MAR', 'Tanger-Tétouan', 521735);
-INSERT INTO city VALUES (2490, 'Salé', 'MAR', 'Rabat-Salé-Zammour-Z', 504420);
-INSERT INTO city VALUES (2491, 'Meknès', 'MAR', 'Meknès-Tafilalet', 460000);
-INSERT INTO city VALUES (2492, 'Oujda', 'MAR', 'Oriental', 365382);
-INSERT INTO city VALUES (2493, 'Kénitra', 'MAR', 'Gharb-Chrarda-Béni H', 292600);
-INSERT INTO city VALUES (2494, 'Tétouan', 'MAR', 'Tanger-Tétouan', 277516);
-INSERT INTO city VALUES (2495, 'Safi', 'MAR', 'Doukkala-Abda', 262300);
-INSERT INTO city VALUES (2496, 'Agadir', 'MAR', 'Souss Massa-Draâ', 155244);
-INSERT INTO city VALUES (2497, 'Mohammedia', 'MAR', 'Casablanca', 154706);
-INSERT INTO city VALUES (2498, 'Khouribga', 'MAR', 'Chaouia-Ouardigha', 152090);
-INSERT INTO city VALUES (2499, 'Beni-Mellal', 'MAR', 'Tadla-Azilal', 140212);
-INSERT INTO city VALUES (2500, 'Témara', 'MAR', 'Rabat-Salé-Zammour-Z', 126303);
-INSERT INTO city VALUES (2501, 'El Jadida', 'MAR', 'Doukkala-Abda', 119083);
-INSERT INTO city VALUES (2502, 'Nador', 'MAR', 'Oriental', 112450);
-INSERT INTO city VALUES (2503, 'Ksar el Kebir', 'MAR', 'Tanger-Tétouan', 107065);
-INSERT INTO city VALUES (2504, 'Settat', 'MAR', 'Chaouia-Ouardigha', 96200);
-INSERT INTO city VALUES (2505, 'Taza', 'MAR', 'Taza-Al Hoceima-Taou', 92700);
-INSERT INTO city VALUES (2506, 'El Araich', 'MAR', 'Tanger-Tétouan', 90400);
-INSERT INTO city VALUES (2507, 'Dalap-Uliga-Darrit', 'MHL', 'Majuro', 28000);
-INSERT INTO city VALUES (2508, 'Fort-de-France', 'MTQ', 'Fort-de-France', 94050);
-INSERT INTO city VALUES (2509, 'Nouakchott', 'MRT', 'Nouakchott', 667300);
-INSERT INTO city VALUES (2510, 'Nouâdhibou', 'MRT', 'Dakhlet Nouâdhibou', 97600);
-INSERT INTO city VALUES (2511, 'Port-Louis', 'MUS', 'Port-Louis', 138200);
-INSERT INTO city VALUES (2512, 'Beau Bassin-Rose Hill', 'MUS', 'Plaines Wilhelms', 100616);
-INSERT INTO city VALUES (2513, 'Vacoas-Phoenix', 'MUS', 'Plaines Wilhelms', 98464);
-INSERT INTO city VALUES (2514, 'Mamoutzou', 'MYT', 'Mamoutzou', 12000);
-INSERT INTO city VALUES (2515, 'Ciudad de México', 'MEX', 'Distrito Federal', 8591309);
-INSERT INTO city VALUES (2516, 'Guadalajara', 'MEX', 'Jalisco', 1647720);
-INSERT INTO city VALUES (2517, 'Ecatepec de Morelos', 'MEX', 'México', 1620303);
-INSERT INTO city VALUES (2518, 'Puebla', 'MEX', 'Puebla', 1346176);
-INSERT INTO city VALUES (2519, 'Nezahualcóyotl', 'MEX', 'México', 1224924);
-INSERT INTO city VALUES (2520, 'Juárez', 'MEX', 'Chihuahua', 1217818);
-INSERT INTO city VALUES (2521, 'Tijuana', 'MEX', 'Baja California', 1212232);
-INSERT INTO city VALUES (2522, 'León', 'MEX', 'Guanajuato', 1133576);
-INSERT INTO city VALUES (2523, 'Monterrey', 'MEX', 'Nuevo León', 1108499);
-INSERT INTO city VALUES (2524, 'Zapopan', 'MEX', 'Jalisco', 1002239);
-INSERT INTO city VALUES (2525, 'Naucalpan de Juárez', 'MEX', 'México', 857511);
-INSERT INTO city VALUES (2526, 'Mexicali', 'MEX', 'Baja California', 764902);
-INSERT INTO city VALUES (2527, 'Culiacán', 'MEX', 'Sinaloa', 744859);
-INSERT INTO city VALUES (2528, 'Acapulco de Juárez', 'MEX', 'Guerrero', 721011);
-INSERT INTO city VALUES (2529, 'Tlalnepantla de Baz', 'MEX', 'México', 720755);
-INSERT INTO city VALUES (2530, 'Mérida', 'MEX', 'Yucatán', 703324);
-INSERT INTO city VALUES (2531, 'Chihuahua', 'MEX', 'Chihuahua', 670208);
-INSERT INTO city VALUES (2532, 'San Luis Potosí', 'MEX', 'San Luis Potosí', 669353);
-INSERT INTO city VALUES (2533, 'Guadalupe', 'MEX', 'Nuevo León', 668780);
-INSERT INTO city VALUES (2534, 'Toluca', 'MEX', 'México', 665617);
-INSERT INTO city VALUES (2535, 'Aguascalientes', 'MEX', 'Aguascalientes', 643360);
-INSERT INTO city VALUES (2536, 'Querétaro', 'MEX', 'Querétaro de Arteaga', 639839);
-INSERT INTO city VALUES (2537, 'Morelia', 'MEX', 'Michoacán de Ocampo', 619958);
-INSERT INTO city VALUES (2538, 'Hermosillo', 'MEX', 'Sonora', 608697);
-INSERT INTO city VALUES (2539, 'Saltillo', 'MEX', 'Coahuila de Zaragoza', 577352);
-INSERT INTO city VALUES (2540, 'Torreón', 'MEX', 'Coahuila de Zaragoza', 529093);
-INSERT INTO city VALUES (2541, 'Centro (Villahermosa)', 'MEX', 'Tabasco', 519873);
-INSERT INTO city VALUES (2542, 'San Nicolás de los Garza', 'MEX', 'Nuevo León', 495540);
-INSERT INTO city VALUES (2543, 'Durango', 'MEX', 'Durango', 490524);
-INSERT INTO city VALUES (2544, 'Chimalhuacán', 'MEX', 'México', 490245);
-INSERT INTO city VALUES (2545, 'Tlaquepaque', 'MEX', 'Jalisco', 475472);
-INSERT INTO city VALUES (2546, 'Atizapán de Zaragoza', 'MEX', 'México', 467262);
-INSERT INTO city VALUES (2547, 'Veracruz', 'MEX', 'Veracruz', 457119);
-INSERT INTO city VALUES (2548, 'Cuautitlán Izcalli', 'MEX', 'México', 452976);
-INSERT INTO city VALUES (2549, 'Irapuato', 'MEX', 'Guanajuato', 440039);
-INSERT INTO city VALUES (2550, 'Tuxtla Gutiérrez', 'MEX', 'Chiapas', 433544);
-INSERT INTO city VALUES (2551, 'Tultitlán', 'MEX', 'México', 432411);
-INSERT INTO city VALUES (2552, 'Reynosa', 'MEX', 'Tamaulipas', 419776);
-INSERT INTO city VALUES (2553, 'Benito Juárez', 'MEX', 'Quintana Roo', 419276);
-INSERT INTO city VALUES (2554, 'Matamoros', 'MEX', 'Tamaulipas', 416428);
-INSERT INTO city VALUES (2555, 'Xalapa', 'MEX', 'Veracruz', 390058);
-INSERT INTO city VALUES (2556, 'Celaya', 'MEX', 'Guanajuato', 382140);
-INSERT INTO city VALUES (2557, 'Mazatlán', 'MEX', 'Sinaloa', 380265);
-INSERT INTO city VALUES (2558, 'Ensenada', 'MEX', 'Baja California', 369573);
-INSERT INTO city VALUES (2559, 'Ahome', 'MEX', 'Sinaloa', 358663);
-INSERT INTO city VALUES (2560, 'Cajeme', 'MEX', 'Sonora', 355679);
-INSERT INTO city VALUES (2561, 'Cuernavaca', 'MEX', 'Morelos', 337966);
-INSERT INTO city VALUES (2562, 'Tonalá', 'MEX', 'Jalisco', 336109);
-INSERT INTO city VALUES (2563, 'Valle de Chalco Solidaridad', 'MEX', 'México', 323113);
-INSERT INTO city VALUES (2564, 'Nuevo Laredo', 'MEX', 'Tamaulipas', 310277);
-INSERT INTO city VALUES (2565, 'Tepic', 'MEX', 'Nayarit', 305025);
-INSERT INTO city VALUES (2566, 'Tampico', 'MEX', 'Tamaulipas', 294789);
-INSERT INTO city VALUES (2567, 'Ixtapaluca', 'MEX', 'México', 293160);
-INSERT INTO city VALUES (2568, 'Apodaca', 'MEX', 'Nuevo León', 282941);
-INSERT INTO city VALUES (2569, 'Guasave', 'MEX', 'Sinaloa', 277201);
-INSERT INTO city VALUES (2570, 'Gómez Palacio', 'MEX', 'Durango', 272806);
-INSERT INTO city VALUES (2571, 'Tapachula', 'MEX', 'Chiapas', 271141);
-INSERT INTO city VALUES (2572, 'Nicolás Romero', 'MEX', 'México', 269393);
-INSERT INTO city VALUES (2573, 'Coatzacoalcos', 'MEX', 'Veracruz', 267037);
-INSERT INTO city VALUES (2574, 'Uruapan', 'MEX', 'Michoacán de Ocampo', 265211);
-INSERT INTO city VALUES (2575, 'Victoria', 'MEX', 'Tamaulipas', 262686);
-INSERT INTO city VALUES (2576, 'Oaxaca de Juárez', 'MEX', 'Oaxaca', 256848);
-INSERT INTO city VALUES (2577, 'Coacalco de Berriozábal', 'MEX', 'México', 252270);
-INSERT INTO city VALUES (2578, 'Pachuca de Soto', 'MEX', 'Hidalgo', 244688);
-INSERT INTO city VALUES (2579, 'General Escobedo', 'MEX', 'Nuevo León', 232961);
-INSERT INTO city VALUES (2580, 'Salamanca', 'MEX', 'Guanajuato', 226864);
-INSERT INTO city VALUES (2581, 'Santa Catarina', 'MEX', 'Nuevo León', 226573);
-INSERT INTO city VALUES (2582, 'Tehuacán', 'MEX', 'Puebla', 225943);
-INSERT INTO city VALUES (2583, 'Chalco', 'MEX', 'México', 222201);
-INSERT INTO city VALUES (2584, 'Cárdenas', 'MEX', 'Tabasco', 216903);
-INSERT INTO city VALUES (2585, 'Campeche', 'MEX', 'Campeche', 216735);
-INSERT INTO city VALUES (2586, 'La Paz', 'MEX', 'México', 213045);
-INSERT INTO city VALUES (2587, 'Othón P. Blanco (Chetumal)', 'MEX', 'Quintana Roo', 208014);
-INSERT INTO city VALUES (2588, 'Texcoco', 'MEX', 'México', 203681);
-INSERT INTO city VALUES (2589, 'La Paz', 'MEX', 'Baja California Sur', 196708);
-INSERT INTO city VALUES (2590, 'Metepec', 'MEX', 'México', 194265);
-INSERT INTO city VALUES (2591, 'Monclova', 'MEX', 'Coahuila de Zaragoza', 193657);
-INSERT INTO city VALUES (2592, 'Huixquilucan', 'MEX', 'México', 193156);
-INSERT INTO city VALUES (2593, 'Chilpancingo de los Bravo', 'MEX', 'Guerrero', 192509);
-INSERT INTO city VALUES (2594, 'Puerto Vallarta', 'MEX', 'Jalisco', 183741);
-INSERT INTO city VALUES (2595, 'Fresnillo', 'MEX', 'Zacatecas', 182744);
-INSERT INTO city VALUES (2596, 'Ciudad Madero', 'MEX', 'Tamaulipas', 182012);
-INSERT INTO city VALUES (2597, 'Soledad de Graciano Sánchez', 'MEX', 'San Luis Potosí', 179956);
-INSERT INTO city VALUES (2598, 'San Juan del Río', 'MEX', 'Querétaro', 179300);
-INSERT INTO city VALUES (2599, 'San Felipe del Progreso', 'MEX', 'México', 177330);
-INSERT INTO city VALUES (2600, 'Córdoba', 'MEX', 'Veracruz', 176952);
-INSERT INTO city VALUES (2601, 'Tecámac', 'MEX', 'México', 172410);
-INSERT INTO city VALUES (2602, 'Ocosingo', 'MEX', 'Chiapas', 171495);
-INSERT INTO city VALUES (2603, 'Carmen', 'MEX', 'Campeche', 171367);
-INSERT INTO city VALUES (2604, 'Lázaro Cárdenas', 'MEX', 'Michoacán de Ocampo', 170878);
-INSERT INTO city VALUES (2605, 'Jiutepec', 'MEX', 'Morelos', 170428);
-INSERT INTO city VALUES (2606, 'Papantla', 'MEX', 'Veracruz', 170123);
-INSERT INTO city VALUES (2607, 'Comalcalco', 'MEX', 'Tabasco', 164640);
-INSERT INTO city VALUES (2608, 'Zamora', 'MEX', 'Michoacán de Ocampo', 161191);
-INSERT INTO city VALUES (2609, 'Nogales', 'MEX', 'Sonora', 159103);
-INSERT INTO city VALUES (2610, 'Huimanguillo', 'MEX', 'Tabasco', 158335);
-INSERT INTO city VALUES (2611, 'Cuautla', 'MEX', 'Morelos', 153132);
-INSERT INTO city VALUES (2612, 'Minatitlán', 'MEX', 'Veracruz', 152983);
-INSERT INTO city VALUES (2613, 'Poza Rica de Hidalgo', 'MEX', 'Veracruz', 152678);
-INSERT INTO city VALUES (2614, 'Ciudad Valles', 'MEX', 'San Luis Potosí', 146411);
-INSERT INTO city VALUES (2615, 'Navolato', 'MEX', 'Sinaloa', 145396);
-INSERT INTO city VALUES (2616, 'San Luis Río Colorado', 'MEX', 'Sonora', 145276);
-INSERT INTO city VALUES (2617, 'Pénjamo', 'MEX', 'Guanajuato', 143927);
-INSERT INTO city VALUES (2618, 'San Andrés Tuxtla', 'MEX', 'Veracruz', 142251);
-INSERT INTO city VALUES (2619, 'Guanajuato', 'MEX', 'Guanajuato', 141215);
-INSERT INTO city VALUES (2620, 'Navojoa', 'MEX', 'Sonora', 140495);
-INSERT INTO city VALUES (2621, 'Zitácuaro', 'MEX', 'Michoacán de Ocampo', 137970);
-INSERT INTO city VALUES (2622, 'Boca del Río', 'MEX', 'Veracruz-Llave', 135721);
-INSERT INTO city VALUES (2623, 'Allende', 'MEX', 'Guanajuato', 134645);
-INSERT INTO city VALUES (2624, 'Silao', 'MEX', 'Guanajuato', 134037);
-INSERT INTO city VALUES (2625, 'Macuspana', 'MEX', 'Tabasco', 133795);
-INSERT INTO city VALUES (2626, 'San Juan Bautista Tuxtepec', 'MEX', 'Oaxaca', 133675);
-INSERT INTO city VALUES (2627, 'San Cristóbal de las Casas', 'MEX', 'Chiapas', 132317);
-INSERT INTO city VALUES (2628, 'Valle de Santiago', 'MEX', 'Guanajuato', 130557);
-INSERT INTO city VALUES (2629, 'Guaymas', 'MEX', 'Sonora', 130108);
-INSERT INTO city VALUES (2630, 'Colima', 'MEX', 'Colima', 129454);
-INSERT INTO city VALUES (2631, 'Dolores Hidalgo', 'MEX', 'Guanajuato', 128675);
-INSERT INTO city VALUES (2632, 'Lagos de Moreno', 'MEX', 'Jalisco', 127949);
-INSERT INTO city VALUES (2633, 'Piedras Negras', 'MEX', 'Coahuila de Zaragoza', 127898);
-INSERT INTO city VALUES (2634, 'Altamira', 'MEX', 'Tamaulipas', 127490);
-INSERT INTO city VALUES (2635, 'Túxpam', 'MEX', 'Veracruz', 126475);
-INSERT INTO city VALUES (2636, 'San Pedro Garza García', 'MEX', 'Nuevo León', 126147);
-INSERT INTO city VALUES (2637, 'Cuauhtémoc', 'MEX', 'Chihuahua', 124279);
-INSERT INTO city VALUES (2638, 'Manzanillo', 'MEX', 'Colima', 124014);
-INSERT INTO city VALUES (2639, 'Iguala de la Independencia', 'MEX', 'Guerrero', 123883);
-INSERT INTO city VALUES (2640, 'Zacatecas', 'MEX', 'Zacatecas', 123700);
-INSERT INTO city VALUES (2641, 'Tlajomulco de Zúñiga', 'MEX', 'Jalisco', 123220);
-INSERT INTO city VALUES (2642, 'Tulancingo de Bravo', 'MEX', 'Hidalgo', 121946);
-INSERT INTO city VALUES (2643, 'Zinacantepec', 'MEX', 'México', 121715);
-INSERT INTO city VALUES (2644, 'San Martín Texmelucan', 'MEX', 'Puebla', 121093);
-INSERT INTO city VALUES (2645, 'Tepatitlán de Morelos', 'MEX', 'Jalisco', 118948);
-INSERT INTO city VALUES (2646, 'Martínez de la Torre', 'MEX', 'Veracruz', 118815);
-INSERT INTO city VALUES (2647, 'Orizaba', 'MEX', 'Veracruz', 118488);
-INSERT INTO city VALUES (2648, 'Apatzingán', 'MEX', 'Michoacán de Ocampo', 117849);
-INSERT INTO city VALUES (2649, 'Atlixco', 'MEX', 'Puebla', 117019);
-INSERT INTO city VALUES (2650, 'Delicias', 'MEX', 'Chihuahua', 116132);
-INSERT INTO city VALUES (2651, 'Ixtlahuaca', 'MEX', 'México', 115548);
-INSERT INTO city VALUES (2652, 'El Mante', 'MEX', 'Tamaulipas', 112453);
-INSERT INTO city VALUES (2653, 'Lerdo', 'MEX', 'Durango', 112272);
-INSERT INTO city VALUES (2654, 'Almoloya de Juárez', 'MEX', 'México', 110550);
-INSERT INTO city VALUES (2655, 'Acámbaro', 'MEX', 'Guanajuato', 110487);
-INSERT INTO city VALUES (2656, 'Acuña', 'MEX', 'Coahuila de Zaragoza', 110388);
-INSERT INTO city VALUES (2657, 'Guadalupe', 'MEX', 'Zacatecas', 108881);
-INSERT INTO city VALUES (2658, 'Huejutla de Reyes', 'MEX', 'Hidalgo', 108017);
-INSERT INTO city VALUES (2659, 'Hidalgo', 'MEX', 'Michoacán de Ocampo', 106198);
-INSERT INTO city VALUES (2660, 'Los Cabos', 'MEX', 'Baja California Sur', 105199);
-INSERT INTO city VALUES (2661, 'Comitán de Domínguez', 'MEX', 'Chiapas', 104986);
-INSERT INTO city VALUES (2662, 'Cunduacán', 'MEX', 'Tabasco', 104164);
-INSERT INTO city VALUES (2663, 'Río Bravo', 'MEX', 'Tamaulipas', 103901);
-INSERT INTO city VALUES (2664, 'Temapache', 'MEX', 'Veracruz', 102824);
-INSERT INTO city VALUES (2665, 'Chilapa de Alvarez', 'MEX', 'Guerrero', 102716);
-INSERT INTO city VALUES (2666, 'Hidalgo del Parral', 'MEX', 'Chihuahua', 100881);
-INSERT INTO city VALUES (2667, 'San Francisco del Rincón', 'MEX', 'Guanajuato', 100149);
-INSERT INTO city VALUES (2668, 'Taxco de Alarcón', 'MEX', 'Guerrero', 99907);
-INSERT INTO city VALUES (2669, 'Zumpango', 'MEX', 'México', 99781);
-INSERT INTO city VALUES (2670, 'San Pedro Cholula', 'MEX', 'Puebla', 99734);
-INSERT INTO city VALUES (2671, 'Lerma', 'MEX', 'México', 99714);
-INSERT INTO city VALUES (2672, 'Tecomán', 'MEX', 'Colima', 99296);
-INSERT INTO city VALUES (2673, 'Las Margaritas', 'MEX', 'Chiapas', 97389);
-INSERT INTO city VALUES (2674, 'Cosoleacaque', 'MEX', 'Veracruz', 97199);
-INSERT INTO city VALUES (2675, 'San Luis de la Paz', 'MEX', 'Guanajuato', 96763);
-INSERT INTO city VALUES (2676, 'José Azueta', 'MEX', 'Guerrero', 95448);
-INSERT INTO city VALUES (2677, 'Santiago Ixcuintla', 'MEX', 'Nayarit', 95311);
-INSERT INTO city VALUES (2678, 'San Felipe', 'MEX', 'Guanajuato', 95305);
-INSERT INTO city VALUES (2679, 'Tejupilco', 'MEX', 'México', 94934);
-INSERT INTO city VALUES (2680, 'Tantoyuca', 'MEX', 'Veracruz', 94709);
-INSERT INTO city VALUES (2681, 'Salvatierra', 'MEX', 'Guanajuato', 94322);
-INSERT INTO city VALUES (2682, 'Tultepec', 'MEX', 'México', 93364);
-INSERT INTO city VALUES (2683, 'Temixco', 'MEX', 'Morelos', 92686);
-INSERT INTO city VALUES (2684, 'Matamoros', 'MEX', 'Coahuila de Zaragoza', 91858);
-INSERT INTO city VALUES (2685, 'Pánuco', 'MEX', 'Veracruz', 90551);
-INSERT INTO city VALUES (2686, 'El Fuerte', 'MEX', 'Sinaloa', 89556);
-INSERT INTO city VALUES (2687, 'Tierra Blanca', 'MEX', 'Veracruz', 89143);
-INSERT INTO city VALUES (2688, 'Weno', 'FSM', 'Chuuk', 22000);
-INSERT INTO city VALUES (2689, 'Palikir', 'FSM', 'Pohnpei', 8600);
-INSERT INTO city VALUES (2690, 'Chisinau', 'MDA', 'Chisinau', 719900);
-INSERT INTO city VALUES (2691, 'Tiraspol', 'MDA', 'Dnjestria', 194300);
-INSERT INTO city VALUES (2692, 'Balti', 'MDA', 'Balti', 153400);
-INSERT INTO city VALUES (2693, 'Bender (Tîghina)', 'MDA', 'Bender (Tîghina)', 125700);
-INSERT INTO city VALUES (2694, 'Monte-Carlo', 'MCO', '', 13154);
-INSERT INTO city VALUES (2695, 'Monaco-Ville', 'MCO', '', 1234);
-INSERT INTO city VALUES (2696, 'Ulan Bator', 'MNG', 'Ulaanbaatar', 773700);
-INSERT INTO city VALUES (2697, 'Plymouth', 'MSR', 'Plymouth', 2000);
-INSERT INTO city VALUES (2698, 'Maputo', 'MOZ', 'Maputo', 1018938);
-INSERT INTO city VALUES (2699, 'Matola', 'MOZ', 'Maputo', 424662);
-INSERT INTO city VALUES (2700, 'Beira', 'MOZ', 'Sofala', 397368);
-INSERT INTO city VALUES (2701, 'Nampula', 'MOZ', 'Nampula', 303346);
-INSERT INTO city VALUES (2702, 'Chimoio', 'MOZ', 'Manica', 171056);
-INSERT INTO city VALUES (2703, 'Naçala-Porto', 'MOZ', 'Nampula', 158248);
-INSERT INTO city VALUES (2704, 'Quelimane', 'MOZ', 'Zambézia', 150116);
-INSERT INTO city VALUES (2705, 'Mocuba', 'MOZ', 'Zambézia', 124700);
-INSERT INTO city VALUES (2706, 'Tete', 'MOZ', 'Tete', 101984);
-INSERT INTO city VALUES (2707, 'Xai-Xai', 'MOZ', 'Gaza', 99442);
-INSERT INTO city VALUES (2708, 'Gurue', 'MOZ', 'Zambézia', 99300);
-INSERT INTO city VALUES (2709, 'Maxixe', 'MOZ', 'Inhambane', 93985);
-INSERT INTO city VALUES (2710, 'Rangoon (Yangon)', 'MMR', 'Rangoon [Yangon]', 3361700);
-INSERT INTO city VALUES (2711, 'Mandalay', 'MMR', 'Mandalay', 885300);
-INSERT INTO city VALUES (2712, 'Moulmein (Mawlamyine)', 'MMR', 'Mon', 307900);
-INSERT INTO city VALUES (2713, 'Pegu (Bago)', 'MMR', 'Pegu [Bago]', 190900);
-INSERT INTO city VALUES (2714, 'Bassein (Pathein)', 'MMR', 'Irrawaddy [Ayeyarwad', 183900);
-INSERT INTO city VALUES (2715, 'Monywa', 'MMR', 'Sagaing', 138600);
-INSERT INTO city VALUES (2716, 'Sittwe (Akyab)', 'MMR', 'Rakhine', 137600);
-INSERT INTO city VALUES (2717, 'Taunggyi (Taunggye)', 'MMR', 'Shan', 131500);
-INSERT INTO city VALUES (2718, 'Meikhtila', 'MMR', 'Mandalay', 129700);
-INSERT INTO city VALUES (2719, 'Mergui (Myeik)', 'MMR', 'Tenasserim [Tanintha', 122700);
-INSERT INTO city VALUES (2720, 'Lashio (Lasho)', 'MMR', 'Shan', 107600);
-INSERT INTO city VALUES (2721, 'Prome (Pyay)', 'MMR', 'Pegu [Bago]', 105700);
-INSERT INTO city VALUES (2722, 'Henzada (Hinthada)', 'MMR', 'Irrawaddy [Ayeyarwad', 104700);
-INSERT INTO city VALUES (2723, 'Myingyan', 'MMR', 'Mandalay', 103600);
-INSERT INTO city VALUES (2724, 'Tavoy (Dawei)', 'MMR', 'Tenasserim [Tanintha', 96800);
-INSERT INTO city VALUES (2725, 'Pagakku (Pakokku)', 'MMR', 'Magwe [Magway]', 94800);
-INSERT INTO city VALUES (2726, 'Windhoek', 'NAM', 'Khomas', 169000);
-INSERT INTO city VALUES (2727, 'Yangor', 'NRU', '', 4050);
-INSERT INTO city VALUES (2728, 'Yaren', 'NRU', '', 559);
-INSERT INTO city VALUES (2729, 'Kathmandu', 'NPL', 'Central', 591835);
-INSERT INTO city VALUES (2730, 'Biratnagar', 'NPL', 'Eastern', 157764);
-INSERT INTO city VALUES (2731, 'Pokhara', 'NPL', 'Western', 146318);
-INSERT INTO city VALUES (2732, 'Lalitapur', 'NPL', 'Central', 145847);
-INSERT INTO city VALUES (2733, 'Birgunj', 'NPL', 'Central', 90639);
-INSERT INTO city VALUES (2734, 'Managua', 'NIC', 'Managua', 959000);
-INSERT INTO city VALUES (2735, 'León', 'NIC', 'León', 123865);
-INSERT INTO city VALUES (2736, 'Chinandega', 'NIC', 'Chinandega', 97387);
-INSERT INTO city VALUES (2737, 'Masaya', 'NIC', 'Masaya', 88971);
-INSERT INTO city VALUES (2738, 'Niamey', 'NER', 'Niamey', 420000);
-INSERT INTO city VALUES (2739, 'Zinder', 'NER', 'Zinder', 120892);
-INSERT INTO city VALUES (2740, 'Maradi', 'NER', 'Maradi', 112965);
-INSERT INTO city VALUES (2741, 'Lagos', 'NGA', 'Lagos', 1518000);
-INSERT INTO city VALUES (2742, 'Ibadan', 'NGA', 'Oyo & Osun', 1432000);
-INSERT INTO city VALUES (2743, 'Ogbomosho', 'NGA', 'Oyo & Osun', 730000);
-INSERT INTO city VALUES (2744, 'Kano', 'NGA', 'Kano & Jigawa', 674100);
-INSERT INTO city VALUES (2745, 'Oshogbo', 'NGA', 'Oyo & Osun', 476800);
-INSERT INTO city VALUES (2746, 'Ilorin', 'NGA', 'Kwara & Kogi', 475800);
-INSERT INTO city VALUES (2747, 'Abeokuta', 'NGA', 'Ogun', 427400);
-INSERT INTO city VALUES (2748, 'Port Harcourt', 'NGA', 'Rivers & Bayelsa', 410000);
-INSERT INTO city VALUES (2749, 'Zaria', 'NGA', 'Kaduna', 379200);
-INSERT INTO city VALUES (2750, 'Ilesha', 'NGA', 'Oyo & Osun', 378400);
-INSERT INTO city VALUES (2751, 'Onitsha', 'NGA', 'Anambra & Enugu & Eb', 371900);
-INSERT INTO city VALUES (2752, 'Iwo', 'NGA', 'Oyo & Osun', 362000);
-INSERT INTO city VALUES (2753, 'Ado-Ekiti', 'NGA', 'Ondo & Ekiti', 359400);
-INSERT INTO city VALUES (2754, 'Abuja', 'NGA', 'Federal Capital Dist', 350100);
-INSERT INTO city VALUES (2755, 'Kaduna', 'NGA', 'Kaduna', 342200);
-INSERT INTO city VALUES (2756, 'Mushin', 'NGA', 'Lagos', 333200);
-INSERT INTO city VALUES (2757, 'Maiduguri', 'NGA', 'Borno & Yobe', 320000);
-INSERT INTO city VALUES (2758, 'Enugu', 'NGA', 'Anambra & Enugu & Eb', 316100);
-INSERT INTO city VALUES (2759, 'Ede', 'NGA', 'Oyo & Osun', 307100);
-INSERT INTO city VALUES (2760, 'Aba', 'NGA', 'Imo & Abia', 298900);
-INSERT INTO city VALUES (2761, 'Ife', 'NGA', 'Oyo & Osun', 296800);
-INSERT INTO city VALUES (2762, 'Ila', 'NGA', 'Oyo & Osun', 264000);
-INSERT INTO city VALUES (2763, 'Oyo', 'NGA', 'Oyo & Osun', 256400);
-INSERT INTO city VALUES (2764, 'Ikerre', 'NGA', 'Ondo & Ekiti', 244600);
-INSERT INTO city VALUES (2765, 'Benin City', 'NGA', 'Edo & Delta', 229400);
-INSERT INTO city VALUES (2766, 'Iseyin', 'NGA', 'Oyo & Osun', 217300);
-INSERT INTO city VALUES (2767, 'Katsina', 'NGA', 'Katsina', 206500);
-INSERT INTO city VALUES (2768, 'Jos', 'NGA', 'Plateau & Nassarawa', 206300);
-INSERT INTO city VALUES (2769, 'Sokoto', 'NGA', 'Sokoto & Kebbi & Zam', 204900);
-INSERT INTO city VALUES (2770, 'Ilobu', 'NGA', 'Oyo & Osun', 199000);
-INSERT INTO city VALUES (2771, 'Offa', 'NGA', 'Kwara & Kogi', 197200);
-INSERT INTO city VALUES (2772, 'Ikorodu', 'NGA', 'Lagos', 184900);
-INSERT INTO city VALUES (2773, 'Ilawe-Ekiti', 'NGA', 'Ondo & Ekiti', 184500);
-INSERT INTO city VALUES (2774, 'Owo', 'NGA', 'Ondo & Ekiti', 183500);
-INSERT INTO city VALUES (2775, 'Ikirun', 'NGA', 'Oyo & Osun', 181400);
-INSERT INTO city VALUES (2776, 'Shaki', 'NGA', 'Oyo & Osun', 174500);
-INSERT INTO city VALUES (2777, 'Calabar', 'NGA', 'Cross River', 174400);
-INSERT INTO city VALUES (2778, 'Ondo', 'NGA', 'Ondo & Ekiti', 173600);
-INSERT INTO city VALUES (2779, 'Akure', 'NGA', 'Ondo & Ekiti', 162300);
-INSERT INTO city VALUES (2780, 'Gusau', 'NGA', 'Sokoto & Kebbi & Zam', 158000);
-INSERT INTO city VALUES (2781, 'Ijebu-Ode', 'NGA', 'Ogun', 156400);
-INSERT INTO city VALUES (2782, 'Effon-Alaiye', 'NGA', 'Oyo & Osun', 153100);
-INSERT INTO city VALUES (2783, 'Kumo', 'NGA', 'Bauchi & Gombe', 148000);
-INSERT INTO city VALUES (2784, 'Shomolu', 'NGA', 'Lagos', 147700);
-INSERT INTO city VALUES (2785, 'Oka-Akoko', 'NGA', 'Ondo & Ekiti', 142900);
-INSERT INTO city VALUES (2786, 'Ikare', 'NGA', 'Ondo & Ekiti', 140800);
-INSERT INTO city VALUES (2787, 'Sapele', 'NGA', 'Edo & Delta', 139200);
-INSERT INTO city VALUES (2788, 'Deba Habe', 'NGA', 'Bauchi & Gombe', 138600);
-INSERT INTO city VALUES (2789, 'Minna', 'NGA', 'Niger', 136900);
-INSERT INTO city VALUES (2790, 'Warri', 'NGA', 'Edo & Delta', 126100);
-INSERT INTO city VALUES (2791, 'Bida', 'NGA', 'Niger', 125500);
-INSERT INTO city VALUES (2792, 'Ikire', 'NGA', 'Oyo & Osun', 123300);
-INSERT INTO city VALUES (2793, 'Makurdi', 'NGA', 'Benue', 123100);
-INSERT INTO city VALUES (2794, 'Lafia', 'NGA', 'Plateau & Nassarawa', 122500);
-INSERT INTO city VALUES (2795, 'Inisa', 'NGA', 'Oyo & Osun', 119800);
-INSERT INTO city VALUES (2796, 'Shagamu', 'NGA', 'Ogun', 117200);
-INSERT INTO city VALUES (2797, 'Awka', 'NGA', 'Anambra & Enugu & Eb', 111200);
-INSERT INTO city VALUES (2798, 'Gombe', 'NGA', 'Bauchi & Gombe', 107800);
-INSERT INTO city VALUES (2799, 'Igboho', 'NGA', 'Oyo & Osun', 106800);
-INSERT INTO city VALUES (2800, 'Ejigbo', 'NGA', 'Oyo & Osun', 105900);
-INSERT INTO city VALUES (2801, 'Agege', 'NGA', 'Lagos', 105000);
-INSERT INTO city VALUES (2802, 'Ise-Ekiti', 'NGA', 'Ondo & Ekiti', 103400);
-INSERT INTO city VALUES (2803, 'Ugep', 'NGA', 'Cross River', 102600);
-INSERT INTO city VALUES (2804, 'Epe', 'NGA', 'Lagos', 101000);
-INSERT INTO city VALUES (2805, 'Alofi', 'NIU', '', 682);
-INSERT INTO city VALUES (2806, 'Kingston', 'NFK', '', 800);
-INSERT INTO city VALUES (2807, 'Oslo', 'NOR', 'Oslo', 508726);
-INSERT INTO city VALUES (2808, 'Bergen', 'NOR', 'Hordaland', 230948);
-INSERT INTO city VALUES (2809, 'Trondheim', 'NOR', 'Sør-Trøndelag', 150166);
-INSERT INTO city VALUES (2810, 'Stavanger', 'NOR', 'Rogaland', 108848);
-INSERT INTO city VALUES (2811, 'Bærum', 'NOR', 'Akershus', 101340);
-INSERT INTO city VALUES (2812, 'Abidjan', 'CIV', 'Abidjan', 2500000);
-INSERT INTO city VALUES (2813, 'Bouaké', 'CIV', 'Bouaké', 329850);
-INSERT INTO city VALUES (2814, 'Yamoussoukro', 'CIV', 'Yamoussoukro', 130000);
-INSERT INTO city VALUES (2815, 'Daloa', 'CIV', 'Daloa', 121842);
-INSERT INTO city VALUES (2816, 'Korhogo', 'CIV', 'Korhogo', 109445);
-INSERT INTO city VALUES (2817, 'al-Sib', 'OMN', 'Masqat', 155000);
-INSERT INTO city VALUES (2818, 'Salala', 'OMN', 'Zufar', 131813);
-INSERT INTO city VALUES (2819, 'Bawshar', 'OMN', 'Masqat', 107500);
-INSERT INTO city VALUES (2820, 'Suhar', 'OMN', 'al-Batina', 90814);
-INSERT INTO city VALUES (2821, 'Masqat', 'OMN', 'Masqat', 51969);
-INSERT INTO city VALUES (2822, 'Karachi', 'PAK', 'Sindh', 9269265);
-INSERT INTO city VALUES (2823, 'Lahore', 'PAK', 'Punjab', 5063499);
-INSERT INTO city VALUES (2824, 'Faisalabad', 'PAK', 'Punjab', 1977246);
-INSERT INTO city VALUES (2825, 'Rawalpindi', 'PAK', 'Punjab', 1406214);
-INSERT INTO city VALUES (2826, 'Multan', 'PAK', 'Punjab', 1182441);
-INSERT INTO city VALUES (2827, 'Hyderabad', 'PAK', 'Sindh', 1151274);
-INSERT INTO city VALUES (2828, 'Gujranwala', 'PAK', 'Punjab', 1124749);
-INSERT INTO city VALUES (2829, 'Peshawar', 'PAK', 'Nothwest Border Prov', 988005);
-INSERT INTO city VALUES (2830, 'Quetta', 'PAK', 'Baluchistan', 560307);
-INSERT INTO city VALUES (2831, 'Islamabad', 'PAK', 'Islamabad', 524500);
-INSERT INTO city VALUES (2832, 'Sargodha', 'PAK', 'Punjab', 455360);
-INSERT INTO city VALUES (2833, 'Sialkot', 'PAK', 'Punjab', 417597);
-INSERT INTO city VALUES (2834, 'Bahawalpur', 'PAK', 'Punjab', 403408);
-INSERT INTO city VALUES (2835, 'Sukkur', 'PAK', 'Sindh', 329176);
-INSERT INTO city VALUES (2836, 'Jhang', 'PAK', 'Punjab', 292214);
-INSERT INTO city VALUES (2837, 'Sheikhupura', 'PAK', 'Punjab', 271875);
-INSERT INTO city VALUES (2838, 'Larkana', 'PAK', 'Sindh', 270366);
-INSERT INTO city VALUES (2839, 'Gujrat', 'PAK', 'Punjab', 250121);
-INSERT INTO city VALUES (2840, 'Mardan', 'PAK', 'Nothwest Border Prov', 244511);
-INSERT INTO city VALUES (2841, 'Kasur', 'PAK', 'Punjab', 241649);
-INSERT INTO city VALUES (2842, 'Rahim Yar Khan', 'PAK', 'Punjab', 228479);
-INSERT INTO city VALUES (2843, 'Sahiwal', 'PAK', 'Punjab', 207388);
-INSERT INTO city VALUES (2844, 'Okara', 'PAK', 'Punjab', 200901);
-INSERT INTO city VALUES (2845, 'Wah', 'PAK', 'Punjab', 198400);
-INSERT INTO city VALUES (2846, 'Dera Ghazi Khan', 'PAK', 'Punjab', 188100);
-INSERT INTO city VALUES (2847, 'Mirpur Khas', 'PAK', 'Sind', 184500);
-INSERT INTO city VALUES (2848, 'Nawabshah', 'PAK', 'Sind', 183100);
-INSERT INTO city VALUES (2849, 'Mingora', 'PAK', 'Nothwest Border Prov', 174500);
-INSERT INTO city VALUES (2850, 'Chiniot', 'PAK', 'Punjab', 169300);
-INSERT INTO city VALUES (2851, 'Kamoke', 'PAK', 'Punjab', 151000);
-INSERT INTO city VALUES (2852, 'Mandi Burewala', 'PAK', 'Punjab', 149900);
-INSERT INTO city VALUES (2853, 'Jhelum', 'PAK', 'Punjab', 145800);
-INSERT INTO city VALUES (2854, 'Sadiqabad', 'PAK', 'Punjab', 141500);
-INSERT INTO city VALUES (2855, 'Jacobabad', 'PAK', 'Sind', 137700);
-INSERT INTO city VALUES (2856, 'Shikarpur', 'PAK', 'Sind', 133300);
-INSERT INTO city VALUES (2857, 'Khanewal', 'PAK', 'Punjab', 133000);
-INSERT INTO city VALUES (2858, 'Hafizabad', 'PAK', 'Punjab', 130200);
-INSERT INTO city VALUES (2859, 'Kohat', 'PAK', 'Nothwest Border Prov', 125300);
-INSERT INTO city VALUES (2860, 'Muzaffargarh', 'PAK', 'Punjab', 121600);
-INSERT INTO city VALUES (2861, 'Khanpur', 'PAK', 'Punjab', 117800);
-INSERT INTO city VALUES (2862, 'Gojra', 'PAK', 'Punjab', 115000);
-INSERT INTO city VALUES (2863, 'Bahawalnagar', 'PAK', 'Punjab', 109600);
-INSERT INTO city VALUES (2864, 'Muridke', 'PAK', 'Punjab', 108600);
-INSERT INTO city VALUES (2865, 'Pak Pattan', 'PAK', 'Punjab', 107800);
-INSERT INTO city VALUES (2866, 'Abottabad', 'PAK', 'Nothwest Border Prov', 106000);
-INSERT INTO city VALUES (2867, 'Tando Adam', 'PAK', 'Sind', 103400);
-INSERT INTO city VALUES (2868, 'Jaranwala', 'PAK', 'Punjab', 103300);
-INSERT INTO city VALUES (2869, 'Khairpur', 'PAK', 'Sind', 102200);
-INSERT INTO city VALUES (2870, 'Chishtian Mandi', 'PAK', 'Punjab', 101700);
-INSERT INTO city VALUES (2871, 'Daska', 'PAK', 'Punjab', 101500);
-INSERT INTO city VALUES (2872, 'Dadu', 'PAK', 'Sind', 98600);
-INSERT INTO city VALUES (2873, 'Mandi Bahauddin', 'PAK', 'Punjab', 97300);
-INSERT INTO city VALUES (2874, 'Ahmadpur East', 'PAK', 'Punjab', 96000);
-INSERT INTO city VALUES (2875, 'Kamalia', 'PAK', 'Punjab', 95300);
-INSERT INTO city VALUES (2876, 'Khuzdar', 'PAK', 'Baluchistan', 93100);
-INSERT INTO city VALUES (2877, 'Vihari', 'PAK', 'Punjab', 92300);
-INSERT INTO city VALUES (2878, 'Dera Ismail Khan', 'PAK', 'Nothwest Border Prov', 90400);
-INSERT INTO city VALUES (2879, 'Wazirabad', 'PAK', 'Punjab', 89700);
-INSERT INTO city VALUES (2880, 'Nowshera', 'PAK', 'Nothwest Border Prov', 89400);
-INSERT INTO city VALUES (2881, 'Koror', 'PLW', 'Koror', 12000);
-INSERT INTO city VALUES (2882, 'Ciudad de Panamá', 'PAN', 'Panamá', 471373);
-INSERT INTO city VALUES (2883, 'San Miguelito', 'PAN', 'San Miguelito', 315382);
-INSERT INTO city VALUES (2884, 'Port Moresby', 'PNG', 'National Capital Dis', 247000);
-INSERT INTO city VALUES (2885, 'Asunción', 'PRY', 'Asunción', 557776);
-INSERT INTO city VALUES (2886, 'Ciudad del Este', 'PRY', 'Alto Paraná', 133881);
-INSERT INTO city VALUES (2887, 'San Lorenzo', 'PRY', 'Central', 133395);
-INSERT INTO city VALUES (2888, 'Lambaré', 'PRY', 'Central', 99681);
-INSERT INTO city VALUES (2889, 'Fernando de la Mora', 'PRY', 'Central', 95287);
-INSERT INTO city VALUES (2890, 'Lima', 'PER', 'Lima', 6464693);
-INSERT INTO city VALUES (2891, 'Arequipa', 'PER', 'Arequipa', 762000);
-INSERT INTO city VALUES (2892, 'Trujillo', 'PER', 'La Libertad', 652000);
-INSERT INTO city VALUES (2893, 'Chiclayo', 'PER', 'Lambayeque', 517000);
-INSERT INTO city VALUES (2894, 'Callao', 'PER', 'Callao', 424294);
-INSERT INTO city VALUES (2895, 'Iquitos', 'PER', 'Loreto', 367000);
-INSERT INTO city VALUES (2896, 'Chimbote', 'PER', 'Ancash', 336000);
-INSERT INTO city VALUES (2897, 'Huancayo', 'PER', 'Junín', 327000);
-INSERT INTO city VALUES (2898, 'Piura', 'PER', 'Piura', 325000);
-INSERT INTO city VALUES (2899, 'Cusco', 'PER', 'Cusco', 291000);
-INSERT INTO city VALUES (2900, 'Pucallpa', 'PER', 'Ucayali', 220866);
-INSERT INTO city VALUES (2901, 'Tacna', 'PER', 'Tacna', 215683);
-INSERT INTO city VALUES (2902, 'Ica', 'PER', 'Ica', 194820);
-INSERT INTO city VALUES (2903, 'Sullana', 'PER', 'Piura', 147361);
-INSERT INTO city VALUES (2904, 'Juliaca', 'PER', 'Puno', 142576);
-INSERT INTO city VALUES (2905, 'Huánuco', 'PER', 'Huanuco', 129688);
-INSERT INTO city VALUES (2906, 'Ayacucho', 'PER', 'Ayacucho', 118960);
-INSERT INTO city VALUES (2907, 'Chincha Alta', 'PER', 'Ica', 110016);
-INSERT INTO city VALUES (2908, 'Cajamarca', 'PER', 'Cajamarca', 108009);
-INSERT INTO city VALUES (2909, 'Puno', 'PER', 'Puno', 101578);
-INSERT INTO city VALUES (2910, 'Ventanilla', 'PER', 'Callao', 101056);
-INSERT INTO city VALUES (2911, 'Castilla', 'PER', 'Piura', 90642);
-INSERT INTO city VALUES (2912, 'Adamstown', 'PCN', '', 42);
-INSERT INTO city VALUES (2913, 'Garapan', 'MNP', 'Saipan', 9200);
-INSERT INTO city VALUES (2914, 'Lisboa', 'PRT', 'Lisboa', 563210);
-INSERT INTO city VALUES (2915, 'Porto', 'PRT', 'Porto', 273060);
-INSERT INTO city VALUES (2916, 'Amadora', 'PRT', 'Lisboa', 122106);
-INSERT INTO city VALUES (2917, 'Coímbra', 'PRT', 'Coímbra', 96100);
-INSERT INTO city VALUES (2918, 'Braga', 'PRT', 'Braga', 90535);
-INSERT INTO city VALUES (2919, 'San Juan', 'PRI', 'San Juan', 434374);
-INSERT INTO city VALUES (2920, 'Bayamón', 'PRI', 'Bayamón', 224044);
-INSERT INTO city VALUES (2921, 'Ponce', 'PRI', 'Ponce', 186475);
-INSERT INTO city VALUES (2922, 'Carolina', 'PRI', 'Carolina', 186076);
-INSERT INTO city VALUES (2923, 'Caguas', 'PRI', 'Caguas', 140502);
-INSERT INTO city VALUES (2924, 'Arecibo', 'PRI', 'Arecibo', 100131);
-INSERT INTO city VALUES (2925, 'Guaynabo', 'PRI', 'Guaynabo', 100053);
-INSERT INTO city VALUES (2926, 'Mayagüez', 'PRI', 'Mayagüez', 98434);
-INSERT INTO city VALUES (2927, 'Toa Baja', 'PRI', 'Toa Baja', 94085);
-INSERT INTO city VALUES (2928, 'Warszawa', 'POL', 'Mazowieckie', 1615369);
-INSERT INTO city VALUES (2929, 'Lódz', 'POL', 'Lodzkie', 800110);
-INSERT INTO city VALUES (2930, 'Kraków', 'POL', 'Malopolskie', 738150);
-INSERT INTO city VALUES (2931, 'Wroclaw', 'POL', 'Dolnoslaskie', 636765);
-INSERT INTO city VALUES (2932, 'Poznan', 'POL', 'Wielkopolskie', 576899);
-INSERT INTO city VALUES (2933, 'Gdansk', 'POL', 'Pomorskie', 458988);
-INSERT INTO city VALUES (2934, 'Szczecin', 'POL', 'Zachodnio-Pomorskie', 416988);
-INSERT INTO city VALUES (2935, 'Bydgoszcz', 'POL', 'Kujawsko-Pomorskie', 386855);
-INSERT INTO city VALUES (2936, 'Lublin', 'POL', 'Lubelskie', 356251);
-INSERT INTO city VALUES (2937, 'Katowice', 'POL', 'Slaskie', 345934);
-INSERT INTO city VALUES (2938, 'Bialystok', 'POL', 'Podlaskie', 283937);
-INSERT INTO city VALUES (2939, 'Czestochowa', 'POL', 'Slaskie', 257812);
-INSERT INTO city VALUES (2940, 'Gdynia', 'POL', 'Pomorskie', 253521);
-INSERT INTO city VALUES (2941, 'Sosnowiec', 'POL', 'Slaskie', 244102);
-INSERT INTO city VALUES (2942, 'Radom', 'POL', 'Mazowieckie', 232262);
-INSERT INTO city VALUES (2943, 'Kielce', 'POL', 'Swietokrzyskie', 212383);
-INSERT INTO city VALUES (2944, 'Gliwice', 'POL', 'Slaskie', 212164);
-INSERT INTO city VALUES (2945, 'Torun', 'POL', 'Kujawsko-Pomorskie', 206158);
-INSERT INTO city VALUES (2946, 'Bytom', 'POL', 'Slaskie', 205560);
-INSERT INTO city VALUES (2947, 'Zabrze', 'POL', 'Slaskie', 200177);
-INSERT INTO city VALUES (2948, 'Bielsko-Biala', 'POL', 'Slaskie', 180307);
-INSERT INTO city VALUES (2949, 'Olsztyn', 'POL', 'Warminsko-Mazurskie', 170904);
-INSERT INTO city VALUES (2950, 'Rzeszów', 'POL', 'Podkarpackie', 162049);
-INSERT INTO city VALUES (2951, 'Ruda Slaska', 'POL', 'Slaskie', 159665);
-INSERT INTO city VALUES (2952, 'Rybnik', 'POL', 'Slaskie', 144582);
-INSERT INTO city VALUES (2953, 'Walbrzych', 'POL', 'Dolnoslaskie', 136923);
-INSERT INTO city VALUES (2954, 'Tychy', 'POL', 'Slaskie', 133178);
-INSERT INTO city VALUES (2955, 'Dabrowa Górnicza', 'POL', 'Slaskie', 131037);
-INSERT INTO city VALUES (2956, 'Plock', 'POL', 'Mazowieckie', 131011);
-INSERT INTO city VALUES (2957, 'Elblag', 'POL', 'Warminsko-Mazurskie', 129782);
-INSERT INTO city VALUES (2958, 'Opole', 'POL', 'Opolskie', 129553);
-INSERT INTO city VALUES (2959, 'Gorzów Wielkopolski', 'POL', 'Lubuskie', 126019);
-INSERT INTO city VALUES (2960, 'Wloclawek', 'POL', 'Kujawsko-Pomorskie', 123373);
-INSERT INTO city VALUES (2961, 'Chorzów', 'POL', 'Slaskie', 121708);
-INSERT INTO city VALUES (2962, 'Tarnów', 'POL', 'Malopolskie', 121494);
-INSERT INTO city VALUES (2963, 'Zielona Góra', 'POL', 'Lubuskie', 118182);
-INSERT INTO city VALUES (2964, 'Koszalin', 'POL', 'Zachodnio-Pomorskie', 112375);
-INSERT INTO city VALUES (2965, 'Legnica', 'POL', 'Dolnoslaskie', 109335);
-INSERT INTO city VALUES (2966, 'Kalisz', 'POL', 'Wielkopolskie', 106641);
-INSERT INTO city VALUES (2967, 'Grudziadz', 'POL', 'Kujawsko-Pomorskie', 102434);
-INSERT INTO city VALUES (2968, 'Slupsk', 'POL', 'Pomorskie', 102370);
-INSERT INTO city VALUES (2969, 'Jastrzebie-Zdrój', 'POL', 'Slaskie', 102294);
-INSERT INTO city VALUES (2970, 'Jaworzno', 'POL', 'Slaskie', 97929);
-INSERT INTO city VALUES (2971, 'Jelenia Góra', 'POL', 'Dolnoslaskie', 93901);
-INSERT INTO city VALUES (2972, 'Malabo', 'GNQ', 'Bioko', 40000);
-INSERT INTO city VALUES (2973, 'Doha', 'QAT', 'Doha', 355000);
-INSERT INTO city VALUES (2974, 'Paris', 'FRA', 'Île-de-France', 2125246);
-INSERT INTO city VALUES (2975, 'Marseille', 'FRA', 'Provence-Alpes-Côte', 798430);
-INSERT INTO city VALUES (2976, 'Lyon', 'FRA', 'Rhône-Alpes', 445452);
-INSERT INTO city VALUES (2977, 'Toulouse', 'FRA', 'Midi-Pyrénées', 390350);
-INSERT INTO city VALUES (2978, 'Nice', 'FRA', 'Provence-Alpes-Côte', 342738);
-INSERT INTO city VALUES (2979, 'Nantes', 'FRA', 'Pays de la Loire', 270251);
-INSERT INTO city VALUES (2980, 'Strasbourg', 'FRA', 'Alsace', 264115);
-INSERT INTO city VALUES (2981, 'Montpellier', 'FRA', 'Languedoc-Roussillon', 225392);
-INSERT INTO city VALUES (2982, 'Bordeaux', 'FRA', 'Aquitaine', 215363);
-INSERT INTO city VALUES (2983, 'Rennes', 'FRA', 'Haute-Normandie', 206229);
-INSERT INTO city VALUES (2984, 'Le Havre', 'FRA', 'Champagne-Ardenne', 190905);
-INSERT INTO city VALUES (2985, 'Reims', 'FRA', 'Nord-Pas-de-Calais', 187206);
-INSERT INTO city VALUES (2986, 'Lille', 'FRA', 'Rhône-Alpes', 184657);
-INSERT INTO city VALUES (2987, 'St-Étienne', 'FRA', 'Bretagne', 180210);
-INSERT INTO city VALUES (2988, 'Toulon', 'FRA', 'Provence-Alpes-Côte', 160639);
-INSERT INTO city VALUES (2989, 'Grenoble', 'FRA', 'Rhône-Alpes', 153317);
-INSERT INTO city VALUES (2990, 'Angers', 'FRA', 'Pays de la Loire', 151279);
-INSERT INTO city VALUES (2991, 'Dijon', 'FRA', 'Bourgogne', 149867);
-INSERT INTO city VALUES (2992, 'Brest', 'FRA', 'Bretagne', 149634);
-INSERT INTO city VALUES (2993, 'Le Mans', 'FRA', 'Pays de la Loire', 146105);
-INSERT INTO city VALUES (2994, 'Clermont-Ferrand', 'FRA', 'Auvergne', 137140);
-INSERT INTO city VALUES (2995, 'Amiens', 'FRA', 'Picardie', 135501);
-INSERT INTO city VALUES (2996, 'Aix-en-Provence', 'FRA', 'Provence-Alpes-Côte', 134222);
-INSERT INTO city VALUES (2997, 'Limoges', 'FRA', 'Limousin', 133968);
-INSERT INTO city VALUES (2998, 'Nîmes', 'FRA', 'Languedoc-Roussillon', 133424);
-INSERT INTO city VALUES (2999, 'Tours', 'FRA', 'Centre', 132820);
-INSERT INTO city VALUES (3000, 'Villeurbanne', 'FRA', 'Rhône-Alpes', 124215);
-INSERT INTO city VALUES (3001, 'Metz', 'FRA', 'Lorraine', 123776);
-INSERT INTO city VALUES (3002, 'Besançon', 'FRA', 'Franche-Comté', 117733);
-INSERT INTO city VALUES (3003, 'Caen', 'FRA', 'Basse-Normandie', 113987);
-INSERT INTO city VALUES (3004, 'Orléans', 'FRA', 'Centre', 113126);
-INSERT INTO city VALUES (3005, 'Mulhouse', 'FRA', 'Alsace', 110359);
-INSERT INTO city VALUES (3006, 'Rouen', 'FRA', 'Haute-Normandie', 106592);
-INSERT INTO city VALUES (3007, 'Boulogne-Billancourt', 'FRA', 'Île-de-France', 106367);
-INSERT INTO city VALUES (3008, 'Perpignan', 'FRA', 'Languedoc-Roussillon', 105115);
-INSERT INTO city VALUES (3009, 'Nancy', 'FRA', 'Lorraine', 103605);
-INSERT INTO city VALUES (3010, 'Roubaix', 'FRA', 'Nord-Pas-de-Calais', 96984);
-INSERT INTO city VALUES (3011, 'Argenteuil', 'FRA', 'Île-de-France', 93961);
-INSERT INTO city VALUES (3012, 'Tourcoing', 'FRA', 'Nord-Pas-de-Calais', 93540);
-INSERT INTO city VALUES (3013, 'Montreuil', 'FRA', 'Île-de-France', 90674);
-INSERT INTO city VALUES (3014, 'Cayenne', 'GUF', 'Cayenne', 50699);
-INSERT INTO city VALUES (3015, 'Faaa', 'PYF', 'Tahiti', 25888);
-INSERT INTO city VALUES (3016, 'Papeete', 'PYF', 'Tahiti', 25553);
-INSERT INTO city VALUES (3017, 'Saint-Denis', 'REU', 'Saint-Denis', 131480);
-INSERT INTO city VALUES (3018, 'Bucuresti', 'ROM', 'Bukarest', 2016131);
-INSERT INTO city VALUES (3019, 'Iasi', 'ROM', 'Iasi', 348070);
-INSERT INTO city VALUES (3020, 'Constanta', 'ROM', 'Constanta', 342264);
-INSERT INTO city VALUES (3021, 'Cluj-Napoca', 'ROM', 'Cluj', 332498);
-INSERT INTO city VALUES (3022, 'Galati', 'ROM', 'Galati', 330276);
-INSERT INTO city VALUES (3023, 'Timisoara', 'ROM', 'Timis', 324304);
-INSERT INTO city VALUES (3024, 'Brasov', 'ROM', 'Brasov', 314225);
-INSERT INTO city VALUES (3025, 'Craiova', 'ROM', 'Dolj', 313530);
-INSERT INTO city VALUES (3026, 'Ploiesti', 'ROM', 'Prahova', 251348);
-INSERT INTO city VALUES (3027, 'Braila', 'ROM', 'Braila', 233756);
-INSERT INTO city VALUES (3028, 'Oradea', 'ROM', 'Bihor', 222239);
-INSERT INTO city VALUES (3029, 'Bacau', 'ROM', 'Bacau', 209235);
-INSERT INTO city VALUES (3030, 'Pitesti', 'ROM', 'Arges', 187170);
-INSERT INTO city VALUES (3031, 'Arad', 'ROM', 'Arad', 184408);
-INSERT INTO city VALUES (3032, 'Sibiu', 'ROM', 'Sibiu', 169611);
-INSERT INTO city VALUES (3033, 'Târgu Mures', 'ROM', 'Mures', 165153);
-INSERT INTO city VALUES (3034, 'Baia Mare', 'ROM', 'Maramures', 149665);
-INSERT INTO city VALUES (3035, 'Buzau', 'ROM', 'Buzau', 148372);
-INSERT INTO city VALUES (3036, 'Satu Mare', 'ROM', 'Satu Mare', 130059);
-INSERT INTO city VALUES (3037, 'Botosani', 'ROM', 'Botosani', 128730);
-INSERT INTO city VALUES (3038, 'Piatra Neamt', 'ROM', 'Neamt', 125070);
-INSERT INTO city VALUES (3039, 'Râmnicu Vâlcea', 'ROM', 'Vâlcea', 119741);
-INSERT INTO city VALUES (3040, 'Suceava', 'ROM', 'Suceava', 118549);
-INSERT INTO city VALUES (3041, 'Drobeta-Turnu Severin', 'ROM', 'Mehedinti', 117865);
-INSERT INTO city VALUES (3042, 'Târgoviste', 'ROM', 'Dâmbovita', 98980);
-INSERT INTO city VALUES (3043, 'Focsani', 'ROM', 'Vrancea', 98979);
-INSERT INTO city VALUES (3044, 'Târgu Jiu', 'ROM', 'Gorj', 98524);
-INSERT INTO city VALUES (3045, 'Tulcea', 'ROM', 'Tulcea', 96278);
-INSERT INTO city VALUES (3046, 'Resita', 'ROM', 'Caras-Severin', 93976);
-INSERT INTO city VALUES (3047, 'Kigali', 'RWA', 'Kigali', 286000);
-INSERT INTO city VALUES (3048, 'Stockholm', 'SWE', 'Lisboa', 750348);
-INSERT INTO city VALUES (3049, 'Gothenburg [Göteborg]', 'SWE', 'West Götanmaan län', 466990);
-INSERT INTO city VALUES (3050, 'Malmö', 'SWE', 'Skåne län', 259579);
-INSERT INTO city VALUES (3051, 'Uppsala', 'SWE', 'Uppsala län', 189569);
-INSERT INTO city VALUES (3052, 'Linköping', 'SWE', 'East Götanmaan län', 133168);
-INSERT INTO city VALUES (3053, 'Västerås', 'SWE', 'Västmanlands län', 126328);
-INSERT INTO city VALUES (3054, 'Örebro', 'SWE', 'Örebros län', 124207);
-INSERT INTO city VALUES (3055, 'Norrköping', 'SWE', 'East Götanmaan län', 122199);
-INSERT INTO city VALUES (3056, 'Helsingborg', 'SWE', 'Skåne län', 117737);
-INSERT INTO city VALUES (3057, 'Jönköping', 'SWE', 'Jönköpings län', 117095);
-INSERT INTO city VALUES (3058, 'Umeå', 'SWE', 'Västerbottens län', 104512);
-INSERT INTO city VALUES (3059, 'Lund', 'SWE', 'Skåne län', 98948);
-INSERT INTO city VALUES (3060, 'Borås', 'SWE', 'West Götanmaan län', 96883);
-INSERT INTO city VALUES (3061, 'Sundsvall', 'SWE', 'Västernorrlands län', 93126);
-INSERT INTO city VALUES (3062, 'Gävle', 'SWE', 'Gävleborgs län', 90742);
-INSERT INTO city VALUES (3063, 'Jamestown', 'SHN', 'Saint Helena', 1500);
-INSERT INTO city VALUES (3064, 'Basseterre', 'KNA', 'St George Basseterre', 11600);
-INSERT INTO city VALUES (3065, 'Castries', 'LCA', 'Castries', 2301);
-INSERT INTO city VALUES (3066, 'Kingstown', 'VCT', 'St George', 17100);
-INSERT INTO city VALUES (3067, 'Saint-Pierre', 'SPM', 'Saint-Pierre', 5808);
-INSERT INTO city VALUES (3068, 'Berlin', 'DEU', 'Berliini', 3386667);
-INSERT INTO city VALUES (3069, 'Hamburg', 'DEU', 'Hamburg', 1704735);
-INSERT INTO city VALUES (3070, 'Munich [München]', 'DEU', 'Baijeri', 1194560);
-INSERT INTO city VALUES (3071, 'Köln', 'DEU', 'Nordrhein-Westfalen', 962507);
-INSERT INTO city VALUES (3072, 'Frankfurt am Main', 'DEU', 'Hessen', 643821);
-INSERT INTO city VALUES (3073, 'Essen', 'DEU', 'Nordrhein-Westfalen', 599515);
-INSERT INTO city VALUES (3074, 'Dortmund', 'DEU', 'Nordrhein-Westfalen', 590213);
-INSERT INTO city VALUES (3075, 'Stuttgart', 'DEU', 'Baden-Württemberg', 582443);
-INSERT INTO city VALUES (3076, 'Düsseldorf', 'DEU', 'Nordrhein-Westfalen', 568855);
-INSERT INTO city VALUES (3077, 'Bremen', 'DEU', 'Bremen', 540330);
-INSERT INTO city VALUES (3078, 'Duisburg', 'DEU', 'Nordrhein-Westfalen', 519793);
-INSERT INTO city VALUES (3079, 'Hannover', 'DEU', 'Niedersachsen', 514718);
-INSERT INTO city VALUES (3080, 'Leipzig', 'DEU', 'Saksi', 489532);
-INSERT INTO city VALUES (3081, 'Nürnberg', 'DEU', 'Baijeri', 486628);
-INSERT INTO city VALUES (3082, 'Dresden', 'DEU', 'Saksi', 476668);
-INSERT INTO city VALUES (3083, 'Bochum', 'DEU', 'Nordrhein-Westfalen', 392830);
-INSERT INTO city VALUES (3084, 'Wuppertal', 'DEU', 'Nordrhein-Westfalen', 368993);
-INSERT INTO city VALUES (3085, 'Bielefeld', 'DEU', 'Nordrhein-Westfalen', 321125);
-INSERT INTO city VALUES (3086, 'Mannheim', 'DEU', 'Baden-Württemberg', 307730);
-INSERT INTO city VALUES (3087, 'Bonn', 'DEU', 'Nordrhein-Westfalen', 301048);
-INSERT INTO city VALUES (3088, 'Gelsenkirchen', 'DEU', 'Nordrhein-Westfalen', 281979);
-INSERT INTO city VALUES (3089, 'Karlsruhe', 'DEU', 'Baden-Württemberg', 277204);
-INSERT INTO city VALUES (3090, 'Wiesbaden', 'DEU', 'Hessen', 268716);
-INSERT INTO city VALUES (3091, 'Münster', 'DEU', 'Nordrhein-Westfalen', 264670);
-INSERT INTO city VALUES (3092, 'Mönchengladbach', 'DEU', 'Nordrhein-Westfalen', 263697);
-INSERT INTO city VALUES (3093, 'Chemnitz', 'DEU', 'Saksi', 263222);
-INSERT INTO city VALUES (3094, 'Augsburg', 'DEU', 'Baijeri', 254867);
-INSERT INTO city VALUES (3095, 'Halle/Saale', 'DEU', 'Anhalt Sachsen', 254360);
-INSERT INTO city VALUES (3096, 'Braunschweig', 'DEU', 'Niedersachsen', 246322);
-INSERT INTO city VALUES (3097, 'Aachen', 'DEU', 'Nordrhein-Westfalen', 243825);
-INSERT INTO city VALUES (3098, 'Krefeld', 'DEU', 'Nordrhein-Westfalen', 241769);
-INSERT INTO city VALUES (3099, 'Magdeburg', 'DEU', 'Anhalt Sachsen', 235073);
-INSERT INTO city VALUES (3100, 'Kiel', 'DEU', 'Schleswig-Holstein', 233795);
-INSERT INTO city VALUES (3101, 'Oberhausen', 'DEU', 'Nordrhein-Westfalen', 222349);
-INSERT INTO city VALUES (3102, 'Lübeck', 'DEU', 'Schleswig-Holstein', 213326);
-INSERT INTO city VALUES (3103, 'Hagen', 'DEU', 'Nordrhein-Westfalen', 205201);
-INSERT INTO city VALUES (3104, 'Rostock', 'DEU', 'Mecklenburg-Vorpomme', 203279);
-INSERT INTO city VALUES (3105, 'Freiburg im Breisgau', 'DEU', 'Baden-Württemberg', 202455);
-INSERT INTO city VALUES (3106, 'Erfurt', 'DEU', 'Thüringen', 201267);
-INSERT INTO city VALUES (3107, 'Kassel', 'DEU', 'Hessen', 196211);
-INSERT INTO city VALUES (3108, 'Saarbrücken', 'DEU', 'Saarland', 183836);
-INSERT INTO city VALUES (3109, 'Mainz', 'DEU', 'Rheinland-Pfalz', 183134);
-INSERT INTO city VALUES (3110, 'Hamm', 'DEU', 'Nordrhein-Westfalen', 181804);
-INSERT INTO city VALUES (3111, 'Herne', 'DEU', 'Nordrhein-Westfalen', 175661);
-INSERT INTO city VALUES (3112, 'Mülheim an der Ruhr', 'DEU', 'Nordrhein-Westfalen', 173895);
-INSERT INTO city VALUES (3113, 'Solingen', 'DEU', 'Nordrhein-Westfalen', 165583);
-INSERT INTO city VALUES (3114, 'Osnabrück', 'DEU', 'Niedersachsen', 164539);
-INSERT INTO city VALUES (3115, 'Ludwigshafen am Rhein', 'DEU', 'Rheinland-Pfalz', 163771);
-INSERT INTO city VALUES (3116, 'Leverkusen', 'DEU', 'Nordrhein-Westfalen', 160841);
-INSERT INTO city VALUES (3117, 'Oldenburg', 'DEU', 'Niedersachsen', 154125);
-INSERT INTO city VALUES (3118, 'Neuss', 'DEU', 'Nordrhein-Westfalen', 149702);
-INSERT INTO city VALUES (3119, 'Heidelberg', 'DEU', 'Baden-Württemberg', 139672);
-INSERT INTO city VALUES (3120, 'Darmstadt', 'DEU', 'Hessen', 137776);
-INSERT INTO city VALUES (3121, 'Paderborn', 'DEU', 'Nordrhein-Westfalen', 137647);
-INSERT INTO city VALUES (3122, 'Potsdam', 'DEU', 'Brandenburg', 128983);
-INSERT INTO city VALUES (3123, 'Würzburg', 'DEU', 'Baijeri', 127350);
-INSERT INTO city VALUES (3124, 'Regensburg', 'DEU', 'Baijeri', 125236);
-INSERT INTO city VALUES (3125, 'Recklinghausen', 'DEU', 'Nordrhein-Westfalen', 125022);
-INSERT INTO city VALUES (3126, 'Göttingen', 'DEU', 'Niedersachsen', 124775);
-INSERT INTO city VALUES (3127, 'Bremerhaven', 'DEU', 'Bremen', 122735);
-INSERT INTO city VALUES (3128, 'Wolfsburg', 'DEU', 'Niedersachsen', 121954);
-INSERT INTO city VALUES (3129, 'Bottrop', 'DEU', 'Nordrhein-Westfalen', 121097);
-INSERT INTO city VALUES (3130, 'Remscheid', 'DEU', 'Nordrhein-Westfalen', 120125);
-INSERT INTO city VALUES (3131, 'Heilbronn', 'DEU', 'Baden-Württemberg', 119526);
-INSERT INTO city VALUES (3132, 'Pforzheim', 'DEU', 'Baden-Württemberg', 117227);
-INSERT INTO city VALUES (3133, 'Offenbach am Main', 'DEU', 'Hessen', 116627);
-INSERT INTO city VALUES (3134, 'Ulm', 'DEU', 'Baden-Württemberg', 116103);
-INSERT INTO city VALUES (3135, 'Ingolstadt', 'DEU', 'Baijeri', 114826);
-INSERT INTO city VALUES (3136, 'Gera', 'DEU', 'Thüringen', 114718);
-INSERT INTO city VALUES (3137, 'Salzgitter', 'DEU', 'Niedersachsen', 112934);
-INSERT INTO city VALUES (3138, 'Cottbus', 'DEU', 'Brandenburg', 110894);
-INSERT INTO city VALUES (3139, 'Reutlingen', 'DEU', 'Baden-Württemberg', 110343);
-INSERT INTO city VALUES (3140, 'Fürth', 'DEU', 'Baijeri', 109771);
-INSERT INTO city VALUES (3141, 'Siegen', 'DEU', 'Nordrhein-Westfalen', 109225);
-INSERT INTO city VALUES (3142, 'Koblenz', 'DEU', 'Rheinland-Pfalz', 108003);
-INSERT INTO city VALUES (3143, 'Moers', 'DEU', 'Nordrhein-Westfalen', 106837);
-INSERT INTO city VALUES (3144, 'Bergisch Gladbach', 'DEU', 'Nordrhein-Westfalen', 106150);
-INSERT INTO city VALUES (3145, 'Zwickau', 'DEU', 'Saksi', 104146);
-INSERT INTO city VALUES (3146, 'Hildesheim', 'DEU', 'Niedersachsen', 104013);
-INSERT INTO city VALUES (3147, 'Witten', 'DEU', 'Nordrhein-Westfalen', 103384);
-INSERT INTO city VALUES (3148, 'Schwerin', 'DEU', 'Mecklenburg-Vorpomme', 102878);
-INSERT INTO city VALUES (3149, 'Erlangen', 'DEU', 'Baijeri', 100750);
-INSERT INTO city VALUES (3150, 'Kaiserslautern', 'DEU', 'Rheinland-Pfalz', 100025);
-INSERT INTO city VALUES (3151, 'Trier', 'DEU', 'Rheinland-Pfalz', 99891);
-INSERT INTO city VALUES (3152, 'Jena', 'DEU', 'Thüringen', 99779);
-INSERT INTO city VALUES (3153, 'Iserlohn', 'DEU', 'Nordrhein-Westfalen', 99474);
-INSERT INTO city VALUES (3154, 'Gütersloh', 'DEU', 'Nordrhein-Westfalen', 95028);
-INSERT INTO city VALUES (3155, 'Marl', 'DEU', 'Nordrhein-Westfalen', 93735);
-INSERT INTO city VALUES (3156, 'Lünen', 'DEU', 'Nordrhein-Westfalen', 92044);
-INSERT INTO city VALUES (3157, 'Düren', 'DEU', 'Nordrhein-Westfalen', 91092);
-INSERT INTO city VALUES (3158, 'Ratingen', 'DEU', 'Nordrhein-Westfalen', 90951);
-INSERT INTO city VALUES (3159, 'Velbert', 'DEU', 'Nordrhein-Westfalen', 89881);
-INSERT INTO city VALUES (3160, 'Esslingen am Neckar', 'DEU', 'Baden-Württemberg', 89667);
-INSERT INTO city VALUES (3161, 'Honiara', 'SLB', 'Honiara', 50100);
-INSERT INTO city VALUES (3162, 'Lusaka', 'ZMB', 'Lusaka', 1317000);
-INSERT INTO city VALUES (3163, 'Ndola', 'ZMB', 'Copperbelt', 329200);
-INSERT INTO city VALUES (3164, 'Kitwe', 'ZMB', 'Copperbelt', 288600);
-INSERT INTO city VALUES (3165, 'Kabwe', 'ZMB', 'Central', 154300);
-INSERT INTO city VALUES (3166, 'Chingola', 'ZMB', 'Copperbelt', 142400);
-INSERT INTO city VALUES (3167, 'Mufulira', 'ZMB', 'Copperbelt', 123900);
-INSERT INTO city VALUES (3168, 'Luanshya', 'ZMB', 'Copperbelt', 118100);
-INSERT INTO city VALUES (3169, 'Apia', 'WSM', 'Upolu', 35900);
-INSERT INTO city VALUES (3170, 'Serravalle', 'SMR', 'Serravalle/Dogano', 4802);
-INSERT INTO city VALUES (3171, 'San Marino', 'SMR', 'San Marino', 2294);
-INSERT INTO city VALUES (3172, 'São Tomé', 'STP', 'Aqua Grande', 49541);
-INSERT INTO city VALUES (3173, 'Riyadh', 'SAU', 'Riyadh', 3324000);
-INSERT INTO city VALUES (3174, 'Jedda', 'SAU', 'Mekka', 2046300);
-INSERT INTO city VALUES (3175, 'Mekka', 'SAU', 'Mekka', 965700);
-INSERT INTO city VALUES (3176, 'Medina', 'SAU', 'Medina', 608300);
-INSERT INTO city VALUES (3177, 'al-Dammam', 'SAU', 'al-Sharqiya', 482300);
-INSERT INTO city VALUES (3178, 'al-Taif', 'SAU', 'Mekka', 416100);
-INSERT INTO city VALUES (3179, 'Tabuk', 'SAU', 'Tabuk', 292600);
-INSERT INTO city VALUES (3180, 'Burayda', 'SAU', 'al-Qasim', 248600);
-INSERT INTO city VALUES (3181, 'al-Hufuf', 'SAU', 'al-Sharqiya', 225800);
-INSERT INTO city VALUES (3182, 'al-Mubarraz', 'SAU', 'al-Sharqiya', 219100);
-INSERT INTO city VALUES (3183, 'Khamis Mushayt', 'SAU', 'Asir', 217900);
-INSERT INTO city VALUES (3184, 'Hail', 'SAU', 'Hail', 176800);
-INSERT INTO city VALUES (3185, 'al-Kharj', 'SAU', 'Riad', 152100);
-INSERT INTO city VALUES (3186, 'al-Khubar', 'SAU', 'al-Sharqiya', 141700);
-INSERT INTO city VALUES (3187, 'Jubayl', 'SAU', 'al-Sharqiya', 140800);
-INSERT INTO city VALUES (3188, 'Hafar al-Batin', 'SAU', 'al-Sharqiya', 137800);
-INSERT INTO city VALUES (3189, 'al-Tuqba', 'SAU', 'al-Sharqiya', 125700);
-INSERT INTO city VALUES (3190, 'Yanbu', 'SAU', 'Medina', 119800);
-INSERT INTO city VALUES (3191, 'Abha', 'SAU', 'Asir', 112300);
-INSERT INTO city VALUES (3192, 'Ara´ar', 'SAU', 'al-Khudud al-Samaliy', 108100);
-INSERT INTO city VALUES (3193, 'al-Qatif', 'SAU', 'al-Sharqiya', 98900);
-INSERT INTO city VALUES (3194, 'al-Hawiya', 'SAU', 'Mekka', 93900);
-INSERT INTO city VALUES (3195, 'Unayza', 'SAU', 'Qasim', 91100);
-INSERT INTO city VALUES (3196, 'Najran', 'SAU', 'Najran', 91000);
-INSERT INTO city VALUES (3197, 'Pikine', 'SEN', 'Cap-Vert', 855287);
-INSERT INTO city VALUES (3198, 'Dakar', 'SEN', 'Cap-Vert', 785071);
-INSERT INTO city VALUES (3199, 'Thiès', 'SEN', 'Thiès', 248000);
-INSERT INTO city VALUES (3200, 'Kaolack', 'SEN', 'Kaolack', 199000);
-INSERT INTO city VALUES (3201, 'Ziguinchor', 'SEN', 'Ziguinchor', 192000);
-INSERT INTO city VALUES (3202, 'Rufisque', 'SEN', 'Cap-Vert', 150000);
-INSERT INTO city VALUES (3203, 'Saint-Louis', 'SEN', 'Saint-Louis', 132400);
-INSERT INTO city VALUES (3204, 'Mbour', 'SEN', 'Thiès', 109300);
-INSERT INTO city VALUES (3205, 'Diourbel', 'SEN', 'Diourbel', 99400);
-INSERT INTO city VALUES (3206, 'Victoria', 'SYC', 'Mahé', 41000);
-INSERT INTO city VALUES (3207, 'Freetown', 'SLE', 'Western', 850000);
-INSERT INTO city VALUES (3208, 'Singapore', 'SGP', '', 4017733);
-INSERT INTO city VALUES (3209, 'Bratislava', 'SVK', 'Bratislava', 448292);
-INSERT INTO city VALUES (3210, 'Koice', 'SVK', 'Východné Slovensko', 241874);
-INSERT INTO city VALUES (3211, 'Preov', 'SVK', 'Východné Slovensko', 93977);
-INSERT INTO city VALUES (3212, 'Ljubljana', 'SVN', 'Osrednjeslovenska', 270986);
-INSERT INTO city VALUES (3213, 'Maribor', 'SVN', 'Podravska', 115532);
-INSERT INTO city VALUES (3214, 'Mogadishu', 'SOM', 'Banaadir', 997000);
-INSERT INTO city VALUES (3215, 'Hargeysa', 'SOM', 'Woqooyi Galbeed', 90000);
-INSERT INTO city VALUES (3216, 'Kismaayo', 'SOM', 'Jubbada Hoose', 90000);
-INSERT INTO city VALUES (3217, 'Colombo', 'LKA', 'Western', 645000);
-INSERT INTO city VALUES (3218, 'Dehiwala', 'LKA', 'Western', 203000);
-INSERT INTO city VALUES (3219, 'Moratuwa', 'LKA', 'Western', 190000);
-INSERT INTO city VALUES (3220, 'Jaffna', 'LKA', 'Northern', 149000);
-INSERT INTO city VALUES (3221, 'Kandy', 'LKA', 'Central', 140000);
-INSERT INTO city VALUES (3222, 'Sri Jayawardenepura Kotte', 'LKA', 'Western', 118000);
-INSERT INTO city VALUES (3223, 'Negombo', 'LKA', 'Western', 100000);
-INSERT INTO city VALUES (3224, 'Omdurman', 'SDN', 'Khartum', 1271403);
-INSERT INTO city VALUES (3225, 'Khartum', 'SDN', 'Khartum', 947483);
-INSERT INTO city VALUES (3226, 'Sharq al-Nil', 'SDN', 'Khartum', 700887);
-INSERT INTO city VALUES (3227, 'Port Sudan', 'SDN', 'al-Bahr al-Ahmar', 308195);
-INSERT INTO city VALUES (3228, 'Kassala', 'SDN', 'Kassala', 234622);
-INSERT INTO city VALUES (3229, 'Obeid', 'SDN', 'Kurdufan al-Shamaliy', 229425);
-INSERT INTO city VALUES (3230, 'Nyala', 'SDN', 'Darfur al-Janubiya', 227183);
-INSERT INTO city VALUES (3231, 'Wad Madani', 'SDN', 'al-Jazira', 211362);
-INSERT INTO city VALUES (3232, 'al-Qadarif', 'SDN', 'al-Qadarif', 191164);
-INSERT INTO city VALUES (3233, 'Kusti', 'SDN', 'al-Bahr al-Abyad', 173599);
-INSERT INTO city VALUES (3234, 'al-Fashir', 'SDN', 'Darfur al-Shamaliya', 141884);
-INSERT INTO city VALUES (3235, 'Juba', 'SDN', 'Bahr al-Jabal', 114980);
-INSERT INTO city VALUES (3236, 'Helsinki [Helsingfors]', 'FIN', 'Newmaa', 555474);
-INSERT INTO city VALUES (3237, 'Espoo', 'FIN', 'Newmaa', 213271);
-INSERT INTO city VALUES (3238, 'Tampere', 'FIN', 'Pirkanmaa', 195468);
-INSERT INTO city VALUES (3239, 'Vantaa', 'FIN', 'Newmaa', 178471);
-INSERT INTO city VALUES (3240, 'Turku [Åbo]', 'FIN', 'Varsinais-Suomi', 172561);
-INSERT INTO city VALUES (3241, 'Oulu', 'FIN', 'Pohjois-Pohjanmaa', 120753);
-INSERT INTO city VALUES (3242, 'Lahti', 'FIN', 'Päijät-Häme', 96921);
-INSERT INTO city VALUES (3243, 'Paramaribo', 'SUR', 'Paramaribo', 112000);
-INSERT INTO city VALUES (3244, 'Mbabane', 'SWZ', 'Hhohho', 61000);
-INSERT INTO city VALUES (3245, 'Zürich', 'CHE', 'Zürich', 336800);
-INSERT INTO city VALUES (3246, 'Geneve', 'CHE', 'Geneve', 173500);
-INSERT INTO city VALUES (3247, 'Basel', 'CHE', 'Basel-Stadt', 166700);
-INSERT INTO city VALUES (3248, 'Bern', 'CHE', 'Bern', 122700);
-INSERT INTO city VALUES (3249, 'Lausanne', 'CHE', 'Vaud', 114500);
-INSERT INTO city VALUES (3250, 'Damascus', 'SYR', 'Damascus', 1347000);
-INSERT INTO city VALUES (3251, 'Aleppo', 'SYR', 'Aleppo', 1261983);
-INSERT INTO city VALUES (3252, 'Hims', 'SYR', 'Hims', 507404);
-INSERT INTO city VALUES (3253, 'Hama', 'SYR', 'Hama', 343361);
-INSERT INTO city VALUES (3254, 'Latakia', 'SYR', 'Latakia', 264563);
-INSERT INTO city VALUES (3255, 'al-Qamishliya', 'SYR', 'al-Hasaka', 144286);
-INSERT INTO city VALUES (3256, 'Dayr al-Zawr', 'SYR', 'Dayr al-Zawr', 140459);
-INSERT INTO city VALUES (3257, 'Jaramana', 'SYR', 'Damaskos', 138469);
-INSERT INTO city VALUES (3258, 'Duma', 'SYR', 'Damaskos', 131158);
-INSERT INTO city VALUES (3259, 'al-Raqqa', 'SYR', 'al-Raqqa', 108020);
-INSERT INTO city VALUES (3260, 'Idlib', 'SYR', 'Idlib', 91081);
-INSERT INTO city VALUES (3261, 'Dushanbe', 'TJK', 'Karotegin', 524000);
-INSERT INTO city VALUES (3262, 'Khujand', 'TJK', 'Khujand', 161500);
-INSERT INTO city VALUES (3263, 'Taipei', 'TWN', 'Taipei', 2641312);
-INSERT INTO city VALUES (3264, 'Kaohsiung', 'TWN', 'Kaohsiung', 1475505);
-INSERT INTO city VALUES (3265, 'Taichung', 'TWN', 'Taichung', 940589);
-INSERT INTO city VALUES (3266, 'Tainan', 'TWN', 'Tainan', 728060);
-INSERT INTO city VALUES (3267, 'Panchiao', 'TWN', 'Taipei', 523850);
-INSERT INTO city VALUES (3268, 'Chungho', 'TWN', 'Taipei', 392176);
-INSERT INTO city VALUES (3269, 'Keelung (Chilung)', 'TWN', 'Keelung', 385201);
-INSERT INTO city VALUES (3270, 'Sanchung', 'TWN', 'Taipei', 380084);
-INSERT INTO city VALUES (3271, 'Hsinchuang', 'TWN', 'Taipei', 365048);
-INSERT INTO city VALUES (3272, 'Hsinchu', 'TWN', 'Hsinchu', 361958);
-INSERT INTO city VALUES (3273, 'Chungli', 'TWN', 'Taoyuan', 318649);
-INSERT INTO city VALUES (3274, 'Fengshan', 'TWN', 'Kaohsiung', 318562);
-INSERT INTO city VALUES (3275, 'Taoyuan', 'TWN', 'Taoyuan', 316438);
-INSERT INTO city VALUES (3276, 'Chiayi', 'TWN', 'Chiayi', 265109);
-INSERT INTO city VALUES (3277, 'Hsintien', 'TWN', 'Taipei', 263603);
-INSERT INTO city VALUES (3278, 'Changhwa', 'TWN', 'Changhwa', 227715);
-INSERT INTO city VALUES (3279, 'Yungho', 'TWN', 'Taipei', 227700);
-INSERT INTO city VALUES (3280, 'Tucheng', 'TWN', 'Taipei', 224897);
-INSERT INTO city VALUES (3281, 'Pingtung', 'TWN', 'Pingtung', 214727);
-INSERT INTO city VALUES (3282, 'Yungkang', 'TWN', 'Tainan', 193005);
-INSERT INTO city VALUES (3283, 'Pingchen', 'TWN', 'Taoyuan', 188344);
-INSERT INTO city VALUES (3284, 'Tali', 'TWN', 'Taichung', 171940);
-INSERT INTO city VALUES (3285, 'Taiping', 'TWN', '', 165524);
-INSERT INTO city VALUES (3286, 'Pate', 'TWN', 'Taoyuan', 161700);
-INSERT INTO city VALUES (3287, 'Fengyuan', 'TWN', 'Taichung', 161032);
-INSERT INTO city VALUES (3288, 'Luchou', 'TWN', 'Taipei', 160516);
-INSERT INTO city VALUES (3289, 'Hsichuh', 'TWN', 'Taipei', 154976);
-INSERT INTO city VALUES (3290, 'Shulin', 'TWN', 'Taipei', 151260);
-INSERT INTO city VALUES (3291, 'Yuanlin', 'TWN', 'Changhwa', 126402);
-INSERT INTO city VALUES (3292, 'Yangmei', 'TWN', 'Taoyuan', 126323);
-INSERT INTO city VALUES (3293, 'Taliao', 'TWN', '', 115897);
-INSERT INTO city VALUES (3294, 'Kueishan', 'TWN', '', 112195);
-INSERT INTO city VALUES (3295, 'Tanshui', 'TWN', 'Taipei', 111882);
-INSERT INTO city VALUES (3296, 'Taitung', 'TWN', 'Taitung', 111039);
-INSERT INTO city VALUES (3297, 'Hualien', 'TWN', 'Hualien', 108407);
-INSERT INTO city VALUES (3298, 'Nantou', 'TWN', 'Nantou', 104723);
-INSERT INTO city VALUES (3299, 'Lungtan', 'TWN', 'Taipei', 103088);
-INSERT INTO city VALUES (3300, 'Touliu', 'TWN', 'Yünlin', 98900);
-INSERT INTO city VALUES (3301, 'Tsaotun', 'TWN', 'Nantou', 96800);
-INSERT INTO city VALUES (3302, 'Kangshan', 'TWN', 'Kaohsiung', 92200);
-INSERT INTO city VALUES (3303, 'Ilan', 'TWN', 'Ilan', 92000);
-INSERT INTO city VALUES (3304, 'Miaoli', 'TWN', 'Miaoli', 90000);
-INSERT INTO city VALUES (3305, 'Dar es Salaam', 'TZA', 'Dar es Salaam', 1747000);
-INSERT INTO city VALUES (3306, 'Dodoma', 'TZA', 'Dodoma', 189000);
-INSERT INTO city VALUES (3307, 'Mwanza', 'TZA', 'Mwanza', 172300);
-INSERT INTO city VALUES (3308, 'Zanzibar', 'TZA', 'Zanzibar West', 157634);
-INSERT INTO city VALUES (3309, 'Tanga', 'TZA', 'Tanga', 137400);
-INSERT INTO city VALUES (3310, 'Mbeya', 'TZA', 'Mbeya', 130800);
-INSERT INTO city VALUES (3311, 'Morogoro', 'TZA', 'Morogoro', 117800);
-INSERT INTO city VALUES (3312, 'Arusha', 'TZA', 'Arusha', 102500);
-INSERT INTO city VALUES (3313, 'Moshi', 'TZA', 'Kilimanjaro', 96800);
-INSERT INTO city VALUES (3314, 'Tabora', 'TZA', 'Tabora', 92800);
-INSERT INTO city VALUES (3315, 'København', 'DNK', 'København', 495699);
-INSERT INTO city VALUES (3316, 'Århus', 'DNK', 'Århus', 284846);
-INSERT INTO city VALUES (3317, 'Odense', 'DNK', 'Fyn', 183912);
-INSERT INTO city VALUES (3318, 'Aalborg', 'DNK', 'Nordjylland', 161161);
-INSERT INTO city VALUES (3319, 'Frederiksberg', 'DNK', 'Frederiksberg', 90327);
-INSERT INTO city VALUES (3320, 'Bangkok', 'THA', 'Bangkok', 6320174);
-INSERT INTO city VALUES (3321, 'Nonthaburi', 'THA', 'Nonthaburi', 292100);
-INSERT INTO city VALUES (3322, 'Nakhon Ratchasima', 'THA', 'Nakhon Ratchasima', 181400);
-INSERT INTO city VALUES (3323, 'Chiang Mai', 'THA', 'Chiang Mai', 171100);
-INSERT INTO city VALUES (3324, 'Udon Thani', 'THA', 'Udon Thani', 158100);
-INSERT INTO city VALUES (3325, 'Hat Yai', 'THA', 'Songkhla', 148632);
-INSERT INTO city VALUES (3326, 'Khon Kaen', 'THA', 'Khon Kaen', 126500);
-INSERT INTO city VALUES (3327, 'Pak Kret', 'THA', 'Nonthaburi', 126055);
-INSERT INTO city VALUES (3328, 'Nakhon Sawan', 'THA', 'Nakhon Sawan', 123800);
-INSERT INTO city VALUES (3329, 'Ubon Ratchathani', 'THA', 'Ubon Ratchathani', 116300);
-INSERT INTO city VALUES (3330, 'Songkhla', 'THA', 'Songkhla', 94900);
-INSERT INTO city VALUES (3331, 'Nakhon Pathom', 'THA', 'Nakhon Pathom', 94100);
-INSERT INTO city VALUES (3332, 'Lomé', 'TGO', 'Maritime', 375000);
-INSERT INTO city VALUES (3333, 'Fakaofo', 'TKL', 'Fakaofo', 300);
-INSERT INTO city VALUES (3334, 'Nuku´alofa', 'TON', 'Tongatapu', 22400);
-INSERT INTO city VALUES (3335, 'Chaguanas', 'TTO', 'Caroni', 56601);
-INSERT INTO city VALUES (3336, 'Port-of-Spain', 'TTO', 'Port-of-Spain', 43396);
-INSERT INTO city VALUES (3337, 'N´Djaména', 'TCD', 'Chari-Baguirmi', 530965);
-INSERT INTO city VALUES (3338, 'Moundou', 'TCD', 'Logone Occidental', 99500);
-INSERT INTO city VALUES (3339, 'Praha', 'CZE', 'Hlavní mesto Praha', 1181126);
-INSERT INTO city VALUES (3340, 'Brno', 'CZE', 'Jizní Morava', 381862);
-INSERT INTO city VALUES (3341, 'Ostrava', 'CZE', 'Severní Morava', 320041);
-INSERT INTO city VALUES (3342, 'Plzen', 'CZE', 'Zapadní Cechy', 166759);
-INSERT INTO city VALUES (3343, 'Olomouc', 'CZE', 'Severní Morava', 102702);
-INSERT INTO city VALUES (3344, 'Liberec', 'CZE', 'Severní Cechy', 99155);
-INSERT INTO city VALUES (3345, 'Ceské Budejovice', 'CZE', 'Jizní Cechy', 98186);
-INSERT INTO city VALUES (3346, 'Hradec Králové', 'CZE', 'Východní Cechy', 98080);
-INSERT INTO city VALUES (3347, 'Ústí nad Labem', 'CZE', 'Severní Cechy', 95491);
-INSERT INTO city VALUES (3348, 'Pardubice', 'CZE', 'Východní Cechy', 91309);
-INSERT INTO city VALUES (3349, 'Tunis', 'TUN', 'Tunis', 690600);
-INSERT INTO city VALUES (3350, 'Sfax', 'TUN', 'Sfax', 257800);
-INSERT INTO city VALUES (3351, 'Ariana', 'TUN', 'Ariana', 197000);
-INSERT INTO city VALUES (3352, 'Ettadhamen', 'TUN', 'Ariana', 178600);
-INSERT INTO city VALUES (3353, 'Sousse', 'TUN', 'Sousse', 145900);
-INSERT INTO city VALUES (3354, 'Kairouan', 'TUN', 'Kairouan', 113100);
-INSERT INTO city VALUES (3355, 'Biserta', 'TUN', 'Biserta', 108900);
-INSERT INTO city VALUES (3356, 'Gabès', 'TUN', 'Gabès', 106600);
-INSERT INTO city VALUES (3357, 'Istanbul', 'TUR', 'Istanbul', 8787958);
-INSERT INTO city VALUES (3358, 'Ankara', 'TUR', 'Ankara', 3038159);
-INSERT INTO city VALUES (3359, 'Izmir', 'TUR', 'Izmir', 2130359);
-INSERT INTO city VALUES (3360, 'Adana', 'TUR', 'Adana', 1131198);
-INSERT INTO city VALUES (3361, 'Bursa', 'TUR', 'Bursa', 1095842);
-INSERT INTO city VALUES (3362, 'Gaziantep', 'TUR', 'Gaziantep', 789056);
-INSERT INTO city VALUES (3363, 'Konya', 'TUR', 'Konya', 628364);
-INSERT INTO city VALUES (3364, 'Mersin (Içel)', 'TUR', 'Içel', 587212);
-INSERT INTO city VALUES (3365, 'Antalya', 'TUR', 'Antalya', 564914);
-INSERT INTO city VALUES (3366, 'Diyarbakir', 'TUR', 'Diyarbakir', 479884);
-INSERT INTO city VALUES (3367, 'Kayseri', 'TUR', 'Kayseri', 475657);
-INSERT INTO city VALUES (3368, 'Eskisehir', 'TUR', 'Eskisehir', 470781);
-INSERT INTO city VALUES (3369, 'Sanliurfa', 'TUR', 'Sanliurfa', 405905);
-INSERT INTO city VALUES (3370, 'Samsun', 'TUR', 'Samsun', 339871);
-INSERT INTO city VALUES (3371, 'Malatya', 'TUR', 'Malatya', 330312);
-INSERT INTO city VALUES (3372, 'Gebze', 'TUR', 'Kocaeli', 264170);
-INSERT INTO city VALUES (3373, 'Denizli', 'TUR', 'Denizli', 253848);
-INSERT INTO city VALUES (3374, 'Sivas', 'TUR', 'Sivas', 246642);
-INSERT INTO city VALUES (3375, 'Erzurum', 'TUR', 'Erzurum', 246535);
-INSERT INTO city VALUES (3376, 'Tarsus', 'TUR', 'Adana', 246206);
-INSERT INTO city VALUES (3377, 'Kahramanmaras', 'TUR', 'Kahramanmaras', 245772);
-INSERT INTO city VALUES (3378, 'Elâzig', 'TUR', 'Elâzig', 228815);
-INSERT INTO city VALUES (3379, 'Van', 'TUR', 'Van', 219319);
-INSERT INTO city VALUES (3380, 'Sultanbeyli', 'TUR', 'Istanbul', 211068);
-INSERT INTO city VALUES (3381, 'Izmit (Kocaeli)', 'TUR', 'Kocaeli', 210068);
-INSERT INTO city VALUES (3382, 'Manisa', 'TUR', 'Manisa', 207148);
-INSERT INTO city VALUES (3383, 'Batman', 'TUR', 'Batman', 203793);
-INSERT INTO city VALUES (3384, 'Balikesir', 'TUR', 'Balikesir', 196382);
-INSERT INTO city VALUES (3385, 'Sakarya (Adapazari)', 'TUR', 'Sakarya', 190641);
-INSERT INTO city VALUES (3386, 'Iskenderun', 'TUR', 'Hatay', 153022);
-INSERT INTO city VALUES (3387, 'Osmaniye', 'TUR', 'Osmaniye', 146003);
-INSERT INTO city VALUES (3388, 'Çorum', 'TUR', 'Çorum', 145495);
-INSERT INTO city VALUES (3389, 'Kütahya', 'TUR', 'Kütahya', 144761);
-INSERT INTO city VALUES (3390, 'Hatay (Antakya)', 'TUR', 'Hatay', 143982);
-INSERT INTO city VALUES (3391, 'Kirikkale', 'TUR', 'Kirikkale', 142044);
-INSERT INTO city VALUES (3392, 'Adiyaman', 'TUR', 'Adiyaman', 141529);
-INSERT INTO city VALUES (3393, 'Trabzon', 'TUR', 'Trabzon', 138234);
-INSERT INTO city VALUES (3394, 'Ordu', 'TUR', 'Ordu', 133642);
-INSERT INTO city VALUES (3395, 'Aydin', 'TUR', 'Aydin', 128651);
-INSERT INTO city VALUES (3396, 'Usak', 'TUR', 'Usak', 128162);
-INSERT INTO city VALUES (3397, 'Edirne', 'TUR', 'Edirne', 123383);
-INSERT INTO city VALUES (3398, 'Çorlu', 'TUR', 'Tekirdag', 123300);
-INSERT INTO city VALUES (3399, 'Isparta', 'TUR', 'Isparta', 121911);
-INSERT INTO city VALUES (3400, 'Karabük', 'TUR', 'Karabük', 118285);
-INSERT INTO city VALUES (3401, 'Kilis', 'TUR', 'Kilis', 118245);
-INSERT INTO city VALUES (3402, 'Alanya', 'TUR', 'Antalya', 117300);
-INSERT INTO city VALUES (3403, 'Kiziltepe', 'TUR', 'Mardin', 112000);
-INSERT INTO city VALUES (3404, 'Zonguldak', 'TUR', 'Zonguldak', 111542);
-INSERT INTO city VALUES (3405, 'Siirt', 'TUR', 'Siirt', 107100);
-INSERT INTO city VALUES (3406, 'Viransehir', 'TUR', 'Sanliurfa', 106400);
-INSERT INTO city VALUES (3407, 'Tekirdag', 'TUR', 'Tekirdag', 106077);
-INSERT INTO city VALUES (3408, 'Karaman', 'TUR', 'Karaman', 104200);
-INSERT INTO city VALUES (3409, 'Afyon', 'TUR', 'Afyon', 103984);
-INSERT INTO city VALUES (3410, 'Aksaray', 'TUR', 'Aksaray', 102681);
-INSERT INTO city VALUES (3411, 'Ceyhan', 'TUR', 'Adana', 102412);
-INSERT INTO city VALUES (3412, 'Erzincan', 'TUR', 'Erzincan', 102304);
-INSERT INTO city VALUES (3413, 'Bismil', 'TUR', 'Diyarbakir', 101400);
-INSERT INTO city VALUES (3414, 'Nazilli', 'TUR', 'Aydin', 99900);
-INSERT INTO city VALUES (3415, 'Tokat', 'TUR', 'Tokat', 99500);
-INSERT INTO city VALUES (3416, 'Kars', 'TUR', 'Kars', 93000);
-INSERT INTO city VALUES (3417, 'Inegöl', 'TUR', 'Bursa', 90500);
-INSERT INTO city VALUES (3418, 'Bandirma', 'TUR', 'Balikesir', 90200);
-INSERT INTO city VALUES (3419, 'Ashgabat', 'TKM', 'Ahal', 540600);
-INSERT INTO city VALUES (3420, 'Chärjew', 'TKM', 'Lebap', 189200);
-INSERT INTO city VALUES (3421, 'Dashhowuz', 'TKM', 'Dashhowuz', 141800);
-INSERT INTO city VALUES (3422, 'Mary', 'TKM', 'Mary', 101000);
-INSERT INTO city VALUES (3423, 'Cockburn Town', 'TCA', 'Grand Turk', 4800);
-INSERT INTO city VALUES (3424, 'Funafuti', 'TUV', 'Funafuti', 4600);
-INSERT INTO city VALUES (3425, 'Kampala', 'UGA', 'Central', 890800);
-INSERT INTO city VALUES (3426, 'Kyiv', 'UKR', 'Kiova', 2624000);
-INSERT INTO city VALUES (3427, 'Harkova [Harkiv]', 'UKR', 'Harkova', 1500000);
-INSERT INTO city VALUES (3428, 'Dnipropetrovsk', 'UKR', 'Dnipropetrovsk', 1103000);
-INSERT INTO city VALUES (3429, 'Donetsk', 'UKR', 'Donetsk', 1050000);
-INSERT INTO city VALUES (3430, 'Odesa', 'UKR', 'Odesa', 1011000);
-INSERT INTO city VALUES (3431, 'Zaporizzja', 'UKR', 'Zaporizzja', 848000);
-INSERT INTO city VALUES (3432, 'Lviv', 'UKR', 'Lviv', 788000);
-INSERT INTO city VALUES (3433, 'Kryvyi Rig', 'UKR', 'Dnipropetrovsk', 703000);
-INSERT INTO city VALUES (3434, 'Mykolajiv', 'UKR', 'Mykolajiv', 508000);
-INSERT INTO city VALUES (3435, 'Mariupol', 'UKR', 'Donetsk', 490000);
-INSERT INTO city VALUES (3436, 'Lugansk', 'UKR', 'Lugansk', 469000);
-INSERT INTO city VALUES (3437, 'Vinnytsja', 'UKR', 'Vinnytsja', 391000);
-INSERT INTO city VALUES (3438, 'Makijivka', 'UKR', 'Donetsk', 384000);
-INSERT INTO city VALUES (3439, 'Herson', 'UKR', 'Herson', 353000);
-INSERT INTO city VALUES (3440, 'Sevastopol', 'UKR', 'Krim', 348000);
-INSERT INTO city VALUES (3441, 'Simferopol', 'UKR', 'Krim', 339000);
-INSERT INTO city VALUES (3442, 'Pultava [Poltava]', 'UKR', 'Pultava', 313000);
-INSERT INTO city VALUES (3443, 'Ternigiv', 'UKR', 'Ternigiv', 313000);
-INSERT INTO city VALUES (3444, 'Terkasy', 'UKR', 'Terkasy', 309000);
-INSERT INTO city VALUES (3445, 'Gorlivka', 'UKR', 'Donetsk', 299000);
-INSERT INTO city VALUES (3446, 'Zytomyr', 'UKR', 'Zytomyr', 297000);
-INSERT INTO city VALUES (3447, 'Sumy', 'UKR', 'Sumy', 294000);
-INSERT INTO city VALUES (3448, 'Dniprodzerzynsk', 'UKR', 'Dnipropetrovsk', 270000);
-INSERT INTO city VALUES (3449, 'Kirovograd', 'UKR', 'Kirovograd', 265000);
-INSERT INTO city VALUES (3450, 'Hmelnytskyi', 'UKR', 'Hmelnytskyi', 262000);
-INSERT INTO city VALUES (3451, 'Ternivtsi', 'UKR', 'Ternivtsi', 259000);
-INSERT INTO city VALUES (3452, 'Rivne', 'UKR', 'Rivne', 245000);
-INSERT INTO city VALUES (3453, 'Krementuk', 'UKR', 'Pultava', 239000);
-INSERT INTO city VALUES (3454, 'Ivano-Frankivsk', 'UKR', 'Ivano-Frankivsk', 237000);
-INSERT INTO city VALUES (3455, 'Ternopil', 'UKR', 'Ternopil', 236000);
-INSERT INTO city VALUES (3456, 'Lutsk', 'UKR', 'Volynia', 217000);
-INSERT INTO city VALUES (3457, 'Bila Tserkva', 'UKR', 'Kiova', 215000);
-INSERT INTO city VALUES (3458, 'Kramatorsk', 'UKR', 'Donetsk', 186000);
-INSERT INTO city VALUES (3459, 'Melitopol', 'UKR', 'Zaporizzja', 169000);
-INSERT INTO city VALUES (3460, 'Kert', 'UKR', 'Krim', 162000);
-INSERT INTO city VALUES (3461, 'Nikopol', 'UKR', 'Dnipropetrovsk', 149000);
-INSERT INTO city VALUES (3462, 'Berdjansk', 'UKR', 'Zaporizzja', 130000);
-INSERT INTO city VALUES (3463, 'Pavlograd', 'UKR', 'Dnipropetrovsk', 127000);
-INSERT INTO city VALUES (3464, 'Sjeverodonetsk', 'UKR', 'Lugansk', 127000);
-INSERT INTO city VALUES (3465, 'Slovjansk', 'UKR', 'Donetsk', 127000);
-INSERT INTO city VALUES (3466, 'Uzgorod', 'UKR', 'Taka-Karpatia', 127000);
-INSERT INTO city VALUES (3467, 'Altevsk', 'UKR', 'Lugansk', 119000);
-INSERT INTO city VALUES (3468, 'Lysytansk', 'UKR', 'Lugansk', 116000);
-INSERT INTO city VALUES (3469, 'Jevpatorija', 'UKR', 'Krim', 112000);
-INSERT INTO city VALUES (3470, 'Kamjanets-Podilskyi', 'UKR', 'Hmelnytskyi', 109000);
-INSERT INTO city VALUES (3471, 'Jenakijeve', 'UKR', 'Donetsk', 105000);
-INSERT INTO city VALUES (3472, 'Krasnyi Lut', 'UKR', 'Lugansk', 101000);
-INSERT INTO city VALUES (3473, 'Stahanov', 'UKR', 'Lugansk', 101000);
-INSERT INTO city VALUES (3474, 'Oleksandrija', 'UKR', 'Kirovograd', 99000);
-INSERT INTO city VALUES (3475, 'Konotop', 'UKR', 'Sumy', 96000);
-INSERT INTO city VALUES (3476, 'Kostjantynivka', 'UKR', 'Donetsk', 95000);
-INSERT INTO city VALUES (3477, 'Berdytiv', 'UKR', 'Zytomyr', 90000);
-INSERT INTO city VALUES (3478, 'Izmajil', 'UKR', 'Odesa', 90000);
-INSERT INTO city VALUES (3479, 'ostka', 'UKR', 'Sumy', 90000);
-INSERT INTO city VALUES (3480, 'Uman', 'UKR', 'Terkasy', 90000);
-INSERT INTO city VALUES (3481, 'Brovary', 'UKR', 'Kiova', 89000);
-INSERT INTO city VALUES (3482, 'Mukateve', 'UKR', 'Taka-Karpatia', 89000);
-INSERT INTO city VALUES (3483, 'Budapest', 'HUN', 'Budapest', 1811552);
-INSERT INTO city VALUES (3484, 'Debrecen', 'HUN', 'Hajdú-Bihar', 203648);
-INSERT INTO city VALUES (3485, 'Miskolc', 'HUN', 'Borsod-Abaúj-Zemplén', 172357);
-INSERT INTO city VALUES (3486, 'Szeged', 'HUN', 'Csongrád', 158158);
-INSERT INTO city VALUES (3487, 'Pécs', 'HUN', 'Baranya', 157332);
-INSERT INTO city VALUES (3488, 'Györ', 'HUN', 'Györ-Moson-Sopron', 127119);
-INSERT INTO city VALUES (3489, 'Nyiregyháza', 'HUN', 'Szabolcs-Szatmár-Ber', 112419);
-INSERT INTO city VALUES (3490, 'Kecskemét', 'HUN', 'Bács-Kiskun', 105606);
-INSERT INTO city VALUES (3491, 'Székesfehérvár', 'HUN', 'Fejér', 105119);
-INSERT INTO city VALUES (3492, 'Montevideo', 'URY', 'Montevideo', 1236000);
-INSERT INTO city VALUES (3493, 'Nouméa', 'NCL', '', 76293);
-INSERT INTO city VALUES (3494, 'Auckland', 'NZL', 'Auckland', 381800);
-INSERT INTO city VALUES (3495, 'Christchurch', 'NZL', 'Canterbury', 324200);
-INSERT INTO city VALUES (3496, 'Manukau', 'NZL', 'Auckland', 281800);
-INSERT INTO city VALUES (3497, 'North Shore', 'NZL', 'Auckland', 187700);
-INSERT INTO city VALUES (3498, 'Waitakere', 'NZL', 'Auckland', 170600);
-INSERT INTO city VALUES (3499, 'Wellington', 'NZL', 'Wellington', 166700);
-INSERT INTO city VALUES (3500, 'Dunedin', 'NZL', 'Dunedin', 119600);
-INSERT INTO city VALUES (3501, 'Hamilton', 'NZL', 'Hamilton', 117100);
-INSERT INTO city VALUES (3502, 'Lower Hutt', 'NZL', 'Wellington', 98100);
-INSERT INTO city VALUES (3503, 'Toskent', 'UZB', 'Toskent Shahri', 2117500);
-INSERT INTO city VALUES (3504, 'Namangan', 'UZB', 'Namangan', 370500);
-INSERT INTO city VALUES (3505, 'Samarkand', 'UZB', 'Samarkand', 361800);
-INSERT INTO city VALUES (3506, 'Andijon', 'UZB', 'Andijon', 318600);
-INSERT INTO city VALUES (3507, 'Buhoro', 'UZB', 'Buhoro', 237100);
-INSERT INTO city VALUES (3508, 'Karsi', 'UZB', 'Qashqadaryo', 194100);
-INSERT INTO city VALUES (3509, 'Nukus', 'UZB', 'Karakalpakistan', 194100);
-INSERT INTO city VALUES (3510, 'Kükon', 'UZB', 'Fargona', 190100);
-INSERT INTO city VALUES (3511, 'Fargona', 'UZB', 'Fargona', 180500);
-INSERT INTO city VALUES (3512, 'Circik', 'UZB', 'Toskent', 146400);
-INSERT INTO city VALUES (3513, 'Margilon', 'UZB', 'Fargona', 140800);
-INSERT INTO city VALUES (3514, 'Ürgenc', 'UZB', 'Khorazm', 138900);
-INSERT INTO city VALUES (3515, 'Angren', 'UZB', 'Toskent', 128000);
-INSERT INTO city VALUES (3516, 'Cizah', 'UZB', 'Cizah', 124800);
-INSERT INTO city VALUES (3517, 'Navoi', 'UZB', 'Navoi', 116300);
-INSERT INTO city VALUES (3518, 'Olmalik', 'UZB', 'Toskent', 114900);
-INSERT INTO city VALUES (3519, 'Termiz', 'UZB', 'Surkhondaryo', 109500);
-INSERT INTO city VALUES (3520, 'Minsk', 'BLR', 'Horad Minsk', 1674000);
-INSERT INTO city VALUES (3521, 'Gomel', 'BLR', 'Gomel', 475000);
-INSERT INTO city VALUES (3522, 'Mogiljov', 'BLR', 'Mogiljov', 356000);
-INSERT INTO city VALUES (3523, 'Vitebsk', 'BLR', 'Vitebsk', 340000);
-INSERT INTO city VALUES (3524, 'Grodno', 'BLR', 'Grodno', 302000);
-INSERT INTO city VALUES (3525, 'Brest', 'BLR', 'Brest', 286000);
-INSERT INTO city VALUES (3526, 'Bobruisk', 'BLR', 'Mogiljov', 221000);
-INSERT INTO city VALUES (3527, 'Baranoviti', 'BLR', 'Brest', 167000);
-INSERT INTO city VALUES (3528, 'Borisov', 'BLR', 'Minsk', 151000);
-INSERT INTO city VALUES (3529, 'Pinsk', 'BLR', 'Brest', 130000);
-INSERT INTO city VALUES (3530, 'Ora', 'BLR', 'Vitebsk', 124000);
-INSERT INTO city VALUES (3531, 'Mozyr', 'BLR', 'Gomel', 110000);
-INSERT INTO city VALUES (3532, 'Novopolotsk', 'BLR', 'Vitebsk', 106000);
-INSERT INTO city VALUES (3533, 'Lida', 'BLR', 'Grodno', 101000);
-INSERT INTO city VALUES (3534, 'Soligorsk', 'BLR', 'Minsk', 101000);
-INSERT INTO city VALUES (3535, 'Molodetno', 'BLR', 'Minsk', 97000);
-INSERT INTO city VALUES (3536, 'Mata-Utu', 'WLF', 'Wallis', 1137);
-INSERT INTO city VALUES (3537, 'Port-Vila', 'VUT', 'Shefa', 33700);
-INSERT INTO city VALUES (3538, 'Città del Vaticano', 'VAT', '', 455);
-INSERT INTO city VALUES (3539, 'Caracas', 'VEN', 'Distrito Federal', 1975294);
-INSERT INTO city VALUES (3540, 'Maracaíbo', 'VEN', 'Zulia', 1304776);
-INSERT INTO city VALUES (3541, 'Barquisimeto', 'VEN', 'Lara', 877239);
-INSERT INTO city VALUES (3542, 'Valencia', 'VEN', 'Carabobo', 794246);
-INSERT INTO city VALUES (3543, 'Ciudad Guayana', 'VEN', 'Bolívar', 663713);
-INSERT INTO city VALUES (3544, 'Petare', 'VEN', 'Miranda', 488868);
-INSERT INTO city VALUES (3545, 'Maracay', 'VEN', 'Aragua', 444443);
-INSERT INTO city VALUES (3546, 'Barcelona', 'VEN', 'Anzoátegui', 322267);
-INSERT INTO city VALUES (3547, 'Maturín', 'VEN', 'Monagas', 319726);
-INSERT INTO city VALUES (3548, 'San Cristóbal', 'VEN', 'Táchira', 319373);
-INSERT INTO city VALUES (3549, 'Ciudad Bolívar', 'VEN', 'Bolívar', 301107);
-INSERT INTO city VALUES (3550, 'Cumaná', 'VEN', 'Sucre', 293105);
-INSERT INTO city VALUES (3551, 'Mérida', 'VEN', 'Mérida', 224887);
-INSERT INTO city VALUES (3552, 'Cabimas', 'VEN', 'Zulia', 221329);
-INSERT INTO city VALUES (3553, 'Barinas', 'VEN', 'Barinas', 217831);
-INSERT INTO city VALUES (3554, 'Turmero', 'VEN', 'Aragua', 217499);
-INSERT INTO city VALUES (3555, 'Baruta', 'VEN', 'Miranda', 207290);
-INSERT INTO city VALUES (3556, 'Puerto Cabello', 'VEN', 'Carabobo', 187722);
-INSERT INTO city VALUES (3557, 'Santa Ana de Coro', 'VEN', 'Falcón', 185766);
-INSERT INTO city VALUES (3558, 'Los Teques', 'VEN', 'Miranda', 178784);
-INSERT INTO city VALUES (3559, 'Punto Fijo', 'VEN', 'Falcón', 167215);
-INSERT INTO city VALUES (3560, 'Guarenas', 'VEN', 'Miranda', 165889);
-INSERT INTO city VALUES (3561, 'Acarigua', 'VEN', 'Portuguesa', 158954);
-INSERT INTO city VALUES (3562, 'Puerto La Cruz', 'VEN', 'Anzoátegui', 155700);
-INSERT INTO city VALUES (3563, 'Ciudad Losada', 'VEN', '', 134501);
-INSERT INTO city VALUES (3564, 'Guacara', 'VEN', 'Carabobo', 131334);
-INSERT INTO city VALUES (3565, 'Valera', 'VEN', 'Trujillo', 130281);
-INSERT INTO city VALUES (3566, 'Guanare', 'VEN', 'Portuguesa', 125621);
-INSERT INTO city VALUES (3567, 'Carúpano', 'VEN', 'Sucre', 119639);
-INSERT INTO city VALUES (3568, 'Catia La Mar', 'VEN', 'Distrito Federal', 117012);
-INSERT INTO city VALUES (3569, 'El Tigre', 'VEN', 'Anzoátegui', 116256);
-INSERT INTO city VALUES (3570, 'Guatire', 'VEN', 'Miranda', 109121);
-INSERT INTO city VALUES (3571, 'Calabozo', 'VEN', 'Guárico', 107146);
-INSERT INTO city VALUES (3572, 'Pozuelos', 'VEN', 'Anzoátegui', 105690);
-INSERT INTO city VALUES (3573, 'Ciudad Ojeda', 'VEN', 'Zulia', 99354);
-INSERT INTO city VALUES (3574, 'Ocumare del Tuy', 'VEN', 'Miranda', 97168);
-INSERT INTO city VALUES (3575, 'Valle de la Pascua', 'VEN', 'Guárico', 95927);
-INSERT INTO city VALUES (3576, 'Araure', 'VEN', 'Portuguesa', 94269);
-INSERT INTO city VALUES (3577, 'San Fernando de Apure', 'VEN', 'Apure', 93809);
-INSERT INTO city VALUES (3578, 'San Felipe', 'VEN', 'Yaracuy', 90940);
-INSERT INTO city VALUES (3579, 'El Limón', 'VEN', 'Aragua', 90000);
-INSERT INTO city VALUES (3580, 'Moscow', 'RUS', 'Moscow (City)', 8389200);
-INSERT INTO city VALUES (3581, 'St Petersburg', 'RUS', 'Pietari', 4694000);
-INSERT INTO city VALUES (3582, 'Novosibirsk', 'RUS', 'Novosibirsk', 1398800);
-INSERT INTO city VALUES (3583, 'Nizni Novgorod', 'RUS', 'Nizni Novgorod', 1357000);
-INSERT INTO city VALUES (3584, 'Jekaterinburg', 'RUS', 'Sverdlovsk', 1266300);
-INSERT INTO city VALUES (3585, 'Samara', 'RUS', 'Samara', 1156100);
-INSERT INTO city VALUES (3586, 'Omsk', 'RUS', 'Omsk', 1148900);
-INSERT INTO city VALUES (3587, 'Kazan', 'RUS', 'Tatarstan', 1101000);
-INSERT INTO city VALUES (3588, 'Ufa', 'RUS', 'Bakortostan', 1091200);
-INSERT INTO city VALUES (3589, 'Teljabinsk', 'RUS', 'Teljabinsk', 1083200);
-INSERT INTO city VALUES (3590, 'Rostov-na-Donu', 'RUS', 'Rostov-na-Donu', 1012700);
-INSERT INTO city VALUES (3591, 'Perm', 'RUS', 'Perm', 1009700);
-INSERT INTO city VALUES (3592, 'Volgograd', 'RUS', 'Volgograd', 993400);
-INSERT INTO city VALUES (3593, 'Voronez', 'RUS', 'Voronez', 907700);
-INSERT INTO city VALUES (3594, 'Krasnojarsk', 'RUS', 'Krasnojarsk', 875500);
-INSERT INTO city VALUES (3595, 'Saratov', 'RUS', 'Saratov', 874000);
-INSERT INTO city VALUES (3596, 'Toljatti', 'RUS', 'Samara', 722900);
-INSERT INTO city VALUES (3597, 'Uljanovsk', 'RUS', 'Uljanovsk', 667400);
-INSERT INTO city VALUES (3598, 'Izevsk', 'RUS', 'Udmurtia', 652800);
-INSERT INTO city VALUES (3599, 'Krasnodar', 'RUS', 'Krasnodar', 639000);
-INSERT INTO city VALUES (3600, 'Jaroslavl', 'RUS', 'Jaroslavl', 616700);
-INSERT INTO city VALUES (3601, 'Habarovsk', 'RUS', 'Habarovsk', 609400);
-INSERT INTO city VALUES (3602, 'Vladivostok', 'RUS', 'Primorje', 606200);
-INSERT INTO city VALUES (3603, 'Irkutsk', 'RUS', 'Irkutsk', 593700);
-INSERT INTO city VALUES (3604, 'Barnaul', 'RUS', 'Altai', 580100);
-INSERT INTO city VALUES (3605, 'Novokuznetsk', 'RUS', 'Kemerovo', 561600);
-INSERT INTO city VALUES (3606, 'Penza', 'RUS', 'Penza', 532200);
-INSERT INTO city VALUES (3607, 'Rjazan', 'RUS', 'Rjazan', 529900);
-INSERT INTO city VALUES (3608, 'Orenburg', 'RUS', 'Orenburg', 523600);
-INSERT INTO city VALUES (3609, 'Lipetsk', 'RUS', 'Lipetsk', 521000);
-INSERT INTO city VALUES (3610, 'Nabereznyje Telny', 'RUS', 'Tatarstan', 514700);
-INSERT INTO city VALUES (3611, 'Tula', 'RUS', 'Tula', 506100);
-INSERT INTO city VALUES (3612, 'Tjumen', 'RUS', 'Tjumen', 503400);
-INSERT INTO city VALUES (3613, 'Kemerovo', 'RUS', 'Kemerovo', 492700);
-INSERT INTO city VALUES (3614, 'Astrahan', 'RUS', 'Astrahan', 486100);
-INSERT INTO city VALUES (3615, 'Tomsk', 'RUS', 'Tomsk', 482100);
-INSERT INTO city VALUES (3616, 'Kirov', 'RUS', 'Kirov', 466200);
-INSERT INTO city VALUES (3617, 'Ivanovo', 'RUS', 'Ivanovo', 459200);
-INSERT INTO city VALUES (3618, 'Teboksary', 'RUS', 'Tuvassia', 459200);
-INSERT INTO city VALUES (3619, 'Brjansk', 'RUS', 'Brjansk', 457400);
-INSERT INTO city VALUES (3620, 'Tver', 'RUS', 'Tver', 454900);
-INSERT INTO city VALUES (3621, 'Kursk', 'RUS', 'Kursk', 443500);
-INSERT INTO city VALUES (3622, 'Magnitogorsk', 'RUS', 'Teljabinsk', 427900);
-INSERT INTO city VALUES (3623, 'Kaliningrad', 'RUS', 'Kaliningrad', 424400);
-INSERT INTO city VALUES (3624, 'Nizni Tagil', 'RUS', 'Sverdlovsk', 390900);
-INSERT INTO city VALUES (3625, 'Murmansk', 'RUS', 'Murmansk', 376300);
-INSERT INTO city VALUES (3626, 'Ulan-Ude', 'RUS', 'Burjatia', 370400);
-INSERT INTO city VALUES (3627, 'Kurgan', 'RUS', 'Kurgan', 364700);
-INSERT INTO city VALUES (3628, 'Arkangeli', 'RUS', 'Arkangeli', 361800);
-INSERT INTO city VALUES (3629, 'Soti', 'RUS', 'Krasnodar', 358600);
-INSERT INTO city VALUES (3630, 'Smolensk', 'RUS', 'Smolensk', 353400);
-INSERT INTO city VALUES (3631, 'Orjol', 'RUS', 'Orjol', 344500);
-INSERT INTO city VALUES (3632, 'Stavropol', 'RUS', 'Stavropol', 343300);
-INSERT INTO city VALUES (3633, 'Belgorod', 'RUS', 'Belgorod', 342000);
-INSERT INTO city VALUES (3634, 'Kaluga', 'RUS', 'Kaluga', 339300);
-INSERT INTO city VALUES (3635, 'Vladimir', 'RUS', 'Vladimir', 337100);
-INSERT INTO city VALUES (3636, 'Mahatkala', 'RUS', 'Dagestan', 332800);
-INSERT INTO city VALUES (3637, 'Terepovets', 'RUS', 'Vologda', 324400);
-INSERT INTO city VALUES (3638, 'Saransk', 'RUS', 'Mordva', 314800);
-INSERT INTO city VALUES (3639, 'Tambov', 'RUS', 'Tambov', 312000);
-INSERT INTO city VALUES (3640, 'Vladikavkaz', 'RUS', 'North Ossetia-Alania', 310100);
-INSERT INTO city VALUES (3641, 'Tita', 'RUS', 'Tita', 309900);
-INSERT INTO city VALUES (3642, 'Vologda', 'RUS', 'Vologda', 302500);
-INSERT INTO city VALUES (3643, 'Veliki Novgorod', 'RUS', 'Novgorod', 299500);
-INSERT INTO city VALUES (3644, 'Komsomolsk-na-Amure', 'RUS', 'Habarovsk', 291600);
-INSERT INTO city VALUES (3645, 'Kostroma', 'RUS', 'Kostroma', 288100);
-INSERT INTO city VALUES (3646, 'Volzski', 'RUS', 'Volgograd', 286900);
-INSERT INTO city VALUES (3647, 'Taganrog', 'RUS', 'Rostov-na-Donu', 284400);
-INSERT INTO city VALUES (3648, 'Petroskoi', 'RUS', 'Karjala', 282100);
-INSERT INTO city VALUES (3649, 'Bratsk', 'RUS', 'Irkutsk', 277600);
-INSERT INTO city VALUES (3650, 'Dzerzinsk', 'RUS', 'Nizni Novgorod', 277100);
-INSERT INTO city VALUES (3651, 'Surgut', 'RUS', 'Hanti-Mansia', 274900);
-INSERT INTO city VALUES (3652, 'Orsk', 'RUS', 'Orenburg', 273900);
-INSERT INTO city VALUES (3653, 'Sterlitamak', 'RUS', 'Bakortostan', 265200);
-INSERT INTO city VALUES (3654, 'Angarsk', 'RUS', 'Irkutsk', 264700);
-INSERT INTO city VALUES (3655, 'Jokar-Ola', 'RUS', 'Marinmaa', 249200);
-INSERT INTO city VALUES (3656, 'Rybinsk', 'RUS', 'Jaroslavl', 239600);
-INSERT INTO city VALUES (3657, 'Prokopjevsk', 'RUS', 'Kemerovo', 237300);
-INSERT INTO city VALUES (3658, 'Niznevartovsk', 'RUS', 'Hanti-Mansia', 233900);
-INSERT INTO city VALUES (3659, 'Naltik', 'RUS', 'Kabardi-Balkaria', 233400);
-INSERT INTO city VALUES (3660, 'Syktyvkar', 'RUS', 'Komi', 229700);
-INSERT INTO city VALUES (3661, 'Severodvinsk', 'RUS', 'Arkangeli', 229300);
-INSERT INTO city VALUES (3662, 'Bijsk', 'RUS', 'Altai', 225000);
-INSERT INTO city VALUES (3663, 'Niznekamsk', 'RUS', 'Tatarstan', 223400);
-INSERT INTO city VALUES (3664, 'Blagovetensk', 'RUS', 'Amur', 222000);
-INSERT INTO city VALUES (3665, 'ahty', 'RUS', 'Rostov-na-Donu', 221800);
-INSERT INTO city VALUES (3666, 'Staryi Oskol', 'RUS', 'Belgorod', 213800);
-INSERT INTO city VALUES (3667, 'Zelenograd', 'RUS', 'Moscow (City)', 207100);
-INSERT INTO city VALUES (3668, 'Balakovo', 'RUS', 'Saratov', 206000);
-INSERT INTO city VALUES (3669, 'Novorossijsk', 'RUS', 'Krasnodar', 203300);
-INSERT INTO city VALUES (3670, 'Pihkova', 'RUS', 'Pihkova', 201500);
-INSERT INTO city VALUES (3671, 'Zlatoust', 'RUS', 'Teljabinsk', 196900);
-INSERT INTO city VALUES (3672, 'Jakutsk', 'RUS', 'Saha (Jakutia)', 195400);
-INSERT INTO city VALUES (3673, 'Podolsk', 'RUS', 'Moskova', 194300);
-INSERT INTO city VALUES (3674, 'Petropavlovsk-Kamtatski', 'RUS', 'Kamtatka', 194100);
-INSERT INTO city VALUES (3675, 'Kamensk-Uralski', 'RUS', 'Sverdlovsk', 190600);
-INSERT INTO city VALUES (3676, 'Engels', 'RUS', 'Saratov', 189000);
-INSERT INTO city VALUES (3677, 'Syzran', 'RUS', 'Samara', 186900);
-INSERT INTO city VALUES (3678, 'Grozny', 'RUS', 'Tetenia', 186000);
-INSERT INTO city VALUES (3679, 'Novoterkassk', 'RUS', 'Rostov-na-Donu', 184400);
-INSERT INTO city VALUES (3680, 'Berezniki', 'RUS', 'Perm', 181900);
-INSERT INTO city VALUES (3681, 'Juzno-Sahalinsk', 'RUS', 'Sahalin', 179200);
-INSERT INTO city VALUES (3682, 'Volgodonsk', 'RUS', 'Rostov-na-Donu', 178200);
-INSERT INTO city VALUES (3683, 'Abakan', 'RUS', 'Hakassia', 169200);
-INSERT INTO city VALUES (3684, 'Maikop', 'RUS', 'Adygea', 167300);
-INSERT INTO city VALUES (3685, 'Miass', 'RUS', 'Teljabinsk', 166200);
-INSERT INTO city VALUES (3686, 'Armavir', 'RUS', 'Krasnodar', 164900);
-INSERT INTO city VALUES (3687, 'Ljubertsy', 'RUS', 'Moskova', 163900);
-INSERT INTO city VALUES (3688, 'Rubtsovsk', 'RUS', 'Altai', 162600);
-INSERT INTO city VALUES (3689, 'Kovrov', 'RUS', 'Vladimir', 159900);
-INSERT INTO city VALUES (3690, 'Nahodka', 'RUS', 'Primorje', 157700);
-INSERT INTO city VALUES (3691, 'Ussurijsk', 'RUS', 'Primorje', 157300);
-INSERT INTO city VALUES (3692, 'Salavat', 'RUS', 'Bakortostan', 156800);
-INSERT INTO city VALUES (3693, 'Mytiti', 'RUS', 'Moskova', 155700);
-INSERT INTO city VALUES (3694, 'Kolomna', 'RUS', 'Moskova', 150700);
-INSERT INTO city VALUES (3695, 'Elektrostal', 'RUS', 'Moskova', 147000);
-INSERT INTO city VALUES (3696, 'Murom', 'RUS', 'Vladimir', 142400);
-INSERT INTO city VALUES (3697, 'Kolpino', 'RUS', 'Pietari', 141200);
-INSERT INTO city VALUES (3698, 'Norilsk', 'RUS', 'Krasnojarsk', 140800);
-INSERT INTO city VALUES (3699, 'Almetjevsk', 'RUS', 'Tatarstan', 140700);
-INSERT INTO city VALUES (3700, 'Novomoskovsk', 'RUS', 'Tula', 138100);
-INSERT INTO city VALUES (3701, 'Dimitrovgrad', 'RUS', 'Uljanovsk', 137000);
-INSERT INTO city VALUES (3702, 'Pervouralsk', 'RUS', 'Sverdlovsk', 136100);
-INSERT INTO city VALUES (3703, 'Himki', 'RUS', 'Moskova', 133700);
-INSERT INTO city VALUES (3704, 'Balaiha', 'RUS', 'Moskova', 132900);
-INSERT INTO city VALUES (3705, 'Nevinnomyssk', 'RUS', 'Stavropol', 132600);
-INSERT INTO city VALUES (3706, 'Pjatigorsk', 'RUS', 'Stavropol', 132500);
-INSERT INTO city VALUES (3707, 'Korolev', 'RUS', 'Moskova', 132400);
-INSERT INTO city VALUES (3708, 'Serpuhov', 'RUS', 'Moskova', 132000);
-INSERT INTO city VALUES (3709, 'Odintsovo', 'RUS', 'Moskova', 127400);
-INSERT INTO city VALUES (3710, 'Orehovo-Zujevo', 'RUS', 'Moskova', 124900);
-INSERT INTO city VALUES (3711, 'Kamyin', 'RUS', 'Volgograd', 124600);
-INSERT INTO city VALUES (3712, 'Novoteboksarsk', 'RUS', 'Tuvassia', 123400);
-INSERT INTO city VALUES (3713, 'Terkessk', 'RUS', 'Karatai-Terkessia', 121700);
-INSERT INTO city VALUES (3714, 'Atinsk', 'RUS', 'Krasnojarsk', 121600);
-INSERT INTO city VALUES (3715, 'Magadan', 'RUS', 'Magadan', 121000);
-INSERT INTO city VALUES (3716, 'Miturinsk', 'RUS', 'Tambov', 120700);
-INSERT INTO city VALUES (3717, 'Kislovodsk', 'RUS', 'Stavropol', 120400);
-INSERT INTO city VALUES (3718, 'Jelets', 'RUS', 'Lipetsk', 119400);
-INSERT INTO city VALUES (3719, 'Seversk', 'RUS', 'Tomsk', 118600);
-INSERT INTO city VALUES (3720, 'Noginsk', 'RUS', 'Moskova', 117200);
-INSERT INTO city VALUES (3721, 'Velikije Luki', 'RUS', 'Pihkova', 116300);
-INSERT INTO city VALUES (3722, 'Novokuibyevsk', 'RUS', 'Samara', 116200);
-INSERT INTO city VALUES (3723, 'Neftekamsk', 'RUS', 'Bakortostan', 115700);
-INSERT INTO city VALUES (3724, 'Leninsk-Kuznetski', 'RUS', 'Kemerovo', 113800);
-INSERT INTO city VALUES (3725, 'Oktjabrski', 'RUS', 'Bakortostan', 111500);
-INSERT INTO city VALUES (3726, 'Sergijev Posad', 'RUS', 'Moskova', 111100);
-INSERT INTO city VALUES (3727, 'Arzamas', 'RUS', 'Nizni Novgorod', 110700);
-INSERT INTO city VALUES (3728, 'Kiseljovsk', 'RUS', 'Kemerovo', 110000);
-INSERT INTO city VALUES (3729, 'Novotroitsk', 'RUS', 'Orenburg', 109600);
-INSERT INTO city VALUES (3730, 'Obninsk', 'RUS', 'Kaluga', 108300);
-INSERT INTO city VALUES (3731, 'Kansk', 'RUS', 'Krasnojarsk', 107400);
-INSERT INTO city VALUES (3732, 'Glazov', 'RUS', 'Udmurtia', 106300);
-INSERT INTO city VALUES (3733, 'Solikamsk', 'RUS', 'Perm', 106000);
-INSERT INTO city VALUES (3734, 'Sarapul', 'RUS', 'Udmurtia', 105700);
-INSERT INTO city VALUES (3735, 'Ust-Ilimsk', 'RUS', 'Irkutsk', 105200);
-INSERT INTO city VALUES (3736, 'tolkovo', 'RUS', 'Moskova', 104900);
-INSERT INTO city VALUES (3737, 'Mezduretensk', 'RUS', 'Kemerovo', 104400);
-INSERT INTO city VALUES (3738, 'Usolje-Sibirskoje', 'RUS', 'Irkutsk', 103500);
-INSERT INTO city VALUES (3739, 'Elista', 'RUS', 'Kalmykia', 103300);
-INSERT INTO city VALUES (3740, 'Novoahtinsk', 'RUS', 'Rostov-na-Donu', 101900);
-INSERT INTO city VALUES (3741, 'Votkinsk', 'RUS', 'Udmurtia', 101700);
-INSERT INTO city VALUES (3742, 'Kyzyl', 'RUS', 'Tyva', 101100);
-INSERT INTO city VALUES (3743, 'Serov', 'RUS', 'Sverdlovsk', 100400);
-INSERT INTO city VALUES (3744, 'Zelenodolsk', 'RUS', 'Tatarstan', 100200);
-INSERT INTO city VALUES (3745, 'Zeleznodoroznyi', 'RUS', 'Moskova', 100100);
-INSERT INTO city VALUES (3746, 'Kinema', 'RUS', 'Ivanovo', 100000);
-INSERT INTO city VALUES (3747, 'Kuznetsk', 'RUS', 'Penza', 98200);
-INSERT INTO city VALUES (3748, 'Uhta', 'RUS', 'Komi', 98000);
-INSERT INTO city VALUES (3749, 'Jessentuki', 'RUS', 'Stavropol', 97900);
-INSERT INTO city VALUES (3750, 'Tobolsk', 'RUS', 'Tjumen', 97600);
-INSERT INTO city VALUES (3751, 'Neftejugansk', 'RUS', 'Hanti-Mansia', 97400);
-INSERT INTO city VALUES (3752, 'Bataisk', 'RUS', 'Rostov-na-Donu', 97300);
-INSERT INTO city VALUES (3753, 'Nojabrsk', 'RUS', 'Yamalin Nenetsia', 97300);
-INSERT INTO city VALUES (3754, 'Balaov', 'RUS', 'Saratov', 97100);
-INSERT INTO city VALUES (3755, 'Zeleznogorsk', 'RUS', 'Kursk', 96900);
-INSERT INTO city VALUES (3756, 'Zukovski', 'RUS', 'Moskova', 96500);
-INSERT INTO city VALUES (3757, 'Anzero-Sudzensk', 'RUS', 'Kemerovo', 96100);
-INSERT INTO city VALUES (3758, 'Bugulma', 'RUS', 'Tatarstan', 94100);
-INSERT INTO city VALUES (3759, 'Zeleznogorsk', 'RUS', 'Krasnojarsk', 94000);
-INSERT INTO city VALUES (3760, 'Novouralsk', 'RUS', 'Sverdlovsk', 93300);
-INSERT INTO city VALUES (3761, 'Pukin', 'RUS', 'Pietari', 92900);
-INSERT INTO city VALUES (3762, 'Vorkuta', 'RUS', 'Komi', 92600);
-INSERT INTO city VALUES (3763, 'Derbent', 'RUS', 'Dagestan', 92300);
-INSERT INTO city VALUES (3764, 'Kirovo-Tepetsk', 'RUS', 'Kirov', 91600);
-INSERT INTO city VALUES (3765, 'Krasnogorsk', 'RUS', 'Moskova', 91000);
-INSERT INTO city VALUES (3766, 'Klin', 'RUS', 'Moskova', 90000);
-INSERT INTO city VALUES (3767, 'Taikovski', 'RUS', 'Perm', 90000);
-INSERT INTO city VALUES (3768, 'Novyi Urengoi', 'RUS', 'Yamalin Nenetsia', 89800);
-INSERT INTO city VALUES (3769, 'Ho Chi Minh City', 'VNM', 'Ho Chi Minh City', 3980000);
-INSERT INTO city VALUES (3770, 'Hanoi', 'VNM', 'Hanoi', 1410000);
-INSERT INTO city VALUES (3771, 'Haiphong', 'VNM', 'Haiphong', 783133);
-INSERT INTO city VALUES (3772, 'Da Nang', 'VNM', 'Quang Nam-Da Nang', 382674);
-INSERT INTO city VALUES (3773, 'Biên Hoa', 'VNM', 'Dong Nai', 282095);
-INSERT INTO city VALUES (3774, 'Nha Trang', 'VNM', 'Khanh Hoa', 221331);
-INSERT INTO city VALUES (3775, 'Hue', 'VNM', 'Thua Thien-Hue', 219149);
-INSERT INTO city VALUES (3776, 'Can Tho', 'VNM', 'Can Tho', 215587);
-INSERT INTO city VALUES (3777, 'Cam Pha', 'VNM', 'Quang Binh', 209086);
-INSERT INTO city VALUES (3778, 'Nam Dinh', 'VNM', 'Nam Ha', 171699);
-INSERT INTO city VALUES (3779, 'Quy Nhon', 'VNM', 'Binh Dinh', 163385);
-INSERT INTO city VALUES (3780, 'Vung Tau', 'VNM', 'Ba Ria-Vung Tau', 145145);
-INSERT INTO city VALUES (3781, 'Rach Gia', 'VNM', 'Kien Giang', 141132);
-INSERT INTO city VALUES (3782, 'Long Xuyen', 'VNM', 'An Giang', 132681);
-INSERT INTO city VALUES (3783, 'Thai Nguyen', 'VNM', 'Bac Thai', 127643);
-INSERT INTO city VALUES (3784, 'Hong Gai', 'VNM', 'Quang Ninh', 127484);
-INSERT INTO city VALUES (3785, 'Phan Thiêt', 'VNM', 'Binh Thuan', 114236);
-INSERT INTO city VALUES (3786, 'Cam Ranh', 'VNM', 'Khanh Hoa', 114041);
-INSERT INTO city VALUES (3787, 'Vinh', 'VNM', 'Nghe An', 112455);
-INSERT INTO city VALUES (3788, 'My Tho', 'VNM', 'Tien Giang', 108404);
-INSERT INTO city VALUES (3789, 'Da Lat', 'VNM', 'Lam Dong', 106409);
-INSERT INTO city VALUES (3790, 'Buon Ma Thuot', 'VNM', 'Dac Lac', 97044);
-INSERT INTO city VALUES (3791, 'Tallinn', 'EST', 'Harjumaa', 403981);
-INSERT INTO city VALUES (3792, 'Tartu', 'EST', 'Tartumaa', 101246);
-INSERT INTO city VALUES (3793, 'New York', 'USA', 'New York', 8008278);
-INSERT INTO city VALUES (3794, 'Los Angeles', 'USA', 'California', 3694820);
-INSERT INTO city VALUES (3795, 'Chicago', 'USA', 'Illinois', 2896016);
-INSERT INTO city VALUES (3796, 'Houston', 'USA', 'Texas', 1953631);
-INSERT INTO city VALUES (3797, 'Philadelphia', 'USA', 'Pennsylvania', 1517550);
-INSERT INTO city VALUES (3798, 'Phoenix', 'USA', 'Arizona', 1321045);
-INSERT INTO city VALUES (3799, 'San Diego', 'USA', 'California', 1223400);
-INSERT INTO city VALUES (3800, 'Dallas', 'USA', 'Texas', 1188580);
-INSERT INTO city VALUES (3801, 'San Antonio', 'USA', 'Texas', 1144646);
-INSERT INTO city VALUES (3802, 'Detroit', 'USA', 'Michigan', 951270);
-INSERT INTO city VALUES (3803, 'San Jose', 'USA', 'California', 894943);
-INSERT INTO city VALUES (3804, 'Indianapolis', 'USA', 'Indiana', 791926);
-INSERT INTO city VALUES (3805, 'San Francisco', 'USA', 'California', 776733);
-INSERT INTO city VALUES (3806, 'Jacksonville', 'USA', 'Florida', 735167);
-INSERT INTO city VALUES (3807, 'Columbus', 'USA', 'Ohio', 711470);
-INSERT INTO city VALUES (3808, 'Austin', 'USA', 'Texas', 656562);
-INSERT INTO city VALUES (3809, 'Baltimore', 'USA', 'Maryland', 651154);
-INSERT INTO city VALUES (3810, 'Memphis', 'USA', 'Tennessee', 650100);
-INSERT INTO city VALUES (3811, 'Milwaukee', 'USA', 'Wisconsin', 596974);
-INSERT INTO city VALUES (3812, 'Boston', 'USA', 'Massachusetts', 589141);
-INSERT INTO city VALUES (3813, 'Washington', 'USA', 'District of Columbia', 572059);
-INSERT INTO city VALUES (3814, 'Nashville-Davidson', 'USA', 'Tennessee', 569891);
-INSERT INTO city VALUES (3815, 'El Paso', 'USA', 'Texas', 563662);
-INSERT INTO city VALUES (3816, 'Seattle', 'USA', 'Washington', 563374);
-INSERT INTO city VALUES (3817, 'Denver', 'USA', 'Colorado', 554636);
-INSERT INTO city VALUES (3818, 'Charlotte', 'USA', 'North Carolina', 540828);
-INSERT INTO city VALUES (3819, 'Fort Worth', 'USA', 'Texas', 534694);
-INSERT INTO city VALUES (3820, 'Portland', 'USA', 'Oregon', 529121);
-INSERT INTO city VALUES (3821, 'Oklahoma City', 'USA', 'Oklahoma', 506132);
-INSERT INTO city VALUES (3822, 'Tucson', 'USA', 'Arizona', 486699);
-INSERT INTO city VALUES (3823, 'New Orleans', 'USA', 'Louisiana', 484674);
-INSERT INTO city VALUES (3824, 'Las Vegas', 'USA', 'Nevada', 478434);
-INSERT INTO city VALUES (3825, 'Cleveland', 'USA', 'Ohio', 478403);
-INSERT INTO city VALUES (3826, 'Long Beach', 'USA', 'California', 461522);
-INSERT INTO city VALUES (3827, 'Albuquerque', 'USA', 'New Mexico', 448607);
-INSERT INTO city VALUES (3828, 'Kansas City', 'USA', 'Missouri', 441545);
-INSERT INTO city VALUES (3829, 'Fresno', 'USA', 'California', 427652);
-INSERT INTO city VALUES (3830, 'Virginia Beach', 'USA', 'Virginia', 425257);
-INSERT INTO city VALUES (3831, 'Atlanta', 'USA', 'Georgia', 416474);
-INSERT INTO city VALUES (3832, 'Sacramento', 'USA', 'California', 407018);
-INSERT INTO city VALUES (3833, 'Oakland', 'USA', 'California', 399484);
-INSERT INTO city VALUES (3834, 'Mesa', 'USA', 'Arizona', 396375);
-INSERT INTO city VALUES (3835, 'Tulsa', 'USA', 'Oklahoma', 393049);
-INSERT INTO city VALUES (3836, 'Omaha', 'USA', 'Nebraska', 390007);
-INSERT INTO city VALUES (3837, 'Minneapolis', 'USA', 'Minnesota', 382618);
-INSERT INTO city VALUES (3838, 'Honolulu', 'USA', 'Hawaii', 371657);
-INSERT INTO city VALUES (3839, 'Miami', 'USA', 'Florida', 362470);
-INSERT INTO city VALUES (3840, 'Colorado Springs', 'USA', 'Colorado', 360890);
-INSERT INTO city VALUES (3841, 'Saint Louis', 'USA', 'Missouri', 348189);
-INSERT INTO city VALUES (3842, 'Wichita', 'USA', 'Kansas', 344284);
-INSERT INTO city VALUES (3843, 'Santa Ana', 'USA', 'California', 337977);
-INSERT INTO city VALUES (3844, 'Pittsburgh', 'USA', 'Pennsylvania', 334563);
-INSERT INTO city VALUES (3845, 'Arlington', 'USA', 'Texas', 332969);
-INSERT INTO city VALUES (3846, 'Cincinnati', 'USA', 'Ohio', 331285);
-INSERT INTO city VALUES (3847, 'Anaheim', 'USA', 'California', 328014);
-INSERT INTO city VALUES (3848, 'Toledo', 'USA', 'Ohio', 313619);
-INSERT INTO city VALUES (3849, 'Tampa', 'USA', 'Florida', 303447);
-INSERT INTO city VALUES (3850, 'Buffalo', 'USA', 'New York', 292648);
-INSERT INTO city VALUES (3851, 'Saint Paul', 'USA', 'Minnesota', 287151);
-INSERT INTO city VALUES (3852, 'Corpus Christi', 'USA', 'Texas', 277454);
-INSERT INTO city VALUES (3853, 'Aurora', 'USA', 'Colorado', 276393);
-INSERT INTO city VALUES (3854, 'Raleigh', 'USA', 'North Carolina', 276093);
-INSERT INTO city VALUES (3855, 'Newark', 'USA', 'New Jersey', 273546);
-INSERT INTO city VALUES (3856, 'Lexington-Fayette', 'USA', 'Kentucky', 260512);
-INSERT INTO city VALUES (3857, 'Anchorage', 'USA', 'Alaska', 260283);
-INSERT INTO city VALUES (3858, 'Louisville', 'USA', 'Kentucky', 256231);
-INSERT INTO city VALUES (3859, 'Riverside', 'USA', 'California', 255166);
-INSERT INTO city VALUES (3860, 'Saint Petersburg', 'USA', 'Florida', 248232);
-INSERT INTO city VALUES (3861, 'Bakersfield', 'USA', 'California', 247057);
-INSERT INTO city VALUES (3862, 'Stockton', 'USA', 'California', 243771);
-INSERT INTO city VALUES (3863, 'Birmingham', 'USA', 'Alabama', 242820);
-INSERT INTO city VALUES (3864, 'Jersey City', 'USA', 'New Jersey', 240055);
-INSERT INTO city VALUES (3865, 'Norfolk', 'USA', 'Virginia', 234403);
-INSERT INTO city VALUES (3866, 'Baton Rouge', 'USA', 'Louisiana', 227818);
-INSERT INTO city VALUES (3867, 'Hialeah', 'USA', 'Florida', 226419);
-INSERT INTO city VALUES (3868, 'Lincoln', 'USA', 'Nebraska', 225581);
-INSERT INTO city VALUES (3869, 'Greensboro', 'USA', 'North Carolina', 223891);
-INSERT INTO city VALUES (3870, 'Plano', 'USA', 'Texas', 222030);
-INSERT INTO city VALUES (3871, 'Rochester', 'USA', 'New York', 219773);
-INSERT INTO city VALUES (3872, 'Glendale', 'USA', 'Arizona', 218812);
-INSERT INTO city VALUES (3873, 'Akron', 'USA', 'Ohio', 217074);
-INSERT INTO city VALUES (3874, 'Garland', 'USA', 'Texas', 215768);
-INSERT INTO city VALUES (3875, 'Madison', 'USA', 'Wisconsin', 208054);
-INSERT INTO city VALUES (3876, 'Fort Wayne', 'USA', 'Indiana', 205727);
-INSERT INTO city VALUES (3877, 'Fremont', 'USA', 'California', 203413);
-INSERT INTO city VALUES (3878, 'Scottsdale', 'USA', 'Arizona', 202705);
-INSERT INTO city VALUES (3879, 'Montgomery', 'USA', 'Alabama', 201568);
-INSERT INTO city VALUES (3880, 'Shreveport', 'USA', 'Louisiana', 200145);
-INSERT INTO city VALUES (3881, 'Augusta-Richmond County', 'USA', 'Georgia', 199775);
-INSERT INTO city VALUES (3882, 'Lubbock', 'USA', 'Texas', 199564);
-INSERT INTO city VALUES (3883, 'Chesapeake', 'USA', 'Virginia', 199184);
-INSERT INTO city VALUES (3884, 'Mobile', 'USA', 'Alabama', 198915);
-INSERT INTO city VALUES (3885, 'Des Moines', 'USA', 'Iowa', 198682);
-INSERT INTO city VALUES (3886, 'Grand Rapids', 'USA', 'Michigan', 197800);
-INSERT INTO city VALUES (3887, 'Richmond', 'USA', 'Virginia', 197790);
-INSERT INTO city VALUES (3888, 'Yonkers', 'USA', 'New York', 196086);
-INSERT INTO city VALUES (3889, 'Spokane', 'USA', 'Washington', 195629);
-INSERT INTO city VALUES (3890, 'Glendale', 'USA', 'California', 194973);
-INSERT INTO city VALUES (3891, 'Tacoma', 'USA', 'Washington', 193556);
-INSERT INTO city VALUES (3892, 'Irving', 'USA', 'Texas', 191615);
-INSERT INTO city VALUES (3893, 'Huntington Beach', 'USA', 'California', 189594);
-INSERT INTO city VALUES (3894, 'Modesto', 'USA', 'California', 188856);
-INSERT INTO city VALUES (3895, 'Durham', 'USA', 'North Carolina', 187035);
-INSERT INTO city VALUES (3896, 'Columbus', 'USA', 'Georgia', 186291);
-INSERT INTO city VALUES (3897, 'Orlando', 'USA', 'Florida', 185951);
-INSERT INTO city VALUES (3898, 'Boise City', 'USA', 'Idaho', 185787);
-INSERT INTO city VALUES (3899, 'Winston-Salem', 'USA', 'North Carolina', 185776);
-INSERT INTO city VALUES (3900, 'San Bernardino', 'USA', 'California', 185401);
-INSERT INTO city VALUES (3901, 'Jackson', 'USA', 'Mississippi', 184256);
-INSERT INTO city VALUES (3902, 'Little Rock', 'USA', 'Arkansas', 183133);
-INSERT INTO city VALUES (3903, 'Salt Lake City', 'USA', 'Utah', 181743);
-INSERT INTO city VALUES (3904, 'Reno', 'USA', 'Nevada', 180480);
-INSERT INTO city VALUES (3905, 'Newport News', 'USA', 'Virginia', 180150);
-INSERT INTO city VALUES (3906, 'Chandler', 'USA', 'Arizona', 176581);
-INSERT INTO city VALUES (3907, 'Laredo', 'USA', 'Texas', 176576);
-INSERT INTO city VALUES (3908, 'Henderson', 'USA', 'Nevada', 175381);
-INSERT INTO city VALUES (3909, 'Arlington', 'USA', 'Virginia', 174838);
-INSERT INTO city VALUES (3910, 'Knoxville', 'USA', 'Tennessee', 173890);
-INSERT INTO city VALUES (3911, 'Amarillo', 'USA', 'Texas', 173627);
-INSERT INTO city VALUES (3912, 'Providence', 'USA', 'Rhode Island', 173618);
-INSERT INTO city VALUES (3913, 'Chula Vista', 'USA', 'California', 173556);
-INSERT INTO city VALUES (3914, 'Worcester', 'USA', 'Massachusetts', 172648);
-INSERT INTO city VALUES (3915, 'Oxnard', 'USA', 'California', 170358);
-INSERT INTO city VALUES (3916, 'Dayton', 'USA', 'Ohio', 166179);
-INSERT INTO city VALUES (3917, 'Garden Grove', 'USA', 'California', 165196);
-INSERT INTO city VALUES (3918, 'Oceanside', 'USA', 'California', 161029);
-INSERT INTO city VALUES (3919, 'Tempe', 'USA', 'Arizona', 158625);
-INSERT INTO city VALUES (3920, 'Huntsville', 'USA', 'Alabama', 158216);
-INSERT INTO city VALUES (3921, 'Ontario', 'USA', 'California', 158007);
-INSERT INTO city VALUES (3922, 'Chattanooga', 'USA', 'Tennessee', 155554);
-INSERT INTO city VALUES (3923, 'Fort Lauderdale', 'USA', 'Florida', 152397);
-INSERT INTO city VALUES (3924, 'Springfield', 'USA', 'Massachusetts', 152082);
-INSERT INTO city VALUES (3925, 'Springfield', 'USA', 'Missouri', 151580);
-INSERT INTO city VALUES (3926, 'Santa Clarita', 'USA', 'California', 151088);
-INSERT INTO city VALUES (3927, 'Salinas', 'USA', 'California', 151060);
-INSERT INTO city VALUES (3928, 'Tallahassee', 'USA', 'Florida', 150624);
-INSERT INTO city VALUES (3929, 'Rockford', 'USA', 'Illinois', 150115);
-INSERT INTO city VALUES (3930, 'Pomona', 'USA', 'California', 149473);
-INSERT INTO city VALUES (3931, 'Metairie', 'USA', 'Louisiana', 149428);
-INSERT INTO city VALUES (3932, 'Paterson', 'USA', 'New Jersey', 149222);
-INSERT INTO city VALUES (3933, 'Overland Park', 'USA', 'Kansas', 149080);
-INSERT INTO city VALUES (3934, 'Santa Rosa', 'USA', 'California', 147595);
-INSERT INTO city VALUES (3935, 'Syracuse', 'USA', 'New York', 147306);
-INSERT INTO city VALUES (3936, 'Kansas City', 'USA', 'Kansas', 146866);
-INSERT INTO city VALUES (3937, 'Hampton', 'USA', 'Virginia', 146437);
-INSERT INTO city VALUES (3938, 'Lakewood', 'USA', 'Colorado', 144126);
-INSERT INTO city VALUES (3939, 'Vancouver', 'USA', 'Washington', 143560);
-INSERT INTO city VALUES (3940, 'Irvine', 'USA', 'California', 143072);
-INSERT INTO city VALUES (3941, 'Aurora', 'USA', 'Illinois', 142990);
-INSERT INTO city VALUES (3942, 'Moreno Valley', 'USA', 'California', 142381);
-INSERT INTO city VALUES (3943, 'Pasadena', 'USA', 'California', 141674);
-INSERT INTO city VALUES (3944, 'Hayward', 'USA', 'California', 140030);
-INSERT INTO city VALUES (3945, 'Brownsville', 'USA', 'Texas', 139722);
-INSERT INTO city VALUES (3946, 'Bridgeport', 'USA', 'Connecticut', 139529);
-INSERT INTO city VALUES (3947, 'Hollywood', 'USA', 'Florida', 139357);
-INSERT INTO city VALUES (3948, 'Warren', 'USA', 'Michigan', 138247);
-INSERT INTO city VALUES (3949, 'Torrance', 'USA', 'California', 137946);
-INSERT INTO city VALUES (3950, 'Eugene', 'USA', 'Oregon', 137893);
-INSERT INTO city VALUES (3951, 'Pembroke Pines', 'USA', 'Florida', 137427);
-INSERT INTO city VALUES (3952, 'Salem', 'USA', 'Oregon', 136924);
-INSERT INTO city VALUES (3953, 'Pasadena', 'USA', 'Texas', 133936);
-INSERT INTO city VALUES (3954, 'Escondido', 'USA', 'California', 133559);
-INSERT INTO city VALUES (3955, 'Sunnyvale', 'USA', 'California', 131760);
-INSERT INTO city VALUES (3956, 'Savannah', 'USA', 'Georgia', 131510);
-INSERT INTO city VALUES (3957, 'Fontana', 'USA', 'California', 128929);
-INSERT INTO city VALUES (3958, 'Orange', 'USA', 'California', 128821);
-INSERT INTO city VALUES (3959, 'Naperville', 'USA', 'Illinois', 128358);
-INSERT INTO city VALUES (3960, 'Alexandria', 'USA', 'Virginia', 128283);
-INSERT INTO city VALUES (3961, 'Rancho Cucamonga', 'USA', 'California', 127743);
-INSERT INTO city VALUES (3962, 'Grand Prairie', 'USA', 'Texas', 127427);
-INSERT INTO city VALUES (3963, 'East Los Angeles', 'USA', 'California', 126379);
-INSERT INTO city VALUES (3964, 'Fullerton', 'USA', 'California', 126003);
-INSERT INTO city VALUES (3965, 'Corona', 'USA', 'California', 124966);
-INSERT INTO city VALUES (3966, 'Flint', 'USA', 'Michigan', 124943);
-INSERT INTO city VALUES (3967, 'Paradise', 'USA', 'Nevada', 124682);
-INSERT INTO city VALUES (3968, 'Mesquite', 'USA', 'Texas', 124523);
-INSERT INTO city VALUES (3969, 'Sterling Heights', 'USA', 'Michigan', 124471);
-INSERT INTO city VALUES (3970, 'Sioux Falls', 'USA', 'South Dakota', 123975);
-INSERT INTO city VALUES (3971, 'New Haven', 'USA', 'Connecticut', 123626);
-INSERT INTO city VALUES (3972, 'Topeka', 'USA', 'Kansas', 122377);
-INSERT INTO city VALUES (3973, 'Concord', 'USA', 'California', 121780);
-INSERT INTO city VALUES (3974, 'Evansville', 'USA', 'Indiana', 121582);
-INSERT INTO city VALUES (3975, 'Hartford', 'USA', 'Connecticut', 121578);
-INSERT INTO city VALUES (3976, 'Fayetteville', 'USA', 'North Carolina', 121015);
-INSERT INTO city VALUES (3977, 'Cedar Rapids', 'USA', 'Iowa', 120758);
-INSERT INTO city VALUES (3978, 'Elizabeth', 'USA', 'New Jersey', 120568);
-INSERT INTO city VALUES (3979, 'Lansing', 'USA', 'Michigan', 119128);
-INSERT INTO city VALUES (3980, 'Lancaster', 'USA', 'California', 118718);
-INSERT INTO city VALUES (3981, 'Fort Collins', 'USA', 'Colorado', 118652);
-INSERT INTO city VALUES (3982, 'Coral Springs', 'USA', 'Florida', 117549);
-INSERT INTO city VALUES (3983, 'Stamford', 'USA', 'Connecticut', 117083);
-INSERT INTO city VALUES (3984, 'Thousand Oaks', 'USA', 'California', 117005);
-INSERT INTO city VALUES (3985, 'Vallejo', 'USA', 'California', 116760);
-INSERT INTO city VALUES (3986, 'Palmdale', 'USA', 'California', 116670);
-INSERT INTO city VALUES (3987, 'Columbia', 'USA', 'South Carolina', 116278);
-INSERT INTO city VALUES (3988, 'El Monte', 'USA', 'California', 115965);
-INSERT INTO city VALUES (3989, 'Abilene', 'USA', 'Texas', 115930);
-INSERT INTO city VALUES (3990, 'North Las Vegas', 'USA', 'Nevada', 115488);
-INSERT INTO city VALUES (3991, 'Ann Arbor', 'USA', 'Michigan', 114024);
-INSERT INTO city VALUES (3992, 'Beaumont', 'USA', 'Texas', 113866);
-INSERT INTO city VALUES (3993, 'Waco', 'USA', 'Texas', 113726);
-INSERT INTO city VALUES (3994, 'Macon', 'USA', 'Georgia', 113336);
-INSERT INTO city VALUES (3995, 'Independence', 'USA', 'Missouri', 113288);
-INSERT INTO city VALUES (3996, 'Peoria', 'USA', 'Illinois', 112936);
-INSERT INTO city VALUES (3997, 'Inglewood', 'USA', 'California', 112580);
-INSERT INTO city VALUES (3998, 'Springfield', 'USA', 'Illinois', 111454);
-INSERT INTO city VALUES (3999, 'Simi Valley', 'USA', 'California', 111351);
-INSERT INTO city VALUES (4000, 'Lafayette', 'USA', 'Louisiana', 110257);
-INSERT INTO city VALUES (4001, 'Gilbert', 'USA', 'Arizona', 109697);
-INSERT INTO city VALUES (4002, 'Carrollton', 'USA', 'Texas', 109576);
-INSERT INTO city VALUES (4003, 'Bellevue', 'USA', 'Washington', 109569);
-INSERT INTO city VALUES (4004, 'West Valley City', 'USA', 'Utah', 108896);
-INSERT INTO city VALUES (4005, 'Clarksville', 'USA', 'Tennessee', 108787);
-INSERT INTO city VALUES (4006, 'Costa Mesa', 'USA', 'California', 108724);
-INSERT INTO city VALUES (4007, 'Peoria', 'USA', 'Arizona', 108364);
-INSERT INTO city VALUES (4008, 'South Bend', 'USA', 'Indiana', 107789);
-INSERT INTO city VALUES (4009, 'Downey', 'USA', 'California', 107323);
-INSERT INTO city VALUES (4010, 'Waterbury', 'USA', 'Connecticut', 107271);
-INSERT INTO city VALUES (4011, 'Manchester', 'USA', 'New Hampshire', 107006);
-INSERT INTO city VALUES (4012, 'Allentown', 'USA', 'Pennsylvania', 106632);
-INSERT INTO city VALUES (4013, 'McAllen', 'USA', 'Texas', 106414);
-INSERT INTO city VALUES (4014, 'Joliet', 'USA', 'Illinois', 106221);
-INSERT INTO city VALUES (4015, 'Lowell', 'USA', 'Massachusetts', 105167);
-INSERT INTO city VALUES (4016, 'Provo', 'USA', 'Utah', 105166);
-INSERT INTO city VALUES (4017, 'West Covina', 'USA', 'California', 105080);
-INSERT INTO city VALUES (4018, 'Wichita Falls', 'USA', 'Texas', 104197);
-INSERT INTO city VALUES (4019, 'Erie', 'USA', 'Pennsylvania', 103717);
-INSERT INTO city VALUES (4020, 'Daly City', 'USA', 'California', 103621);
-INSERT INTO city VALUES (4021, 'Citrus Heights', 'USA', 'California', 103455);
-INSERT INTO city VALUES (4022, 'Norwalk', 'USA', 'California', 103298);
-INSERT INTO city VALUES (4023, 'Gary', 'USA', 'Indiana', 102746);
-INSERT INTO city VALUES (4024, 'Berkeley', 'USA', 'California', 102743);
-INSERT INTO city VALUES (4025, 'Santa Clara', 'USA', 'California', 102361);
-INSERT INTO city VALUES (4026, 'Green Bay', 'USA', 'Wisconsin', 102313);
-INSERT INTO city VALUES (4027, 'Cape Coral', 'USA', 'Florida', 102286);
-INSERT INTO city VALUES (4028, 'Arvada', 'USA', 'Colorado', 102153);
-INSERT INTO city VALUES (4029, 'Pueblo', 'USA', 'Colorado', 102121);
-INSERT INTO city VALUES (4030, 'Sandy', 'USA', 'Utah', 101853);
-INSERT INTO city VALUES (4031, 'Athens-Clarke County', 'USA', 'Georgia', 101489);
-INSERT INTO city VALUES (4032, 'Cambridge', 'USA', 'Massachusetts', 101355);
-INSERT INTO city VALUES (4033, 'Westminster', 'USA', 'Colorado', 100940);
-INSERT INTO city VALUES (4034, 'San Buenaventura', 'USA', 'California', 100916);
-INSERT INTO city VALUES (4035, 'Portsmouth', 'USA', 'Virginia', 100565);
-INSERT INTO city VALUES (4036, 'Livonia', 'USA', 'Michigan', 100545);
-INSERT INTO city VALUES (4037, 'Burbank', 'USA', 'California', 100316);
-INSERT INTO city VALUES (4038, 'Clearwater', 'USA', 'Florida', 99936);
-INSERT INTO city VALUES (4039, 'Midland', 'USA', 'Texas', 98293);
-INSERT INTO city VALUES (4040, 'Davenport', 'USA', 'Iowa', 98256);
-INSERT INTO city VALUES (4041, 'Mission Viejo', 'USA', 'California', 98049);
-INSERT INTO city VALUES (4042, 'Miami Beach', 'USA', 'Florida', 97855);
-INSERT INTO city VALUES (4043, 'Sunrise Manor', 'USA', 'Nevada', 95362);
-INSERT INTO city VALUES (4044, 'New Bedford', 'USA', 'Massachusetts', 94780);
-INSERT INTO city VALUES (4045, 'El Cajon', 'USA', 'California', 94578);
-INSERT INTO city VALUES (4046, 'Norman', 'USA', 'Oklahoma', 94193);
-INSERT INTO city VALUES (4047, 'Richmond', 'USA', 'California', 94100);
-INSERT INTO city VALUES (4048, 'Albany', 'USA', 'New York', 93994);
-INSERT INTO city VALUES (4049, 'Brockton', 'USA', 'Massachusetts', 93653);
-INSERT INTO city VALUES (4050, 'Roanoke', 'USA', 'Virginia', 93357);
-INSERT INTO city VALUES (4051, 'Billings', 'USA', 'Montana', 92988);
-INSERT INTO city VALUES (4052, 'Compton', 'USA', 'California', 92864);
-INSERT INTO city VALUES (4053, 'Gainesville', 'USA', 'Florida', 92291);
-INSERT INTO city VALUES (4054, 'Fairfield', 'USA', 'California', 92256);
-INSERT INTO city VALUES (4055, 'Arden-Arcade', 'USA', 'California', 92040);
-INSERT INTO city VALUES (4056, 'San Mateo', 'USA', 'California', 91799);
-INSERT INTO city VALUES (4057, 'Visalia', 'USA', 'California', 91762);
-INSERT INTO city VALUES (4058, 'Boulder', 'USA', 'Colorado', 91238);
-INSERT INTO city VALUES (4059, 'Cary', 'USA', 'North Carolina', 91213);
-INSERT INTO city VALUES (4060, 'Santa Monica', 'USA', 'California', 91084);
-INSERT INTO city VALUES (4061, 'Fall River', 'USA', 'Massachusetts', 90555);
-INSERT INTO city VALUES (4062, 'Kenosha', 'USA', 'Wisconsin', 89447);
-INSERT INTO city VALUES (4063, 'Elgin', 'USA', 'Illinois', 89408);
-INSERT INTO city VALUES (4064, 'Odessa', 'USA', 'Texas', 89293);
-INSERT INTO city VALUES (4065, 'Carson', 'USA', 'California', 89089);
-INSERT INTO city VALUES (4066, 'Charleston', 'USA', 'South Carolina', 89063);
-INSERT INTO city VALUES (4067, 'Charlotte Amalie', 'VIR', 'St Thomas', 13000);
-INSERT INTO city VALUES (4068, 'Harare', 'ZWE', 'Harare', 1410000);
-INSERT INTO city VALUES (4069, 'Bulawayo', 'ZWE', 'Bulawayo', 621742);
-INSERT INTO city VALUES (4070, 'Chitungwiza', 'ZWE', 'Harare', 274912);
-INSERT INTO city VALUES (4071, 'Mount Darwin', 'ZWE', 'Harare', 164362);
-INSERT INTO city VALUES (4072, 'Mutare', 'ZWE', 'Manicaland', 131367);
-INSERT INTO city VALUES (4073, 'Gweru', 'ZWE', 'Midlands', 128037);
-INSERT INTO city VALUES (4074, 'Gaza', 'PSE', 'Gaza', 353632);
-INSERT INTO city VALUES (4075, 'Khan Yunis', 'PSE', 'Khan Yunis', 123175);
-INSERT INTO city VALUES (4076, 'Hebron', 'PSE', 'Hebron', 119401);
-INSERT INTO city VALUES (4077, 'Jabaliya', 'PSE', 'North Gaza', 113901);
-INSERT INTO city VALUES (4078, 'Nablus', 'PSE', 'Nablus', 100231);
-INSERT INTO city VALUES (4079, 'Rafah', 'PSE', 'Rafah', 92020);
+INSERT INTO city (name, countrycode, district, population) VALUES ('Kabul', 'AFG', 'Kabol', 1780000),
+('Qandahar', 'AFG', 'Qandahar', 237500),
+('Herat', 'AFG', 'Herat', 186800),
+('Mazar-e-Sharif', 'AFG', 'Balkh', 127800),
+('Amsterdam', 'NLD', 'Noord-Holland', 731200),
+('Rotterdam', 'NLD', 'Zuid-Holland', 593321),
+('Haag', 'NLD', 'Zuid-Holland', 440900),
+('Utrecht', 'NLD', 'Utrecht', 234323),
+('Eindhoven', 'NLD', 'Noord-Brabant', 201843),
+('Tilburg', 'NLD', 'Noord-Brabant', 193238),
+('Groningen', 'NLD', 'Groningen', 172701),
+('Breda', 'NLD', 'Noord-Brabant', 160398),
+('Apeldoorn', 'NLD', 'Gelderland', 153491),
+('Nijmegen', 'NLD', 'Gelderland', 152463),
+('Enschede', 'NLD', 'Overijssel', 149544),
+('Haarlem', 'NLD', 'Noord-Holland', 148772),
+('Almere', 'NLD', 'Flevoland', 142465),
+('Arnhem', 'NLD', 'Gelderland', 138020),
+('Zaanstad', 'NLD', 'Noord-Holland', 135621),
+('´s-Hertogenbosch', 'NLD', 'Noord-Brabant', 129170),
+('Amersfoort', 'NLD', 'Utrecht', 126270),
+('Maastricht', 'NLD', 'Limburg', 122087),
+('Dordrecht', 'NLD', 'Zuid-Holland', 119811),
+('Leiden', 'NLD', 'Zuid-Holland', 117196),
+('Haarlemmermeer', 'NLD', 'Noord-Holland', 110722),
+('Zoetermeer', 'NLD', 'Zuid-Holland', 110214),
+('Emmen', 'NLD', 'Drenthe', 105853),
+('Zwolle', 'NLD', 'Overijssel', 105819),
+('Ede', 'NLD', 'Gelderland', 101574),
+('Delft', 'NLD', 'Zuid-Holland', 95268),
+('Heerlen', 'NLD', 'Limburg', 95052),
+('Alkmaar', 'NLD', 'Noord-Holland', 92713),
+('Willemstad', 'ANT', 'Curaçao', 2345),
+('Tirana', 'ALB', 'Tirana', 270000),
+('Alger', 'DZA', 'Alger', 2168000),
+('Oran', 'DZA', 'Oran', 609823),
+('Constantine', 'DZA', 'Constantine', 443727),
+('Annaba', 'DZA', 'Annaba', 222518),
+('Batna', 'DZA', 'Batna', 183377),
+('Sétif', 'DZA', 'Sétif', 179055),
+('Sidi Bel Abbès', 'DZA', 'Sidi Bel Abbès', 153106),
+('Skikda', 'DZA', 'Skikda', 128747),
+('Biskra', 'DZA', 'Biskra', 128281),
+('Blida (el-Boulaida)', 'DZA', 'Blida', 127284),
+('Béjaïa', 'DZA', 'Béjaïa', 117162),
+('Mostaganem', 'DZA', 'Mostaganem', 115212),
+('Tébessa', 'DZA', 'Tébessa', 112007),
+('Tlemcen (Tilimsen)', 'DZA', 'Tlemcen', 110242),
+('Béchar', 'DZA', 'Béchar', 107311),
+('Tiaret', 'DZA', 'Tiaret', 100118),
+('Ech-Chleff (el-Asnam)', 'DZA', 'Chlef', 96794),
+('Ghardaïa', 'DZA', 'Ghardaïa', 89415),
+('Tafuna', 'ASM', 'Tutuila', 5200),
+('Fagatogo', 'ASM', 'Tutuila', 2323),
+('Andorra la Vella', 'AND', 'Andorra la Vella', 21189),
+('Luanda', 'AGO', 'Luanda', 2022000),
+('Huambo', 'AGO', 'Huambo', 163100),
+('Lobito', 'AGO', 'Benguela', 130000),
+('Benguela', 'AGO', 'Benguela', 128300),
+('Namibe', 'AGO', 'Namibe', 118200),
+('South Hill', 'AIA', '', 961),
+('The Valley', 'AIA', '', 595),
+('Saint John´s', 'ATG', 'St John', 24000),
+('Dubai', 'ARE', 'Dubai', 669181),
+('Abu Dhabi', 'ARE', 'Abu Dhabi', 398695),
+('Sharja', 'ARE', 'Sharja', 320095),
+('al-Ayn', 'ARE', 'Abu Dhabi', 225970),
+('Ajman', 'ARE', 'Ajman', 114395),
+('Buenos Aires', 'ARG', 'Distrito Federal', 2982146),
+('La Matanza', 'ARG', 'Buenos Aires', 1266461),
+('Córdoba', 'ARG', 'Córdoba', 1157507),
+('Rosario', 'ARG', 'Santa Fé', 907718),
+('Lomas de Zamora', 'ARG', 'Buenos Aires', 622013),
+('Quilmes', 'ARG', 'Buenos Aires', 559249),
+('Almirante Brown', 'ARG', 'Buenos Aires', 538918),
+('La Plata', 'ARG', 'Buenos Aires', 521936),
+('Mar del Plata', 'ARG', 'Buenos Aires', 512880),
+('San Miguel de Tucumán', 'ARG', 'Tucumán', 470809),
+('Lanús', 'ARG', 'Buenos Aires', 469735),
+('Merlo', 'ARG', 'Buenos Aires', 463846),
+('General San Martín', 'ARG', 'Buenos Aires', 422542),
+('Salta', 'ARG', 'Salta', 367550),
+('Moreno', 'ARG', 'Buenos Aires', 356993),
+('Santa Fé', 'ARG', 'Santa Fé', 353063),
+('Avellaneda', 'ARG', 'Buenos Aires', 353046),
+('Tres de Febrero', 'ARG', 'Buenos Aires', 352311),
+('Morón', 'ARG', 'Buenos Aires', 349246),
+('Florencio Varela', 'ARG', 'Buenos Aires', 315432),
+('San Isidro', 'ARG', 'Buenos Aires', 306341),
+('Tigre', 'ARG', 'Buenos Aires', 296226),
+('Malvinas Argentinas', 'ARG', 'Buenos Aires', 290335),
+('Vicente López', 'ARG', 'Buenos Aires', 288341),
+('Berazategui', 'ARG', 'Buenos Aires', 276916),
+('Corrientes', 'ARG', 'Corrientes', 258103),
+('San Miguel', 'ARG', 'Buenos Aires', 248700),
+('Bahía Blanca', 'ARG', 'Buenos Aires', 239810),
+('Esteban Echeverría', 'ARG', 'Buenos Aires', 235760),
+('Resistencia', 'ARG', 'Chaco', 229212),
+('José C. Paz', 'ARG', 'Buenos Aires', 221754),
+('Paraná', 'ARG', 'Entre Rios', 207041),
+('Godoy Cruz', 'ARG', 'Mendoza', 206998),
+('Posadas', 'ARG', 'Misiones', 201273),
+('Guaymallén', 'ARG', 'Mendoza', 200595),
+('Santiago del Estero', 'ARG', 'Santiago del Estero', 189947),
+('San Salvador de Jujuy', 'ARG', 'Jujuy', 178748),
+('Hurlingham', 'ARG', 'Buenos Aires', 170028),
+('Neuquén', 'ARG', 'Neuquén', 167296),
+('Ituzaingó', 'ARG', 'Buenos Aires', 158197),
+('San Fernando', 'ARG', 'Buenos Aires', 153036),
+('Formosa', 'ARG', 'Formosa', 147636),
+('Las Heras', 'ARG', 'Mendoza', 145823),
+('La Rioja', 'ARG', 'La Rioja', 138117),
+('San Fernando del Valle de Cata', 'ARG', 'Catamarca', 134935),
+('Río Cuarto', 'ARG', 'Córdoba', 134355),
+('Comodoro Rivadavia', 'ARG', 'Chubut', 124104),
+('Mendoza', 'ARG', 'Mendoza', 123027),
+('San Nicolás de los Arroyos', 'ARG', 'Buenos Aires', 119302),
+('San Juan', 'ARG', 'San Juan', 119152),
+('Escobar', 'ARG', 'Buenos Aires', 116675),
+('Concordia', 'ARG', 'Entre Rios', 116485),
+('Pilar', 'ARG', 'Buenos Aires', 113428),
+('San Luis', 'ARG', 'San Luis', 110136),
+('Ezeiza', 'ARG', 'Buenos Aires', 99578),
+('San Rafael', 'ARG', 'Mendoza', 94651),
+('Tandil', 'ARG', 'Buenos Aires', 91101),
+('Yerevan', 'ARM', 'Yerevan', 1248700),
+('Gjumri', 'ARM', 'irak', 211700),
+('Vanadzor', 'ARM', 'Lori', 172700),
+('Oranjestad', 'ABW', '', 29034),
+('Sydney', 'AUS', 'New South Wales', 3276207),
+('Melbourne', 'AUS', 'Victoria', 2865329),
+('Brisbane', 'AUS', 'Queensland', 1291117),
+('Perth', 'AUS', 'West Australia', 1096829),
+('Adelaide', 'AUS', 'South Australia', 978100),
+('Canberra', 'AUS', 'Capital Region', 322723),
+('Gold Coast', 'AUS', 'Queensland', 311932),
+('Newcastle', 'AUS', 'New South Wales', 270324),
+('Central Coast', 'AUS', 'New South Wales', 227657),
+('Wollongong', 'AUS', 'New South Wales', 219761),
+('Hobart', 'AUS', 'Tasmania', 126118),
+('Geelong', 'AUS', 'Victoria', 125382),
+('Townsville', 'AUS', 'Queensland', 109914),
+('Cairns', 'AUS', 'Queensland', 92273),
+('Baku', 'AZE', 'Baki', 1787800),
+('Gäncä', 'AZE', 'Gäncä', 299300),
+('Sumqayit', 'AZE', 'Sumqayit', 283000),
+('Mingäçevir', 'AZE', 'Mingäçevir', 93900),
+('Nassau', 'BHS', 'New Providence', 172000),
+('al-Manama', 'BHR', 'al-Manama', 148000),
+('Dhaka', 'BGD', 'Dhaka', 3612850),
+('Chittagong', 'BGD', 'Chittagong', 1392860),
+('Khulna', 'BGD', 'Khulna', 663340),
+('Rajshahi', 'BGD', 'Rajshahi', 294056),
+('Narayanganj', 'BGD', 'Dhaka', 202134),
+('Rangpur', 'BGD', 'Rajshahi', 191398),
+('Mymensingh', 'BGD', 'Dhaka', 188713),
+('Barisal', 'BGD', 'Barisal', 170232),
+('Tungi', 'BGD', 'Dhaka', 168702),
+('Jessore', 'BGD', 'Khulna', 139710),
+('Comilla', 'BGD', 'Chittagong', 135313),
+('Nawabganj', 'BGD', 'Rajshahi', 130577),
+('Dinajpur', 'BGD', 'Rajshahi', 127815),
+('Bogra', 'BGD', 'Rajshahi', 120170),
+('Sylhet', 'BGD', 'Sylhet', 117396),
+('Brahmanbaria', 'BGD', 'Chittagong', 109032),
+('Tangail', 'BGD', 'Dhaka', 106004),
+('Jamalpur', 'BGD', 'Dhaka', 103556),
+('Pabna', 'BGD', 'Rajshahi', 103277),
+('Naogaon', 'BGD', 'Rajshahi', 101266),
+('Sirajganj', 'BGD', 'Rajshahi', 99669),
+('Narsinghdi', 'BGD', 'Dhaka', 98342),
+('Saidpur', 'BGD', 'Rajshahi', 96777),
+('Gazipur', 'BGD', 'Dhaka', 96717),
+('Bridgetown', 'BRB', 'St Michael', 6070),
+('Antwerpen', 'BEL', 'Antwerpen', 446525),
+('Gent', 'BEL', 'East Flanderi', 224180),
+('Charleroi', 'BEL', 'Hainaut', 200827),
+('Liège', 'BEL', 'Liège', 185639),
+('Bruxelles [Brussel]', 'BEL', 'Bryssel', 133859),
+('Brugge', 'BEL', 'West Flanderi', 116246),
+('Schaerbeek', 'BEL', 'Bryssel', 105692),
+('Namur', 'BEL', 'Namur', 105419),
+('Mons', 'BEL', 'Hainaut', 90935),
+('Belize City', 'BLZ', 'Belize City', 55810),
+('Belmopan', 'BLZ', 'Cayo', 7105),
+('Cotonou', 'BEN', 'Atlantique', 536827),
+('Porto-Novo', 'BEN', 'Ouémé', 194000),
+('Djougou', 'BEN', 'Atacora', 134099),
+('Parakou', 'BEN', 'Borgou', 103577),
+('Saint George', 'BMU', 'Saint George´s', 1800),
+('Hamilton', 'BMU', 'Hamilton', 1200),
+('Thimphu', 'BTN', 'Thimphu', 22000),
+('Santa Cruz de la Sierra', 'BOL', 'Santa Cruz', 935361),
+('La Paz', 'BOL', 'La Paz', 758141),
+('El Alto', 'BOL', 'La Paz', 534466),
+('Cochabamba', 'BOL', 'Cochabamba', 482800),
+('Oruro', 'BOL', 'Oruro', 223553),
+('Sucre', 'BOL', 'Chuquisaca', 178426),
+('Potosí', 'BOL', 'Potosí', 140642),
+('Tarija', 'BOL', 'Tarija', 125255),
+('Sarajevo', 'BIH', 'Federaatio', 360000),
+('Banja Luka', 'BIH', 'Republika Srpska', 143079),
+('Zenica', 'BIH', 'Federaatio', 96027),
+('Gaborone', 'BWA', 'Gaborone', 213017),
+('Francistown', 'BWA', 'Francistown', 101805),
+('São Paulo', 'BRA', 'São Paulo', 9968485),
+('Rio de Janeiro', 'BRA', 'Rio de Janeiro', 5598953),
+('Salvador', 'BRA', 'Bahia', 2302832),
+('Belo Horizonte', 'BRA', 'Minas Gerais', 2139125),
+('Fortaleza', 'BRA', 'Ceará', 2097757),
+('Brasília', 'BRA', 'Distrito Federal', 1969868),
+('Curitiba', 'BRA', 'Paraná', 1584232),
+('Recife', 'BRA', 'Pernambuco', 1378087),
+('Porto Alegre', 'BRA', 'Rio Grande do Sul', 1314032),
+('Manaus', 'BRA', 'Amazonas', 1255049),
+('Belém', 'BRA', 'Pará', 1186926),
+('Guarulhos', 'BRA', 'São Paulo', 1095874),
+('Goiânia', 'BRA', 'Goiás', 1056330),
+('Campinas', 'BRA', 'São Paulo', 950043),
+('São Gonçalo', 'BRA', 'Rio de Janeiro', 869254),
+('Nova Iguaçu', 'BRA', 'Rio de Janeiro', 862225),
+('São Luís', 'BRA', 'Maranhão', 837588),
+('Maceió', 'BRA', 'Alagoas', 786288),
+('Duque de Caxias', 'BRA', 'Rio de Janeiro', 746758),
+('São Bernardo do Campo', 'BRA', 'São Paulo', 723132),
+('Teresina', 'BRA', 'Piauí', 691942),
+('Natal', 'BRA', 'Rio Grande do Norte', 688955),
+('Osasco', 'BRA', 'São Paulo', 659604),
+('Campo Grande', 'BRA', 'Mato Grosso do Sul', 649593),
+('Santo André', 'BRA', 'São Paulo', 630073),
+('João Pessoa', 'BRA', 'Paraíba', 584029),
+('Jaboatão dos Guararapes', 'BRA', 'Pernambuco', 558680),
+('Contagem', 'BRA', 'Minas Gerais', 520801),
+('São José dos Campos', 'BRA', 'São Paulo', 515553),
+('Uberlândia', 'BRA', 'Minas Gerais', 487222),
+('Feira de Santana', 'BRA', 'Bahia', 479992),
+('Ribeirão Preto', 'BRA', 'São Paulo', 473276),
+('Sorocaba', 'BRA', 'São Paulo', 466823),
+('Niterói', 'BRA', 'Rio de Janeiro', 459884),
+('Cuiabá', 'BRA', 'Mato Grosso', 453813),
+('Juiz de Fora', 'BRA', 'Minas Gerais', 450288),
+('Aracaju', 'BRA', 'Sergipe', 445555),
+('São João de Meriti', 'BRA', 'Rio de Janeiro', 440052),
+('Londrina', 'BRA', 'Paraná', 432257),
+('Joinville', 'BRA', 'Santa Catarina', 428011),
+('Belford Roxo', 'BRA', 'Rio de Janeiro', 425194),
+('Santos', 'BRA', 'São Paulo', 408748),
+('Ananindeua', 'BRA', 'Pará', 400940),
+('Campos dos Goytacazes', 'BRA', 'Rio de Janeiro', 398418),
+('Mauá', 'BRA', 'São Paulo', 375055),
+('Carapicuíba', 'BRA', 'São Paulo', 357552),
+('Olinda', 'BRA', 'Pernambuco', 354732),
+('Campina Grande', 'BRA', 'Paraíba', 352497),
+('São José do Rio Preto', 'BRA', 'São Paulo', 351944),
+('Caxias do Sul', 'BRA', 'Rio Grande do Sul', 349581),
+('Moji das Cruzes', 'BRA', 'São Paulo', 339194),
+('Diadema', 'BRA', 'São Paulo', 335078),
+('Aparecida de Goiânia', 'BRA', 'Goiás', 324662),
+('Piracicaba', 'BRA', 'São Paulo', 319104),
+('Cariacica', 'BRA', 'Espírito Santo', 319033),
+('Vila Velha', 'BRA', 'Espírito Santo', 318758),
+('Pelotas', 'BRA', 'Rio Grande do Sul', 315415),
+('Bauru', 'BRA', 'São Paulo', 313670),
+('Porto Velho', 'BRA', 'Rondônia', 309750),
+('Serra', 'BRA', 'Espírito Santo', 302666),
+('Betim', 'BRA', 'Minas Gerais', 302108),
+('Jundíaí', 'BRA', 'São Paulo', 296127),
+('Canoas', 'BRA', 'Rio Grande do Sul', 294125),
+('Franca', 'BRA', 'São Paulo', 290139),
+('São Vicente', 'BRA', 'São Paulo', 286848),
+('Maringá', 'BRA', 'Paraná', 286461),
+('Montes Claros', 'BRA', 'Minas Gerais', 286058),
+('Anápolis', 'BRA', 'Goiás', 282197),
+('Florianópolis', 'BRA', 'Santa Catarina', 281928),
+('Petrópolis', 'BRA', 'Rio de Janeiro', 279183),
+('Itaquaquecetuba', 'BRA', 'São Paulo', 270874),
+('Vitória', 'BRA', 'Espírito Santo', 270626),
+('Ponta Grossa', 'BRA', 'Paraná', 268013),
+('Rio Branco', 'BRA', 'Acre', 259537),
+('Foz do Iguaçu', 'BRA', 'Paraná', 259425),
+('Macapá', 'BRA', 'Amapá', 256033),
+('Ilhéus', 'BRA', 'Bahia', 254970),
+('Vitória da Conquista', 'BRA', 'Bahia', 253587),
+('Uberaba', 'BRA', 'Minas Gerais', 249225),
+('Paulista', 'BRA', 'Pernambuco', 248473),
+('Limeira', 'BRA', 'São Paulo', 245497),
+('Blumenau', 'BRA', 'Santa Catarina', 244379),
+('Caruaru', 'BRA', 'Pernambuco', 244247),
+('Santarém', 'BRA', 'Pará', 241771),
+('Volta Redonda', 'BRA', 'Rio de Janeiro', 240315),
+('Novo Hamburgo', 'BRA', 'Rio Grande do Sul', 239940),
+('Caucaia', 'BRA', 'Ceará', 238738),
+('Santa Maria', 'BRA', 'Rio Grande do Sul', 238473),
+('Cascavel', 'BRA', 'Paraná', 237510),
+('Guarujá', 'BRA', 'São Paulo', 237206),
+('Ribeirão das Neves', 'BRA', 'Minas Gerais', 232685),
+('Governador Valadares', 'BRA', 'Minas Gerais', 231724),
+('Taubaté', 'BRA', 'São Paulo', 229130),
+('Imperatriz', 'BRA', 'Maranhão', 224564),
+('Gravataí', 'BRA', 'Rio Grande do Sul', 223011),
+('Embu', 'BRA', 'São Paulo', 222223),
+('Mossoró', 'BRA', 'Rio Grande do Norte', 214901),
+('Várzea Grande', 'BRA', 'Mato Grosso', 214435),
+('Petrolina', 'BRA', 'Pernambuco', 210540),
+('Barueri', 'BRA', 'São Paulo', 208426),
+('Viamão', 'BRA', 'Rio Grande do Sul', 207557),
+('Ipatinga', 'BRA', 'Minas Gerais', 206338),
+('Juazeiro', 'BRA', 'Bahia', 201073),
+('Juazeiro do Norte', 'BRA', 'Ceará', 199636),
+('Taboão da Serra', 'BRA', 'São Paulo', 197550),
+('São José dos Pinhais', 'BRA', 'Paraná', 196884),
+('Magé', 'BRA', 'Rio de Janeiro', 196147),
+('Suzano', 'BRA', 'São Paulo', 195434),
+('São Leopoldo', 'BRA', 'Rio Grande do Sul', 189258),
+('Marília', 'BRA', 'São Paulo', 188691),
+('São Carlos', 'BRA', 'São Paulo', 187122),
+('Sumaré', 'BRA', 'São Paulo', 186205),
+('Presidente Prudente', 'BRA', 'São Paulo', 185340),
+('Divinópolis', 'BRA', 'Minas Gerais', 185047),
+('Sete Lagoas', 'BRA', 'Minas Gerais', 182984),
+('Rio Grande', 'BRA', 'Rio Grande do Sul', 182222),
+('Itabuna', 'BRA', 'Bahia', 182148),
+('Jequié', 'BRA', 'Bahia', 179128),
+('Arapiraca', 'BRA', 'Alagoas', 178988),
+('Colombo', 'BRA', 'Paraná', 177764),
+('Americana', 'BRA', 'São Paulo', 177409),
+('Alvorada', 'BRA', 'Rio Grande do Sul', 175574),
+('Araraquara', 'BRA', 'São Paulo', 174381),
+('Itaboraí', 'BRA', 'Rio de Janeiro', 173977),
+('Santa Bárbara d´Oeste', 'BRA', 'São Paulo', 171657),
+('Nova Friburgo', 'BRA', 'Rio de Janeiro', 170697),
+('Jacareí', 'BRA', 'São Paulo', 170356),
+('Araçatuba', 'BRA', 'São Paulo', 169303),
+('Barra Mansa', 'BRA', 'Rio de Janeiro', 168953),
+('Praia Grande', 'BRA', 'São Paulo', 168434),
+('Marabá', 'BRA', 'Pará', 167795),
+('Criciúma', 'BRA', 'Santa Catarina', 167661),
+('Boa Vista', 'BRA', 'Roraima', 167185),
+('Passo Fundo', 'BRA', 'Rio Grande do Sul', 166343),
+('Dourados', 'BRA', 'Mato Grosso do Sul', 164716),
+('Santa Luzia', 'BRA', 'Minas Gerais', 164704),
+('Rio Claro', 'BRA', 'São Paulo', 163551),
+('Maracanaú', 'BRA', 'Ceará', 162022),
+('Guarapuava', 'BRA', 'Paraná', 160510),
+('Rondonópolis', 'BRA', 'Mato Grosso', 155115),
+('São José', 'BRA', 'Santa Catarina', 155105),
+('Cachoeiro de Itapemirim', 'BRA', 'Espírito Santo', 155024),
+('Nilópolis', 'BRA', 'Rio de Janeiro', 153383),
+('Itapevi', 'BRA', 'São Paulo', 150664),
+('Cabo de Santo Agostinho', 'BRA', 'Pernambuco', 149964),
+('Camaçari', 'BRA', 'Bahia', 149146),
+('Sobral', 'BRA', 'Ceará', 146005),
+('Itajaí', 'BRA', 'Santa Catarina', 145197),
+('Chapecó', 'BRA', 'Santa Catarina', 144158),
+('Cotia', 'BRA', 'São Paulo', 140042),
+('Lages', 'BRA', 'Santa Catarina', 139570),
+('Ferraz de Vasconcelos', 'BRA', 'São Paulo', 139283),
+('Indaiatuba', 'BRA', 'São Paulo', 135968),
+('Hortolândia', 'BRA', 'São Paulo', 135755),
+('Caxias', 'BRA', 'Maranhão', 133980),
+('São Caetano do Sul', 'BRA', 'São Paulo', 133321),
+('Itu', 'BRA', 'São Paulo', 132736),
+('Nossa Senhora do Socorro', 'BRA', 'Sergipe', 131351),
+('Parnaíba', 'BRA', 'Piauí', 129756),
+('Poços de Caldas', 'BRA', 'Minas Gerais', 129683),
+('Teresópolis', 'BRA', 'Rio de Janeiro', 128079),
+('Barreiras', 'BRA', 'Bahia', 127801),
+('Castanhal', 'BRA', 'Pará', 127634),
+('Alagoinhas', 'BRA', 'Bahia', 126820),
+('Itapecerica da Serra', 'BRA', 'São Paulo', 126672),
+('Uruguaiana', 'BRA', 'Rio Grande do Sul', 126305),
+('Paranaguá', 'BRA', 'Paraná', 126076),
+('Ibirité', 'BRA', 'Minas Gerais', 125982),
+('Timon', 'BRA', 'Maranhão', 125812),
+('Luziânia', 'BRA', 'Goiás', 125597),
+('Macaé', 'BRA', 'Rio de Janeiro', 125597),
+('Teófilo Otoni', 'BRA', 'Minas Gerais', 124489),
+('Moji-Guaçu', 'BRA', 'São Paulo', 123782),
+('Palmas', 'BRA', 'Tocantins', 121919),
+('Pindamonhangaba', 'BRA', 'São Paulo', 121904),
+('Francisco Morato', 'BRA', 'São Paulo', 121197),
+('Bagé', 'BRA', 'Rio Grande do Sul', 120793),
+('Sapucaia do Sul', 'BRA', 'Rio Grande do Sul', 120217),
+('Cabo Frio', 'BRA', 'Rio de Janeiro', 119503),
+('Itapetininga', 'BRA', 'São Paulo', 119391),
+('Patos de Minas', 'BRA', 'Minas Gerais', 119262),
+('Camaragibe', 'BRA', 'Pernambuco', 118968),
+('Bragança Paulista', 'BRA', 'São Paulo', 116929),
+('Queimados', 'BRA', 'Rio de Janeiro', 115020),
+('Araguaína', 'BRA', 'Tocantins', 114948),
+('Garanhuns', 'BRA', 'Pernambuco', 114603),
+('Vitória de Santo Antão', 'BRA', 'Pernambuco', 113595),
+('Santa Rita', 'BRA', 'Paraíba', 113135),
+('Barbacena', 'BRA', 'Minas Gerais', 113079),
+('Abaetetuba', 'BRA', 'Pará', 111258),
+('Jaú', 'BRA', 'São Paulo', 109965),
+('Lauro de Freitas', 'BRA', 'Bahia', 109236),
+('Franco da Rocha', 'BRA', 'São Paulo', 108964),
+('Teixeira de Freitas', 'BRA', 'Bahia', 108441),
+('Varginha', 'BRA', 'Minas Gerais', 108314),
+('Ribeirão Pires', 'BRA', 'São Paulo', 108121),
+('Sabará', 'BRA', 'Minas Gerais', 107781),
+('Catanduva', 'BRA', 'São Paulo', 107761),
+('Rio Verde', 'BRA', 'Goiás', 107755),
+('Botucatu', 'BRA', 'São Paulo', 107663),
+('Colatina', 'BRA', 'Espírito Santo', 107354),
+('Santa Cruz do Sul', 'BRA', 'Rio Grande do Sul', 106734),
+('Linhares', 'BRA', 'Espírito Santo', 106278),
+('Apucarana', 'BRA', 'Paraná', 105114),
+('Barretos', 'BRA', 'São Paulo', 104156),
+('Guaratinguetá', 'BRA', 'São Paulo', 103433),
+('Cachoeirinha', 'BRA', 'Rio Grande do Sul', 103240),
+('Codó', 'BRA', 'Maranhão', 103153),
+('Jaraguá do Sul', 'BRA', 'Santa Catarina', 102580),
+('Cubatão', 'BRA', 'São Paulo', 102372),
+('Itabira', 'BRA', 'Minas Gerais', 102217),
+('Itaituba', 'BRA', 'Pará', 101320),
+('Araras', 'BRA', 'São Paulo', 101046),
+('Resende', 'BRA', 'Rio de Janeiro', 100627),
+('Atibaia', 'BRA', 'São Paulo', 100356),
+('Pouso Alegre', 'BRA', 'Minas Gerais', 100028),
+('Toledo', 'BRA', 'Paraná', 99387),
+('Crato', 'BRA', 'Ceará', 98965),
+('Passos', 'BRA', 'Minas Gerais', 98570),
+('Araguari', 'BRA', 'Minas Gerais', 98399),
+('São José de Ribamar', 'BRA', 'Maranhão', 98318),
+('Pinhais', 'BRA', 'Paraná', 98198),
+('Sertãozinho', 'BRA', 'São Paulo', 98140),
+('Conselheiro Lafaiete', 'BRA', 'Minas Gerais', 97507),
+('Paulo Afonso', 'BRA', 'Bahia', 97291),
+('Angra dos Reis', 'BRA', 'Rio de Janeiro', 96864),
+('Eunápolis', 'BRA', 'Bahia', 96610),
+('Salto', 'BRA', 'São Paulo', 96348),
+('Ourinhos', 'BRA', 'São Paulo', 96291),
+('Parnamirim', 'BRA', 'Rio Grande do Norte', 96210),
+('Jacobina', 'BRA', 'Bahia', 96131),
+('Coronel Fabriciano', 'BRA', 'Minas Gerais', 95933),
+('Birigui', 'BRA', 'São Paulo', 94685),
+('Tatuí', 'BRA', 'São Paulo', 93897),
+('Ji-Paraná', 'BRA', 'Rondônia', 93346),
+('Bacabal', 'BRA', 'Maranhão', 93121),
+('Cametá', 'BRA', 'Pará', 92779),
+('Guaíba', 'BRA', 'Rio Grande do Sul', 92224),
+('São Lourenço da Mata', 'BRA', 'Pernambuco', 91999),
+('Santana do Livramento', 'BRA', 'Rio Grande do Sul', 91779),
+('Votorantim', 'BRA', 'São Paulo', 91777),
+('Campo Largo', 'BRA', 'Paraná', 91203),
+('Patos', 'BRA', 'Paraíba', 90519),
+('Ituiutaba', 'BRA', 'Minas Gerais', 90507),
+('Corumbá', 'BRA', 'Mato Grosso do Sul', 90111),
+('Palhoça', 'BRA', 'Santa Catarina', 89465),
+('Barra do Piraí', 'BRA', 'Rio de Janeiro', 89388),
+('Bento Gonçalves', 'BRA', 'Rio Grande do Sul', 89254),
+('Poá', 'BRA', 'São Paulo', 89236),
+('Águas Lindas de Goiás', 'BRA', 'Goiás', 89200),
+('London', 'GBR', 'England', 7285000),
+('Birmingham', 'GBR', 'England', 1013000),
+('Glasgow', 'GBR', 'Scotland', 619680),
+('Liverpool', 'GBR', 'England', 461000),
+('Edinburgh', 'GBR', 'Scotland', 450180),
+('Sheffield', 'GBR', 'England', 431607),
+('Manchester', 'GBR', 'England', 430000),
+('Leeds', 'GBR', 'England', 424194),
+('Bristol', 'GBR', 'England', 402000),
+('Cardiff', 'GBR', 'Wales', 321000),
+('Coventry', 'GBR', 'England', 304000),
+('Leicester', 'GBR', 'England', 294000),
+('Bradford', 'GBR', 'England', 289376),
+('Belfast', 'GBR', 'North Ireland', 287500),
+('Nottingham', 'GBR', 'England', 287000),
+('Kingston upon Hull', 'GBR', 'England', 262000),
+('Plymouth', 'GBR', 'England', 253000),
+('Stoke-on-Trent', 'GBR', 'England', 252000),
+('Wolverhampton', 'GBR', 'England', 242000),
+('Derby', 'GBR', 'England', 236000),
+('Swansea', 'GBR', 'Wales', 230000),
+('Southampton', 'GBR', 'England', 216000),
+('Aberdeen', 'GBR', 'Scotland', 213070),
+('Northampton', 'GBR', 'England', 196000),
+('Dudley', 'GBR', 'England', 192171),
+('Portsmouth', 'GBR', 'England', 190000),
+('Newcastle upon Tyne', 'GBR', 'England', 189150),
+('Sunderland', 'GBR', 'England', 183310),
+('Luton', 'GBR', 'England', 183000),
+('Swindon', 'GBR', 'England', 180000),
+('Southend-on-Sea', 'GBR', 'England', 176000),
+('Walsall', 'GBR', 'England', 174739),
+('Bournemouth', 'GBR', 'England', 162000),
+('Peterborough', 'GBR', 'England', 156000),
+('Brighton', 'GBR', 'England', 156124),
+('Blackpool', 'GBR', 'England', 151000),
+('Dundee', 'GBR', 'Scotland', 146690),
+('West Bromwich', 'GBR', 'England', 146386),
+('Reading', 'GBR', 'England', 148000),
+('Oldbury/Smethwick (Warley)', 'GBR', 'England', 145542),
+('Middlesbrough', 'GBR', 'England', 145000),
+('Huddersfield', 'GBR', 'England', 143726),
+('Oxford', 'GBR', 'England', 144000),
+('Poole', 'GBR', 'England', 141000),
+('Bolton', 'GBR', 'England', 139020),
+('Blackburn', 'GBR', 'England', 140000),
+('Newport', 'GBR', 'Wales', 139000),
+('Preston', 'GBR', 'England', 135000),
+('Stockport', 'GBR', 'England', 132813),
+('Norwich', 'GBR', 'England', 124000),
+('Rotherham', 'GBR', 'England', 121380),
+('Cambridge', 'GBR', 'England', 121000),
+('Watford', 'GBR', 'England', 113080),
+('Ipswich', 'GBR', 'England', 114000),
+('Slough', 'GBR', 'England', 112000),
+('Exeter', 'GBR', 'England', 111000),
+('Cheltenham', 'GBR', 'England', 106000),
+('Gloucester', 'GBR', 'England', 107000),
+('Saint Helens', 'GBR', 'England', 106293),
+('Sutton Coldfield', 'GBR', 'England', 106001),
+('York', 'GBR', 'England', 104425),
+('Oldham', 'GBR', 'England', 103931),
+('Basildon', 'GBR', 'England', 100924),
+('Worthing', 'GBR', 'England', 100000),
+('Chelmsford', 'GBR', 'England', 97451),
+('Colchester', 'GBR', 'England', 96063),
+('Crawley', 'GBR', 'England', 97000),
+('Gillingham', 'GBR', 'England', 92000),
+('Solihull', 'GBR', 'England', 94531),
+('Rochdale', 'GBR', 'England', 94313),
+('Birkenhead', 'GBR', 'England', 93087),
+('Worcester', 'GBR', 'England', 95000),
+('Hartlepool', 'GBR', 'England', 92000),
+('Halifax', 'GBR', 'England', 91069),
+('Woking/Byfleet', 'GBR', 'England', 92000),
+('Southport', 'GBR', 'England', 90959),
+('Maidstone', 'GBR', 'England', 90878),
+('Eastbourne', 'GBR', 'England', 90000),
+('Grimsby', 'GBR', 'England', 89000),
+('Saint Helier', 'GBR', 'Jersey', 27523),
+('Douglas', 'GBR', '', 23487),
+('Road Town', 'VGB', 'Tortola', 8000),
+('Bandar Seri Begawan', 'BRN', 'Brunei and Muara', 21484),
+('Sofija', 'BGR', 'Grad Sofija', 1122302),
+('Plovdiv', 'BGR', 'Plovdiv', 342584),
+('Varna', 'BGR', 'Varna', 299801),
+('Burgas', 'BGR', 'Burgas', 195255),
+('Ruse', 'BGR', 'Ruse', 166467),
+('Stara Zagora', 'BGR', 'Haskovo', 147939),
+('Pleven', 'BGR', 'Lovec', 121952),
+('Sliven', 'BGR', 'Burgas', 105530),
+('Dobric', 'BGR', 'Varna', 100399),
+('umen', 'BGR', 'Varna', 94686),
+('Ouagadougou', 'BFA', 'Kadiogo', 824000),
+('Bobo-Dioulasso', 'BFA', 'Houet', 300000),
+('Koudougou', 'BFA', 'Boulkiemdé', 105000),
+('Bujumbura', 'BDI', 'Bujumbura', 300000),
+('George Town', 'CYM', 'Grand Cayman', 19600),
+('Santiago de Chile', 'CHL', 'Santiago', 4703954),
+('Puente Alto', 'CHL', 'Santiago', 386236),
+('Viña del Mar', 'CHL', 'Valparaíso', 312493),
+('Valparaíso', 'CHL', 'Valparaíso', 293800),
+('Talcahuano', 'CHL', 'Bíobío', 277752),
+('Antofagasta', 'CHL', 'Antofagasta', 251429),
+('San Bernardo', 'CHL', 'Santiago', 241910),
+('Temuco', 'CHL', 'La Araucanía', 233041),
+('Concepción', 'CHL', 'Bíobío', 217664),
+('Rancagua', 'CHL', 'O´Higgins', 212977),
+('Arica', 'CHL', 'Tarapacá', 189036),
+('Talca', 'CHL', 'Maule', 187557),
+('Chillán', 'CHL', 'Bíobío', 178182),
+('Iquique', 'CHL', 'Tarapacá', 177892),
+('Los Angeles', 'CHL', 'Bíobío', 158215),
+('Puerto Montt', 'CHL', 'Los Lagos', 152194),
+('Coquimbo', 'CHL', 'Coquimbo', 143353),
+('Osorno', 'CHL', 'Los Lagos', 141468),
+('La Serena', 'CHL', 'Coquimbo', 137409),
+('Calama', 'CHL', 'Antofagasta', 137265),
+('Valdivia', 'CHL', 'Los Lagos', 133106),
+('Punta Arenas', 'CHL', 'Magallanes', 125631),
+('Copiapó', 'CHL', 'Atacama', 120128),
+('Quilpué', 'CHL', 'Valparaíso', 118857),
+('Curicó', 'CHL', 'Maule', 115766),
+('Ovalle', 'CHL', 'Coquimbo', 94854),
+('Coronel', 'CHL', 'Bíobío', 93061),
+('San Pedro de la Paz', 'CHL', 'Bíobío', 91684),
+('Melipilla', 'CHL', 'Santiago', 91056),
+('Avarua', 'COK', 'Rarotonga', 11900),
+('San José', 'CRI', 'San José', 339131),
+('Djibouti', 'DJI', 'Djibouti', 383000),
+('Roseau', 'DMA', 'St George', 16243),
+('Santo Domingo de Guzmán', 'DOM', 'Distrito Nacional', 1609966),
+('Santiago de los Caballeros', 'DOM', 'Santiago', 365463),
+('La Romana', 'DOM', 'La Romana', 140204),
+('San Pedro de Macorís', 'DOM', 'San Pedro de Macorís', 124735),
+('San Francisco de Macorís', 'DOM', 'Duarte', 108485),
+('San Felipe de Puerto Plata', 'DOM', 'Puerto Plata', 89423),
+('Guayaquil', 'ECU', 'Guayas', 2070040),
+('Quito', 'ECU', 'Pichincha', 1573458),
+('Cuenca', 'ECU', 'Azuay', 270353),
+('Machala', 'ECU', 'El Oro', 210368),
+('Santo Domingo de los Colorados', 'ECU', 'Pichincha', 202111),
+('Portoviejo', 'ECU', 'Manabí', 176413),
+('Ambato', 'ECU', 'Tungurahua', 169612),
+('Manta', 'ECU', 'Manabí', 164739),
+('Duran [Eloy Alfaro]', 'ECU', 'Guayas', 152514),
+('Ibarra', 'ECU', 'Imbabura', 130643),
+('Quevedo', 'ECU', 'Los Ríos', 129631),
+('Milagro', 'ECU', 'Guayas', 124177),
+('Loja', 'ECU', 'Loja', 123875),
+('Ríobamba', 'ECU', 'Chimborazo', 123163),
+('Esmeraldas', 'ECU', 'Esmeraldas', 123045),
+('Cairo', 'EGY', 'Kairo', 6789479),
+('Alexandria', 'EGY', 'Aleksandria', 3328196),
+('Giza', 'EGY', 'Giza', 2221868),
+('Shubra al-Khayma', 'EGY', 'al-Qalyubiya', 870716),
+('Port Said', 'EGY', 'Port Said', 469533),
+('Suez', 'EGY', 'Suez', 417610),
+('al-Mahallat al-Kubra', 'EGY', 'al-Gharbiya', 395402),
+('Tanta', 'EGY', 'al-Gharbiya', 371010),
+('al-Mansura', 'EGY', 'al-Daqahliya', 369621),
+('Luxor', 'EGY', 'Luxor', 360503),
+('Asyut', 'EGY', 'Asyut', 343498),
+('Bahtim', 'EGY', 'al-Qalyubiya', 275807),
+('Zagazig', 'EGY', 'al-Sharqiya', 267351),
+('al-Faiyum', 'EGY', 'al-Faiyum', 260964),
+('Ismailia', 'EGY', 'Ismailia', 254477),
+('Kafr al-Dawwar', 'EGY', 'al-Buhayra', 231978),
+('Assuan', 'EGY', 'Assuan', 219017),
+('Damanhur', 'EGY', 'al-Buhayra', 212203),
+('al-Minya', 'EGY', 'al-Minya', 201360),
+('Bani Suwayf', 'EGY', 'Bani Suwayf', 172032),
+('Qina', 'EGY', 'Qina', 171275),
+('Sawhaj', 'EGY', 'Sawhaj', 170125),
+('Shibin al-Kawm', 'EGY', 'al-Minufiya', 159909),
+('Bulaq al-Dakrur', 'EGY', 'Giza', 148787),
+('Banha', 'EGY', 'al-Qalyubiya', 145792),
+('Warraq al-Arab', 'EGY', 'Giza', 127108),
+('Kafr al-Shaykh', 'EGY', 'Kafr al-Shaykh', 124819),
+('Mallawi', 'EGY', 'al-Minya', 119283),
+('Bilbays', 'EGY', 'al-Sharqiya', 113608),
+('Mit Ghamr', 'EGY', 'al-Daqahliya', 101801),
+('al-Arish', 'EGY', 'Shamal Sina', 100447),
+('Talkha', 'EGY', 'al-Daqahliya', 97700),
+('Qalyub', 'EGY', 'al-Qalyubiya', 97200),
+('Jirja', 'EGY', 'Sawhaj', 95400),
+('Idfu', 'EGY', 'Qina', 94200),
+('al-Hawamidiya', 'EGY', 'Giza', 91700),
+('Disuq', 'EGY', 'Kafr al-Shaykh', 91300),
+('San Salvador', 'SLV', 'San Salvador', 415346),
+('Santa Ana', 'SLV', 'Santa Ana', 139389),
+('Mejicanos', 'SLV', 'San Salvador', 138800),
+('Soyapango', 'SLV', 'San Salvador', 129800),
+('San Miguel', 'SLV', 'San Miguel', 127696),
+('Nueva San Salvador', 'SLV', 'La Libertad', 98400),
+('Apopa', 'SLV', 'San Salvador', 88800),
+('Asmara', 'ERI', 'Maekel', 431000),
+('Madrid', 'ESP', 'Madrid', 2879052),
+('Barcelona', 'ESP', 'Katalonia', 1503451),
+('Valencia', 'ESP', 'Valencia', 739412),
+('Sevilla', 'ESP', 'Andalusia', 701927),
+('Zaragoza', 'ESP', 'Aragonia', 603367),
+('Málaga', 'ESP', 'Andalusia', 530553),
+('Bilbao', 'ESP', 'Baskimaa', 357589),
+('Las Palmas de Gran Canaria', 'ESP', 'Canary Islands', 354757),
+('Murcia', 'ESP', 'Murcia', 353504),
+('Palma de Mallorca', 'ESP', 'Balears', 326993),
+('Valladolid', 'ESP', 'Castilla and León', 319998),
+('Córdoba', 'ESP', 'Andalusia', 311708),
+('Vigo', 'ESP', 'Galicia', 283670),
+('Alicante [Alacant]', 'ESP', 'Valencia', 272432),
+('Gijón', 'ESP', 'Asturia', 267980),
+('L´Hospitalet de Llobregat', 'ESP', 'Katalonia', 247986),
+('Granada', 'ESP', 'Andalusia', 244767),
+('A Coruña (La Coruña)', 'ESP', 'Galicia', 243402),
+('Vitoria-Gasteiz', 'ESP', 'Baskimaa', 217154),
+('Santa Cruz de Tenerife', 'ESP', 'Canary Islands', 213050),
+('Badalona', 'ESP', 'Katalonia', 209635),
+('Oviedo', 'ESP', 'Asturia', 200453),
+('Móstoles', 'ESP', 'Madrid', 195351),
+('Elche [Elx]', 'ESP', 'Valencia', 193174),
+('Sabadell', 'ESP', 'Katalonia', 184859),
+('Santander', 'ESP', 'Cantabria', 184165),
+('Jerez de la Frontera', 'ESP', 'Andalusia', 182660),
+('Pamplona [Iruña]', 'ESP', 'Navarra', 180483),
+('Donostia-San Sebastián', 'ESP', 'Baskimaa', 179208),
+('Cartagena', 'ESP', 'Murcia', 177709),
+('Leganés', 'ESP', 'Madrid', 173163),
+('Fuenlabrada', 'ESP', 'Madrid', 171173),
+('Almería', 'ESP', 'Andalusia', 169027),
+('Terrassa', 'ESP', 'Katalonia', 168695),
+('Alcalá de Henares', 'ESP', 'Madrid', 164463),
+('Burgos', 'ESP', 'Castilla and León', 162802),
+('Salamanca', 'ESP', 'Castilla and León', 158720),
+('Albacete', 'ESP', 'Kastilia-La Mancha', 147527),
+('Getafe', 'ESP', 'Madrid', 145371),
+('Cádiz', 'ESP', 'Andalusia', 142449),
+('Alcorcón', 'ESP', 'Madrid', 142048),
+('Huelva', 'ESP', 'Andalusia', 140583),
+('León', 'ESP', 'Castilla and León', 139809),
+('Castellón de la Plana [Castell', 'ESP', 'Valencia', 139712),
+('Badajoz', 'ESP', 'Extremadura', 136613),
+('[San Cristóbal de] la Laguna', 'ESP', 'Canary Islands', 127945),
+('Logroño', 'ESP', 'La Rioja', 127093),
+('Santa Coloma de Gramenet', 'ESP', 'Katalonia', 120802),
+('Tarragona', 'ESP', 'Katalonia', 113016),
+('Lleida (Lérida)', 'ESP', 'Katalonia', 112207),
+('Jaén', 'ESP', 'Andalusia', 109247),
+('Ourense (Orense)', 'ESP', 'Galicia', 109120),
+('Mataró', 'ESP', 'Katalonia', 104095),
+('Algeciras', 'ESP', 'Andalusia', 103106),
+('Marbella', 'ESP', 'Andalusia', 101144),
+('Barakaldo', 'ESP', 'Baskimaa', 98212),
+('Dos Hermanas', 'ESP', 'Andalusia', 94591),
+('Santiago de Compostela', 'ESP', 'Galicia', 93745),
+('Torrejón de Ardoz', 'ESP', 'Madrid', 92262),
+('Cape Town', 'ZAF', 'Western Cape', 2352121),
+('Soweto', 'ZAF', 'Gauteng', 904165),
+('Johannesburg', 'ZAF', 'Gauteng', 756653),
+('Port Elizabeth', 'ZAF', 'Eastern Cape', 752319),
+('Pretoria', 'ZAF', 'Gauteng', 658630),
+('Inanda', 'ZAF', 'KwaZulu-Natal', 634065),
+('Durban', 'ZAF', 'KwaZulu-Natal', 566120),
+('Vanderbijlpark', 'ZAF', 'Gauteng', 468931),
+('Kempton Park', 'ZAF', 'Gauteng', 442633),
+('Alberton', 'ZAF', 'Gauteng', 410102),
+('Pinetown', 'ZAF', 'KwaZulu-Natal', 378810),
+('Pietermaritzburg', 'ZAF', 'KwaZulu-Natal', 370190),
+('Benoni', 'ZAF', 'Gauteng', 365467),
+('Randburg', 'ZAF', 'Gauteng', 341288),
+('Umlazi', 'ZAF', 'KwaZulu-Natal', 339233),
+('Bloemfontein', 'ZAF', 'Free State', 334341),
+('Vereeniging', 'ZAF', 'Gauteng', 328535),
+('Wonderboom', 'ZAF', 'Gauteng', 283289),
+('Roodepoort', 'ZAF', 'Gauteng', 279340),
+('Boksburg', 'ZAF', 'Gauteng', 262648),
+('Klerksdorp', 'ZAF', 'North West', 261911),
+('Soshanguve', 'ZAF', 'Gauteng', 242727),
+('Newcastle', 'ZAF', 'KwaZulu-Natal', 222993),
+('East London', 'ZAF', 'Eastern Cape', 221047),
+('Welkom', 'ZAF', 'Free State', 203296),
+('Kimberley', 'ZAF', 'Northern Cape', 197254),
+('Uitenhage', 'ZAF', 'Eastern Cape', 192120),
+('Chatsworth', 'ZAF', 'KwaZulu-Natal', 189885),
+('Mdantsane', 'ZAF', 'Eastern Cape', 182639),
+('Krugersdorp', 'ZAF', 'Gauteng', 181503),
+('Botshabelo', 'ZAF', 'Free State', 177971),
+('Brakpan', 'ZAF', 'Gauteng', 171363),
+('Witbank', 'ZAF', 'Mpumalanga', 167183),
+('Oberholzer', 'ZAF', 'Gauteng', 164367),
+('Germiston', 'ZAF', 'Gauteng', 164252),
+('Springs', 'ZAF', 'Gauteng', 162072),
+('Westonaria', 'ZAF', 'Gauteng', 159632),
+('Randfontein', 'ZAF', 'Gauteng', 120838),
+('Paarl', 'ZAF', 'Western Cape', 105768),
+('Potchefstroom', 'ZAF', 'North West', 101817),
+('Rustenburg', 'ZAF', 'North West', 97008),
+('Nigel', 'ZAF', 'Gauteng', 96734),
+('George', 'ZAF', 'Western Cape', 93818),
+('Ladysmith', 'ZAF', 'KwaZulu-Natal', 89292),
+('Addis Abeba', 'ETH', 'Addis Abeba', 2495000),
+('Dire Dawa', 'ETH', 'Dire Dawa', 164851),
+('Nazret', 'ETH', 'Oromia', 127842),
+('Gonder', 'ETH', 'Amhara', 112249),
+('Dese', 'ETH', 'Amhara', 97314),
+('Mekele', 'ETH', 'Tigray', 96938),
+('Bahir Dar', 'ETH', 'Amhara', 96140),
+('Stanley', 'FLK', 'East Falkland', 1636),
+('Suva', 'FJI', 'Central', 77366),
+('Quezon', 'PHL', 'National Capital Reg', 2173831),
+('Manila', 'PHL', 'National Capital Reg', 1581082),
+('Kalookan', 'PHL', 'National Capital Reg', 1177604),
+('Davao', 'PHL', 'Southern Mindanao', 1147116),
+('Cebu', 'PHL', 'Central Visayas', 718821),
+('Zamboanga', 'PHL', 'Western Mindanao', 601794),
+('Pasig', 'PHL', 'National Capital Reg', 505058),
+('Valenzuela', 'PHL', 'National Capital Reg', 485433),
+('Las Piñas', 'PHL', 'National Capital Reg', 472780),
+('Antipolo', 'PHL', 'Southern Tagalog', 470866),
+('Taguig', 'PHL', 'National Capital Reg', 467375),
+('Cagayan de Oro', 'PHL', 'Northern Mindanao', 461877),
+('Parañaque', 'PHL', 'National Capital Reg', 449811),
+('Makati', 'PHL', 'National Capital Reg', 444867),
+('Bacolod', 'PHL', 'Western Visayas', 429076),
+('General Santos', 'PHL', 'Southern Mindanao', 411822),
+('Marikina', 'PHL', 'National Capital Reg', 391170),
+('Dasmariñas', 'PHL', 'Southern Tagalog', 379520),
+('Muntinlupa', 'PHL', 'National Capital Reg', 379310),
+('Iloilo', 'PHL', 'Western Visayas', 365820),
+('Pasay', 'PHL', 'National Capital Reg', 354908),
+('Malabon', 'PHL', 'National Capital Reg', 338855),
+('San José del Monte', 'PHL', 'Central Luzon', 315807),
+('Bacoor', 'PHL', 'Southern Tagalog', 305699),
+('Iligan', 'PHL', 'Central Mindanao', 285061),
+('Calamba', 'PHL', 'Southern Tagalog', 281146),
+('Mandaluyong', 'PHL', 'National Capital Reg', 278474),
+('Butuan', 'PHL', 'Caraga', 267279),
+('Angeles', 'PHL', 'Central Luzon', 263971),
+('Tarlac', 'PHL', 'Central Luzon', 262481),
+('Mandaue', 'PHL', 'Central Visayas', 259728),
+('Baguio', 'PHL', 'CAR', 252386),
+('Batangas', 'PHL', 'Southern Tagalog', 247588),
+('Cainta', 'PHL', 'Southern Tagalog', 242511),
+('San Pedro', 'PHL', 'Southern Tagalog', 231403),
+('Navotas', 'PHL', 'National Capital Reg', 230403),
+('Cabanatuan', 'PHL', 'Central Luzon', 222859),
+('San Fernando', 'PHL', 'Central Luzon', 221857),
+('Lipa', 'PHL', 'Southern Tagalog', 218447),
+('Lapu-Lapu', 'PHL', 'Central Visayas', 217019),
+('San Pablo', 'PHL', 'Southern Tagalog', 207927),
+('Biñan', 'PHL', 'Southern Tagalog', 201186),
+('Taytay', 'PHL', 'Southern Tagalog', 198183),
+('Lucena', 'PHL', 'Southern Tagalog', 196075),
+('Imus', 'PHL', 'Southern Tagalog', 195482),
+('Olongapo', 'PHL', 'Central Luzon', 194260),
+('Binangonan', 'PHL', 'Southern Tagalog', 187691),
+('Santa Rosa', 'PHL', 'Southern Tagalog', 185633),
+('Tagum', 'PHL', 'Southern Mindanao', 179531),
+('Tacloban', 'PHL', 'Eastern Visayas', 178639),
+('Malolos', 'PHL', 'Central Luzon', 175291),
+('Mabalacat', 'PHL', 'Central Luzon', 171045),
+('Cotabato', 'PHL', 'Central Mindanao', 163849),
+('Meycauayan', 'PHL', 'Central Luzon', 163037),
+('Puerto Princesa', 'PHL', 'Southern Tagalog', 161912),
+('Legazpi', 'PHL', 'Bicol', 157010),
+('Silang', 'PHL', 'Southern Tagalog', 156137),
+('Ormoc', 'PHL', 'Eastern Visayas', 154297),
+('San Carlos', 'PHL', 'Ilocos', 154264),
+('Kabankalan', 'PHL', 'Western Visayas', 149769),
+('Talisay', 'PHL', 'Central Visayas', 148110),
+('Valencia', 'PHL', 'Northern Mindanao', 147924),
+('Calbayog', 'PHL', 'Eastern Visayas', 147187),
+('Santa Maria', 'PHL', 'Central Luzon', 144282),
+('Pagadian', 'PHL', 'Western Mindanao', 142515),
+('Cadiz', 'PHL', 'Western Visayas', 141954),
+('Bago', 'PHL', 'Western Visayas', 141721),
+('Toledo', 'PHL', 'Central Visayas', 141174),
+('Naga', 'PHL', 'Bicol', 137810),
+('San Mateo', 'PHL', 'Southern Tagalog', 135603),
+('Panabo', 'PHL', 'Southern Mindanao', 133950),
+('Koronadal', 'PHL', 'Southern Mindanao', 133786),
+('Marawi', 'PHL', 'Central Mindanao', 131090),
+('Dagupan', 'PHL', 'Ilocos', 130328),
+('Sagay', 'PHL', 'Western Visayas', 129765),
+('Roxas', 'PHL', 'Western Visayas', 126352),
+('Lubao', 'PHL', 'Central Luzon', 125699),
+('Digos', 'PHL', 'Southern Mindanao', 125171),
+('San Miguel', 'PHL', 'Central Luzon', 123824),
+('Malaybalay', 'PHL', 'Northern Mindanao', 123672),
+('Tuguegarao', 'PHL', 'Cagayan Valley', 120645),
+('Ilagan', 'PHL', 'Cagayan Valley', 119990),
+('Baliuag', 'PHL', 'Central Luzon', 119675),
+('Surigao', 'PHL', 'Caraga', 118534),
+('San Carlos', 'PHL', 'Western Visayas', 118259),
+('San Juan del Monte', 'PHL', 'National Capital Reg', 117680),
+('Tanauan', 'PHL', 'Southern Tagalog', 117539),
+('Concepcion', 'PHL', 'Central Luzon', 115171),
+('Rodriguez (Montalban)', 'PHL', 'Southern Tagalog', 115167),
+('Sariaya', 'PHL', 'Southern Tagalog', 114568),
+('Malasiqui', 'PHL', 'Ilocos', 113190),
+('General Mariano Alvarez', 'PHL', 'Southern Tagalog', 112446),
+('Urdaneta', 'PHL', 'Ilocos', 111582),
+('Hagonoy', 'PHL', 'Central Luzon', 111425),
+('San Jose', 'PHL', 'Southern Tagalog', 111009),
+('Polomolok', 'PHL', 'Southern Mindanao', 110709),
+('Santiago', 'PHL', 'Cagayan Valley', 110531),
+('Tanza', 'PHL', 'Southern Tagalog', 110517),
+('Ozamis', 'PHL', 'Northern Mindanao', 110420),
+('Mexico', 'PHL', 'Central Luzon', 109481),
+('San Jose', 'PHL', 'Central Luzon', 108254),
+('Silay', 'PHL', 'Western Visayas', 107722),
+('General Trias', 'PHL', 'Southern Tagalog', 107691),
+('Tabaco', 'PHL', 'Bicol', 107166),
+('Cabuyao', 'PHL', 'Southern Tagalog', 106630),
+('Calapan', 'PHL', 'Southern Tagalog', 105910),
+('Mati', 'PHL', 'Southern Mindanao', 105908),
+('Midsayap', 'PHL', 'Central Mindanao', 105760),
+('Cauayan', 'PHL', 'Cagayan Valley', 103952),
+('Gingoog', 'PHL', 'Northern Mindanao', 102379),
+('Dumaguete', 'PHL', 'Central Visayas', 102265),
+('San Fernando', 'PHL', 'Ilocos', 102082),
+('Arayat', 'PHL', 'Central Luzon', 101792),
+('Bayawan (Tulong)', 'PHL', 'Central Visayas', 101391),
+('Kidapawan', 'PHL', 'Central Mindanao', 101205),
+('Daraga (Locsin)', 'PHL', 'Bicol', 101031),
+('Marilao', 'PHL', 'Central Luzon', 101017),
+('Malita', 'PHL', 'Southern Mindanao', 100000),
+('Dipolog', 'PHL', 'Western Mindanao', 99862),
+('Cavite', 'PHL', 'Southern Tagalog', 99367),
+('Danao', 'PHL', 'Central Visayas', 98781),
+('Bislig', 'PHL', 'Caraga', 97860),
+('Talavera', 'PHL', 'Central Luzon', 97329),
+('Guagua', 'PHL', 'Central Luzon', 96858),
+('Bayambang', 'PHL', 'Ilocos', 96609),
+('Nasugbu', 'PHL', 'Southern Tagalog', 96113),
+('Baybay', 'PHL', 'Eastern Visayas', 95630),
+('Capas', 'PHL', 'Central Luzon', 95219),
+('Sultan Kudarat', 'PHL', 'ARMM', 94861),
+('Laoag', 'PHL', 'Ilocos', 94466),
+('Bayugan', 'PHL', 'Caraga', 93623),
+('Malungon', 'PHL', 'Southern Mindanao', 93232),
+('Santa Cruz', 'PHL', 'Southern Tagalog', 92694),
+('Sorsogon', 'PHL', 'Bicol', 92512),
+('Candelaria', 'PHL', 'Southern Tagalog', 92429),
+('Ligao', 'PHL', 'Bicol', 90603),
+('Tórshavn', 'FRO', 'Streymoyar', 14542),
+('Libreville', 'GAB', 'Estuaire', 419000),
+('Serekunda', 'GMB', 'Kombo St Mary', 102600),
+('Banjul', 'GMB', 'Banjul', 42326),
+('Tbilisi', 'GEO', 'Tbilisi', 1235200),
+('Kutaisi', 'GEO', 'Imereti', 240900),
+('Rustavi', 'GEO', 'Kvemo Kartli', 155400),
+('Batumi', 'GEO', 'Adzaria [Atara]', 137700),
+('Sohumi', 'GEO', 'Abhasia [Aphazeti]', 111700),
+('Accra', 'GHA', 'Greater Accra', 1070000),
+('Kumasi', 'GHA', 'Ashanti', 385192),
+('Tamale', 'GHA', 'Northern', 151069),
+('Tema', 'GHA', 'Greater Accra', 109975),
+('Sekondi-Takoradi', 'GHA', 'Western', 103653),
+('Gibraltar', 'GIB', '', 27025),
+('Saint George´s', 'GRD', 'St George', 4621),
+('Nuuk', 'GRL', 'Kitaa', 13445),
+('Les Abymes', 'GLP', 'Grande-Terre', 62947),
+('Basse-Terre', 'GLP', 'Basse-Terre', 12433),
+('Tamuning', 'GUM', '', 9500),
+('Agaña', 'GUM', '', 1139),
+('Ciudad de Guatemala', 'GTM', 'Guatemala', 823301),
+('Mixco', 'GTM', 'Guatemala', 209791),
+('Villa Nueva', 'GTM', 'Guatemala', 101295),
+('Quetzaltenango', 'GTM', 'Quetzaltenango', 90801),
+('Conakry', 'GIN', 'Conakry', 1090610),
+('Bissau', 'GNB', 'Bissau', 241000),
+('Georgetown', 'GUY', 'Georgetown', 254000),
+('Port-au-Prince', 'HTI', 'Ouest', 884472),
+('Carrefour', 'HTI', 'Ouest', 290204),
+('Delmas', 'HTI', 'Ouest', 240429),
+('Le-Cap-Haïtien', 'HTI', 'Nord', 102233),
+('Tegucigalpa', 'HND', 'Distrito Central', 813900),
+('San Pedro Sula', 'HND', 'Cortés', 383900),
+('La Ceiba', 'HND', 'Atlántida', 89200),
+('Kowloon and New Kowloon', 'HKG', 'Kowloon and New Kowl', 1987996),
+('Victoria', 'HKG', 'Hongkong', 1312637),
+('Longyearbyen', 'SJM', 'Länsimaa', 1438),
+('Jakarta', 'IDN', 'Jakarta Raya', 9604900),
+('Surabaya', 'IDN', 'East Java', 2663820),
+('Bandung', 'IDN', 'West Java', 2429000),
+('Medan', 'IDN', 'Sumatera Utara', 1843919),
+('Palembang', 'IDN', 'Sumatera Selatan', 1222764),
+('Tangerang', 'IDN', 'West Java', 1198300),
+('Semarang', 'IDN', 'Central Java', 1104405),
+('Ujung Pandang', 'IDN', 'Sulawesi Selatan', 1060257),
+('Malang', 'IDN', 'East Java', 716862),
+('Bandar Lampung', 'IDN', 'Lampung', 680332),
+('Bekasi', 'IDN', 'West Java', 644300),
+('Padang', 'IDN', 'Sumatera Barat', 534474),
+('Surakarta', 'IDN', 'Central Java', 518600),
+('Banjarmasin', 'IDN', 'Kalimantan Selatan', 482931),
+('Pekan Baru', 'IDN', 'Riau', 438638),
+('Denpasar', 'IDN', 'Bali', 435000),
+('Yogyakarta', 'IDN', 'Yogyakarta', 418944),
+('Pontianak', 'IDN', 'Kalimantan Barat', 409632),
+('Samarinda', 'IDN', 'Kalimantan Timur', 399175),
+('Jambi', 'IDN', 'Jambi', 385201),
+('Depok', 'IDN', 'West Java', 365200),
+('Cimahi', 'IDN', 'West Java', 344600),
+('Balikpapan', 'IDN', 'Kalimantan Timur', 338752),
+('Manado', 'IDN', 'Sulawesi Utara', 332288),
+('Mataram', 'IDN', 'Nusa Tenggara Barat', 306600),
+('Pekalongan', 'IDN', 'Central Java', 301504),
+('Tegal', 'IDN', 'Central Java', 289744),
+('Bogor', 'IDN', 'West Java', 285114),
+('Ciputat', 'IDN', 'West Java', 270800),
+('Pondokgede', 'IDN', 'West Java', 263200),
+('Cirebon', 'IDN', 'West Java', 254406),
+('Kediri', 'IDN', 'East Java', 253760),
+('Ambon', 'IDN', 'Molukit', 249312),
+('Jember', 'IDN', 'East Java', 218500),
+('Cilacap', 'IDN', 'Central Java', 206900),
+('Cimanggis', 'IDN', 'West Java', 205100),
+('Pematang Siantar', 'IDN', 'Sumatera Utara', 203056),
+('Purwokerto', 'IDN', 'Central Java', 202500),
+('Ciomas', 'IDN', 'West Java', 187400),
+('Tasikmalaya', 'IDN', 'West Java', 179800),
+('Madiun', 'IDN', 'East Java', 171532),
+('Bengkulu', 'IDN', 'Bengkulu', 146439),
+('Karawang', 'IDN', 'West Java', 145000),
+('Banda Aceh', 'IDN', 'Aceh', 143409),
+('Palu', 'IDN', 'Sulawesi Tengah', 142800),
+('Pasuruan', 'IDN', 'East Java', 134019),
+('Kupang', 'IDN', 'Nusa Tenggara Timur', 129300),
+('Tebing Tinggi', 'IDN', 'Sumatera Utara', 129300),
+('Percut Sei Tuan', 'IDN', 'Sumatera Utara', 129000),
+('Binjai', 'IDN', 'Sumatera Utara', 127222),
+('Sukabumi', 'IDN', 'West Java', 125766),
+('Waru', 'IDN', 'East Java', 124300),
+('Pangkal Pinang', 'IDN', 'Sumatera Selatan', 124000),
+('Magelang', 'IDN', 'Central Java', 123800),
+('Blitar', 'IDN', 'East Java', 122600),
+('Serang', 'IDN', 'West Java', 122400),
+('Probolinggo', 'IDN', 'East Java', 120770),
+('Cilegon', 'IDN', 'West Java', 117000),
+('Cianjur', 'IDN', 'West Java', 114300),
+('Ciparay', 'IDN', 'West Java', 111500),
+('Lhokseumawe', 'IDN', 'Aceh', 109600),
+('Taman', 'IDN', 'East Java', 107000),
+('Depok', 'IDN', 'Yogyakarta', 106800),
+('Citeureup', 'IDN', 'West Java', 105100),
+('Pemalang', 'IDN', 'Central Java', 103500),
+('Klaten', 'IDN', 'Central Java', 103300),
+('Salatiga', 'IDN', 'Central Java', 103000),
+('Cibinong', 'IDN', 'West Java', 101300),
+('Palangka Raya', 'IDN', 'Kalimantan Tengah', 99693),
+('Mojokerto', 'IDN', 'East Java', 96626),
+('Purwakarta', 'IDN', 'West Java', 95900),
+('Garut', 'IDN', 'West Java', 95800),
+('Kudus', 'IDN', 'Central Java', 95300),
+('Kendari', 'IDN', 'Sulawesi Tenggara', 94800),
+('Jaya Pura', 'IDN', 'West Irian', 94700),
+('Gorontalo', 'IDN', 'Sulawesi Utara', 94058),
+('Majalaya', 'IDN', 'West Java', 93200),
+('Pondok Aren', 'IDN', 'West Java', 92700),
+('Jombang', 'IDN', 'East Java', 92600),
+('Sunggal', 'IDN', 'Sumatera Utara', 92300),
+('Batam', 'IDN', 'Riau', 91871),
+('Padang Sidempuan', 'IDN', 'Sumatera Utara', 91200),
+('Sawangan', 'IDN', 'West Java', 91100),
+('Banyuwangi', 'IDN', 'East Java', 89900),
+('Tanjung Pinang', 'IDN', 'Riau', 89900),
+('Mumbai (Bombay)', 'IND', 'Maharashtra', 10500000),
+('Delhi', 'IND', 'Delhi', 7206704),
+('Calcutta [Kolkata]', 'IND', 'West Bengali', 4399819),
+('Chennai (Madras)', 'IND', 'Tamil Nadu', 3841396),
+('Hyderabad', 'IND', 'Andhra Pradesh', 2964638),
+('Ahmedabad', 'IND', 'Gujarat', 2876710),
+('Bangalore', 'IND', 'Karnataka', 2660088),
+('Kanpur', 'IND', 'Uttar Pradesh', 1874409),
+('Nagpur', 'IND', 'Maharashtra', 1624752),
+('Lucknow', 'IND', 'Uttar Pradesh', 1619115),
+('Pune', 'IND', 'Maharashtra', 1566651),
+('Surat', 'IND', 'Gujarat', 1498817),
+('Jaipur', 'IND', 'Rajasthan', 1458483),
+('Indore', 'IND', 'Madhya Pradesh', 1091674),
+('Bhopal', 'IND', 'Madhya Pradesh', 1062771),
+('Ludhiana', 'IND', 'Punjab', 1042740),
+('Vadodara (Baroda)', 'IND', 'Gujarat', 1031346),
+('Kalyan', 'IND', 'Maharashtra', 1014557),
+('Madurai', 'IND', 'Tamil Nadu', 977856),
+('Haora (Howrah)', 'IND', 'West Bengali', 950435),
+('Varanasi (Benares)', 'IND', 'Uttar Pradesh', 929270),
+('Patna', 'IND', 'Bihar', 917243),
+('Srinagar', 'IND', 'Jammu and Kashmir', 892506),
+('Agra', 'IND', 'Uttar Pradesh', 891790),
+('Coimbatore', 'IND', 'Tamil Nadu', 816321),
+('Thane (Thana)', 'IND', 'Maharashtra', 803389),
+('Allahabad', 'IND', 'Uttar Pradesh', 792858),
+('Meerut', 'IND', 'Uttar Pradesh', 753778),
+('Vishakhapatnam', 'IND', 'Andhra Pradesh', 752037),
+('Jabalpur', 'IND', 'Madhya Pradesh', 741927),
+('Amritsar', 'IND', 'Punjab', 708835),
+('Faridabad', 'IND', 'Haryana', 703592),
+('Vijayawada', 'IND', 'Andhra Pradesh', 701827),
+('Gwalior', 'IND', 'Madhya Pradesh', 690765),
+('Jodhpur', 'IND', 'Rajasthan', 666279),
+('Nashik (Nasik)', 'IND', 'Maharashtra', 656925),
+('Hubli-Dharwad', 'IND', 'Karnataka', 648298),
+('Solapur (Sholapur)', 'IND', 'Maharashtra', 604215),
+('Ranchi', 'IND', 'Jharkhand', 599306),
+('Bareilly', 'IND', 'Uttar Pradesh', 587211),
+('Guwahati (Gauhati)', 'IND', 'Assam', 584342),
+('Shambajinagar (Aurangabad)', 'IND', 'Maharashtra', 573272),
+('Cochin (Kochi)', 'IND', 'Kerala', 564589),
+('Rajkot', 'IND', 'Gujarat', 559407),
+('Kota', 'IND', 'Rajasthan', 537371),
+('Thiruvananthapuram (Trivandrum', 'IND', 'Kerala', 524006),
+('Pimpri-Chinchwad', 'IND', 'Maharashtra', 517083),
+('Jalandhar (Jullundur)', 'IND', 'Punjab', 509510),
+('Gorakhpur', 'IND', 'Uttar Pradesh', 505566),
+('Chandigarh', 'IND', 'Chandigarh', 504094),
+('Mysore', 'IND', 'Karnataka', 480692),
+('Aligarh', 'IND', 'Uttar Pradesh', 480520),
+('Guntur', 'IND', 'Andhra Pradesh', 471051),
+('Jamshedpur', 'IND', 'Jharkhand', 460577),
+('Ghaziabad', 'IND', 'Uttar Pradesh', 454156),
+('Warangal', 'IND', 'Andhra Pradesh', 447657),
+('Raipur', 'IND', 'Chhatisgarh', 438639),
+('Moradabad', 'IND', 'Uttar Pradesh', 429214),
+('Durgapur', 'IND', 'West Bengali', 425836),
+('Amravati', 'IND', 'Maharashtra', 421576),
+('Calicut (Kozhikode)', 'IND', 'Kerala', 419831),
+('Bikaner', 'IND', 'Rajasthan', 416289),
+('Bhubaneswar', 'IND', 'Orissa', 411542),
+('Kolhapur', 'IND', 'Maharashtra', 406370),
+('Kataka (Cuttack)', 'IND', 'Orissa', 403418),
+('Ajmer', 'IND', 'Rajasthan', 402700),
+('Bhavnagar', 'IND', 'Gujarat', 402338),
+('Tiruchirapalli', 'IND', 'Tamil Nadu', 387223),
+('Bhilai', 'IND', 'Chhatisgarh', 386159),
+('Bhiwandi', 'IND', 'Maharashtra', 379070),
+('Saharanpur', 'IND', 'Uttar Pradesh', 374945),
+('Ulhasnagar', 'IND', 'Maharashtra', 369077),
+('Salem', 'IND', 'Tamil Nadu', 366712),
+('Ujjain', 'IND', 'Madhya Pradesh', 362266),
+('Malegaon', 'IND', 'Maharashtra', 342595),
+('Jamnagar', 'IND', 'Gujarat', 341637),
+('Bokaro Steel City', 'IND', 'Jharkhand', 333683),
+('Akola', 'IND', 'Maharashtra', 328034),
+('Belgaum', 'IND', 'Karnataka', 326399),
+('Rajahmundry', 'IND', 'Andhra Pradesh', 324851),
+('Nellore', 'IND', 'Andhra Pradesh', 316606),
+('Udaipur', 'IND', 'Rajasthan', 308571),
+('New Bombay', 'IND', 'Maharashtra', 307297),
+('Bhatpara', 'IND', 'West Bengali', 304952),
+('Gulbarga', 'IND', 'Karnataka', 304099),
+('New Delhi', 'IND', 'Delhi', 301297),
+('Jhansi', 'IND', 'Uttar Pradesh', 300850),
+('Gaya', 'IND', 'Bihar', 291675),
+('Kakinada', 'IND', 'Andhra Pradesh', 279980),
+('Dhule (Dhulia)', 'IND', 'Maharashtra', 278317),
+('Panihati', 'IND', 'West Bengali', 275990),
+('Nanded (Nander)', 'IND', 'Maharashtra', 275083),
+('Mangalore', 'IND', 'Karnataka', 273304),
+('Dehra Dun', 'IND', 'Uttaranchal', 270159),
+('Kamarhati', 'IND', 'West Bengali', 266889),
+('Davangere', 'IND', 'Karnataka', 266082),
+('Asansol', 'IND', 'West Bengali', 262188),
+('Bhagalpur', 'IND', 'Bihar', 253225),
+('Bellary', 'IND', 'Karnataka', 245391),
+('Barddhaman (Burdwan)', 'IND', 'West Bengali', 245079),
+('Rampur', 'IND', 'Uttar Pradesh', 243742),
+('Jalgaon', 'IND', 'Maharashtra', 242193),
+('Muzaffarpur', 'IND', 'Bihar', 241107),
+('Nizamabad', 'IND', 'Andhra Pradesh', 241034),
+('Muzaffarnagar', 'IND', 'Uttar Pradesh', 240609),
+('Patiala', 'IND', 'Punjab', 238368),
+('Shahjahanpur', 'IND', 'Uttar Pradesh', 237713),
+('Kurnool', 'IND', 'Andhra Pradesh', 236800),
+('Tiruppur (Tirupper)', 'IND', 'Tamil Nadu', 235661),
+('Rohtak', 'IND', 'Haryana', 233400),
+('South Dum Dum', 'IND', 'West Bengali', 232811),
+('Mathura', 'IND', 'Uttar Pradesh', 226691),
+('Chandrapur', 'IND', 'Maharashtra', 226105),
+('Barahanagar (Baranagar)', 'IND', 'West Bengali', 224821),
+('Darbhanga', 'IND', 'Bihar', 218391),
+('Siliguri (Shiliguri)', 'IND', 'West Bengali', 216950),
+('Raurkela', 'IND', 'Orissa', 215489),
+('Ambattur', 'IND', 'Tamil Nadu', 215424),
+('Panipat', 'IND', 'Haryana', 215218),
+('Firozabad', 'IND', 'Uttar Pradesh', 215128),
+('Ichalkaranji', 'IND', 'Maharashtra', 214950),
+('Jammu', 'IND', 'Jammu and Kashmir', 214737),
+('Ramagundam', 'IND', 'Andhra Pradesh', 214384),
+('Eluru', 'IND', 'Andhra Pradesh', 212866),
+('Brahmapur', 'IND', 'Orissa', 210418),
+('Alwar', 'IND', 'Rajasthan', 205086),
+('Pondicherry', 'IND', 'Pondicherry', 203065),
+('Thanjavur', 'IND', 'Tamil Nadu', 202013),
+('Bihar Sharif', 'IND', 'Bihar', 201323),
+('Tuticorin', 'IND', 'Tamil Nadu', 199854),
+('Imphal', 'IND', 'Manipur', 198535),
+('Latur', 'IND', 'Maharashtra', 197408),
+('Sagar', 'IND', 'Madhya Pradesh', 195346),
+('Farrukhabad-cum-Fatehgarh', 'IND', 'Uttar Pradesh', 194567),
+('Sangli', 'IND', 'Maharashtra', 193197),
+('Parbhani', 'IND', 'Maharashtra', 190255),
+('Nagar Coil', 'IND', 'Tamil Nadu', 190084),
+('Bijapur', 'IND', 'Karnataka', 186939),
+('Kukatpalle', 'IND', 'Andhra Pradesh', 185378),
+('Bally', 'IND', 'West Bengali', 184474),
+('Bhilwara', 'IND', 'Rajasthan', 183965),
+('Ratlam', 'IND', 'Madhya Pradesh', 183375),
+('Avadi', 'IND', 'Tamil Nadu', 183215),
+('Dindigul', 'IND', 'Tamil Nadu', 182477),
+('Ahmadnagar', 'IND', 'Maharashtra', 181339),
+('Bilaspur', 'IND', 'Chhatisgarh', 179833),
+('Shimoga', 'IND', 'Karnataka', 179258),
+('Kharagpur', 'IND', 'West Bengali', 177989),
+('Mira Bhayandar', 'IND', 'Maharashtra', 175372),
+('Vellore', 'IND', 'Tamil Nadu', 175061),
+('Jalna', 'IND', 'Maharashtra', 174985),
+('Burnpur', 'IND', 'West Bengali', 174933),
+('Anantapur', 'IND', 'Andhra Pradesh', 174924),
+('Allappuzha (Alleppey)', 'IND', 'Kerala', 174666),
+('Tirupati', 'IND', 'Andhra Pradesh', 174369),
+('Karnal', 'IND', 'Haryana', 173751),
+('Burhanpur', 'IND', 'Madhya Pradesh', 172710),
+('Hisar (Hissar)', 'IND', 'Haryana', 172677),
+('Tiruvottiyur', 'IND', 'Tamil Nadu', 172562),
+('Mirzapur-cum-Vindhyachal', 'IND', 'Uttar Pradesh', 169336),
+('Secunderabad', 'IND', 'Andhra Pradesh', 167461),
+('Nadiad', 'IND', 'Gujarat', 167051),
+('Dewas', 'IND', 'Madhya Pradesh', 164364),
+('Murwara (Katni)', 'IND', 'Madhya Pradesh', 163431),
+('Ganganagar', 'IND', 'Rajasthan', 161482),
+('Vizianagaram', 'IND', 'Andhra Pradesh', 160359),
+('Erode', 'IND', 'Tamil Nadu', 159232),
+('Machilipatnam (Masulipatam)', 'IND', 'Andhra Pradesh', 159110),
+('Bhatinda (Bathinda)', 'IND', 'Punjab', 159042),
+('Raichur', 'IND', 'Karnataka', 157551),
+('Agartala', 'IND', 'Tripura', 157358),
+('Arrah (Ara)', 'IND', 'Bihar', 157082),
+('Satna', 'IND', 'Madhya Pradesh', 156630),
+('Lalbahadur Nagar', 'IND', 'Andhra Pradesh', 155500),
+('Aizawl', 'IND', 'Mizoram', 155240),
+('Uluberia', 'IND', 'West Bengali', 155172),
+('Katihar', 'IND', 'Bihar', 154367),
+('Cuddalore', 'IND', 'Tamil Nadu', 153086),
+('Hugli-Chinsurah', 'IND', 'West Bengali', 151806),
+('Dhanbad', 'IND', 'Jharkhand', 151789),
+('Raiganj', 'IND', 'West Bengali', 151045),
+('Sambhal', 'IND', 'Uttar Pradesh', 150869),
+('Durg', 'IND', 'Chhatisgarh', 150645),
+('Munger (Monghyr)', 'IND', 'Bihar', 150112),
+('Kanchipuram', 'IND', 'Tamil Nadu', 150100),
+('North Dum Dum', 'IND', 'West Bengali', 149965),
+('Karimnagar', 'IND', 'Andhra Pradesh', 148583),
+('Bharatpur', 'IND', 'Rajasthan', 148519),
+('Sikar', 'IND', 'Rajasthan', 148272),
+('Hardwar (Haridwar)', 'IND', 'Uttaranchal', 147305),
+('Dabgram', 'IND', 'West Bengali', 147217),
+('Morena', 'IND', 'Madhya Pradesh', 147124),
+('Noida', 'IND', 'Uttar Pradesh', 146514),
+('Hapur', 'IND', 'Uttar Pradesh', 146262),
+('Bhusawal', 'IND', 'Maharashtra', 145143),
+('Khandwa', 'IND', 'Madhya Pradesh', 145133),
+('Yamuna Nagar', 'IND', 'Haryana', 144346),
+('Sonipat (Sonepat)', 'IND', 'Haryana', 143922),
+('Tenali', 'IND', 'Andhra Pradesh', 143726),
+('Raurkela Civil Township', 'IND', 'Orissa', 140408),
+('Kollam (Quilon)', 'IND', 'Kerala', 139852),
+('Kumbakonam', 'IND', 'Tamil Nadu', 139483),
+('Ingraj Bazar (English Bazar)', 'IND', 'West Bengali', 139204),
+('Timkur', 'IND', 'Karnataka', 138903),
+('Amroha', 'IND', 'Uttar Pradesh', 137061),
+('Serampore', 'IND', 'West Bengali', 137028),
+('Chapra', 'IND', 'Bihar', 136877),
+('Pali', 'IND', 'Rajasthan', 136842),
+('Maunath Bhanjan', 'IND', 'Uttar Pradesh', 136697),
+('Adoni', 'IND', 'Andhra Pradesh', 136182),
+('Jaunpur', 'IND', 'Uttar Pradesh', 136062),
+('Tirunelveli', 'IND', 'Tamil Nadu', 135825),
+('Bahraich', 'IND', 'Uttar Pradesh', 135400),
+('Gadag Betigeri', 'IND', 'Karnataka', 134051),
+('Proddatur', 'IND', 'Andhra Pradesh', 133914),
+('Chittoor', 'IND', 'Andhra Pradesh', 133462),
+('Barrackpur', 'IND', 'West Bengali', 133265),
+('Bharuch (Broach)', 'IND', 'Gujarat', 133102),
+('Naihati', 'IND', 'West Bengali', 132701),
+('Shillong', 'IND', 'Meghalaya', 131719),
+('Sambalpur', 'IND', 'Orissa', 131138),
+('Junagadh', 'IND', 'Gujarat', 130484),
+('Rae Bareli', 'IND', 'Uttar Pradesh', 129904),
+('Rewa', 'IND', 'Madhya Pradesh', 128981),
+('Gurgaon', 'IND', 'Haryana', 128608),
+('Khammam', 'IND', 'Andhra Pradesh', 127992),
+('Bulandshahr', 'IND', 'Uttar Pradesh', 127201),
+('Navsari', 'IND', 'Gujarat', 126089),
+('Malkajgiri', 'IND', 'Andhra Pradesh', 126066),
+('Midnapore (Medinipur)', 'IND', 'West Bengali', 125498),
+('Miraj', 'IND', 'Maharashtra', 125407),
+('Raj Nandgaon', 'IND', 'Chhatisgarh', 125371),
+('Alandur', 'IND', 'Tamil Nadu', 125244),
+('Puri', 'IND', 'Orissa', 125199),
+('Navadwip', 'IND', 'West Bengali', 125037),
+('Sirsa', 'IND', 'Haryana', 125000),
+('Korba', 'IND', 'Chhatisgarh', 124501),
+('Faizabad', 'IND', 'Uttar Pradesh', 124437),
+('Etawah', 'IND', 'Uttar Pradesh', 124072),
+('Pathankot', 'IND', 'Punjab', 123930),
+('Gandhinagar', 'IND', 'Gujarat', 123359),
+('Palghat (Palakkad)', 'IND', 'Kerala', 123289),
+('Veraval', 'IND', 'Gujarat', 123000),
+('Hoshiarpur', 'IND', 'Punjab', 122705),
+('Ambala', 'IND', 'Haryana', 122596),
+('Sitapur', 'IND', 'Uttar Pradesh', 121842),
+('Bhiwani', 'IND', 'Haryana', 121629),
+('Cuddapah', 'IND', 'Andhra Pradesh', 121463),
+('Bhimavaram', 'IND', 'Andhra Pradesh', 121314),
+('Krishnanagar', 'IND', 'West Bengali', 121110),
+('Chandannagar', 'IND', 'West Bengali', 120378),
+('Mandya', 'IND', 'Karnataka', 120265),
+('Dibrugarh', 'IND', 'Assam', 120127),
+('Nandyal', 'IND', 'Andhra Pradesh', 119813),
+('Balurghat', 'IND', 'West Bengali', 119796),
+('Neyveli', 'IND', 'Tamil Nadu', 118080),
+('Fatehpur', 'IND', 'Uttar Pradesh', 117675),
+('Mahbubnagar', 'IND', 'Andhra Pradesh', 116833),
+('Budaun', 'IND', 'Uttar Pradesh', 116695),
+('Porbandar', 'IND', 'Gujarat', 116671),
+('Silchar', 'IND', 'Assam', 115483),
+('Berhampore (Baharampur)', 'IND', 'West Bengali', 115144),
+('Purnea (Purnia)', 'IND', 'Jharkhand', 114912),
+('Bankura', 'IND', 'West Bengali', 114876),
+('Rajapalaiyam', 'IND', 'Tamil Nadu', 114202),
+('Titagarh', 'IND', 'West Bengali', 114085),
+('Halisahar', 'IND', 'West Bengali', 114028),
+('Hathras', 'IND', 'Uttar Pradesh', 113285),
+('Bhir (Bid)', 'IND', 'Maharashtra', 112434),
+('Pallavaram', 'IND', 'Tamil Nadu', 111866),
+('Anand', 'IND', 'Gujarat', 110266),
+('Mango', 'IND', 'Jharkhand', 110024),
+('Santipur', 'IND', 'West Bengali', 109956),
+('Bhind', 'IND', 'Madhya Pradesh', 109755),
+('Gondiya', 'IND', 'Maharashtra', 109470),
+('Tiruvannamalai', 'IND', 'Tamil Nadu', 109196),
+('Yeotmal (Yavatmal)', 'IND', 'Maharashtra', 108578),
+('Kulti-Barakar', 'IND', 'West Bengali', 108518),
+('Moga', 'IND', 'Punjab', 108304),
+('Shivapuri', 'IND', 'Madhya Pradesh', 108277),
+('Bidar', 'IND', 'Karnataka', 108016),
+('Guntakal', 'IND', 'Andhra Pradesh', 107592),
+('Unnao', 'IND', 'Uttar Pradesh', 107425),
+('Barasat', 'IND', 'West Bengali', 107365),
+('Tambaram', 'IND', 'Tamil Nadu', 107187),
+('Abohar', 'IND', 'Punjab', 107163),
+('Pilibhit', 'IND', 'Uttar Pradesh', 106605),
+('Valparai', 'IND', 'Tamil Nadu', 106523),
+('Gonda', 'IND', 'Uttar Pradesh', 106078),
+('Surendranagar', 'IND', 'Gujarat', 105973),
+('Qutubullapur', 'IND', 'Andhra Pradesh', 105380),
+('Beawar', 'IND', 'Rajasthan', 105363),
+('Hindupur', 'IND', 'Andhra Pradesh', 104651),
+('Gandhidham', 'IND', 'Gujarat', 104585),
+('Haldwani-cum-Kathgodam', 'IND', 'Uttaranchal', 104195),
+('Tellicherry (Thalassery)', 'IND', 'Kerala', 103579),
+('Wardha', 'IND', 'Maharashtra', 102985),
+('Rishra', 'IND', 'West Bengali', 102649),
+('Bhuj', 'IND', 'Gujarat', 102176),
+('Modinagar', 'IND', 'Uttar Pradesh', 101660),
+('Gudivada', 'IND', 'Andhra Pradesh', 101656),
+('Basirhat', 'IND', 'West Bengali', 101409),
+('Uttarpara-Kotrung', 'IND', 'West Bengali', 100867),
+('Ongole', 'IND', 'Andhra Pradesh', 100836),
+('North Barrackpur', 'IND', 'West Bengali', 100513),
+('Guna', 'IND', 'Madhya Pradesh', 100490),
+('Haldia', 'IND', 'West Bengali', 100347),
+('Habra', 'IND', 'West Bengali', 100223),
+('Kanchrapara', 'IND', 'West Bengali', 100194),
+('Tonk', 'IND', 'Rajasthan', 100079),
+('Champdani', 'IND', 'West Bengali', 98818),
+('Orai', 'IND', 'Uttar Pradesh', 98640),
+('Pudukkottai', 'IND', 'Tamil Nadu', 98619),
+('Sasaram', 'IND', 'Bihar', 98220),
+('Hazaribag', 'IND', 'Jharkhand', 97712),
+('Palayankottai', 'IND', 'Tamil Nadu', 97662),
+('Banda', 'IND', 'Uttar Pradesh', 97227),
+('Godhra', 'IND', 'Gujarat', 96813),
+('Hospet', 'IND', 'Karnataka', 96322),
+('Ashoknagar-Kalyangarh', 'IND', 'West Bengali', 96315),
+('Achalpur', 'IND', 'Maharashtra', 96216),
+('Patan', 'IND', 'Gujarat', 96109),
+('Mandasor', 'IND', 'Madhya Pradesh', 95758),
+('Damoh', 'IND', 'Madhya Pradesh', 95661),
+('Satara', 'IND', 'Maharashtra', 95133),
+('Meerut Cantonment', 'IND', 'Uttar Pradesh', 94876),
+('Dehri', 'IND', 'Bihar', 94526),
+('Delhi Cantonment', 'IND', 'Delhi', 94326),
+('Chhindwara', 'IND', 'Madhya Pradesh', 93731),
+('Bansberia', 'IND', 'West Bengali', 93447),
+('Nagaon', 'IND', 'Assam', 93350),
+('Kanpur Cantonment', 'IND', 'Uttar Pradesh', 93109),
+('Vidisha', 'IND', 'Madhya Pradesh', 92917),
+('Bettiah', 'IND', 'Bihar', 92583),
+('Purulia', 'IND', 'Jharkhand', 92574),
+('Hassan', 'IND', 'Karnataka', 90803),
+('Ambala Sadar', 'IND', 'Haryana', 90712),
+('Baidyabati', 'IND', 'West Bengali', 90601),
+('Morvi', 'IND', 'Gujarat', 90357),
+('Raigarh', 'IND', 'Chhatisgarh', 89166),
+('Vejalpur', 'IND', 'Gujarat', 89053),
+('Baghdad', 'IRQ', 'Baghdad', 4336000),
+('Mosul', 'IRQ', 'Ninawa', 879000),
+('Irbil', 'IRQ', 'Irbil', 485968),
+('Kirkuk', 'IRQ', 'al-Tamim', 418624),
+('Basra', 'IRQ', 'Basra', 406296),
+('al-Sulaymaniya', 'IRQ', 'al-Sulaymaniya', 364096),
+('al-Najaf', 'IRQ', 'al-Najaf', 309010),
+('Karbala', 'IRQ', 'Karbala', 296705),
+('al-Hilla', 'IRQ', 'Babil', 268834),
+('al-Nasiriya', 'IRQ', 'DhiQar', 265937),
+('al-Amara', 'IRQ', 'Maysan', 208797),
+('al-Diwaniya', 'IRQ', 'al-Qadisiya', 196519),
+('al-Ramadi', 'IRQ', 'al-Anbar', 192556),
+('al-Kut', 'IRQ', 'Wasit', 183183),
+('Baquba', 'IRQ', 'Diyala', 114516),
+('Teheran', 'IRN', 'Teheran', 6758845),
+('Mashhad', 'IRN', 'Khorasan', 1887405),
+('Esfahan', 'IRN', 'Esfahan', 1266072),
+('Tabriz', 'IRN', 'East Azerbaidzan', 1191043),
+('Shiraz', 'IRN', 'Fars', 1053025),
+('Karaj', 'IRN', 'Teheran', 940968),
+('Ahvaz', 'IRN', 'Khuzestan', 804980),
+('Qom', 'IRN', 'Qom', 777677),
+('Kermanshah', 'IRN', 'Kermanshah', 692986),
+('Urmia', 'IRN', 'West Azerbaidzan', 435200),
+('Zahedan', 'IRN', 'Sistan va Baluchesta', 419518),
+('Rasht', 'IRN', 'Gilan', 417748),
+('Hamadan', 'IRN', 'Hamadan', 401281),
+('Kerman', 'IRN', 'Kerman', 384991),
+('Arak', 'IRN', 'Markazi', 380755),
+('Ardebil', 'IRN', 'Ardebil', 340386),
+('Yazd', 'IRN', 'Yazd', 326776),
+('Qazvin', 'IRN', 'Qazvin', 291117),
+('Zanjan', 'IRN', 'Zanjan', 286295),
+('Sanandaj', 'IRN', 'Kordestan', 277808),
+('Bandar-e-Abbas', 'IRN', 'Hormozgan', 273578),
+('Khorramabad', 'IRN', 'Lorestan', 272815),
+('Eslamshahr', 'IRN', 'Teheran', 265450),
+('Borujerd', 'IRN', 'Lorestan', 217804),
+('Abadan', 'IRN', 'Khuzestan', 206073),
+('Dezful', 'IRN', 'Khuzestan', 202639),
+('Kashan', 'IRN', 'Esfahan', 201372),
+('Sari', 'IRN', 'Mazandaran', 195882),
+('Gorgan', 'IRN', 'Golestan', 188710),
+('Najafabad', 'IRN', 'Esfahan', 178498),
+('Sabzevar', 'IRN', 'Khorasan', 170738),
+('Khomeynishahr', 'IRN', 'Esfahan', 165888),
+('Amol', 'IRN', 'Mazandaran', 159092),
+('Neyshabur', 'IRN', 'Khorasan', 158847),
+('Babol', 'IRN', 'Mazandaran', 158346),
+('Khoy', 'IRN', 'West Azerbaidzan', 148944),
+('Malayer', 'IRN', 'Hamadan', 144373),
+('Bushehr', 'IRN', 'Bushehr', 143641),
+('Qaemshahr', 'IRN', 'Mazandaran', 143286),
+('Qarchak', 'IRN', 'Teheran', 142690),
+('Qods', 'IRN', 'Teheran', 138278),
+('Sirjan', 'IRN', 'Kerman', 135024),
+('Bojnurd', 'IRN', 'Khorasan', 134835),
+('Maragheh', 'IRN', 'East Azerbaidzan', 132318),
+('Birjand', 'IRN', 'Khorasan', 127608),
+('Ilam', 'IRN', 'Ilam', 126346),
+('Bukan', 'IRN', 'West Azerbaidzan', 120020),
+('Masjed-e-Soleyman', 'IRN', 'Khuzestan', 116883),
+('Saqqez', 'IRN', 'Kordestan', 115394),
+('Gonbad-e Qabus', 'IRN', 'Mazandaran', 111253),
+('Saveh', 'IRN', 'Qom', 111245),
+('Mahabad', 'IRN', 'West Azerbaidzan', 107799),
+('Varamin', 'IRN', 'Teheran', 107233),
+('Andimeshk', 'IRN', 'Khuzestan', 106923),
+('Khorramshahr', 'IRN', 'Khuzestan', 105636),
+('Shahrud', 'IRN', 'Semnan', 104765),
+('Marv Dasht', 'IRN', 'Fars', 103579),
+('Zabol', 'IRN', 'Sistan va Baluchesta', 100887),
+('Shahr-e Kord', 'IRN', 'Chaharmahal va Bakht', 100477),
+('Bandar-e Anzali', 'IRN', 'Gilan', 98500),
+('Rafsanjan', 'IRN', 'Kerman', 98300),
+('Marand', 'IRN', 'East Azerbaidzan', 96400),
+('Torbat-e Heydariyeh', 'IRN', 'Khorasan', 94600),
+('Jahrom', 'IRN', 'Fars', 94200),
+('Semnan', 'IRN', 'Semnan', 91045),
+('Miandoab', 'IRN', 'West Azerbaidzan', 90100),
+('Qomsheh', 'IRN', 'Esfahan', 89800),
+('Dublin', 'IRL', 'Leinster', 481854),
+('Cork', 'IRL', 'Munster', 127187),
+('Reykjavík', 'ISL', 'Höfuðborgarsvæði', 109184),
+('Jerusalem', 'ISR', 'Jerusalem', 633700),
+('Tel Aviv-Jaffa', 'ISR', 'Tel Aviv', 348100),
+('Haifa', 'ISR', 'Haifa', 265700),
+('Rishon Le Ziyyon', 'ISR', 'Ha Merkaz', 188200),
+('Beerseba', 'ISR', 'Ha Darom', 163700),
+('Holon', 'ISR', 'Tel Aviv', 163100),
+('Petah Tiqwa', 'ISR', 'Ha Merkaz', 159400),
+('Ashdod', 'ISR', 'Ha Darom', 155800),
+('Netanya', 'ISR', 'Ha Merkaz', 154900),
+('Bat Yam', 'ISR', 'Tel Aviv', 137000),
+('Bene Beraq', 'ISR', 'Tel Aviv', 133900),
+('Ramat Gan', 'ISR', 'Tel Aviv', 126900),
+('Ashqelon', 'ISR', 'Ha Darom', 92300),
+('Rehovot', 'ISR', 'Ha Merkaz', 90300),
+('Roma', 'ITA', 'Latium', 2643581),
+('Milano', 'ITA', 'Lombardia', 1300977),
+('Napoli', 'ITA', 'Campania', 1002619),
+('Torino', 'ITA', 'Piemonte', 903705),
+('Palermo', 'ITA', 'Sisilia', 683794),
+('Genova', 'ITA', 'Liguria', 636104),
+('Bologna', 'ITA', 'Emilia-Romagna', 381161),
+('Firenze', 'ITA', 'Toscana', 376662),
+('Catania', 'ITA', 'Sisilia', 337862),
+('Bari', 'ITA', 'Apulia', 331848),
+('Venezia', 'ITA', 'Veneto', 277305),
+('Messina', 'ITA', 'Sisilia', 259156),
+('Verona', 'ITA', 'Veneto', 255268),
+('Trieste', 'ITA', 'Friuli-Venezia Giuli', 216459),
+('Padova', 'ITA', 'Veneto', 211391),
+('Taranto', 'ITA', 'Apulia', 208214),
+('Brescia', 'ITA', 'Lombardia', 191317),
+('Reggio di Calabria', 'ITA', 'Calabria', 179617),
+('Modena', 'ITA', 'Emilia-Romagna', 176022),
+('Prato', 'ITA', 'Toscana', 172473),
+('Parma', 'ITA', 'Emilia-Romagna', 168717),
+('Cagliari', 'ITA', 'Sardinia', 165926),
+('Livorno', 'ITA', 'Toscana', 161673),
+('Perugia', 'ITA', 'Umbria', 156673),
+('Foggia', 'ITA', 'Apulia', 154891),
+('Reggio nell´ Emilia', 'ITA', 'Emilia-Romagna', 143664),
+('Salerno', 'ITA', 'Campania', 142055),
+('Ravenna', 'ITA', 'Emilia-Romagna', 138418),
+('Ferrara', 'ITA', 'Emilia-Romagna', 132127),
+('Rimini', 'ITA', 'Emilia-Romagna', 131062),
+('Syrakusa', 'ITA', 'Sisilia', 126282),
+('Sassari', 'ITA', 'Sardinia', 120803),
+('Monza', 'ITA', 'Lombardia', 119516),
+('Bergamo', 'ITA', 'Lombardia', 117837),
+('Pescara', 'ITA', 'Abruzzit', 115698),
+('Latina', 'ITA', 'Latium', 114099),
+('Vicenza', 'ITA', 'Veneto', 109738),
+('Terni', 'ITA', 'Umbria', 107770),
+('Forlì', 'ITA', 'Emilia-Romagna', 107475),
+('Trento', 'ITA', 'Trentino-Alto Adige', 104906),
+('Novara', 'ITA', 'Piemonte', 102037),
+('Piacenza', 'ITA', 'Emilia-Romagna', 98384),
+('Ancona', 'ITA', 'Marche', 98329),
+('Lecce', 'ITA', 'Apulia', 98208),
+('Bolzano', 'ITA', 'Trentino-Alto Adige', 97232),
+('Catanzaro', 'ITA', 'Calabria', 96700),
+('La Spezia', 'ITA', 'Liguria', 95504),
+('Udine', 'ITA', 'Friuli-Venezia Giuli', 94932),
+('Torre del Greco', 'ITA', 'Campania', 94505),
+('Andria', 'ITA', 'Apulia', 94443),
+('Brindisi', 'ITA', 'Apulia', 93454),
+('Giugliano in Campania', 'ITA', 'Campania', 93286),
+('Pisa', 'ITA', 'Toscana', 92379),
+('Barletta', 'ITA', 'Apulia', 91904),
+('Arezzo', 'ITA', 'Toscana', 91729),
+('Alessandria', 'ITA', 'Piemonte', 90289),
+('Cesena', 'ITA', 'Emilia-Romagna', 89852),
+('Pesaro', 'ITA', 'Marche', 88987),
+('Dili', 'TMP', 'Dili', 47900),
+('Wien', 'AUT', 'Wien', 1608144),
+('Graz', 'AUT', 'Steiermark', 240967),
+('Linz', 'AUT', 'North Austria', 188022),
+('Salzburg', 'AUT', 'Salzburg', 144247),
+('Innsbruck', 'AUT', 'Tiroli', 111752),
+('Klagenfurt', 'AUT', 'Kärnten', 91141),
+('Spanish Town', 'JAM', 'St. Catherine', 110379),
+('Kingston', 'JAM', 'St. Andrew', 103962),
+('Portmore', 'JAM', 'St. Andrew', 99799),
+('Tokyo', 'JPN', 'Tokyo-to', 7980230),
+('Jokohama [Yokohama]', 'JPN', 'Kanagawa', 3339594),
+('Osaka', 'JPN', 'Osaka', 2595674),
+('Nagoya', 'JPN', 'Aichi', 2154376),
+('Sapporo', 'JPN', 'Hokkaido', 1790886),
+('Kioto', 'JPN', 'Kyoto', 1461974),
+('Kobe', 'JPN', 'Hyogo', 1425139),
+('Fukuoka', 'JPN', 'Fukuoka', 1308379),
+('Kawasaki', 'JPN', 'Kanagawa', 1217359),
+('Hiroshima', 'JPN', 'Hiroshima', 1119117),
+('Kitakyushu', 'JPN', 'Fukuoka', 1016264),
+('Sendai', 'JPN', 'Miyagi', 989975),
+('Chiba', 'JPN', 'Chiba', 863930),
+('Sakai', 'JPN', 'Osaka', 797735),
+('Kumamoto', 'JPN', 'Kumamoto', 656734),
+('Okayama', 'JPN', 'Okayama', 624269),
+('Sagamihara', 'JPN', 'Kanagawa', 586300),
+('Hamamatsu', 'JPN', 'Shizuoka', 568796),
+('Kagoshima', 'JPN', 'Kagoshima', 549977),
+('Funabashi', 'JPN', 'Chiba', 545299),
+('Higashiosaka', 'JPN', 'Osaka', 517785),
+('Hachioji', 'JPN', 'Tokyo-to', 513451),
+('Niigata', 'JPN', 'Niigata', 497464),
+('Amagasaki', 'JPN', 'Hyogo', 481434),
+('Himeji', 'JPN', 'Hyogo', 475167),
+('Shizuoka', 'JPN', 'Shizuoka', 473854),
+('Urawa', 'JPN', 'Saitama', 469675),
+('Matsuyama', 'JPN', 'Ehime', 466133),
+('Matsudo', 'JPN', 'Chiba', 461126),
+('Kanazawa', 'JPN', 'Ishikawa', 455386),
+('Kawaguchi', 'JPN', 'Saitama', 452155),
+('Ichikawa', 'JPN', 'Chiba', 441893),
+('Omiya', 'JPN', 'Saitama', 441649),
+('Utsunomiya', 'JPN', 'Tochigi', 440353),
+('Oita', 'JPN', 'Oita', 433401),
+('Nagasaki', 'JPN', 'Nagasaki', 432759),
+('Yokosuka', 'JPN', 'Kanagawa', 430200),
+('Kurashiki', 'JPN', 'Okayama', 425103),
+('Gifu', 'JPN', 'Gifu', 408007),
+('Hirakata', 'JPN', 'Osaka', 403151),
+('Nishinomiya', 'JPN', 'Hyogo', 397618),
+('Toyonaka', 'JPN', 'Osaka', 396689),
+('Wakayama', 'JPN', 'Wakayama', 391233),
+('Fukuyama', 'JPN', 'Hiroshima', 376921),
+('Fujisawa', 'JPN', 'Kanagawa', 372840),
+('Asahikawa', 'JPN', 'Hokkaido', 364813),
+('Machida', 'JPN', 'Tokyo-to', 364197),
+('Nara', 'JPN', 'Nara', 362812),
+('Takatsuki', 'JPN', 'Osaka', 361747),
+('Iwaki', 'JPN', 'Fukushima', 361737),
+('Nagano', 'JPN', 'Nagano', 361391),
+('Toyohashi', 'JPN', 'Aichi', 360066),
+('Toyota', 'JPN', 'Aichi', 346090),
+('Suita', 'JPN', 'Osaka', 345750),
+('Takamatsu', 'JPN', 'Kagawa', 332471),
+('Koriyama', 'JPN', 'Fukushima', 330335),
+('Okazaki', 'JPN', 'Aichi', 328711),
+('Kawagoe', 'JPN', 'Saitama', 327211),
+('Tokorozawa', 'JPN', 'Saitama', 325809),
+('Toyama', 'JPN', 'Toyama', 325790),
+('Kochi', 'JPN', 'Kochi', 324710),
+('Kashiwa', 'JPN', 'Chiba', 320296),
+('Akita', 'JPN', 'Akita', 314440),
+('Miyazaki', 'JPN', 'Miyazaki', 303784),
+('Koshigaya', 'JPN', 'Saitama', 301446),
+('Naha', 'JPN', 'Okinawa', 299851),
+('Aomori', 'JPN', 'Aomori', 295969),
+('Hakodate', 'JPN', 'Hokkaido', 294788),
+('Akashi', 'JPN', 'Hyogo', 292253),
+('Yokkaichi', 'JPN', 'Mie', 288173),
+('Fukushima', 'JPN', 'Fukushima', 287525),
+('Morioka', 'JPN', 'Iwate', 287353),
+('Maebashi', 'JPN', 'Gumma', 284473),
+('Kasugai', 'JPN', 'Aichi', 282348),
+('Otsu', 'JPN', 'Shiga', 282070),
+('Ichihara', 'JPN', 'Chiba', 279280),
+('Yao', 'JPN', 'Osaka', 276421),
+('Ichinomiya', 'JPN', 'Aichi', 270828),
+('Tokushima', 'JPN', 'Tokushima', 269649),
+('Kakogawa', 'JPN', 'Hyogo', 266281),
+('Ibaraki', 'JPN', 'Osaka', 261020),
+('Neyagawa', 'JPN', 'Osaka', 257315),
+('Shimonoseki', 'JPN', 'Yamaguchi', 257263),
+('Yamagata', 'JPN', 'Yamagata', 255617),
+('Fukui', 'JPN', 'Fukui', 254818),
+('Hiratsuka', 'JPN', 'Kanagawa', 254207),
+('Mito', 'JPN', 'Ibaragi', 246559),
+('Sasebo', 'JPN', 'Nagasaki', 244240),
+('Hachinohe', 'JPN', 'Aomori', 242979),
+('Takasaki', 'JPN', 'Gumma', 239124),
+('Shimizu', 'JPN', 'Shizuoka', 239123),
+('Kurume', 'JPN', 'Fukuoka', 235611),
+('Fuji', 'JPN', 'Shizuoka', 231527),
+('Soka', 'JPN', 'Saitama', 222768),
+('Fuchu', 'JPN', 'Tokyo-to', 220576),
+('Chigasaki', 'JPN', 'Kanagawa', 216015),
+('Atsugi', 'JPN', 'Kanagawa', 212407),
+('Numazu', 'JPN', 'Shizuoka', 211382),
+('Ageo', 'JPN', 'Saitama', 209442),
+('Yamato', 'JPN', 'Kanagawa', 208234),
+('Matsumoto', 'JPN', 'Nagano', 206801),
+('Kure', 'JPN', 'Hiroshima', 206504),
+('Takarazuka', 'JPN', 'Hyogo', 205993),
+('Kasukabe', 'JPN', 'Saitama', 201838),
+('Chofu', 'JPN', 'Tokyo-to', 201585),
+('Odawara', 'JPN', 'Kanagawa', 200171),
+('Kofu', 'JPN', 'Yamanashi', 199753),
+('Kushiro', 'JPN', 'Hokkaido', 197608),
+('Kishiwada', 'JPN', 'Osaka', 197276),
+('Hitachi', 'JPN', 'Ibaragi', 196622),
+('Nagaoka', 'JPN', 'Niigata', 192407),
+('Itami', 'JPN', 'Hyogo', 190886),
+('Uji', 'JPN', 'Kyoto', 188735),
+('Suzuka', 'JPN', 'Mie', 184061),
+('Hirosaki', 'JPN', 'Aomori', 177522),
+('Ube', 'JPN', 'Yamaguchi', 175206),
+('Kodaira', 'JPN', 'Tokyo-to', 174984),
+('Takaoka', 'JPN', 'Toyama', 174380),
+('Obihiro', 'JPN', 'Hokkaido', 173685),
+('Tomakomai', 'JPN', 'Hokkaido', 171958),
+('Saga', 'JPN', 'Saga', 170034),
+('Sakura', 'JPN', 'Chiba', 168072),
+('Kamakura', 'JPN', 'Kanagawa', 167661),
+('Mitaka', 'JPN', 'Tokyo-to', 167268),
+('Izumi', 'JPN', 'Osaka', 166979),
+('Hino', 'JPN', 'Tokyo-to', 166770),
+('Hadano', 'JPN', 'Kanagawa', 166512),
+('Ashikaga', 'JPN', 'Tochigi', 165243),
+('Tsu', 'JPN', 'Mie', 164543),
+('Sayama', 'JPN', 'Saitama', 162472),
+('Yachiyo', 'JPN', 'Chiba', 161222),
+('Tsukuba', 'JPN', 'Ibaragi', 160768),
+('Tachikawa', 'JPN', 'Tokyo-to', 159430),
+('Kumagaya', 'JPN', 'Saitama', 157171),
+('Moriguchi', 'JPN', 'Osaka', 155941),
+('Otaru', 'JPN', 'Hokkaido', 155784),
+('Anjo', 'JPN', 'Aichi', 153823),
+('Narashino', 'JPN', 'Chiba', 152849),
+('Oyama', 'JPN', 'Tochigi', 152820),
+('Ogaki', 'JPN', 'Gifu', 151758),
+('Matsue', 'JPN', 'Shimane', 149821),
+('Kawanishi', 'JPN', 'Hyogo', 149794),
+('Hitachinaka', 'JPN', 'Tokyo-to', 148006),
+('Niiza', 'JPN', 'Saitama', 147744),
+('Nagareyama', 'JPN', 'Chiba', 147738),
+('Tottori', 'JPN', 'Tottori', 147523),
+('Tama', 'JPN', 'Ibaragi', 146712),
+('Iruma', 'JPN', 'Saitama', 145922),
+('Ota', 'JPN', 'Gumma', 145317),
+('Omuta', 'JPN', 'Fukuoka', 142889),
+('Komaki', 'JPN', 'Aichi', 139827),
+('Ome', 'JPN', 'Tokyo-to', 139216),
+('Kadoma', 'JPN', 'Osaka', 138953),
+('Yamaguchi', 'JPN', 'Yamaguchi', 138210),
+('Higashimurayama', 'JPN', 'Tokyo-to', 136970),
+('Yonago', 'JPN', 'Tottori', 136461),
+('Matsubara', 'JPN', 'Osaka', 135010),
+('Musashino', 'JPN', 'Tokyo-to', 134426),
+('Tsuchiura', 'JPN', 'Ibaragi', 134072),
+('Joetsu', 'JPN', 'Niigata', 133505),
+('Miyakonojo', 'JPN', 'Miyazaki', 133183),
+('Misato', 'JPN', 'Saitama', 132957),
+('Kakamigahara', 'JPN', 'Gifu', 131831),
+('Daito', 'JPN', 'Osaka', 130594),
+('Seto', 'JPN', 'Aichi', 130470),
+('Kariya', 'JPN', 'Aichi', 127969),
+('Urayasu', 'JPN', 'Chiba', 127550),
+('Beppu', 'JPN', 'Oita', 127486),
+('Niihama', 'JPN', 'Ehime', 127207),
+('Minoo', 'JPN', 'Osaka', 127026),
+('Fujieda', 'JPN', 'Shizuoka', 126897),
+('Abiko', 'JPN', 'Chiba', 126670),
+('Nobeoka', 'JPN', 'Miyazaki', 125547),
+('Tondabayashi', 'JPN', 'Osaka', 125094),
+('Ueda', 'JPN', 'Nagano', 124217),
+('Kashihara', 'JPN', 'Nara', 124013),
+('Matsusaka', 'JPN', 'Mie', 123582),
+('Isesaki', 'JPN', 'Gumma', 123285),
+('Zama', 'JPN', 'Kanagawa', 122046),
+('Kisarazu', 'JPN', 'Chiba', 121967),
+('Noda', 'JPN', 'Chiba', 121030),
+('Ishinomaki', 'JPN', 'Miyagi', 120963),
+('Fujinomiya', 'JPN', 'Shizuoka', 119714),
+('Kawachinagano', 'JPN', 'Osaka', 119666),
+('Imabari', 'JPN', 'Ehime', 119357),
+('Aizuwakamatsu', 'JPN', 'Fukushima', 119287),
+('Higashihiroshima', 'JPN', 'Hiroshima', 119166),
+('Habikino', 'JPN', 'Osaka', 118968),
+('Ebetsu', 'JPN', 'Hokkaido', 118805),
+('Hofu', 'JPN', 'Yamaguchi', 118751),
+('Kiryu', 'JPN', 'Gumma', 118326),
+('Okinawa', 'JPN', 'Okinawa', 117748),
+('Yaizu', 'JPN', 'Shizuoka', 117258),
+('Toyokawa', 'JPN', 'Aichi', 115781),
+('Ebina', 'JPN', 'Kanagawa', 115571),
+('Asaka', 'JPN', 'Saitama', 114815),
+('Higashikurume', 'JPN', 'Tokyo-to', 111666),
+('Ikoma', 'JPN', 'Nara', 111645),
+('Kitami', 'JPN', 'Hokkaido', 111295),
+('Koganei', 'JPN', 'Tokyo-to', 110969),
+('Iwatsuki', 'JPN', 'Saitama', 110034),
+('Mishima', 'JPN', 'Shizuoka', 109699),
+('Handa', 'JPN', 'Aichi', 108600),
+('Muroran', 'JPN', 'Hokkaido', 108275),
+('Komatsu', 'JPN', 'Ishikawa', 107937),
+('Yatsushiro', 'JPN', 'Kumamoto', 107661),
+('Iida', 'JPN', 'Nagano', 107583),
+('Tokuyama', 'JPN', 'Yamaguchi', 107078),
+('Kokubunji', 'JPN', 'Tokyo-to', 106996),
+('Akishima', 'JPN', 'Tokyo-to', 106914),
+('Iwakuni', 'JPN', 'Yamaguchi', 106647),
+('Kusatsu', 'JPN', 'Shiga', 106232),
+('Kuwana', 'JPN', 'Mie', 106121),
+('Sanda', 'JPN', 'Hyogo', 105643),
+('Hikone', 'JPN', 'Shiga', 105508),
+('Toda', 'JPN', 'Saitama', 103969),
+('Tajimi', 'JPN', 'Gifu', 103171),
+('Ikeda', 'JPN', 'Osaka', 102710),
+('Fukaya', 'JPN', 'Saitama', 102156),
+('Ise', 'JPN', 'Mie', 101732),
+('Sakata', 'JPN', 'Yamagata', 101651),
+('Kasuga', 'JPN', 'Fukuoka', 101344),
+('Kamagaya', 'JPN', 'Chiba', 100821),
+('Tsuruoka', 'JPN', 'Yamagata', 100713),
+('Hoya', 'JPN', 'Tokyo-to', 100313),
+('Nishio', 'JPN', 'Chiba', 100032),
+('Tokai', 'JPN', 'Aichi', 99738),
+('Inazawa', 'JPN', 'Aichi', 98746),
+('Sakado', 'JPN', 'Saitama', 98221),
+('Isehara', 'JPN', 'Kanagawa', 98123),
+('Takasago', 'JPN', 'Hyogo', 97632),
+('Fujimi', 'JPN', 'Saitama', 96972),
+('Urasoe', 'JPN', 'Okinawa', 96002),
+('Yonezawa', 'JPN', 'Yamagata', 95592),
+('Konan', 'JPN', 'Aichi', 95521),
+('Yamatokoriyama', 'JPN', 'Nara', 95165),
+('Maizuru', 'JPN', 'Kyoto', 94784),
+('Onomichi', 'JPN', 'Hiroshima', 93756),
+('Higashimatsuyama', 'JPN', 'Saitama', 93342),
+('Kimitsu', 'JPN', 'Chiba', 93216),
+('Isahaya', 'JPN', 'Nagasaki', 93058),
+('Kanuma', 'JPN', 'Tochigi', 93053),
+('Izumisano', 'JPN', 'Osaka', 92583),
+('Kameoka', 'JPN', 'Kyoto', 92398),
+('Mobara', 'JPN', 'Chiba', 91664),
+('Narita', 'JPN', 'Chiba', 91470),
+('Kashiwazaki', 'JPN', 'Niigata', 91229),
+('Tsuyama', 'JPN', 'Okayama', 91170),
+('Sanaa', 'YEM', 'Sanaa', 503600),
+('Aden', 'YEM', 'Aden', 398300),
+('Taizz', 'YEM', 'Taizz', 317600),
+('Hodeida', 'YEM', 'Hodeida', 298500),
+('al-Mukalla', 'YEM', 'Hadramawt', 122400),
+('Ibb', 'YEM', 'Ibb', 103300),
+('Amman', 'JOR', 'Amman', 1000000),
+('al-Zarqa', 'JOR', 'al-Zarqa', 389815),
+('Irbid', 'JOR', 'Irbid', 231511),
+('al-Rusayfa', 'JOR', 'al-Zarqa', 137247),
+('Wadi al-Sir', 'JOR', 'Amman', 89104),
+('Flying Fish Cove', 'CXR', '', 700),
+('Beograd', 'YUG', 'Central Serbia', 1204000),
+('Novi Sad', 'YUG', 'Vojvodina', 179626),
+('Ni', 'YUG', 'Central Serbia', 175391),
+('Pritina', 'YUG', 'Kosovo and Metohija', 155496),
+('Kragujevac', 'YUG', 'Central Serbia', 147305),
+('Podgorica', 'YUG', 'Montenegro', 135000),
+('Subotica', 'YUG', 'Vojvodina', 100386),
+('Prizren', 'YUG', 'Kosovo and Metohija', 92303),
+('Phnom Penh', 'KHM', 'Phnom Penh', 570155),
+('Battambang', 'KHM', 'Battambang', 129800),
+('Siem Reap', 'KHM', 'Siem Reap', 105100),
+('Douala', 'CMR', 'Littoral', 1448300),
+('Yaoundé', 'CMR', 'Centre', 1372800),
+('Garoua', 'CMR', 'Nord', 177000),
+('Maroua', 'CMR', 'Extrême-Nord', 143000),
+('Bamenda', 'CMR', 'Nord-Ouest', 138000),
+('Bafoussam', 'CMR', 'Ouest', 131000),
+('Nkongsamba', 'CMR', 'Littoral', 112454),
+('Montréal', 'CAN', 'Québec', 1016376),
+('Calgary', 'CAN', 'Alberta', 768082),
+('Toronto', 'CAN', 'Ontario', 688275),
+('North York', 'CAN', 'Ontario', 622632),
+('Winnipeg', 'CAN', 'Manitoba', 618477),
+('Edmonton', 'CAN', 'Alberta', 616306),
+('Mississauga', 'CAN', 'Ontario', 608072),
+('Scarborough', 'CAN', 'Ontario', 594501),
+('Vancouver', 'CAN', 'British Colombia', 514008),
+('Etobicoke', 'CAN', 'Ontario', 348845),
+('London', 'CAN', 'Ontario', 339917),
+('Hamilton', 'CAN', 'Ontario', 335614),
+('Ottawa', 'CAN', 'Ontario', 335277),
+('Laval', 'CAN', 'Québec', 330393),
+('Surrey', 'CAN', 'British Colombia', 304477),
+('Brampton', 'CAN', 'Ontario', 296711),
+('Windsor', 'CAN', 'Ontario', 207588),
+('Saskatoon', 'CAN', 'Saskatchewan', 193647),
+('Kitchener', 'CAN', 'Ontario', 189959),
+('Markham', 'CAN', 'Ontario', 189098),
+('Regina', 'CAN', 'Saskatchewan', 180400),
+('Burnaby', 'CAN', 'British Colombia', 179209),
+('Québec', 'CAN', 'Québec', 167264),
+('York', 'CAN', 'Ontario', 154980),
+('Richmond', 'CAN', 'British Colombia', 148867),
+('Vaughan', 'CAN', 'Ontario', 147889),
+('Burlington', 'CAN', 'Ontario', 145150),
+('Oshawa', 'CAN', 'Ontario', 140173),
+('Oakville', 'CAN', 'Ontario', 139192),
+('Saint Catharines', 'CAN', 'Ontario', 136216),
+('Longueuil', 'CAN', 'Québec', 127977),
+('Richmond Hill', 'CAN', 'Ontario', 116428),
+('Thunder Bay', 'CAN', 'Ontario', 115913),
+('Nepean', 'CAN', 'Ontario', 115100),
+('Cape Breton', 'CAN', 'Nova Scotia', 114733),
+('East York', 'CAN', 'Ontario', 114034),
+('Halifax', 'CAN', 'Nova Scotia', 113910),
+('Cambridge', 'CAN', 'Ontario', 109186),
+('Gloucester', 'CAN', 'Ontario', 107314),
+('Abbotsford', 'CAN', 'British Colombia', 105403),
+('Guelph', 'CAN', 'Ontario', 103593),
+('Saint John´s', 'CAN', 'Newfoundland', 101936),
+('Coquitlam', 'CAN', 'British Colombia', 101820),
+('Saanich', 'CAN', 'British Colombia', 101388),
+('Gatineau', 'CAN', 'Québec', 100702),
+('Delta', 'CAN', 'British Colombia', 95411),
+('Sudbury', 'CAN', 'Ontario', 92686),
+('Kelowna', 'CAN', 'British Colombia', 89442),
+('Barrie', 'CAN', 'Ontario', 89269),
+('Praia', 'CPV', 'São Tiago', 94800),
+('Almaty', 'KAZ', 'Almaty Qalasy', 1129400),
+('Qaraghandy', 'KAZ', 'Qaraghandy', 436900),
+('Shymkent', 'KAZ', 'South Kazakstan', 360100),
+('Taraz', 'KAZ', 'Taraz', 330100),
+('Astana', 'KAZ', 'Astana', 311200),
+('Öskemen', 'KAZ', 'East Kazakstan', 311000),
+('Pavlodar', 'KAZ', 'Pavlodar', 300500),
+('Semey', 'KAZ', 'East Kazakstan', 269600),
+('Aqtöbe', 'KAZ', 'Aqtöbe', 253100),
+('Qostanay', 'KAZ', 'Qostanay', 221400),
+('Petropavl', 'KAZ', 'North Kazakstan', 203500),
+('Oral', 'KAZ', 'West Kazakstan', 195500),
+('Temirtau', 'KAZ', 'Qaraghandy', 170500),
+('Qyzylorda', 'KAZ', 'Qyzylorda', 157400),
+('Aqtau', 'KAZ', 'Mangghystau', 143400),
+('Atyrau', 'KAZ', 'Atyrau', 142500),
+('Ekibastuz', 'KAZ', 'Pavlodar', 127200),
+('Kökshetau', 'KAZ', 'North Kazakstan', 123400),
+('Rudnyy', 'KAZ', 'Qostanay', 109500),
+('Taldyqorghan', 'KAZ', 'Almaty', 98000),
+('Zhezqazghan', 'KAZ', 'Qaraghandy', 90000),
+('Nairobi', 'KEN', 'Nairobi', 2290000),
+('Mombasa', 'KEN', 'Coast', 461753),
+('Kisumu', 'KEN', 'Nyanza', 192733),
+('Nakuru', 'KEN', 'Rift Valley', 163927),
+('Machakos', 'KEN', 'Eastern', 116293),
+('Eldoret', 'KEN', 'Rift Valley', 111882),
+('Meru', 'KEN', 'Eastern', 94947),
+('Nyeri', 'KEN', 'Central', 91258),
+('Bangui', 'CAF', 'Bangui', 524000),
+('Shanghai', 'CHN', 'Shanghai', 9696300),
+('Peking', 'CHN', 'Peking', 7472000),
+('Chongqing', 'CHN', 'Chongqing', 6351600),
+('Tianjin', 'CHN', 'Tianjin', 5286800),
+('Wuhan', 'CHN', 'Hubei', 4344600),
+('Harbin', 'CHN', 'Heilongjiang', 4289800),
+('Shenyang', 'CHN', 'Liaoning', 4265200),
+('Kanton [Guangzhou]', 'CHN', 'Guangdong', 4256300),
+('Chengdu', 'CHN', 'Sichuan', 3361500),
+('Nanking [Nanjing]', 'CHN', 'Jiangsu', 2870300),
+('Changchun', 'CHN', 'Jilin', 2812000),
+('Xi´an', 'CHN', 'Shaanxi', 2761400),
+('Dalian', 'CHN', 'Liaoning', 2697000),
+('Qingdao', 'CHN', 'Shandong', 2596000),
+('Jinan', 'CHN', 'Shandong', 2278100),
+('Hangzhou', 'CHN', 'Zhejiang', 2190500),
+('Zhengzhou', 'CHN', 'Henan', 2107200),
+('Shijiazhuang', 'CHN', 'Hebei', 2041500),
+('Taiyuan', 'CHN', 'Shanxi', 1968400),
+('Kunming', 'CHN', 'Yunnan', 1829500),
+('Changsha', 'CHN', 'Hunan', 1809800),
+('Nanchang', 'CHN', 'Jiangxi', 1691600),
+('Fuzhou', 'CHN', 'Fujian', 1593800),
+('Lanzhou', 'CHN', 'Gansu', 1565800),
+('Guiyang', 'CHN', 'Guizhou', 1465200),
+('Ningbo', 'CHN', 'Zhejiang', 1371200),
+('Hefei', 'CHN', 'Anhui', 1369100),
+('Urumti [Ürümqi]', 'CHN', 'Xinxiang', 1310100),
+('Anshan', 'CHN', 'Liaoning', 1200000),
+('Fushun', 'CHN', 'Liaoning', 1200000),
+('Nanning', 'CHN', 'Guangxi', 1161800),
+('Zibo', 'CHN', 'Shandong', 1140000),
+('Qiqihar', 'CHN', 'Heilongjiang', 1070000),
+('Jilin', 'CHN', 'Jilin', 1040000),
+('Tangshan', 'CHN', 'Hebei', 1040000),
+('Baotou', 'CHN', 'Inner Mongolia', 980000),
+('Shenzhen', 'CHN', 'Guangdong', 950500),
+('Hohhot', 'CHN', 'Inner Mongolia', 916700),
+('Handan', 'CHN', 'Hebei', 840000),
+('Wuxi', 'CHN', 'Jiangsu', 830000),
+('Xuzhou', 'CHN', 'Jiangsu', 810000),
+('Datong', 'CHN', 'Shanxi', 800000),
+('Yichun', 'CHN', 'Heilongjiang', 800000),
+('Benxi', 'CHN', 'Liaoning', 770000),
+('Luoyang', 'CHN', 'Henan', 760000),
+('Suzhou', 'CHN', 'Jiangsu', 710000),
+('Xining', 'CHN', 'Qinghai', 700200),
+('Huainan', 'CHN', 'Anhui', 700000),
+('Jixi', 'CHN', 'Heilongjiang', 683885),
+('Daqing', 'CHN', 'Heilongjiang', 660000),
+('Fuxin', 'CHN', 'Liaoning', 640000),
+('Amoy [Xiamen]', 'CHN', 'Fujian', 627500),
+('Liuzhou', 'CHN', 'Guangxi', 610000),
+('Shantou', 'CHN', 'Guangdong', 580000),
+('Jinzhou', 'CHN', 'Liaoning', 570000),
+('Mudanjiang', 'CHN', 'Heilongjiang', 570000),
+('Yinchuan', 'CHN', 'Ningxia', 544500),
+('Changzhou', 'CHN', 'Jiangsu', 530000),
+('Zhangjiakou', 'CHN', 'Hebei', 530000),
+('Dandong', 'CHN', 'Liaoning', 520000),
+('Hegang', 'CHN', 'Heilongjiang', 520000),
+('Kaifeng', 'CHN', 'Henan', 510000),
+('Jiamusi', 'CHN', 'Heilongjiang', 493409),
+('Liaoyang', 'CHN', 'Liaoning', 492559),
+('Hengyang', 'CHN', 'Hunan', 487148),
+('Baoding', 'CHN', 'Hebei', 483155),
+('Hunjiang', 'CHN', 'Jilin', 482043),
+('Xinxiang', 'CHN', 'Henan', 473762),
+('Huangshi', 'CHN', 'Hubei', 457601),
+('Haikou', 'CHN', 'Hainan', 454300),
+('Yantai', 'CHN', 'Shandong', 452127),
+('Bengbu', 'CHN', 'Anhui', 449245),
+('Xiangtan', 'CHN', 'Hunan', 441968),
+('Weifang', 'CHN', 'Shandong', 428522),
+('Wuhu', 'CHN', 'Anhui', 425740),
+('Pingxiang', 'CHN', 'Jiangxi', 425579),
+('Yingkou', 'CHN', 'Liaoning', 421589),
+('Anyang', 'CHN', 'Henan', 420332),
+('Panzhihua', 'CHN', 'Sichuan', 415466),
+('Pingdingshan', 'CHN', 'Henan', 410775),
+('Xiangfan', 'CHN', 'Hubei', 410407),
+('Zhuzhou', 'CHN', 'Hunan', 409924),
+('Jiaozuo', 'CHN', 'Henan', 409100),
+('Wenzhou', 'CHN', 'Zhejiang', 401871),
+('Zhangjiang', 'CHN', 'Guangdong', 400997),
+('Zigong', 'CHN', 'Sichuan', 393184),
+('Shuangyashan', 'CHN', 'Heilongjiang', 386081),
+('Zaozhuang', 'CHN', 'Shandong', 380846),
+('Yakeshi', 'CHN', 'Inner Mongolia', 377869),
+('Yichang', 'CHN', 'Hubei', 371601),
+('Zhenjiang', 'CHN', 'Jiangsu', 368316),
+('Huaibei', 'CHN', 'Anhui', 366549),
+('Qinhuangdao', 'CHN', 'Hebei', 364972),
+('Guilin', 'CHN', 'Guangxi', 364130),
+('Liupanshui', 'CHN', 'Guizhou', 363954),
+('Panjin', 'CHN', 'Liaoning', 362773),
+('Yangquan', 'CHN', 'Shanxi', 362268),
+('Jinxi', 'CHN', 'Liaoning', 357052),
+('Liaoyuan', 'CHN', 'Jilin', 354141),
+('Lianyungang', 'CHN', 'Jiangsu', 354139),
+('Xianyang', 'CHN', 'Shaanxi', 352125),
+('Tai´an', 'CHN', 'Shandong', 350696),
+('Chifeng', 'CHN', 'Inner Mongolia', 350077),
+('Shaoguan', 'CHN', 'Guangdong', 350043),
+('Nantong', 'CHN', 'Jiangsu', 343341),
+('Leshan', 'CHN', 'Sichuan', 341128),
+('Baoji', 'CHN', 'Shaanxi', 337765),
+('Linyi', 'CHN', 'Shandong', 324720),
+('Tonghua', 'CHN', 'Jilin', 324600),
+('Siping', 'CHN', 'Jilin', 317223),
+('Changzhi', 'CHN', 'Shanxi', 317144),
+('Tengzhou', 'CHN', 'Shandong', 315083),
+('Chaozhou', 'CHN', 'Guangdong', 313469),
+('Yangzhou', 'CHN', 'Jiangsu', 312892),
+('Dongwan', 'CHN', 'Guangdong', 308669),
+('Ma´anshan', 'CHN', 'Anhui', 305421),
+('Foshan', 'CHN', 'Guangdong', 303160),
+('Yueyang', 'CHN', 'Hunan', 302800),
+('Xingtai', 'CHN', 'Hebei', 302789),
+('Changde', 'CHN', 'Hunan', 301276),
+('Shihezi', 'CHN', 'Xinxiang', 299676),
+('Yancheng', 'CHN', 'Jiangsu', 296831),
+('Jiujiang', 'CHN', 'Jiangxi', 291187),
+('Dongying', 'CHN', 'Shandong', 281728),
+('Shashi', 'CHN', 'Hubei', 281352),
+('Xintai', 'CHN', 'Shandong', 281248),
+('Jingdezhen', 'CHN', 'Jiangxi', 281183),
+('Tongchuan', 'CHN', 'Shaanxi', 280657),
+('Zhongshan', 'CHN', 'Guangdong', 278829),
+('Shiyan', 'CHN', 'Hubei', 273786),
+('Tieli', 'CHN', 'Heilongjiang', 265683),
+('Jining', 'CHN', 'Shandong', 265248),
+('Wuhai', 'CHN', 'Inner Mongolia', 264081),
+('Mianyang', 'CHN', 'Sichuan', 262947),
+('Luzhou', 'CHN', 'Sichuan', 262892),
+('Zunyi', 'CHN', 'Guizhou', 261862),
+('Shizuishan', 'CHN', 'Ningxia', 257862),
+('Neijiang', 'CHN', 'Sichuan', 256012),
+('Tongliao', 'CHN', 'Inner Mongolia', 255129),
+('Tieling', 'CHN', 'Liaoning', 254842),
+('Wafangdian', 'CHN', 'Liaoning', 251733),
+('Anqing', 'CHN', 'Anhui', 250718),
+('Shaoyang', 'CHN', 'Hunan', 247227),
+('Laiwu', 'CHN', 'Shandong', 246833),
+('Chengde', 'CHN', 'Hebei', 246799),
+('Tianshui', 'CHN', 'Gansu', 244974),
+('Nanyang', 'CHN', 'Henan', 243303),
+('Cangzhou', 'CHN', 'Hebei', 242708),
+('Yibin', 'CHN', 'Sichuan', 241019),
+('Huaiyin', 'CHN', 'Jiangsu', 239675),
+('Dunhua', 'CHN', 'Jilin', 235100),
+('Yanji', 'CHN', 'Jilin', 230892),
+('Jiangmen', 'CHN', 'Guangdong', 230587),
+('Tongling', 'CHN', 'Anhui', 228017),
+('Suihua', 'CHN', 'Heilongjiang', 227881),
+('Gongziling', 'CHN', 'Jilin', 226569),
+('Xiantao', 'CHN', 'Hubei', 222884),
+('Chaoyang', 'CHN', 'Liaoning', 222394),
+('Ganzhou', 'CHN', 'Jiangxi', 220129),
+('Huzhou', 'CHN', 'Zhejiang', 218071),
+('Baicheng', 'CHN', 'Jilin', 217987),
+('Shangzi', 'CHN', 'Heilongjiang', 215373),
+('Yangjiang', 'CHN', 'Guangdong', 215196),
+('Qitaihe', 'CHN', 'Heilongjiang', 214957),
+('Gejiu', 'CHN', 'Yunnan', 214294),
+('Jiangyin', 'CHN', 'Jiangsu', 213659),
+('Hebi', 'CHN', 'Henan', 212976),
+('Jiaxing', 'CHN', 'Zhejiang', 211526),
+('Wuzhou', 'CHN', 'Guangxi', 210452),
+('Meihekou', 'CHN', 'Jilin', 209038),
+('Xuchang', 'CHN', 'Henan', 208815),
+('Liaocheng', 'CHN', 'Shandong', 207844),
+('Haicheng', 'CHN', 'Liaoning', 205560),
+('Qianjiang', 'CHN', 'Hubei', 205504),
+('Baiyin', 'CHN', 'Gansu', 204970),
+('Bei´an', 'CHN', 'Heilongjiang', 204899),
+('Yixing', 'CHN', 'Jiangsu', 200824),
+('Laizhou', 'CHN', 'Shandong', 198664),
+('Qaramay', 'CHN', 'Xinxiang', 197602),
+('Acheng', 'CHN', 'Heilongjiang', 197595),
+('Dezhou', 'CHN', 'Shandong', 195485),
+('Nanping', 'CHN', 'Fujian', 195064),
+('Zhaoqing', 'CHN', 'Guangdong', 194784),
+('Beipiao', 'CHN', 'Liaoning', 194301),
+('Fengcheng', 'CHN', 'Jiangxi', 193784),
+('Fuyu', 'CHN', 'Jilin', 192981),
+('Xinyang', 'CHN', 'Henan', 192509),
+('Dongtai', 'CHN', 'Jiangsu', 192247),
+('Yuci', 'CHN', 'Shanxi', 191356),
+('Honghu', 'CHN', 'Hubei', 190772),
+('Ezhou', 'CHN', 'Hubei', 190123),
+('Heze', 'CHN', 'Shandong', 189293),
+('Daxian', 'CHN', 'Sichuan', 188101),
+('Linfen', 'CHN', 'Shanxi', 187309),
+('Tianmen', 'CHN', 'Hubei', 186332),
+('Yiyang', 'CHN', 'Hunan', 185818),
+('Quanzhou', 'CHN', 'Fujian', 185154),
+('Rizhao', 'CHN', 'Shandong', 185048),
+('Deyang', 'CHN', 'Sichuan', 182488),
+('Guangyuan', 'CHN', 'Sichuan', 182241),
+('Changshu', 'CHN', 'Jiangsu', 181805),
+('Zhangzhou', 'CHN', 'Fujian', 181424),
+('Hailar', 'CHN', 'Inner Mongolia', 180650),
+('Nanchong', 'CHN', 'Sichuan', 180273),
+('Jiutai', 'CHN', 'Jilin', 180130),
+('Zhaodong', 'CHN', 'Heilongjiang', 179976),
+('Shaoxing', 'CHN', 'Zhejiang', 179818),
+('Fuyang', 'CHN', 'Anhui', 179572),
+('Maoming', 'CHN', 'Guangdong', 178683),
+('Qujing', 'CHN', 'Yunnan', 178669),
+('Ghulja', 'CHN', 'Xinxiang', 177193),
+('Jiaohe', 'CHN', 'Jilin', 176367),
+('Puyang', 'CHN', 'Henan', 175988),
+('Huadian', 'CHN', 'Jilin', 175873),
+('Jiangyou', 'CHN', 'Sichuan', 175753),
+('Qashqar', 'CHN', 'Xinxiang', 174570),
+('Anshun', 'CHN', 'Guizhou', 174142),
+('Fuling', 'CHN', 'Sichuan', 173878),
+('Xinyu', 'CHN', 'Jiangxi', 173524),
+('Hanzhong', 'CHN', 'Shaanxi', 169930),
+('Danyang', 'CHN', 'Jiangsu', 169603),
+('Chenzhou', 'CHN', 'Hunan', 169400),
+('Xiaogan', 'CHN', 'Hubei', 166280),
+('Shangqiu', 'CHN', 'Henan', 164880),
+('Zhuhai', 'CHN', 'Guangdong', 164747),
+('Qingyuan', 'CHN', 'Guangdong', 164641),
+('Aqsu', 'CHN', 'Xinxiang', 164092),
+('Jining', 'CHN', 'Inner Mongolia', 163552),
+('Xiaoshan', 'CHN', 'Zhejiang', 162930),
+('Zaoyang', 'CHN', 'Hubei', 162198),
+('Xinghua', 'CHN', 'Jiangsu', 161910),
+('Hami', 'CHN', 'Xinxiang', 161315),
+('Huizhou', 'CHN', 'Guangdong', 161023),
+('Jinmen', 'CHN', 'Hubei', 160794),
+('Sanming', 'CHN', 'Fujian', 160691),
+('Ulanhot', 'CHN', 'Inner Mongolia', 159538),
+('Korla', 'CHN', 'Xinxiang', 159344),
+('Wanxian', 'CHN', 'Sichuan', 156823),
+('Rui´an', 'CHN', 'Zhejiang', 156468),
+('Zhoushan', 'CHN', 'Zhejiang', 156317),
+('Liangcheng', 'CHN', 'Shandong', 156307),
+('Jiaozhou', 'CHN', 'Shandong', 153364),
+('Taizhou', 'CHN', 'Jiangsu', 152442),
+('Suzhou', 'CHN', 'Anhui', 151862),
+('Yichun', 'CHN', 'Jiangxi', 151585),
+('Taonan', 'CHN', 'Jilin', 150168),
+('Pingdu', 'CHN', 'Shandong', 150123),
+('Ji´an', 'CHN', 'Jiangxi', 148583),
+('Longkou', 'CHN', 'Shandong', 148362),
+('Langfang', 'CHN', 'Hebei', 148105),
+('Zhoukou', 'CHN', 'Henan', 146288),
+('Suining', 'CHN', 'Sichuan', 146086),
+('Yulin', 'CHN', 'Guangxi', 144467),
+('Jinhua', 'CHN', 'Zhejiang', 144280),
+('Liu´an', 'CHN', 'Anhui', 144248),
+('Shuangcheng', 'CHN', 'Heilongjiang', 142659),
+('Suizhou', 'CHN', 'Hubei', 142302),
+('Ankang', 'CHN', 'Shaanxi', 142170),
+('Weinan', 'CHN', 'Shaanxi', 140169),
+('Longjing', 'CHN', 'Jilin', 139417),
+('Da´an', 'CHN', 'Jilin', 138963),
+('Lengshuijiang', 'CHN', 'Hunan', 137994),
+('Laiyang', 'CHN', 'Shandong', 137080),
+('Xianning', 'CHN', 'Hubei', 136811),
+('Dali', 'CHN', 'Yunnan', 136554),
+('Anda', 'CHN', 'Heilongjiang', 136446),
+('Jincheng', 'CHN', 'Shanxi', 136396),
+('Longyan', 'CHN', 'Fujian', 134481),
+('Xichang', 'CHN', 'Sichuan', 134419),
+('Wendeng', 'CHN', 'Shandong', 133910),
+('Hailun', 'CHN', 'Heilongjiang', 133565),
+('Binzhou', 'CHN', 'Shandong', 133555),
+('Linhe', 'CHN', 'Inner Mongolia', 133183),
+('Wuwei', 'CHN', 'Gansu', 133101),
+('Duyun', 'CHN', 'Guizhou', 132971),
+('Mishan', 'CHN', 'Heilongjiang', 132744),
+('Shangrao', 'CHN', 'Jiangxi', 132455),
+('Changji', 'CHN', 'Xinxiang', 132260),
+('Meixian', 'CHN', 'Guangdong', 132156),
+('Yushu', 'CHN', 'Jilin', 131861),
+('Tiefa', 'CHN', 'Liaoning', 131807),
+('Huai´an', 'CHN', 'Jiangsu', 131149),
+('Leiyang', 'CHN', 'Hunan', 130115),
+('Zalantun', 'CHN', 'Inner Mongolia', 130031),
+('Weihai', 'CHN', 'Shandong', 128888),
+('Loudi', 'CHN', 'Hunan', 128418),
+('Qingzhou', 'CHN', 'Shandong', 128258),
+('Qidong', 'CHN', 'Jiangsu', 126872),
+('Huaihua', 'CHN', 'Hunan', 126785),
+('Luohe', 'CHN', 'Henan', 126438),
+('Chuzhou', 'CHN', 'Anhui', 125341),
+('Kaiyuan', 'CHN', 'Liaoning', 124219),
+('Linqing', 'CHN', 'Shandong', 123958),
+('Chaohu', 'CHN', 'Anhui', 123676),
+('Laohekou', 'CHN', 'Hubei', 123366),
+('Dujiangyan', 'CHN', 'Sichuan', 123357),
+('Zhumadian', 'CHN', 'Henan', 123232),
+('Linchuan', 'CHN', 'Jiangxi', 121949),
+('Jiaonan', 'CHN', 'Shandong', 121397),
+('Sanmenxia', 'CHN', 'Henan', 120523),
+('Heyuan', 'CHN', 'Guangdong', 120101),
+('Manzhouli', 'CHN', 'Inner Mongolia', 120023),
+('Lhasa', 'CHN', 'Tibet', 120000),
+('Lianyuan', 'CHN', 'Hunan', 118858),
+('Kuytun', 'CHN', 'Xinxiang', 118553),
+('Puqi', 'CHN', 'Hubei', 117264),
+('Hongjiang', 'CHN', 'Hunan', 116188),
+('Qinzhou', 'CHN', 'Guangxi', 114586),
+('Renqiu', 'CHN', 'Hebei', 114256),
+('Yuyao', 'CHN', 'Zhejiang', 114065),
+('Guigang', 'CHN', 'Guangxi', 114025),
+('Kaili', 'CHN', 'Guizhou', 113958),
+('Yan´an', 'CHN', 'Shaanxi', 113277),
+('Beihai', 'CHN', 'Guangxi', 112673),
+('Xuangzhou', 'CHN', 'Anhui', 112673),
+('Quzhou', 'CHN', 'Zhejiang', 112373),
+('Yong´an', 'CHN', 'Fujian', 111762),
+('Zixing', 'CHN', 'Hunan', 110048),
+('Liyang', 'CHN', 'Jiangsu', 109520),
+('Yizheng', 'CHN', 'Jiangsu', 109268),
+('Yumen', 'CHN', 'Gansu', 109234),
+('Liling', 'CHN', 'Hunan', 108504),
+('Yuncheng', 'CHN', 'Shanxi', 108359),
+('Shanwei', 'CHN', 'Guangdong', 107847),
+('Cixi', 'CHN', 'Zhejiang', 107329),
+('Yuanjiang', 'CHN', 'Hunan', 107004),
+('Bozhou', 'CHN', 'Anhui', 106346),
+('Jinchang', 'CHN', 'Gansu', 105287),
+('Fu´an', 'CHN', 'Fujian', 105265),
+('Suqian', 'CHN', 'Jiangsu', 105021),
+('Shishou', 'CHN', 'Hubei', 104571),
+('Hengshui', 'CHN', 'Hebei', 104269),
+('Danjiangkou', 'CHN', 'Hubei', 103211),
+('Fujin', 'CHN', 'Heilongjiang', 103104),
+('Sanya', 'CHN', 'Hainan', 102820),
+('Guangshui', 'CHN', 'Hubei', 102770),
+('Huangshan', 'CHN', 'Anhui', 102628),
+('Xingcheng', 'CHN', 'Liaoning', 102384),
+('Zhucheng', 'CHN', 'Shandong', 102134),
+('Kunshan', 'CHN', 'Jiangsu', 102052),
+('Haining', 'CHN', 'Zhejiang', 100478),
+('Pingliang', 'CHN', 'Gansu', 99265),
+('Fuqing', 'CHN', 'Fujian', 99193),
+('Xinzhou', 'CHN', 'Shanxi', 98667),
+('Jieyang', 'CHN', 'Guangdong', 98531),
+('Zhangjiagang', 'CHN', 'Jiangsu', 97994),
+('Tong Xian', 'CHN', 'Peking', 97168),
+('Ya´an', 'CHN', 'Sichuan', 95900),
+('Jinzhou', 'CHN', 'Liaoning', 95761),
+('Emeishan', 'CHN', 'Sichuan', 94000),
+('Enshi', 'CHN', 'Hubei', 93056),
+('Bose', 'CHN', 'Guangxi', 93009),
+('Yuzhou', 'CHN', 'Henan', 92889),
+('Kaiyuan', 'CHN', 'Yunnan', 91999),
+('Tumen', 'CHN', 'Jilin', 91471),
+('Putian', 'CHN', 'Fujian', 91030),
+('Linhai', 'CHN', 'Zhejiang', 90870),
+('Xilin Hot', 'CHN', 'Inner Mongolia', 90646),
+('Shaowu', 'CHN', 'Fujian', 90286),
+('Junan', 'CHN', 'Shandong', 90222),
+('Huaying', 'CHN', 'Sichuan', 89400),
+('Pingyi', 'CHN', 'Shandong', 89373),
+('Huangyan', 'CHN', 'Zhejiang', 89288),
+('Bishkek', 'KGZ', 'Bishkek shaary', 589400),
+('Osh', 'KGZ', 'Osh', 222700),
+('Bikenibeu', 'KIR', 'South Tarawa', 5055),
+('Bairiki', 'KIR', 'South Tarawa', 2226),
+('Santafé de Bogotá', 'COL', 'Santafé de Bogotá', 6260862),
+('Cali', 'COL', 'Valle', 2077386),
+('Medellín', 'COL', 'Antioquia', 1861265),
+('Barranquilla', 'COL', 'Atlántico', 1223260),
+('Cartagena', 'COL', 'Bolívar', 805757),
+('Cúcuta', 'COL', 'Norte de Santander', 606932),
+('Bucaramanga', 'COL', 'Santander', 515555),
+('Ibagué', 'COL', 'Tolima', 393664),
+('Pereira', 'COL', 'Risaralda', 381725),
+('Santa Marta', 'COL', 'Magdalena', 359147),
+('Manizales', 'COL', 'Caldas', 337580),
+('Bello', 'COL', 'Antioquia', 333470),
+('Pasto', 'COL', 'Nariño', 332396),
+('Neiva', 'COL', 'Huila', 300052),
+('Soledad', 'COL', 'Atlántico', 295058),
+('Armenia', 'COL', 'Quindío', 288977),
+('Villavicencio', 'COL', 'Meta', 273140),
+('Soacha', 'COL', 'Cundinamarca', 272058),
+('Valledupar', 'COL', 'Cesar', 263247),
+('Montería', 'COL', 'Córdoba', 248245),
+('Itagüí', 'COL', 'Antioquia', 228985),
+('Palmira', 'COL', 'Valle', 226509),
+('Buenaventura', 'COL', 'Valle', 224336),
+('Floridablanca', 'COL', 'Santander', 221913),
+('Sincelejo', 'COL', 'Sucre', 220704),
+('Popayán', 'COL', 'Cauca', 200719),
+('Barrancabermeja', 'COL', 'Santander', 178020),
+('Dos Quebradas', 'COL', 'Risaralda', 159363),
+('Tuluá', 'COL', 'Valle', 152488),
+('Envigado', 'COL', 'Antioquia', 135848),
+('Cartago', 'COL', 'Valle', 125884),
+('Girardot', 'COL', 'Cundinamarca', 110963),
+('Buga', 'COL', 'Valle', 110699),
+('Tunja', 'COL', 'Boyacá', 109740),
+('Florencia', 'COL', 'Caquetá', 108574),
+('Maicao', 'COL', 'La Guajira', 108053),
+('Sogamoso', 'COL', 'Boyacá', 107728),
+('Giron', 'COL', 'Santander', 90688),
+('Moroni', 'COM', 'Njazidja', 36000),
+('Brazzaville', 'COG', 'Brazzaville', 950000),
+('Pointe-Noire', 'COG', 'Kouilou', 500000),
+('Kinshasa', 'COD', 'Kinshasa', 5064000),
+('Lubumbashi', 'COD', 'Shaba', 851381),
+('Mbuji-Mayi', 'COD', 'East Kasai', 806475),
+('Kolwezi', 'COD', 'Shaba', 417810),
+('Kisangani', 'COD', 'Haute-Zaïre', 417517),
+('Kananga', 'COD', 'West Kasai', 393030),
+('Likasi', 'COD', 'Shaba', 299118),
+('Bukavu', 'COD', 'South Kivu', 201569),
+('Kikwit', 'COD', 'Bandundu', 182142),
+('Tshikapa', 'COD', 'West Kasai', 180860),
+('Matadi', 'COD', 'Bas-Zaïre', 172730),
+('Mbandaka', 'COD', 'Equateur', 169841),
+('Mwene-Ditu', 'COD', 'East Kasai', 137459),
+('Boma', 'COD', 'Bas-Zaïre', 135284),
+('Uvira', 'COD', 'South Kivu', 115590),
+('Butembo', 'COD', 'North Kivu', 109406),
+('Goma', 'COD', 'North Kivu', 109094),
+('Kalemie', 'COD', 'Shaba', 101309),
+('Bantam', 'CCK', 'Home Island', 503),
+('West Island', 'CCK', 'West Island', 167),
+('Pyongyang', 'PRK', 'Pyongyang-si', 2484000),
+('Hamhung', 'PRK', 'Hamgyong N', 709730),
+('Chongjin', 'PRK', 'Hamgyong P', 582480),
+('Nampo', 'PRK', 'Nampo-si', 566200),
+('Sinuiju', 'PRK', 'Pyongan P', 326011),
+('Wonsan', 'PRK', 'Kangwon', 300148),
+('Phyongsong', 'PRK', 'Pyongan N', 272934),
+('Sariwon', 'PRK', 'Hwanghae P', 254146),
+('Haeju', 'PRK', 'Hwanghae N', 229172),
+('Kanggye', 'PRK', 'Chagang', 223410),
+('Kimchaek', 'PRK', 'Hamgyong P', 179000),
+('Hyesan', 'PRK', 'Yanggang', 178020),
+('Kaesong', 'PRK', 'Kaesong-si', 171500),
+('Seoul', 'KOR', 'Seoul', 9981619),
+('Pusan', 'KOR', 'Pusan', 3804522),
+('Inchon', 'KOR', 'Inchon', 2559424),
+('Taegu', 'KOR', 'Taegu', 2548568),
+('Taejon', 'KOR', 'Taejon', 1425835),
+('Kwangju', 'KOR', 'Kwangju', 1368341),
+('Ulsan', 'KOR', 'Kyongsangnam', 1084891),
+('Songnam', 'KOR', 'Kyonggi', 869094),
+('Puchon', 'KOR', 'Kyonggi', 779412),
+('Suwon', 'KOR', 'Kyonggi', 755550),
+('Anyang', 'KOR', 'Kyonggi', 591106),
+('Chonju', 'KOR', 'Chollabuk', 563153),
+('Chongju', 'KOR', 'Chungchongbuk', 531376),
+('Koyang', 'KOR', 'Kyonggi', 518282),
+('Ansan', 'KOR', 'Kyonggi', 510314),
+('Pohang', 'KOR', 'Kyongsangbuk', 508899),
+('Chang-won', 'KOR', 'Kyongsangnam', 481694),
+('Masan', 'KOR', 'Kyongsangnam', 441242),
+('Kwangmyong', 'KOR', 'Kyonggi', 350914),
+('Chonan', 'KOR', 'Chungchongnam', 330259),
+('Chinju', 'KOR', 'Kyongsangnam', 329886),
+('Iksan', 'KOR', 'Chollabuk', 322685),
+('Pyongtaek', 'KOR', 'Kyonggi', 312927),
+('Kumi', 'KOR', 'Kyongsangbuk', 311431),
+('Uijongbu', 'KOR', 'Kyonggi', 276111),
+('Kyongju', 'KOR', 'Kyongsangbuk', 272968),
+('Kunsan', 'KOR', 'Chollabuk', 266569),
+('Cheju', 'KOR', 'Cheju', 258511),
+('Kimhae', 'KOR', 'Kyongsangnam', 256370),
+('Sunchon', 'KOR', 'Chollanam', 249263),
+('Mokpo', 'KOR', 'Chollanam', 247452),
+('Yong-in', 'KOR', 'Kyonggi', 242643),
+('Wonju', 'KOR', 'Kang-won', 237460),
+('Kunpo', 'KOR', 'Kyonggi', 235233),
+('Chunchon', 'KOR', 'Kang-won', 234528),
+('Namyangju', 'KOR', 'Kyonggi', 229060),
+('Kangnung', 'KOR', 'Kang-won', 220403),
+('Chungju', 'KOR', 'Chungchongbuk', 205206),
+('Andong', 'KOR', 'Kyongsangbuk', 188443),
+('Yosu', 'KOR', 'Chollanam', 183596),
+('Kyongsan', 'KOR', 'Kyongsangbuk', 173746),
+('Paju', 'KOR', 'Kyonggi', 163379),
+('Yangsan', 'KOR', 'Kyongsangnam', 163351),
+('Ichon', 'KOR', 'Kyonggi', 155332),
+('Asan', 'KOR', 'Chungchongnam', 154663),
+('Koje', 'KOR', 'Kyongsangnam', 147562),
+('Kimchon', 'KOR', 'Kyongsangbuk', 147027),
+('Nonsan', 'KOR', 'Chungchongnam', 146619),
+('Kuri', 'KOR', 'Kyonggi', 142173),
+('Chong-up', 'KOR', 'Chollabuk', 139111),
+('Chechon', 'KOR', 'Chungchongbuk', 137070),
+('Sosan', 'KOR', 'Chungchongnam', 134746),
+('Shihung', 'KOR', 'Kyonggi', 133443),
+('Tong-yong', 'KOR', 'Kyongsangnam', 131717),
+('Kongju', 'KOR', 'Chungchongnam', 131229),
+('Yongju', 'KOR', 'Kyongsangbuk', 131097),
+('Chinhae', 'KOR', 'Kyongsangnam', 125997),
+('Sangju', 'KOR', 'Kyongsangbuk', 124116),
+('Poryong', 'KOR', 'Chungchongnam', 122604),
+('Kwang-yang', 'KOR', 'Chollanam', 122052),
+('Miryang', 'KOR', 'Kyongsangnam', 121501),
+('Hanam', 'KOR', 'Kyonggi', 115812),
+('Kimje', 'KOR', 'Chollabuk', 115427),
+('Yongchon', 'KOR', 'Kyongsangbuk', 113511),
+('Sachon', 'KOR', 'Kyongsangnam', 113494),
+('Uiwang', 'KOR', 'Kyonggi', 108788),
+('Naju', 'KOR', 'Chollanam', 107831),
+('Namwon', 'KOR', 'Chollabuk', 103544),
+('Tonghae', 'KOR', 'Kang-won', 95472),
+('Mun-gyong', 'KOR', 'Kyongsangbuk', 92239),
+('Athenai', 'GRC', 'Attika', 772072),
+('Thessaloniki', 'GRC', 'Central Macedonia', 383967),
+('Pireus', 'GRC', 'Attika', 182671),
+('Patras', 'GRC', 'West Greece', 153344),
+('Peristerion', 'GRC', 'Attika', 137288),
+('Herakleion', 'GRC', 'Crete', 116178),
+('Kallithea', 'GRC', 'Attika', 114233),
+('Larisa', 'GRC', 'Thessalia', 113090),
+('Zagreb', 'HRV', 'Grad Zagreb', 706770),
+('Split', 'HRV', 'Split-Dalmatia', 189388),
+('Rijeka', 'HRV', 'Primorje-Gorski Kota', 167964),
+('Osijek', 'HRV', 'Osijek-Baranja', 104761),
+('La Habana', 'CUB', 'La Habana', 2256000),
+('Santiago de Cuba', 'CUB', 'Santiago de Cuba', 433180),
+('Camagüey', 'CUB', 'Camagüey', 298726),
+('Holguín', 'CUB', 'Holguín', 249492),
+('Santa Clara', 'CUB', 'Villa Clara', 207350),
+('Guantánamo', 'CUB', 'Guantánamo', 205078),
+('Pinar del Río', 'CUB', 'Pinar del Río', 142100),
+('Bayamo', 'CUB', 'Granma', 141000),
+('Cienfuegos', 'CUB', 'Cienfuegos', 132770),
+('Victoria de las Tunas', 'CUB', 'Las Tunas', 132350),
+('Matanzas', 'CUB', 'Matanzas', 123273),
+('Manzanillo', 'CUB', 'Granma', 109350),
+('Sancti-Spíritus', 'CUB', 'Sancti-Spíritus', 100751),
+('Ciego de Ávila', 'CUB', 'Ciego de Ávila', 98505),
+('al-Salimiya', 'KWT', 'Hawalli', 130215),
+('Jalib al-Shuyukh', 'KWT', 'Hawalli', 102178),
+('Kuwait', 'KWT', 'al-Asima', 28859),
+('Nicosia', 'CYP', 'Nicosia', 195000),
+('Limassol', 'CYP', 'Limassol', 154400),
+('Vientiane', 'LAO', 'Viangchan', 531800),
+('Savannakhet', 'LAO', 'Savannakhet', 96652),
+('Riga', 'LVA', 'Riika', 764328),
+('Daugavpils', 'LVA', 'Daugavpils', 114829),
+('Liepaja', 'LVA', 'Liepaja', 89439),
+('Maseru', 'LSO', 'Maseru', 297000),
+('Beirut', 'LBN', 'Beirut', 1100000),
+('Tripoli', 'LBN', 'al-Shamal', 240000),
+('Monrovia', 'LBR', 'Montserrado', 850000),
+('Tripoli', 'LBY', 'Tripoli', 1682000),
+('Bengasi', 'LBY', 'Bengasi', 804000),
+('Misrata', 'LBY', 'Misrata', 121669),
+('al-Zawiya', 'LBY', 'al-Zawiya', 89338),
+('Schaan', 'LIE', 'Schaan', 5346),
+('Vaduz', 'LIE', 'Vaduz', 5043),
+('Vilnius', 'LTU', 'Vilna', 577969),
+('Kaunas', 'LTU', 'Kaunas', 412639),
+('Klaipeda', 'LTU', 'Klaipeda', 202451),
+('iauliai', 'LTU', 'iauliai', 146563),
+('Panevezys', 'LTU', 'Panevezys', 133695),
+('Luxembourg [Luxemburg/Lëtzebuerg]', 'LUX', 'Luxembourg', 80700),
+('El-Aaiún', 'ESH', 'El-Aaiún', 169000),
+('Macao', 'MAC', 'Macau', 437500),
+('Antananarivo', 'MDG', 'Antananarivo', 675669),
+('Toamasina', 'MDG', 'Toamasina', 127441),
+('Antsirabé', 'MDG', 'Antananarivo', 120239),
+('Mahajanga', 'MDG', 'Mahajanga', 100807),
+('Fianarantsoa', 'MDG', 'Fianarantsoa', 99005),
+('Skopje', 'MKD', 'Skopje', 444299),
+('Blantyre', 'MWI', 'Blantyre', 478155),
+('Lilongwe', 'MWI', 'Lilongwe', 435964),
+('Male', 'MDV', 'Maale', 71000),
+('Kuala Lumpur', 'MYS', 'Wilayah Persekutuan', 1297526),
+('Ipoh', 'MYS', 'Perak', 382853),
+('Johor Baharu', 'MYS', 'Johor', 328436),
+('Petaling Jaya', 'MYS', 'Selangor', 254350),
+('Kelang', 'MYS', 'Selangor', 243355),
+('Kuala Terengganu', 'MYS', 'Terengganu', 228119),
+('Pinang', 'MYS', 'Pulau Pinang', 219603),
+('Kota Bharu', 'MYS', 'Kelantan', 219582),
+('Kuantan', 'MYS', 'Pahang', 199484),
+('Taiping', 'MYS', 'Perak', 183261),
+('Seremban', 'MYS', 'Negeri Sembilan', 182869),
+('Kuching', 'MYS', 'Sarawak', 148059),
+('Sibu', 'MYS', 'Sarawak', 126381),
+('Sandakan', 'MYS', 'Sabah', 125841),
+('Alor Setar', 'MYS', 'Kedah', 124412),
+('Selayang Baru', 'MYS', 'Selangor', 124228),
+('Sungai Petani', 'MYS', 'Kedah', 114763),
+('Shah Alam', 'MYS', 'Selangor', 102019),
+('Bamako', 'MLI', 'Bamako', 809552),
+('Birkirkara', 'MLT', 'Outer Harbour', 21445),
+('Valletta', 'MLT', 'Inner Harbour', 7073),
+('Casablanca', 'MAR', 'Casablanca', 2940623),
+('Rabat', 'MAR', 'Rabat-Salé-Zammour-Z', 623457),
+('Marrakech', 'MAR', 'Marrakech-Tensift-Al', 621914),
+('Fès', 'MAR', 'Fès-Boulemane', 541162),
+('Tanger', 'MAR', 'Tanger-Tétouan', 521735),
+('Salé', 'MAR', 'Rabat-Salé-Zammour-Z', 504420),
+('Meknès', 'MAR', 'Meknès-Tafilalet', 460000),
+('Oujda', 'MAR', 'Oriental', 365382),
+('Kénitra', 'MAR', 'Gharb-Chrarda-Béni H', 292600),
+('Tétouan', 'MAR', 'Tanger-Tétouan', 277516),
+('Safi', 'MAR', 'Doukkala-Abda', 262300),
+('Agadir', 'MAR', 'Souss Massa-Draâ', 155244),
+('Mohammedia', 'MAR', 'Casablanca', 154706),
+('Khouribga', 'MAR', 'Chaouia-Ouardigha', 152090),
+('Beni-Mellal', 'MAR', 'Tadla-Azilal', 140212),
+('Témara', 'MAR', 'Rabat-Salé-Zammour-Z', 126303),
+('El Jadida', 'MAR', 'Doukkala-Abda', 119083),
+('Nador', 'MAR', 'Oriental', 112450),
+('Ksar el Kebir', 'MAR', 'Tanger-Tétouan', 107065),
+('Settat', 'MAR', 'Chaouia-Ouardigha', 96200),
+('Taza', 'MAR', 'Taza-Al Hoceima-Taou', 92700),
+('El Araich', 'MAR', 'Tanger-Tétouan', 90400),
+('Dalap-Uliga-Darrit', 'MHL', 'Majuro', 28000),
+('Fort-de-France', 'MTQ', 'Fort-de-France', 94050),
+('Nouakchott', 'MRT', 'Nouakchott', 667300),
+('Nouâdhibou', 'MRT', 'Dakhlet Nouâdhibou', 97600),
+('Port-Louis', 'MUS', 'Port-Louis', 138200),
+('Beau Bassin-Rose Hill', 'MUS', 'Plaines Wilhelms', 100616),
+('Vacoas-Phoenix', 'MUS', 'Plaines Wilhelms', 98464),
+('Mamoutzou', 'MYT', 'Mamoutzou', 12000),
+('Ciudad de México', 'MEX', 'Distrito Federal', 8591309),
+('Guadalajara', 'MEX', 'Jalisco', 1647720),
+('Ecatepec de Morelos', 'MEX', 'México', 1620303),
+('Puebla', 'MEX', 'Puebla', 1346176),
+('Nezahualcóyotl', 'MEX', 'México', 1224924),
+('Juárez', 'MEX', 'Chihuahua', 1217818),
+('Tijuana', 'MEX', 'Baja California', 1212232),
+('León', 'MEX', 'Guanajuato', 1133576),
+('Monterrey', 'MEX', 'Nuevo León', 1108499),
+('Zapopan', 'MEX', 'Jalisco', 1002239),
+('Naucalpan de Juárez', 'MEX', 'México', 857511),
+('Mexicali', 'MEX', 'Baja California', 764902),
+('Culiacán', 'MEX', 'Sinaloa', 744859),
+('Acapulco de Juárez', 'MEX', 'Guerrero', 721011),
+('Tlalnepantla de Baz', 'MEX', 'México', 720755),
+('Mérida', 'MEX', 'Yucatán', 703324),
+('Chihuahua', 'MEX', 'Chihuahua', 670208),
+('San Luis Potosí', 'MEX', 'San Luis Potosí', 669353),
+('Guadalupe', 'MEX', 'Nuevo León', 668780),
+('Toluca', 'MEX', 'México', 665617),
+('Aguascalientes', 'MEX', 'Aguascalientes', 643360),
+('Querétaro', 'MEX', 'Querétaro de Arteaga', 639839),
+('Morelia', 'MEX', 'Michoacán de Ocampo', 619958),
+('Hermosillo', 'MEX', 'Sonora', 608697),
+('Saltillo', 'MEX', 'Coahuila de Zaragoza', 577352),
+('Torreón', 'MEX', 'Coahuila de Zaragoza', 529093),
+('Centro (Villahermosa)', 'MEX', 'Tabasco', 519873),
+('San Nicolás de los Garza', 'MEX', 'Nuevo León', 495540),
+('Durango', 'MEX', 'Durango', 490524),
+('Chimalhuacán', 'MEX', 'México', 490245),
+('Tlaquepaque', 'MEX', 'Jalisco', 475472),
+('Atizapán de Zaragoza', 'MEX', 'México', 467262),
+('Veracruz', 'MEX', 'Veracruz', 457119),
+('Cuautitlán Izcalli', 'MEX', 'México', 452976),
+('Irapuato', 'MEX', 'Guanajuato', 440039),
+('Tuxtla Gutiérrez', 'MEX', 'Chiapas', 433544),
+('Tultitlán', 'MEX', 'México', 432411),
+('Reynosa', 'MEX', 'Tamaulipas', 419776),
+('Benito Juárez', 'MEX', 'Quintana Roo', 419276),
+('Matamoros', 'MEX', 'Tamaulipas', 416428),
+('Xalapa', 'MEX', 'Veracruz', 390058),
+('Celaya', 'MEX', 'Guanajuato', 382140),
+('Mazatlán', 'MEX', 'Sinaloa', 380265),
+('Ensenada', 'MEX', 'Baja California', 369573),
+('Ahome', 'MEX', 'Sinaloa', 358663),
+('Cajeme', 'MEX', 'Sonora', 355679),
+('Cuernavaca', 'MEX', 'Morelos', 337966),
+('Tonalá', 'MEX', 'Jalisco', 336109),
+('Valle de Chalco Solidaridad', 'MEX', 'México', 323113),
+('Nuevo Laredo', 'MEX', 'Tamaulipas', 310277),
+('Tepic', 'MEX', 'Nayarit', 305025),
+('Tampico', 'MEX', 'Tamaulipas', 294789),
+('Ixtapaluca', 'MEX', 'México', 293160),
+('Apodaca', 'MEX', 'Nuevo León', 282941),
+('Guasave', 'MEX', 'Sinaloa', 277201),
+('Gómez Palacio', 'MEX', 'Durango', 272806),
+('Tapachula', 'MEX', 'Chiapas', 271141),
+('Nicolás Romero', 'MEX', 'México', 269393),
+('Coatzacoalcos', 'MEX', 'Veracruz', 267037),
+('Uruapan', 'MEX', 'Michoacán de Ocampo', 265211),
+('Victoria', 'MEX', 'Tamaulipas', 262686),
+('Oaxaca de Juárez', 'MEX', 'Oaxaca', 256848),
+('Coacalco de Berriozábal', 'MEX', 'México', 252270),
+('Pachuca de Soto', 'MEX', 'Hidalgo', 244688),
+('General Escobedo', 'MEX', 'Nuevo León', 232961),
+('Salamanca', 'MEX', 'Guanajuato', 226864),
+('Santa Catarina', 'MEX', 'Nuevo León', 226573),
+('Tehuacán', 'MEX', 'Puebla', 225943),
+('Chalco', 'MEX', 'México', 222201),
+('Cárdenas', 'MEX', 'Tabasco', 216903),
+('Campeche', 'MEX', 'Campeche', 216735),
+('La Paz', 'MEX', 'México', 213045),
+('Othón P. Blanco (Chetumal)', 'MEX', 'Quintana Roo', 208014),
+('Texcoco', 'MEX', 'México', 203681),
+('La Paz', 'MEX', 'Baja California Sur', 196708),
+('Metepec', 'MEX', 'México', 194265),
+('Monclova', 'MEX', 'Coahuila de Zaragoza', 193657),
+('Huixquilucan', 'MEX', 'México', 193156),
+('Chilpancingo de los Bravo', 'MEX', 'Guerrero', 192509),
+('Puerto Vallarta', 'MEX', 'Jalisco', 183741),
+('Fresnillo', 'MEX', 'Zacatecas', 182744),
+('Ciudad Madero', 'MEX', 'Tamaulipas', 182012),
+('Soledad de Graciano Sánchez', 'MEX', 'San Luis Potosí', 179956),
+('San Juan del Río', 'MEX', 'Querétaro', 179300),
+('San Felipe del Progreso', 'MEX', 'México', 177330),
+('Córdoba', 'MEX', 'Veracruz', 176952),
+('Tecámac', 'MEX', 'México', 172410),
+('Ocosingo', 'MEX', 'Chiapas', 171495),
+('Carmen', 'MEX', 'Campeche', 171367),
+('Lázaro Cárdenas', 'MEX', 'Michoacán de Ocampo', 170878),
+('Jiutepec', 'MEX', 'Morelos', 170428),
+('Papantla', 'MEX', 'Veracruz', 170123),
+('Comalcalco', 'MEX', 'Tabasco', 164640),
+('Zamora', 'MEX', 'Michoacán de Ocampo', 161191),
+('Nogales', 'MEX', 'Sonora', 159103),
+('Huimanguillo', 'MEX', 'Tabasco', 158335),
+('Cuautla', 'MEX', 'Morelos', 153132),
+('Minatitlán', 'MEX', 'Veracruz', 152983),
+('Poza Rica de Hidalgo', 'MEX', 'Veracruz', 152678),
+('Ciudad Valles', 'MEX', 'San Luis Potosí', 146411),
+('Navolato', 'MEX', 'Sinaloa', 145396),
+('San Luis Río Colorado', 'MEX', 'Sonora', 145276),
+('Pénjamo', 'MEX', 'Guanajuato', 143927),
+('San Andrés Tuxtla', 'MEX', 'Veracruz', 142251),
+('Guanajuato', 'MEX', 'Guanajuato', 141215),
+('Navojoa', 'MEX', 'Sonora', 140495),
+('Zitácuaro', 'MEX', 'Michoacán de Ocampo', 137970),
+('Boca del Río', 'MEX', 'Veracruz-Llave', 135721),
+('Allende', 'MEX', 'Guanajuato', 134645),
+('Silao', 'MEX', 'Guanajuato', 134037),
+('Macuspana', 'MEX', 'Tabasco', 133795),
+('San Juan Bautista Tuxtepec', 'MEX', 'Oaxaca', 133675),
+('San Cristóbal de las Casas', 'MEX', 'Chiapas', 132317),
+('Valle de Santiago', 'MEX', 'Guanajuato', 130557),
+('Guaymas', 'MEX', 'Sonora', 130108),
+('Colima', 'MEX', 'Colima', 129454),
+('Dolores Hidalgo', 'MEX', 'Guanajuato', 128675),
+('Lagos de Moreno', 'MEX', 'Jalisco', 127949),
+('Piedras Negras', 'MEX', 'Coahuila de Zaragoza', 127898),
+('Altamira', 'MEX', 'Tamaulipas', 127490),
+('Túxpam', 'MEX', 'Veracruz', 126475),
+('San Pedro Garza García', 'MEX', 'Nuevo León', 126147),
+('Cuauhtémoc', 'MEX', 'Chihuahua', 124279),
+('Manzanillo', 'MEX', 'Colima', 124014),
+('Iguala de la Independencia', 'MEX', 'Guerrero', 123883),
+('Zacatecas', 'MEX', 'Zacatecas', 123700),
+('Tlajomulco de Zúñiga', 'MEX', 'Jalisco', 123220),
+('Tulancingo de Bravo', 'MEX', 'Hidalgo', 121946),
+('Zinacantepec', 'MEX', 'México', 121715),
+('San Martín Texmelucan', 'MEX', 'Puebla', 121093),
+('Tepatitlán de Morelos', 'MEX', 'Jalisco', 118948),
+('Martínez de la Torre', 'MEX', 'Veracruz', 118815),
+('Orizaba', 'MEX', 'Veracruz', 118488),
+('Apatzingán', 'MEX', 'Michoacán de Ocampo', 117849),
+('Atlixco', 'MEX', 'Puebla', 117019),
+('Delicias', 'MEX', 'Chihuahua', 116132),
+('Ixtlahuaca', 'MEX', 'México', 115548),
+('El Mante', 'MEX', 'Tamaulipas', 112453),
+('Lerdo', 'MEX', 'Durango', 112272),
+('Almoloya de Juárez', 'MEX', 'México', 110550),
+('Acámbaro', 'MEX', 'Guanajuato', 110487),
+('Acuña', 'MEX', 'Coahuila de Zaragoza', 110388),
+('Guadalupe', 'MEX', 'Zacatecas', 108881),
+('Huejutla de Reyes', 'MEX', 'Hidalgo', 108017),
+('Hidalgo', 'MEX', 'Michoacán de Ocampo', 106198),
+('Los Cabos', 'MEX', 'Baja California Sur', 105199),
+('Comitán de Domínguez', 'MEX', 'Chiapas', 104986),
+('Cunduacán', 'MEX', 'Tabasco', 104164),
+('Río Bravo', 'MEX', 'Tamaulipas', 103901),
+('Temapache', 'MEX', 'Veracruz', 102824),
+('Chilapa de Alvarez', 'MEX', 'Guerrero', 102716),
+('Hidalgo del Parral', 'MEX', 'Chihuahua', 100881),
+('San Francisco del Rincón', 'MEX', 'Guanajuato', 100149),
+('Taxco de Alarcón', 'MEX', 'Guerrero', 99907),
+('Zumpango', 'MEX', 'México', 99781),
+('San Pedro Cholula', 'MEX', 'Puebla', 99734),
+('Lerma', 'MEX', 'México', 99714),
+('Tecomán', 'MEX', 'Colima', 99296),
+('Las Margaritas', 'MEX', 'Chiapas', 97389),
+('Cosoleacaque', 'MEX', 'Veracruz', 97199),
+('San Luis de la Paz', 'MEX', 'Guanajuato', 96763),
+('José Azueta', 'MEX', 'Guerrero', 95448),
+('Santiago Ixcuintla', 'MEX', 'Nayarit', 95311),
+('San Felipe', 'MEX', 'Guanajuato', 95305),
+('Tejupilco', 'MEX', 'México', 94934),
+('Tantoyuca', 'MEX', 'Veracruz', 94709),
+('Salvatierra', 'MEX', 'Guanajuato', 94322),
+('Tultepec', 'MEX', 'México', 93364),
+('Temixco', 'MEX', 'Morelos', 92686),
+('Matamoros', 'MEX', 'Coahuila de Zaragoza', 91858),
+('Pánuco', 'MEX', 'Veracruz', 90551),
+('El Fuerte', 'MEX', 'Sinaloa', 89556),
+('Tierra Blanca', 'MEX', 'Veracruz', 89143),
+('Weno', 'FSM', 'Chuuk', 22000),
+('Palikir', 'FSM', 'Pohnpei', 8600),
+('Chisinau', 'MDA', 'Chisinau', 719900),
+('Tiraspol', 'MDA', 'Dnjestria', 194300),
+('Balti', 'MDA', 'Balti', 153400),
+('Bender (Tîghina)', 'MDA', 'Bender (Tîghina)', 125700),
+('Monte-Carlo', 'MCO', '', 13154),
+('Monaco-Ville', 'MCO', '', 1234),
+('Ulan Bator', 'MNG', 'Ulaanbaatar', 773700),
+('Plymouth', 'MSR', 'Plymouth', 2000),
+('Maputo', 'MOZ', 'Maputo', 1018938),
+('Matola', 'MOZ', 'Maputo', 424662),
+('Beira', 'MOZ', 'Sofala', 397368),
+('Nampula', 'MOZ', 'Nampula', 303346),
+('Chimoio', 'MOZ', 'Manica', 171056),
+('Naçala-Porto', 'MOZ', 'Nampula', 158248),
+('Quelimane', 'MOZ', 'Zambézia', 150116),
+('Mocuba', 'MOZ', 'Zambézia', 124700),
+('Tete', 'MOZ', 'Tete', 101984),
+('Xai-Xai', 'MOZ', 'Gaza', 99442),
+('Gurue', 'MOZ', 'Zambézia', 99300),
+('Maxixe', 'MOZ', 'Inhambane', 93985),
+('Rangoon (Yangon)', 'MMR', 'Rangoon [Yangon]', 3361700),
+('Mandalay', 'MMR', 'Mandalay', 885300),
+('Moulmein (Mawlamyine)', 'MMR', 'Mon', 307900),
+('Pegu (Bago)', 'MMR', 'Pegu [Bago]', 190900),
+('Bassein (Pathein)', 'MMR', 'Irrawaddy [Ayeyarwad', 183900),
+('Monywa', 'MMR', 'Sagaing', 138600),
+('Sittwe (Akyab)', 'MMR', 'Rakhine', 137600),
+('Taunggyi (Taunggye)', 'MMR', 'Shan', 131500),
+('Meikhtila', 'MMR', 'Mandalay', 129700),
+('Mergui (Myeik)', 'MMR', 'Tenasserim [Tanintha', 122700),
+('Lashio (Lasho)', 'MMR', 'Shan', 107600),
+('Prome (Pyay)', 'MMR', 'Pegu [Bago]', 105700),
+('Henzada (Hinthada)', 'MMR', 'Irrawaddy [Ayeyarwad', 104700),
+('Myingyan', 'MMR', 'Mandalay', 103600),
+('Tavoy (Dawei)', 'MMR', 'Tenasserim [Tanintha', 96800),
+('Pagakku (Pakokku)', 'MMR', 'Magwe [Magway]', 94800),
+('Windhoek', 'NAM', 'Khomas', 169000),
+('Yangor', 'NRU', '', 4050),
+('Yaren', 'NRU', '', 559),
+('Kathmandu', 'NPL', 'Central', 591835),
+('Biratnagar', 'NPL', 'Eastern', 157764),
+('Pokhara', 'NPL', 'Western', 146318),
+('Lalitapur', 'NPL', 'Central', 145847),
+('Birgunj', 'NPL', 'Central', 90639),
+('Managua', 'NIC', 'Managua', 959000),
+('León', 'NIC', 'León', 123865),
+('Chinandega', 'NIC', 'Chinandega', 97387),
+('Masaya', 'NIC', 'Masaya', 88971),
+('Niamey', 'NER', 'Niamey', 420000),
+('Zinder', 'NER', 'Zinder', 120892),
+('Maradi', 'NER', 'Maradi', 112965),
+('Lagos', 'NGA', 'Lagos', 1518000),
+('Ibadan', 'NGA', 'Oyo & Osun', 1432000),
+('Ogbomosho', 'NGA', 'Oyo & Osun', 730000),
+('Kano', 'NGA', 'Kano & Jigawa', 674100),
+('Oshogbo', 'NGA', 'Oyo & Osun', 476800),
+('Ilorin', 'NGA', 'Kwara & Kogi', 475800),
+('Abeokuta', 'NGA', 'Ogun', 427400),
+('Port Harcourt', 'NGA', 'Rivers & Bayelsa', 410000),
+('Zaria', 'NGA', 'Kaduna', 379200),
+('Ilesha', 'NGA', 'Oyo & Osun', 378400),
+('Onitsha', 'NGA', 'Anambra & Enugu & Eb', 371900),
+('Iwo', 'NGA', 'Oyo & Osun', 362000),
+('Ado-Ekiti', 'NGA', 'Ondo & Ekiti', 359400),
+('Abuja', 'NGA', 'Federal Capital Dist', 350100),
+('Kaduna', 'NGA', 'Kaduna', 342200),
+('Mushin', 'NGA', 'Lagos', 333200),
+('Maiduguri', 'NGA', 'Borno & Yobe', 320000),
+('Enugu', 'NGA', 'Anambra & Enugu & Eb', 316100),
+('Ede', 'NGA', 'Oyo & Osun', 307100),
+('Aba', 'NGA', 'Imo & Abia', 298900),
+('Ife', 'NGA', 'Oyo & Osun', 296800),
+('Ila', 'NGA', 'Oyo & Osun', 264000),
+('Oyo', 'NGA', 'Oyo & Osun', 256400),
+('Ikerre', 'NGA', 'Ondo & Ekiti', 244600),
+('Benin City', 'NGA', 'Edo & Delta', 229400),
+('Iseyin', 'NGA', 'Oyo & Osun', 217300),
+('Katsina', 'NGA', 'Katsina', 206500),
+('Jos', 'NGA', 'Plateau & Nassarawa', 206300),
+('Sokoto', 'NGA', 'Sokoto & Kebbi & Zam', 204900),
+('Ilobu', 'NGA', 'Oyo & Osun', 199000),
+('Offa', 'NGA', 'Kwara & Kogi', 197200),
+('Ikorodu', 'NGA', 'Lagos', 184900),
+('Ilawe-Ekiti', 'NGA', 'Ondo & Ekiti', 184500),
+('Owo', 'NGA', 'Ondo & Ekiti', 183500),
+('Ikirun', 'NGA', 'Oyo & Osun', 181400),
+('Shaki', 'NGA', 'Oyo & Osun', 174500),
+('Calabar', 'NGA', 'Cross River', 174400),
+('Ondo', 'NGA', 'Ondo & Ekiti', 173600),
+('Akure', 'NGA', 'Ondo & Ekiti', 162300),
+('Gusau', 'NGA', 'Sokoto & Kebbi & Zam', 158000),
+('Ijebu-Ode', 'NGA', 'Ogun', 156400),
+('Effon-Alaiye', 'NGA', 'Oyo & Osun', 153100),
+('Kumo', 'NGA', 'Bauchi & Gombe', 148000),
+('Shomolu', 'NGA', 'Lagos', 147700),
+('Oka-Akoko', 'NGA', 'Ondo & Ekiti', 142900),
+('Ikare', 'NGA', 'Ondo & Ekiti', 140800),
+('Sapele', 'NGA', 'Edo & Delta', 139200),
+('Deba Habe', 'NGA', 'Bauchi & Gombe', 138600),
+('Minna', 'NGA', 'Niger', 136900),
+('Warri', 'NGA', 'Edo & Delta', 126100),
+('Bida', 'NGA', 'Niger', 125500),
+('Ikire', 'NGA', 'Oyo & Osun', 123300),
+('Makurdi', 'NGA', 'Benue', 123100),
+('Lafia', 'NGA', 'Plateau & Nassarawa', 122500),
+('Inisa', 'NGA', 'Oyo & Osun', 119800),
+('Shagamu', 'NGA', 'Ogun', 117200),
+('Awka', 'NGA', 'Anambra & Enugu & Eb', 111200),
+('Gombe', 'NGA', 'Bauchi & Gombe', 107800),
+('Igboho', 'NGA', 'Oyo & Osun', 106800),
+('Ejigbo', 'NGA', 'Oyo & Osun', 105900),
+('Agege', 'NGA', 'Lagos', 105000),
+('Ise-Ekiti', 'NGA', 'Ondo & Ekiti', 103400),
+('Ugep', 'NGA', 'Cross River', 102600),
+('Epe', 'NGA', 'Lagos', 101000),
+('Alofi', 'NIU', '', 682),
+('Kingston', 'NFK', '', 800),
+('Oslo', 'NOR', 'Oslo', 508726),
+('Bergen', 'NOR', 'Hordaland', 230948),
+('Trondheim', 'NOR', 'Sør-Trøndelag', 150166),
+('Stavanger', 'NOR', 'Rogaland', 108848),
+('Bærum', 'NOR', 'Akershus', 101340),
+('Abidjan', 'CIV', 'Abidjan', 2500000),
+('Bouaké', 'CIV', 'Bouaké', 329850),
+('Yamoussoukro', 'CIV', 'Yamoussoukro', 130000),
+('Daloa', 'CIV', 'Daloa', 121842),
+('Korhogo', 'CIV', 'Korhogo', 109445),
+('al-Sib', 'OMN', 'Masqat', 155000),
+('Salala', 'OMN', 'Zufar', 131813),
+('Bawshar', 'OMN', 'Masqat', 107500),
+('Suhar', 'OMN', 'al-Batina', 90814),
+('Masqat', 'OMN', 'Masqat', 51969),
+('Karachi', 'PAK', 'Sindh', 9269265),
+('Lahore', 'PAK', 'Punjab', 5063499),
+('Faisalabad', 'PAK', 'Punjab', 1977246),
+('Rawalpindi', 'PAK', 'Punjab', 1406214),
+('Multan', 'PAK', 'Punjab', 1182441),
+('Hyderabad', 'PAK', 'Sindh', 1151274),
+('Gujranwala', 'PAK', 'Punjab', 1124749),
+('Peshawar', 'PAK', 'Nothwest Border Prov', 988005),
+('Quetta', 'PAK', 'Baluchistan', 560307),
+('Islamabad', 'PAK', 'Islamabad', 524500),
+('Sargodha', 'PAK', 'Punjab', 455360),
+('Sialkot', 'PAK', 'Punjab', 417597),
+('Bahawalpur', 'PAK', 'Punjab', 403408),
+('Sukkur', 'PAK', 'Sindh', 329176),
+('Jhang', 'PAK', 'Punjab', 292214),
+('Sheikhupura', 'PAK', 'Punjab', 271875),
+('Larkana', 'PAK', 'Sindh', 270366),
+('Gujrat', 'PAK', 'Punjab', 250121),
+('Mardan', 'PAK', 'Nothwest Border Prov', 244511),
+('Kasur', 'PAK', 'Punjab', 241649),
+('Rahim Yar Khan', 'PAK', 'Punjab', 228479),
+('Sahiwal', 'PAK', 'Punjab', 207388),
+('Okara', 'PAK', 'Punjab', 200901),
+('Wah', 'PAK', 'Punjab', 198400),
+('Dera Ghazi Khan', 'PAK', 'Punjab', 188100),
+('Mirpur Khas', 'PAK', 'Sind', 184500),
+('Nawabshah', 'PAK', 'Sind', 183100),
+('Mingora', 'PAK', 'Nothwest Border Prov', 174500),
+('Chiniot', 'PAK', 'Punjab', 169300),
+('Kamoke', 'PAK', 'Punjab', 151000),
+('Mandi Burewala', 'PAK', 'Punjab', 149900),
+('Jhelum', 'PAK', 'Punjab', 145800),
+('Sadiqabad', 'PAK', 'Punjab', 141500),
+('Jacobabad', 'PAK', 'Sind', 137700),
+('Shikarpur', 'PAK', 'Sind', 133300),
+('Khanewal', 'PAK', 'Punjab', 133000),
+('Hafizabad', 'PAK', 'Punjab', 130200),
+('Kohat', 'PAK', 'Nothwest Border Prov', 125300),
+('Muzaffargarh', 'PAK', 'Punjab', 121600),
+('Khanpur', 'PAK', 'Punjab', 117800),
+('Gojra', 'PAK', 'Punjab', 115000),
+('Bahawalnagar', 'PAK', 'Punjab', 109600),
+('Muridke', 'PAK', 'Punjab', 108600),
+('Pak Pattan', 'PAK', 'Punjab', 107800),
+('Abottabad', 'PAK', 'Nothwest Border Prov', 106000),
+('Tando Adam', 'PAK', 'Sind', 103400),
+('Jaranwala', 'PAK', 'Punjab', 103300),
+('Khairpur', 'PAK', 'Sind', 102200),
+('Chishtian Mandi', 'PAK', 'Punjab', 101700),
+('Daska', 'PAK', 'Punjab', 101500),
+('Dadu', 'PAK', 'Sind', 98600),
+('Mandi Bahauddin', 'PAK', 'Punjab', 97300),
+('Ahmadpur East', 'PAK', 'Punjab', 96000),
+('Kamalia', 'PAK', 'Punjab', 95300),
+('Khuzdar', 'PAK', 'Baluchistan', 93100),
+('Vihari', 'PAK', 'Punjab', 92300),
+('Dera Ismail Khan', 'PAK', 'Nothwest Border Prov', 90400),
+('Wazirabad', 'PAK', 'Punjab', 89700),
+('Nowshera', 'PAK', 'Nothwest Border Prov', 89400),
+('Koror', 'PLW', 'Koror', 12000),
+('Ciudad de Panamá', 'PAN', 'Panamá', 471373),
+('San Miguelito', 'PAN', 'San Miguelito', 315382),
+('Port Moresby', 'PNG', 'National Capital Dis', 247000),
+('Asunción', 'PRY', 'Asunción', 557776),
+('Ciudad del Este', 'PRY', 'Alto Paraná', 133881),
+('San Lorenzo', 'PRY', 'Central', 133395),
+('Lambaré', 'PRY', 'Central', 99681),
+('Fernando de la Mora', 'PRY', 'Central', 95287),
+('Lima', 'PER', 'Lima', 6464693),
+('Arequipa', 'PER', 'Arequipa', 762000),
+('Trujillo', 'PER', 'La Libertad', 652000),
+('Chiclayo', 'PER', 'Lambayeque', 517000),
+('Callao', 'PER', 'Callao', 424294),
+('Iquitos', 'PER', 'Loreto', 367000),
+('Chimbote', 'PER', 'Ancash', 336000),
+('Huancayo', 'PER', 'Junín', 327000),
+('Piura', 'PER', 'Piura', 325000),
+('Cusco', 'PER', 'Cusco', 291000),
+('Pucallpa', 'PER', 'Ucayali', 220866),
+('Tacna', 'PER', 'Tacna', 215683),
+('Ica', 'PER', 'Ica', 194820),
+('Sullana', 'PER', 'Piura', 147361),
+('Juliaca', 'PER', 'Puno', 142576),
+('Huánuco', 'PER', 'Huanuco', 129688),
+('Ayacucho', 'PER', 'Ayacucho', 118960),
+('Chincha Alta', 'PER', 'Ica', 110016),
+('Cajamarca', 'PER', 'Cajamarca', 108009),
+('Puno', 'PER', 'Puno', 101578),
+('Ventanilla', 'PER', 'Callao', 101056),
+('Castilla', 'PER', 'Piura', 90642),
+('Adamstown', 'PCN', '', 42),
+('Garapan', 'MNP', 'Saipan', 9200),
+('Lisboa', 'PRT', 'Lisboa', 563210),
+('Porto', 'PRT', 'Porto', 273060),
+('Amadora', 'PRT', 'Lisboa', 122106),
+('Coímbra', 'PRT', 'Coímbra', 96100),
+('Braga', 'PRT', 'Braga', 90535),
+('San Juan', 'PRI', 'San Juan', 434374),
+('Bayamón', 'PRI', 'Bayamón', 224044),
+('Ponce', 'PRI', 'Ponce', 186475),
+('Carolina', 'PRI', 'Carolina', 186076),
+('Caguas', 'PRI', 'Caguas', 140502),
+('Arecibo', 'PRI', 'Arecibo', 100131),
+('Guaynabo', 'PRI', 'Guaynabo', 100053),
+('Mayagüez', 'PRI', 'Mayagüez', 98434),
+('Toa Baja', 'PRI', 'Toa Baja', 94085),
+('Warszawa', 'POL', 'Mazowieckie', 1615369),
+('Lódz', 'POL', 'Lodzkie', 800110),
+('Kraków', 'POL', 'Malopolskie', 738150),
+('Wroclaw', 'POL', 'Dolnoslaskie', 636765),
+('Poznan', 'POL', 'Wielkopolskie', 576899),
+('Gdansk', 'POL', 'Pomorskie', 458988),
+('Szczecin', 'POL', 'Zachodnio-Pomorskie', 416988),
+('Bydgoszcz', 'POL', 'Kujawsko-Pomorskie', 386855),
+('Lublin', 'POL', 'Lubelskie', 356251),
+('Katowice', 'POL', 'Slaskie', 345934),
+('Bialystok', 'POL', 'Podlaskie', 283937),
+('Czestochowa', 'POL', 'Slaskie', 257812),
+('Gdynia', 'POL', 'Pomorskie', 253521),
+('Sosnowiec', 'POL', 'Slaskie', 244102),
+('Radom', 'POL', 'Mazowieckie', 232262),
+('Kielce', 'POL', 'Swietokrzyskie', 212383),
+('Gliwice', 'POL', 'Slaskie', 212164),
+('Torun', 'POL', 'Kujawsko-Pomorskie', 206158),
+('Bytom', 'POL', 'Slaskie', 205560),
+('Zabrze', 'POL', 'Slaskie', 200177),
+('Bielsko-Biala', 'POL', 'Slaskie', 180307),
+('Olsztyn', 'POL', 'Warminsko-Mazurskie', 170904),
+('Rzeszów', 'POL', 'Podkarpackie', 162049),
+('Ruda Slaska', 'POL', 'Slaskie', 159665),
+('Rybnik', 'POL', 'Slaskie', 144582),
+('Walbrzych', 'POL', 'Dolnoslaskie', 136923),
+('Tychy', 'POL', 'Slaskie', 133178),
+('Dabrowa Górnicza', 'POL', 'Slaskie', 131037),
+('Plock', 'POL', 'Mazowieckie', 131011),
+('Elblag', 'POL', 'Warminsko-Mazurskie', 129782),
+('Opole', 'POL', 'Opolskie', 129553),
+('Gorzów Wielkopolski', 'POL', 'Lubuskie', 126019),
+('Wloclawek', 'POL', 'Kujawsko-Pomorskie', 123373),
+('Chorzów', 'POL', 'Slaskie', 121708),
+('Tarnów', 'POL', 'Malopolskie', 121494),
+('Zielona Góra', 'POL', 'Lubuskie', 118182),
+('Koszalin', 'POL', 'Zachodnio-Pomorskie', 112375),
+('Legnica', 'POL', 'Dolnoslaskie', 109335),
+('Kalisz', 'POL', 'Wielkopolskie', 106641),
+('Grudziadz', 'POL', 'Kujawsko-Pomorskie', 102434),
+('Slupsk', 'POL', 'Pomorskie', 102370),
+('Jastrzebie-Zdrój', 'POL', 'Slaskie', 102294),
+('Jaworzno', 'POL', 'Slaskie', 97929),
+('Jelenia Góra', 'POL', 'Dolnoslaskie', 93901),
+('Malabo', 'GNQ', 'Bioko', 40000),
+('Doha', 'QAT', 'Doha', 355000),
+('Paris', 'FRA', 'Île-de-France', 2125246),
+('Marseille', 'FRA', 'Provence-Alpes-Côte', 798430),
+('Lyon', 'FRA', 'Rhône-Alpes', 445452),
+('Toulouse', 'FRA', 'Midi-Pyrénées', 390350),
+('Nice', 'FRA', 'Provence-Alpes-Côte', 342738),
+('Nantes', 'FRA', 'Pays de la Loire', 270251),
+('Strasbourg', 'FRA', 'Alsace', 264115),
+('Montpellier', 'FRA', 'Languedoc-Roussillon', 225392),
+('Bordeaux', 'FRA', 'Aquitaine', 215363),
+('Rennes', 'FRA', 'Haute-Normandie', 206229),
+('Le Havre', 'FRA', 'Champagne-Ardenne', 190905),
+('Reims', 'FRA', 'Nord-Pas-de-Calais', 187206),
+('Lille', 'FRA', 'Rhône-Alpes', 184657),
+('St-Étienne', 'FRA', 'Bretagne', 180210),
+('Toulon', 'FRA', 'Provence-Alpes-Côte', 160639),
+('Grenoble', 'FRA', 'Rhône-Alpes', 153317),
+('Angers', 'FRA', 'Pays de la Loire', 151279),
+('Dijon', 'FRA', 'Bourgogne', 149867),
+('Brest', 'FRA', 'Bretagne', 149634),
+('Le Mans', 'FRA', 'Pays de la Loire', 146105),
+('Clermont-Ferrand', 'FRA', 'Auvergne', 137140),
+('Amiens', 'FRA', 'Picardie', 135501),
+('Aix-en-Provence', 'FRA', 'Provence-Alpes-Côte', 134222),
+('Limoges', 'FRA', 'Limousin', 133968),
+('Nîmes', 'FRA', 'Languedoc-Roussillon', 133424),
+('Tours', 'FRA', 'Centre', 132820),
+('Villeurbanne', 'FRA', 'Rhône-Alpes', 124215),
+('Metz', 'FRA', 'Lorraine', 123776),
+('Besançon', 'FRA', 'Franche-Comté', 117733),
+('Caen', 'FRA', 'Basse-Normandie', 113987),
+('Orléans', 'FRA', 'Centre', 113126),
+('Mulhouse', 'FRA', 'Alsace', 110359),
+('Rouen', 'FRA', 'Haute-Normandie', 106592),
+('Boulogne-Billancourt', 'FRA', 'Île-de-France', 106367),
+('Perpignan', 'FRA', 'Languedoc-Roussillon', 105115),
+('Nancy', 'FRA', 'Lorraine', 103605),
+('Roubaix', 'FRA', 'Nord-Pas-de-Calais', 96984),
+('Argenteuil', 'FRA', 'Île-de-France', 93961),
+('Tourcoing', 'FRA', 'Nord-Pas-de-Calais', 93540),
+('Montreuil', 'FRA', 'Île-de-France', 90674),
+('Cayenne', 'GUF', 'Cayenne', 50699),
+('Faaa', 'PYF', 'Tahiti', 25888),
+('Papeete', 'PYF', 'Tahiti', 25553),
+('Saint-Denis', 'REU', 'Saint-Denis', 131480),
+('Bucuresti', 'ROM', 'Bukarest', 2016131),
+('Iasi', 'ROM', 'Iasi', 348070),
+('Constanta', 'ROM', 'Constanta', 342264),
+('Cluj-Napoca', 'ROM', 'Cluj', 332498),
+('Galati', 'ROM', 'Galati', 330276),
+('Timisoara', 'ROM', 'Timis', 324304),
+('Brasov', 'ROM', 'Brasov', 314225),
+('Craiova', 'ROM', 'Dolj', 313530),
+('Ploiesti', 'ROM', 'Prahova', 251348),
+('Braila', 'ROM', 'Braila', 233756),
+('Oradea', 'ROM', 'Bihor', 222239),
+('Bacau', 'ROM', 'Bacau', 209235),
+('Pitesti', 'ROM', 'Arges', 187170),
+('Arad', 'ROM', 'Arad', 184408),
+('Sibiu', 'ROM', 'Sibiu', 169611),
+('Târgu Mures', 'ROM', 'Mures', 165153),
+('Baia Mare', 'ROM', 'Maramures', 149665),
+('Buzau', 'ROM', 'Buzau', 148372),
+('Satu Mare', 'ROM', 'Satu Mare', 130059),
+('Botosani', 'ROM', 'Botosani', 128730),
+('Piatra Neamt', 'ROM', 'Neamt', 125070),
+('Râmnicu Vâlcea', 'ROM', 'Vâlcea', 119741),
+('Suceava', 'ROM', 'Suceava', 118549),
+('Drobeta-Turnu Severin', 'ROM', 'Mehedinti', 117865),
+('Târgoviste', 'ROM', 'Dâmbovita', 98980),
+('Focsani', 'ROM', 'Vrancea', 98979),
+('Târgu Jiu', 'ROM', 'Gorj', 98524),
+('Tulcea', 'ROM', 'Tulcea', 96278),
+('Resita', 'ROM', 'Caras-Severin', 93976),
+('Kigali', 'RWA', 'Kigali', 286000),
+('Stockholm', 'SWE', 'Lisboa', 750348),
+('Gothenburg [Göteborg]', 'SWE', 'West Götanmaan län', 466990),
+('Malmö', 'SWE', 'Skåne län', 259579),
+('Uppsala', 'SWE', 'Uppsala län', 189569),
+('Linköping', 'SWE', 'East Götanmaan län', 133168),
+('Västerås', 'SWE', 'Västmanlands län', 126328),
+('Örebro', 'SWE', 'Örebros län', 124207),
+('Norrköping', 'SWE', 'East Götanmaan län', 122199),
+('Helsingborg', 'SWE', 'Skåne län', 117737),
+('Jönköping', 'SWE', 'Jönköpings län', 117095),
+('Umeå', 'SWE', 'Västerbottens län', 104512),
+('Lund', 'SWE', 'Skåne län', 98948),
+('Borås', 'SWE', 'West Götanmaan län', 96883),
+('Sundsvall', 'SWE', 'Västernorrlands län', 93126),
+('Gävle', 'SWE', 'Gävleborgs län', 90742),
+('Jamestown', 'SHN', 'Saint Helena', 1500),
+('Basseterre', 'KNA', 'St George Basseterre', 11600),
+('Castries', 'LCA', 'Castries', 2301),
+('Kingstown', 'VCT', 'St George', 17100),
+('Saint-Pierre', 'SPM', 'Saint-Pierre', 5808),
+('Berlin', 'DEU', 'Berliini', 3386667),
+('Hamburg', 'DEU', 'Hamburg', 1704735),
+('Munich [München]', 'DEU', 'Baijeri', 1194560),
+('Köln', 'DEU', 'Nordrhein-Westfalen', 962507),
+('Frankfurt am Main', 'DEU', 'Hessen', 643821),
+('Essen', 'DEU', 'Nordrhein-Westfalen', 599515),
+('Dortmund', 'DEU', 'Nordrhein-Westfalen', 590213),
+('Stuttgart', 'DEU', 'Baden-Württemberg', 582443),
+('Düsseldorf', 'DEU', 'Nordrhein-Westfalen', 568855),
+('Bremen', 'DEU', 'Bremen', 540330),
+('Duisburg', 'DEU', 'Nordrhein-Westfalen', 519793),
+('Hannover', 'DEU', 'Niedersachsen', 514718),
+('Leipzig', 'DEU', 'Saksi', 489532),
+('Nürnberg', 'DEU', 'Baijeri', 486628),
+('Dresden', 'DEU', 'Saksi', 476668),
+('Bochum', 'DEU', 'Nordrhein-Westfalen', 392830),
+('Wuppertal', 'DEU', 'Nordrhein-Westfalen', 368993),
+('Bielefeld', 'DEU', 'Nordrhein-Westfalen', 321125),
+('Mannheim', 'DEU', 'Baden-Württemberg', 307730),
+('Bonn', 'DEU', 'Nordrhein-Westfalen', 301048),
+('Gelsenkirchen', 'DEU', 'Nordrhein-Westfalen', 281979),
+('Karlsruhe', 'DEU', 'Baden-Württemberg', 277204),
+('Wiesbaden', 'DEU', 'Hessen', 268716),
+('Münster', 'DEU', 'Nordrhein-Westfalen', 264670),
+('Mönchengladbach', 'DEU', 'Nordrhein-Westfalen', 263697),
+('Chemnitz', 'DEU', 'Saksi', 263222),
+('Augsburg', 'DEU', 'Baijeri', 254867),
+('Halle/Saale', 'DEU', 'Anhalt Sachsen', 254360),
+('Braunschweig', 'DEU', 'Niedersachsen', 246322),
+('Aachen', 'DEU', 'Nordrhein-Westfalen', 243825),
+('Krefeld', 'DEU', 'Nordrhein-Westfalen', 241769),
+('Magdeburg', 'DEU', 'Anhalt Sachsen', 235073),
+('Kiel', 'DEU', 'Schleswig-Holstein', 233795),
+('Oberhausen', 'DEU', 'Nordrhein-Westfalen', 222349),
+('Lübeck', 'DEU', 'Schleswig-Holstein', 213326),
+('Hagen', 'DEU', 'Nordrhein-Westfalen', 205201),
+('Rostock', 'DEU', 'Mecklenburg-Vorpomme', 203279),
+('Freiburg im Breisgau', 'DEU', 'Baden-Württemberg', 202455),
+('Erfurt', 'DEU', 'Thüringen', 201267),
+('Kassel', 'DEU', 'Hessen', 196211),
+('Saarbrücken', 'DEU', 'Saarland', 183836),
+('Mainz', 'DEU', 'Rheinland-Pfalz', 183134),
+('Hamm', 'DEU', 'Nordrhein-Westfalen', 181804),
+('Herne', 'DEU', 'Nordrhein-Westfalen', 175661),
+('Mülheim an der Ruhr', 'DEU', 'Nordrhein-Westfalen', 173895),
+('Solingen', 'DEU', 'Nordrhein-Westfalen', 165583),
+('Osnabrück', 'DEU', 'Niedersachsen', 164539),
+('Ludwigshafen am Rhein', 'DEU', 'Rheinland-Pfalz', 163771),
+('Leverkusen', 'DEU', 'Nordrhein-Westfalen', 160841),
+('Oldenburg', 'DEU', 'Niedersachsen', 154125),
+('Neuss', 'DEU', 'Nordrhein-Westfalen', 149702),
+('Heidelberg', 'DEU', 'Baden-Württemberg', 139672),
+('Darmstadt', 'DEU', 'Hessen', 137776),
+('Paderborn', 'DEU', 'Nordrhein-Westfalen', 137647),
+('Potsdam', 'DEU', 'Brandenburg', 128983),
+('Würzburg', 'DEU', 'Baijeri', 127350),
+('Regensburg', 'DEU', 'Baijeri', 125236),
+('Recklinghausen', 'DEU', 'Nordrhein-Westfalen', 125022),
+('Göttingen', 'DEU', 'Niedersachsen', 124775),
+('Bremerhaven', 'DEU', 'Bremen', 122735),
+('Wolfsburg', 'DEU', 'Niedersachsen', 121954),
+('Bottrop', 'DEU', 'Nordrhein-Westfalen', 121097),
+('Remscheid', 'DEU', 'Nordrhein-Westfalen', 120125),
+('Heilbronn', 'DEU', 'Baden-Württemberg', 119526),
+('Pforzheim', 'DEU', 'Baden-Württemberg', 117227),
+('Offenbach am Main', 'DEU', 'Hessen', 116627),
+('Ulm', 'DEU', 'Baden-Württemberg', 116103),
+('Ingolstadt', 'DEU', 'Baijeri', 114826),
+('Gera', 'DEU', 'Thüringen', 114718),
+('Salzgitter', 'DEU', 'Niedersachsen', 112934),
+('Cottbus', 'DEU', 'Brandenburg', 110894),
+('Reutlingen', 'DEU', 'Baden-Württemberg', 110343),
+('Fürth', 'DEU', 'Baijeri', 109771),
+('Siegen', 'DEU', 'Nordrhein-Westfalen', 109225),
+('Koblenz', 'DEU', 'Rheinland-Pfalz', 108003),
+('Moers', 'DEU', 'Nordrhein-Westfalen', 106837),
+('Bergisch Gladbach', 'DEU', 'Nordrhein-Westfalen', 106150),
+('Zwickau', 'DEU', 'Saksi', 104146),
+('Hildesheim', 'DEU', 'Niedersachsen', 104013),
+('Witten', 'DEU', 'Nordrhein-Westfalen', 103384),
+('Schwerin', 'DEU', 'Mecklenburg-Vorpomme', 102878),
+('Erlangen', 'DEU', 'Baijeri', 100750),
+('Kaiserslautern', 'DEU', 'Rheinland-Pfalz', 100025),
+('Trier', 'DEU', 'Rheinland-Pfalz', 99891),
+('Jena', 'DEU', 'Thüringen', 99779),
+('Iserlohn', 'DEU', 'Nordrhein-Westfalen', 99474),
+('Gütersloh', 'DEU', 'Nordrhein-Westfalen', 95028),
+('Marl', 'DEU', 'Nordrhein-Westfalen', 93735),
+('Lünen', 'DEU', 'Nordrhein-Westfalen', 92044),
+('Düren', 'DEU', 'Nordrhein-Westfalen', 91092),
+('Ratingen', 'DEU', 'Nordrhein-Westfalen', 90951),
+('Velbert', 'DEU', 'Nordrhein-Westfalen', 89881),
+('Esslingen am Neckar', 'DEU', 'Baden-Württemberg', 89667),
+('Honiara', 'SLB', 'Honiara', 50100),
+('Lusaka', 'ZMB', 'Lusaka', 1317000),
+('Ndola', 'ZMB', 'Copperbelt', 329200),
+('Kitwe', 'ZMB', 'Copperbelt', 288600),
+('Kabwe', 'ZMB', 'Central', 154300),
+('Chingola', 'ZMB', 'Copperbelt', 142400),
+('Mufulira', 'ZMB', 'Copperbelt', 123900),
+('Luanshya', 'ZMB', 'Copperbelt', 118100),
+('Apia', 'WSM', 'Upolu', 35900),
+('Serravalle', 'SMR', 'Serravalle/Dogano', 4802),
+('San Marino', 'SMR', 'San Marino', 2294),
+('São Tomé', 'STP', 'Aqua Grande', 49541),
+('Riyadh', 'SAU', 'Riyadh', 3324000),
+('Jedda', 'SAU', 'Mekka', 2046300),
+('Mekka', 'SAU', 'Mekka', 965700),
+('Medina', 'SAU', 'Medina', 608300),
+('al-Dammam', 'SAU', 'al-Sharqiya', 482300),
+('al-Taif', 'SAU', 'Mekka', 416100),
+('Tabuk', 'SAU', 'Tabuk', 292600),
+('Burayda', 'SAU', 'al-Qasim', 248600),
+('al-Hufuf', 'SAU', 'al-Sharqiya', 225800),
+('al-Mubarraz', 'SAU', 'al-Sharqiya', 219100),
+('Khamis Mushayt', 'SAU', 'Asir', 217900),
+('Hail', 'SAU', 'Hail', 176800),
+('al-Kharj', 'SAU', 'Riad', 152100),
+('al-Khubar', 'SAU', 'al-Sharqiya', 141700),
+('Jubayl', 'SAU', 'al-Sharqiya', 140800),
+('Hafar al-Batin', 'SAU', 'al-Sharqiya', 137800),
+('al-Tuqba', 'SAU', 'al-Sharqiya', 125700),
+('Yanbu', 'SAU', 'Medina', 119800),
+('Abha', 'SAU', 'Asir', 112300),
+('Ara´ar', 'SAU', 'al-Khudud al-Samaliy', 108100),
+('al-Qatif', 'SAU', 'al-Sharqiya', 98900),
+('al-Hawiya', 'SAU', 'Mekka', 93900),
+('Unayza', 'SAU', 'Qasim', 91100),
+('Najran', 'SAU', 'Najran', 91000),
+('Pikine', 'SEN', 'Cap-Vert', 855287),
+('Dakar', 'SEN', 'Cap-Vert', 785071),
+('Thiès', 'SEN', 'Thiès', 248000),
+('Kaolack', 'SEN', 'Kaolack', 199000),
+('Ziguinchor', 'SEN', 'Ziguinchor', 192000),
+('Rufisque', 'SEN', 'Cap-Vert', 150000),
+('Saint-Louis', 'SEN', 'Saint-Louis', 132400),
+('Mbour', 'SEN', 'Thiès', 109300),
+('Diourbel', 'SEN', 'Diourbel', 99400),
+('Victoria', 'SYC', 'Mahé', 41000),
+('Freetown', 'SLE', 'Western', 850000),
+('Singapore', 'SGP', '', 4017733),
+('Bratislava', 'SVK', 'Bratislava', 448292),
+('Koice', 'SVK', 'Východné Slovensko', 241874),
+('Preov', 'SVK', 'Východné Slovensko', 93977),
+('Ljubljana', 'SVN', 'Osrednjeslovenska', 270986),
+('Maribor', 'SVN', 'Podravska', 115532),
+('Mogadishu', 'SOM', 'Banaadir', 997000),
+('Hargeysa', 'SOM', 'Woqooyi Galbeed', 90000),
+('Kismaayo', 'SOM', 'Jubbada Hoose', 90000),
+('Colombo', 'LKA', 'Western', 645000),
+('Dehiwala', 'LKA', 'Western', 203000),
+('Moratuwa', 'LKA', 'Western', 190000),
+('Jaffna', 'LKA', 'Northern', 149000),
+('Kandy', 'LKA', 'Central', 140000),
+('Sri Jayawardenepura Kotte', 'LKA', 'Western', 118000),
+('Negombo', 'LKA', 'Western', 100000),
+('Omdurman', 'SDN', 'Khartum', 1271403),
+('Khartum', 'SDN', 'Khartum', 947483),
+('Sharq al-Nil', 'SDN', 'Khartum', 700887),
+('Port Sudan', 'SDN', 'al-Bahr al-Ahmar', 308195),
+('Kassala', 'SDN', 'Kassala', 234622),
+('Obeid', 'SDN', 'Kurdufan al-Shamaliy', 229425),
+('Nyala', 'SDN', 'Darfur al-Janubiya', 227183),
+('Wad Madani', 'SDN', 'al-Jazira', 211362),
+('al-Qadarif', 'SDN', 'al-Qadarif', 191164),
+('Kusti', 'SDN', 'al-Bahr al-Abyad', 173599),
+('al-Fashir', 'SDN', 'Darfur al-Shamaliya', 141884),
+('Juba', 'SDN', 'Bahr al-Jabal', 114980),
+('Helsinki [Helsingfors]', 'FIN', 'Newmaa', 555474),
+('Espoo', 'FIN', 'Newmaa', 213271),
+('Tampere', 'FIN', 'Pirkanmaa', 195468),
+('Vantaa', 'FIN', 'Newmaa', 178471),
+('Turku [Åbo]', 'FIN', 'Varsinais-Suomi', 172561),
+('Oulu', 'FIN', 'Pohjois-Pohjanmaa', 120753),
+('Lahti', 'FIN', 'Päijät-Häme', 96921),
+('Paramaribo', 'SUR', 'Paramaribo', 112000),
+('Mbabane', 'SWZ', 'Hhohho', 61000),
+('Zürich', 'CHE', 'Zürich', 336800),
+('Geneve', 'CHE', 'Geneve', 173500),
+('Basel', 'CHE', 'Basel-Stadt', 166700),
+('Bern', 'CHE', 'Bern', 122700),
+('Lausanne', 'CHE', 'Vaud', 114500),
+('Damascus', 'SYR', 'Damascus', 1347000),
+('Aleppo', 'SYR', 'Aleppo', 1261983),
+('Hims', 'SYR', 'Hims', 507404),
+('Hama', 'SYR', 'Hama', 343361),
+('Latakia', 'SYR', 'Latakia', 264563),
+('al-Qamishliya', 'SYR', 'al-Hasaka', 144286),
+('Dayr al-Zawr', 'SYR', 'Dayr al-Zawr', 140459),
+('Jaramana', 'SYR', 'Damaskos', 138469),
+('Duma', 'SYR', 'Damaskos', 131158),
+('al-Raqqa', 'SYR', 'al-Raqqa', 108020),
+('Idlib', 'SYR', 'Idlib', 91081),
+('Dushanbe', 'TJK', 'Karotegin', 524000),
+('Khujand', 'TJK', 'Khujand', 161500),
+('Taipei', 'TWN', 'Taipei', 2641312),
+('Kaohsiung', 'TWN', 'Kaohsiung', 1475505),
+('Taichung', 'TWN', 'Taichung', 940589),
+('Tainan', 'TWN', 'Tainan', 728060),
+('Panchiao', 'TWN', 'Taipei', 523850),
+('Chungho', 'TWN', 'Taipei', 392176),
+('Keelung (Chilung)', 'TWN', 'Keelung', 385201),
+('Sanchung', 'TWN', 'Taipei', 380084),
+('Hsinchuang', 'TWN', 'Taipei', 365048),
+('Hsinchu', 'TWN', 'Hsinchu', 361958),
+('Chungli', 'TWN', 'Taoyuan', 318649),
+('Fengshan', 'TWN', 'Kaohsiung', 318562),
+('Taoyuan', 'TWN', 'Taoyuan', 316438),
+('Chiayi', 'TWN', 'Chiayi', 265109),
+('Hsintien', 'TWN', 'Taipei', 263603),
+('Changhwa', 'TWN', 'Changhwa', 227715),
+('Yungho', 'TWN', 'Taipei', 227700),
+('Tucheng', 'TWN', 'Taipei', 224897),
+('Pingtung', 'TWN', 'Pingtung', 214727),
+('Yungkang', 'TWN', 'Tainan', 193005),
+('Pingchen', 'TWN', 'Taoyuan', 188344),
+('Tali', 'TWN', 'Taichung', 171940),
+('Taiping', 'TWN', '', 165524),
+('Pate', 'TWN', 'Taoyuan', 161700),
+('Fengyuan', 'TWN', 'Taichung', 161032),
+('Luchou', 'TWN', 'Taipei', 160516),
+('Hsichuh', 'TWN', 'Taipei', 154976),
+('Shulin', 'TWN', 'Taipei', 151260),
+('Yuanlin', 'TWN', 'Changhwa', 126402),
+('Yangmei', 'TWN', 'Taoyuan', 126323),
+('Taliao', 'TWN', '', 115897),
+('Kueishan', 'TWN', '', 112195),
+('Tanshui', 'TWN', 'Taipei', 111882),
+('Taitung', 'TWN', 'Taitung', 111039),
+('Hualien', 'TWN', 'Hualien', 108407),
+('Nantou', 'TWN', 'Nantou', 104723),
+('Lungtan', 'TWN', 'Taipei', 103088),
+('Touliu', 'TWN', 'Yünlin', 98900),
+('Tsaotun', 'TWN', 'Nantou', 96800),
+('Kangshan', 'TWN', 'Kaohsiung', 92200),
+('Ilan', 'TWN', 'Ilan', 92000),
+('Miaoli', 'TWN', 'Miaoli', 90000),
+('Dar es Salaam', 'TZA', 'Dar es Salaam', 1747000),
+('Dodoma', 'TZA', 'Dodoma', 189000),
+('Mwanza', 'TZA', 'Mwanza', 172300),
+('Zanzibar', 'TZA', 'Zanzibar West', 157634),
+('Tanga', 'TZA', 'Tanga', 137400),
+('Mbeya', 'TZA', 'Mbeya', 130800),
+('Morogoro', 'TZA', 'Morogoro', 117800),
+('Arusha', 'TZA', 'Arusha', 102500),
+('Moshi', 'TZA', 'Kilimanjaro', 96800),
+('Tabora', 'TZA', 'Tabora', 92800),
+('København', 'DNK', 'København', 495699),
+('Århus', 'DNK', 'Århus', 284846),
+('Odense', 'DNK', 'Fyn', 183912),
+('Aalborg', 'DNK', 'Nordjylland', 161161),
+('Frederiksberg', 'DNK', 'Frederiksberg', 90327),
+('Bangkok', 'THA', 'Bangkok', 6320174),
+('Nonthaburi', 'THA', 'Nonthaburi', 292100),
+('Nakhon Ratchasima', 'THA', 'Nakhon Ratchasima', 181400),
+('Chiang Mai', 'THA', 'Chiang Mai', 171100),
+('Udon Thani', 'THA', 'Udon Thani', 158100),
+('Hat Yai', 'THA', 'Songkhla', 148632),
+('Khon Kaen', 'THA', 'Khon Kaen', 126500),
+('Pak Kret', 'THA', 'Nonthaburi', 126055),
+('Nakhon Sawan', 'THA', 'Nakhon Sawan', 123800),
+('Ubon Ratchathani', 'THA', 'Ubon Ratchathani', 116300),
+('Songkhla', 'THA', 'Songkhla', 94900),
+('Nakhon Pathom', 'THA', 'Nakhon Pathom', 94100),
+('Lomé', 'TGO', 'Maritime', 375000),
+('Fakaofo', 'TKL', 'Fakaofo', 300),
+('Nuku´alofa', 'TON', 'Tongatapu', 22400),
+('Chaguanas', 'TTO', 'Caroni', 56601),
+('Port-of-Spain', 'TTO', 'Port-of-Spain', 43396),
+('N´Djaména', 'TCD', 'Chari-Baguirmi', 530965),
+('Moundou', 'TCD', 'Logone Occidental', 99500),
+('Praha', 'CZE', 'Hlavní mesto Praha', 1181126),
+('Brno', 'CZE', 'Jizní Morava', 381862),
+('Ostrava', 'CZE', 'Severní Morava', 320041),
+('Plzen', 'CZE', 'Zapadní Cechy', 166759),
+('Olomouc', 'CZE', 'Severní Morava', 102702),
+('Liberec', 'CZE', 'Severní Cechy', 99155),
+('Ceské Budejovice', 'CZE', 'Jizní Cechy', 98186),
+('Hradec Králové', 'CZE', 'Východní Cechy', 98080),
+('Ústí nad Labem', 'CZE', 'Severní Cechy', 95491),
+('Pardubice', 'CZE', 'Východní Cechy', 91309),
+('Tunis', 'TUN', 'Tunis', 690600),
+('Sfax', 'TUN', 'Sfax', 257800),
+('Ariana', 'TUN', 'Ariana', 197000),
+('Ettadhamen', 'TUN', 'Ariana', 178600),
+('Sousse', 'TUN', 'Sousse', 145900),
+('Kairouan', 'TUN', 'Kairouan', 113100),
+('Biserta', 'TUN', 'Biserta', 108900),
+('Gabès', 'TUN', 'Gabès', 106600),
+('Istanbul', 'TUR', 'Istanbul', 8787958),
+('Ankara', 'TUR', 'Ankara', 3038159),
+('Izmir', 'TUR', 'Izmir', 2130359),
+('Adana', 'TUR', 'Adana', 1131198),
+('Bursa', 'TUR', 'Bursa', 1095842),
+('Gaziantep', 'TUR', 'Gaziantep', 789056),
+('Konya', 'TUR', 'Konya', 628364),
+('Mersin (Içel)', 'TUR', 'Içel', 587212),
+('Antalya', 'TUR', 'Antalya', 564914),
+('Diyarbakir', 'TUR', 'Diyarbakir', 479884),
+('Kayseri', 'TUR', 'Kayseri', 475657),
+('Eskisehir', 'TUR', 'Eskisehir', 470781),
+('Sanliurfa', 'TUR', 'Sanliurfa', 405905),
+('Samsun', 'TUR', 'Samsun', 339871),
+('Malatya', 'TUR', 'Malatya', 330312),
+('Gebze', 'TUR', 'Kocaeli', 264170),
+('Denizli', 'TUR', 'Denizli', 253848),
+('Sivas', 'TUR', 'Sivas', 246642),
+('Erzurum', 'TUR', 'Erzurum', 246535),
+('Tarsus', 'TUR', 'Adana', 246206),
+('Kahramanmaras', 'TUR', 'Kahramanmaras', 245772),
+('Elâzig', 'TUR', 'Elâzig', 228815),
+('Van', 'TUR', 'Van', 219319),
+('Sultanbeyli', 'TUR', 'Istanbul', 211068),
+('Izmit (Kocaeli)', 'TUR', 'Kocaeli', 210068),
+('Manisa', 'TUR', 'Manisa', 207148),
+('Batman', 'TUR', 'Batman', 203793),
+('Balikesir', 'TUR', 'Balikesir', 196382),
+('Sakarya (Adapazari)', 'TUR', 'Sakarya', 190641),
+('Iskenderun', 'TUR', 'Hatay', 153022),
+('Osmaniye', 'TUR', 'Osmaniye', 146003),
+('Çorum', 'TUR', 'Çorum', 145495),
+('Kütahya', 'TUR', 'Kütahya', 144761),
+('Hatay (Antakya)', 'TUR', 'Hatay', 143982),
+('Kirikkale', 'TUR', 'Kirikkale', 142044),
+('Adiyaman', 'TUR', 'Adiyaman', 141529),
+('Trabzon', 'TUR', 'Trabzon', 138234),
+('Ordu', 'TUR', 'Ordu', 133642),
+('Aydin', 'TUR', 'Aydin', 128651),
+('Usak', 'TUR', 'Usak', 128162),
+('Edirne', 'TUR', 'Edirne', 123383),
+('Çorlu', 'TUR', 'Tekirdag', 123300),
+('Isparta', 'TUR', 'Isparta', 121911),
+('Karabük', 'TUR', 'Karabük', 118285),
+('Kilis', 'TUR', 'Kilis', 118245),
+('Alanya', 'TUR', 'Antalya', 117300),
+('Kiziltepe', 'TUR', 'Mardin', 112000),
+('Zonguldak', 'TUR', 'Zonguldak', 111542),
+('Siirt', 'TUR', 'Siirt', 107100),
+('Viransehir', 'TUR', 'Sanliurfa', 106400),
+('Tekirdag', 'TUR', 'Tekirdag', 106077),
+('Karaman', 'TUR', 'Karaman', 104200),
+('Afyon', 'TUR', 'Afyon', 103984),
+('Aksaray', 'TUR', 'Aksaray', 102681),
+('Ceyhan', 'TUR', 'Adana', 102412),
+('Erzincan', 'TUR', 'Erzincan', 102304),
+('Bismil', 'TUR', 'Diyarbakir', 101400),
+('Nazilli', 'TUR', 'Aydin', 99900),
+('Tokat', 'TUR', 'Tokat', 99500),
+('Kars', 'TUR', 'Kars', 93000),
+('Inegöl', 'TUR', 'Bursa', 90500),
+('Bandirma', 'TUR', 'Balikesir', 90200),
+('Ashgabat', 'TKM', 'Ahal', 540600),
+('Chärjew', 'TKM', 'Lebap', 189200),
+('Dashhowuz', 'TKM', 'Dashhowuz', 141800),
+('Mary', 'TKM', 'Mary', 101000),
+('Cockburn Town', 'TCA', 'Grand Turk', 4800),
+('Funafuti', 'TUV', 'Funafuti', 4600),
+('Kampala', 'UGA', 'Central', 890800),
+('Kyiv', 'UKR', 'Kiova', 2624000),
+('Harkova [Harkiv]', 'UKR', 'Harkova', 1500000),
+('Dnipropetrovsk', 'UKR', 'Dnipropetrovsk', 1103000),
+('Donetsk', 'UKR', 'Donetsk', 1050000),
+('Odesa', 'UKR', 'Odesa', 1011000),
+('Zaporizzja', 'UKR', 'Zaporizzja', 848000),
+('Lviv', 'UKR', 'Lviv', 788000),
+('Kryvyi Rig', 'UKR', 'Dnipropetrovsk', 703000),
+('Mykolajiv', 'UKR', 'Mykolajiv', 508000),
+('Mariupol', 'UKR', 'Donetsk', 490000),
+('Lugansk', 'UKR', 'Lugansk', 469000),
+('Vinnytsja', 'UKR', 'Vinnytsja', 391000),
+('Makijivka', 'UKR', 'Donetsk', 384000),
+('Herson', 'UKR', 'Herson', 353000),
+('Sevastopol', 'UKR', 'Krim', 348000),
+('Simferopol', 'UKR', 'Krim', 339000),
+('Pultava [Poltava]', 'UKR', 'Pultava', 313000),
+('Ternigiv', 'UKR', 'Ternigiv', 313000),
+('Terkasy', 'UKR', 'Terkasy', 309000),
+('Gorlivka', 'UKR', 'Donetsk', 299000),
+('Zytomyr', 'UKR', 'Zytomyr', 297000),
+('Sumy', 'UKR', 'Sumy', 294000),
+('Dniprodzerzynsk', 'UKR', 'Dnipropetrovsk', 270000),
+('Kirovograd', 'UKR', 'Kirovograd', 265000),
+('Hmelnytskyi', 'UKR', 'Hmelnytskyi', 262000),
+('Ternivtsi', 'UKR', 'Ternivtsi', 259000),
+('Rivne', 'UKR', 'Rivne', 245000),
+('Krementuk', 'UKR', 'Pultava', 239000),
+('Ivano-Frankivsk', 'UKR', 'Ivano-Frankivsk', 237000),
+('Ternopil', 'UKR', 'Ternopil', 236000),
+('Lutsk', 'UKR', 'Volynia', 217000),
+('Bila Tserkva', 'UKR', 'Kiova', 215000),
+('Kramatorsk', 'UKR', 'Donetsk', 186000),
+('Melitopol', 'UKR', 'Zaporizzja', 169000),
+('Kert', 'UKR', 'Krim', 162000),
+('Nikopol', 'UKR', 'Dnipropetrovsk', 149000),
+('Berdjansk', 'UKR', 'Zaporizzja', 130000),
+('Pavlograd', 'UKR', 'Dnipropetrovsk', 127000),
+('Sjeverodonetsk', 'UKR', 'Lugansk', 127000),
+('Slovjansk', 'UKR', 'Donetsk', 127000),
+('Uzgorod', 'UKR', 'Taka-Karpatia', 127000),
+('Altevsk', 'UKR', 'Lugansk', 119000),
+('Lysytansk', 'UKR', 'Lugansk', 116000),
+('Jevpatorija', 'UKR', 'Krim', 112000),
+('Kamjanets-Podilskyi', 'UKR', 'Hmelnytskyi', 109000),
+('Jenakijeve', 'UKR', 'Donetsk', 105000),
+('Krasnyi Lut', 'UKR', 'Lugansk', 101000),
+('Stahanov', 'UKR', 'Lugansk', 101000),
+('Oleksandrija', 'UKR', 'Kirovograd', 99000),
+('Konotop', 'UKR', 'Sumy', 96000),
+('Kostjantynivka', 'UKR', 'Donetsk', 95000),
+('Berdytiv', 'UKR', 'Zytomyr', 90000),
+('Izmajil', 'UKR', 'Odesa', 90000),
+('ostka', 'UKR', 'Sumy', 90000),
+('Uman', 'UKR', 'Terkasy', 90000),
+('Brovary', 'UKR', 'Kiova', 89000),
+('Mukateve', 'UKR', 'Taka-Karpatia', 89000),
+('Budapest', 'HUN', 'Budapest', 1811552),
+('Debrecen', 'HUN', 'Hajdú-Bihar', 203648),
+('Miskolc', 'HUN', 'Borsod-Abaúj-Zemplén', 172357),
+('Szeged', 'HUN', 'Csongrád', 158158),
+('Pécs', 'HUN', 'Baranya', 157332),
+('Györ', 'HUN', 'Györ-Moson-Sopron', 127119),
+('Nyiregyháza', 'HUN', 'Szabolcs-Szatmár-Ber', 112419),
+('Kecskemét', 'HUN', 'Bács-Kiskun', 105606),
+('Székesfehérvár', 'HUN', 'Fejér', 105119),
+('Montevideo', 'URY', 'Montevideo', 1236000),
+('Nouméa', 'NCL', '', 76293),
+('Auckland', 'NZL', 'Auckland', 381800),
+('Christchurch', 'NZL', 'Canterbury', 324200),
+('Manukau', 'NZL', 'Auckland', 281800),
+('North Shore', 'NZL', 'Auckland', 187700),
+('Waitakere', 'NZL', 'Auckland', 170600),
+('Wellington', 'NZL', 'Wellington', 166700),
+('Dunedin', 'NZL', 'Dunedin', 119600),
+('Hamilton', 'NZL', 'Hamilton', 117100),
+('Lower Hutt', 'NZL', 'Wellington', 98100),
+('Toskent', 'UZB', 'Toskent Shahri', 2117500),
+('Namangan', 'UZB', 'Namangan', 370500),
+('Samarkand', 'UZB', 'Samarkand', 361800),
+('Andijon', 'UZB', 'Andijon', 318600),
+('Buhoro', 'UZB', 'Buhoro', 237100),
+('Karsi', 'UZB', 'Qashqadaryo', 194100),
+('Nukus', 'UZB', 'Karakalpakistan', 194100),
+('Kükon', 'UZB', 'Fargona', 190100),
+('Fargona', 'UZB', 'Fargona', 180500),
+('Circik', 'UZB', 'Toskent', 146400),
+('Margilon', 'UZB', 'Fargona', 140800),
+('Ürgenc', 'UZB', 'Khorazm', 138900),
+('Angren', 'UZB', 'Toskent', 128000),
+('Cizah', 'UZB', 'Cizah', 124800),
+('Navoi', 'UZB', 'Navoi', 116300),
+('Olmalik', 'UZB', 'Toskent', 114900),
+('Termiz', 'UZB', 'Surkhondaryo', 109500),
+('Minsk', 'BLR', 'Horad Minsk', 1674000),
+('Gomel', 'BLR', 'Gomel', 475000),
+('Mogiljov', 'BLR', 'Mogiljov', 356000),
+('Vitebsk', 'BLR', 'Vitebsk', 340000),
+('Grodno', 'BLR', 'Grodno', 302000),
+('Brest', 'BLR', 'Brest', 286000),
+('Bobruisk', 'BLR', 'Mogiljov', 221000),
+('Baranoviti', 'BLR', 'Brest', 167000),
+('Borisov', 'BLR', 'Minsk', 151000),
+('Pinsk', 'BLR', 'Brest', 130000),
+('Ora', 'BLR', 'Vitebsk', 124000),
+('Mozyr', 'BLR', 'Gomel', 110000),
+('Novopolotsk', 'BLR', 'Vitebsk', 106000),
+('Lida', 'BLR', 'Grodno', 101000),
+('Soligorsk', 'BLR', 'Minsk', 101000),
+('Molodetno', 'BLR', 'Minsk', 97000),
+('Mata-Utu', 'WLF', 'Wallis', 1137),
+('Port-Vila', 'VUT', 'Shefa', 33700),
+('Città del Vaticano', 'VAT', '', 455),
+('Caracas', 'VEN', 'Distrito Federal', 1975294),
+('Maracaíbo', 'VEN', 'Zulia', 1304776),
+('Barquisimeto', 'VEN', 'Lara', 877239),
+('Valencia', 'VEN', 'Carabobo', 794246),
+('Ciudad Guayana', 'VEN', 'Bolívar', 663713),
+('Petare', 'VEN', 'Miranda', 488868),
+('Maracay', 'VEN', 'Aragua', 444443),
+('Barcelona', 'VEN', 'Anzoátegui', 322267),
+('Maturín', 'VEN', 'Monagas', 319726),
+('San Cristóbal', 'VEN', 'Táchira', 319373),
+('Ciudad Bolívar', 'VEN', 'Bolívar', 301107),
+('Cumaná', 'VEN', 'Sucre', 293105),
+('Mérida', 'VEN', 'Mérida', 224887),
+('Cabimas', 'VEN', 'Zulia', 221329),
+('Barinas', 'VEN', 'Barinas', 217831),
+('Turmero', 'VEN', 'Aragua', 217499),
+('Baruta', 'VEN', 'Miranda', 207290),
+('Puerto Cabello', 'VEN', 'Carabobo', 187722),
+('Santa Ana de Coro', 'VEN', 'Falcón', 185766),
+('Los Teques', 'VEN', 'Miranda', 178784),
+('Punto Fijo', 'VEN', 'Falcón', 167215),
+('Guarenas', 'VEN', 'Miranda', 165889),
+('Acarigua', 'VEN', 'Portuguesa', 158954),
+('Puerto La Cruz', 'VEN', 'Anzoátegui', 155700),
+('Ciudad Losada', 'VEN', '', 134501),
+('Guacara', 'VEN', 'Carabobo', 131334),
+('Valera', 'VEN', 'Trujillo', 130281),
+('Guanare', 'VEN', 'Portuguesa', 125621),
+('Carúpano', 'VEN', 'Sucre', 119639),
+('Catia La Mar', 'VEN', 'Distrito Federal', 117012),
+('El Tigre', 'VEN', 'Anzoátegui', 116256),
+('Guatire', 'VEN', 'Miranda', 109121),
+('Calabozo', 'VEN', 'Guárico', 107146),
+('Pozuelos', 'VEN', 'Anzoátegui', 105690),
+('Ciudad Ojeda', 'VEN', 'Zulia', 99354),
+('Ocumare del Tuy', 'VEN', 'Miranda', 97168),
+('Valle de la Pascua', 'VEN', 'Guárico', 95927),
+('Araure', 'VEN', 'Portuguesa', 94269),
+('San Fernando de Apure', 'VEN', 'Apure', 93809),
+('San Felipe', 'VEN', 'Yaracuy', 90940),
+('El Limón', 'VEN', 'Aragua', 90000),
+('Moscow', 'RUS', 'Moscow (City)', 8389200),
+('St Petersburg', 'RUS', 'Pietari', 4694000),
+('Novosibirsk', 'RUS', 'Novosibirsk', 1398800),
+('Nizni Novgorod', 'RUS', 'Nizni Novgorod', 1357000),
+('Jekaterinburg', 'RUS', 'Sverdlovsk', 1266300),
+('Samara', 'RUS', 'Samara', 1156100),
+('Omsk', 'RUS', 'Omsk', 1148900),
+('Kazan', 'RUS', 'Tatarstan', 1101000),
+('Ufa', 'RUS', 'Bakortostan', 1091200),
+('Teljabinsk', 'RUS', 'Teljabinsk', 1083200),
+('Rostov-na-Donu', 'RUS', 'Rostov-na-Donu', 1012700),
+('Perm', 'RUS', 'Perm', 1009700),
+('Volgograd', 'RUS', 'Volgograd', 993400),
+('Voronez', 'RUS', 'Voronez', 907700),
+('Krasnojarsk', 'RUS', 'Krasnojarsk', 875500),
+('Saratov', 'RUS', 'Saratov', 874000),
+('Toljatti', 'RUS', 'Samara', 722900),
+('Uljanovsk', 'RUS', 'Uljanovsk', 667400),
+('Izevsk', 'RUS', 'Udmurtia', 652800),
+('Krasnodar', 'RUS', 'Krasnodar', 639000),
+('Jaroslavl', 'RUS', 'Jaroslavl', 616700),
+('Habarovsk', 'RUS', 'Habarovsk', 609400),
+('Vladivostok', 'RUS', 'Primorje', 606200),
+('Irkutsk', 'RUS', 'Irkutsk', 593700),
+('Barnaul', 'RUS', 'Altai', 580100),
+('Novokuznetsk', 'RUS', 'Kemerovo', 561600),
+('Penza', 'RUS', 'Penza', 532200),
+('Rjazan', 'RUS', 'Rjazan', 529900),
+('Orenburg', 'RUS', 'Orenburg', 523600),
+('Lipetsk', 'RUS', 'Lipetsk', 521000),
+('Nabereznyje Telny', 'RUS', 'Tatarstan', 514700),
+('Tula', 'RUS', 'Tula', 506100),
+('Tjumen', 'RUS', 'Tjumen', 503400),
+('Kemerovo', 'RUS', 'Kemerovo', 492700),
+('Astrahan', 'RUS', 'Astrahan', 486100),
+('Tomsk', 'RUS', 'Tomsk', 482100),
+('Kirov', 'RUS', 'Kirov', 466200),
+('Ivanovo', 'RUS', 'Ivanovo', 459200),
+('Teboksary', 'RUS', 'Tuvassia', 459200),
+('Brjansk', 'RUS', 'Brjansk', 457400),
+('Tver', 'RUS', 'Tver', 454900),
+('Kursk', 'RUS', 'Kursk', 443500),
+('Magnitogorsk', 'RUS', 'Teljabinsk', 427900),
+('Kaliningrad', 'RUS', 'Kaliningrad', 424400),
+('Nizni Tagil', 'RUS', 'Sverdlovsk', 390900),
+('Murmansk', 'RUS', 'Murmansk', 376300),
+('Ulan-Ude', 'RUS', 'Burjatia', 370400),
+('Kurgan', 'RUS', 'Kurgan', 364700),
+('Arkangeli', 'RUS', 'Arkangeli', 361800),
+('Soti', 'RUS', 'Krasnodar', 358600),
+('Smolensk', 'RUS', 'Smolensk', 353400),
+('Orjol', 'RUS', 'Orjol', 344500),
+('Stavropol', 'RUS', 'Stavropol', 343300),
+('Belgorod', 'RUS', 'Belgorod', 342000),
+('Kaluga', 'RUS', 'Kaluga', 339300),
+('Vladimir', 'RUS', 'Vladimir', 337100),
+('Mahatkala', 'RUS', 'Dagestan', 332800),
+('Terepovets', 'RUS', 'Vologda', 324400),
+('Saransk', 'RUS', 'Mordva', 314800),
+('Tambov', 'RUS', 'Tambov', 312000),
+('Vladikavkaz', 'RUS', 'North Ossetia-Alania', 310100),
+('Tita', 'RUS', 'Tita', 309900),
+('Vologda', 'RUS', 'Vologda', 302500),
+('Veliki Novgorod', 'RUS', 'Novgorod', 299500),
+('Komsomolsk-na-Amure', 'RUS', 'Habarovsk', 291600),
+('Kostroma', 'RUS', 'Kostroma', 288100),
+('Volzski', 'RUS', 'Volgograd', 286900),
+('Taganrog', 'RUS', 'Rostov-na-Donu', 284400),
+('Petroskoi', 'RUS', 'Karjala', 282100),
+('Bratsk', 'RUS', 'Irkutsk', 277600),
+('Dzerzinsk', 'RUS', 'Nizni Novgorod', 277100),
+('Surgut', 'RUS', 'Hanti-Mansia', 274900),
+('Orsk', 'RUS', 'Orenburg', 273900),
+('Sterlitamak', 'RUS', 'Bakortostan', 265200),
+('Angarsk', 'RUS', 'Irkutsk', 264700),
+('Jokar-Ola', 'RUS', 'Marinmaa', 249200),
+('Rybinsk', 'RUS', 'Jaroslavl', 239600),
+('Prokopjevsk', 'RUS', 'Kemerovo', 237300),
+('Niznevartovsk', 'RUS', 'Hanti-Mansia', 233900),
+('Naltik', 'RUS', 'Kabardi-Balkaria', 233400),
+('Syktyvkar', 'RUS', 'Komi', 229700),
+('Severodvinsk', 'RUS', 'Arkangeli', 229300),
+('Bijsk', 'RUS', 'Altai', 225000),
+('Niznekamsk', 'RUS', 'Tatarstan', 223400),
+('Blagovetensk', 'RUS', 'Amur', 222000),
+('ahty', 'RUS', 'Rostov-na-Donu', 221800),
+('Staryi Oskol', 'RUS', 'Belgorod', 213800),
+('Zelenograd', 'RUS', 'Moscow (City)', 207100),
+('Balakovo', 'RUS', 'Saratov', 206000),
+('Novorossijsk', 'RUS', 'Krasnodar', 203300),
+('Pihkova', 'RUS', 'Pihkova', 201500),
+('Zlatoust', 'RUS', 'Teljabinsk', 196900),
+('Jakutsk', 'RUS', 'Saha (Jakutia)', 195400),
+('Podolsk', 'RUS', 'Moskova', 194300),
+('Petropavlovsk-Kamtatski', 'RUS', 'Kamtatka', 194100),
+('Kamensk-Uralski', 'RUS', 'Sverdlovsk', 190600),
+('Engels', 'RUS', 'Saratov', 189000),
+('Syzran', 'RUS', 'Samara', 186900),
+('Grozny', 'RUS', 'Tetenia', 186000),
+('Novoterkassk', 'RUS', 'Rostov-na-Donu', 184400),
+('Berezniki', 'RUS', 'Perm', 181900),
+('Juzno-Sahalinsk', 'RUS', 'Sahalin', 179200),
+('Volgodonsk', 'RUS', 'Rostov-na-Donu', 178200),
+('Abakan', 'RUS', 'Hakassia', 169200),
+('Maikop', 'RUS', 'Adygea', 167300),
+('Miass', 'RUS', 'Teljabinsk', 166200),
+('Armavir', 'RUS', 'Krasnodar', 164900),
+('Ljubertsy', 'RUS', 'Moskova', 163900),
+('Rubtsovsk', 'RUS', 'Altai', 162600),
+('Kovrov', 'RUS', 'Vladimir', 159900),
+('Nahodka', 'RUS', 'Primorje', 157700),
+('Ussurijsk', 'RUS', 'Primorje', 157300),
+('Salavat', 'RUS', 'Bakortostan', 156800),
+('Mytiti', 'RUS', 'Moskova', 155700),
+('Kolomna', 'RUS', 'Moskova', 150700),
+('Elektrostal', 'RUS', 'Moskova', 147000),
+('Murom', 'RUS', 'Vladimir', 142400),
+('Kolpino', 'RUS', 'Pietari', 141200),
+('Norilsk', 'RUS', 'Krasnojarsk', 140800),
+('Almetjevsk', 'RUS', 'Tatarstan', 140700),
+('Novomoskovsk', 'RUS', 'Tula', 138100),
+('Dimitrovgrad', 'RUS', 'Uljanovsk', 137000),
+('Pervouralsk', 'RUS', 'Sverdlovsk', 136100),
+('Himki', 'RUS', 'Moskova', 133700),
+('Balaiha', 'RUS', 'Moskova', 132900),
+('Nevinnomyssk', 'RUS', 'Stavropol', 132600),
+('Pjatigorsk', 'RUS', 'Stavropol', 132500),
+('Korolev', 'RUS', 'Moskova', 132400),
+('Serpuhov', 'RUS', 'Moskova', 132000),
+('Odintsovo', 'RUS', 'Moskova', 127400),
+('Orehovo-Zujevo', 'RUS', 'Moskova', 124900),
+('Kamyin', 'RUS', 'Volgograd', 124600),
+('Novoteboksarsk', 'RUS', 'Tuvassia', 123400),
+('Terkessk', 'RUS', 'Karatai-Terkessia', 121700),
+('Atinsk', 'RUS', 'Krasnojarsk', 121600),
+('Magadan', 'RUS', 'Magadan', 121000),
+('Miturinsk', 'RUS', 'Tambov', 120700),
+('Kislovodsk', 'RUS', 'Stavropol', 120400),
+('Jelets', 'RUS', 'Lipetsk', 119400),
+('Seversk', 'RUS', 'Tomsk', 118600),
+('Noginsk', 'RUS', 'Moskova', 117200),
+('Velikije Luki', 'RUS', 'Pihkova', 116300),
+('Novokuibyevsk', 'RUS', 'Samara', 116200),
+('Neftekamsk', 'RUS', 'Bakortostan', 115700),
+('Leninsk-Kuznetski', 'RUS', 'Kemerovo', 113800),
+('Oktjabrski', 'RUS', 'Bakortostan', 111500),
+('Sergijev Posad', 'RUS', 'Moskova', 111100),
+('Arzamas', 'RUS', 'Nizni Novgorod', 110700),
+('Kiseljovsk', 'RUS', 'Kemerovo', 110000),
+('Novotroitsk', 'RUS', 'Orenburg', 109600),
+('Obninsk', 'RUS', 'Kaluga', 108300),
+('Kansk', 'RUS', 'Krasnojarsk', 107400),
+('Glazov', 'RUS', 'Udmurtia', 106300),
+('Solikamsk', 'RUS', 'Perm', 106000),
+('Sarapul', 'RUS', 'Udmurtia', 105700),
+('Ust-Ilimsk', 'RUS', 'Irkutsk', 105200),
+('tolkovo', 'RUS', 'Moskova', 104900),
+('Mezduretensk', 'RUS', 'Kemerovo', 104400),
+('Usolje-Sibirskoje', 'RUS', 'Irkutsk', 103500),
+('Elista', 'RUS', 'Kalmykia', 103300),
+('Novoahtinsk', 'RUS', 'Rostov-na-Donu', 101900),
+('Votkinsk', 'RUS', 'Udmurtia', 101700),
+('Kyzyl', 'RUS', 'Tyva', 101100),
+('Serov', 'RUS', 'Sverdlovsk', 100400),
+('Zelenodolsk', 'RUS', 'Tatarstan', 100200),
+('Zeleznodoroznyi', 'RUS', 'Moskova', 100100),
+('Kinema', 'RUS', 'Ivanovo', 100000),
+('Kuznetsk', 'RUS', 'Penza', 98200),
+('Uhta', 'RUS', 'Komi', 98000),
+('Jessentuki', 'RUS', 'Stavropol', 97900),
+('Tobolsk', 'RUS', 'Tjumen', 97600),
+('Neftejugansk', 'RUS', 'Hanti-Mansia', 97400),
+('Bataisk', 'RUS', 'Rostov-na-Donu', 97300),
+('Nojabrsk', 'RUS', 'Yamalin Nenetsia', 97300),
+('Balaov', 'RUS', 'Saratov', 97100),
+('Zeleznogorsk', 'RUS', 'Kursk', 96900),
+('Zukovski', 'RUS', 'Moskova', 96500),
+('Anzero-Sudzensk', 'RUS', 'Kemerovo', 96100),
+('Bugulma', 'RUS', 'Tatarstan', 94100),
+('Zeleznogorsk', 'RUS', 'Krasnojarsk', 94000),
+('Novouralsk', 'RUS', 'Sverdlovsk', 93300),
+('Pukin', 'RUS', 'Pietari', 92900),
+('Vorkuta', 'RUS', 'Komi', 92600),
+('Derbent', 'RUS', 'Dagestan', 92300),
+('Kirovo-Tepetsk', 'RUS', 'Kirov', 91600),
+('Krasnogorsk', 'RUS', 'Moskova', 91000),
+('Klin', 'RUS', 'Moskova', 90000),
+('Taikovski', 'RUS', 'Perm', 90000),
+('Novyi Urengoi', 'RUS', 'Yamalin Nenetsia', 89800),
+('Ho Chi Minh City', 'VNM', 'Ho Chi Minh City', 3980000),
+('Hanoi', 'VNM', 'Hanoi', 1410000),
+('Haiphong', 'VNM', 'Haiphong', 783133),
+('Da Nang', 'VNM', 'Quang Nam-Da Nang', 382674),
+('Biên Hoa', 'VNM', 'Dong Nai', 282095),
+('Nha Trang', 'VNM', 'Khanh Hoa', 221331),
+('Hue', 'VNM', 'Thua Thien-Hue', 219149),
+('Can Tho', 'VNM', 'Can Tho', 215587),
+('Cam Pha', 'VNM', 'Quang Binh', 209086),
+('Nam Dinh', 'VNM', 'Nam Ha', 171699),
+('Quy Nhon', 'VNM', 'Binh Dinh', 163385),
+('Vung Tau', 'VNM', 'Ba Ria-Vung Tau', 145145),
+('Rach Gia', 'VNM', 'Kien Giang', 141132),
+('Long Xuyen', 'VNM', 'An Giang', 132681),
+('Thai Nguyen', 'VNM', 'Bac Thai', 127643),
+('Hong Gai', 'VNM', 'Quang Ninh', 127484),
+('Phan Thiêt', 'VNM', 'Binh Thuan', 114236),
+('Cam Ranh', 'VNM', 'Khanh Hoa', 114041),
+('Vinh', 'VNM', 'Nghe An', 112455),
+('My Tho', 'VNM', 'Tien Giang', 108404),
+('Da Lat', 'VNM', 'Lam Dong', 106409),
+('Buon Ma Thuot', 'VNM', 'Dac Lac', 97044),
+('Tallinn', 'EST', 'Harjumaa', 403981),
+('Tartu', 'EST', 'Tartumaa', 101246),
+('New York', 'USA', 'New York', 8008278),
+('Los Angeles', 'USA', 'California', 3694820),
+('Chicago', 'USA', 'Illinois', 2896016),
+('Houston', 'USA', 'Texas', 1953631),
+('Philadelphia', 'USA', 'Pennsylvania', 1517550),
+('Phoenix', 'USA', 'Arizona', 1321045),
+('San Diego', 'USA', 'California', 1223400),
+('Dallas', 'USA', 'Texas', 1188580),
+('San Antonio', 'USA', 'Texas', 1144646),
+('Detroit', 'USA', 'Michigan', 951270),
+('San Jose', 'USA', 'California', 894943),
+('Indianapolis', 'USA', 'Indiana', 791926),
+('San Francisco', 'USA', 'California', 776733),
+('Jacksonville', 'USA', 'Florida', 735167),
+('Columbus', 'USA', 'Ohio', 711470),
+('Austin', 'USA', 'Texas', 656562),
+('Baltimore', 'USA', 'Maryland', 651154),
+('Memphis', 'USA', 'Tennessee', 650100),
+('Milwaukee', 'USA', 'Wisconsin', 596974),
+('Boston', 'USA', 'Massachusetts', 589141),
+('Washington', 'USA', 'District of Columbia', 572059),
+('Nashville-Davidson', 'USA', 'Tennessee', 569891),
+('El Paso', 'USA', 'Texas', 563662),
+('Seattle', 'USA', 'Washington', 563374),
+('Denver', 'USA', 'Colorado', 554636),
+('Charlotte', 'USA', 'North Carolina', 540828),
+('Fort Worth', 'USA', 'Texas', 534694),
+('Portland', 'USA', 'Oregon', 529121),
+('Oklahoma City', 'USA', 'Oklahoma', 506132),
+('Tucson', 'USA', 'Arizona', 486699),
+('New Orleans', 'USA', 'Louisiana', 484674),
+('Las Vegas', 'USA', 'Nevada', 478434),
+('Cleveland', 'USA', 'Ohio', 478403),
+('Long Beach', 'USA', 'California', 461522),
+('Albuquerque', 'USA', 'New Mexico', 448607),
+('Kansas City', 'USA', 'Missouri', 441545),
+('Fresno', 'USA', 'California', 427652),
+('Virginia Beach', 'USA', 'Virginia', 425257),
+('Atlanta', 'USA', 'Georgia', 416474),
+('Sacramento', 'USA', 'California', 407018),
+('Oakland', 'USA', 'California', 399484),
+('Mesa', 'USA', 'Arizona', 396375),
+('Tulsa', 'USA', 'Oklahoma', 393049),
+('Omaha', 'USA', 'Nebraska', 390007),
+('Minneapolis', 'USA', 'Minnesota', 382618),
+('Honolulu', 'USA', 'Hawaii', 371657),
+('Miami', 'USA', 'Florida', 362470),
+('Colorado Springs', 'USA', 'Colorado', 360890),
+('Saint Louis', 'USA', 'Missouri', 348189),
+('Wichita', 'USA', 'Kansas', 344284),
+('Santa Ana', 'USA', 'California', 337977),
+('Pittsburgh', 'USA', 'Pennsylvania', 334563),
+('Arlington', 'USA', 'Texas', 332969),
+('Cincinnati', 'USA', 'Ohio', 331285),
+('Anaheim', 'USA', 'California', 328014),
+('Toledo', 'USA', 'Ohio', 313619),
+('Tampa', 'USA', 'Florida', 303447),
+('Buffalo', 'USA', 'New York', 292648),
+('Saint Paul', 'USA', 'Minnesota', 287151),
+('Corpus Christi', 'USA', 'Texas', 277454),
+('Aurora', 'USA', 'Colorado', 276393),
+('Raleigh', 'USA', 'North Carolina', 276093),
+('Newark', 'USA', 'New Jersey', 273546),
+('Lexington-Fayette', 'USA', 'Kentucky', 260512),
+('Anchorage', 'USA', 'Alaska', 260283),
+('Louisville', 'USA', 'Kentucky', 256231),
+('Riverside', 'USA', 'California', 255166),
+('Saint Petersburg', 'USA', 'Florida', 248232),
+('Bakersfield', 'USA', 'California', 247057),
+('Stockton', 'USA', 'California', 243771),
+('Birmingham', 'USA', 'Alabama', 242820),
+('Jersey City', 'USA', 'New Jersey', 240055),
+('Norfolk', 'USA', 'Virginia', 234403),
+('Baton Rouge', 'USA', 'Louisiana', 227818),
+('Hialeah', 'USA', 'Florida', 226419),
+('Lincoln', 'USA', 'Nebraska', 225581),
+('Greensboro', 'USA', 'North Carolina', 223891),
+('Plano', 'USA', 'Texas', 222030),
+('Rochester', 'USA', 'New York', 219773),
+('Glendale', 'USA', 'Arizona', 218812),
+('Akron', 'USA', 'Ohio', 217074),
+('Garland', 'USA', 'Texas', 215768),
+('Madison', 'USA', 'Wisconsin', 208054),
+('Fort Wayne', 'USA', 'Indiana', 205727),
+('Fremont', 'USA', 'California', 203413),
+('Scottsdale', 'USA', 'Arizona', 202705),
+('Montgomery', 'USA', 'Alabama', 201568),
+('Shreveport', 'USA', 'Louisiana', 200145),
+('Augusta-Richmond County', 'USA', 'Georgia', 199775),
+('Lubbock', 'USA', 'Texas', 199564),
+('Chesapeake', 'USA', 'Virginia', 199184),
+('Mobile', 'USA', 'Alabama', 198915),
+('Des Moines', 'USA', 'Iowa', 198682),
+('Grand Rapids', 'USA', 'Michigan', 197800),
+('Richmond', 'USA', 'Virginia', 197790),
+('Yonkers', 'USA', 'New York', 196086),
+('Spokane', 'USA', 'Washington', 195629),
+('Glendale', 'USA', 'California', 194973),
+('Tacoma', 'USA', 'Washington', 193556),
+('Irving', 'USA', 'Texas', 191615),
+('Huntington Beach', 'USA', 'California', 189594),
+('Modesto', 'USA', 'California', 188856),
+('Durham', 'USA', 'North Carolina', 187035),
+('Columbus', 'USA', 'Georgia', 186291),
+('Orlando', 'USA', 'Florida', 185951),
+('Boise City', 'USA', 'Idaho', 185787),
+('Winston-Salem', 'USA', 'North Carolina', 185776),
+('San Bernardino', 'USA', 'California', 185401),
+('Jackson', 'USA', 'Mississippi', 184256),
+('Little Rock', 'USA', 'Arkansas', 183133),
+('Salt Lake City', 'USA', 'Utah', 181743),
+('Reno', 'USA', 'Nevada', 180480),
+('Newport News', 'USA', 'Virginia', 180150),
+('Chandler', 'USA', 'Arizona', 176581),
+('Laredo', 'USA', 'Texas', 176576),
+('Henderson', 'USA', 'Nevada', 175381),
+('Arlington', 'USA', 'Virginia', 174838),
+('Knoxville', 'USA', 'Tennessee', 173890),
+('Amarillo', 'USA', 'Texas', 173627),
+('Providence', 'USA', 'Rhode Island', 173618),
+('Chula Vista', 'USA', 'California', 173556),
+('Worcester', 'USA', 'Massachusetts', 172648),
+('Oxnard', 'USA', 'California', 170358),
+('Dayton', 'USA', 'Ohio', 166179),
+('Garden Grove', 'USA', 'California', 165196),
+('Oceanside', 'USA', 'California', 161029),
+('Tempe', 'USA', 'Arizona', 158625),
+('Huntsville', 'USA', 'Alabama', 158216),
+('Ontario', 'USA', 'California', 158007),
+('Chattanooga', 'USA', 'Tennessee', 155554),
+('Fort Lauderdale', 'USA', 'Florida', 152397),
+('Springfield', 'USA', 'Massachusetts', 152082),
+('Springfield', 'USA', 'Missouri', 151580),
+('Santa Clarita', 'USA', 'California', 151088),
+('Salinas', 'USA', 'California', 151060),
+('Tallahassee', 'USA', 'Florida', 150624),
+('Rockford', 'USA', 'Illinois', 150115),
+('Pomona', 'USA', 'California', 149473),
+('Metairie', 'USA', 'Louisiana', 149428),
+('Paterson', 'USA', 'New Jersey', 149222),
+('Overland Park', 'USA', 'Kansas', 149080),
+('Santa Rosa', 'USA', 'California', 147595),
+('Syracuse', 'USA', 'New York', 147306),
+('Kansas City', 'USA', 'Kansas', 146866),
+('Hampton', 'USA', 'Virginia', 146437),
+('Lakewood', 'USA', 'Colorado', 144126),
+('Vancouver', 'USA', 'Washington', 143560),
+('Irvine', 'USA', 'California', 143072),
+('Aurora', 'USA', 'Illinois', 142990),
+('Moreno Valley', 'USA', 'California', 142381),
+('Pasadena', 'USA', 'California', 141674),
+('Hayward', 'USA', 'California', 140030),
+('Brownsville', 'USA', 'Texas', 139722),
+('Bridgeport', 'USA', 'Connecticut', 139529),
+('Hollywood', 'USA', 'Florida', 139357),
+('Warren', 'USA', 'Michigan', 138247),
+('Torrance', 'USA', 'California', 137946),
+('Eugene', 'USA', 'Oregon', 137893),
+('Pembroke Pines', 'USA', 'Florida', 137427),
+('Salem', 'USA', 'Oregon', 136924),
+('Pasadena', 'USA', 'Texas', 133936),
+('Escondido', 'USA', 'California', 133559),
+('Sunnyvale', 'USA', 'California', 131760),
+('Savannah', 'USA', 'Georgia', 131510),
+('Fontana', 'USA', 'California', 128929),
+('Orange', 'USA', 'California', 128821),
+('Naperville', 'USA', 'Illinois', 128358),
+('Alexandria', 'USA', 'Virginia', 128283),
+('Rancho Cucamonga', 'USA', 'California', 127743),
+('Grand Prairie', 'USA', 'Texas', 127427),
+('East Los Angeles', 'USA', 'California', 126379),
+('Fullerton', 'USA', 'California', 126003),
+('Corona', 'USA', 'California', 124966),
+('Flint', 'USA', 'Michigan', 124943),
+('Paradise', 'USA', 'Nevada', 124682),
+('Mesquite', 'USA', 'Texas', 124523),
+('Sterling Heights', 'USA', 'Michigan', 124471),
+('Sioux Falls', 'USA', 'South Dakota', 123975),
+('New Haven', 'USA', 'Connecticut', 123626),
+('Topeka', 'USA', 'Kansas', 122377),
+('Concord', 'USA', 'California', 121780),
+('Evansville', 'USA', 'Indiana', 121582),
+('Hartford', 'USA', 'Connecticut', 121578),
+('Fayetteville', 'USA', 'North Carolina', 121015),
+('Cedar Rapids', 'USA', 'Iowa', 120758),
+('Elizabeth', 'USA', 'New Jersey', 120568),
+('Lansing', 'USA', 'Michigan', 119128),
+('Lancaster', 'USA', 'California', 118718),
+('Fort Collins', 'USA', 'Colorado', 118652),
+('Coral Springs', 'USA', 'Florida', 117549),
+('Stamford', 'USA', 'Connecticut', 117083),
+('Thousand Oaks', 'USA', 'California', 117005),
+('Vallejo', 'USA', 'California', 116760),
+('Palmdale', 'USA', 'California', 116670),
+('Columbia', 'USA', 'South Carolina', 116278),
+('El Monte', 'USA', 'California', 115965),
+('Abilene', 'USA', 'Texas', 115930),
+('North Las Vegas', 'USA', 'Nevada', 115488),
+('Ann Arbor', 'USA', 'Michigan', 114024),
+('Beaumont', 'USA', 'Texas', 113866),
+('Waco', 'USA', 'Texas', 113726),
+('Macon', 'USA', 'Georgia', 113336),
+('Independence', 'USA', 'Missouri', 113288),
+('Peoria', 'USA', 'Illinois', 112936),
+('Inglewood', 'USA', 'California', 112580),
+('Springfield', 'USA', 'Illinois', 111454),
+('Simi Valley', 'USA', 'California', 111351),
+('Lafayette', 'USA', 'Louisiana', 110257),
+('Gilbert', 'USA', 'Arizona', 109697),
+('Carrollton', 'USA', 'Texas', 109576),
+('Bellevue', 'USA', 'Washington', 109569),
+('West Valley City', 'USA', 'Utah', 108896),
+('Clarksville', 'USA', 'Tennessee', 108787),
+('Costa Mesa', 'USA', 'California', 108724),
+('Peoria', 'USA', 'Arizona', 108364),
+('South Bend', 'USA', 'Indiana', 107789),
+('Downey', 'USA', 'California', 107323),
+('Waterbury', 'USA', 'Connecticut', 107271),
+('Manchester', 'USA', 'New Hampshire', 107006),
+('Allentown', 'USA', 'Pennsylvania', 106632),
+('McAllen', 'USA', 'Texas', 106414),
+('Joliet', 'USA', 'Illinois', 106221),
+('Lowell', 'USA', 'Massachusetts', 105167),
+('Provo', 'USA', 'Utah', 105166),
+('West Covina', 'USA', 'California', 105080),
+('Wichita Falls', 'USA', 'Texas', 104197),
+('Erie', 'USA', 'Pennsylvania', 103717),
+('Daly City', 'USA', 'California', 103621),
+('Citrus Heights', 'USA', 'California', 103455),
+('Norwalk', 'USA', 'California', 103298),
+('Gary', 'USA', 'Indiana', 102746),
+('Berkeley', 'USA', 'California', 102743),
+('Santa Clara', 'USA', 'California', 102361),
+('Green Bay', 'USA', 'Wisconsin', 102313),
+('Cape Coral', 'USA', 'Florida', 102286),
+('Arvada', 'USA', 'Colorado', 102153),
+('Pueblo', 'USA', 'Colorado', 102121),
+('Sandy', 'USA', 'Utah', 101853),
+('Athens-Clarke County', 'USA', 'Georgia', 101489),
+('Cambridge', 'USA', 'Massachusetts', 101355),
+('Westminster', 'USA', 'Colorado', 100940),
+('San Buenaventura', 'USA', 'California', 100916),
+('Portsmouth', 'USA', 'Virginia', 100565),
+('Livonia', 'USA', 'Michigan', 100545),
+('Burbank', 'USA', 'California', 100316),
+('Clearwater', 'USA', 'Florida', 99936),
+('Midland', 'USA', 'Texas', 98293),
+('Davenport', 'USA', 'Iowa', 98256),
+('Mission Viejo', 'USA', 'California', 98049),
+('Miami Beach', 'USA', 'Florida', 97855),
+('Sunrise Manor', 'USA', 'Nevada', 95362),
+('New Bedford', 'USA', 'Massachusetts', 94780),
+('El Cajon', 'USA', 'California', 94578),
+('Norman', 'USA', 'Oklahoma', 94193),
+('Richmond', 'USA', 'California', 94100),
+('Albany', 'USA', 'New York', 93994),
+('Brockton', 'USA', 'Massachusetts', 93653),
+('Roanoke', 'USA', 'Virginia', 93357),
+('Billings', 'USA', 'Montana', 92988),
+('Compton', 'USA', 'California', 92864),
+('Gainesville', 'USA', 'Florida', 92291),
+('Fairfield', 'USA', 'California', 92256),
+('Arden-Arcade', 'USA', 'California', 92040),
+('San Mateo', 'USA', 'California', 91799),
+('Visalia', 'USA', 'California', 91762),
+('Boulder', 'USA', 'Colorado', 91238),
+('Cary', 'USA', 'North Carolina', 91213),
+('Santa Monica', 'USA', 'California', 91084),
+('Fall River', 'USA', 'Massachusetts', 90555),
+('Kenosha', 'USA', 'Wisconsin', 89447),
+('Elgin', 'USA', 'Illinois', 89408),
+('Odessa', 'USA', 'Texas', 89293),
+('Carson', 'USA', 'California', 89089),
+('Charleston', 'USA', 'South Carolina', 89063),
+('Charlotte Amalie', 'VIR', 'St Thomas', 13000),
+('Harare', 'ZWE', 'Harare', 1410000),
+('Bulawayo', 'ZWE', 'Bulawayo', 621742),
+('Chitungwiza', 'ZWE', 'Harare', 274912),
+('Mount Darwin', 'ZWE', 'Harare', 164362),
+('Mutare', 'ZWE', 'Manicaland', 131367),
+('Gweru', 'ZWE', 'Midlands', 128037),
+('Gaza', 'PSE', 'Gaza', 353632),
+('Khan Yunis', 'PSE', 'Khan Yunis', 123175),
+('Hebron', 'PSE', 'Hebron', 119401),
+('Jabaliya', 'PSE', 'North Gaza', 113901),
+('Nablus', 'PSE', 'Nablus', 100231),
+('Rafah', 'PSE', 'Rafah', 92020);
 
 
 --
@@ -5359,9 +5359,6 @@ ALTER TABLE country
 
 ALTER TABLE countrylanguage
     ADD CONSTRAINT countrylanguage_pkey PRIMARY KEY (countrycode, language);
-
-ALTER TABLE country
-    ADD CONSTRAINT country_capital_fkey FOREIGN KEY (capital) REFERENCES city(id);
 
 ALTER TABLE countrylanguage
     ADD CONSTRAINT countrylanguage_countrycode_fkey FOREIGN KEY (countrycode) REFERENCES country(code);

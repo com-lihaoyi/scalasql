@@ -11,9 +11,9 @@ class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
     )
   }
 
-  def update: Update[V[Column.ColumnExpr], V[Id]] = {
+  def update(f: V[Column.ColumnExpr] => Expr[Boolean]): Update[V[Column.ColumnExpr], V[Id]] = {
     val ref = t.tableRef
-    new Update.Impl(t.metadata.vExpr(ref), ref, Nil, Nil, Nil)(t.containerQr)
+    new Update.Impl(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(f(t.metadata.vExpr(ref))))(t.containerQr)
   }
 
   def insert: Insert[V[Column.ColumnExpr], V[Id]] = {

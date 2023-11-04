@@ -115,7 +115,7 @@ trait ReturningTests extends ScalaSqlSuite {
     test("update") {
       test("single") - {
         checker(
-          query = Buyer.update.filter(_.name `=` "James Bond")
+          query = Buyer.update(_.name `=` "James Bond")
             .set(_.dateOfBirth -> LocalDate.parse("2019-04-07")).returning(_.id),
           sqls = Seq(
             "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
@@ -132,7 +132,7 @@ trait ReturningTests extends ScalaSqlSuite {
 
       test("multiple") - {
         checker(
-          query = Buyer.update.filter(_.name `=` "James Bond")
+          query = Buyer.update(_.name `=` "James Bond")
             .set(_.dateOfBirth -> LocalDate.parse("2019-04-07"), _.name -> "John Dee")
             .returning(c => (c.id, c.name, c.dateOfBirth)),
           sqls = Seq(

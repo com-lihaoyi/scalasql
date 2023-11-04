@@ -15,15 +15,17 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
 
     test("setSubquery") - {
       checker(
-        query = Product.update.set(_.price -> Product.select.maxBy(_.price)),
+        query = Product.update(_ => true).set(_.price -> Product.select.maxBy(_.price)),
         sqls = Seq(
           """
             UPDATE product
             SET price = (SELECT MAX(product0.price) as res FROM product product0)
+            WHERE ?
           """,
           """
             UPDATE product
             SET product.price = (SELECT MAX(product0.price) as res FROM product product0)
+            WHERE ?
           """
         ),
         value = 6
@@ -44,7 +46,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
 
     test("whereSubquery") - {
       checker(
-        query = Product.update.filter(_.price `=` Product.select.maxBy(_.price)).set(_.price -> 0),
+        query = Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price -> 0),
         sqls = Seq(
           """
             UPDATE product

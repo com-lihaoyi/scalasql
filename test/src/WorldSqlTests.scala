@@ -7,7 +7,7 @@ import scalasql.query.Expr
 
 object WorldSqlTests extends TestSuite {
     
-  case class Country[T[_]](
+  case class Country[+T[_]](
       code: T[String],
       name: T[String],
       continent: T[String],
@@ -29,7 +29,7 @@ object WorldSqlTests extends TestSuite {
     val metadata = initMetadata()
   }
 
-  case class City[T[_]](
+  case class City[+T[_]](
       id: T[Int],
       name: T[String],
       countryCode: T[String],
@@ -41,7 +41,7 @@ object WorldSqlTests extends TestSuite {
     val metadata = initMetadata()
   }
 
-  case class CountryLanguage[T[_]](
+  case class CountryLanguage[+T[_]](
       countryCode: T[String],
       language: T[String],
       isOfficial: T[Boolean],
@@ -52,17 +52,18 @@ object WorldSqlTests extends TestSuite {
     val metadata = initMetadata()
   }
 
-  val dbClient = new DatabaseClient(
-    java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", ""),
-    new Config{
-      override def columnNameMapper(v: String) = v.toLowerCase()
-      override def tableNameMapper(v: String) = v.toLowerCase()
-    },
-    H2Dialect
-  )
-  dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
   def tests = Tests {
+    val dbClient = new DatabaseClient(
+      java.sql.DriverManager.getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
+      new Config {
+        override def columnNameMapper(v: String) = v.toLowerCase()
+
+        override def tableNameMapper(v: String) = v.toLowerCase()
+      },
+      H2Dialect
+    )
+    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
     // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
     test("expr") {
@@ -149,7 +150,7 @@ object WorldSqlTests extends TestSuite {
               id = 3208,
               name = "Singapore",
               countryCode = "SGP",
-              district = "",
+              district = "",
               population = 4017733
             )
           )
@@ -182,7 +183,7 @@ object WorldSqlTests extends TestSuite {
               id = 3208,
               name = "Singapore",
               countryCode = "SGP",
-              district = "",
+              district = "",
               population = 4017733
             )
           )
@@ -341,7 +342,7 @@ object WorldSqlTests extends TestSuite {
 
       def find(cityId: Int)(implicit db: scalasql.DbApi) = db.run(City.select.filter(_.id === cityId))
       dbClient.transaction { implicit db =>
-        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
       }
     }
@@ -474,7 +475,7 @@ object WorldSqlTests extends TestSuite {
                 id = 3208,
                 name = "Singapore",
                 countryCode = "SGP",
-                district = "",
+                district = "",
                 population = 4017733
               ),
               "Singapore",
@@ -698,7 +699,7 @@ object WorldSqlTests extends TestSuite {
       test("join") {
         dbClient.transaction { implicit db =>
           val query = CountryLanguage.select
-            .joinOn(Country.select.sortBy(_.population).asc.take(2))(_.countryCode === _.code)
+            .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
             .map { case (language, country) => (language.language, country.name) }
 
           val sql = db.toSqlQuery(query)
@@ -751,7 +752,7 @@ object WorldSqlTests extends TestSuite {
       }
       test("from") {
         dbClient.transaction { implicit db =>
-          val query = Country.select.sortBy(_.population).asc.take(2)
+          val query = Country.select.sortBy(_.population).desc.take(2)
             .joinOn(CountryLanguage)(_.code === _.countryCode)
             .map { case (country, language) => (language.language, country.name) }
 
@@ -807,9 +808,12 @@ object WorldSqlTests extends TestSuite {
 
       test("sortLimitSortLimit") {
         dbClient.transaction { implicit db =>
-          val query = City.select.sortBy(_.population).desc.take(20).sortBy(_.population).asc.take(
-            10
-          ).map(_.name)
+          val query = City.select
+            .sortBy(_.population).desc
+            .take(20)
+            .sortBy(_.population).asc
+            .take(10)
+            .map(_.name)
 
           val sql = db.toSqlQuery(query)
           assert(
@@ -843,6 +847,189 @@ object WorldSqlTests extends TestSuite {
         }
       }
     }
-  }
 
+    test("insert"){
+      test("values") {
+        dbClient.transaction { implicit db =>
+          val query = City.insert.values(
+            // ID provided by database AUTO_INCREMENT
+            _.name -> "Sentosa",
+            _.countryCode -> "SGP",
+            _.district -> "South",
+            _.population -> 1337
+          )
+          val sql = db.toSqlQuery(query)
+          assert(sql == "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)")
+
+          db.run(query)
+
+          val query2 = City.select.filter(_.countryCode === "SGP")
+          val res = db.run(query2)
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            ),
+            City[Id](
+              id = 4080,
+              name = "Sentosa",
+              countryCode = "SGP",
+              district = "South",
+              population = 1337
+            ),
+          )
+
+          assert(res == expected)
+        }
+      }
+
+      test("values") {
+        dbClient.transaction { implicit db =>
+          val query = City.insert.batched(_.name, _.countryCode, _.district, _.population)(
+            // ID provided by database AUTO_INCREMENT
+            ("Sentosa", "SGP", "South", 1337),
+            ("Loyang", "SGP", "East", 31337),
+            ("Jurong", "SGP", "West", 313373),
+          )
+          val sql = db.toSqlQuery(query)
+          assert(
+            sql ==
+            """
+            INSERT INTO city (name, countrycode, district, population) VALUES
+            (?, ?, ?, ?),
+            (?, ?, ?, ?),
+            (?, ?, ?, ?)
+            """.trim.replaceAll("\\s+", " ")
+          )
+
+          db.run(query)
+
+          val query2 = City.select.filter(_.countryCode === "SGP")
+          val res = db.run(query2)
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            ),
+            City[Id](
+              id = 4080,
+              name = "Sentosa",
+              countryCode = "SGP",
+              district = "South",
+              population = 1337
+            ),
+            City[Id](
+              id = 4081,
+              name = "Loyang",
+              countryCode = "SGP",
+              district = "East",
+              population = 31337
+            ),
+            City[Id](
+              id = 4082,
+              name = "Jurong",
+              countryCode = "SGP",
+              district = "West",
+              population = 313373
+            ),
+          )
+
+          assert(res == expected)
+        }
+      }
+
+      test("select") {
+        dbClient.transaction { implicit db =>
+          val query = City.insert.select(
+            c => (c.name, c.countryCode, c.district, c.population),
+            City.select.filter(_.name === "Singapore")
+              .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
+          )
+
+          val sql = db.toSqlQuery(query)
+          assert(
+            sql ==
+            """
+            INSERT INTO city (name, countrycode, district, population)
+            SELECT ? || city0.name as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
+            FROM city city0 WHERE city0.name = ?
+            """.trim.replaceAll("\\s+", " "))
+
+          db.run(query)
+
+          val query2 = City.select.filter(_.countryCode === "SGP")
+          val res = db.run(query2)
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            ),
+            City[Id](
+              id = 4080,
+              name = "New-Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 0
+            ),
+          )
+
+          assert(res == expected)
+        }
+      }
+    }
+
+    test("update") {
+      dbClient.transaction { implicit db =>
+        val query = City.update(_.countryCode === "SGP").set(c => c.population -> (c.population + 1000000))
+        val sql = db.toSqlQuery(query)
+        assert(sql == "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?")
+
+        db.run(query)
+
+        val query2 = City.select.filter(_.countryCode === "SGP")
+        val res = db.run(query2)
+
+        val expected = Seq(
+          City[Id](
+            id = 3208,
+            name = "Singapore",
+            countryCode = "SGP",
+            district = "",
+            population = 5017733
+          )
+        )
+
+        assert(res == expected)
+      }
+    }
+
+    test("delete") {
+      dbClient.transaction { implicit db =>
+        val query = City.delete(_.countryCode === "SGP")
+        val sql = db.toSqlQuery(query)
+        assert(sql == "DELETE FROM city WHERE city.countrycode = ?")
+
+        db.run(query)
+
+        val query2 = City.select.filter(_.countryCode === "SGP")
+        val res = db.run(query2)
+
+        val expected = Seq()
+
+        assert(res == expected)
+      }
+    }
+  }
 }
