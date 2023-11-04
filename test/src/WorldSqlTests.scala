@@ -1,11 +1,33 @@
-package scalasql
+package test.scalasql
 import utest._
-import dialects.H2Dialect._
-import scalasql.dialects.H2Dialect
-import scalasql.query.Expr
 
 object WorldSqlTests extends TestSuite {
+  // +DOCS
+  // ## Importing Your Database Dialect
+  // To begin using ScalaSql, you need the following imports:
+  import scalasql._
+  import scalasql.dialects.H2Dialect._
+  // This readme will use the H2 database for simplicity, but you can change the `Dialect`
+  // above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
+  // Postgres, and MySql out of the box. The `Dialect` import provides the
+  // various operators and functions that may be unique to each specific database
+  // -DOCS
 
+  // +DOCS
+  //
+  // ## Modeling Your Schema
+  //
+  // Next, you need to define your data model classes. In ScalaSql, your data model
+  // is defined using `case class`es with each field wrapped in the wrapper type
+  // parameter `+T[_]`. This allows us to re-use the same case class to represent
+  // both database values (when `T` is `scalasql.Expr`) as well as Scala values
+  // (when `T` is `scalasql.Id`).
+  //
+  // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
+  // the database tables defined by the
+  // [MySql World Statistics Example Database](https://dev.mysql.com/doc/world-setup/en/),
+  // adjusted for compatibility with H2
+  //
   case class Country[+T[_]](
       code: T[String],
       name: T[String],
@@ -50,32 +72,135 @@ object WorldSqlTests extends TestSuite {
   object CountryLanguage extends Table[CountryLanguage]() {
     val metadata = initMetadata()
   }
+  // -DOCS
 
   def tests = Tests {
+    // +DOCS
+    // ## Creating Your Database Client
+    // Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
+    // passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
+    // you are targeting (in this case `H2Dialect`).
+
     val dbClient = new DatabaseClient(
       java.sql.DriverManager
         .getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
       new Config {
         override def columnNameMapper(v: String) = v.toLowerCase()
-
         override def tableNameMapper(v: String) = v.toLowerCase()
       },
-      H2Dialect
+      scalasql.dialects.H2Dialect
     )
-    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
 
-    // From https://www.lihaoyi.com/post/WorkingwithDatabasesusingScalaandQuill.html
+    val db = dbClient.autoCommit
+    db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
+
+    // We use `dbClient.autoCommit` in order to create a client that will automatically
+    // run every SQL command in a new transaction and commit it. For the majority of
+    // examples in this page, the exact transaction configuration doesn't matter, so
+    // using the auto-committing `db` API will help focus on the queries at hand.
+    //
+    // Lastly, we will run the `world.sql` script to initialize the database, and
+    // we're ready to begin writing queries!
+    // -DOCS
+
     test("expr") {
-      dbClient.transaction { implicit db =>
-        val query = Expr(1) + Expr(3)
-        db.toSqlQuery(query) ==> """SELECT ? + ? as res"""
-        db.run(query) ==> 4
-      }
+      // +DOCS
+      // ## Expressions
+      // The simplest thing you can query are `scalasql.Expr`s. These represent the SQL
+      // expressions that are part of a query, and can be evaluated even without being
+      // part of any database table.
+      //
+      // Here, we construct `Expr`s to represent the SQL query `1 + 3`. We can use
+      // `db.toSqlQuery` to see the generated SQL code, and `db.run` to send the
+      // query to the database and return the output `4`
+      val query = Expr(1) + Expr(3)
+      db.toSqlQuery(query) ==> "SELECT ? + ? as res"
+      db.run(query) ==> 4
+      // In general, most primitive types that can be mapped to SQL can be converted
+      // to `scalasql.Expr`s: `Int`s and other numeric types, `String`s, `Boolean`s,
+      // etc., each returning an `Expr[T]` for the respective type `T`. Each type of
+      // `Expr[T]` has a set of operations representing what operations the database
+      // supports on that type of expression.
+      //
+      // All database operations run in a _transaction_, represented by the
+      // `.transaction{}` block. If a the block fails with an exception, changes
+      // made in the transaction are rolled back. This does not affect the read-only
+      // queries we are doing now, but becomes more important once we start doing
+      // create/update/delete queries later on.
+      //
+      // -DOCS
     }
 
     test("city") {
-      dbClient.transaction { implicit db =>
-        val query = City.select
+      // +DOCS
+      // ## Select
+      //
+      // The next type of query to look at are simple `SELECT`s. Each table
+      // that we modelled earlier has `.insert`, `.select`, `.update`, and `.delete`
+      // methods to help construct the respective queries. You can run a `Table.select`
+      // on its own in order to retrieve all the data in the table:
+
+      val query = City.select
+      db.toSqlQuery(query) ==> """
+      SELECT
+        city0.id as res__id,
+        city0.name as res__name,
+        city0.countrycode as res__countrycode,
+        city0.district as res__district,
+        city0.population as res__population
+      FROM city city0
+      """.trim.replaceAll("\\s+", " ")
+
+      db.run(query).take(3) ==> Seq(
+        City[Id](
+          id = 1,
+          name = "Kabul",
+          countryCode = "AFG",
+          district = "Kabol",
+          population = 1780000
+        ),
+        City[Id](
+          id = 2,
+          name = "Qandahar",
+          countryCode = "AFG",
+          district = "Qandahar",
+          population = 237500
+        ),
+        City[Id](
+          id = 3,
+          name = "Herat",
+          countryCode = "AFG",
+          district = "Herat",
+          population = 186800
+        )
+      )
+
+      // Notice that `db.run` returns instances of type `City[Id]`. `Id` is `scalasql.Id`,
+      // short for the "Identity" type, representing a `City` object containing normal Scala
+      // values. The `[Id]` type parameter must be provided explicitly whenever creating,
+      // type-annotating, or otherwise working with these `City` values.
+      //
+      // In this example, we do `.take(3)` after running the query to show only the first
+      // 3 table entries for brevity, but by that point the `City.select` query had already
+      // fetched the entire database table into memory. This can be a problem with non-trivial
+      // datasets, and for that you
+
+      // -DOCS
+    }
+
+    test("queryFilter") {
+
+      test("singleName") {
+
+        // +DOCS
+        // ## Filtering
+        //
+        // To avoid loading the entire database table into your Scala program, you can
+        // add filters to the query before running it. Below, we add a filter to only
+        // query the city whose name is "Singapore"
+
+        val query = City.select.filter(_.name === "Singapore").single
+
         db.toSqlQuery(query) ==> """
         SELECT
           city0.id as res__id,
@@ -84,157 +209,57 @@ object WorldSqlTests extends TestSuite {
           city0.district as res__district,
           city0.population as res__population
         FROM city city0
+        WHERE city0.name = ?
         """.trim.replaceAll("\\s+", " ")
 
-        db.run(query).take(3) ==> Seq[City[Id]](
-          City[Id](
-            id = 1,
-            name = "Kabul",
-            countryCode = "AFG",
-            district = "Kabol",
-            population = 1780000
-          ),
-          City[Id](
-            id = 2,
-            name = "Qandahar",
-            countryCode = "AFG",
-            district = "Qandahar",
-            population = 237500
-          ),
-          City[Id](
-            id = 3,
-            name = "Herat",
-            countryCode = "AFG",
-            district = "Herat",
-            population = 186800
-          )
-        )
-      }
-    }
+        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 
-    test("queryFilter") {
-      test("singleName") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.filter(_.name === "Singapore")
-
-          db.toSqlQuery(query) ==> """
-          SELECT
-            city0.id as res__id,
-            city0.name as res__name,
-            city0.countrycode as res__countrycode,
-            city0.district as res__district,
-            city0.population as res__population
-          FROM city city0
-          WHERE city0.name = ?
-          """.trim.replaceAll("\\s+", " ")
-
-          db.run(query) ==> Seq[City[Id]](City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
-        }
+        // Note that we use `===` rather than `==` for the equality comparison. The
+        // function literal passed to `.filter` is given a `City[Expr]` as its parameter,
+        // representing a `City` that is part of the database query, in contrast to the
+        // `City[Id]`s that `db.run` returns , and so `_.name` is of type `Expr[String]`
+        // rather than just `String` or `Id[String]`. You can use your IDE's
+        // auto-complete to see what operations are available on `Expr[String]`: typically
+        // they will represent SQL string functions rather than Scala string functions and
+        // take and return `Expr[String]`s rather than plain Scala `String`s. Database
+        // value equality is represented by the `===` operator.
+        //
+        // Note also the `.single` operator. This tells ScalaSql that you expect exactly
+        // own result row from this query: not zero rows, and not more than one row. This
+        // causes `db.run` to return a `City[Id]` rather than `Seq[City[Id]]`, and throw
+        // an exception if zero or multiple rows are returned by the query.
+        //
+        // -DOCS
       }
 
       test("singleId") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.filter(_.id === 3208)
-          db.toSqlQuery(query) ==> """
-          SELECT
-            city0.id as res__id,
-            city0.name as res__name,
-            city0.countrycode as res__countrycode,
-            city0.district as res__district,
-            city0.population as res__population
-          FROM city city0
-          WHERE city0.id = ?
-          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query) ==> Seq[City[Id]](City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
-        }
-      }
+        // +DOCS
+        // Apart from filtering by name, it is also very common to filter by ID,
+        // as shown below:
+        val query = City.select.filter(_.id === 3208).single
+        db.toSqlQuery(query) ==> """
+        SELECT
+          city0.id as res__id,
+          city0.name as res__name,
+          city0.countrycode as res__countrycode,
+          city0.district as res__district,
+          city0.population as res__population
+        FROM city city0
+        WHERE city0.id = ?
+        """.trim.replaceAll("\\s+", " ")
 
-      test("population") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.filter(_.population > 9980000)
-          db.toSqlQuery(query) ==> """
-            SELECT
-              city0.id as res__id,
-              city0.name as res__name,
-              city0.countrycode as res__countrycode,
-              city0.district as res__district,
-              city0.population as res__population
-            FROM city city0
-            WHERE city0.population > ?
-            """.trim.replaceAll("\\s+", " ")
-
-          db.run(query).take(5) ==> Seq(
-            City[Id](
-              id = 1024,
-              name = "Mumbai (Bombay)",
-              countryCode = "IND",
-              district = "Maharashtra",
-              population = 10500000
-            ),
-            City[Id](
-              id = 2331,
-              name = "Seoul",
-              countryCode = "KOR",
-              district = "Seoul",
-              population = 9981619
-            )
-          )
-        }
+        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+        // -DOCS
       }
 
       test("multiple") {
         test("combined") {
-          dbClient.transaction { implicit db =>
-            val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
-            db.toSqlQuery(query) ==> """
-              SELECT
-                city0.id as res__id,
-                city0.name as res__name,
-                city0.countrycode as res__countrycode,
-                city0.district as res__district,
-                city0.population as res__population
-              FROM city city0
-              WHERE
-                city0.population > ?
-                AND city0.countrycode = ?
-              """.trim.replaceAll("\\s+", " ")
-
-            db.run(query).take(2) ==> Seq(
-              City[Id](
-                id = 1890,
-                name = "Shanghai",
-                countryCode = "CHN",
-                district = "Shanghai",
-                population = 9696300
-              ),
-              City[Id](
-                id = 1891,
-                name = "Peking",
-                countryCode = "CHN",
-                district = "Peking",
-                population = 7472000
-              )
-            )
-          }
-        }
-
-        test("separate") {
-          dbClient.transaction { implicit db =>
-            val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
-            db.toSqlQuery(query) ==> """
+          // +DOCS
+          // You can filter on multiple things, e.g. here we look for cities in China
+          // with population more than 5 million:
+          val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
+          db.toSqlQuery(query) ==> """
             SELECT
               city0.id as res__id,
               city0.name as res__name,
@@ -247,403 +272,456 @@ object WorldSqlTests extends TestSuite {
               AND city0.countrycode = ?
             """.trim.replaceAll("\\s+", " ")
 
-            db.run(query).take(2) ==> Seq(
-              City[Id](
-                id = 1890,
-                name = "Shanghai",
-                countryCode = "CHN",
-                district = "Shanghai",
-                population = 9696300
-              ),
-              City[Id](
-                id = 1891,
-                name = "Peking",
-                countryCode = "CHN",
-                district = "Peking",
-                population = 7472000
-              )
-            )
-          }
+          db.run(query).take(2) ==> Seq(
+            City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City[Id](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+          )
+          // Again, all the operations within the query work on `Expr`s: `c` is a `City[Expr]`,
+          // `c.population` is an `Expr[Int]`, `c.countryCode` is an `Expr[String]`, and
+          // `===` and `>` and `&&` on `Expr`s all return `Expr[Boolean]`s that represent
+          // a SQL expression that can be sent to the Database as part of your query.
+          // -DOCS
+        }
+
+        test("separate") {
+          // +DOCS
+          // You can also stack multiple separate filters together, as shown below:
+          val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
+          db.toSqlQuery(query) ==> """
+          SELECT
+            city0.id as res__id,
+            city0.name as res__name,
+            city0.countrycode as res__countrycode,
+            city0.district as res__district,
+            city0.population as res__population
+          FROM city city0
+          WHERE
+            city0.population > ?
+            AND city0.countrycode = ?
+          """.trim.replaceAll("\\s+", " ")
+
+          db.run(query).take(2) ==> Seq(
+            City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City[Id](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+          )
+          // -DOCS
         }
       }
     }
 
     test("lifting") {
       test("implicit") {
-        def find(cityId: Int)(implicit db: scalasql.DbApi) = db
-          .run(City.select.filter(_.id === cityId))
+        // +DOCS
+        // ## Lifting
+        // Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
+        // `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
+        // already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
+        // a `Expr[Int]` automatically
 
-        dbClient.transaction { implicit db =>
-          assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
-          assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
-        }
+        def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
+
+        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+
+        // -DOCS
       }
 
       test("explicit") {
-        def find(cityId: Int)(implicit db: scalasql.DbApi) = db
-          .run(City.select.filter(_.id === Expr(cityId)))
+        // +DOCS
+        // This implicit lifting can be done explicitly using the `Expr(...)` syntax
+        // as shown below
+        def find(cityId: Int) = db.run(City.select.filter(_.id === Expr(cityId)))
 
-        dbClient.transaction { implicit db =>
-          assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
-          assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
-        }
+        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        // -DOCS
       }
     }
 
     test("mapping") {
       test("tuple2") {
-        dbClient.transaction { implicit db =>
-          val query = Country.select.map(c => (c.name, c.continent))
-          db.toSqlQuery(query) ==> """
-            SELECT
-              country0.name as res__0,
-              country0.continent as res__1
-            FROM country country0
-            """.trim.replaceAll("\\s+", " ")
+        // +DOCS
+        // ## Mapping
+        //
+        // You can use `.map` to select exactly what values you want to return from a query.
+        // Below, we query the `country` table, but only want the `name` and `continent` of
+        // each country, without all the other metadata:
+        val query = Country.select.map(c => (c.name, c.continent))
+        db.toSqlQuery(query) ==> """
+          SELECT
+            country0.name as res__0,
+            country0.continent as res__1
+          FROM country country0
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query).take(5) ==> Seq(
-            ("Afghanistan", "Asia"),
-            ("Netherlands", "Europe"),
-            ("Netherlands Antilles", "North America"),
-            ("Albania", "Europe"),
-            ("Algeria", "Africa")
-          )
-        }
+        db.run(query).take(5) ==> Seq(
+          ("Afghanistan", "Asia"),
+          ("Netherlands", "Europe"),
+          ("Netherlands Antilles", "North America"),
+          ("Albania", "Europe"),
+          ("Algeria", "Africa")
+        )
+        // -DOCS
       }
 
       test("heterogenousTuple") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.filter(_.name === "Singapore")
-            .map(c => (c, c.name, c.population / 1000000))
+        // +DOCS
+        // These `.map` calls can contains arbitrarily complex data: below, we query
+        // the `city` table to look for `Singapore` and get the entire row as a `City[Id]`,
+        // but also want to fetch the uppercase name and the population-in-millions. As
+        // you would expect, you get a tuple of `(City[Id], String, Int)` back.
+        val query = City.select.filter(_.name === "Singapore")
+          .map(c => (c, c.name.toUpperCase, c.population / 1000000))
+          .single
 
-          db.toSqlQuery(query) ==> """
-            SELECT
-              city0.id as res__0__id,
-              city0.name as res__0__name,
-              city0.countrycode as res__0__countrycode,
-              city0.district as res__0__district,
-              city0.population as res__0__population,
-              city0.name as res__1,
-              city0.population / ? as res__2
-            FROM
-              city city0
-            WHERE
-              city0.name = ?
-            """.trim.replaceAll("\\s+", " ")
+        db.toSqlQuery(query) ==> """
+          SELECT
+            city0.id as res__0__id,
+            city0.name as res__0__name,
+            city0.countrycode as res__0__countrycode,
+            city0.district as res__0__district,
+            city0.population as res__0__population,
+            UPPER(city0.name) as res__1,
+            city0.population / ? as res__2
+          FROM
+            city city0
+          WHERE
+            city0.name = ?
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query) ==> Seq((
-            City[Id](
-              id = 3208,
-              name = "Singapore",
-              countryCode = "SGP",
-              district = "",
-              population = 4017733
-            ),
-            "Singapore",
-            4 // population in millions
-          ))
-        }
+        db.run(query) ==> (
+          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+          "SINGAPORE",
+          4 // population in millions
+        )
+        // -DOCS
       }
     }
 
     test("aggregate") {
       test("sum") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.map(_.population).sum
-          db.toSqlQuery(query) ==> "SELECT SUM(city0.population) as res FROM city city0"
+        // +DOCS
+        // ## Aggregates
+        //
+        // You can perform simple aggregates like `.sum` as below, where we
+        // query all cities in China and sum up their populations
+        val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
+        db.toSqlQuery(query) ==>
+        "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
 
-          db.run(query) ==> 1429559884
-        }
+        db.run(query) ==> 175953614
+        // -DOCS
       }
       test("sumBy") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.sumBy(_.population)
-          db.toSqlQuery(query) ==> "SELECT SUM(city0.population) as res FROM city city0"
+        // +DOCS
+        // Many aggregates have a `By` version, e.g. `.sumBy`, which allows you to
+        // customize exactly what you are aggregating:
+        val query = City.select.sumBy(_.population)
+        db.toSqlQuery(query) ==> "SELECT SUM(city0.population) as res FROM city city0"
 
-          db.run(query) ==> 1429559884
-        }
+        db.run(query) ==> 1429559884
+        // -DOCS
       }
-      test("count") {
-        dbClient.transaction { implicit db =>
-          val query = Country.select.size
-          db.toSqlQuery(query) ==> "SELECT COUNT(1) as res FROM country country0"
+      test("size") {
+        // +DOCS
+        // `.size` is a commonly used function that translates to the SQL aggregate
+        // `COUNT(1)`. Below, we count how many countries in our database have population
+        // greater than one million
+        val query = Country.select.filter(_.population > 1000000).size
+        db.toSqlQuery(query) ==>
+        "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
 
-          db.run(query) ==> 239
-        }
+        db.run(query) ==> 154
+        // -DOCS
+      }
+      test("aggregate") {
+        // +DOCS
+        // If you want to perform multiple aggregates at once, you can use the `.aggregate`
+        // function. Below, we run a single query that returns the minimum, average, and
+        // maximum populations across all countries in our dataset
+        val query = Country.select.aggregate(cs =>
+          (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population))
+        )
+        db.toSqlQuery(query) ==>
+        """
+        SELECT
+          MIN(country0.population) as res__0,
+          AVG(country0.population) as res__1,
+          MAX(country0.population) as res__2
+        FROM country country0
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> (0, 25434098, 1277558000)
+        // -DOCS
       }
     }
 
     test("sortLimitOffset") {
-      dbClient.transaction { implicit db =>
-        val query = City.select.sortBy(_.population).desc.drop(5).take(5)
-          .map(c => (c.name, c.population))
+      // +DOCS
+      // ## Sort/Drop/Take
+      //
+      // You can use `.sortBy` to order the returned rows, and `.drop` and .take`
+      // to select a range of rows within the entire result set:
+      val query = City.select.sortBy(_.population).desc.drop(5).take(5)
+        .map(c => (c.name, c.population))
 
-        db.toSqlQuery(query) ==> """
-          SELECT
-            city0.name as res__0,
-            city0.population as res__1
-          FROM city city0
-          ORDER BY res__1 DESC
-          LIMIT 5 OFFSET 5
-          """.trim.replaceAll("\\s+", " ")
+      db.toSqlQuery(query) ==> """
+        SELECT city0.name as res__0, city0.population as res__1
+        FROM city city0
+        ORDER BY res__1 DESC
+        LIMIT 5 OFFSET 5
+        """.trim.replaceAll("\\s+", " ")
 
-        db.run(query) ==> Seq(
-          ("Karachi", 9269265),
-          ("Istanbul", 8787958),
-          ("Ciudad de México", 8591309),
-          ("Moscow", 8389200),
-          ("New York", 8008278)
-        )
-      }
+      db.run(query) ==> Seq(
+        ("Karachi", 9269265),
+        ("Istanbul", 8787958),
+        ("Ciudad de México", 8591309),
+        ("Moscow", 8389200),
+        ("New York", 8008278)
+      )
+      // You can also use `.drop` and `.take` without `.sortBy`, but in that case
+      // the order of returned rows is arbitrary and may differ between databases
+      // and implementations
+      //
+      // -DOCS
     }
 
     test("joins") {
-      dbClient.transaction { implicit db =>
+      test("inner") {
+        // +DOCS
+        // ## Joins
+        //
+        // You can perform SQL inner `JOIN`s between tables via the `.join` or `.joinOn`
+        // methods. Below, we use a `JOIN` to look for cities which are in the country
+        // named "Liechtenstein":
         val query = City.select.joinOn(Country)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Liechtenstein" }
           .map { case (city, country) => city.name }
 
-        db.toSqlQuery(query) ==> """
-          SELECT city0.name as res
-          FROM city city0
-          JOIN country country1 ON city0.countrycode = country1.code
-          WHERE country1.name = ?
-          """.trim.replaceAll("\\s+", " ")
+        db.toSqlQuery(query) ==>
+        """
+        SELECT city0.name as res
+        FROM city city0
+        JOIN country country1 ON city0.countrycode = country1.code
+        WHERE country1.name = ?
+        """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq("Schaan", "Vaduz")
+        // -DOCS
+      }
+      test("right"){
+        // +DOCS
+        // `LEFT JOIN`, `RIGHT JOIN`, and `OUTER JOIN`s are also supported, e.g.
+        val query = City.select.rightJoin(Country)(_.countryCode === _.code)
+          .filter { case (cityOpt, country) => cityOpt.isEmpty }
+          .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
+
+        db.toSqlQuery(query) ==>
+        """
+        SELECT city0.name as res__0, country1.name as res__1
+        FROM city city0
+        RIGHT JOIN country country1 ON city0.countrycode = country1.code
+        WHERE ?
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> Seq()
+        // Note that when you use a left/right/outer join, the corresponding
+        // rows are provided to you as `Option[T]` rather than plain `T`s, e.g.
+        // `cityOpt: Option[City[Expr]]` above.
+        //
+        // -DOCS
       }
     }
 
     test("flatMap") {
-      dbClient.transaction { implicit db =>
-        val query = for {
-          city <- City.select
-          country <- Country.select if city.countryCode === country.code
-          if country.name === "Liechtenstein"
-        } yield city.name
+      // +DOCS
+      // ScalaSql also supports performing `JOIN`s via Scala's for-comprehension syntax:
+      val query = for {
+        city <- City.select
+        country <- Country.select if city.countryCode === country.code
+        if country.name === "Liechtenstein"
+      } yield city.name
 
-        db.toSqlQuery(query) ==> """
-          SELECT city0.name as res
-          FROM city city0, country country1
-          WHERE city0.countrycode = country1.code AND country1.name = ?
-          """.trim.replaceAll("\\s+", " ")
+      db.toSqlQuery(query) ==> """
+        SELECT city0.name as res
+        FROM city city0, country country1
+        WHERE city0.countrycode = country1.code AND country1.name = ?
+        """.trim.replaceAll("\\s+", " ")
 
-        db.run(query) ==> Seq("Schaan", "Vaduz")
-      }
+      db.run(query) ==> Seq("Schaan", "Vaduz")
+      // -DOCS
     }
 
     test("subquery") {
       test("join") {
-        dbClient.transaction { implicit db =>
-          val query = CountryLanguage.select
-            .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
-            .map { case (language, country) => (language.language, country.name) }
+        // +DOCS
+        // ScalaSql in general allows you to use SQL Subqueries anywhere you would use
+        // a table. e.g. you can pass a Subquery to `.joinOn`, as we do in the below
+        // query to find language and the name of the top 2 most populous countries:
+        val query = CountryLanguage.select
+          .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
+          .map { case (language, country) => (language.language, country.name) }
 
-          db.toSqlQuery(query) ==> """
-            SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
-            FROM countrylanguage countrylanguage0
-            JOIN (SELECT
-                country0.code as res__code,
-                country0.name as res__name,
-                country0.population as res__population
-              FROM country country0
-              ORDER BY res__population DESC
-              LIMIT 2) subquery1
-            ON countrylanguage0.countrycode = subquery1.res__code
-            """.trim.replaceAll("\\s+", " ")
+        db.toSqlQuery(query) ==> """
+          SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
+          FROM countrylanguage countrylanguage0
+          JOIN (SELECT
+              country0.code as res__code,
+              country0.name as res__name,
+              country0.population as res__population
+            FROM country country0
+            ORDER BY res__population DESC
+            LIMIT 2) subquery1
+          ON countrylanguage0.countrycode = subquery1.res__code
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query).take(5) ==> Seq(
-            ("Chinese", "China"),
-            ("Dong", "China"),
-            ("Hui", "China"),
-            ("Mantu", "China"),
-            ("Miao", "China")
-          )
-        }
+        db.run(query).take(5) ==> Seq(
+          ("Chinese", "China"),
+          ("Dong", "China"),
+          ("Hui", "China"),
+          ("Mantu", "China"),
+          ("Miao", "China")
+        )
+        // -DOCS
       }
       test("from") {
-        dbClient.transaction { implicit db =>
-          val query = Country.select.sortBy(_.population).desc.take(2)
-            .joinOn(CountryLanguage)(_.code === _.countryCode).map { case (country, language) =>
-              (language.language, country.name)
-            }
+        // +DOCS
+        // Some operations automatically generate subqueries where necessary, e.g.
+        // performing a `.joinOn` after you have done a `.take`:
+        val query = Country.select.sortBy(_.population).desc.take(2)
+          .joinOn(CountryLanguage)(_.code === _.countryCode).map { case (country, language) =>
+            (language.language, country.name)
+          }
 
-          db.toSqlQuery(query) ==> """
-            SELECT countrylanguage1.language as res__0, subquery0.res__name as res__1
-            FROM (SELECT
-                country0.code as res__code,
-                country0.name as res__name,
-                country0.population as res__population
-              FROM country country0
-              ORDER BY res__population DESC
-              LIMIT 2) subquery0
-            JOIN countrylanguage countrylanguage1
-            ON subquery0.res__code = countrylanguage1.countrycode
-            """.trim.replaceAll("\\s+", " ")
+        db.toSqlQuery(query) ==> """
+          SELECT countrylanguage1.language as res__0, subquery0.res__name as res__1
+          FROM (SELECT
+              country0.code as res__code,
+              country0.name as res__name,
+              country0.population as res__population
+            FROM country country0
+            ORDER BY res__population DESC
+            LIMIT 2) subquery0
+          JOIN countrylanguage countrylanguage1
+          ON subquery0.res__code = countrylanguage1.countrycode
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query).take(5) ==> List(
-            ("Chinese", "China"),
-            ("Dong", "China"),
-            ("Hui", "China"),
-            ("Mantu", "China"),
-            ("Miao", "China")
-          )
-        }
-      }
-
-      test("sortLimitSortLimit") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.sortBy(_.population).desc.take(20).sortBy(_.population).asc
-            .take(10).map(_.name)
-
-          db.toSqlQuery(query) ==> """
-            SELECT subquery0.res__name as res
-            FROM (SELECT city0.name as res__name, city0.population as res__population
-              FROM city city0
-              ORDER BY res__population DESC
-              LIMIT 20) subquery0
-            ORDER BY subquery0.res__population ASC
-            LIMIT 10
-            """.trim.replaceAll("\\s+", " ")
-
-          db.run(query) ==> List(
-            "Santafé de Bogotá",
-            "Bangkok",
-            "Chongqing",
-            "Lima",
-            "Teheran",
-            "Cairo",
-            "Delhi",
-            "London",
-            "Peking",
-            "Tokyo"
-          )
-        }
+        db.run(query).take(5) ==> List(
+          ("Chinese", "China"),
+          ("Dong", "China"),
+          ("Hui", "China"),
+          ("Mantu", "China"),
+          ("Miao", "China")
+        )
+        // -DOCS
       }
     }
 
     test("insert") {
       test("values") {
-        dbClient.transaction { implicit db =>
-          val query = City.insert.values(
-            // ID provided by database AUTO_INCREMENT
-            _.name -> "Sentosa",
-            _.countryCode -> "SGP",
-            _.district -> "South",
-            _.population -> 1337
-          )
-          db.toSqlQuery(query) ==>
-            "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)"
+        // +DOCS
+        // ## Inserts
+        // ScalaSql supports SQL `INSERT`s with multiple styles. You can insert
+        // a single row via `.insert.values`, passing the columns you want to insert
+        // (and leaving out any that the database would auto-populate)
+        val query = City.insert.values( // ID provided by database AUTO_INCREMENT
+          _.name -> "Sentosa",
+          _.countryCode -> "SGP",
+          _.district -> "South",
+          _.population -> 1337
+        )
+        db.toSqlQuery(query) ==>
+          "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)"
 
-          db.run(query)
+        db.run(query)
 
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-            City[Id](
-              id = 3208,
-              name = "Singapore",
-              countryCode = "SGP",
-              district = "",
-              population = 4017733
-            ),
-            City[Id](
-              id = 4080,
-              name = "Sentosa",
-              countryCode = "SGP",
-              district = "South",
-              population = 1337
-            )
-          )
-        }
+        db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
+          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Id](4080, "Sentosa", "SGP", district = "South", population = 1337)
+        )
+        // -DOCS
       }
 
       test("values") {
-        dbClient.transaction { implicit db =>
-          val query = City.insert.batched(_.name, _.countryCode, _.district, _.population)(
-            // ID provided by database AUTO_INCREMENT
-            ("Sentosa", "SGP", "South", 1337),
-            ("Loyang", "SGP", "East", 31337),
-            ("Jurong", "SGP", "West", 313373)
-          )
-          db.toSqlQuery(query) ==> """
-            INSERT INTO city (name, countrycode, district, population) VALUES
-            (?, ?, ?, ?),
-            (?, ?, ?, ?),
-            (?, ?, ?, ?)
-            """.trim.replaceAll("\\s+", " ")
+        // +DOCS
+        // You can perform batch inserts via `.insert.batched`, passing in both a set of
+        // columns and a list of tuples that provide the data inserted into those columns:
+        val query = City.insert.batched(_.name, _.countryCode, _.district, _.population)(
+          ("Sentosa", "SGP", "South", 1337), // ID provided by database AUTO_INCREMENT
+          ("Loyang", "SGP", "East", 31337),
+          ("Jurong", "SGP", "West", 313373)
+        )
+        db.toSqlQuery(query) ==> """
+          INSERT INTO city (name, countrycode, district, population) VALUES
+          (?, ?, ?, ?),
+          (?, ?, ?, ?),
+          (?, ?, ?, ?)
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query)
+        db.run(query)
 
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-            City[Id](
-              id = 3208,
-              name = "Singapore",
-              countryCode = "SGP",
-              district = "",
-              population = 4017733
-            ),
-            City[Id](
-              id = 4080,
-              name = "Sentosa",
-              countryCode = "SGP",
-              district = "South",
-              population = 1337
-            ),
-            City[Id](
-              id = 4081,
-              name = "Loyang",
-              countryCode = "SGP",
-              district = "East",
-              population = 31337
-            ),
-            City[Id](
-              id = 4082,
-              name = "Jurong",
-              countryCode = "SGP",
-              district = "West",
-              population = 313373
-            )
-          )
-        }
+        db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
+          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Id](4080, "Sentosa", "SGP", district = "South", population = 1337),
+          City[Id](4081, "Loyang", "SGP", district = "East", population = 31337),
+          City[Id](4082, "Jurong", "SGP", district = "West", population = 313373)
+        )
+        // -DOCS
       }
 
       test("select") {
-        dbClient.transaction { implicit db =>
-          val query = City.insert.select(
-            c => (c.name, c.countryCode, c.district, c.population),
-            City.select.filter(_.name === "Singapore")
-              .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
-          )
+        // +DOCS
+        // Or you can provide an entire `SELECT` query via `.insert.select`, allowing
+        // you to select arbitrary data from the same table (or another table) to insert:
+        val query = City.insert.select(
+          c => (c.name, c.countryCode, c.district, c.population),
+          City.select.filter(_.name === "Singapore")
+            .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
+        )
 
-          db.toSqlQuery(query) ==> """
-            INSERT INTO city (name, countrycode, district, population)
-            SELECT ? || city0.name as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
-            FROM city city0 WHERE city0.name = ?
-            """.trim.replaceAll("\\s+", " ")
+        db.toSqlQuery(query) ==> """
+          INSERT INTO city (name, countrycode, district, population)
+          SELECT ? || city0.name as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
+          FROM city city0 WHERE city0.name = ?
+          """.trim.replaceAll("\\s+", " ")
 
-          db.run(query)
+        db.run(query)
 
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-            City[Id](
-              id = 3208,
-              name = "Singapore",
-              countryCode = "SGP",
-              district = "",
-              population = 4017733
-            ),
-            City[Id](
-              id = 4080,
-              name = "New-Singapore",
-              countryCode = "SGP",
-              district = "",
-              population = 0
-            )
-          )
-        }
+        db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
+          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Id](4080, "New-Singapore", "SGP", district = "", population = 0)
+        )
+        // These three styles of inserts that ScalaSql provides correspond directly to the
+        // various `INSERT` syntaxes supported by the underlying database.
+        //
+        // -DOCS
       }
     }
 
     test("update") {
-      dbClient.transaction { implicit db =>
+      test("simple") {
+        // +DOCS
+        // ## Updates
+        //
+        // ScalaSql allows updates via the `.update` syntax, that takes a filter
+        // and a list of columns to update:
+        val query = City.update(_.countryCode === "SGP")
+          .set(_.population -> 0, _.district -> "UNKNOWN")
+
+        db.toSqlQuery(query) ==>
+          "UPDATE city SET population = ?, district = ? WHERE city.countrycode = ?"
+
+        db.run(query)
+
+        db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+          City[Id](3208, "Singapore", "SGP", district = "UNKNOWN", population = 0)
+        // -DOCS
+      }
+
+      test("computed"){
+        // +DOCS
+        // You can perform computed updates by referencing columns as part of the
+        // expressions passed to the `.set` call:
         val query = City.update(_.countryCode === "SGP")
           .set(c => c.population -> (c.population + 1000000))
         db.toSqlQuery(query) ==>
@@ -651,28 +729,54 @@ object WorldSqlTests extends TestSuite {
 
         db.run(query)
 
-        db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(City[Id](
-          id = 3208,
-          name = "Singapore",
-          countryCode = "SGP",
-          district = "",
-          population = 5017733
-        ))
+        db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+          City[Id](3208, "Singapore", "SGP", district = "", population = 5017733)
+        // -DOCS
+      }
+      test("all"){
+        // +DOCS
+        // The filter predicate to `.update` is mandatory, to avoid performing updates across
+        // an entire database table accidentally . If you really want to perform an update
+        // on every single row, you can pass in `_ => true` as your filter:
+        val query = City.update(_ => true)
+          .set(_.population -> 0)
+        db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
+
+        db.run(query)
+
+        db.run(City.select.filter(_.countryCode === "LIE")) ==> Seq(
+          City[Id](2445, "Schaan", "LIE", district = "Schaan", population = 0),
+          City[Id](2446, "Vaduz", "LIE", district = "Vaduz", population = 0)
+        )
+        // -DOCS
       }
     }
 
     test("delete") {
-      dbClient.transaction { implicit db =>
-        val query = City.delete(_.countryCode === "SGP")
-        db.toSqlQuery(query) ==> "DELETE FROM city WHERE city.countrycode = ?"
-        db.run(query)
+      // +DOCS
+      // ## Deletes
+      // Deletes are performed by the `.delete` method, which takes a predicate
+      // letting you specify what rows you want to delete.
+      val query = City.delete(_.countryCode === "SGP")
+      db.toSqlQuery(query) ==> "DELETE FROM city WHERE city.countrycode = ?"
+      db.run(query)
 
-        db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
-      }
+      db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
+      // -DOCS
     }
 
     test("transactions") {
       test("exception") {
+        // +DOCS
+        // ## Transactions
+        // You can use `.transaction` to perform an explicit database transaction.
+        // This transaction is opened when `.transaction` begins, is commited when
+        // `.transaction` terminates successfully, and is rolled back if
+        // `.transaction` terminates with an error.
+        //
+        // Below, we can see how `.delete` immediately takes effect within the
+        // transaction, but when it fails due to an exception the deletion is rolled
+        // back and a subsequent transaction can see the deleted city re-appear
         try {
           dbClient.transaction { implicit db =>
             db.run(City.delete(_.countryCode === "SGP"))
@@ -684,36 +788,41 @@ object WorldSqlTests extends TestSuite {
         } catch { case e: Exception => /*do nothing*/ }
 
         dbClient.transaction { implicit db =>
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
+          db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
+        // -DOCS
       }
       test("rollback") {
+        // +DOCS
+        // You can also roll back a transaction explicitly via the `.rollback()` method:
         dbClient.transaction { implicit db =>
           db.run(City.delete(_.countryCode === "SGP"))
 
           db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
+
           db.rollback()
         }
 
         dbClient.transaction { implicit db =>
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
+          db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
+        // -DOCS
       }
     }
     test("savepoint") {
       test("exception") {
+        // +DOCS
+        // ## Savepoints
+        // Most database support Savepoints, which are sort of "nested transactions"
+        // allowing you to roll back portions of a transaction without rolling back
+        // everything.
+        //
+        // ScalaSql supports these via the `.savepoint` method, which works similarly
+        // to `.transaction`: if the provided block terminates successfully the savepoint
+        // is committed ("released"), if it terminates with an exception the savepoint
+        // is rolled back and all changes are undoned (as seen below)
         dbClient.transaction { implicit db =>
           try {
             db.savepoint { implicit sp =>
@@ -724,18 +833,15 @@ object WorldSqlTests extends TestSuite {
             }
           } catch { case e: Exception => /*do nothing*/ }
 
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
+          db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 
         }
-
+        // -DOCS
       }
       test("rollback") {
+        // +DOCS
+        // Savepoints support an explicit `.rollback()` method, just as transactions do:
         dbClient.transaction { implicit db =>
           db.savepoint { implicit sp =>
             db.run(City.delete(_.countryCode === "SGP"))
@@ -745,14 +851,10 @@ object WorldSqlTests extends TestSuite {
             sp.rollback()
           }
 
-          db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(City[Id](
-            id = 3208,
-            name = "Singapore",
-            countryCode = "SGP",
-            district = "",
-            population = 4017733
-          ))
+          db.run(City.select.filter(_.countryCode === "SGP").single) ==>
+            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
+        // -DOCS
       }
     }
   }

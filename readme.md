@@ -281,5 +281,6 @@ their own operations not provided by the base library.
 * Scala 3 support
 * Tutorial Docs and Reference Docs
 * Flat joins (Quill Style)
+* Fix WorldSqlTests's `RIGHT JOIN` example
 * Dot-delimited result names
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
