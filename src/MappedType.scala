@@ -69,7 +69,8 @@ object MappedType {
   implicit object BigDecimalType extends MappedType[scala.math.BigDecimal] {
     def jdbcType = JDBCType.DOUBLE
     def get(r: ResultSet, idx: Int) = r.getBigDecimal(idx)
-    def put(r: PreparedStatement, idx: Int, v: scala.math.BigDecimal) = r.setBigDecimal(idx, v.bigDecimal)
+    def put(r: PreparedStatement, idx: Int, v: scala.math.BigDecimal) = r
+      .setBigDecimal(idx, v.bigDecimal)
   }
 
   implicit object BooleanType extends MappedType[Boolean] {

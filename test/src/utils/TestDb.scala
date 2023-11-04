@@ -10,12 +10,11 @@ import scalasql.{Config, DatabaseClient, Queryable}
 import java.sql.Connection
 
 class TestDb(
-              val dbClient: DatabaseClient,
-              testSchemaFileName: String,
-              testDataFileName: String,
-              dialectConfig: DialectConfig
+    val dbClient: DatabaseClient,
+    testSchemaFileName: String,
+    testDataFileName: String,
+    dialectConfig: DialectConfig
 ) {
-
 
   def reset() = {
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
@@ -58,7 +57,6 @@ class TestDb(
 }
 
 object TestDb {
-
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(additionalHandlers = {
     case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)

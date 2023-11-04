@@ -2,25 +2,25 @@ package scalasql.utils
 
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 
-object TestClients{
+object TestClients {
   import java.sql.DriverManager
 
   lazy val sqliteClient = new scalasql.DatabaseClient(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     dialectConfig = scalasql.dialects.SqliteDialect,
-    config = new scalasql.Config{}
+    config = new scalasql.Config {}
   )
 
   lazy val hsqlDbClient = new scalasql.DatabaseClient(
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
     dialectConfig = scalasql.dialects.HsqlDbDialect,
-    config = new scalasql.Config{}
+    config = new scalasql.Config {}
   )
 
   lazy val h2Client = new scalasql.DatabaseClient(
     DriverManager.getConnection("jdbc:h2:mem:mydb"),
     dialectConfig = scalasql.dialects.H2Dialect,
-    config = new scalasql.Config{}
+    config = new scalasql.Config {}
   )
 
   lazy val postgres = {
@@ -33,7 +33,7 @@ object TestClients{
   lazy val postgresClient = new scalasql.DatabaseClient(
     DriverManager.getConnection(postgres.getJdbcUrl, postgres.getUsername, postgres.getPassword),
     dialectConfig = scalasql.dialects.PostgresDialect,
-    config = new scalasql.Config{}
+    config = new scalasql.Config {}
   )
 
   lazy val mysql = {
@@ -51,7 +51,7 @@ object TestClients{
       mysql.getPassword
     ),
     dialectConfig = scalasql.dialects.PostgresDialect,
-    config = new scalasql.Config{}
+    config = new scalasql.Config {}
   )
 
 }
