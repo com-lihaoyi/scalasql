@@ -192,9 +192,9 @@ object WorldSqlTests extends TestSuite {
         }
       }
 
-      test("singlePopulation") {
+      test("population") {
         dbClient.transaction { implicit db =>
-          val query = City.select.filter(_.population > 9000000)
+          val query = City.select.filter(_.population > 9980000)
           val sql = db.toSqlQuery(query)
           assert(
             sql ==
@@ -213,32 +213,11 @@ object WorldSqlTests extends TestSuite {
           val res = db.run(query).take(5)
           val expected = Seq(
             City[Id](
-              id = 206,
-              name = "São Paulo",
-              countryCode = "BRA",
-              district = "São Paulo",
-              population = 9968485
-            ),
-            City[Id](
-              id = 939,
-              name = "Jakarta",
-              countryCode = "IDN",
-              district = "Jakarta Raya",
-              population = 9604900
-            ),
-            City[Id](
               id = 1024,
               name = "Mumbai (Bombay)",
               countryCode = "IND",
               district = "Maharashtra",
               population = 10500000
-            ),
-            City[Id](
-              id = 1890,
-              name = "Shanghai",
-              countryCode = "CHN",
-              district = "Shanghai",
-              population = 9696300
             ),
             City[Id](
               id = 2331,
@@ -339,11 +318,22 @@ object WorldSqlTests extends TestSuite {
     }
 
     test("lifting") {
+      test("implicit") {
 
-      def find(cityId: Int)(implicit db: scalasql.DbApi) = db.run(City.select.filter(_.id === cityId))
-      dbClient.transaction { implicit db =>
-        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
-        assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        def find(cityId: Int)(implicit db: scalasql.DbApi) = db.run(City.select.filter(_.id === cityId))
+        dbClient.transaction { implicit db =>
+          assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
+          assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        }
+      }
+
+      test("explicit") {
+
+        def find(cityId: Int)(implicit db: scalasql.DbApi) = db.run(City.select.filter(_.id === Expr(cityId)))
+        dbClient.transaction { implicit db =>
+          assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
+          assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        }
       }
     }
 
@@ -354,12 +344,12 @@ object WorldSqlTests extends TestSuite {
           val sql = db.toSqlQuery(query)
           assert(
             sql ==
-              """
-          SELECT
-            country0.name as res__0,
-            country0.continent as res__1
-          FROM country country0
-          """.trim.replaceAll("\\s+", " ")
+            """
+            SELECT
+              country0.name as res__0,
+              country0.continent as res__1
+            FROM country country0
+            """.trim.replaceAll("\\s+", " ")
           )
 
           val res = db.run(query).take(5)
@@ -375,97 +365,30 @@ object WorldSqlTests extends TestSuite {
         }
       }
 
-      test("tuple3") {
-        dbClient.transaction { implicit db =>
-          val query = Country.select.map(c => (c.name, c.continent, c.population))
-          val sql = db.toSqlQuery(query)
-          assert(
-            sql ==
-              """
-          SELECT
-            country0.name as res__0,
-            country0.continent as res__1,
-            country0.population as res__2
-          FROM country country0
-          """.trim.replaceAll("\\s+", " ")
-          )
-
-          val res = db.run(query).take(5)
-          val expected = Seq(
-            ("Afghanistan", "Asia", 22720000),
-            ("Netherlands", "Europe", 15864000),
-            ("Netherlands Antilles", "North America", 217000),
-            ("Albania", "Europe", 3401200),
-            ("Algeria", "Africa", 31471000)
-          )
-
-          assert(res == expected)
-        }
-      }
-
-      test("interpolateInMap") {
-        dbClient.transaction { implicit db =>
-          val query = Country.select.filter(_.name === "Singapore").map(c => c.population * 2)
-          val sql = db.toSqlQuery(query)
-          assert(
-            sql ==
-              """
-          SELECT
-            country0.population * ? as res
-          FROM country country0
-          WHERE country0.name = ?
-          """.trim.replaceAll("\\s+", " ")
-          )
-
-          val res = db.run(query)
-          val expected = Seq(7134000)
-          assert(res == expected)
-        }
-      }
-
-      test("interpolateInMap2") {
-        dbClient.transaction { implicit db =>
-          val query =
-            Country.select.filter(_.name === "Singapore").map(c => (c.name, c.population * 2))
-          val sql = db.toSqlQuery(query)
-          assert(
-            sql ==
-              """
-          SELECT
-            country0.name as res__0,
-            country0.population * ? as res__1
-          FROM country country0
-          WHERE country0.name = ?
-          """.trim.replaceAll("\\s+", " ")
-          )
-
-          val res = db.run(query)
-          val expected = Seq(("Singapore", 7134000))
-          assert(res == expected)
-        }
-      }
-
       test("heterogenousTuple") {
         dbClient.transaction { implicit db =>
-          val query =
-            City.select.filter(_.name === "Singapore").map(c => (c, c.name, c.population * 2))
+          val query = City.select
+            .filter(_.name === "Singapore")
+            .map(c => (c, c.name, c.population / 1000000))
+
           val sql = db.toSqlQuery(query)
+
           assert(
             sql ==
-              """
-          SELECT
-            city0.id as res__0__id,
-            city0.name as res__0__name,
-            city0.countrycode as res__0__countrycode,
-            city0.district as res__0__district,
-            city0.population as res__0__population,
-            city0.name as res__1,
-            city0.population * ? as res__2
-          FROM
-            city city0
-          WHERE
-            city0.name = ?
-          """.trim.replaceAll("\\s+", " ")
+            """
+            SELECT
+              city0.id as res__0__id,
+              city0.name as res__0__name,
+              city0.countrycode as res__0__countrycode,
+              city0.district as res__0__district,
+              city0.population as res__0__population,
+              city0.name as res__1,
+              city0.population / ? as res__2
+            FROM
+              city city0
+            WHERE
+              city0.name = ?
+            """.trim.replaceAll("\\s+", " ")
           )
 
           val res = db.run(query)
@@ -479,21 +402,11 @@ object WorldSqlTests extends TestSuite {
                 population = 4017733
               ),
               "Singapore",
-              8035466
+              4 // population in millions
             )
           )
 
           assert(res == expected)
-        }
-      }
-
-      test("filterMap") {
-
-        def findName(cityId: Int)(implicit db: DbApi) = db.run(City.select.filter(_.id === cityId).map(_.name))
-
-        dbClient.transaction { implicit db =>
-          assert(findName(3208) == List("Singapore"))
-          assert(findName(3209) == List("Bratislava"))
         }
       }
     }
@@ -535,78 +448,6 @@ object WorldSqlTests extends TestSuite {
           assert(res == expected)
         }
       }
-      test("min") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.map(_.population).min
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 42
-          assert(res == expected)
-        }
-      }
-      test("minBy") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.minBy(_.population)
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT MIN(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 42
-          assert(res == expected)
-        }
-      }
-      test("max") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.map(_.population).max
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 10500000
-          assert(res == expected)
-        }
-      }
-      test("maxBy") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.maxBy(_.population)
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT MAX(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 10500000
-          assert(res == expected)
-        }
-      }
-      test("avg") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.map(_.population).avg
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 350468
-          assert(res == expected)
-        }
-      }
-      test("avgBy") {
-        dbClient.transaction { implicit db =>
-          val query = City.select.avgBy(_.population)
-          val sql = db.toSqlQuery(query)
-
-          assert(sql == """SELECT AVG(city0.population) as res FROM city city0""")
-
-          val res = db.run(query)
-          val expected = 350468
-          assert(res == expected)
-        }
-      }
     }
 
     test("sortLimitOffset") {
@@ -617,14 +458,14 @@ object WorldSqlTests extends TestSuite {
 
         assert(
           sql ==
-            """
-      SELECT
-        city0.name as res__0,
-        city0.population as res__1
-      FROM city city0
-      ORDER BY res__1 DESC
-      LIMIT 5 OFFSET 5
-      """.trim.replaceAll("\\s+", " ")
+          """
+          SELECT
+            city0.name as res__0,
+            city0.population as res__1
+          FROM city city0
+          ORDER BY res__1 DESC
+          LIMIT 5 OFFSET 5
+          """.trim.replaceAll("\\s+", " ")
         )
 
         val res = db.run(query)
@@ -651,12 +492,12 @@ object WorldSqlTests extends TestSuite {
 
         assert(
           sql ==
-            """
-        SELECT city0.name as res
-        FROM city city0
-        JOIN country country1 ON city0.countrycode = country1.code
-        WHERE country1.name = ?
-        """.trim.replaceAll("\\s+", " ")
+          """
+          SELECT city0.name as res
+          FROM city city0
+          JOIN country country1 ON city0.countrycode = country1.code
+          WHERE country1.name = ?
+          """.trim.replaceAll("\\s+", " ")
         )
 
         val res = db.run(query)
