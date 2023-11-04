@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.{MappedType, Queryable}
+import scalasql.{Config, MappedType, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
 
@@ -184,8 +184,7 @@ object SimpleSelect {
     })
 
     lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
-      val str = (prevContext.config.columnLabelPrefix +: k).map(prevContext.config.columnNameMapper)
-        .mkString(prevContext.config.columnLabelDelimiter)
+      val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
       val exprId = Expr.getIdentity(v)
 
       (exprId, SqlStr.raw(str, Seq(exprId)))

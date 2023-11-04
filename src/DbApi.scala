@@ -155,7 +155,7 @@ object DbApi {
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
-      val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+      val (exprs, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
       else {
@@ -164,13 +164,15 @@ object DbApi {
         try {
           if (qr.singleRow(query)) {
             assert(resultSet.next())
-            val res = handleResultRow(resultSet, qr.valueReader(query), exprs, config)
+            val res =
+              handleResultRow(resultSet, qr.valueReader(query), exprs, config, columnUnMapper)
             assert(!resultSet.next())
             res
           } else {
             val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
             while (resultSet.next()) {
-              val rowRes = handleResultRow(resultSet, arrVisitor.subVisitor, exprs, config)
+              val rowRes =
+                handleResultRow(resultSet, arrVisitor.subVisitor, exprs, config, columnUnMapper)
               arrVisitor.visitValue(rowRes, -1)
             }
             arrVisitor.visitEnd(-1)
@@ -197,22 +199,29 @@ object DbApi {
       for ((p, n) <- params.zipWithIndex) {
         p.mappedType.asInstanceOf[MappedType[Any]].put(statement, n + 1, p.value)
       }
-      (exprs, statement)
+
+      val walked = qr.walk(query)
+
+      val columnUnMapper = walked.map { case (namesChunks, exprs) =>
+        Config.joinName(namesChunks.map(config.columnNameMapper), config) ->
+          Config.joinName(namesChunks, config)
+      }.toMap
+
+      (exprs, statement, columnUnMapper)
     }
 
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val (exprs, statement) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+        val (exprs, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
         val resultSet: ResultSet = statement.executeQuery()
         try {
           val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader[Seq, R]].r
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-
-            val rowRes = handleResultRow(resultSet, visitor, exprs, config)
+            val rowRes = handleResultRow(resultSet, visitor, exprs, config, columnUnMapper)
             action = handleItem(rowRes)
           }
 
@@ -235,7 +244,8 @@ object DbApi {
       resultSet: ResultSet,
       rowVisitor: Visitor[_, V],
       exprs: Seq[MappedType[_]],
-      config: Config
+      config: Config,
+      columnNameUnMapper: Map[String, String]
   ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
@@ -244,8 +254,8 @@ object DbApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = metadata.getColumnLabel(i + 1).split(config.columnLabelDelimiter)
-        .map(s => config.columnNameUnMapper(s.toLowerCase)).drop(1)
+      val k = columnNameUnMapper(metadata.getColumnLabel(i + 1).toLowerCase)
+        .split(config.columnLabelDelimiter).drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
       val isNull = resultSet.getObject(i + 1) == null
