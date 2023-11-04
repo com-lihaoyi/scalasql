@@ -7,6 +7,7 @@ import scalasql.utils.OptionPickler
 
 trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
+  def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)
 
   def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q, R]
 

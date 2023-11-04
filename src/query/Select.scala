@@ -45,6 +45,7 @@ trait Select[Q, R]
   def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
   def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
   def filter(f: Q => Expr[Boolean]): Select[Q, R]
+  def withFilter(f: Q => Expr[Boolean]): Select[Q, R] = filter(f)
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V]
 

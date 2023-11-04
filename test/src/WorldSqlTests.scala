@@ -765,88 +765,31 @@ object MainTests extends TestSuite {
 
     test("flatMap") {
       test {
-        val query = City.select
-          .flatMap(city =>
-            Country.select.map(country => (city.countryCode, country.code, country.name, city.name))
-          )
-          .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
-            cityCountryCode === countryCode && countryName === "Aruba"
-          }
-          .map { case (cityCountryCode, countryCode, countryName, cityName) =>
-            (cityName, countryCode)
-          }
-
+        val query = for{
+          city <- City.select
+          country <- Country.select
+          if city.countryCode === country.code
+          if country.name === "Liechtenstein"
+        } yield city.name
+        
         val sql = db.toSqlQuery(query)
 
         assert(
           sql ==
           """
-          SELECT city0.name as res__0, country1.code as res__1
-          FROM country country1 city city0,
-          WHERE city0.countrycode = country1.code
-          AND country1.name = ?
-          """.trim.replaceAll("\\s+", " ")
-        )
-
-        val res = db.run(query)
-
-        val expected = Seq(
-          ("Oranjestad", "ABW")
-        )
-
-        assert(res == expected)
-      }
-
-      test {
-        val query = City.select
-          .flatMap(city =>
-            Country.select.map(country => (city.countryCode, country.code, country.name, city.name))
-          )
-          .filter { case (cityCountryCode, countryCode, countryName, cityName) =>
-            cityCountryCode === countryCode && countryName === "Malaysia"
-          }
-          .map { case (cityCountryCode, countryCode, countryName, cityName) =>
-            (countryCode, cityName)
-          }
-
-        val sql = db.toSqlQuery(query)
-        assert(
-          sql ==
-            """
-          SELECT
-            country1.code as res__0,
-            city0.name as res__1
+          SELECT city0.name as res
           FROM city city0, country country1
-          WHERE city0.countrycode = country1.code
-          AND country1.name = ?
+          WHERE city0.countrycode = country1.code AND country1.name = ?
           """.trim.replaceAll("\\s+", " ")
         )
 
         val res = db.run(query)
 
-        val expected = Seq(
-          ("MYS", "Kuala Lumpur"),
-          ("MYS", "Ipoh"),
-          ("MYS", "Johor Baharu"),
-          ("MYS", "Petaling Jaya"),
-          ("MYS", "Kelang"),
-          ("MYS", "Kuala Terengganu"),
-          ("MYS", "Pinang"),
-          ("MYS", "Kota Bharu"),
-          ("MYS", "Kuantan"),
-          ("MYS", "Taiping"),
-          ("MYS", "Seremban"),
-          ("MYS", "Kuching"),
-          ("MYS", "Sibu"),
-          ("MYS", "Sandakan"),
-          ("MYS", "Alor Setar"),
-          ("MYS", "Selayang Baru"),
-          ("MYS", "Sungai Petani"),
-          ("MYS", "Shah Alam")
-        )
+        val expected = Seq("Schaan", "Vaduz")
 
         assert(res == expected)
       }
+
     }
 
     test("subquery") {
