@@ -10,16 +10,16 @@ import scalasql.{Config, DatabaseClient, Queryable}
 import java.sql.Connection
 
 class TestDb(
-    val db: DatabaseClient,
-    testSchemaFileName: String,
-    testDataFileName: String,
-    dialectConfig: DialectConfig
+              val dbClient: DatabaseClient,
+              testSchemaFileName: String,
+              testDataFileName: String,
+              dialectConfig: DialectConfig
 ) {
 
 
   def reset() = {
-    db.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
-    db.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
+    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
+    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
   def apply[T, V](
@@ -31,7 +31,7 @@ class TestDb(
       normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V]) = {
     if (sql != null) {
-      val sqlResult = db.autoCommit.toSqlQuery(query)
+      val sqlResult = dbClient.autoCommit.toSqlQuery(query)
         .stripSuffix(dialectConfig.defaultQueryableSuffix)
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
 //      pprint.log(sqlResult)
@@ -39,7 +39,7 @@ class TestDb(
       assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
     }
     if (sqls.nonEmpty) {
-      val sqlResult = db.autoCommit.toSqlQuery(query)
+      val sqlResult = dbClient.autoCommit.toSqlQuery(query)
         .stripSuffix(dialectConfig.defaultQueryableSuffix)
 
       val simplifiedSqls = sqls.map(_.trim.replaceAll("\\s+", " "))
@@ -49,7 +49,7 @@ class TestDb(
 
     }
 
-    val result = db.autoCommit.run(query)
+    val result = dbClient.autoCommit.run(query)
 
     val values = Option(value) ++ moreValues
     val normalized = normalize(result)

@@ -14,7 +14,7 @@ trait DbApiTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("run") {
-      checker.db.transaction { db =>
+      dbClient.transaction { db =>
         db.run(Buyer.select) ==> List(
           Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
           Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
@@ -24,7 +24,7 @@ trait DbApiTests extends ScalaSqlSuite {
     }
 
     test("runQuery") {
-      checker.db.transaction { db =>
+      dbClient.transaction { db =>
         val filterId = 2
         val output = db.runQuery(sql"SELECT name FROM buyer WHERE id = $filterId") { rs =>
           val output = mutable.Buffer.empty[String]
@@ -45,7 +45,7 @@ trait DbApiTests extends ScalaSqlSuite {
     }
 
     test("runUpdate") {
-      checker.db.transaction { db =>
+      dbClient.transaction { db =>
         val newName = "Moo Moo Cow"
         val newDateOfBirth = LocalDate.parse("2000-01-01")
         val count = db
@@ -63,7 +63,7 @@ trait DbApiTests extends ScalaSqlSuite {
 
     test("runRawQuery") {
       test("simple") {
-        checker.db.transaction { db =>
+        dbClient.transaction { db =>
           val output = db.runRawQuery("SELECT name FROM buyer") { rs =>
             val output = mutable.Buffer.empty[String]
 
@@ -83,7 +83,7 @@ trait DbApiTests extends ScalaSqlSuite {
       }
 
       test("interpolated") {
-        checker.db.transaction { db =>
+        dbClient.transaction { db =>
           val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", 2) { rs =>
             val output = mutable.Buffer.empty[String]
 
@@ -106,7 +106,7 @@ trait DbApiTests extends ScalaSqlSuite {
 
     test("runRawUpdate") {
       test("Simple") {
-        checker.db.transaction { db =>
+        dbClient.transaction { db =>
           val count = db.runRawUpdate(
             "INSERT INTO buyer (name, date_of_birth) VALUES('Moo Moo Cow', '2000-01-01')"
           )
@@ -122,7 +122,7 @@ trait DbApiTests extends ScalaSqlSuite {
       }
 
       test("prepared") {
-        checker.db.transaction { db =>
+        dbClient.transaction { db =>
           val count = db.runRawUpdate(
             "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
             "Moo Moo Cow",
@@ -141,7 +141,7 @@ trait DbApiTests extends ScalaSqlSuite {
     }
 
     test("stream") {
-      checker.db.transaction { db =>
+      dbClient.transaction { db =>
         val output = collection.mutable.Buffer.empty[String]
 
         db.stream(Buyer.select).generate { buyer =>

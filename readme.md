@@ -236,10 +236,11 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
 The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
 
 - `Q` -> `R` given `Queryable[Q, R]`
-   - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
    - `Query[R]` -> `R`
-   - `CaseClass[Expr]` -> `CaseClass[Id]`
-   - `Expr[T]` -> `T`
+   - `Q` -> `R` given `Queryable.Row[Q, R]`
+     - `TupleN[Q1, Q2, ... Qn]` -> `TupleN[R1, R2, ... Rn]`
+     - `CaseClass[Expr]` -> `CaseClass[Id]`
+     - `Expr[T]` -> `T`
 
 We need to use a `Queryable` typeclass here for two reasons:
 

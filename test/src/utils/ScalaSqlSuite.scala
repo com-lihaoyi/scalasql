@@ -7,7 +7,8 @@ import utest.TestSuite
 import java.sql.DriverManager
 
 trait ScalaSqlSuite extends TestSuite with Dialect {
-  val checker: TestDb
+  def checker: TestDb
+  lazy val dbClient = checker.dbClient
 }
 
 trait SqliteSuite extends TestSuite with SqliteDialect {
