@@ -31,7 +31,7 @@ class SimpleSelect[Q, R](
     val joins: Seq[Join],
     val where: Seq[Expr[_]],
     val groupBy0: Option[GroupBy]
-)(implicit val qr: Queryable.Simple[Q, R])
+)(implicit val qr: Queryable.Row[Q, R])
     extends Select[Q, R] {
   override def select = this
 
@@ -42,13 +42,13 @@ class SimpleSelect[Q, R](
       joins: Seq[Join] = this.joins,
       where: Seq[Expr[_]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
-  )(implicit qr: Queryable.Simple[Q, R]) =
+  )(implicit qr: Queryable.Row[Q, R]) =
     newSimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
   def queryExpr[V: MappedType](
       f: Q => Context => SqlStr
-  )(implicit qr2: Queryable.Simple[Expr[V], V]): Expr[V] = {
+  )(implicit qr2: Queryable.Row[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
       this.copy(expr = Expr[V] { implicit ctx: Context =>
         val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
@@ -58,12 +58,12 @@ class SimpleSelect[Q, R](
     }
   }
 
-  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Simple[Q2, R2]): Select[Q2, R2] =
+  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] =
     copy(expr = f(expr))
 
   def flatMap[Q2, R2](
       f: Q => Select[Q2, R2]
-  )(implicit qr2: Queryable.Simple[Q2, R2]): Select[Q2, R2] = {
+  )(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     val other = f(expr)
     val simple = simpleFrom(other)
     simple.copy(from = this.from ++ simple.from)
@@ -75,14 +75,14 @@ class SimpleSelect[Q, R](
   }
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-      implicit joinQr: Queryable.Simple[Q2, R2]
+      implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, None)((_, _)) }
 
   protected def joinCopy[Q2, R2, Q3, R3](
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]],
       joinPrefix: Option[String]
-  )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Simple[Q2, _], jqr: Queryable.Simple[Q3, R3]) = {
+  )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
     val thisTrivial = groupBy0.isEmpty
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
@@ -98,25 +98,23 @@ class SimpleSelect[Q, R](
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Simple[Q2, R2]): Select[(Q, Option[Q2]), (R, Option[R2])] = {
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, Option[Q2]), (R, Option[R2])] = {
     joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Option(o)))
   }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Simple[Q2, R2]): Select[(Option[Q], Q2), (Option[R], R2)] = {
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Option[Q], Q2), (Option[R], R2)] = {
     joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Option(e), o))
   }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable.Simple[Q2, R2]
+      implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
     joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (Option(e), Option(o)))
   }
 
-  def aggregate[E, V](
-      f: SelectProxy[Q] => E
-  )(implicit qr: Queryable.Simple[E, V]): Aggregate[E, V] = {
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
       implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery,
@@ -124,10 +122,9 @@ class SimpleSelect[Q, R](
     )(qr)
   }
 
-  def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(
-      implicit qrk: Queryable.Simple[K, R1],
-      qrv: Queryable.Simple[V, R2]
-  ): Select[(K, V), (R1, R2)] = {
+  def groupBy[K, V, R1, R2](groupKey: Q => K)(
+      groupAggregate: SelectProxy[Q] => V
+  )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))

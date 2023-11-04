@@ -11,10 +11,10 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q, R]
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-      implicit joinQr: Queryable.Simple[Q2, R2]
+      implicit joinQr: Queryable.Row[Q2, R2]
   ): Update[(Q, Q2), (R, R2)]
 
-  def qr: Queryable.Simple[Q, R]
+  def qr: Queryable.Row[Q, R]
   override def isExecuteUpdate = true
   override def singleRow = false
   def walk() = Nil
@@ -33,7 +33,7 @@ object Update {
       val set0: Seq[(Column.ColumnExpr[_], Expr[_])],
       val joins: Seq[Join],
       val where: Seq[Expr[_]]
-  )(implicit val qr: Queryable.Simple[Q, R])
+  )(implicit val qr: Queryable.Row[Q, R])
       extends Update[Q, R] {
     def copy[Q, R](
         expr: Q = this.expr,
@@ -41,14 +41,14 @@ object Update {
         set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Simple[Q, R]): Update[Q, R] = new Impl(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R]): Update[Q, R] = new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
     def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-        implicit joinQr: Queryable.Simple[Q2, R2]
+        implicit joinQr: Queryable.Row[Q2, R2]
     ) = {
       val (otherJoin, otherSelect) = joinInfo(None, other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)

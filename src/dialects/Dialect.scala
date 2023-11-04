@@ -16,11 +16,11 @@ trait Dialect extends DialectConfig {
     new operations.ExprOptionOps(v)
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
   implicit def AggNumericOpsConv[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(
-      implicit qr: Queryable.Simple[Expr[V], V]
+      implicit qr: Queryable.Row[Expr[V], V]
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
 
   implicit def AggOpsConv[T](v: Aggregatable[T])(
-      implicit qr: Queryable.Simple[T, _]
+      implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
   implicit def SelectOpsConv[T](v: Select[T, _]): operations.SelectOps[T] =

@@ -5,22 +5,22 @@ import scalasql.{Queryable, Table}
 trait JoinOps[C[_, _], Q, R] {
   def expr: Q
   def join[Q2, R2](other: Joinable[Q2, R2])(
-      implicit qr: Queryable.Simple[Q2, R2]
+      implicit qr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)] = join0(other, None)
 
   def joinOn[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit qr: Queryable.Simple[Q2, R2]
+      implicit qr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)] = join0(other, Some(on))
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-      implicit joinQr: Queryable.Simple[Q2, R2]
+      implicit joinQr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)]
 
   def joinInfo[Q2, R2](
       joinPrefix: Option[String],
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
-  )(implicit joinQr: Queryable.Simple[Q2, _]) = {
+  )(implicit joinQr: Queryable.Row[Q2, _]) = {
     val otherSelect = other.select
 
     val otherJoin =
@@ -34,7 +34,7 @@ trait JoinOps[C[_, _], Q, R] {
       else Join(
         joinPrefix,
         Seq(JoinFrom(
-          new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable.Simple[Q2, R2]]),
+          new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable.Row[Q2, R2]]),
           on.map(_(expr, otherSelect.expr))
         ))
       )

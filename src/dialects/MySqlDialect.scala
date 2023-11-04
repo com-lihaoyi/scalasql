@@ -64,7 +64,7 @@ object MySqlDialect extends MySqlDialect {
       set0: Seq[(Column.ColumnExpr[_], Expr[_])],
       joins: Seq[Join],
       where: Seq[Expr[_]]
-  )(implicit qr: Queryable.Simple[Q, R])
+  )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
     override def copy[Q, R](
@@ -73,7 +73,7 @@ object MySqlDialect extends MySqlDialect {
         set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Simple[Q, R]) = new Update(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
 
     override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       toSqlQuery0(this, ctx)
@@ -150,7 +150,7 @@ object MySqlDialect extends MySqlDialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Simple[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -161,7 +161,7 @@ object MySqlDialect extends MySqlDialect {
         joins: Seq[Join],
         where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Simple[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }
@@ -173,11 +173,11 @@ object MySqlDialect extends MySqlDialect {
       joins: Seq[Join],
       where: Seq[Expr[_]],
       groupBy0: Option[GroupBy]
-  )(implicit qr: Queryable.Simple[Q, R])
+  )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
       with Select[Q, R] {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-        implicit joinQr: Queryable.Simple[Q2, R2]
+        implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on).map { case (l, r) => (Option(l), r) }.union(rightJoin(other)(on).map {
         case (l, r) => (l, Option(r))
@@ -191,7 +191,7 @@ object MySqlDialect extends MySqlDialect {
       orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
-  )(implicit qr: Queryable.Simple[Q, R])
+  )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
     override def getRenderer(prevContext: Context) = new CompoundSelectRenderer(this, prevContext)

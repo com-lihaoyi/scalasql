@@ -35,10 +35,10 @@ object Expr {
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](
       implicit valueReader0: OptionPickler.Reader[T]
-  ): Queryable.Simple[E[T], T] = new ExprQueryable[E, T]()
+  ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
 
   class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
-      extends Queryable.Simple[E[T], T] {
+      extends Queryable.Row[E[T], T] {
     def walk(q: E[T]) = Seq(Nil -> q)
 
     def valueReader = valueReader0

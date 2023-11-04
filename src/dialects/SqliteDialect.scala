@@ -40,7 +40,7 @@ object SqliteDialect extends SqliteDialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Simple[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -51,7 +51,7 @@ object SqliteDialect extends SqliteDialect {
         joins: Seq[Join],
         where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Simple[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }
@@ -63,7 +63,7 @@ object SqliteDialect extends SqliteDialect {
       joins: Seq[Join],
       where: Seq[Expr[_]],
       groupBy0: Option[GroupBy]
-  )(implicit qr: Queryable.Simple[Q, R])
+  )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
       with Select[Q, R]
 
@@ -73,7 +73,7 @@ object SqliteDialect extends SqliteDialect {
       orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
-  )(implicit qr: Queryable.Simple[Q, R])
+  )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
     override def getRenderer(prevContext: Context) = {
