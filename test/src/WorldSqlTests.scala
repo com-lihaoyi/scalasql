@@ -1,7 +1,7 @@
 package scalasql
 import utest._
-import dialects.SqliteDialect._
-import scalasql.dialects.SqliteDialect
+import dialects.H2Dialect._
+import scalasql.dialects.H2Dialect
 import scalasql.query.Expr
 
 
@@ -58,7 +58,7 @@ object WorldSqlTests extends TestSuite {
       override def columnNameMapper(v: String) = v.toLowerCase()
       override def tableNameMapper(v: String) = v.toLowerCase()
     },
-    SqliteDialect
+    H2Dialect
   ).autoCommit
   db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
 

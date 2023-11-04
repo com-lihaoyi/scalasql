@@ -25,7 +25,7 @@ object TestClients{
 
   lazy val postgres = {
     println("Initializing Postgres")
-    val pg: PostgreSQLContainer[_] = new PostgreSQLContainer("postgres:15-alpine")
+    val pg = new PostgreSQLContainer("postgres:15-alpine")
     pg.start()
     pg
   }
@@ -38,8 +38,8 @@ object TestClients{
 
   lazy val mysql = {
     println("Initializing MySql")
-    val mysql: MySQLContainer[_] = new MySQLContainer("mysql:8.0.31")
-      .withCommand("mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin")
+    val mysql = new MySQLContainer("mysql:8.0.31")
+    mysql.setCommand("mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_bin")
     mysql.start()
     mysql
   }
