@@ -12,6 +12,14 @@ object WorldSqlTests extends TestSuite {
   // Postgres, and MySql out of the box. The `Dialect` import provides the
   // various operators and functions that may be unique to each specific database
   //
+  // For these examples, we will be using the
+  // [MySql World Statistics Example Database](https://dev.mysql.com/doc/world-setup/en/),
+  // adjusted for compatibility with H2
+  //
+  // ```sql
+  // +INCLUDE test/resources/world-schema.sql
+  // ```
+  //
   // ## Modeling Your Schema
   //
   // Next, you need to define your data model classes. In ScalaSql, your data model
@@ -21,9 +29,7 @@ object WorldSqlTests extends TestSuite {
   // (when `T` is `scalasql.Id`).
   //
   // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
-  // the database tables defined by the
-  // [MySql World Statistics Example Database](https://dev.mysql.com/doc/world-setup/en/),
-  // adjusted for compatibility with H2
+  // the database tables we saw above
   //
   case class Country[+T[_]](
       code: T[String],
@@ -89,7 +95,8 @@ object WorldSqlTests extends TestSuite {
     )
 
     val db = dbClient.autoCommit
-    db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world.sql"))
+    db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world-schema.sql"))
+    db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world-data.sql"))
 
     // We use `dbClient.autoCommit` in order to create a client that will automatically
     // run every SQL command in a new transaction and commit it. For the majority of
@@ -149,27 +156,9 @@ object WorldSqlTests extends TestSuite {
       """.trim.replaceAll("\\s+", " ")
 
       db.run(query).take(3) ==> Seq(
-        City[Id](
-          id = 1,
-          name = "Kabul",
-          countryCode = "AFG",
-          district = "Kabol",
-          population = 1780000
-        ),
-        City[Id](
-          id = 2,
-          name = "Qandahar",
-          countryCode = "AFG",
-          district = "Qandahar",
-          population = 237500
-        ),
-        City[Id](
-          id = 3,
-          name = "Herat",
-          countryCode = "AFG",
-          district = "Herat",
-          population = 186800
-        )
+        City[Id](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
+        City[Id](2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
+        City[Id](3, "Herat", "AFG", district = "Herat", population = 186800)
       )
 
       // Notice that `db.run` returns instances of type `City[Id]`. `Id` is `scalasql.Id`,

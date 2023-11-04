@@ -53,6 +53,9 @@ object scalasql extends RootModule with ScalaModule {
         (suffix, isCode) match{
           case ("", _) => outputLines.append("")
 
+          case (s"// +INCLUDE $rest", _) =>
+            os.read.lines(os.pwd / os.SubPath(rest)).foreach(outputLines.append)
+
           case (s"//$rest", false) => outputLines.append(rest.stripPrefix(" "))
 
           case (s"//$rest", true) =>

@@ -1,42 +1,4 @@
 
---
--- The sample data used in the world database is Copyright Statistics
--- Finland, http://www.stat.fi/worldinfigures.
---
-
-CREATE TABLE IF NOT EXISTS city (
-    id integer AUTO_INCREMENT NOT NULL,
-    name varchar NOT NULL,
-    countrycode character(3) NOT NULL,
-    district varchar NOT NULL,
-    population integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS country (
-    code character(3) NOT NULL,
-    name varchar NOT NULL,
-    continent varchar NOT NULL,
-    region varchar NOT NULL,
-    surfacearea real NOT NULL,
-    indepyear smallint,
-    population integer NOT NULL,
-    lifeexpectancy real,
-    gnp numeric(10,2),
-    gnpold numeric(10,2),
-    localname varchar NOT NULL,
-    governmentform varchar NOT NULL,
-    headofstate varchar,
-    capital integer,
-    code2 character(2) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS countrylanguage (
-    countrycode character(3) NOT NULL,
-    language varchar NOT NULL,
-    isofficial boolean NOT NULL,
-    percentage real NOT NULL
-);
-
 -- COPY city (id, name, countrycode, district, population) FROM stdin;
 INSERT INTO city (name, countrycode, district, population) VALUES ('Kabul', 'AFG', 'Kabol', 1780000),
 ('Qandahar', 'AFG', 'Qandahar', 237500),
@@ -4122,1243 +4084,1230 @@ INSERT INTO city (name, countrycode, district, population) VALUES ('Kabul', 'AFG
 --
 -- Data for Name: country; Type: TABLE DATA; Schema: public; Owner: chriskl
 --
-INSERT INTO country VALUES ('AFG', 'Afghanistan', 'Asia', 'Southern and Central Asia', 652090, 1919, 22720000, 45.900002, 5976.00, NULL, 'Afganistan/Afqanestan', 'Islamic Emirate', 'Mohammad Omar', 1, 'AF');
-INSERT INTO country VALUES ('NLD', 'Netherlands', 'Europe', 'Western Europe', 41526, 1581, 15864000, 78.300003, 371362.00, 360478.00, 'Nederland', 'Constitutional Monarchy', 'Beatrix', 5, 'NL');
-INSERT INTO country VALUES ('ANT', 'Netherlands Antilles', 'North America', 'Caribbean', 800, NULL, 217000, 74.699997, 1941.00, NULL, 'Nederlandse Antillen', 'Nonmetropolitan Territory of The Netherlands', 'Beatrix', 33, 'AN');
-INSERT INTO country VALUES ('ALB', 'Albania', 'Europe', 'Southern Europe', 28748, 1912, 3401200, 71.599998, 3205.00, 2500.00, 'Shqipëria', 'Republic', 'Rexhep Mejdani', 34, 'AL');
-INSERT INTO country VALUES ('DZA', 'Algeria', 'Africa', 'Northern Africa', 2381741, 1962, 31471000, 69.699997, 49982.00, 46966.00, 'Al-Jazair/Algérie', 'Republic', 'Abdelaziz Bouteflika', 35, 'DZ');
-INSERT INTO country VALUES ('ASM', 'American Samoa', 'Oceania', 'Polynesia', 199, NULL, 68000, 75.099998, 334.00, NULL, 'Amerika Samoa', 'US Territory', 'George W. Bush', 54, 'AS');
-INSERT INTO country VALUES ('AND', 'Andorra', 'Europe', 'Southern Europe', 468, 1278, 78000, 83.5, 1630.00, NULL, 'Andorra', 'Parliamentary Coprincipality', '', 55, 'AD');
-INSERT INTO country VALUES ('AGO', 'Angola', 'Africa', 'Central Africa', 1246700, 1975, 12878000, 38.299999, 6648.00, 7984.00, 'Angola', 'Republic', 'José Eduardo dos Santos', 56, 'AO');
-INSERT INTO country VALUES ('AIA', 'Anguilla', 'North America', 'Caribbean', 96, NULL, 8000, 76.099998, 63.20, NULL, 'Anguilla', 'Dependent Territory of the UK', 'Elisabeth II', 62, 'AI');
-INSERT INTO country VALUES ('ATG', 'Antigua and Barbuda', 'North America', 'Caribbean', 442, 1981, 68000, 70.5, 612.00, 584.00, 'Antigua and Barbuda', 'Constitutional Monarchy', 'Elisabeth II', 63, 'AG');
-INSERT INTO country VALUES ('ARE', 'United Arab Emirates', 'Asia', 'Middle East', 83600, 1971, 2441000, 74.099998, 37966.00, 36846.00, 'Al-Imarat al-´Arabiya al-Muttahida', 'Emirate Federation', 'Zayid bin Sultan al-Nahayan', 65, 'AE');
-INSERT INTO country VALUES ('ARG', 'Argentina', 'South America', 'South America', 2780400, 1816, 37032000, 75.099998, 340238.00, 323310.00, 'Argentina', 'Federal Republic', 'Fernando de la Rúa', 69, 'AR');
-INSERT INTO country VALUES ('ARM', 'Armenia', 'Asia', 'Middle East', 29800, 1991, 3520000, 66.400002, 1813.00, 1627.00, 'Hajastan', 'Republic', 'Robert Kotarjan', 126, 'AM');
-INSERT INTO country VALUES ('ABW', 'Aruba', 'North America', 'Caribbean', 193, NULL, 103000, 78.400002, 828.00, 793.00, 'Aruba', 'Nonmetropolitan Territory of The Netherlands', 'Beatrix', 129, 'AW');
-INSERT INTO country VALUES ('AUS', 'Australia', 'Oceania', 'Australia and New Zealand', 7741220, 1901, 18886000, 79.800003, 351182.00, 392911.00, 'Australia', 'Constitutional Monarchy, Federation', 'Elisabeth II', 135, 'AU');
-INSERT INTO country VALUES ('AZE', 'Azerbaijan', 'Asia', 'Middle East', 86600, 1991, 7734000, 62.900002, 4127.00, 4100.00, 'Azärbaycan', 'Federal Republic', 'Heydär Äliyev', 144, 'AZ');
-INSERT INTO country VALUES ('BHS', 'Bahamas', 'North America', 'Caribbean', 13878, 1973, 307000, 71.099998, 3527.00, 3347.00, 'The Bahamas', 'Constitutional Monarchy', 'Elisabeth II', 148, 'BS');
-INSERT INTO country VALUES ('BHR', 'Bahrain', 'Asia', 'Middle East', 694, 1971, 617000, 73, 6366.00, 6097.00, 'Al-Bahrayn', 'Monarchy (Emirate)', 'Hamad ibn Isa al-Khalifa', 149, 'BH');
-INSERT INTO country VALUES ('BGD', 'Bangladesh', 'Asia', 'Southern and Central Asia', 143998, 1971, 129155000, 60.200001, 32852.00, 31966.00, 'Bangladesh', 'Republic', 'Shahabuddin Ahmad', 150, 'BD');
-INSERT INTO country VALUES ('BRB', 'Barbados', 'North America', 'Caribbean', 430, 1966, 270000, 73, 2223.00, 2186.00, 'Barbados', 'Constitutional Monarchy', 'Elisabeth II', 174, 'BB');
-INSERT INTO country VALUES ('BEL', 'Belgium', 'Europe', 'Western Europe', 30518, 1830, 10239000, 77.800003, 249704.00, 243948.00, 'België/Belgique', 'Constitutional Monarchy, Federation', 'Albert II', 179, 'BE');
-INSERT INTO country VALUES ('BLZ', 'Belize', 'North America', 'Central America', 22696, 1981, 241000, 70.900002, 630.00, 616.00, 'Belize', 'Constitutional Monarchy', 'Elisabeth II', 185, 'BZ');
-INSERT INTO country VALUES ('BEN', 'Benin', 'Africa', 'Western Africa', 112622, 1960, 6097000, 50.200001, 2357.00, 2141.00, 'Bénin', 'Republic', 'Mathieu Kérékou', 187, 'BJ');
-INSERT INTO country VALUES ('BMU', 'Bermuda', 'North America', 'North America', 53, NULL, 65000, 76.900002, 2328.00, 2190.00, 'Bermuda', 'Dependent Territory of the UK', 'Elisabeth II', 191, 'BM');
-INSERT INTO country VALUES ('BTN', 'Bhutan', 'Asia', 'Southern and Central Asia', 47000, 1910, 2124000, 52.400002, 372.00, 383.00, 'Druk-Yul', 'Monarchy', 'Jigme Singye Wangchuk', 192, 'BT');
-INSERT INTO country VALUES ('BOL', 'Bolivia', 'South America', 'South America', 1098581, 1825, 8329000, 63.700001, 8571.00, 7967.00, 'Bolivia', 'Republic', 'Hugo Bánzer Suárez', 194, 'BO');
-INSERT INTO country VALUES ('BIH', 'Bosnia and Herzegovina', 'Europe', 'Southern Europe', 51197, 1992, 3972000, 71.5, 2841.00, NULL, 'Bosna i Hercegovina', 'Federal Republic', 'Ante Jelavic', 201, 'BA');
-INSERT INTO country VALUES ('BWA', 'Botswana', 'Africa', 'Southern Africa', 581730, 1966, 1622000, 39.299999, 4834.00, 4935.00, 'Botswana', 'Republic', 'Festus G. Mogae', 204, 'BW');
-INSERT INTO country VALUES ('BRA', 'Brazil', 'South America', 'South America', 8547403, 1822, 170115000, 62.900002, 776739.00, 804108.00, 'Brasil', 'Federal Republic', 'Fernando Henrique Cardoso', 211, 'BR');
-INSERT INTO country VALUES ('GBR', 'United Kingdom', 'Europe', 'British Islands', 242900, 1066, 59623400, 77.699997, 1378330.00, 1296830.00, 'United Kingdom', 'Constitutional Monarchy', 'Elisabeth II', 456, 'GB');
-INSERT INTO country VALUES ('VGB', 'Virgin Islands, British', 'North America', 'Caribbean', 151, NULL, 21000, 75.400002, 612.00, 573.00, 'British Virgin Islands', 'Dependent Territory of the UK', 'Elisabeth II', 537, 'VG');
-INSERT INTO country VALUES ('BRN', 'Brunei', 'Asia', 'Southeast Asia', 5765, 1984, 328000, 73.599998, 11705.00, 12460.00, 'Brunei Darussalam', 'Monarchy (Sultanate)', 'Haji Hassan al-Bolkiah', 538, 'BN');
-INSERT INTO country VALUES ('BGR', 'Bulgaria', 'Europe', 'Eastern Europe', 110994, 1908, 8190900, 70.900002, 12178.00, 10169.00, 'Balgarija', 'Republic', 'Petar Stojanov', 539, 'BG');
-INSERT INTO country VALUES ('BFA', 'Burkina Faso', 'Africa', 'Western Africa', 274000, 1960, 11937000, 46.700001, 2425.00, 2201.00, 'Burkina Faso', 'Republic', 'Blaise Compaoré', 549, 'BF');
-INSERT INTO country VALUES ('BDI', 'Burundi', 'Africa', 'Eastern Africa', 27834, 1962, 6695000, 46.200001, 903.00, 982.00, 'Burundi/Uburundi', 'Republic', 'Pierre Buyoya', 552, 'BI');
-INSERT INTO country VALUES ('CYM', 'Cayman Islands', 'North America', 'Caribbean', 264, NULL, 38000, 78.900002, 1263.00, 1186.00, 'Cayman Islands', 'Dependent Territory of the UK', 'Elisabeth II', 553, 'KY');
-INSERT INTO country VALUES ('CHL', 'Chile', 'South America', 'South America', 756626, 1810, 15211000, 75.699997, 72949.00, 75780.00, 'Chile', 'Republic', 'Ricardo Lagos Escobar', 554, 'CL');
-INSERT INTO country VALUES ('COK', 'Cook Islands', 'Oceania', 'Polynesia', 236, NULL, 20000, 71.099998, 100.00, NULL, 'The Cook Islands', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 583, 'CK');
-INSERT INTO country VALUES ('CRI', 'Costa Rica', 'North America', 'Central America', 51100, 1821, 4023000, 75.800003, 10226.00, 9757.00, 'Costa Rica', 'Republic', 'Miguel Ángel Rodríguez Echeverría', 584, 'CR');
-INSERT INTO country VALUES ('DJI', 'Djibouti', 'Africa', 'Eastern Africa', 23200, 1977, 638000, 50.799999, 382.00, 373.00, 'Djibouti/Jibuti', 'Republic', 'Ismail Omar Guelleh', 585, 'DJ');
-INSERT INTO country VALUES ('DMA', 'Dominica', 'North America', 'Caribbean', 751, 1978, 71000, 73.400002, 256.00, 243.00, 'Dominica', 'Republic', 'Vernon Shaw', 586, 'DM');
-INSERT INTO country VALUES ('DOM', 'Dominican Republic', 'North America', 'Caribbean', 48511, 1844, 8495000, 73.199997, 15846.00, 15076.00, 'República Dominicana', 'Republic', 'Hipólito Mejía Domínguez', 587, 'DO');
-INSERT INTO country VALUES ('ECU', 'Ecuador', 'South America', 'South America', 283561, 1822, 12646000, 71.099998, 19770.00, 19769.00, 'Ecuador', 'Republic', 'Gustavo Noboa Bejarano', 594, 'EC');
-INSERT INTO country VALUES ('EGY', 'Egypt', 'Africa', 'Northern Africa', 1001449, 1922, 68470000, 63.299999, 82710.00, 75617.00, 'Misr', 'Republic', 'Hosni Mubarak', 608, 'EG');
-INSERT INTO country VALUES ('SLV', 'El Salvador', 'North America', 'Central America', 21041, 1841, 6276000, 69.699997, 11863.00, 11203.00, 'El Salvador', 'Republic', 'Francisco Guillermo Flores Pérez', 645, 'SV');
-INSERT INTO country VALUES ('ERI', 'Eritrea', 'Africa', 'Eastern Africa', 117600, 1993, 3850000, 55.799999, 650.00, 755.00, 'Ertra', 'Republic', 'Isayas Afewerki [Isaias Afwerki]', 652, 'ER');
-INSERT INTO country VALUES ('ESP', 'Spain', 'Europe', 'Southern Europe', 505992, 1492, 39441700, 78.800003, 553233.00, 532031.00, 'España', 'Constitutional Monarchy', 'Juan Carlos I', 653, 'ES');
-INSERT INTO country VALUES ('ZAF', 'South Africa', 'Africa', 'Southern Africa', 1221037, 1910, 40377000, 51.099998, 116729.00, 129092.00, 'South Africa', 'Republic', 'Thabo Mbeki', 716, 'ZA');
-INSERT INTO country VALUES ('ETH', 'Ethiopia', 'Africa', 'Eastern Africa', 1104300, -1000, 62565000, 45.200001, 6353.00, 6180.00, 'YeItyop´iya', 'Republic', 'Negasso Gidada', 756, 'ET');
-INSERT INTO country VALUES ('FLK', 'Falkland Islands', 'South America', 'South America', 12173, NULL, 2000, NULL, 0.00, NULL, 'Falkland Islands', 'Dependent Territory of the UK', 'Elisabeth II', 763, 'FK');
-INSERT INTO country VALUES ('FJI', 'Fiji Islands', 'Oceania', 'Melanesia', 18274, 1970, 817000, 67.900002, 1536.00, 2149.00, 'Fiji Islands', 'Republic', 'Josefa Iloilo', 764, 'FJ');
-INSERT INTO country VALUES ('PHL', 'Philippines', 'Asia', 'Southeast Asia', 300000, 1946, 75967000, 67.5, 65107.00, 82239.00, 'Pilipinas', 'Republic', 'Gloria Macapagal-Arroyo', 766, 'PH');
-INSERT INTO country VALUES ('FRO', 'Faroe Islands', 'Europe', 'Nordic Countries', 1399, NULL, 43000, 78.400002, 0.00, NULL, 'Føroyar', 'Part of Denmark', 'Margrethe II', 901, 'FO');
-INSERT INTO country VALUES ('GAB', 'Gabon', 'Africa', 'Central Africa', 267668, 1960, 1226000, 50.099998, 5493.00, 5279.00, 'Le Gabon', 'Republic', 'Omar Bongo', 902, 'GA');
-INSERT INTO country VALUES ('GMB', 'Gambia', 'Africa', 'Western Africa', 11295, 1965, 1305000, 53.200001, 320.00, 325.00, 'The Gambia', 'Republic', 'Yahya Jammeh', 904, 'GM');
-INSERT INTO country VALUES ('GEO', 'Georgia', 'Asia', 'Middle East', 69700, 1991, 4968000, 64.5, 6064.00, 5924.00, 'Sakartvelo', 'Republic', 'Eduard evardnadze', 905, 'GE');
-INSERT INTO country VALUES ('GHA', 'Ghana', 'Africa', 'Western Africa', 238533, 1957, 20212000, 57.400002, 7137.00, 6884.00, 'Ghana', 'Republic', 'John Kufuor', 910, 'GH');
-INSERT INTO country VALUES ('GIB', 'Gibraltar', 'Europe', 'Southern Europe', 6, NULL, 25000, 79, 258.00, NULL, 'Gibraltar', 'Dependent Territory of the UK', 'Elisabeth II', 915, 'GI');
-INSERT INTO country VALUES ('GRD', 'Grenada', 'North America', 'Caribbean', 344, 1974, 94000, 64.5, 318.00, NULL, 'Grenada', 'Constitutional Monarchy', 'Elisabeth II', 916, 'GD');
-INSERT INTO country VALUES ('GRL', 'Greenland', 'North America', 'North America', 2166090, NULL, 56000, 68.099998, 0.00, NULL, 'Kalaallit Nunaat/Grønland', 'Part of Denmark', 'Margrethe II', 917, 'GL');
-INSERT INTO country VALUES ('GLP', 'Guadeloupe', 'North America', 'Caribbean', 1705, NULL, 456000, 77, 3501.00, NULL, 'Guadeloupe', 'Overseas Department of France', 'Jacques Chirac', 919, 'GP');
-INSERT INTO country VALUES ('GUM', 'Guam', 'Oceania', 'Micronesia', 549, NULL, 168000, 77.800003, 1197.00, 1136.00, 'Guam', 'US Territory', 'George W. Bush', 921, 'GU');
-INSERT INTO country VALUES ('GTM', 'Guatemala', 'North America', 'Central America', 108889, 1821, 11385000, 66.199997, 19008.00, 17797.00, 'Guatemala', 'Republic', 'Alfonso Portillo Cabrera', 922, 'GT');
-INSERT INTO country VALUES ('GIN', 'Guinea', 'Africa', 'Western Africa', 245857, 1958, 7430000, 45.599998, 2352.00, 2383.00, 'Guinée', 'Republic', 'Lansana Conté', 926, 'GN');
-INSERT INTO country VALUES ('GNB', 'Guinea-Bissau', 'Africa', 'Western Africa', 36125, 1974, 1213000, 49, 293.00, 272.00, 'Guiné-Bissau', 'Republic', 'Kumba Ialá', 927, 'GW');
-INSERT INTO country VALUES ('GUY', 'Guyana', 'South America', 'South America', 214969, 1966, 861000, 64, 722.00, 743.00, 'Guyana', 'Republic', 'Bharrat Jagdeo', 928, 'GY');
-INSERT INTO country VALUES ('HTI', 'Haiti', 'North America', 'Caribbean', 27750, 1804, 8222000, 49.200001, 3459.00, 3107.00, 'Haïti/Dayti', 'Republic', 'Jean-Bertrand Aristide', 929, 'HT');
-INSERT INTO country VALUES ('HND', 'Honduras', 'North America', 'Central America', 112088, 1838, 6485000, 69.900002, 5333.00, 4697.00, 'Honduras', 'Republic', 'Carlos Roberto Flores Facussé', 933, 'HN');
-INSERT INTO country VALUES ('HKG', 'Hong Kong', 'Asia', 'Eastern Asia', 1075, NULL, 6782000, 79.5, 166448.00, 173610.00, 'Xianggang/Hong Kong', 'Special Administrative Region of China', 'Jiang Zemin', 937, 'HK');
-INSERT INTO country VALUES ('SJM', 'Svalbard and Jan Mayen', 'Europe', 'Nordic Countries', 62422, NULL, 3200, NULL, 0.00, NULL, 'Svalbard og Jan Mayen', 'Dependent Territory of Norway', 'Harald V', 938, 'SJ');
-INSERT INTO country VALUES ('IDN', 'Indonesia', 'Asia', 'Southeast Asia', 1904569, 1945, 212107000, 68, 84982.00, 215002.00, 'Indonesia', 'Republic', 'Abdurrahman Wahid', 939, 'ID');
-INSERT INTO country VALUES ('IND', 'India', 'Asia', 'Southern and Central Asia', 3287263, 1947, 1013662000, 62.5, 447114.00, 430572.00, 'Bharat/India', 'Federal Republic', 'Kocheril Raman Narayanan', 1109, 'IN');
-INSERT INTO country VALUES ('IRQ', 'Iraq', 'Asia', 'Middle East', 438317, 1932, 23115000, 66.5, 11500.00, NULL, 'Al-´Iraq', 'Republic', 'Saddam Hussein al-Takriti', 1365, 'IQ');
-INSERT INTO country VALUES ('IRN', 'Iran', 'Asia', 'Southern and Central Asia', 1648195, 1906, 67702000, 69.699997, 195746.00, 160151.00, 'Iran', 'Islamic Republic', 'Ali Mohammad Khatami-Ardakani', 1380, 'IR');
-INSERT INTO country VALUES ('IRL', 'Ireland', 'Europe', 'British Islands', 70273, 1921, 3775100, 76.800003, 75921.00, 73132.00, 'Ireland/Éire', 'Republic', 'Mary McAleese', 1447, 'IE');
-INSERT INTO country VALUES ('ISL', 'Iceland', 'Europe', 'Nordic Countries', 103000, 1944, 279000, 79.400002, 8255.00, 7474.00, 'Ísland', 'Republic', 'Ólafur Ragnar Grímsson', 1449, 'IS');
-INSERT INTO country VALUES ('ISR', 'Israel', 'Asia', 'Middle East', 21056, 1948, 6217000, 78.599998, 97477.00, 98577.00, 'Yisrael/Israil', 'Republic', 'Moshe Katzav', 1450, 'IL');
-INSERT INTO country VALUES ('ITA', 'Italy', 'Europe', 'Southern Europe', 301316, 1861, 57680000, 79, 1161755.00, 1145372.00, 'Italia', 'Republic', 'Carlo Azeglio Ciampi', 1464, 'IT');
-INSERT INTO country VALUES ('TMP', 'East Timor', 'Asia', 'Southeast Asia', 14874, NULL, 885000, 46, 0.00, NULL, 'Timor Timur', 'Administrated by the UN', 'José Alexandre Gusmão', 1522, 'TP');
-INSERT INTO country VALUES ('AUT', 'Austria', 'Europe', 'Western Europe', 83859, 1918, 8091800, 77.699997, 211860.00, 206025.00, 'Österreich', 'Federal Republic', 'Thomas Klestil', 1523, 'AT');
-INSERT INTO country VALUES ('JAM', 'Jamaica', 'North America', 'Caribbean', 10990, 1962, 2583000, 75.199997, 6871.00, 6722.00, 'Jamaica', 'Constitutional Monarchy', 'Elisabeth II', 1530, 'JM');
-INSERT INTO country VALUES ('JPN', 'Japan', 'Asia', 'Eastern Asia', 377829, -660, 126714000, 80.699997, 3787042.00, 4192638.00, 'Nihon/Nippon', 'Constitutional Monarchy', 'Akihito', 1532, 'JP');
-INSERT INTO country VALUES ('YEM', 'Yemen', 'Asia', 'Middle East', 527968, 1918, 18112000, 59.799999, 6041.00, 5729.00, 'Al-Yaman', 'Republic', 'Ali Abdallah Salih', 1780, 'YE');
-INSERT INTO country VALUES ('JOR', 'Jordan', 'Asia', 'Middle East', 88946, 1946, 5083000, 77.400002, 7526.00, 7051.00, 'Al-Urdunn', 'Constitutional Monarchy', 'Abdullah II', 1786, 'JO');
-INSERT INTO country VALUES ('CXR', 'Christmas Island', 'Oceania', 'Australia and New Zealand', 135, NULL, 2500, NULL, 0.00, NULL, 'Christmas Island', 'Territory of Australia', 'Elisabeth II', 1791, 'CX');
-INSERT INTO country VALUES ('YUG', 'Yugoslavia', 'Europe', 'Southern Europe', 102173, 1918, 10640000, 72.400002, 17000.00, NULL, 'Jugoslavija', 'Federal Republic', 'Vojislav Kotunica', 1792, 'YU');
-INSERT INTO country VALUES ('KHM', 'Cambodia', 'Asia', 'Southeast Asia', 181035, 1953, 11168000, 56.5, 5121.00, 5670.00, 'Kâmpuchéa', 'Constitutional Monarchy', 'Norodom Sihanouk', 1800, 'KH');
-INSERT INTO country VALUES ('CMR', 'Cameroon', 'Africa', 'Central Africa', 475442, 1960, 15085000, 54.799999, 9174.00, 8596.00, 'Cameroun/Cameroon', 'Republic', 'Paul Biya', 1804, 'CM');
-INSERT INTO country VALUES ('CAN', 'Canada', 'North America', 'North America', 9970610, 1867, 31147000, 79.400002, 598862.00, 625626.00, 'Canada', 'Constitutional Monarchy, Federation', 'Elisabeth II', 1822, 'CA');
-INSERT INTO country VALUES ('CPV', 'Cape Verde', 'Africa', 'Western Africa', 4033, 1975, 428000, 68.900002, 435.00, 420.00, 'Cabo Verde', 'Republic', 'António Mascarenhas Monteiro', 1859, 'CV');
-INSERT INTO country VALUES ('KAZ', 'Kazakstan', 'Asia', 'Southern and Central Asia', 2724900, 1991, 16223000, 63.200001, 24375.00, 23383.00, 'Qazaqstan', 'Republic', 'Nursultan Nazarbajev', 1864, 'KZ');
-INSERT INTO country VALUES ('KEN', 'Kenya', 'Africa', 'Eastern Africa', 580367, 1963, 30080000, 48, 9217.00, 10241.00, 'Kenya', 'Republic', 'Daniel arap Moi', 1881, 'KE');
-INSERT INTO country VALUES ('CAF', 'Central African Republic', 'Africa', 'Central Africa', 622984, 1960, 3615000, 44, 1054.00, 993.00, 'Centrafrique/Bê-Afrîka', 'Republic', 'Ange-Félix Patassé', 1889, 'CF');
-INSERT INTO country VALUES ('CHN', 'China', 'Asia', 'Eastern Asia', 9572900, -1523, 1277558000, 71.400002, 982268.00, 917719.00, 'Zhongquo', 'People''s Republic', 'Jiang Zemin', 1891, 'CN');
-INSERT INTO country VALUES ('KGZ', 'Kyrgyzstan', 'Asia', 'Southern and Central Asia', 199900, 1991, 4699000, 63.400002, 1626.00, 1767.00, 'Kyrgyzstan', 'Republic', 'Askar Akajev', 2253, 'KG');
-INSERT INTO country VALUES ('KIR', 'Kiribati', 'Oceania', 'Micronesia', 726, 1979, 83000, 59.799999, 40.70, NULL, 'Kiribati', 'Republic', 'Teburoro Tito', 2256, 'KI');
-INSERT INTO country VALUES ('COL', 'Colombia', 'South America', 'South America', 1138914, 1810, 42321000, 70.300003, 102896.00, 105116.00, 'Colombia', 'Republic', 'Andrés Pastrana Arango', 2257, 'CO');
-INSERT INTO country VALUES ('COM', 'Comoros', 'Africa', 'Eastern Africa', 1862, 1975, 578000, 60, 4401.00, 4361.00, 'Komori/Comores', 'Republic', 'Azali Assoumani', 2295, 'KM');
-INSERT INTO country VALUES ('COG', 'Congo', 'Africa', 'Central Africa', 342000, 1960, 2943000, 47.400002, 2108.00, 2287.00, 'Congo', 'Republic', 'Denis Sassou-Nguesso', 2296, 'CG');
-INSERT INTO country VALUES ('COD', 'Congo, The Democratic Republic of the', 'Africa', 'Central Africa', 2344858, 1960, 51654000, 48.799999, 6964.00, 2474.00, 'République Démocratique du Congo', 'Republic', 'Joseph Kabila', 2298, 'CD');
-INSERT INTO country VALUES ('CCK', 'Cocos (Keeling) Islands', 'Oceania', 'Australia and New Zealand', 14, NULL, 600, NULL, 0.00, NULL, 'Cocos (Keeling) Islands', 'Territory of Australia', 'Elisabeth II', 2317, 'CC');
-INSERT INTO country VALUES ('PRK', 'North Korea', 'Asia', 'Eastern Asia', 120538, 1948, 24039000, 70.699997, 5332.00, NULL, 'Choson Minjujuui In´min Konghwaguk (Bukhan)', 'Socialistic Republic', 'Kim Jong-il', 2318, 'KP');
-INSERT INTO country VALUES ('KOR', 'South Korea', 'Asia', 'Eastern Asia', 99434, 1948, 46844000, 74.400002, 320749.00, 442544.00, 'Taehan Minguk (Namhan)', 'Republic', 'Kim Dae-jung', 2331, 'KR');
-INSERT INTO country VALUES ('GRC', 'Greece', 'Europe', 'Southern Europe', 131626, 1830, 10545700, 78.400002, 120724.00, 119946.00, 'Elláda', 'Republic', 'Kostis Stefanopoulos', 2401, 'GR');
-INSERT INTO country VALUES ('HRV', 'Croatia', 'Europe', 'Southern Europe', 56538, 1991, 4473000, 73.699997, 20208.00, 19300.00, 'Hrvatska', 'Republic', 'tipe Mesic', 2409, 'HR');
-INSERT INTO country VALUES ('CUB', 'Cuba', 'North America', 'Caribbean', 110861, 1902, 11201000, 76.199997, 17843.00, 18862.00, 'Cuba', 'Socialistic Republic', 'Fidel Castro Ruz', 2413, 'CU');
-INSERT INTO country VALUES ('KWT', 'Kuwait', 'Asia', 'Middle East', 17818, 1961, 1972000, 76.099998, 27037.00, 30373.00, 'Al-Kuwayt', 'Constitutional Monarchy (Emirate)', 'Jabir al-Ahmad al-Jabir al-Sabah', 2429, 'KW');
-INSERT INTO country VALUES ('CYP', 'Cyprus', 'Asia', 'Middle East', 9251, 1960, 754700, 76.699997, 9333.00, 8246.00, 'Kýpros/Kibris', 'Republic', 'Glafkos Klerides', 2430, 'CY');
-INSERT INTO country VALUES ('LAO', 'Laos', 'Asia', 'Southeast Asia', 236800, 1953, 5433000, 53.099998, 1292.00, 1746.00, 'Lao', 'Republic', 'Khamtay Siphandone', 2432, 'LA');
-INSERT INTO country VALUES ('LVA', 'Latvia', 'Europe', 'Baltic Countries', 64589, 1991, 2424200, 68.400002, 6398.00, 5639.00, 'Latvija', 'Republic', 'Vaira Vike-Freiberga', 2434, 'LV');
-INSERT INTO country VALUES ('LSO', 'Lesotho', 'Africa', 'Southern Africa', 30355, 1966, 2153000, 50.799999, 1061.00, 1161.00, 'Lesotho', 'Constitutional Monarchy', 'Letsie III', 2437, 'LS');
-INSERT INTO country VALUES ('LBN', 'Lebanon', 'Asia', 'Middle East', 10400, 1941, 3282000, 71.300003, 17121.00, 15129.00, 'Lubnan', 'Republic', 'Émile Lahoud', 2438, 'LB');
-INSERT INTO country VALUES ('LBR', 'Liberia', 'Africa', 'Western Africa', 111369, 1847, 3154000, 51, 2012.00, NULL, 'Liberia', 'Republic', 'Charles Taylor', 2440, 'LR');
-INSERT INTO country VALUES ('LBY', 'Libyan Arab Jamahiriya', 'Africa', 'Northern Africa', 1759540, 1951, 5605000, 75.5, 44806.00, 40562.00, 'Libiya', 'Socialistic State', 'Muammar al-Qadhafi', 2441, 'LY');
-INSERT INTO country VALUES ('LIE', 'Liechtenstein', 'Europe', 'Western Europe', 160, 1806, 32300, 78.800003, 1119.00, 1084.00, 'Liechtenstein', 'Constitutional Monarchy', 'Hans-Adam II', 2446, 'LI');
-INSERT INTO country VALUES ('LTU', 'Lithuania', 'Europe', 'Baltic Countries', 65301, 1991, 3698500, 69.099998, 10692.00, 9585.00, 'Lietuva', 'Republic', 'Valdas Adamkus', 2447, 'LT');
-INSERT INTO country VALUES ('LUX', 'Luxembourg', 'Europe', 'Western Europe', 2586, 1867, 435700, 77.099998, 16321.00, 15519.00, 'Luxembourg/Lëtzebuerg', 'Constitutional Monarchy', 'Henri', 2452, 'LU');
-INSERT INTO country VALUES ('ESH', 'Western Sahara', 'Africa', 'Northern Africa', 266000, NULL, 293000, 49.799999, 60.00, NULL, 'As-Sahrawiya', 'Occupied by Marocco', 'Mohammed Abdel Aziz', 2453, 'EH');
-INSERT INTO country VALUES ('MAC', 'Macao', 'Asia', 'Eastern Asia', 18, NULL, 473000, 81.599998, 5749.00, 5940.00, 'Macau/Aomen', 'Special Administrative Region of China', 'Jiang Zemin', 2454, 'MO');
-INSERT INTO country VALUES ('MDG', 'Madagascar', 'Africa', 'Eastern Africa', 587041, 1960, 15942000, 55, 3750.00, 3545.00, 'Madagasikara/Madagascar', 'Federal Republic', 'Didier Ratsiraka', 2455, 'MG');
-INSERT INTO country VALUES ('MKD', 'Macedonia', 'Europe', 'Southern Europe', 25713, 1991, 2024000, 73.800003, 1694.00, 1915.00, 'Makedonija', 'Republic', 'Boris Trajkovski', 2460, 'MK');
-INSERT INTO country VALUES ('MWI', 'Malawi', 'Africa', 'Eastern Africa', 118484, 1964, 10925000, 37.599998, 1687.00, 2527.00, 'Malawi', 'Republic', 'Bakili Muluzi', 2462, 'MW');
-INSERT INTO country VALUES ('MDV', 'Maldives', 'Asia', 'Southern and Central Asia', 298, 1965, 286000, 62.200001, 199.00, NULL, 'Dhivehi Raajje/Maldives', 'Republic', 'Maumoon Abdul Gayoom', 2463, 'MV');
-INSERT INTO country VALUES ('MYS', 'Malaysia', 'Asia', 'Southeast Asia', 329758, 1957, 22244000, 70.800003, 69213.00, 97884.00, 'Malaysia', 'Constitutional Monarchy, Federation', 'Salahuddin Abdul Aziz Shah Alhaj', 2464, 'MY');
-INSERT INTO country VALUES ('MLI', 'Mali', 'Africa', 'Western Africa', 1240192, 1960, 11234000, 46.700001, 2642.00, 2453.00, 'Mali', 'Republic', 'Alpha Oumar Konaré', 2482, 'ML');
-INSERT INTO country VALUES ('MLT', 'Malta', 'Europe', 'Southern Europe', 316, 1964, 380200, 77.900002, 3512.00, 3338.00, 'Malta', 'Republic', 'Guido de Marco', 2484, 'MT');
-INSERT INTO country VALUES ('MAR', 'Morocco', 'Africa', 'Northern Africa', 446550, 1956, 28351000, 69.099998, 36124.00, 33514.00, 'Al-Maghrib', 'Constitutional Monarchy', 'Mohammed VI', 2486, 'MA');
-INSERT INTO country VALUES ('MHL', 'Marshall Islands', 'Oceania', 'Micronesia', 181, 1990, 64000, 65.5, 97.00, NULL, 'Marshall Islands/Majol', 'Republic', 'Kessai Note', 2507, 'MH');
-INSERT INTO country VALUES ('MTQ', 'Martinique', 'North America', 'Caribbean', 1102, NULL, 395000, 78.300003, 2731.00, 2559.00, 'Martinique', 'Overseas Department of France', 'Jacques Chirac', 2508, 'MQ');
-INSERT INTO country VALUES ('MRT', 'Mauritania', 'Africa', 'Western Africa', 1025520, 1960, 2670000, 50.799999, 998.00, 1081.00, 'Muritaniya/Mauritanie', 'Republic', 'Maaouiya Ould Sid´Ahmad Taya', 2509, 'MR');
-INSERT INTO country VALUES ('MUS', 'Mauritius', 'Africa', 'Eastern Africa', 2040, 1968, 1158000, 71, 4251.00, 4186.00, 'Mauritius', 'Republic', 'Cassam Uteem', 2511, 'MU');
-INSERT INTO country VALUES ('MYT', 'Mayotte', 'Africa', 'Eastern Africa', 373, NULL, 149000, 59.5, 0.00, NULL, 'Mayotte', 'Territorial Collectivity of France', 'Jacques Chirac', 2514, 'YT');
-INSERT INTO country VALUES ('MEX', 'Mexico', 'North America', 'Central America', 1958201, 1810, 98881000, 71.5, 414972.00, 401461.00, 'México', 'Federal Republic', 'Vicente Fox Quesada', 2515, 'MX');
-INSERT INTO country VALUES ('FSM', 'Micronesia, Federated States of', 'Oceania', 'Micronesia', 702, 1990, 119000, 68.599998, 212.00, NULL, 'Micronesia', 'Federal Republic', 'Leo A. Falcam', 2689, 'FM');
-INSERT INTO country VALUES ('MDA', 'Moldova', 'Europe', 'Eastern Europe', 33851, 1991, 4380000, 64.5, 1579.00, 1872.00, 'Moldova', 'Republic', 'Vladimir Voronin', 2690, 'MD');
-INSERT INTO country VALUES ('MCO', 'Monaco', 'Europe', 'Western Europe', 1.5, 1861, 34000, 78.800003, 776.00, NULL, 'Monaco', 'Constitutional Monarchy', 'Rainier III', 2695, 'MC');
-INSERT INTO country VALUES ('MNG', 'Mongolia', 'Asia', 'Eastern Asia', 1566500, 1921, 2662000, 67.300003, 1043.00, 933.00, 'Mongol Uls', 'Republic', 'Natsagiin Bagabandi', 2696, 'MN');
-INSERT INTO country VALUES ('MSR', 'Montserrat', 'North America', 'Caribbean', 102, NULL, 11000, 78, 109.00, NULL, 'Montserrat', 'Dependent Territory of the UK', 'Elisabeth II', 2697, 'MS');
-INSERT INTO country VALUES ('MOZ', 'Mozambique', 'Africa', 'Eastern Africa', 801590, 1975, 19680000, 37.5, 2891.00, 2711.00, 'Moçambique', 'Republic', 'Joaquím A. Chissano', 2698, 'MZ');
-INSERT INTO country VALUES ('MMR', 'Myanmar', 'Asia', 'Southeast Asia', 676578, 1948, 45611000, 54.900002, 180375.00, 171028.00, 'Myanma Pye', 'Republic', 'kenraali Than Shwe', 2710, 'MM');
-INSERT INTO country VALUES ('NAM', 'Namibia', 'Africa', 'Southern Africa', 824292, 1990, 1726000, 42.5, 3101.00, 3384.00, 'Namibia', 'Republic', 'Sam Nujoma', 2726, 'NA');
-INSERT INTO country VALUES ('NRU', 'Nauru', 'Oceania', 'Micronesia', 21, 1968, 12000, 60.799999, 197.00, NULL, 'Naoero/Nauru', 'Republic', 'Bernard Dowiyogo', 2728, 'NR');
-INSERT INTO country VALUES ('NPL', 'Nepal', 'Asia', 'Southern and Central Asia', 147181, 1769, 23930000, 57.799999, 4768.00, 4837.00, 'Nepal', 'Constitutional Monarchy', 'Gyanendra Bir Bikram', 2729, 'NP');
-INSERT INTO country VALUES ('NIC', 'Nicaragua', 'North America', 'Central America', 130000, 1838, 5074000, 68.699997, 1988.00, 2023.00, 'Nicaragua', 'Republic', 'Arnoldo Alemán Lacayo', 2734, 'NI');
-INSERT INTO country VALUES ('NER', 'Niger', 'Africa', 'Western Africa', 1267000, 1960, 10730000, 41.299999, 1706.00, 1580.00, 'Niger', 'Republic', 'Mamadou Tandja', 2738, 'NE');
-INSERT INTO country VALUES ('NGA', 'Nigeria', 'Africa', 'Western Africa', 923768, 1960, 111506000, 51.599998, 65707.00, 58623.00, 'Nigeria', 'Federal Republic', 'Olusegun Obasanjo', 2754, 'NG');
-INSERT INTO country VALUES ('NIU', 'Niue', 'Oceania', 'Polynesia', 260, NULL, 2000, NULL, 0.00, NULL, 'Niue', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 2805, 'NU');
-INSERT INTO country VALUES ('NFK', 'Norfolk Island', 'Oceania', 'Australia and New Zealand', 36, NULL, 2000, NULL, 0.00, NULL, 'Norfolk Island', 'Territory of Australia', 'Elisabeth II', 2806, 'NF');
-INSERT INTO country VALUES ('NOR', 'Norway', 'Europe', 'Nordic Countries', 323877, 1905, 4478500, 78.699997, 145895.00, 153370.00, 'Norge', 'Constitutional Monarchy', 'Harald V', 2807, 'NO');
-INSERT INTO country VALUES ('CIV', 'Côte dIvoire', 'Africa', 'Western Africa', 322463, 1960, 14786000, 45.200001, 11345.00, 10285.00, 'Côte dIvoire', 'Republic', 'Laurent Gbagbo', 2814, 'CI');
-INSERT INTO country VALUES ('OMN', 'Oman', 'Asia', 'Middle East', 309500, 1951, 2542000, 71.800003, 16904.00, 16153.00, '´Uman', 'Monarchy (Sultanate)', 'Qabus ibn Sa´id', 2821, 'OM');
-INSERT INTO country VALUES ('PAK', 'Pakistan', 'Asia', 'Southern and Central Asia', 796095, 1947, 156483000, 61.099998, 61289.00, 58549.00, 'Pakistan', 'Republic', 'Mohammad Rafiq Tarar', 2831, 'PK');
-INSERT INTO country VALUES ('PLW', 'Palau', 'Oceania', 'Micronesia', 459, 1994, 19000, 68.599998, 105.00, NULL, 'Belau/Palau', 'Republic', 'Kuniwo Nakamura', 2881, 'PW');
-INSERT INTO country VALUES ('PAN', 'Panama', 'North America', 'Central America', 75517, 1903, 2856000, 75.5, 9131.00, 8700.00, 'Panamá', 'Republic', 'Mireya Elisa Moscoso Rodríguez', 2882, 'PA');
-INSERT INTO country VALUES ('PNG', 'Papua New Guinea', 'Oceania', 'Melanesia', 462840, 1975, 4807000, 63.099998, 4988.00, 6328.00, 'Papua New Guinea/Papua Niugini', 'Constitutional Monarchy', 'Elisabeth II', 2884, 'PG');
-INSERT INTO country VALUES ('PRY', 'Paraguay', 'South America', 'South America', 406752, 1811, 5496000, 73.699997, 8444.00, 9555.00, 'Paraguay', 'Republic', 'Luis Ángel González Macchi', 2885, 'PY');
-INSERT INTO country VALUES ('PER', 'Peru', 'South America', 'South America', 1285216, 1821, 25662000, 70, 64140.00, 65186.00, 'Perú/Piruw', 'Republic', 'Valentin Paniagua Corazao', 2890, 'PE');
-INSERT INTO country VALUES ('PCN', 'Pitcairn', 'Oceania', 'Polynesia', 49, NULL, 50, NULL, 0.00, NULL, 'Pitcairn', 'Dependent Territory of the UK', 'Elisabeth II', 2912, 'PN');
-INSERT INTO country VALUES ('MNP', 'Northern Mariana Islands', 'Oceania', 'Micronesia', 464, NULL, 78000, 75.5, 0.00, NULL, 'Northern Mariana Islands', 'Commonwealth of the US', 'George W. Bush', 2913, 'MP');
-INSERT INTO country VALUES ('PRT', 'Portugal', 'Europe', 'Southern Europe', 91982, 1143, 9997600, 75.800003, 105954.00, 102133.00, 'Portugal', 'Republic', 'Jorge Sampãio', 2914, 'PT');
-INSERT INTO country VALUES ('PRI', 'Puerto Rico', 'North America', 'Caribbean', 8875, NULL, 3869000, 75.599998, 34100.00, 32100.00, 'Puerto Rico', 'Commonwealth of the US', 'George W. Bush', 2919, 'PR');
-INSERT INTO country VALUES ('POL', 'Poland', 'Europe', 'Eastern Europe', 323250, 1918, 38653600, 73.199997, 151697.00, 135636.00, 'Polska', 'Republic', 'Aleksander Kwasniewski', 2928, 'PL');
-INSERT INTO country VALUES ('GNQ', 'Equatorial Guinea', 'Africa', 'Central Africa', 28051, 1968, 453000, 53.599998, 283.00, 542.00, 'Guinea Ecuatorial', 'Republic', 'Teodoro Obiang Nguema Mbasogo', 2972, 'GQ');
-INSERT INTO country VALUES ('QAT', 'Qatar', 'Asia', 'Middle East', 11000, 1971, 599000, 72.400002, 9472.00, 8920.00, 'Qatar', 'Monarchy', 'Hamad ibn Khalifa al-Thani', 2973, 'QA');
-INSERT INTO country VALUES ('FRA', 'France', 'Europe', 'Western Europe', 551500, 843, 59225700, 78.800003, 1424285.00, 1392448.00, 'France', 'Republic', 'Jacques Chirac', 2974, 'FR');
-INSERT INTO country VALUES ('GUF', 'French Guiana', 'South America', 'South America', 90000, NULL, 181000, 76.099998, 681.00, NULL, 'Guyane française', 'Overseas Department of France', 'Jacques Chirac', 3014, 'GF');
-INSERT INTO country VALUES ('PYF', 'French Polynesia', 'Oceania', 'Polynesia', 4000, NULL, 235000, 74.800003, 818.00, 781.00, 'Polynésie française', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3016, 'PF');
-INSERT INTO country VALUES ('REU', 'Réunion', 'Africa', 'Eastern Africa', 2510, NULL, 699000, 72.699997, 8287.00, 7988.00, 'Réunion', 'Overseas Department of France', 'Jacques Chirac', 3017, 'RE');
-INSERT INTO country VALUES ('ROM', 'Romania', 'Europe', 'Eastern Europe', 238391, 1878, 22455500, 69.900002, 38158.00, 34843.00, 'România', 'Republic', 'Ion Iliescu', 3018, 'RO');
-INSERT INTO country VALUES ('RWA', 'Rwanda', 'Africa', 'Eastern Africa', 26338, 1962, 7733000, 39.299999, 2036.00, 1863.00, 'Rwanda/Urwanda', 'Republic', 'Paul Kagame', 3047, 'RW');
-INSERT INTO country VALUES ('SWE', 'Sweden', 'Europe', 'Nordic Countries', 449964, 836, 8861400, 79.599998, 226492.00, 227757.00, 'Sverige', 'Constitutional Monarchy', 'Carl XVI Gustaf', 3048, 'SE');
-INSERT INTO country VALUES ('SHN', 'Saint Helena', 'Africa', 'Western Africa', 314, NULL, 6000, 76.800003, 0.00, NULL, 'Saint Helena', 'Dependent Territory of the UK', 'Elisabeth II', 3063, 'SH');
-INSERT INTO country VALUES ('KNA', 'Saint Kitts and Nevis', 'North America', 'Caribbean', 261, 1983, 38000, 70.699997, 299.00, NULL, 'Saint Kitts and Nevis', 'Constitutional Monarchy', 'Elisabeth II', 3064, 'KN');
-INSERT INTO country VALUES ('LCA', 'Saint Lucia', 'North America', 'Caribbean', 622, 1979, 154000, 72.300003, 571.00, NULL, 'Saint Lucia', 'Constitutional Monarchy', 'Elisabeth II', 3065, 'LC');
-INSERT INTO country VALUES ('VCT', 'Saint Vincent and the Grenadines', 'North America', 'Caribbean', 388, 1979, 114000, 72.300003, 285.00, NULL, 'Saint Vincent and the Grenadines', 'Constitutional Monarchy', 'Elisabeth II', 3066, 'VC');
-INSERT INTO country VALUES ('SPM', 'Saint Pierre and Miquelon', 'North America', 'North America', 242, NULL, 7000, 77.599998, 0.00, NULL, 'Saint-Pierre-et-Miquelon', 'Territorial Collectivity of France', 'Jacques Chirac', 3067, 'PM');
-INSERT INTO country VALUES ('DEU', 'Germany', 'Europe', 'Western Europe', 357022, 1955, 82164700, 77.400002, 2133367.00, 2102826.00, 'Deutschland', 'Federal Republic', 'Johannes Rau', 3068, 'DE');
-INSERT INTO country VALUES ('SLB', 'Solomon Islands', 'Oceania', 'Melanesia', 28896, 1978, 444000, 71.300003, 182.00, 220.00, 'Solomon Islands', 'Constitutional Monarchy', 'Elisabeth II', 3161, 'SB');
-INSERT INTO country VALUES ('ZMB', 'Zambia', 'Africa', 'Eastern Africa', 752618, 1964, 9169000, 37.200001, 3377.00, 3922.00, 'Zambia', 'Republic', 'Frederick Chiluba', 3162, 'ZM');
-INSERT INTO country VALUES ('WSM', 'Samoa', 'Oceania', 'Polynesia', 2831, 1962, 180000, 69.199997, 141.00, 157.00, 'Samoa', 'Parlementary Monarchy', 'Malietoa Tanumafili II', 3169, 'WS');
-INSERT INTO country VALUES ('SMR', 'San Marino', 'Europe', 'Southern Europe', 61, 885, 27000, 81.099998, 510.00, NULL, 'San Marino', 'Republic', NULL, 3171, 'SM');
-INSERT INTO country VALUES ('STP', 'Sao Tome and Principe', 'Africa', 'Central Africa', 964, 1975, 147000, 65.300003, 6.00, NULL, 'São Tomé e Príncipe', 'Republic', 'Miguel Trovoada', 3172, 'ST');
-INSERT INTO country VALUES ('SAU', 'Saudi Arabia', 'Asia', 'Middle East', 2149690, 1932, 21607000, 67.800003, 137635.00, 146171.00, 'Al-´Arabiya as-Sa´udiya', 'Monarchy', 'Fahd ibn Abdul-Aziz al-Sa´ud', 3173, 'SA');
-INSERT INTO country VALUES ('SEN', 'Senegal', 'Africa', 'Western Africa', 196722, 1960, 9481000, 62.200001, 4787.00, 4542.00, 'Sénégal/Sounougal', 'Republic', 'Abdoulaye Wade', 3198, 'SN');
-INSERT INTO country VALUES ('SYC', 'Seychelles', 'Africa', 'Eastern Africa', 455, 1976, 77000, 70.400002, 536.00, 539.00, 'Sesel/Seychelles', 'Republic', 'France-Albert René', 3206, 'SC');
-INSERT INTO country VALUES ('SLE', 'Sierra Leone', 'Africa', 'Western Africa', 71740, 1961, 4854000, 45.299999, 746.00, 858.00, 'Sierra Leone', 'Republic', 'Ahmed Tejan Kabbah', 3207, 'SL');
-INSERT INTO country VALUES ('SGP', 'Singapore', 'Asia', 'Southeast Asia', 618, 1965, 3567000, 80.099998, 86503.00, 96318.00, 'Singapore/Singapura/Xinjiapo/Singapur', 'Republic', 'Sellapan Rama Nathan', 3208, 'SG');
-INSERT INTO country VALUES ('SVK', 'Slovakia', 'Europe', 'Eastern Europe', 49012, 1993, 5398700, 73.699997, 20594.00, 19452.00, 'Slovensko', 'Republic', 'Rudolf Schuster', 3209, 'SK');
-INSERT INTO country VALUES ('SVN', 'Slovenia', 'Europe', 'Southern Europe', 20256, 1991, 1987800, 74.900002, 19756.00, 18202.00, 'Slovenija', 'Republic', 'Milan Kucan', 3212, 'SI');
-INSERT INTO country VALUES ('SOM', 'Somalia', 'Africa', 'Eastern Africa', 637657, 1960, 10097000, 46.200001, 935.00, NULL, 'Soomaaliya', 'Republic', 'Abdiqassim Salad Hassan', 3214, 'SO');
-INSERT INTO country VALUES ('LKA', 'Sri Lanka', 'Asia', 'Southern and Central Asia', 65610, 1948, 18827000, 71.800003, 15706.00, 15091.00, 'Sri Lanka/Ilankai', 'Republic', 'Chandrika Kumaratunga', 3217, 'LK');
-INSERT INTO country VALUES ('SDN', 'Sudan', 'Africa', 'Northern Africa', 2505813, 1956, 29490000, 56.599998, 10162.00, NULL, 'As-Sudan', 'Islamic Republic', 'Omar Hassan Ahmad al-Bashir', 3225, 'SD');
-INSERT INTO country VALUES ('FIN', 'Finland', 'Europe', 'Nordic Countries', 338145, 1917, 5171300, 77.400002, 121914.00, 119833.00, 'Suomi', 'Republic', 'Tarja Halonen', 3236, 'FI');
-INSERT INTO country VALUES ('SUR', 'Suriname', 'South America', 'South America', 163265, 1975, 417000, 71.400002, 870.00, 706.00, 'Suriname', 'Republic', 'Ronald Venetiaan', 3243, 'SR');
-INSERT INTO country VALUES ('SWZ', 'Swaziland', 'Africa', 'Southern Africa', 17364, 1968, 1008000, 40.400002, 1206.00, 1312.00, 'kaNgwane', 'Monarchy', 'Mswati III', 3244, 'SZ');
-INSERT INTO country VALUES ('CHE', 'Switzerland', 'Europe', 'Western Europe', 41284, 1499, 7160400, 79.599998, 264478.00, 256092.00, 'Schweiz/Suisse/Svizzera/Svizra', 'Federation', 'Adolf Ogi', 3248, 'CH');
-INSERT INTO country VALUES ('SYR', 'Syria', 'Asia', 'Middle East', 185180, 1941, 16125000, 68.5, 65984.00, 64926.00, 'Suriya', 'Republic', 'Bashar al-Assad', 3250, 'SY');
-INSERT INTO country VALUES ('TJK', 'Tajikistan', 'Asia', 'Southern and Central Asia', 143100, 1991, 6188000, 64.099998, 1990.00, 1056.00, 'Toçikiston', 'Republic', 'Emomali Rahmonov', 3261, 'TJ');
-INSERT INTO country VALUES ('TWN', 'Taiwan', 'Asia', 'Eastern Asia', 36188, 1945, 22256000, 76.400002, 256254.00, 263451.00, 'Tai-wan', 'Republic', 'Chen Shui-bian', 3263, 'TW');
-INSERT INTO country VALUES ('TZA', 'Tanzania', 'Africa', 'Eastern Africa', 883749, 1961, 33517000, 52.299999, 8005.00, 7388.00, 'Tanzania', 'Republic', 'Benjamin William Mkapa', 3306, 'TZ');
-INSERT INTO country VALUES ('DNK', 'Denmark', 'Europe', 'Nordic Countries', 43094, 800, 5330000, 76.5, 174099.00, 169264.00, 'Danmark', 'Constitutional Monarchy', 'Margrethe II', 3315, 'DK');
-INSERT INTO country VALUES ('THA', 'Thailand', 'Asia', 'Southeast Asia', 513115, 1350, 61399000, 68.599998, 116416.00, 153907.00, 'Prathet Thai', 'Constitutional Monarchy', 'Bhumibol Adulyadej', 3320, 'TH');
-INSERT INTO country VALUES ('TGO', 'Togo', 'Africa', 'Western Africa', 56785, 1960, 4629000, 54.700001, 1449.00, 1400.00, 'Togo', 'Republic', 'Gnassingbé Eyadéma', 3332, 'TG');
-INSERT INTO country VALUES ('TKL', 'Tokelau', 'Oceania', 'Polynesia', 12, NULL, 2000, NULL, 0.00, NULL, 'Tokelau', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 3333, 'TK');
-INSERT INTO country VALUES ('TON', 'Tonga', 'Oceania', 'Polynesia', 650, 1970, 99000, 67.900002, 146.00, 170.00, 'Tonga', 'Monarchy', 'Taufa''ahau Tupou IV', 3334, 'TO');
-INSERT INTO country VALUES ('TTO', 'Trinidad and Tobago', 'North America', 'Caribbean', 5130, 1962, 1295000, 68, 6232.00, 5867.00, 'Trinidad and Tobago', 'Republic', 'Arthur N. R. Robinson', 3336, 'TT');
-INSERT INTO country VALUES ('TCD', 'Chad', 'Africa', 'Central Africa', 1284000, 1960, 7651000, 50.5, 1208.00, 1102.00, 'Tchad/Tshad', 'Republic', 'Idriss Déby', 3337, 'TD');
-INSERT INTO country VALUES ('CZE', 'Czech Republic', 'Europe', 'Eastern Europe', 78866, 1993, 10278100, 74.5, 55017.00, 52037.00, '¸esko', 'Republic', 'Václav Havel', 3339, 'CZ');
-INSERT INTO country VALUES ('TUN', 'Tunisia', 'Africa', 'Northern Africa', 163610, 1956, 9586000, 73.699997, 20026.00, 18898.00, 'Tunis/Tunisie', 'Republic', 'Zine al-Abidine Ben Ali', 3349, 'TN');
-INSERT INTO country VALUES ('TUR', 'Turkey', 'Asia', 'Middle East', 774815, 1923, 66591000, 71, 210721.00, 189122.00, 'Türkiye', 'Republic', 'Ahmet Necdet Sezer', 3358, 'TR');
-INSERT INTO country VALUES ('TKM', 'Turkmenistan', 'Asia', 'Southern and Central Asia', 488100, 1991, 4459000, 60.900002, 4397.00, 2000.00, 'Türkmenostan', 'Republic', 'Saparmurad Nijazov', 3419, 'TM');
-INSERT INTO country VALUES ('TCA', 'Turks and Caicos Islands', 'North America', 'Caribbean', 430, NULL, 17000, 73.300003, 96.00, NULL, 'The Turks and Caicos Islands', 'Dependent Territory of the UK', 'Elisabeth II', 3423, 'TC');
-INSERT INTO country VALUES ('TUV', 'Tuvalu', 'Oceania', 'Polynesia', 26, 1978, 12000, 66.300003, 6.00, NULL, 'Tuvalu', 'Constitutional Monarchy', 'Elisabeth II', 3424, 'TV');
-INSERT INTO country VALUES ('UGA', 'Uganda', 'Africa', 'Eastern Africa', 241038, 1962, 21778000, 42.900002, 6313.00, 6887.00, 'Uganda', 'Republic', 'Yoweri Museveni', 3425, 'UG');
-INSERT INTO country VALUES ('UKR', 'Ukraine', 'Europe', 'Eastern Europe', 603700, 1991, 50456000, 66, 42168.00, 49677.00, 'Ukrajina', 'Republic', 'Leonid Kutma', 3426, 'UA');
-INSERT INTO country VALUES ('HUN', 'Hungary', 'Europe', 'Eastern Europe', 93030, 1918, 10043200, 71.400002, 48267.00, 45914.00, 'Magyarország', 'Republic', 'Ferenc Mádl', 3483, 'HU');
-INSERT INTO country VALUES ('URY', 'Uruguay', 'South America', 'South America', 175016, 1828, 3337000, 75.199997, 20831.00, 19967.00, 'Uruguay', 'Republic', 'Jorge Batlle Ibáñez', 3492, 'UY');
-INSERT INTO country VALUES ('NCL', 'New Caledonia', 'Oceania', 'Melanesia', 18575, NULL, 214000, 72.800003, 3563.00, NULL, 'Nouvelle-Calédonie', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3493, 'NC');
-INSERT INTO country VALUES ('NZL', 'New Zealand', 'Oceania', 'Australia and New Zealand', 270534, 1907, 3862000, 77.800003, 54669.00, 64960.00, 'New Zealand/Aotearoa', 'Constitutional Monarchy', 'Elisabeth II', 3499, 'NZ');
-INSERT INTO country VALUES ('UZB', 'Uzbekistan', 'Asia', 'Southern and Central Asia', 447400, 1991, 24318000, 63.700001, 14194.00, 21300.00, 'Uzbekiston', 'Republic', 'Islam Karimov', 3503, 'UZ');
-INSERT INTO country VALUES ('BLR', 'Belarus', 'Europe', 'Eastern Europe', 207600, 1991, 10236000, 68, 13714.00, NULL, 'Belarus', 'Republic', 'Aljaksandr Lukaenka', 3520, 'BY');
-INSERT INTO country VALUES ('WLF', 'Wallis and Futuna', 'Oceania', 'Polynesia', 200, NULL, 15000, NULL, 0.00, NULL, 'Wallis-et-Futuna', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3536, 'WF');
-INSERT INTO country VALUES ('VUT', 'Vanuatu', 'Oceania', 'Melanesia', 12189, 1980, 190000, 60.599998, 261.00, 246.00, 'Vanuatu', 'Republic', 'John Bani', 3537, 'VU');
-INSERT INTO country VALUES ('VAT', 'Holy See (Vatican City State)', 'Europe', 'Southern Europe', 0.40000001, 1929, 1000, NULL, 9.00, NULL, 'Santa Sede/Città del Vaticano', 'Independent Church State', 'Johannes Paavali II', 3538, 'VA');
-INSERT INTO country VALUES ('VEN', 'Venezuela', 'South America', 'South America', 912050, 1811, 24170000, 73.099998, 95023.00, 88434.00, 'Venezuela', 'Federal Republic', 'Hugo Chávez Frías', 3539, 'VE');
-INSERT INTO country VALUES ('RUS', 'Russian Federation', 'Europe', 'Eastern Europe', 17075400, 1991, 146934000, 67.199997, 276608.00, 442989.00, 'Rossija', 'Federal Republic', 'Vladimir Putin', 3580, 'RU');
-INSERT INTO country VALUES ('VNM', 'Vietnam', 'Asia', 'Southeast Asia', 331689, 1945, 79832000, 69.300003, 21929.00, 22834.00, 'Viêt Nam', 'Socialistic Republic', 'Trân Duc Luong', 3770, 'VN');
-INSERT INTO country VALUES ('EST', 'Estonia', 'Europe', 'Baltic Countries', 45227, 1991, 1439200, 69.5, 5328.00, 3371.00, 'Eesti', 'Republic', 'Lennart Meri', 3791, 'EE');
-INSERT INTO country VALUES ('USA', 'United States', 'North America', 'North America', 9363520, 1776, 278357000, 77.099998, 8510700.00, 8110900.00, 'United States', 'Federal Republic', 'George W. Bush', 3813, 'US');
-INSERT INTO country VALUES ('VIR', 'Virgin Islands, U.S.', 'North America', 'Caribbean', 347, NULL, 93000, 78.099998, 0.00, NULL, 'Virgin Islands of the United States', 'US Territory', 'George W. Bush', 4067, 'VI');
-INSERT INTO country VALUES ('ZWE', 'Zimbabwe', 'Africa', 'Eastern Africa', 390757, 1980, 11669000, 37.799999, 5951.00, 8670.00, 'Zimbabwe', 'Republic', 'Robert G. Mugabe', 4068, 'ZW');
-INSERT INTO country VALUES ('PSE', 'Palestine', 'Asia', 'Middle East', 6257, NULL, 3101000, 71.400002, 4173.00, NULL, 'Filastin', 'Autonomous Area', 'Yasser (Yasir) Arafat', 4074, 'PS');
-INSERT INTO country VALUES ('ATA', 'Antarctica', 'Antarctica', 'Antarctica', 13120000, NULL, 0, NULL, 0.00, NULL, '', 'Co-administrated', '', NULL, 'AQ');
-INSERT INTO country VALUES ('BVT', 'Bouvet Island', 'Antarctica', 'Antarctica', 59, NULL, 0, NULL, 0.00, NULL, 'Bouvetøya', 'Dependent Territory of Norway', 'Harald V', NULL, 'BV');
-INSERT INTO country VALUES ('IOT', 'British Indian Ocean Territory', 'Africa', 'Eastern Africa', 78, NULL, 0, NULL, 0.00, NULL, 'British Indian Ocean Territory', 'Dependent Territory of the UK', 'Elisabeth II', NULL, 'IO');
-INSERT INTO country VALUES ('SGS', 'South Georgia and the South Sandwich Islands', 'Antarctica', 'Antarctica', 3903, NULL, 0, NULL, 0.00, NULL, 'South Georgia and the South Sandwich Islands', 'Dependent Territory of the UK', 'Elisabeth II', NULL, 'GS');
-INSERT INTO country VALUES ('HMD', 'Heard Island and McDonald Islands', 'Antarctica', 'Antarctica', 359, NULL, 0, NULL, 0.00, NULL, 'Heard and McDonald Islands', 'Territory of Australia', 'Elisabeth II', NULL, 'HM');
-INSERT INTO country VALUES ('ATF', 'French Southern territories', 'Antarctica', 'Antarctica', 7780, NULL, 0, NULL, 0.00, NULL, 'Terres australes françaises', 'Nonmetropolitan Territory of France', 'Jacques Chirac', NULL, 'TF');
-INSERT INTO country VALUES ('UMI', 'United States Minor Outlying Islands', 'Oceania', 'Micronesia/Caribbean', 16, NULL, 0, NULL, 0.00, NULL, 'United States Minor Outlying Islands', 'Dependent Territory of the US', 'George W. Bush', NULL, 'UM');
+INSERT INTO country VALUES ('AFG', 'Afghanistan', 'Asia', 'Southern and Central Asia', 652090, 1919, 22720000, 45.900002, 5976.00, NULL, 'Afganistan/Afqanestan', 'Islamic Emirate', 'Mohammad Omar', 1, 'AF'),
+('NLD', 'Netherlands', 'Europe', 'Western Europe', 41526, 1581, 15864000, 78.300003, 371362.00, 360478.00, 'Nederland', 'Constitutional Monarchy', 'Beatrix', 5, 'NL'),
+('ANT', 'Netherlands Antilles', 'North America', 'Caribbean', 800, NULL, 217000, 74.699997, 1941.00, NULL, 'Nederlandse Antillen', 'Nonmetropolitan Territory of The Netherlands', 'Beatrix', 33, 'AN'),
+('ALB', 'Albania', 'Europe', 'Southern Europe', 28748, 1912, 3401200, 71.599998, 3205.00, 2500.00, 'Shqipëria', 'Republic', 'Rexhep Mejdani', 34, 'AL'),
+('DZA', 'Algeria', 'Africa', 'Northern Africa', 2381741, 1962, 31471000, 69.699997, 49982.00, 46966.00, 'Al-Jazair/Algérie', 'Republic', 'Abdelaziz Bouteflika', 35, 'DZ'),
+('ASM', 'American Samoa', 'Oceania', 'Polynesia', 199, NULL, 68000, 75.099998, 334.00, NULL, 'Amerika Samoa', 'US Territory', 'George W. Bush', 54, 'AS'),
+('AND', 'Andorra', 'Europe', 'Southern Europe', 468, 1278, 78000, 83.5, 1630.00, NULL, 'Andorra', 'Parliamentary Coprincipality', '', 55, 'AD'),
+('AGO', 'Angola', 'Africa', 'Central Africa', 1246700, 1975, 12878000, 38.299999, 6648.00, 7984.00, 'Angola', 'Republic', 'José Eduardo dos Santos', 56, 'AO'),
+('AIA', 'Anguilla', 'North America', 'Caribbean', 96, NULL, 8000, 76.099998, 63.20, NULL, 'Anguilla', 'Dependent Territory of the UK', 'Elisabeth II', 62, 'AI'),
+('ATG', 'Antigua and Barbuda', 'North America', 'Caribbean', 442, 1981, 68000, 70.5, 612.00, 584.00, 'Antigua and Barbuda', 'Constitutional Monarchy', 'Elisabeth II', 63, 'AG'),
+('ARE', 'United Arab Emirates', 'Asia', 'Middle East', 83600, 1971, 2441000, 74.099998, 37966.00, 36846.00, 'Al-Imarat al-´Arabiya al-Muttahida', 'Emirate Federation', 'Zayid bin Sultan al-Nahayan', 65, 'AE'),
+('ARG', 'Argentina', 'South America', 'South America', 2780400, 1816, 37032000, 75.099998, 340238.00, 323310.00, 'Argentina', 'Federal Republic', 'Fernando de la Rúa', 69, 'AR'),
+('ARM', 'Armenia', 'Asia', 'Middle East', 29800, 1991, 3520000, 66.400002, 1813.00, 1627.00, 'Hajastan', 'Republic', 'Robert Kotarjan', 126, 'AM'),
+('ABW', 'Aruba', 'North America', 'Caribbean', 193, NULL, 103000, 78.400002, 828.00, 793.00, 'Aruba', 'Nonmetropolitan Territory of The Netherlands', 'Beatrix', 129, 'AW'),
+('AUS', 'Australia', 'Oceania', 'Australia and New Zealand', 7741220, 1901, 18886000, 79.800003, 351182.00, 392911.00, 'Australia', 'Constitutional Monarchy, Federation', 'Elisabeth II', 135, 'AU'),
+('AZE', 'Azerbaijan', 'Asia', 'Middle East', 86600, 1991, 7734000, 62.900002, 4127.00, 4100.00, 'Azärbaycan', 'Federal Republic', 'Heydär Äliyev', 144, 'AZ'),
+('BHS', 'Bahamas', 'North America', 'Caribbean', 13878, 1973, 307000, 71.099998, 3527.00, 3347.00, 'The Bahamas', 'Constitutional Monarchy', 'Elisabeth II', 148, 'BS'),
+('BHR', 'Bahrain', 'Asia', 'Middle East', 694, 1971, 617000, 73, 6366.00, 6097.00, 'Al-Bahrayn', 'Monarchy (Emirate)', 'Hamad ibn Isa al-Khalifa', 149, 'BH'),
+('BGD', 'Bangladesh', 'Asia', 'Southern and Central Asia', 143998, 1971, 129155000, 60.200001, 32852.00, 31966.00, 'Bangladesh', 'Republic', 'Shahabuddin Ahmad', 150, 'BD'),
+('BRB', 'Barbados', 'North America', 'Caribbean', 430, 1966, 270000, 73, 2223.00, 2186.00, 'Barbados', 'Constitutional Monarchy', 'Elisabeth II', 174, 'BB'),
+('BEL', 'Belgium', 'Europe', 'Western Europe', 30518, 1830, 10239000, 77.800003, 249704.00, 243948.00, 'België/Belgique', 'Constitutional Monarchy, Federation', 'Albert II', 179, 'BE'),
+('BLZ', 'Belize', 'North America', 'Central America', 22696, 1981, 241000, 70.900002, 630.00, 616.00, 'Belize', 'Constitutional Monarchy', 'Elisabeth II', 185, 'BZ'),
+('BEN', 'Benin', 'Africa', 'Western Africa', 112622, 1960, 6097000, 50.200001, 2357.00, 2141.00, 'Bénin', 'Republic', 'Mathieu Kérékou', 187, 'BJ'),
+('BMU', 'Bermuda', 'North America', 'North America', 53, NULL, 65000, 76.900002, 2328.00, 2190.00, 'Bermuda', 'Dependent Territory of the UK', 'Elisabeth II', 191, 'BM'),
+('BTN', 'Bhutan', 'Asia', 'Southern and Central Asia', 47000, 1910, 2124000, 52.400002, 372.00, 383.00, 'Druk-Yul', 'Monarchy', 'Jigme Singye Wangchuk', 192, 'BT'),
+('BOL', 'Bolivia', 'South America', 'South America', 1098581, 1825, 8329000, 63.700001, 8571.00, 7967.00, 'Bolivia', 'Republic', 'Hugo Bánzer Suárez', 194, 'BO'),
+('BIH', 'Bosnia and Herzegovina', 'Europe', 'Southern Europe', 51197, 1992, 3972000, 71.5, 2841.00, NULL, 'Bosna i Hercegovina', 'Federal Republic', 'Ante Jelavic', 201, 'BA'),
+('BWA', 'Botswana', 'Africa', 'Southern Africa', 581730, 1966, 1622000, 39.299999, 4834.00, 4935.00, 'Botswana', 'Republic', 'Festus G. Mogae', 204, 'BW'),
+('BRA', 'Brazil', 'South America', 'South America', 8547403, 1822, 170115000, 62.900002, 776739.00, 804108.00, 'Brasil', 'Federal Republic', 'Fernando Henrique Cardoso', 211, 'BR'),
+('GBR', 'United Kingdom', 'Europe', 'British Islands', 242900, 1066, 59623400, 77.699997, 1378330.00, 1296830.00, 'United Kingdom', 'Constitutional Monarchy', 'Elisabeth II', 456, 'GB'),
+('VGB', 'Virgin Islands, British', 'North America', 'Caribbean', 151, NULL, 21000, 75.400002, 612.00, 573.00, 'British Virgin Islands', 'Dependent Territory of the UK', 'Elisabeth II', 537, 'VG'),
+('BRN', 'Brunei', 'Asia', 'Southeast Asia', 5765, 1984, 328000, 73.599998, 11705.00, 12460.00, 'Brunei Darussalam', 'Monarchy (Sultanate)', 'Haji Hassan al-Bolkiah', 538, 'BN'),
+('BGR', 'Bulgaria', 'Europe', 'Eastern Europe', 110994, 1908, 8190900, 70.900002, 12178.00, 10169.00, 'Balgarija', 'Republic', 'Petar Stojanov', 539, 'BG'),
+('BFA', 'Burkina Faso', 'Africa', 'Western Africa', 274000, 1960, 11937000, 46.700001, 2425.00, 2201.00, 'Burkina Faso', 'Republic', 'Blaise Compaoré', 549, 'BF'),
+('BDI', 'Burundi', 'Africa', 'Eastern Africa', 27834, 1962, 6695000, 46.200001, 903.00, 982.00, 'Burundi/Uburundi', 'Republic', 'Pierre Buyoya', 552, 'BI'),
+('CYM', 'Cayman Islands', 'North America', 'Caribbean', 264, NULL, 38000, 78.900002, 1263.00, 1186.00, 'Cayman Islands', 'Dependent Territory of the UK', 'Elisabeth II', 553, 'KY'),
+('CHL', 'Chile', 'South America', 'South America', 756626, 1810, 15211000, 75.699997, 72949.00, 75780.00, 'Chile', 'Republic', 'Ricardo Lagos Escobar', 554, 'CL'),
+('COK', 'Cook Islands', 'Oceania', 'Polynesia', 236, NULL, 20000, 71.099998, 100.00, NULL, 'The Cook Islands', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 583, 'CK'),
+('CRI', 'Costa Rica', 'North America', 'Central America', 51100, 1821, 4023000, 75.800003, 10226.00, 9757.00, 'Costa Rica', 'Republic', 'Miguel Ángel Rodríguez Echeverría', 584, 'CR'),
+('DJI', 'Djibouti', 'Africa', 'Eastern Africa', 23200, 1977, 638000, 50.799999, 382.00, 373.00, 'Djibouti/Jibuti', 'Republic', 'Ismail Omar Guelleh', 585, 'DJ'),
+('DMA', 'Dominica', 'North America', 'Caribbean', 751, 1978, 71000, 73.400002, 256.00, 243.00, 'Dominica', 'Republic', 'Vernon Shaw', 586, 'DM'),
+('DOM', 'Dominican Republic', 'North America', 'Caribbean', 48511, 1844, 8495000, 73.199997, 15846.00, 15076.00, 'República Dominicana', 'Republic', 'Hipólito Mejía Domínguez', 587, 'DO'),
+('ECU', 'Ecuador', 'South America', 'South America', 283561, 1822, 12646000, 71.099998, 19770.00, 19769.00, 'Ecuador', 'Republic', 'Gustavo Noboa Bejarano', 594, 'EC'),
+('EGY', 'Egypt', 'Africa', 'Northern Africa', 1001449, 1922, 68470000, 63.299999, 82710.00, 75617.00, 'Misr', 'Republic', 'Hosni Mubarak', 608, 'EG'),
+('SLV', 'El Salvador', 'North America', 'Central America', 21041, 1841, 6276000, 69.699997, 11863.00, 11203.00, 'El Salvador', 'Republic', 'Francisco Guillermo Flores Pérez', 645, 'SV'),
+('ERI', 'Eritrea', 'Africa', 'Eastern Africa', 117600, 1993, 3850000, 55.799999, 650.00, 755.00, 'Ertra', 'Republic', 'Isayas Afewerki [Isaias Afwerki]', 652, 'ER'),
+('ESP', 'Spain', 'Europe', 'Southern Europe', 505992, 1492, 39441700, 78.800003, 553233.00, 532031.00, 'España', 'Constitutional Monarchy', 'Juan Carlos I', 653, 'ES'),
+('ZAF', 'South Africa', 'Africa', 'Southern Africa', 1221037, 1910, 40377000, 51.099998, 116729.00, 129092.00, 'South Africa', 'Republic', 'Thabo Mbeki', 716, 'ZA'),
+('ETH', 'Ethiopia', 'Africa', 'Eastern Africa', 1104300, -1000, 62565000, 45.200001, 6353.00, 6180.00, 'YeItyop´iya', 'Republic', 'Negasso Gidada', 756, 'ET'),
+('FLK', 'Falkland Islands', 'South America', 'South America', 12173, NULL, 2000, NULL, 0.00, NULL, 'Falkland Islands', 'Dependent Territory of the UK', 'Elisabeth II', 763, 'FK'),
+('FJI', 'Fiji Islands', 'Oceania', 'Melanesia', 18274, 1970, 817000, 67.900002, 1536.00, 2149.00, 'Fiji Islands', 'Republic', 'Josefa Iloilo', 764, 'FJ'),
+('PHL', 'Philippines', 'Asia', 'Southeast Asia', 300000, 1946, 75967000, 67.5, 65107.00, 82239.00, 'Pilipinas', 'Republic', 'Gloria Macapagal-Arroyo', 766, 'PH'),
+('FRO', 'Faroe Islands', 'Europe', 'Nordic Countries', 1399, NULL, 43000, 78.400002, 0.00, NULL, 'Føroyar', 'Part of Denmark', 'Margrethe II', 901, 'FO'),
+('GAB', 'Gabon', 'Africa', 'Central Africa', 267668, 1960, 1226000, 50.099998, 5493.00, 5279.00, 'Le Gabon', 'Republic', 'Omar Bongo', 902, 'GA'),
+('GMB', 'Gambia', 'Africa', 'Western Africa', 11295, 1965, 1305000, 53.200001, 320.00, 325.00, 'The Gambia', 'Republic', 'Yahya Jammeh', 904, 'GM'),
+('GEO', 'Georgia', 'Asia', 'Middle East', 69700, 1991, 4968000, 64.5, 6064.00, 5924.00, 'Sakartvelo', 'Republic', 'Eduard evardnadze', 905, 'GE'),
+('GHA', 'Ghana', 'Africa', 'Western Africa', 238533, 1957, 20212000, 57.400002, 7137.00, 6884.00, 'Ghana', 'Republic', 'John Kufuor', 910, 'GH'),
+('GIB', 'Gibraltar', 'Europe', 'Southern Europe', 6, NULL, 25000, 79, 258.00, NULL, 'Gibraltar', 'Dependent Territory of the UK', 'Elisabeth II', 915, 'GI'),
+('GRD', 'Grenada', 'North America', 'Caribbean', 344, 1974, 94000, 64.5, 318.00, NULL, 'Grenada', 'Constitutional Monarchy', 'Elisabeth II', 916, 'GD'),
+('GRL', 'Greenland', 'North America', 'North America', 2166090, NULL, 56000, 68.099998, 0.00, NULL, 'Kalaallit Nunaat/Grønland', 'Part of Denmark', 'Margrethe II', 917, 'GL'),
+('GLP', 'Guadeloupe', 'North America', 'Caribbean', 1705, NULL, 456000, 77, 3501.00, NULL, 'Guadeloupe', 'Overseas Department of France', 'Jacques Chirac', 919, 'GP'),
+('GUM', 'Guam', 'Oceania', 'Micronesia', 549, NULL, 168000, 77.800003, 1197.00, 1136.00, 'Guam', 'US Territory', 'George W. Bush', 921, 'GU'),
+('GTM', 'Guatemala', 'North America', 'Central America', 108889, 1821, 11385000, 66.199997, 19008.00, 17797.00, 'Guatemala', 'Republic', 'Alfonso Portillo Cabrera', 922, 'GT'),
+('GIN', 'Guinea', 'Africa', 'Western Africa', 245857, 1958, 7430000, 45.599998, 2352.00, 2383.00, 'Guinée', 'Republic', 'Lansana Conté', 926, 'GN'),
+('GNB', 'Guinea-Bissau', 'Africa', 'Western Africa', 36125, 1974, 1213000, 49, 293.00, 272.00, 'Guiné-Bissau', 'Republic', 'Kumba Ialá', 927, 'GW'),
+('GUY', 'Guyana', 'South America', 'South America', 214969, 1966, 861000, 64, 722.00, 743.00, 'Guyana', 'Republic', 'Bharrat Jagdeo', 928, 'GY'),
+('HTI', 'Haiti', 'North America', 'Caribbean', 27750, 1804, 8222000, 49.200001, 3459.00, 3107.00, 'Haïti/Dayti', 'Republic', 'Jean-Bertrand Aristide', 929, 'HT'),
+('HND', 'Honduras', 'North America', 'Central America', 112088, 1838, 6485000, 69.900002, 5333.00, 4697.00, 'Honduras', 'Republic', 'Carlos Roberto Flores Facussé', 933, 'HN'),
+('HKG', 'Hong Kong', 'Asia', 'Eastern Asia', 1075, NULL, 6782000, 79.5, 166448.00, 173610.00, 'Xianggang/Hong Kong', 'Special Administrative Region of China', 'Jiang Zemin', 937, 'HK'),
+('SJM', 'Svalbard and Jan Mayen', 'Europe', 'Nordic Countries', 62422, NULL, 3200, NULL, 0.00, NULL, 'Svalbard og Jan Mayen', 'Dependent Territory of Norway', 'Harald V', 938, 'SJ'),
+('IDN', 'Indonesia', 'Asia', 'Southeast Asia', 1904569, 1945, 212107000, 68, 84982.00, 215002.00, 'Indonesia', 'Republic', 'Abdurrahman Wahid', 939, 'ID'),
+('IND', 'India', 'Asia', 'Southern and Central Asia', 3287263, 1947, 1013662000, 62.5, 447114.00, 430572.00, 'Bharat/India', 'Federal Republic', 'Kocheril Raman Narayanan', 1109, 'IN'),
+('IRQ', 'Iraq', 'Asia', 'Middle East', 438317, 1932, 23115000, 66.5, 11500.00, NULL, 'Al-´Iraq', 'Republic', 'Saddam Hussein al-Takriti', 1365, 'IQ'),
+('IRN', 'Iran', 'Asia', 'Southern and Central Asia', 1648195, 1906, 67702000, 69.699997, 195746.00, 160151.00, 'Iran', 'Islamic Republic', 'Ali Mohammad Khatami-Ardakani', 1380, 'IR'),
+('IRL', 'Ireland', 'Europe', 'British Islands', 70273, 1921, 3775100, 76.800003, 75921.00, 73132.00, 'Ireland/Éire', 'Republic', 'Mary McAleese', 1447, 'IE'),
+('ISL', 'Iceland', 'Europe', 'Nordic Countries', 103000, 1944, 279000, 79.400002, 8255.00, 7474.00, 'Ísland', 'Republic', 'Ólafur Ragnar Grímsson', 1449, 'IS'),
+('ISR', 'Israel', 'Asia', 'Middle East', 21056, 1948, 6217000, 78.599998, 97477.00, 98577.00, 'Yisrael/Israil', 'Republic', 'Moshe Katzav', 1450, 'IL'),
+('ITA', 'Italy', 'Europe', 'Southern Europe', 301316, 1861, 57680000, 79, 1161755.00, 1145372.00, 'Italia', 'Republic', 'Carlo Azeglio Ciampi', 1464, 'IT'),
+('TMP', 'East Timor', 'Asia', 'Southeast Asia', 14874, NULL, 885000, 46, 0.00, NULL, 'Timor Timur', 'Administrated by the UN', 'José Alexandre Gusmão', 1522, 'TP'),
+('AUT', 'Austria', 'Europe', 'Western Europe', 83859, 1918, 8091800, 77.699997, 211860.00, 206025.00, 'Österreich', 'Federal Republic', 'Thomas Klestil', 1523, 'AT'),
+('JAM', 'Jamaica', 'North America', 'Caribbean', 10990, 1962, 2583000, 75.199997, 6871.00, 6722.00, 'Jamaica', 'Constitutional Monarchy', 'Elisabeth II', 1530, 'JM'),
+('JPN', 'Japan', 'Asia', 'Eastern Asia', 377829, -660, 126714000, 80.699997, 3787042.00, 4192638.00, 'Nihon/Nippon', 'Constitutional Monarchy', 'Akihito', 1532, 'JP'),
+('YEM', 'Yemen', 'Asia', 'Middle East', 527968, 1918, 18112000, 59.799999, 6041.00, 5729.00, 'Al-Yaman', 'Republic', 'Ali Abdallah Salih', 1780, 'YE'),
+('JOR', 'Jordan', 'Asia', 'Middle East', 88946, 1946, 5083000, 77.400002, 7526.00, 7051.00, 'Al-Urdunn', 'Constitutional Monarchy', 'Abdullah II', 1786, 'JO'),
+('CXR', 'Christmas Island', 'Oceania', 'Australia and New Zealand', 135, NULL, 2500, NULL, 0.00, NULL, 'Christmas Island', 'Territory of Australia', 'Elisabeth II', 1791, 'CX'),
+('YUG', 'Yugoslavia', 'Europe', 'Southern Europe', 102173, 1918, 10640000, 72.400002, 17000.00, NULL, 'Jugoslavija', 'Federal Republic', 'Vojislav Kotunica', 1792, 'YU'),
+('KHM', 'Cambodia', 'Asia', 'Southeast Asia', 181035, 1953, 11168000, 56.5, 5121.00, 5670.00, 'Kâmpuchéa', 'Constitutional Monarchy', 'Norodom Sihanouk', 1800, 'KH'),
+('CMR', 'Cameroon', 'Africa', 'Central Africa', 475442, 1960, 15085000, 54.799999, 9174.00, 8596.00, 'Cameroun/Cameroon', 'Republic', 'Paul Biya', 1804, 'CM'),
+('CAN', 'Canada', 'North America', 'North America', 9970610, 1867, 31147000, 79.400002, 598862.00, 625626.00, 'Canada', 'Constitutional Monarchy, Federation', 'Elisabeth II', 1822, 'CA'),
+('CPV', 'Cape Verde', 'Africa', 'Western Africa', 4033, 1975, 428000, 68.900002, 435.00, 420.00, 'Cabo Verde', 'Republic', 'António Mascarenhas Monteiro', 1859, 'CV'),
+('KAZ', 'Kazakstan', 'Asia', 'Southern and Central Asia', 2724900, 1991, 16223000, 63.200001, 24375.00, 23383.00, 'Qazaqstan', 'Republic', 'Nursultan Nazarbajev', 1864, 'KZ'),
+('KEN', 'Kenya', 'Africa', 'Eastern Africa', 580367, 1963, 30080000, 48, 9217.00, 10241.00, 'Kenya', 'Republic', 'Daniel arap Moi', 1881, 'KE'),
+('CAF', 'Central African Republic', 'Africa', 'Central Africa', 622984, 1960, 3615000, 44, 1054.00, 993.00, 'Centrafrique/Bê-Afrîka', 'Republic', 'Ange-Félix Patassé', 1889, 'CF'),
+('CHN', 'China', 'Asia', 'Eastern Asia', 9572900, -1523, 1277558000, 71.400002, 982268.00, 917719.00, 'Zhongquo', 'People''s Republic', 'Jiang Zemin', 1891, 'CN'),
+('KGZ', 'Kyrgyzstan', 'Asia', 'Southern and Central Asia', 199900, 1991, 4699000, 63.400002, 1626.00, 1767.00, 'Kyrgyzstan', 'Republic', 'Askar Akajev', 2253, 'KG'),
+('KIR', 'Kiribati', 'Oceania', 'Micronesia', 726, 1979, 83000, 59.799999, 40.70, NULL, 'Kiribati', 'Republic', 'Teburoro Tito', 2256, 'KI'),
+('COL', 'Colombia', 'South America', 'South America', 1138914, 1810, 42321000, 70.300003, 102896.00, 105116.00, 'Colombia', 'Republic', 'Andrés Pastrana Arango', 2257, 'CO'),
+('COM', 'Comoros', 'Africa', 'Eastern Africa', 1862, 1975, 578000, 60, 4401.00, 4361.00, 'Komori/Comores', 'Republic', 'Azali Assoumani', 2295, 'KM'),
+('COG', 'Congo', 'Africa', 'Central Africa', 342000, 1960, 2943000, 47.400002, 2108.00, 2287.00, 'Congo', 'Republic', 'Denis Sassou-Nguesso', 2296, 'CG'),
+('COD', 'Congo, The Democratic Republic of the', 'Africa', 'Central Africa', 2344858, 1960, 51654000, 48.799999, 6964.00, 2474.00, 'République Démocratique du Congo', 'Republic', 'Joseph Kabila', 2298, 'CD'),
+('CCK', 'Cocos (Keeling) Islands', 'Oceania', 'Australia and New Zealand', 14, NULL, 600, NULL, 0.00, NULL, 'Cocos (Keeling) Islands', 'Territory of Australia', 'Elisabeth II', 2317, 'CC'),
+('PRK', 'North Korea', 'Asia', 'Eastern Asia', 120538, 1948, 24039000, 70.699997, 5332.00, NULL, 'Choson Minjujuui In´min Konghwaguk (Bukhan)', 'Socialistic Republic', 'Kim Jong-il', 2318, 'KP'),
+('KOR', 'South Korea', 'Asia', 'Eastern Asia', 99434, 1948, 46844000, 74.400002, 320749.00, 442544.00, 'Taehan Minguk (Namhan)', 'Republic', 'Kim Dae-jung', 2331, 'KR'),
+('GRC', 'Greece', 'Europe', 'Southern Europe', 131626, 1830, 10545700, 78.400002, 120724.00, 119946.00, 'Elláda', 'Republic', 'Kostis Stefanopoulos', 2401, 'GR'),
+('HRV', 'Croatia', 'Europe', 'Southern Europe', 56538, 1991, 4473000, 73.699997, 20208.00, 19300.00, 'Hrvatska', 'Republic', 'tipe Mesic', 2409, 'HR'),
+('CUB', 'Cuba', 'North America', 'Caribbean', 110861, 1902, 11201000, 76.199997, 17843.00, 18862.00, 'Cuba', 'Socialistic Republic', 'Fidel Castro Ruz', 2413, 'CU'),
+('KWT', 'Kuwait', 'Asia', 'Middle East', 17818, 1961, 1972000, 76.099998, 27037.00, 30373.00, 'Al-Kuwayt', 'Constitutional Monarchy (Emirate)', 'Jabir al-Ahmad al-Jabir al-Sabah', 2429, 'KW'),
+('CYP', 'Cyprus', 'Asia', 'Middle East', 9251, 1960, 754700, 76.699997, 9333.00, 8246.00, 'Kýpros/Kibris', 'Republic', 'Glafkos Klerides', 2430, 'CY'),
+('LAO', 'Laos', 'Asia', 'Southeast Asia', 236800, 1953, 5433000, 53.099998, 1292.00, 1746.00, 'Lao', 'Republic', 'Khamtay Siphandone', 2432, 'LA'),
+('LVA', 'Latvia', 'Europe', 'Baltic Countries', 64589, 1991, 2424200, 68.400002, 6398.00, 5639.00, 'Latvija', 'Republic', 'Vaira Vike-Freiberga', 2434, 'LV'),
+('LSO', 'Lesotho', 'Africa', 'Southern Africa', 30355, 1966, 2153000, 50.799999, 1061.00, 1161.00, 'Lesotho', 'Constitutional Monarchy', 'Letsie III', 2437, 'LS'),
+('LBN', 'Lebanon', 'Asia', 'Middle East', 10400, 1941, 3282000, 71.300003, 17121.00, 15129.00, 'Lubnan', 'Republic', 'Émile Lahoud', 2438, 'LB'),
+('LBR', 'Liberia', 'Africa', 'Western Africa', 111369, 1847, 3154000, 51, 2012.00, NULL, 'Liberia', 'Republic', 'Charles Taylor', 2440, 'LR'),
+('LBY', 'Libyan Arab Jamahiriya', 'Africa', 'Northern Africa', 1759540, 1951, 5605000, 75.5, 44806.00, 40562.00, 'Libiya', 'Socialistic State', 'Muammar al-Qadhafi', 2441, 'LY'),
+('LIE', 'Liechtenstein', 'Europe', 'Western Europe', 160, 1806, 32300, 78.800003, 1119.00, 1084.00, 'Liechtenstein', 'Constitutional Monarchy', 'Hans-Adam II', 2446, 'LI'),
+('LTU', 'Lithuania', 'Europe', 'Baltic Countries', 65301, 1991, 3698500, 69.099998, 10692.00, 9585.00, 'Lietuva', 'Republic', 'Valdas Adamkus', 2447, 'LT'),
+('LUX', 'Luxembourg', 'Europe', 'Western Europe', 2586, 1867, 435700, 77.099998, 16321.00, 15519.00, 'Luxembourg/Lëtzebuerg', 'Constitutional Monarchy', 'Henri', 2452, 'LU'),
+('ESH', 'Western Sahara', 'Africa', 'Northern Africa', 266000, NULL, 293000, 49.799999, 60.00, NULL, 'As-Sahrawiya', 'Occupied by Marocco', 'Mohammed Abdel Aziz', 2453, 'EH'),
+('MAC', 'Macao', 'Asia', 'Eastern Asia', 18, NULL, 473000, 81.599998, 5749.00, 5940.00, 'Macau/Aomen', 'Special Administrative Region of China', 'Jiang Zemin', 2454, 'MO'),
+('MDG', 'Madagascar', 'Africa', 'Eastern Africa', 587041, 1960, 15942000, 55, 3750.00, 3545.00, 'Madagasikara/Madagascar', 'Federal Republic', 'Didier Ratsiraka', 2455, 'MG'),
+('MKD', 'Macedonia', 'Europe', 'Southern Europe', 25713, 1991, 2024000, 73.800003, 1694.00, 1915.00, 'Makedonija', 'Republic', 'Boris Trajkovski', 2460, 'MK'),
+('MWI', 'Malawi', 'Africa', 'Eastern Africa', 118484, 1964, 10925000, 37.599998, 1687.00, 2527.00, 'Malawi', 'Republic', 'Bakili Muluzi', 2462, 'MW'),
+('MDV', 'Maldives', 'Asia', 'Southern and Central Asia', 298, 1965, 286000, 62.200001, 199.00, NULL, 'Dhivehi Raajje/Maldives', 'Republic', 'Maumoon Abdul Gayoom', 2463, 'MV'),
+('MYS', 'Malaysia', 'Asia', 'Southeast Asia', 329758, 1957, 22244000, 70.800003, 69213.00, 97884.00, 'Malaysia', 'Constitutional Monarchy, Federation', 'Salahuddin Abdul Aziz Shah Alhaj', 2464, 'MY'),
+('MLI', 'Mali', 'Africa', 'Western Africa', 1240192, 1960, 11234000, 46.700001, 2642.00, 2453.00, 'Mali', 'Republic', 'Alpha Oumar Konaré', 2482, 'ML'),
+('MLT', 'Malta', 'Europe', 'Southern Europe', 316, 1964, 380200, 77.900002, 3512.00, 3338.00, 'Malta', 'Republic', 'Guido de Marco', 2484, 'MT'),
+('MAR', 'Morocco', 'Africa', 'Northern Africa', 446550, 1956, 28351000, 69.099998, 36124.00, 33514.00, 'Al-Maghrib', 'Constitutional Monarchy', 'Mohammed VI', 2486, 'MA'),
+('MHL', 'Marshall Islands', 'Oceania', 'Micronesia', 181, 1990, 64000, 65.5, 97.00, NULL, 'Marshall Islands/Majol', 'Republic', 'Kessai Note', 2507, 'MH'),
+('MTQ', 'Martinique', 'North America', 'Caribbean', 1102, NULL, 395000, 78.300003, 2731.00, 2559.00, 'Martinique', 'Overseas Department of France', 'Jacques Chirac', 2508, 'MQ'),
+('MRT', 'Mauritania', 'Africa', 'Western Africa', 1025520, 1960, 2670000, 50.799999, 998.00, 1081.00, 'Muritaniya/Mauritanie', 'Republic', 'Maaouiya Ould Sid´Ahmad Taya', 2509, 'MR'),
+('MUS', 'Mauritius', 'Africa', 'Eastern Africa', 2040, 1968, 1158000, 71, 4251.00, 4186.00, 'Mauritius', 'Republic', 'Cassam Uteem', 2511, 'MU'),
+('MYT', 'Mayotte', 'Africa', 'Eastern Africa', 373, NULL, 149000, 59.5, 0.00, NULL, 'Mayotte', 'Territorial Collectivity of France', 'Jacques Chirac', 2514, 'YT'),
+('MEX', 'Mexico', 'North America', 'Central America', 1958201, 1810, 98881000, 71.5, 414972.00, 401461.00, 'México', 'Federal Republic', 'Vicente Fox Quesada', 2515, 'MX'),
+('FSM', 'Micronesia, Federated States of', 'Oceania', 'Micronesia', 702, 1990, 119000, 68.599998, 212.00, NULL, 'Micronesia', 'Federal Republic', 'Leo A. Falcam', 2689, 'FM'),
+('MDA', 'Moldova', 'Europe', 'Eastern Europe', 33851, 1991, 4380000, 64.5, 1579.00, 1872.00, 'Moldova', 'Republic', 'Vladimir Voronin', 2690, 'MD'),
+('MCO', 'Monaco', 'Europe', 'Western Europe', 1.5, 1861, 34000, 78.800003, 776.00, NULL, 'Monaco', 'Constitutional Monarchy', 'Rainier III', 2695, 'MC'),
+('MNG', 'Mongolia', 'Asia', 'Eastern Asia', 1566500, 1921, 2662000, 67.300003, 1043.00, 933.00, 'Mongol Uls', 'Republic', 'Natsagiin Bagabandi', 2696, 'MN'),
+('MSR', 'Montserrat', 'North America', 'Caribbean', 102, NULL, 11000, 78, 109.00, NULL, 'Montserrat', 'Dependent Territory of the UK', 'Elisabeth II', 2697, 'MS'),
+('MOZ', 'Mozambique', 'Africa', 'Eastern Africa', 801590, 1975, 19680000, 37.5, 2891.00, 2711.00, 'Moçambique', 'Republic', 'Joaquím A. Chissano', 2698, 'MZ'),
+('MMR', 'Myanmar', 'Asia', 'Southeast Asia', 676578, 1948, 45611000, 54.900002, 180375.00, 171028.00, 'Myanma Pye', 'Republic', 'kenraali Than Shwe', 2710, 'MM'),
+('NAM', 'Namibia', 'Africa', 'Southern Africa', 824292, 1990, 1726000, 42.5, 3101.00, 3384.00, 'Namibia', 'Republic', 'Sam Nujoma', 2726, 'NA'),
+('NRU', 'Nauru', 'Oceania', 'Micronesia', 21, 1968, 12000, 60.799999, 197.00, NULL, 'Naoero/Nauru', 'Republic', 'Bernard Dowiyogo', 2728, 'NR'),
+('NPL', 'Nepal', 'Asia', 'Southern and Central Asia', 147181, 1769, 23930000, 57.799999, 4768.00, 4837.00, 'Nepal', 'Constitutional Monarchy', 'Gyanendra Bir Bikram', 2729, 'NP'),
+('NIC', 'Nicaragua', 'North America', 'Central America', 130000, 1838, 5074000, 68.699997, 1988.00, 2023.00, 'Nicaragua', 'Republic', 'Arnoldo Alemán Lacayo', 2734, 'NI'),
+('NER', 'Niger', 'Africa', 'Western Africa', 1267000, 1960, 10730000, 41.299999, 1706.00, 1580.00, 'Niger', 'Republic', 'Mamadou Tandja', 2738, 'NE'),
+('NGA', 'Nigeria', 'Africa', 'Western Africa', 923768, 1960, 111506000, 51.599998, 65707.00, 58623.00, 'Nigeria', 'Federal Republic', 'Olusegun Obasanjo', 2754, 'NG'),
+('NIU', 'Niue', 'Oceania', 'Polynesia', 260, NULL, 2000, NULL, 0.00, NULL, 'Niue', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 2805, 'NU'),
+('NFK', 'Norfolk Island', 'Oceania', 'Australia and New Zealand', 36, NULL, 2000, NULL, 0.00, NULL, 'Norfolk Island', 'Territory of Australia', 'Elisabeth II', 2806, 'NF'),
+('NOR', 'Norway', 'Europe', 'Nordic Countries', 323877, 1905, 4478500, 78.699997, 145895.00, 153370.00, 'Norge', 'Constitutional Monarchy', 'Harald V', 2807, 'NO'),
+('CIV', 'Côte dIvoire', 'Africa', 'Western Africa', 322463, 1960, 14786000, 45.200001, 11345.00, 10285.00, 'Côte dIvoire', 'Republic', 'Laurent Gbagbo', 2814, 'CI'),
+('OMN', 'Oman', 'Asia', 'Middle East', 309500, 1951, 2542000, 71.800003, 16904.00, 16153.00, '´Uman', 'Monarchy (Sultanate)', 'Qabus ibn Sa´id', 2821, 'OM'),
+('PAK', 'Pakistan', 'Asia', 'Southern and Central Asia', 796095, 1947, 156483000, 61.099998, 61289.00, 58549.00, 'Pakistan', 'Republic', 'Mohammad Rafiq Tarar', 2831, 'PK'),
+('PLW', 'Palau', 'Oceania', 'Micronesia', 459, 1994, 19000, 68.599998, 105.00, NULL, 'Belau/Palau', 'Republic', 'Kuniwo Nakamura', 2881, 'PW'),
+('PAN', 'Panama', 'North America', 'Central America', 75517, 1903, 2856000, 75.5, 9131.00, 8700.00, 'Panamá', 'Republic', 'Mireya Elisa Moscoso Rodríguez', 2882, 'PA'),
+('PNG', 'Papua New Guinea', 'Oceania', 'Melanesia', 462840, 1975, 4807000, 63.099998, 4988.00, 6328.00, 'Papua New Guinea/Papua Niugini', 'Constitutional Monarchy', 'Elisabeth II', 2884, 'PG'),
+('PRY', 'Paraguay', 'South America', 'South America', 406752, 1811, 5496000, 73.699997, 8444.00, 9555.00, 'Paraguay', 'Republic', 'Luis Ángel González Macchi', 2885, 'PY'),
+('PER', 'Peru', 'South America', 'South America', 1285216, 1821, 25662000, 70, 64140.00, 65186.00, 'Perú/Piruw', 'Republic', 'Valentin Paniagua Corazao', 2890, 'PE'),
+('PCN', 'Pitcairn', 'Oceania', 'Polynesia', 49, NULL, 50, NULL, 0.00, NULL, 'Pitcairn', 'Dependent Territory of the UK', 'Elisabeth II', 2912, 'PN'),
+('MNP', 'Northern Mariana Islands', 'Oceania', 'Micronesia', 464, NULL, 78000, 75.5, 0.00, NULL, 'Northern Mariana Islands', 'Commonwealth of the US', 'George W. Bush', 2913, 'MP'),
+('PRT', 'Portugal', 'Europe', 'Southern Europe', 91982, 1143, 9997600, 75.800003, 105954.00, 102133.00, 'Portugal', 'Republic', 'Jorge Sampãio', 2914, 'PT'),
+('PRI', 'Puerto Rico', 'North America', 'Caribbean', 8875, NULL, 3869000, 75.599998, 34100.00, 32100.00, 'Puerto Rico', 'Commonwealth of the US', 'George W. Bush', 2919, 'PR'),
+('POL', 'Poland', 'Europe', 'Eastern Europe', 323250, 1918, 38653600, 73.199997, 151697.00, 135636.00, 'Polska', 'Republic', 'Aleksander Kwasniewski', 2928, 'PL'),
+('GNQ', 'Equatorial Guinea', 'Africa', 'Central Africa', 28051, 1968, 453000, 53.599998, 283.00, 542.00, 'Guinea Ecuatorial', 'Republic', 'Teodoro Obiang Nguema Mbasogo', 2972, 'GQ'),
+('QAT', 'Qatar', 'Asia', 'Middle East', 11000, 1971, 599000, 72.400002, 9472.00, 8920.00, 'Qatar', 'Monarchy', 'Hamad ibn Khalifa al-Thani', 2973, 'QA'),
+('FRA', 'France', 'Europe', 'Western Europe', 551500, 843, 59225700, 78.800003, 1424285.00, 1392448.00, 'France', 'Republic', 'Jacques Chirac', 2974, 'FR'),
+('GUF', 'French Guiana', 'South America', 'South America', 90000, NULL, 181000, 76.099998, 681.00, NULL, 'Guyane française', 'Overseas Department of France', 'Jacques Chirac', 3014, 'GF'),
+('PYF', 'French Polynesia', 'Oceania', 'Polynesia', 4000, NULL, 235000, 74.800003, 818.00, 781.00, 'Polynésie française', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3016, 'PF'),
+('REU', 'Réunion', 'Africa', 'Eastern Africa', 2510, NULL, 699000, 72.699997, 8287.00, 7988.00, 'Réunion', 'Overseas Department of France', 'Jacques Chirac', 3017, 'RE'),
+('ROM', 'Romania', 'Europe', 'Eastern Europe', 238391, 1878, 22455500, 69.900002, 38158.00, 34843.00, 'România', 'Republic', 'Ion Iliescu', 3018, 'RO'),
+('RWA', 'Rwanda', 'Africa', 'Eastern Africa', 26338, 1962, 7733000, 39.299999, 2036.00, 1863.00, 'Rwanda/Urwanda', 'Republic', 'Paul Kagame', 3047, 'RW'),
+('SWE', 'Sweden', 'Europe', 'Nordic Countries', 449964, 836, 8861400, 79.599998, 226492.00, 227757.00, 'Sverige', 'Constitutional Monarchy', 'Carl XVI Gustaf', 3048, 'SE'),
+('SHN', 'Saint Helena', 'Africa', 'Western Africa', 314, NULL, 6000, 76.800003, 0.00, NULL, 'Saint Helena', 'Dependent Territory of the UK', 'Elisabeth II', 3063, 'SH'),
+('KNA', 'Saint Kitts and Nevis', 'North America', 'Caribbean', 261, 1983, 38000, 70.699997, 299.00, NULL, 'Saint Kitts and Nevis', 'Constitutional Monarchy', 'Elisabeth II', 3064, 'KN'),
+('LCA', 'Saint Lucia', 'North America', 'Caribbean', 622, 1979, 154000, 72.300003, 571.00, NULL, 'Saint Lucia', 'Constitutional Monarchy', 'Elisabeth II', 3065, 'LC'),
+('VCT', 'Saint Vincent and the Grenadines', 'North America', 'Caribbean', 388, 1979, 114000, 72.300003, 285.00, NULL, 'Saint Vincent and the Grenadines', 'Constitutional Monarchy', 'Elisabeth II', 3066, 'VC'),
+('SPM', 'Saint Pierre and Miquelon', 'North America', 'North America', 242, NULL, 7000, 77.599998, 0.00, NULL, 'Saint-Pierre-et-Miquelon', 'Territorial Collectivity of France', 'Jacques Chirac', 3067, 'PM'),
+('DEU', 'Germany', 'Europe', 'Western Europe', 357022, 1955, 82164700, 77.400002, 2133367.00, 2102826.00, 'Deutschland', 'Federal Republic', 'Johannes Rau', 3068, 'DE'),
+('SLB', 'Solomon Islands', 'Oceania', 'Melanesia', 28896, 1978, 444000, 71.300003, 182.00, 220.00, 'Solomon Islands', 'Constitutional Monarchy', 'Elisabeth II', 3161, 'SB'),
+('ZMB', 'Zambia', 'Africa', 'Eastern Africa', 752618, 1964, 9169000, 37.200001, 3377.00, 3922.00, 'Zambia', 'Republic', 'Frederick Chiluba', 3162, 'ZM'),
+('WSM', 'Samoa', 'Oceania', 'Polynesia', 2831, 1962, 180000, 69.199997, 141.00, 157.00, 'Samoa', 'Parlementary Monarchy', 'Malietoa Tanumafili II', 3169, 'WS'),
+('SMR', 'San Marino', 'Europe', 'Southern Europe', 61, 885, 27000, 81.099998, 510.00, NULL, 'San Marino', 'Republic', NULL, 3171, 'SM'),
+('STP', 'Sao Tome and Principe', 'Africa', 'Central Africa', 964, 1975, 147000, 65.300003, 6.00, NULL, 'São Tomé e Príncipe', 'Republic', 'Miguel Trovoada', 3172, 'ST'),
+('SAU', 'Saudi Arabia', 'Asia', 'Middle East', 2149690, 1932, 21607000, 67.800003, 137635.00, 146171.00, 'Al-´Arabiya as-Sa´udiya', 'Monarchy', 'Fahd ibn Abdul-Aziz al-Sa´ud', 3173, 'SA'),
+('SEN', 'Senegal', 'Africa', 'Western Africa', 196722, 1960, 9481000, 62.200001, 4787.00, 4542.00, 'Sénégal/Sounougal', 'Republic', 'Abdoulaye Wade', 3198, 'SN'),
+('SYC', 'Seychelles', 'Africa', 'Eastern Africa', 455, 1976, 77000, 70.400002, 536.00, 539.00, 'Sesel/Seychelles', 'Republic', 'France-Albert René', 3206, 'SC'),
+('SLE', 'Sierra Leone', 'Africa', 'Western Africa', 71740, 1961, 4854000, 45.299999, 746.00, 858.00, 'Sierra Leone', 'Republic', 'Ahmed Tejan Kabbah', 3207, 'SL'),
+('SGP', 'Singapore', 'Asia', 'Southeast Asia', 618, 1965, 3567000, 80.099998, 86503.00, 96318.00, 'Singapore/Singapura/Xinjiapo/Singapur', 'Republic', 'Sellapan Rama Nathan', 3208, 'SG'),
+('SVK', 'Slovakia', 'Europe', 'Eastern Europe', 49012, 1993, 5398700, 73.699997, 20594.00, 19452.00, 'Slovensko', 'Republic', 'Rudolf Schuster', 3209, 'SK'),
+('SVN', 'Slovenia', 'Europe', 'Southern Europe', 20256, 1991, 1987800, 74.900002, 19756.00, 18202.00, 'Slovenija', 'Republic', 'Milan Kucan', 3212, 'SI'),
+('SOM', 'Somalia', 'Africa', 'Eastern Africa', 637657, 1960, 10097000, 46.200001, 935.00, NULL, 'Soomaaliya', 'Republic', 'Abdiqassim Salad Hassan', 3214, 'SO'),
+('LKA', 'Sri Lanka', 'Asia', 'Southern and Central Asia', 65610, 1948, 18827000, 71.800003, 15706.00, 15091.00, 'Sri Lanka/Ilankai', 'Republic', 'Chandrika Kumaratunga', 3217, 'LK'),
+('SDN', 'Sudan', 'Africa', 'Northern Africa', 2505813, 1956, 29490000, 56.599998, 10162.00, NULL, 'As-Sudan', 'Islamic Republic', 'Omar Hassan Ahmad al-Bashir', 3225, 'SD'),
+('FIN', 'Finland', 'Europe', 'Nordic Countries', 338145, 1917, 5171300, 77.400002, 121914.00, 119833.00, 'Suomi', 'Republic', 'Tarja Halonen', 3236, 'FI'),
+('SUR', 'Suriname', 'South America', 'South America', 163265, 1975, 417000, 71.400002, 870.00, 706.00, 'Suriname', 'Republic', 'Ronald Venetiaan', 3243, 'SR'),
+('SWZ', 'Swaziland', 'Africa', 'Southern Africa', 17364, 1968, 1008000, 40.400002, 1206.00, 1312.00, 'kaNgwane', 'Monarchy', 'Mswati III', 3244, 'SZ'),
+('CHE', 'Switzerland', 'Europe', 'Western Europe', 41284, 1499, 7160400, 79.599998, 264478.00, 256092.00, 'Schweiz/Suisse/Svizzera/Svizra', 'Federation', 'Adolf Ogi', 3248, 'CH'),
+('SYR', 'Syria', 'Asia', 'Middle East', 185180, 1941, 16125000, 68.5, 65984.00, 64926.00, 'Suriya', 'Republic', 'Bashar al-Assad', 3250, 'SY'),
+('TJK', 'Tajikistan', 'Asia', 'Southern and Central Asia', 143100, 1991, 6188000, 64.099998, 1990.00, 1056.00, 'Toçikiston', 'Republic', 'Emomali Rahmonov', 3261, 'TJ'),
+('TWN', 'Taiwan', 'Asia', 'Eastern Asia', 36188, 1945, 22256000, 76.400002, 256254.00, 263451.00, 'Tai-wan', 'Republic', 'Chen Shui-bian', 3263, 'TW'),
+('TZA', 'Tanzania', 'Africa', 'Eastern Africa', 883749, 1961, 33517000, 52.299999, 8005.00, 7388.00, 'Tanzania', 'Republic', 'Benjamin William Mkapa', 3306, 'TZ'),
+('DNK', 'Denmark', 'Europe', 'Nordic Countries', 43094, 800, 5330000, 76.5, 174099.00, 169264.00, 'Danmark', 'Constitutional Monarchy', 'Margrethe II', 3315, 'DK'),
+('THA', 'Thailand', 'Asia', 'Southeast Asia', 513115, 1350, 61399000, 68.599998, 116416.00, 153907.00, 'Prathet Thai', 'Constitutional Monarchy', 'Bhumibol Adulyadej', 3320, 'TH'),
+('TGO', 'Togo', 'Africa', 'Western Africa', 56785, 1960, 4629000, 54.700001, 1449.00, 1400.00, 'Togo', 'Republic', 'Gnassingbé Eyadéma', 3332, 'TG'),
+('TKL', 'Tokelau', 'Oceania', 'Polynesia', 12, NULL, 2000, NULL, 0.00, NULL, 'Tokelau', 'Nonmetropolitan Territory of New Zealand', 'Elisabeth II', 3333, 'TK'),
+('TON', 'Tonga', 'Oceania', 'Polynesia', 650, 1970, 99000, 67.900002, 146.00, 170.00, 'Tonga', 'Monarchy', 'Taufa''ahau Tupou IV', 3334, 'TO'),
+('TTO', 'Trinidad and Tobago', 'North America', 'Caribbean', 5130, 1962, 1295000, 68, 6232.00, 5867.00, 'Trinidad and Tobago', 'Republic', 'Arthur N. R. Robinson', 3336, 'TT'),
+('TCD', 'Chad', 'Africa', 'Central Africa', 1284000, 1960, 7651000, 50.5, 1208.00, 1102.00, 'Tchad/Tshad', 'Republic', 'Idriss Déby', 3337, 'TD'),
+('CZE', 'Czech Republic', 'Europe', 'Eastern Europe', 78866, 1993, 10278100, 74.5, 55017.00, 52037.00, '¸esko', 'Republic', 'Václav Havel', 3339, 'CZ'),
+('TUN', 'Tunisia', 'Africa', 'Northern Africa', 163610, 1956, 9586000, 73.699997, 20026.00, 18898.00, 'Tunis/Tunisie', 'Republic', 'Zine al-Abidine Ben Ali', 3349, 'TN'),
+('TUR', 'Turkey', 'Asia', 'Middle East', 774815, 1923, 66591000, 71, 210721.00, 189122.00, 'Türkiye', 'Republic', 'Ahmet Necdet Sezer', 3358, 'TR'),
+('TKM', 'Turkmenistan', 'Asia', 'Southern and Central Asia', 488100, 1991, 4459000, 60.900002, 4397.00, 2000.00, 'Türkmenostan', 'Republic', 'Saparmurad Nijazov', 3419, 'TM'),
+('TCA', 'Turks and Caicos Islands', 'North America', 'Caribbean', 430, NULL, 17000, 73.300003, 96.00, NULL, 'The Turks and Caicos Islands', 'Dependent Territory of the UK', 'Elisabeth II', 3423, 'TC'),
+('TUV', 'Tuvalu', 'Oceania', 'Polynesia', 26, 1978, 12000, 66.300003, 6.00, NULL, 'Tuvalu', 'Constitutional Monarchy', 'Elisabeth II', 3424, 'TV'),
+('UGA', 'Uganda', 'Africa', 'Eastern Africa', 241038, 1962, 21778000, 42.900002, 6313.00, 6887.00, 'Uganda', 'Republic', 'Yoweri Museveni', 3425, 'UG'),
+('UKR', 'Ukraine', 'Europe', 'Eastern Europe', 603700, 1991, 50456000, 66, 42168.00, 49677.00, 'Ukrajina', 'Republic', 'Leonid Kutma', 3426, 'UA'),
+('HUN', 'Hungary', 'Europe', 'Eastern Europe', 93030, 1918, 10043200, 71.400002, 48267.00, 45914.00, 'Magyarország', 'Republic', 'Ferenc Mádl', 3483, 'HU'),
+('URY', 'Uruguay', 'South America', 'South America', 175016, 1828, 3337000, 75.199997, 20831.00, 19967.00, 'Uruguay', 'Republic', 'Jorge Batlle Ibáñez', 3492, 'UY'),
+('NCL', 'New Caledonia', 'Oceania', 'Melanesia', 18575, NULL, 214000, 72.800003, 3563.00, NULL, 'Nouvelle-Calédonie', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3493, 'NC'),
+('NZL', 'New Zealand', 'Oceania', 'Australia and New Zealand', 270534, 1907, 3862000, 77.800003, 54669.00, 64960.00, 'New Zealand/Aotearoa', 'Constitutional Monarchy', 'Elisabeth II', 3499, 'NZ'),
+('UZB', 'Uzbekistan', 'Asia', 'Southern and Central Asia', 447400, 1991, 24318000, 63.700001, 14194.00, 21300.00, 'Uzbekiston', 'Republic', 'Islam Karimov', 3503, 'UZ'),
+('BLR', 'Belarus', 'Europe', 'Eastern Europe', 207600, 1991, 10236000, 68, 13714.00, NULL, 'Belarus', 'Republic', 'Aljaksandr Lukaenka', 3520, 'BY'),
+('WLF', 'Wallis and Futuna', 'Oceania', 'Polynesia', 200, NULL, 15000, NULL, 0.00, NULL, 'Wallis-et-Futuna', 'Nonmetropolitan Territory of France', 'Jacques Chirac', 3536, 'WF'),
+('VUT', 'Vanuatu', 'Oceania', 'Melanesia', 12189, 1980, 190000, 60.599998, 261.00, 246.00, 'Vanuatu', 'Republic', 'John Bani', 3537, 'VU'),
+('VAT', 'Holy See (Vatican City State)', 'Europe', 'Southern Europe', 0.40000001, 1929, 1000, NULL, 9.00, NULL, 'Santa Sede/Città del Vaticano', 'Independent Church State', 'Johannes Paavali II', 3538, 'VA'),
+('VEN', 'Venezuela', 'South America', 'South America', 912050, 1811, 24170000, 73.099998, 95023.00, 88434.00, 'Venezuela', 'Federal Republic', 'Hugo Chávez Frías', 3539, 'VE'),
+('RUS', 'Russian Federation', 'Europe', 'Eastern Europe', 17075400, 1991, 146934000, 67.199997, 276608.00, 442989.00, 'Rossija', 'Federal Republic', 'Vladimir Putin', 3580, 'RU'),
+('VNM', 'Vietnam', 'Asia', 'Southeast Asia', 331689, 1945, 79832000, 69.300003, 21929.00, 22834.00, 'Viêt Nam', 'Socialistic Republic', 'Trân Duc Luong', 3770, 'VN'),
+('EST', 'Estonia', 'Europe', 'Baltic Countries', 45227, 1991, 1439200, 69.5, 5328.00, 3371.00, 'Eesti', 'Republic', 'Lennart Meri', 3791, 'EE'),
+('USA', 'United States', 'North America', 'North America', 9363520, 1776, 278357000, 77.099998, 8510700.00, 8110900.00, 'United States', 'Federal Republic', 'George W. Bush', 3813, 'US'),
+('VIR', 'Virgin Islands, U.S.', 'North America', 'Caribbean', 347, NULL, 93000, 78.099998, 0.00, NULL, 'Virgin Islands of the United States', 'US Territory', 'George W. Bush', 4067, 'VI'),
+('ZWE', 'Zimbabwe', 'Africa', 'Eastern Africa', 390757, 1980, 11669000, 37.799999, 5951.00, 8670.00, 'Zimbabwe', 'Republic', 'Robert G. Mugabe', 4068, 'ZW'),
+('PSE', 'Palestine', 'Asia', 'Middle East', 6257, NULL, 3101000, 71.400002, 4173.00, NULL, 'Filastin', 'Autonomous Area', 'Yasser (Yasir) Arafat', 4074, 'PS'),
+('ATA', 'Antarctica', 'Antarctica', 'Antarctica', 13120000, NULL, 0, NULL, 0.00, NULL, '', 'Co-administrated', '', NULL, 'AQ'),
+('BVT', 'Bouvet Island', 'Antarctica', 'Antarctica', 59, NULL, 0, NULL, 0.00, NULL, 'Bouvetøya', 'Dependent Territory of Norway', 'Harald V', NULL, 'BV'),
+('IOT', 'British Indian Ocean Territory', 'Africa', 'Eastern Africa', 78, NULL, 0, NULL, 0.00, NULL, 'British Indian Ocean Territory', 'Dependent Territory of the UK', 'Elisabeth II', NULL, 'IO'),
+('SGS', 'South Georgia and the South Sandwich Islands', 'Antarctica', 'Antarctica', 3903, NULL, 0, NULL, 0.00, NULL, 'South Georgia and the South Sandwich Islands', 'Dependent Territory of the UK', 'Elisabeth II', NULL, 'GS'),
+('HMD', 'Heard Island and McDonald Islands', 'Antarctica', 'Antarctica', 359, NULL, 0, NULL, 0.00, NULL, 'Heard and McDonald Islands', 'Territory of Australia', 'Elisabeth II', NULL, 'HM'),
+('ATF', 'French Southern territories', 'Antarctica', 'Antarctica', 7780, NULL, 0, NULL, 0.00, NULL, 'Terres australes françaises', 'Nonmetropolitan Territory of France', 'Jacques Chirac', NULL, 'TF'),
+('UMI', 'United States Minor Outlying Islands', 'Oceania', 'Micronesia/Caribbean', 16, NULL, 0, NULL, 0.00, NULL, 'United States Minor Outlying Islands', 'Dependent Territory of the US', 'George W. Bush', NULL, 'UM');
 
 --
 -- Data for Name: countrylanguage; Type: TABLE DATA; Schema: public; Owner: chriskl
 --
-INSERT INTO countrylanguage VALUES ('AFG', 'Pashto', true, 52.400002);
-INSERT INTO countrylanguage VALUES ('NLD', 'Dutch', true, 95.599998);
-INSERT INTO countrylanguage VALUES ('ANT', 'Papiamento', true, 86.199997);
-INSERT INTO countrylanguage VALUES ('ALB', 'Albaniana', true, 97.900002);
-INSERT INTO countrylanguage VALUES ('DZA', 'Arabic', true, 86);
-INSERT INTO countrylanguage VALUES ('ASM', 'Samoan', true, 90.599998);
-INSERT INTO countrylanguage VALUES ('AND', 'Spanish', false, 44.599998);
-INSERT INTO countrylanguage VALUES ('AGO', 'Ovimbundu', false, 37.200001);
-INSERT INTO countrylanguage VALUES ('AIA', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('ATG', 'Creole English', false, 95.699997);
-INSERT INTO countrylanguage VALUES ('ARE', 'Arabic', true, 42);
-INSERT INTO countrylanguage VALUES ('ARG', 'Spanish', true, 96.800003);
-INSERT INTO countrylanguage VALUES ('ARM', 'Armenian', true, 93.400002);
-INSERT INTO countrylanguage VALUES ('ABW', 'Papiamento', false, 76.699997);
-INSERT INTO countrylanguage VALUES ('AUS', 'English', true, 81.199997);
-INSERT INTO countrylanguage VALUES ('AZE', 'Azerbaijani', true, 89);
-INSERT INTO countrylanguage VALUES ('BHS', 'Creole English', false, 89.699997);
-INSERT INTO countrylanguage VALUES ('BHR', 'Arabic', true, 67.699997);
-INSERT INTO countrylanguage VALUES ('BGD', 'Bengali', true, 97.699997);
-INSERT INTO countrylanguage VALUES ('BRB', 'Bajan', false, 95.099998);
-INSERT INTO countrylanguage VALUES ('BEL', 'Dutch', true, 59.200001);
-INSERT INTO countrylanguage VALUES ('BLZ', 'English', true, 50.799999);
-INSERT INTO countrylanguage VALUES ('BEN', 'Fon', false, 39.799999);
-INSERT INTO countrylanguage VALUES ('BMU', 'English', true, 100);
-INSERT INTO countrylanguage VALUES ('BTN', 'Dzongkha', true, 50);
-INSERT INTO countrylanguage VALUES ('BOL', 'Spanish', true, 87.699997);
-INSERT INTO countrylanguage VALUES ('BIH', 'Serbo-Croatian', true, 99.199997);
-INSERT INTO countrylanguage VALUES ('BWA', 'Tswana', false, 75.5);
-INSERT INTO countrylanguage VALUES ('BRA', 'Portuguese', true, 97.5);
-INSERT INTO countrylanguage VALUES ('GBR', 'English', true, 97.300003);
-INSERT INTO countrylanguage VALUES ('VGB', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('BRN', 'Malay', true, 45.5);
-INSERT INTO countrylanguage VALUES ('BGR', 'Bulgariana', true, 83.199997);
-INSERT INTO countrylanguage VALUES ('BFA', 'Mossi', false, 50.200001);
-INSERT INTO countrylanguage VALUES ('BDI', 'Kirundi', true, 98.099998);
-INSERT INTO countrylanguage VALUES ('CYM', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('CHL', 'Spanish', true, 89.699997);
-INSERT INTO countrylanguage VALUES ('COK', 'Maori', true, 0);
-INSERT INTO countrylanguage VALUES ('CRI', 'Spanish', true, 97.5);
-INSERT INTO countrylanguage VALUES ('DJI', 'Somali', false, 43.900002);
-INSERT INTO countrylanguage VALUES ('DMA', 'Creole English', false, 100);
-INSERT INTO countrylanguage VALUES ('DOM', 'Spanish', true, 98);
-INSERT INTO countrylanguage VALUES ('ECU', 'Spanish', true, 93);
-INSERT INTO countrylanguage VALUES ('EGY', 'Arabic', true, 98.800003);
-INSERT INTO countrylanguage VALUES ('SLV', 'Spanish', true, 100);
-INSERT INTO countrylanguage VALUES ('ERI', 'Tigrinja', true, 49.099998);
-INSERT INTO countrylanguage VALUES ('ESP', 'Spanish', true, 74.400002);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Zulu', true, 22.700001);
-INSERT INTO countrylanguage VALUES ('ETH', 'Oromo', false, 31);
-INSERT INTO countrylanguage VALUES ('FLK', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('FJI', 'Fijian', true, 50.799999);
-INSERT INTO countrylanguage VALUES ('PHL', 'Pilipino', true, 29.299999);
-INSERT INTO countrylanguage VALUES ('FRO', 'Faroese', true, 100);
-INSERT INTO countrylanguage VALUES ('GAB', 'Fang', false, 35.799999);
-INSERT INTO countrylanguage VALUES ('GMB', 'Malinke', false, 34.099998);
-INSERT INTO countrylanguage VALUES ('GEO', 'Georgiana', true, 71.699997);
-INSERT INTO countrylanguage VALUES ('GHA', 'Akan', false, 52.400002);
-INSERT INTO countrylanguage VALUES ('GIB', 'English', true, 88.900002);
-INSERT INTO countrylanguage VALUES ('GRD', 'Creole English', false, 100);
-INSERT INTO countrylanguage VALUES ('GRL', 'Greenlandic', true, 87.5);
-INSERT INTO countrylanguage VALUES ('GLP', 'Creole French', false, 95);
-INSERT INTO countrylanguage VALUES ('GUM', 'English', true, 37.5);
-INSERT INTO countrylanguage VALUES ('GTM', 'Spanish', true, 64.699997);
-INSERT INTO countrylanguage VALUES ('GIN', 'Ful', false, 38.599998);
-INSERT INTO countrylanguage VALUES ('GNB', 'Crioulo', false, 36.400002);
-INSERT INTO countrylanguage VALUES ('GUY', 'Creole English', false, 96.400002);
-INSERT INTO countrylanguage VALUES ('HTI', 'Haiti Creole', false, 100);
-INSERT INTO countrylanguage VALUES ('HND', 'Spanish', true, 97.199997);
-INSERT INTO countrylanguage VALUES ('HKG', 'Canton Chinese', false, 88.699997);
-INSERT INTO countrylanguage VALUES ('SJM', 'Norwegian', true, 0);
-INSERT INTO countrylanguage VALUES ('IDN', 'Javanese', false, 39.400002);
-INSERT INTO countrylanguage VALUES ('IND', 'Hindi', true, 39.900002);
-INSERT INTO countrylanguage VALUES ('IRQ', 'Arabic', true, 77.199997);
-INSERT INTO countrylanguage VALUES ('IRN', 'Persian', true, 45.700001);
-INSERT INTO countrylanguage VALUES ('IRL', 'English', true, 98.400002);
-INSERT INTO countrylanguage VALUES ('ISL', 'Icelandic', true, 95.699997);
-INSERT INTO countrylanguage VALUES ('ISR', 'Hebrew', true, 63.099998);
-INSERT INTO countrylanguage VALUES ('ITA', 'Italian', true, 94.099998);
-INSERT INTO countrylanguage VALUES ('TMP', 'Sunda', false, 0);
-INSERT INTO countrylanguage VALUES ('AUT', 'German', true, 92);
-INSERT INTO countrylanguage VALUES ('JAM', 'Creole English', false, 94.199997);
-INSERT INTO countrylanguage VALUES ('JPN', 'Japanese', true, 99.099998);
-INSERT INTO countrylanguage VALUES ('YEM', 'Arabic', true, 99.599998);
-INSERT INTO countrylanguage VALUES ('JOR', 'Arabic', true, 97.900002);
-INSERT INTO countrylanguage VALUES ('CXR', 'Chinese', false, 0);
-INSERT INTO countrylanguage VALUES ('YUG', 'Serbo-Croatian', true, 75.199997);
-INSERT INTO countrylanguage VALUES ('KHM', 'Khmer', true, 88.599998);
-INSERT INTO countrylanguage VALUES ('CMR', 'Fang', false, 19.700001);
-INSERT INTO countrylanguage VALUES ('CAN', 'English', true, 60.400002);
-INSERT INTO countrylanguage VALUES ('CPV', 'Crioulo', false, 100);
-INSERT INTO countrylanguage VALUES ('KAZ', 'Kazakh', true, 46);
-INSERT INTO countrylanguage VALUES ('KEN', 'Kikuyu', false, 20.9);
-INSERT INTO countrylanguage VALUES ('CAF', 'Gbaya', false, 23.799999);
-INSERT INTO countrylanguage VALUES ('CHN', 'Chinese', true, 92);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Kirgiz', true, 59.700001);
-INSERT INTO countrylanguage VALUES ('KIR', 'Kiribati', true, 98.900002);
-INSERT INTO countrylanguage VALUES ('COL', 'Spanish', true, 99);
-INSERT INTO countrylanguage VALUES ('COM', 'Comorian', true, 75);
-INSERT INTO countrylanguage VALUES ('COG', 'Kongo', false, 51.5);
-INSERT INTO countrylanguage VALUES ('COD', 'Luba', false, 18);
-INSERT INTO countrylanguage VALUES ('CCK', 'Malay', false, 0);
-INSERT INTO countrylanguage VALUES ('PRK', 'Korean', true, 99.900002);
-INSERT INTO countrylanguage VALUES ('KOR', 'Korean', true, 99.900002);
-INSERT INTO countrylanguage VALUES ('GRC', 'Greek', true, 98.5);
-INSERT INTO countrylanguage VALUES ('HRV', 'Serbo-Croatian', true, 95.900002);
-INSERT INTO countrylanguage VALUES ('CUB', 'Spanish', true, 100);
-INSERT INTO countrylanguage VALUES ('KWT', 'Arabic', true, 78.099998);
-INSERT INTO countrylanguage VALUES ('CYP', 'Greek', true, 74.099998);
-INSERT INTO countrylanguage VALUES ('LAO', 'Lao', true, 67.199997);
-INSERT INTO countrylanguage VALUES ('LVA', 'Latvian', true, 55.099998);
-INSERT INTO countrylanguage VALUES ('LSO', 'Sotho', true, 85);
-INSERT INTO countrylanguage VALUES ('LBN', 'Arabic', true, 93);
-INSERT INTO countrylanguage VALUES ('LBR', 'Kpelle', false, 19.5);
-INSERT INTO countrylanguage VALUES ('LBY', 'Arabic', true, 96);
-INSERT INTO countrylanguage VALUES ('LIE', 'German', true, 89);
-INSERT INTO countrylanguage VALUES ('LTU', 'Lithuanian', true, 81.599998);
-INSERT INTO countrylanguage VALUES ('LUX', 'Luxembourgish', true, 64.400002);
-INSERT INTO countrylanguage VALUES ('ESH', 'Arabic', true, 100);
-INSERT INTO countrylanguage VALUES ('MAC', 'Canton Chinese', false, 85.599998);
-INSERT INTO countrylanguage VALUES ('MDG', 'Malagasy', true, 98.900002);
-INSERT INTO countrylanguage VALUES ('MKD', 'Macedonian', true, 66.5);
-INSERT INTO countrylanguage VALUES ('MWI', 'Chichewa', true, 58.299999);
-INSERT INTO countrylanguage VALUES ('MDV', 'Dhivehi', true, 100);
-INSERT INTO countrylanguage VALUES ('MYS', 'Malay', true, 58.400002);
-INSERT INTO countrylanguage VALUES ('MLI', 'Bambara', false, 31.799999);
-INSERT INTO countrylanguage VALUES ('MLT', 'Maltese', true, 95.800003);
-INSERT INTO countrylanguage VALUES ('MAR', 'Arabic', true, 65);
-INSERT INTO countrylanguage VALUES ('MHL', 'Marshallese', true, 96.800003);
-INSERT INTO countrylanguage VALUES ('MTQ', 'Creole French', false, 96.599998);
-INSERT INTO countrylanguage VALUES ('MRT', 'Hassaniya', false, 81.699997);
-INSERT INTO countrylanguage VALUES ('MUS', 'Creole French', false, 70.599998);
-INSERT INTO countrylanguage VALUES ('MYT', 'Mahoré', false, 41.900002);
-INSERT INTO countrylanguage VALUES ('MEX', 'Spanish', true, 92.099998);
-INSERT INTO countrylanguage VALUES ('FSM', 'Trukese', false, 41.599998);
-INSERT INTO countrylanguage VALUES ('MDA', 'Romanian', true, 61.900002);
-INSERT INTO countrylanguage VALUES ('MCO', 'French', true, 41.900002);
-INSERT INTO countrylanguage VALUES ('MNG', 'Mongolian', true, 78.800003);
-INSERT INTO countrylanguage VALUES ('MSR', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Makua', false, 27.799999);
-INSERT INTO countrylanguage VALUES ('MMR', 'Burmese', true, 69);
-INSERT INTO countrylanguage VALUES ('NAM', 'Ovambo', false, 50.700001);
-INSERT INTO countrylanguage VALUES ('NRU', 'Nauru', true, 57.5);
-INSERT INTO countrylanguage VALUES ('NPL', 'Nepali', true, 50.400002);
-INSERT INTO countrylanguage VALUES ('NIC', 'Spanish', true, 97.599998);
-INSERT INTO countrylanguage VALUES ('NER', 'Hausa', false, 53.099998);
-INSERT INTO countrylanguage VALUES ('NGA', 'Joruba', false, 21.4);
-INSERT INTO countrylanguage VALUES ('NIU', 'Niue', false, 0);
-INSERT INTO countrylanguage VALUES ('NFK', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('NOR', 'Norwegian', true, 96.599998);
-INSERT INTO countrylanguage VALUES ('CIV', 'Akan', false, 30);
-INSERT INTO countrylanguage VALUES ('OMN', 'Arabic', true, 76.699997);
-INSERT INTO countrylanguage VALUES ('PAK', 'Punjabi', false, 48.200001);
-INSERT INTO countrylanguage VALUES ('PLW', 'Palau', true, 82.199997);
-INSERT INTO countrylanguage VALUES ('PAN', 'Spanish', true, 76.800003);
-INSERT INTO countrylanguage VALUES ('PNG', 'Papuan Languages', false, 78.099998);
-INSERT INTO countrylanguage VALUES ('PRY', 'Spanish', true, 55.099998);
-INSERT INTO countrylanguage VALUES ('PER', 'Spanish', true, 79.800003);
-INSERT INTO countrylanguage VALUES ('PCN', 'Pitcairnese', false, 0);
-INSERT INTO countrylanguage VALUES ('MNP', 'Philippene Languages', false, 34.099998);
-INSERT INTO countrylanguage VALUES ('PRT', 'Portuguese', true, 99);
-INSERT INTO countrylanguage VALUES ('PRI', 'Spanish', true, 51.299999);
-INSERT INTO countrylanguage VALUES ('POL', 'Polish', true, 97.599998);
-INSERT INTO countrylanguage VALUES ('GNQ', 'Fang', false, 84.800003);
-INSERT INTO countrylanguage VALUES ('QAT', 'Arabic', true, 40.700001);
-INSERT INTO countrylanguage VALUES ('FRA', 'French', true, 93.599998);
-INSERT INTO countrylanguage VALUES ('GUF', 'Creole French', false, 94.300003);
-INSERT INTO countrylanguage VALUES ('PYF', 'Tahitian', false, 46.400002);
-INSERT INTO countrylanguage VALUES ('REU', 'Creole French', false, 91.5);
-INSERT INTO countrylanguage VALUES ('ROM', 'Romanian', true, 90.699997);
-INSERT INTO countrylanguage VALUES ('RWA', 'Rwanda', true, 100);
-INSERT INTO countrylanguage VALUES ('SWE', 'Swedish', true, 89.5);
-INSERT INTO countrylanguage VALUES ('SHN', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('KNA', 'Creole English', false, 100);
-INSERT INTO countrylanguage VALUES ('LCA', 'Creole French', false, 80);
-INSERT INTO countrylanguage VALUES ('VCT', 'Creole English', false, 99.099998);
-INSERT INTO countrylanguage VALUES ('SPM', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('DEU', 'German', true, 91.300003);
-INSERT INTO countrylanguage VALUES ('SLB', 'Malenasian Languages', false, 85.599998);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Bemba', false, 29.700001);
-INSERT INTO countrylanguage VALUES ('WSM', 'Samoan-English', false, 52);
-INSERT INTO countrylanguage VALUES ('SMR', 'Italian', true, 100);
-INSERT INTO countrylanguage VALUES ('STP', 'Crioulo', false, 86.300003);
-INSERT INTO countrylanguage VALUES ('SAU', 'Arabic', true, 95);
-INSERT INTO countrylanguage VALUES ('SEN', 'Wolof', true, 48.099998);
-INSERT INTO countrylanguage VALUES ('SYC', 'Seselwa', false, 91.300003);
-INSERT INTO countrylanguage VALUES ('SLE', 'Mende', false, 34.799999);
-INSERT INTO countrylanguage VALUES ('SGP', 'Chinese', true, 77.099998);
-INSERT INTO countrylanguage VALUES ('SVK', 'Slovak', true, 85.599998);
-INSERT INTO countrylanguage VALUES ('SVN', 'Slovene', true, 87.900002);
-INSERT INTO countrylanguage VALUES ('SOM', 'Somali', true, 98.300003);
-INSERT INTO countrylanguage VALUES ('LKA', 'Singali', true, 60.299999);
-INSERT INTO countrylanguage VALUES ('SDN', 'Arabic', true, 49.400002);
-INSERT INTO countrylanguage VALUES ('FIN', 'Finnish', true, 92.699997);
-INSERT INTO countrylanguage VALUES ('SUR', 'Sranantonga', false, 81);
-INSERT INTO countrylanguage VALUES ('SWZ', 'Swazi', true, 89.900002);
-INSERT INTO countrylanguage VALUES ('CHE', 'German', true, 63.599998);
-INSERT INTO countrylanguage VALUES ('SYR', 'Arabic', true, 90);
-INSERT INTO countrylanguage VALUES ('TJK', 'Tadzhik', true, 62.200001);
-INSERT INTO countrylanguage VALUES ('TWN', 'Min', false, 66.699997);
-INSERT INTO countrylanguage VALUES ('TZA', 'Nyamwesi', false, 21.1);
-INSERT INTO countrylanguage VALUES ('DNK', 'Danish', true, 93.5);
-INSERT INTO countrylanguage VALUES ('THA', 'Thai', true, 52.599998);
-INSERT INTO countrylanguage VALUES ('TGO', 'Ewe', true, 23.200001);
-INSERT INTO countrylanguage VALUES ('TKL', 'Tokelau', false, 0);
-INSERT INTO countrylanguage VALUES ('TON', 'Tongan', true, 98.300003);
-INSERT INTO countrylanguage VALUES ('TTO', 'English', false, 93.5);
-INSERT INTO countrylanguage VALUES ('TCD', 'Sara', false, 27.700001);
-INSERT INTO countrylanguage VALUES ('CZE', 'Czech', true, 81.199997);
-INSERT INTO countrylanguage VALUES ('TUN', 'Arabic', true, 69.900002);
-INSERT INTO countrylanguage VALUES ('TUR', 'Turkish', true, 87.599998);
-INSERT INTO countrylanguage VALUES ('TKM', 'Turkmenian', true, 76.699997);
-INSERT INTO countrylanguage VALUES ('TCA', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('TUV', 'Tuvalu', true, 92.5);
-INSERT INTO countrylanguage VALUES ('UGA', 'Ganda', false, 18.1);
-INSERT INTO countrylanguage VALUES ('UKR', 'Ukrainian', true, 64.699997);
-INSERT INTO countrylanguage VALUES ('HUN', 'Hungarian', true, 98.5);
-INSERT INTO countrylanguage VALUES ('URY', 'Spanish', true, 95.699997);
-INSERT INTO countrylanguage VALUES ('NCL', 'Malenasian Languages', false, 45.400002);
-INSERT INTO countrylanguage VALUES ('NZL', 'English', true, 87);
-INSERT INTO countrylanguage VALUES ('UZB', 'Uzbek', true, 72.599998);
-INSERT INTO countrylanguage VALUES ('BLR', 'Belorussian', true, 65.599998);
-INSERT INTO countrylanguage VALUES ('WLF', 'Wallis', false, 0);
-INSERT INTO countrylanguage VALUES ('VUT', 'Bislama', true, 56.599998);
-INSERT INTO countrylanguage VALUES ('VAT', 'Italian', true, 0);
-INSERT INTO countrylanguage VALUES ('VEN', 'Spanish', true, 96.900002);
-INSERT INTO countrylanguage VALUES ('RUS', 'Russian', true, 86.599998);
-INSERT INTO countrylanguage VALUES ('VNM', 'Vietnamese', true, 86.800003);
-INSERT INTO countrylanguage VALUES ('EST', 'Estonian', true, 65.300003);
-INSERT INTO countrylanguage VALUES ('USA', 'English', true, 86.199997);
-INSERT INTO countrylanguage VALUES ('VIR', 'English', true, 81.699997);
-INSERT INTO countrylanguage VALUES ('UMI', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('ZWE', 'Shona', false, 72.099998);
-INSERT INTO countrylanguage VALUES ('PSE', 'Arabic', false, 95.900002);
-INSERT INTO countrylanguage VALUES ('AFG', 'Dari', true, 32.099998);
-INSERT INTO countrylanguage VALUES ('NLD', 'Fries', false, 3.7);
-INSERT INTO countrylanguage VALUES ('ANT', 'English', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('ALB', 'Greek', false, 1.8);
-INSERT INTO countrylanguage VALUES ('DZA', 'Berberi', false, 14);
-INSERT INTO countrylanguage VALUES ('ASM', 'English', true, 3.0999999);
-INSERT INTO countrylanguage VALUES ('AND', 'Catalan', true, 32.299999);
-INSERT INTO countrylanguage VALUES ('AGO', 'Mbundu', false, 21.6);
-INSERT INTO countrylanguage VALUES ('ATG', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('ARE', 'Hindi', false, 0);
-INSERT INTO countrylanguage VALUES ('ARG', 'Italian', false, 1.7);
-INSERT INTO countrylanguage VALUES ('ARM', 'Azerbaijani', false, 2.5999999);
-INSERT INTO countrylanguage VALUES ('ABW', 'English', false, 9.5);
-INSERT INTO countrylanguage VALUES ('AUS', 'Italian', false, 2.2);
-INSERT INTO countrylanguage VALUES ('AZE', 'Russian', false, 3);
-INSERT INTO countrylanguage VALUES ('BHS', 'Creole French', false, 10.3);
-INSERT INTO countrylanguage VALUES ('BHR', 'English', false, 0);
-INSERT INTO countrylanguage VALUES ('BGD', 'Chakma', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('BRB', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('BEL', 'French', true, 32.599998);
-INSERT INTO countrylanguage VALUES ('BLZ', 'Spanish', false, 31.6);
-INSERT INTO countrylanguage VALUES ('BEN', 'Joruba', false, 12.2);
-INSERT INTO countrylanguage VALUES ('BTN', 'Nepali', false, 34.799999);
-INSERT INTO countrylanguage VALUES ('BOL', 'Ketua', true, 8.1000004);
-INSERT INTO countrylanguage VALUES ('BWA', 'Shona', false, 12.3);
-INSERT INTO countrylanguage VALUES ('BRA', 'German', false, 0.5);
-INSERT INTO countrylanguage VALUES ('GBR', 'Kymri', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('BRN', 'Malay-English', false, 28.799999);
-INSERT INTO countrylanguage VALUES ('BGR', 'Turkish', false, 9.3999996);
-INSERT INTO countrylanguage VALUES ('BFA', 'Ful', false, 9.6999998);
-INSERT INTO countrylanguage VALUES ('BDI', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('CHL', 'Araucan', false, 9.6000004);
-INSERT INTO countrylanguage VALUES ('COK', 'English', false, 0);
-INSERT INTO countrylanguage VALUES ('CRI', 'Creole English', false, 2);
-INSERT INTO countrylanguage VALUES ('DJI', 'Afar', false, 34.799999);
-INSERT INTO countrylanguage VALUES ('DMA', 'Creole French', false, 0);
-INSERT INTO countrylanguage VALUES ('DOM', 'Creole French', false, 2);
-INSERT INTO countrylanguage VALUES ('ECU', 'Ketua', false, 7);
-INSERT INTO countrylanguage VALUES ('EGY', 'Sinaberberi', false, 0);
-INSERT INTO countrylanguage VALUES ('SLV', 'Nahua', false, 0);
-INSERT INTO countrylanguage VALUES ('ERI', 'Tigre', false, 31.700001);
-INSERT INTO countrylanguage VALUES ('ESP', 'Catalan', false, 16.9);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Xhosa', true, 17.700001);
-INSERT INTO countrylanguage VALUES ('ETH', 'Amhara', false, 30);
-INSERT INTO countrylanguage VALUES ('FJI', 'Hindi', false, 43.700001);
-INSERT INTO countrylanguage VALUES ('PHL', 'Cebuano', false, 23.299999);
-INSERT INTO countrylanguage VALUES ('FRO', 'Danish', true, 0);
-INSERT INTO countrylanguage VALUES ('GAB', 'Punu-sira-nzebi', false, 17.1);
-INSERT INTO countrylanguage VALUES ('GMB', 'Ful', false, 16.200001);
-INSERT INTO countrylanguage VALUES ('GEO', 'Russian', false, 8.8000002);
-INSERT INTO countrylanguage VALUES ('GHA', 'Mossi', false, 15.8);
-INSERT INTO countrylanguage VALUES ('GIB', 'Arabic', false, 7.4000001);
-INSERT INTO countrylanguage VALUES ('GRL', 'Danish', true, 12.5);
-INSERT INTO countrylanguage VALUES ('GLP', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('GUM', 'Chamorro', true, 29.6);
-INSERT INTO countrylanguage VALUES ('GTM', 'Quiché', false, 10.1);
-INSERT INTO countrylanguage VALUES ('GIN', 'Malinke', false, 23.200001);
-INSERT INTO countrylanguage VALUES ('GNB', 'Ful', false, 16.6);
-INSERT INTO countrylanguage VALUES ('GUY', 'Caribbean', false, 2.2);
-INSERT INTO countrylanguage VALUES ('HTI', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('HND', 'Garifuna', false, 1.3);
-INSERT INTO countrylanguage VALUES ('HKG', 'English', true, 2.2);
-INSERT INTO countrylanguage VALUES ('SJM', 'Russian', false, 0);
-INSERT INTO countrylanguage VALUES ('IDN', 'Sunda', false, 15.8);
-INSERT INTO countrylanguage VALUES ('IND', 'Bengali', false, 8.1999998);
-INSERT INTO countrylanguage VALUES ('IRQ', 'Kurdish', false, 19);
-INSERT INTO countrylanguage VALUES ('IRN', 'Azerbaijani', false, 16.799999);
-INSERT INTO countrylanguage VALUES ('IRL', 'Irish', true, 1.6);
-INSERT INTO countrylanguage VALUES ('ISL', 'English', false, 0);
-INSERT INTO countrylanguage VALUES ('ISR', 'Arabic', true, 18);
-INSERT INTO countrylanguage VALUES ('ITA', 'Sardinian', false, 2.7);
-INSERT INTO countrylanguage VALUES ('TMP', 'Portuguese', true, 0);
-INSERT INTO countrylanguage VALUES ('AUT', 'Serbo-Croatian', false, 2.2);
-INSERT INTO countrylanguage VALUES ('JAM', 'Hindi', false, 1.9);
-INSERT INTO countrylanguage VALUES ('JPN', 'Korean', false, 0.5);
-INSERT INTO countrylanguage VALUES ('YEM', 'Soqutri', false, 0);
-INSERT INTO countrylanguage VALUES ('JOR', 'Circassian', false, 1);
-INSERT INTO countrylanguage VALUES ('CXR', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('YUG', 'Albaniana', false, 16.5);
-INSERT INTO countrylanguage VALUES ('KHM', 'Vietnamese', false, 5.5);
-INSERT INTO countrylanguage VALUES ('CMR', 'Bamileke-bamum', false, 18.6);
-INSERT INTO countrylanguage VALUES ('CAN', 'French', true, 23.4);
-INSERT INTO countrylanguage VALUES ('CPV', 'Portuguese', true, 0);
-INSERT INTO countrylanguage VALUES ('KAZ', 'Russian', false, 34.700001);
-INSERT INTO countrylanguage VALUES ('KEN', 'Luhya', false, 13.8);
-INSERT INTO countrylanguage VALUES ('CAF', 'Banda', false, 23.5);
-INSERT INTO countrylanguage VALUES ('CHN', 'Zhuang', false, 1.4);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Russian', true, 16.200001);
-INSERT INTO countrylanguage VALUES ('KIR', 'Tuvalu', false, 0.5);
-INSERT INTO countrylanguage VALUES ('COL', 'Chibcha', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('COM', 'Comorian-French', false, 12.9);
-INSERT INTO countrylanguage VALUES ('COG', 'Teke', false, 17.299999);
-INSERT INTO countrylanguage VALUES ('COD', 'Kongo', false, 16);
-INSERT INTO countrylanguage VALUES ('CCK', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('PRK', 'Chinese', false, 0.1);
-INSERT INTO countrylanguage VALUES ('KOR', 'Chinese', false, 0.1);
-INSERT INTO countrylanguage VALUES ('GRC', 'Turkish', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('HRV', 'Slovene', false, 0);
-INSERT INTO countrylanguage VALUES ('KWT', 'English', false, 0);
-INSERT INTO countrylanguage VALUES ('CYP', 'Turkish', true, 22.4);
-INSERT INTO countrylanguage VALUES ('LAO', 'Mon-khmer', false, 16.5);
-INSERT INTO countrylanguage VALUES ('LVA', 'Russian', false, 32.5);
-INSERT INTO countrylanguage VALUES ('LSO', 'Zulu', false, 15);
-INSERT INTO countrylanguage VALUES ('LBN', 'Armenian', false, 5.9000001);
-INSERT INTO countrylanguage VALUES ('LBR', 'Bassa', false, 13.7);
-INSERT INTO countrylanguage VALUES ('LBY', 'Berberi', false, 1);
-INSERT INTO countrylanguage VALUES ('LIE', 'Italian', false, 2.5);
-INSERT INTO countrylanguage VALUES ('LTU', 'Russian', false, 8.1000004);
-INSERT INTO countrylanguage VALUES ('LUX', 'Portuguese', false, 13);
-INSERT INTO countrylanguage VALUES ('MAC', 'Portuguese', true, 2.3);
-INSERT INTO countrylanguage VALUES ('MDG', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('MKD', 'Albaniana', false, 22.9);
-INSERT INTO countrylanguage VALUES ('MWI', 'Lomwe', false, 18.4);
-INSERT INTO countrylanguage VALUES ('MDV', 'English', false, 0);
-INSERT INTO countrylanguage VALUES ('MYS', 'Chinese', false, 9);
-INSERT INTO countrylanguage VALUES ('MLI', 'Ful', false, 13.9);
-INSERT INTO countrylanguage VALUES ('MLT', 'English', true, 2.0999999);
-INSERT INTO countrylanguage VALUES ('MAR', 'Berberi', false, 33);
-INSERT INTO countrylanguage VALUES ('MHL', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('MTQ', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('MRT', 'Wolof', false, 6.5999999);
-INSERT INTO countrylanguage VALUES ('MUS', 'Bhojpuri', false, 21.1);
-INSERT INTO countrylanguage VALUES ('MYT', 'French', true, 20.299999);
-INSERT INTO countrylanguage VALUES ('MEX', 'Náhuatl', false, 1.8);
-INSERT INTO countrylanguage VALUES ('FSM', 'Pohnpei', false, 23.799999);
-INSERT INTO countrylanguage VALUES ('MDA', 'Russian', false, 23.200001);
-INSERT INTO countrylanguage VALUES ('MCO', 'Monegasque', false, 16.1);
-INSERT INTO countrylanguage VALUES ('MNG', 'Kazakh', false, 5.9000001);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Tsonga', false, 12.4);
-INSERT INTO countrylanguage VALUES ('MMR', 'Shan', false, 8.5);
-INSERT INTO countrylanguage VALUES ('NAM', 'Nama', false, 12.4);
-INSERT INTO countrylanguage VALUES ('NRU', 'Kiribati', false, 17.9);
-INSERT INTO countrylanguage VALUES ('NPL', 'Maithili', false, 11.9);
-INSERT INTO countrylanguage VALUES ('NIC', 'Miskito', false, 1.6);
-INSERT INTO countrylanguage VALUES ('NER', 'Songhai-zerma', false, 21.200001);
-INSERT INTO countrylanguage VALUES ('NGA', 'Hausa', false, 21.1);
-INSERT INTO countrylanguage VALUES ('NIU', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('NOR', 'English', false, 0.5);
-INSERT INTO countrylanguage VALUES ('CIV', 'Gur', false, 11.7);
-INSERT INTO countrylanguage VALUES ('OMN', 'Balochi', false, 0);
-INSERT INTO countrylanguage VALUES ('PAK', 'Pashto', false, 13.1);
-INSERT INTO countrylanguage VALUES ('PLW', 'Philippene Languages', false, 9.1999998);
-INSERT INTO countrylanguage VALUES ('PAN', 'Creole English', false, 14);
-INSERT INTO countrylanguage VALUES ('PNG', 'Malenasian Languages', false, 20);
-INSERT INTO countrylanguage VALUES ('PRY', 'Guaraní', true, 40.099998);
-INSERT INTO countrylanguage VALUES ('PER', 'Ketua', true, 16.4);
-INSERT INTO countrylanguage VALUES ('MNP', 'Chamorro', false, 30);
-INSERT INTO countrylanguage VALUES ('PRI', 'English', false, 47.400002);
-INSERT INTO countrylanguage VALUES ('POL', 'German', false, 1.3);
-INSERT INTO countrylanguage VALUES ('GNQ', 'Bubi', false, 8.6999998);
-INSERT INTO countrylanguage VALUES ('QAT', 'Urdu', false, 0);
-INSERT INTO countrylanguage VALUES ('FRA', 'Arabic', false, 2.5);
-INSERT INTO countrylanguage VALUES ('GUF', 'Indian Languages', false, 1.9);
-INSERT INTO countrylanguage VALUES ('PYF', 'French', true, 40.799999);
-INSERT INTO countrylanguage VALUES ('REU', 'Chinese', false, 2.8);
-INSERT INTO countrylanguage VALUES ('ROM', 'Hungarian', false, 7.1999998);
-INSERT INTO countrylanguage VALUES ('RWA', 'French', true, 0);
-INSERT INTO countrylanguage VALUES ('SWE', 'Finnish', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('KNA', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('LCA', 'English', true, 20);
-INSERT INTO countrylanguage VALUES ('VCT', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('DEU', 'Turkish', false, 2.5999999);
-INSERT INTO countrylanguage VALUES ('SLB', 'Papuan Languages', false, 8.6000004);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Tongan', false, 11);
-INSERT INTO countrylanguage VALUES ('WSM', 'Samoan', true, 47.5);
-INSERT INTO countrylanguage VALUES ('STP', 'French', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('SEN', 'Ful', false, 21.700001);
-INSERT INTO countrylanguage VALUES ('SYC', 'English', true, 3.8);
-INSERT INTO countrylanguage VALUES ('SLE', 'Temne', false, 31.799999);
-INSERT INTO countrylanguage VALUES ('SGP', 'Malay', true, 14.1);
-INSERT INTO countrylanguage VALUES ('SVK', 'Hungarian', false, 10.5);
-INSERT INTO countrylanguage VALUES ('SVN', 'Serbo-Croatian', false, 7.9000001);
-INSERT INTO countrylanguage VALUES ('SOM', 'Arabic', true, 0);
-INSERT INTO countrylanguage VALUES ('LKA', 'Tamil', true, 19.6);
-INSERT INTO countrylanguage VALUES ('SDN', 'Dinka', false, 11.5);
-INSERT INTO countrylanguage VALUES ('FIN', 'Swedish', true, 5.6999998);
-INSERT INTO countrylanguage VALUES ('SUR', 'Hindi', false, 0);
-INSERT INTO countrylanguage VALUES ('SWZ', 'Zulu', false, 2);
-INSERT INTO countrylanguage VALUES ('CHE', 'French', true, 19.200001);
-INSERT INTO countrylanguage VALUES ('SYR', 'Kurdish', false, 9);
-INSERT INTO countrylanguage VALUES ('TJK', 'Uzbek', false, 23.200001);
-INSERT INTO countrylanguage VALUES ('TWN', 'Mandarin Chinese', true, 20.1);
-INSERT INTO countrylanguage VALUES ('TZA', 'Swahili', true, 8.8000002);
-INSERT INTO countrylanguage VALUES ('DNK', 'Turkish', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('THA', 'Lao', false, 26.9);
-INSERT INTO countrylanguage VALUES ('TGO', 'Kabyé', true, 13.8);
-INSERT INTO countrylanguage VALUES ('TKL', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('TON', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('TTO', 'Hindi', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('TCD', 'Arabic', true, 12.3);
-INSERT INTO countrylanguage VALUES ('CZE', 'Moravian', false, 12.9);
-INSERT INTO countrylanguage VALUES ('TUN', 'Arabic-French', false, 26.299999);
-INSERT INTO countrylanguage VALUES ('TUR', 'Kurdish', false, 10.6);
-INSERT INTO countrylanguage VALUES ('TKM', 'Uzbek', false, 9.1999998);
-INSERT INTO countrylanguage VALUES ('TUV', 'Kiribati', false, 7.5);
-INSERT INTO countrylanguage VALUES ('UGA', 'Nkole', false, 10.7);
-INSERT INTO countrylanguage VALUES ('UKR', 'Russian', false, 32.900002);
-INSERT INTO countrylanguage VALUES ('HUN', 'Romani', false, 0.5);
-INSERT INTO countrylanguage VALUES ('NCL', 'French', true, 34.299999);
-INSERT INTO countrylanguage VALUES ('NZL', 'Maori', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('UZB', 'Russian', false, 10.9);
-INSERT INTO countrylanguage VALUES ('BLR', 'Russian', true, 32);
-INSERT INTO countrylanguage VALUES ('WLF', 'Futuna', false, 0);
-INSERT INTO countrylanguage VALUES ('VUT', 'English', true, 28.299999);
-INSERT INTO countrylanguage VALUES ('VEN', 'Goajiro', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('RUS', 'Tatar', false, 3.2);
-INSERT INTO countrylanguage VALUES ('VNM', 'Tho', false, 1.8);
-INSERT INTO countrylanguage VALUES ('EST', 'Russian', false, 27.799999);
-INSERT INTO countrylanguage VALUES ('USA', 'Spanish', false, 7.5);
-INSERT INTO countrylanguage VALUES ('VIR', 'Spanish', false, 13.3);
-INSERT INTO countrylanguage VALUES ('ZWE', 'Ndebele', false, 16.200001);
-INSERT INTO countrylanguage VALUES ('PSE', 'Hebrew', false, 4.0999999);
-INSERT INTO countrylanguage VALUES ('AFG', 'Uzbek', false, 8.8000002);
-INSERT INTO countrylanguage VALUES ('NLD', 'Arabic', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('ANT', 'Dutch', true, 0);
-INSERT INTO countrylanguage VALUES ('ALB', 'Macedonian', false, 0.1);
-INSERT INTO countrylanguage VALUES ('ASM', 'Tongan', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('AND', 'Portuguese', false, 10.8);
-INSERT INTO countrylanguage VALUES ('AGO', 'Kongo', false, 13.2);
-INSERT INTO countrylanguage VALUES ('ARG', 'Indian Languages', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('ABW', 'Spanish', false, 7.4000001);
-INSERT INTO countrylanguage VALUES ('AUS', 'Greek', false, 1.6);
-INSERT INTO countrylanguage VALUES ('AZE', 'Lezgian', false, 2.3);
-INSERT INTO countrylanguage VALUES ('BGD', 'Marma', false, 0.2);
-INSERT INTO countrylanguage VALUES ('BEL', 'Italian', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('BLZ', 'Maya Languages', false, 9.6000004);
-INSERT INTO countrylanguage VALUES ('BEN', 'Adja', false, 11.1);
-INSERT INTO countrylanguage VALUES ('BTN', 'Asami', false, 15.2);
-INSERT INTO countrylanguage VALUES ('BOL', 'Aimará', true, 3.2);
-INSERT INTO countrylanguage VALUES ('BWA', 'San', false, 3.5);
-INSERT INTO countrylanguage VALUES ('BRA', 'Italian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('GBR', 'Gaeli', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BRN', 'Chinese', false, 9.3000002);
-INSERT INTO countrylanguage VALUES ('BGR', 'Romani', false, 3.7);
-INSERT INTO countrylanguage VALUES ('BFA', 'Gurma', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('BDI', 'Swahili', false, 0);
-INSERT INTO countrylanguage VALUES ('CHL', 'Aimará', false, 0.5);
-INSERT INTO countrylanguage VALUES ('CRI', 'Chibcha', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('DJI', 'Arabic', true, 10.6);
-INSERT INTO countrylanguage VALUES ('ERI', 'Afar', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('ESP', 'Galecian', false, 6.4000001);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Afrikaans', true, 14.3);
-INSERT INTO countrylanguage VALUES ('ETH', 'Tigrinja', false, 7.1999998);
-INSERT INTO countrylanguage VALUES ('PHL', 'Ilocano', false, 9.3000002);
-INSERT INTO countrylanguage VALUES ('GAB', 'Mpongwe', false, 14.6);
-INSERT INTO countrylanguage VALUES ('GMB', 'Wolof', false, 12.6);
-INSERT INTO countrylanguage VALUES ('GEO', 'Armenian', false, 6.8000002);
-INSERT INTO countrylanguage VALUES ('GHA', 'Ewe', false, 11.9);
-INSERT INTO countrylanguage VALUES ('GUM', 'Philippene Languages', false, 19.700001);
-INSERT INTO countrylanguage VALUES ('GTM', 'Cakchiquel', false, 8.8999996);
-INSERT INTO countrylanguage VALUES ('GIN', 'Susu', false, 11);
-INSERT INTO countrylanguage VALUES ('GNB', 'Balante', false, 14.6);
-INSERT INTO countrylanguage VALUES ('GUY', 'Arawakan', false, 1.4);
-INSERT INTO countrylanguage VALUES ('HND', 'Creole English', false, 0.2);
-INSERT INTO countrylanguage VALUES ('HKG', 'Fukien', false, 1.9);
-INSERT INTO countrylanguage VALUES ('IDN', 'Malay', true, 12.1);
-INSERT INTO countrylanguage VALUES ('IND', 'Telugu', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('IRQ', 'Azerbaijani', false, 1.7);
-INSERT INTO countrylanguage VALUES ('IRN', 'Kurdish', false, 9.1000004);
-INSERT INTO countrylanguage VALUES ('ISR', 'Russian', false, 8.8999996);
-INSERT INTO countrylanguage VALUES ('ITA', 'Friuli', false, 1.2);
-INSERT INTO countrylanguage VALUES ('AUT', 'Turkish', false, 1.5);
-INSERT INTO countrylanguage VALUES ('JPN', 'Chinese', false, 0.2);
-INSERT INTO countrylanguage VALUES ('JOR', 'Armenian', false, 1);
-INSERT INTO countrylanguage VALUES ('YUG', 'Hungarian', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('KHM', 'Chinese', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('CMR', 'Duala', false, 10.9);
-INSERT INTO countrylanguage VALUES ('CAN', 'Chinese', false, 2.5);
-INSERT INTO countrylanguage VALUES ('KAZ', 'Ukrainian', false, 5);
-INSERT INTO countrylanguage VALUES ('KEN', 'Luo', false, 12.8);
-INSERT INTO countrylanguage VALUES ('CAF', 'Mandjia', false, 14.8);
-INSERT INTO countrylanguage VALUES ('CHN', 'Mantu', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Uzbek', false, 14.1);
-INSERT INTO countrylanguage VALUES ('COL', 'Creole English', false, 0.1);
-INSERT INTO countrylanguage VALUES ('COM', 'Comorian-madagassi', false, 5.5);
-INSERT INTO countrylanguage VALUES ('COG', 'Mboshi', false, 11.4);
-INSERT INTO countrylanguage VALUES ('COD', 'Mongo', false, 13.5);
-INSERT INTO countrylanguage VALUES ('LAO', 'Thai', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('LVA', 'Belorussian', false, 4.0999999);
-INSERT INTO countrylanguage VALUES ('LSO', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('LBN', 'French', false, 0);
-INSERT INTO countrylanguage VALUES ('LBR', 'Grebo', false, 8.8999996);
-INSERT INTO countrylanguage VALUES ('LIE', 'Turkish', false, 2.5);
-INSERT INTO countrylanguage VALUES ('LTU', 'Polish', false, 7);
-INSERT INTO countrylanguage VALUES ('LUX', 'Italian', false, 4.5999999);
-INSERT INTO countrylanguage VALUES ('MAC', 'Mandarin Chinese', false, 1.2);
-INSERT INTO countrylanguage VALUES ('MKD', 'Turkish', false, 4);
-INSERT INTO countrylanguage VALUES ('MWI', 'Yao', false, 13.2);
-INSERT INTO countrylanguage VALUES ('MYS', 'Tamil', false, 3.9000001);
-INSERT INTO countrylanguage VALUES ('MLI', 'Senufo and Minianka', false, 12);
-INSERT INTO countrylanguage VALUES ('MRT', 'Tukulor', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('MUS', 'French', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('MYT', 'Malagasy', false, 16.1);
-INSERT INTO countrylanguage VALUES ('MEX', 'Yucatec', false, 1.1);
-INSERT INTO countrylanguage VALUES ('FSM', 'Mortlock', false, 7.5999999);
-INSERT INTO countrylanguage VALUES ('MDA', 'Ukrainian', false, 8.6000004);
-INSERT INTO countrylanguage VALUES ('MCO', 'Italian', false, 16.1);
-INSERT INTO countrylanguage VALUES ('MNG', 'Dorbet', false, 2.7);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Sena', false, 9.3999996);
-INSERT INTO countrylanguage VALUES ('MMR', 'Karen', false, 6.1999998);
-INSERT INTO countrylanguage VALUES ('NAM', 'Kavango', false, 9.6999998);
-INSERT INTO countrylanguage VALUES ('NRU', 'Chinese', false, 8.5);
-INSERT INTO countrylanguage VALUES ('NPL', 'Bhojpuri', false, 7.5);
-INSERT INTO countrylanguage VALUES ('NIC', 'Creole English', false, 0.5);
-INSERT INTO countrylanguage VALUES ('NER', 'Tamashek', false, 10.4);
-INSERT INTO countrylanguage VALUES ('NGA', 'Ibo', false, 18.1);
-INSERT INTO countrylanguage VALUES ('NOR', 'Danish', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('CIV', 'Malinke', false, 11.4);
-INSERT INTO countrylanguage VALUES ('PAK', 'Sindhi', false, 11.8);
-INSERT INTO countrylanguage VALUES ('PLW', 'English', true, 3.2);
-INSERT INTO countrylanguage VALUES ('PAN', 'Guaymí', false, 5.3000002);
-INSERT INTO countrylanguage VALUES ('PRY', 'Portuguese', false, 3.2);
-INSERT INTO countrylanguage VALUES ('PER', 'Aimará', true, 2.3);
-INSERT INTO countrylanguage VALUES ('MNP', 'Chinese', false, 7.0999999);
-INSERT INTO countrylanguage VALUES ('POL', 'Ukrainian', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('FRA', 'Portuguese', false, 1.2);
-INSERT INTO countrylanguage VALUES ('PYF', 'Chinese', false, 2.9000001);
-INSERT INTO countrylanguage VALUES ('REU', 'Comorian', false, 2.8);
-INSERT INTO countrylanguage VALUES ('ROM', 'Romani', true, 0.69999999);
-INSERT INTO countrylanguage VALUES ('SWE', 'Southern Slavic Languages', false, 1.3);
-INSERT INTO countrylanguage VALUES ('DEU', 'Southern Slavic Languages', false, 1.4);
-INSERT INTO countrylanguage VALUES ('SLB', 'Polynesian Languages', false, 3.8);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Nyanja', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('WSM', 'English', true, 0.60000002);
-INSERT INTO countrylanguage VALUES ('SEN', 'Serer', false, 12.5);
-INSERT INTO countrylanguage VALUES ('SYC', 'French', true, 1.3);
-INSERT INTO countrylanguage VALUES ('SLE', 'Limba', false, 8.3000002);
-INSERT INTO countrylanguage VALUES ('SGP', 'Tamil', true, 7.4000001);
-INSERT INTO countrylanguage VALUES ('SVK', 'Romani', false, 1.7);
-INSERT INTO countrylanguage VALUES ('SVN', 'Hungarian', false, 0.5);
-INSERT INTO countrylanguage VALUES ('LKA', 'Mixed Languages', false, 19.6);
-INSERT INTO countrylanguage VALUES ('SDN', 'Nubian Languages', false, 8.1000004);
-INSERT INTO countrylanguage VALUES ('FIN', 'Russian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('CHE', 'Italian', true, 7.6999998);
-INSERT INTO countrylanguage VALUES ('TJK', 'Russian', false, 9.6999998);
-INSERT INTO countrylanguage VALUES ('TWN', 'Hakka', false, 11);
-INSERT INTO countrylanguage VALUES ('TZA', 'Hehet', false, 6.9000001);
-INSERT INTO countrylanguage VALUES ('DNK', 'Arabic', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('THA', 'Chinese', false, 12.1);
-INSERT INTO countrylanguage VALUES ('TGO', 'Watyi', false, 10.3);
-INSERT INTO countrylanguage VALUES ('TTO', 'Creole English', false, 2.9000001);
-INSERT INTO countrylanguage VALUES ('TCD', 'Mayo-kebbi', false, 11.5);
-INSERT INTO countrylanguage VALUES ('CZE', 'Slovak', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('TUN', 'Arabic-French-English', false, 3.2);
-INSERT INTO countrylanguage VALUES ('TUR', 'Arabic', false, 1.4);
-INSERT INTO countrylanguage VALUES ('TKM', 'Russian', false, 6.6999998);
-INSERT INTO countrylanguage VALUES ('TUV', 'English', true, 0);
-INSERT INTO countrylanguage VALUES ('UGA', 'Kiga', false, 8.3000002);
-INSERT INTO countrylanguage VALUES ('UKR', 'Romanian', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('HUN', 'German', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('NCL', 'Polynesian Languages', false, 11.6);
-INSERT INTO countrylanguage VALUES ('UZB', 'Tadzhik', false, 4.4000001);
-INSERT INTO countrylanguage VALUES ('BLR', 'Ukrainian', false, 1.3);
-INSERT INTO countrylanguage VALUES ('VUT', 'French', true, 14.2);
-INSERT INTO countrylanguage VALUES ('VEN', 'Warrau', false, 0.1);
-INSERT INTO countrylanguage VALUES ('RUS', 'Ukrainian', false, 1.3);
-INSERT INTO countrylanguage VALUES ('VNM', 'Thai', false, 1.6);
-INSERT INTO countrylanguage VALUES ('EST', 'Ukrainian', false, 2.8);
-INSERT INTO countrylanguage VALUES ('USA', 'French', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('VIR', 'French', false, 2.5);
-INSERT INTO countrylanguage VALUES ('ZWE', 'English', true, 2.2);
-INSERT INTO countrylanguage VALUES ('AFG', 'Turkmenian', false, 1.9);
-INSERT INTO countrylanguage VALUES ('NLD', 'Turkish', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('AND', 'French', false, 6.1999998);
-INSERT INTO countrylanguage VALUES ('AGO', 'Luimbe-nganguela', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('ABW', 'Dutch', true, 5.3000002);
-INSERT INTO countrylanguage VALUES ('AUS', 'Canton Chinese', false, 1.1);
-INSERT INTO countrylanguage VALUES ('AZE', 'Armenian', false, 2);
-INSERT INTO countrylanguage VALUES ('BGD', 'Garo', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BEL', 'Arabic', false, 1.6);
-INSERT INTO countrylanguage VALUES ('BLZ', 'Garifuna', false, 6.8000002);
-INSERT INTO countrylanguage VALUES ('BEN', 'Aizo', false, 8.6999998);
-INSERT INTO countrylanguage VALUES ('BOL', 'Guaraní', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BWA', 'Khoekhoe', false, 2.5);
-INSERT INTO countrylanguage VALUES ('BRA', 'Japanese', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('BRN', 'English', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('BGR', 'Macedonian', false, 2.5999999);
-INSERT INTO countrylanguage VALUES ('BFA', 'Busansi', false, 3.5);
-INSERT INTO countrylanguage VALUES ('CHL', 'Rapa nui', false, 0.2);
-INSERT INTO countrylanguage VALUES ('CRI', 'Chinese', false, 0.2);
-INSERT INTO countrylanguage VALUES ('ERI', 'Hadareb', false, 3.8);
-INSERT INTO countrylanguage VALUES ('ESP', 'Basque', false, 1.6);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Northsotho', false, 9.1000004);
-INSERT INTO countrylanguage VALUES ('ETH', 'Gurage', false, 4.6999998);
-INSERT INTO countrylanguage VALUES ('PHL', 'Hiligaynon', false, 9.1000004);
-INSERT INTO countrylanguage VALUES ('GAB', 'Mbete', false, 13.8);
-INSERT INTO countrylanguage VALUES ('GMB', 'Diola', false, 9.1999998);
-INSERT INTO countrylanguage VALUES ('GEO', 'Azerbaijani', false, 5.5);
-INSERT INTO countrylanguage VALUES ('GHA', 'Ga-adangme', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('GUM', 'Korean', false, 3.3);
-INSERT INTO countrylanguage VALUES ('GTM', 'Kekchí', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('GIN', 'Kissi', false, 6);
-INSERT INTO countrylanguage VALUES ('GNB', 'Portuguese', true, 8.1000004);
-INSERT INTO countrylanguage VALUES ('HND', 'Miskito', false, 0.2);
-INSERT INTO countrylanguage VALUES ('HKG', 'Hakka', false, 1.6);
-INSERT INTO countrylanguage VALUES ('IDN', 'Madura', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('IND', 'Marathi', false, 7.4000001);
-INSERT INTO countrylanguage VALUES ('IRQ', 'Assyrian', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('IRN', 'Gilaki', false, 5.3000002);
-INSERT INTO countrylanguage VALUES ('ITA', 'French', false, 0.5);
-INSERT INTO countrylanguage VALUES ('AUT', 'Hungarian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('JPN', 'English', false, 0.1);
-INSERT INTO countrylanguage VALUES ('YUG', 'Romani', false, 1.4);
-INSERT INTO countrylanguage VALUES ('KHM', 'Tam', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('CMR', 'Ful', false, 9.6000004);
-INSERT INTO countrylanguage VALUES ('CAN', 'Italian', false, 1.7);
-INSERT INTO countrylanguage VALUES ('KAZ', 'German', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('KEN', 'Kamba', false, 11.2);
-INSERT INTO countrylanguage VALUES ('CAF', 'Ngbaka', false, 7.5);
-INSERT INTO countrylanguage VALUES ('CHN', 'Hui', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Ukrainian', false, 1.7);
-INSERT INTO countrylanguage VALUES ('COL', 'Arawakan', false, 0.1);
-INSERT INTO countrylanguage VALUES ('COM', 'Comorian-Arabic', false, 1.6);
-INSERT INTO countrylanguage VALUES ('COG', 'Mbete', false, 4.8000002);
-INSERT INTO countrylanguage VALUES ('COD', 'Rwanda', false, 10.3);
-INSERT INTO countrylanguage VALUES ('LAO', 'Lao-Soung', false, 5.1999998);
-INSERT INTO countrylanguage VALUES ('LVA', 'Ukrainian', false, 2.9000001);
-INSERT INTO countrylanguage VALUES ('LBR', 'Gio', false, 7.9000001);
-INSERT INTO countrylanguage VALUES ('LTU', 'Belorussian', false, 1.4);
-INSERT INTO countrylanguage VALUES ('LUX', 'French', true, 4.1999998);
-INSERT INTO countrylanguage VALUES ('MAC', 'English', false, 0.5);
-INSERT INTO countrylanguage VALUES ('MKD', 'Romani', false, 2.3);
-INSERT INTO countrylanguage VALUES ('MWI', 'Ngoni', false, 6.6999998);
-INSERT INTO countrylanguage VALUES ('MYS', 'Iban', false, 2.8);
-INSERT INTO countrylanguage VALUES ('MLI', 'Soninke', false, 8.6999998);
-INSERT INTO countrylanguage VALUES ('MRT', 'Soninke', false, 2.7);
-INSERT INTO countrylanguage VALUES ('MUS', 'Hindi', false, 1.2);
-INSERT INTO countrylanguage VALUES ('MEX', 'Zapotec', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('FSM', 'Kosrean', false, 7.3000002);
-INSERT INTO countrylanguage VALUES ('MDA', 'Gagauzi', false, 3.2);
-INSERT INTO countrylanguage VALUES ('MCO', 'English', false, 6.5);
-INSERT INTO countrylanguage VALUES ('MNG', 'Bajad', false, 1.9);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Lomwe', false, 7.8000002);
-INSERT INTO countrylanguage VALUES ('MMR', 'Rakhine', false, 4.5);
-INSERT INTO countrylanguage VALUES ('NAM', 'Afrikaans', false, 9.5);
-INSERT INTO countrylanguage VALUES ('NRU', 'Tuvalu', false, 8.5);
-INSERT INTO countrylanguage VALUES ('NPL', 'Tharu', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('NIC', 'Sumo', false, 0.2);
-INSERT INTO countrylanguage VALUES ('NER', 'Ful', false, 9.6999998);
-INSERT INTO countrylanguage VALUES ('NGA', 'Ful', false, 11.3);
-INSERT INTO countrylanguage VALUES ('NOR', 'Swedish', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('CIV', 'Kru', false, 10.5);
-INSERT INTO countrylanguage VALUES ('PAK', 'Saraiki', false, 9.8000002);
-INSERT INTO countrylanguage VALUES ('PLW', 'Chinese', false, 1.6);
-INSERT INTO countrylanguage VALUES ('PAN', 'Cuna', false, 2);
-INSERT INTO countrylanguage VALUES ('PRY', 'German', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('MNP', 'Korean', false, 6.5);
-INSERT INTO countrylanguage VALUES ('POL', 'Belorussian', false, 0.5);
-INSERT INTO countrylanguage VALUES ('FRA', 'Italian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('REU', 'Malagasy', false, 1.4);
-INSERT INTO countrylanguage VALUES ('ROM', 'German', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('SWE', 'Arabic', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('DEU', 'Italian', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Lozi', false, 6.4000001);
-INSERT INTO countrylanguage VALUES ('SEN', 'Diola', false, 5);
-INSERT INTO countrylanguage VALUES ('SLE', 'Kono-vai', false, 5.0999999);
-INSERT INTO countrylanguage VALUES ('SVK', 'Czech and Moravian', false, 1.1);
-INSERT INTO countrylanguage VALUES ('SDN', 'Beja', false, 6.4000001);
-INSERT INTO countrylanguage VALUES ('FIN', 'Estonian', false, 0.2);
-INSERT INTO countrylanguage VALUES ('CHE', 'Romansh', true, 0.60000002);
-INSERT INTO countrylanguage VALUES ('TWN', 'Ami', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('TZA', 'Haya', false, 5.9000001);
-INSERT INTO countrylanguage VALUES ('DNK', 'German', false, 0.5);
-INSERT INTO countrylanguage VALUES ('THA', 'Malay', false, 3.5999999);
-INSERT INTO countrylanguage VALUES ('TGO', 'Kotokoli', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('TCD', 'Kanem-bornu', false, 9);
-INSERT INTO countrylanguage VALUES ('CZE', 'Polish', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('TKM', 'Kazakh', false, 2);
-INSERT INTO countrylanguage VALUES ('UGA', 'Soga', false, 8.1999998);
-INSERT INTO countrylanguage VALUES ('UKR', 'Bulgariana', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('HUN', 'Serbo-Croatian', false, 0.2);
-INSERT INTO countrylanguage VALUES ('UZB', 'Kazakh', false, 3.8);
-INSERT INTO countrylanguage VALUES ('BLR', 'Polish', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('RUS', 'Chuvash', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('VNM', 'Muong', false, 1.5);
-INSERT INTO countrylanguage VALUES ('EST', 'Belorussian', false, 1.4);
-INSERT INTO countrylanguage VALUES ('USA', 'German', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('ZWE', 'Nyanja', false, 2.2);
-INSERT INTO countrylanguage VALUES ('AFG', 'Balochi', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('AGO', 'Nyaneka-nkhumbi', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('AUS', 'Arabic', false, 1);
-INSERT INTO countrylanguage VALUES ('BGD', 'Khasi', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BEL', 'German', true, 1);
-INSERT INTO countrylanguage VALUES ('BEN', 'Bariba', false, 8.6999998);
-INSERT INTO countrylanguage VALUES ('BWA', 'Ndebele', false, 1.3);
-INSERT INTO countrylanguage VALUES ('BRA', 'Indian Languages', false, 0.2);
-INSERT INTO countrylanguage VALUES ('BFA', 'Dagara', false, 3.0999999);
-INSERT INTO countrylanguage VALUES ('ERI', 'Bilin', false, 3);
-INSERT INTO countrylanguage VALUES ('ZAF', 'English', true, 8.5);
-INSERT INTO countrylanguage VALUES ('ETH', 'Somali', false, 4.0999999);
-INSERT INTO countrylanguage VALUES ('PHL', 'Bicol', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('GMB', 'Soninke', false, 7.5999999);
-INSERT INTO countrylanguage VALUES ('GEO', 'Osseetti', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('GHA', 'Gurma', false, 3.3);
-INSERT INTO countrylanguage VALUES ('GUM', 'Japanese', false, 2);
-INSERT INTO countrylanguage VALUES ('GTM', 'Mam', false, 2.7);
-INSERT INTO countrylanguage VALUES ('GIN', 'Kpelle', false, 4.5999999);
-INSERT INTO countrylanguage VALUES ('GNB', 'Malinke', false, 6.9000001);
-INSERT INTO countrylanguage VALUES ('HKG', 'Chiu chau', false, 1.4);
-INSERT INTO countrylanguage VALUES ('IDN', 'Minangkabau', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('IND', 'Tamil', false, 6.3000002);
-INSERT INTO countrylanguage VALUES ('IRQ', 'Persian', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('IRN', 'Luri', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('ITA', 'German', false, 0.5);
-INSERT INTO countrylanguage VALUES ('AUT', 'Slovene', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('JPN', 'Philippene Languages', false, 0.1);
-INSERT INTO countrylanguage VALUES ('YUG', 'Slovak', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('CMR', 'Tikar', false, 7.4000001);
-INSERT INTO countrylanguage VALUES ('CAN', 'German', false, 1.6);
-INSERT INTO countrylanguage VALUES ('KAZ', 'Uzbek', false, 2.3);
-INSERT INTO countrylanguage VALUES ('KEN', 'Kalenjin', false, 10.8);
-INSERT INTO countrylanguage VALUES ('CAF', 'Sara', false, 6.4000001);
-INSERT INTO countrylanguage VALUES ('CHN', 'Miao', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Tatar', false, 1.3);
-INSERT INTO countrylanguage VALUES ('COL', 'Caribbean', false, 0.1);
-INSERT INTO countrylanguage VALUES ('COM', 'Comorian-Swahili', false, 0.5);
-INSERT INTO countrylanguage VALUES ('COG', 'Punu', false, 2.9000001);
-INSERT INTO countrylanguage VALUES ('COD', 'Zande', false, 6.0999999);
-INSERT INTO countrylanguage VALUES ('LVA', 'Polish', false, 2.0999999);
-INSERT INTO countrylanguage VALUES ('LBR', 'Kru', false, 7.1999998);
-INSERT INTO countrylanguage VALUES ('LTU', 'Ukrainian', false, 1.1);
-INSERT INTO countrylanguage VALUES ('LUX', 'German', true, 2.3);
-INSERT INTO countrylanguage VALUES ('MKD', 'Serbo-Croatian', false, 2);
-INSERT INTO countrylanguage VALUES ('MYS', 'English', false, 1.6);
-INSERT INTO countrylanguage VALUES ('MLI', 'Tamashek', false, 7.3000002);
-INSERT INTO countrylanguage VALUES ('MRT', 'Ful', false, 1.2);
-INSERT INTO countrylanguage VALUES ('MUS', 'Tamil', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('MEX', 'Mixtec', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('FSM', 'Yap', false, 5.8000002);
-INSERT INTO countrylanguage VALUES ('MDA', 'Bulgariana', false, 1.6);
-INSERT INTO countrylanguage VALUES ('MNG', 'Buryat', false, 1.7);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Shona', false, 6.5);
-INSERT INTO countrylanguage VALUES ('MMR', 'Mon', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('NAM', 'Herero', false, 8);
-INSERT INTO countrylanguage VALUES ('NRU', 'English', true, 7.5);
-INSERT INTO countrylanguage VALUES ('NPL', 'Tamang', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('NER', 'Kanuri', false, 4.4000001);
-INSERT INTO countrylanguage VALUES ('NGA', 'Ibibio', false, 5.5999999);
-INSERT INTO countrylanguage VALUES ('NOR', 'Saame', false, 0);
-INSERT INTO countrylanguage VALUES ('CIV', '[South]Mande', false, 7.6999998);
-INSERT INTO countrylanguage VALUES ('PAK', 'Urdu', true, 7.5999999);
-INSERT INTO countrylanguage VALUES ('PAN', 'Embera', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('MNP', 'English', true, 4.8000002);
-INSERT INTO countrylanguage VALUES ('FRA', 'Spanish', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('REU', 'Tamil', false, 0);
-INSERT INTO countrylanguage VALUES ('ROM', 'Ukrainian', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('SWE', 'Spanish', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('DEU', 'Greek', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Chewa', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('SEN', 'Malinke', false, 3.8);
-INSERT INTO countrylanguage VALUES ('SLE', 'Bullom-sherbro', false, 3.8);
-INSERT INTO countrylanguage VALUES ('SVK', 'Ukrainian and Russian', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('SDN', 'Nuer', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('FIN', 'Saame', false, 0);
-INSERT INTO countrylanguage VALUES ('TWN', 'Atayal', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('TZA', 'Makonde', false, 5.9000001);
-INSERT INTO countrylanguage VALUES ('DNK', 'English', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('THA', 'Khmer', false, 1.3);
-INSERT INTO countrylanguage VALUES ('TGO', 'Ane', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('TCD', 'Ouaddai', false, 8.6999998);
-INSERT INTO countrylanguage VALUES ('CZE', 'German', false, 0.5);
-INSERT INTO countrylanguage VALUES ('UGA', 'Teso', false, 6);
-INSERT INTO countrylanguage VALUES ('UKR', 'Hungarian', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('HUN', 'Romanian', false, 0.1);
-INSERT INTO countrylanguage VALUES ('UZB', 'Karakalpak', false, 2);
-INSERT INTO countrylanguage VALUES ('RUS', 'Bashkir', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('VNM', 'Chinese', false, 1.4);
-INSERT INTO countrylanguage VALUES ('EST', 'Finnish', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('USA', 'Italian', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('AGO', 'Chokwe', false, 4.1999998);
-INSERT INTO countrylanguage VALUES ('AUS', 'Vietnamese', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('BGD', 'Santhali', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BEL', 'Turkish', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('BEN', 'Somba', false, 6.6999998);
-INSERT INTO countrylanguage VALUES ('BFA', 'Dyula', false, 2.5999999);
-INSERT INTO countrylanguage VALUES ('ERI', 'Saho', false, 3);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Tswana', false, 8.1000004);
-INSERT INTO countrylanguage VALUES ('ETH', 'Sidamo', false, 3.2);
-INSERT INTO countrylanguage VALUES ('PHL', 'Waray-waray', false, 3.8);
-INSERT INTO countrylanguage VALUES ('GEO', 'Abhyasi', false, 1.7);
-INSERT INTO countrylanguage VALUES ('GHA', 'Joruba', false, 1.3);
-INSERT INTO countrylanguage VALUES ('GIN', 'Yalunka', false, 2.9000001);
-INSERT INTO countrylanguage VALUES ('GNB', 'Mandyako', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('IDN', 'Batakki', false, 2.2);
-INSERT INTO countrylanguage VALUES ('IND', 'Urdu', false, 5.0999999);
-INSERT INTO countrylanguage VALUES ('IRN', 'Mazandarani', false, 3.5999999);
-INSERT INTO countrylanguage VALUES ('ITA', 'Albaniana', false, 0.2);
-INSERT INTO countrylanguage VALUES ('AUT', 'Polish', false, 0.2);
-INSERT INTO countrylanguage VALUES ('JPN', 'Ainu', false, 0);
-INSERT INTO countrylanguage VALUES ('YUG', 'Macedonian', false, 0.5);
-INSERT INTO countrylanguage VALUES ('CMR', 'Mandara', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('CAN', 'Polish', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('KAZ', 'Tatar', false, 2);
-INSERT INTO countrylanguage VALUES ('KEN', 'Gusii', false, 6.0999999);
-INSERT INTO countrylanguage VALUES ('CAF', 'Mbum', false, 6.4000001);
-INSERT INTO countrylanguage VALUES ('CHN', 'Uighur', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Kazakh', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('COG', 'Sango', false, 2.5999999);
-INSERT INTO countrylanguage VALUES ('COD', 'Ngala and Bangi', false, 5.8000002);
-INSERT INTO countrylanguage VALUES ('LVA', 'Lithuanian', false, 1.2);
-INSERT INTO countrylanguage VALUES ('LBR', 'Mano', false, 7.1999998);
-INSERT INTO countrylanguage VALUES ('MYS', 'Dusun', false, 1.1);
-INSERT INTO countrylanguage VALUES ('MLI', 'Songhai', false, 6.9000001);
-INSERT INTO countrylanguage VALUES ('MRT', 'Zenaga', false, 1.2);
-INSERT INTO countrylanguage VALUES ('MUS', 'Marathi', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('MEX', 'Otomí', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('FSM', 'Wolea', false, 3.7);
-INSERT INTO countrylanguage VALUES ('MNG', 'Dariganga', false, 1.4);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Tswa', false, 6);
-INSERT INTO countrylanguage VALUES ('MMR', 'Chin', false, 2.2);
-INSERT INTO countrylanguage VALUES ('NAM', 'Caprivi', false, 4.6999998);
-INSERT INTO countrylanguage VALUES ('NPL', 'Newari', false, 3.7);
-INSERT INTO countrylanguage VALUES ('NGA', 'Kanuri', false, 4.0999999);
-INSERT INTO countrylanguage VALUES ('PAK', 'Balochi', false, 3);
-INSERT INTO countrylanguage VALUES ('PAN', 'Arabic', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('MNP', 'Carolinian', false, 4.8000002);
-INSERT INTO countrylanguage VALUES ('FRA', 'Turkish', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('ROM', 'Serbo-Croatian', false, 0.1);
-INSERT INTO countrylanguage VALUES ('SWE', 'Norwegian', false, 0.5);
-INSERT INTO countrylanguage VALUES ('DEU', 'Polish', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('ZMB', 'Nsenga', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('SEN', 'Soninke', false, 1.3);
-INSERT INTO countrylanguage VALUES ('SLE', 'Ful', false, 3.8);
-INSERT INTO countrylanguage VALUES ('SDN', 'Zande', false, 2.7);
-INSERT INTO countrylanguage VALUES ('TWN', 'Paiwan', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('TZA', 'Nyakusa', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('DNK', 'Swedish', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('THA', 'Kuy', false, 1.1);
-INSERT INTO countrylanguage VALUES ('TGO', 'Moba', false, 5.4000001);
-INSERT INTO countrylanguage VALUES ('TCD', 'Hadjarai', false, 6.6999998);
-INSERT INTO countrylanguage VALUES ('CZE', 'Silesiana', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('UGA', 'Lango', false, 5.9000001);
-INSERT INTO countrylanguage VALUES ('UKR', 'Belorussian', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('HUN', 'Slovak', false, 0.1);
-INSERT INTO countrylanguage VALUES ('UZB', 'Tatar', false, 1.8);
-INSERT INTO countrylanguage VALUES ('RUS', 'Chechen', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('VNM', 'Khmer', false, 1.4);
-INSERT INTO countrylanguage VALUES ('USA', 'Chinese', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('AGO', 'Luvale', false, 3.5999999);
-INSERT INTO countrylanguage VALUES ('AUS', 'Serbo-Croatian', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('BGD', 'Tripuri', false, 0.1);
-INSERT INTO countrylanguage VALUES ('BEN', 'Ful', false, 5.5999999);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Southsotho', false, 7.5999999);
-INSERT INTO countrylanguage VALUES ('ETH', 'Walaita', false, 2.8);
-INSERT INTO countrylanguage VALUES ('PHL', 'Pampango', false, 3);
-INSERT INTO countrylanguage VALUES ('GIN', 'Loma', false, 2.3);
-INSERT INTO countrylanguage VALUES ('IDN', 'Bugi', false, 2.2);
-INSERT INTO countrylanguage VALUES ('IND', 'Gujarati', false, 4.8000002);
-INSERT INTO countrylanguage VALUES ('IRN', 'Balochi', false, 2.3);
-INSERT INTO countrylanguage VALUES ('ITA', 'Slovene', false, 0.2);
-INSERT INTO countrylanguage VALUES ('AUT', 'Czech', false, 0.2);
-INSERT INTO countrylanguage VALUES ('CMR', 'Maka', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('CAN', 'Spanish', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('KEN', 'Meru', false, 5.5);
-INSERT INTO countrylanguage VALUES ('CHN', 'Yi', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('KGZ', 'Tadzhik', false, 0.80000001);
-INSERT INTO countrylanguage VALUES ('COD', 'Rundi', false, 3.8);
-INSERT INTO countrylanguage VALUES ('LBR', 'Loma', false, 5.8000002);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Chuabo', false, 5.6999998);
-INSERT INTO countrylanguage VALUES ('MMR', 'Kachin', false, 1.4);
-INSERT INTO countrylanguage VALUES ('NAM', 'San', false, 1.9);
-INSERT INTO countrylanguage VALUES ('NPL', 'Hindi', false, 3);
-INSERT INTO countrylanguage VALUES ('NGA', 'Edo', false, 3.3);
-INSERT INTO countrylanguage VALUES ('PAK', 'Hindko', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('SLE', 'Kuranko', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('SDN', 'Bari', false, 2.5);
-INSERT INTO countrylanguage VALUES ('TZA', 'Chaga and Pare', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('DNK', 'Norwegian', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('TGO', 'Naudemba', false, 4.0999999);
-INSERT INTO countrylanguage VALUES ('TCD', 'Tandjile', false, 6.5);
-INSERT INTO countrylanguage VALUES ('CZE', 'Romani', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('UGA', 'Lugbara', false, 4.6999998);
-INSERT INTO countrylanguage VALUES ('UKR', 'Polish', false, 0.1);
-INSERT INTO countrylanguage VALUES ('RUS', 'Mordva', false, 0.5);
-INSERT INTO countrylanguage VALUES ('VNM', 'Nung', false, 1.1);
-INSERT INTO countrylanguage VALUES ('USA', 'Tagalog', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('AGO', 'Ambo', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('AUS', 'German', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Tsonga', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('PHL', 'Pangasinan', false, 1.8);
-INSERT INTO countrylanguage VALUES ('IDN', 'Banja', false, 1.8);
-INSERT INTO countrylanguage VALUES ('IND', 'Kannada', false, 3.9000001);
-INSERT INTO countrylanguage VALUES ('IRN', 'Arabic', false, 2.2);
-INSERT INTO countrylanguage VALUES ('ITA', 'Romani', false, 0.2);
-INSERT INTO countrylanguage VALUES ('AUT', 'Romanian', false, 0.2);
-INSERT INTO countrylanguage VALUES ('CMR', 'Masana', false, 3.9000001);
-INSERT INTO countrylanguage VALUES ('CAN', 'Portuguese', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('KEN', 'Nyika', false, 4.8000002);
-INSERT INTO countrylanguage VALUES ('CHN', 'Tujia', false, 0.5);
-INSERT INTO countrylanguage VALUES ('COD', 'Teke', false, 2.7);
-INSERT INTO countrylanguage VALUES ('LBR', 'Malinke', false, 5.0999999);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Ronga', false, 3.7);
-INSERT INTO countrylanguage VALUES ('MMR', 'Kayah', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('NAM', 'German', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('NGA', 'Tiv', false, 2.3);
-INSERT INTO countrylanguage VALUES ('PAK', 'Brahui', false, 1.2);
-INSERT INTO countrylanguage VALUES ('SLE', 'Yalunka', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('SDN', 'Fur', false, 2.0999999);
-INSERT INTO countrylanguage VALUES ('TZA', 'Luguru', false, 4.9000001);
-INSERT INTO countrylanguage VALUES ('TGO', 'Gurma', false, 3.4000001);
-INSERT INTO countrylanguage VALUES ('TCD', 'Gorane', false, 6.1999998);
-INSERT INTO countrylanguage VALUES ('CZE', 'Hungarian', false, 0.2);
-INSERT INTO countrylanguage VALUES ('UGA', 'Gisu', false, 4.5);
-INSERT INTO countrylanguage VALUES ('RUS', 'Kazakh', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('VNM', 'Miao', false, 0.89999998);
-INSERT INTO countrylanguage VALUES ('USA', 'Polish', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('AGO', 'Luchazi', false, 2.4000001);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Swazi', false, 2.5);
-INSERT INTO countrylanguage VALUES ('PHL', 'Maguindanao', false, 1.4);
-INSERT INTO countrylanguage VALUES ('IDN', 'Bali', false, 1.7);
-INSERT INTO countrylanguage VALUES ('IND', 'Malajalam', false, 3.5999999);
-INSERT INTO countrylanguage VALUES ('IRN', 'Bakhtyari', false, 1.7);
-INSERT INTO countrylanguage VALUES ('CAN', 'Punjabi', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('KEN', 'Masai', false, 1.6);
-INSERT INTO countrylanguage VALUES ('CHN', 'Mongolian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('COD', 'Boa', false, 2.3);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Marendje', false, 3.5);
-INSERT INTO countrylanguage VALUES ('NGA', 'Ijo', false, 1.8);
-INSERT INTO countrylanguage VALUES ('SDN', 'Chilluk', false, 1.7);
-INSERT INTO countrylanguage VALUES ('TZA', 'Shambala', false, 4.3000002);
-INSERT INTO countrylanguage VALUES ('UGA', 'Acholi', false, 4.4000001);
-INSERT INTO countrylanguage VALUES ('RUS', 'Avarian', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('VNM', 'Man', false, 0.69999999);
-INSERT INTO countrylanguage VALUES ('USA', 'Korean', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Venda', false, 2.2);
-INSERT INTO countrylanguage VALUES ('PHL', 'Maranao', false, 1.3);
-INSERT INTO countrylanguage VALUES ('IND', 'Orija', false, 3.3);
-INSERT INTO countrylanguage VALUES ('IRN', 'Turkmenian', false, 1.6);
-INSERT INTO countrylanguage VALUES ('CAN', 'Ukrainian', false, 0.60000002);
-INSERT INTO countrylanguage VALUES ('KEN', 'Turkana', false, 1.4);
-INSERT INTO countrylanguage VALUES ('CHN', 'Tibetan', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('COD', 'Chokwe', false, 1.8);
-INSERT INTO countrylanguage VALUES ('MOZ', 'Nyanja', false, 3.3);
-INSERT INTO countrylanguage VALUES ('NGA', 'Bura', false, 1.6);
-INSERT INTO countrylanguage VALUES ('SDN', 'Lotuko', false, 1.5);
-INSERT INTO countrylanguage VALUES ('TZA', 'Gogo', false, 3.9000001);
-INSERT INTO countrylanguage VALUES ('UGA', 'Rwanda', false, 3.2);
-INSERT INTO countrylanguage VALUES ('RUS', 'Mari', false, 0.40000001);
-INSERT INTO countrylanguage VALUES ('USA', 'Vietnamese', false, 0.2);
-INSERT INTO countrylanguage VALUES ('ZAF', 'Ndebele', false, 1.5);
-INSERT INTO countrylanguage VALUES ('IND', 'Punjabi', false, 2.8);
-INSERT INTO countrylanguage VALUES ('CAN', 'Dutch', false, 0.5);
-INSERT INTO countrylanguage VALUES ('CHN', 'Puyi', false, 0.2);
-INSERT INTO countrylanguage VALUES ('TZA', 'Ha', false, 3.5);
-INSERT INTO countrylanguage VALUES ('RUS', 'Udmur', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('USA', 'Japanese', false, 0.2);
-INSERT INTO countrylanguage VALUES ('IND', 'Asami', false, 1.5);
-INSERT INTO countrylanguage VALUES ('CAN', 'Eskimo Languages', false, 0.1);
-INSERT INTO countrylanguage VALUES ('CHN', 'Dong', false, 0.2);
-INSERT INTO countrylanguage VALUES ('RUS', 'Belorussian', false, 0.30000001);
-INSERT INTO countrylanguage VALUES ('USA', 'Portuguese', false, 0.2);
-
-
-ALTER TABLE city
-    ADD CONSTRAINT city_pkey PRIMARY KEY (id);
-
-ALTER TABLE country
-    ADD CONSTRAINT country_pkey PRIMARY KEY (code);
-
-ALTER TABLE countrylanguage
-    ADD CONSTRAINT countrylanguage_pkey PRIMARY KEY (countrycode, language);
-
-ALTER TABLE countrylanguage
-    ADD CONSTRAINT countrylanguage_countrycode_fkey FOREIGN KEY (countrycode) REFERENCES country(code);
+INSERT INTO countrylanguage VALUES ('AFG', 'Pashto', true, 52.400002),
+('NLD', 'Dutch', true, 95.599998),
+('ANT', 'Papiamento', true, 86.199997),
+('ALB', 'Albaniana', true, 97.900002),
+('DZA', 'Arabic', true, 86),
+('ASM', 'Samoan', true, 90.599998),
+('AND', 'Spanish', false, 44.599998),
+('AGO', 'Ovimbundu', false, 37.200001),
+('AIA', 'English', true, 0),
+('ATG', 'Creole English', false, 95.699997),
+('ARE', 'Arabic', true, 42),
+('ARG', 'Spanish', true, 96.800003),
+('ARM', 'Armenian', true, 93.400002),
+('ABW', 'Papiamento', false, 76.699997),
+('AUS', 'English', true, 81.199997),
+('AZE', 'Azerbaijani', true, 89),
+('BHS', 'Creole English', false, 89.699997),
+('BHR', 'Arabic', true, 67.699997),
+('BGD', 'Bengali', true, 97.699997),
+('BRB', 'Bajan', false, 95.099998),
+('BEL', 'Dutch', true, 59.200001),
+('BLZ', 'English', true, 50.799999),
+('BEN', 'Fon', false, 39.799999),
+('BMU', 'English', true, 100),
+('BTN', 'Dzongkha', true, 50),
+('BOL', 'Spanish', true, 87.699997),
+('BIH', 'Serbo-Croatian', true, 99.199997),
+('BWA', 'Tswana', false, 75.5),
+('BRA', 'Portuguese', true, 97.5),
+('GBR', 'English', true, 97.300003),
+('VGB', 'English', true, 0),
+('BRN', 'Malay', true, 45.5),
+('BGR', 'Bulgariana', true, 83.199997),
+('BFA', 'Mossi', false, 50.200001),
+('BDI', 'Kirundi', true, 98.099998),
+('CYM', 'English', true, 0),
+('CHL', 'Spanish', true, 89.699997),
+('COK', 'Maori', true, 0),
+('CRI', 'Spanish', true, 97.5),
+('DJI', 'Somali', false, 43.900002),
+('DMA', 'Creole English', false, 100),
+('DOM', 'Spanish', true, 98),
+('ECU', 'Spanish', true, 93),
+('EGY', 'Arabic', true, 98.800003),
+('SLV', 'Spanish', true, 100),
+('ERI', 'Tigrinja', true, 49.099998),
+('ESP', 'Spanish', true, 74.400002),
+('ZAF', 'Zulu', true, 22.700001),
+('ETH', 'Oromo', false, 31),
+('FLK', 'English', true, 0),
+('FJI', 'Fijian', true, 50.799999),
+('PHL', 'Pilipino', true, 29.299999),
+('FRO', 'Faroese', true, 100),
+('GAB', 'Fang', false, 35.799999),
+('GMB', 'Malinke', false, 34.099998),
+('GEO', 'Georgiana', true, 71.699997),
+('GHA', 'Akan', false, 52.400002),
+('GIB', 'English', true, 88.900002),
+('GRD', 'Creole English', false, 100),
+('GRL', 'Greenlandic', true, 87.5),
+('GLP', 'Creole French', false, 95),
+('GUM', 'English', true, 37.5),
+('GTM', 'Spanish', true, 64.699997),
+('GIN', 'Ful', false, 38.599998),
+('GNB', 'Crioulo', false, 36.400002),
+('GUY', 'Creole English', false, 96.400002),
+('HTI', 'Haiti Creole', false, 100),
+('HND', 'Spanish', true, 97.199997),
+('HKG', 'Canton Chinese', false, 88.699997),
+('SJM', 'Norwegian', true, 0),
+('IDN', 'Javanese', false, 39.400002),
+('IND', 'Hindi', true, 39.900002),
+('IRQ', 'Arabic', true, 77.199997),
+('IRN', 'Persian', true, 45.700001),
+('IRL', 'English', true, 98.400002),
+('ISL', 'Icelandic', true, 95.699997),
+('ISR', 'Hebrew', true, 63.099998),
+('ITA', 'Italian', true, 94.099998),
+('TMP', 'Sunda', false, 0),
+('AUT', 'German', true, 92),
+('JAM', 'Creole English', false, 94.199997),
+('JPN', 'Japanese', true, 99.099998),
+('YEM', 'Arabic', true, 99.599998),
+('JOR', 'Arabic', true, 97.900002),
+('CXR', 'Chinese', false, 0),
+('YUG', 'Serbo-Croatian', true, 75.199997),
+('KHM', 'Khmer', true, 88.599998),
+('CMR', 'Fang', false, 19.700001),
+('CAN', 'English', true, 60.400002),
+('CPV', 'Crioulo', false, 100),
+('KAZ', 'Kazakh', true, 46),
+('KEN', 'Kikuyu', false, 20.9),
+('CAF', 'Gbaya', false, 23.799999),
+('CHN', 'Chinese', true, 92),
+('KGZ', 'Kirgiz', true, 59.700001),
+('KIR', 'Kiribati', true, 98.900002),
+('COL', 'Spanish', true, 99),
+('COM', 'Comorian', true, 75),
+('COG', 'Kongo', false, 51.5),
+('COD', 'Luba', false, 18),
+('CCK', 'Malay', false, 0),
+('PRK', 'Korean', true, 99.900002),
+('KOR', 'Korean', true, 99.900002),
+('GRC', 'Greek', true, 98.5),
+('HRV', 'Serbo-Croatian', true, 95.900002),
+('CUB', 'Spanish', true, 100),
+('KWT', 'Arabic', true, 78.099998),
+('CYP', 'Greek', true, 74.099998),
+('LAO', 'Lao', true, 67.199997),
+('LVA', 'Latvian', true, 55.099998),
+('LSO', 'Sotho', true, 85),
+('LBN', 'Arabic', true, 93),
+('LBR', 'Kpelle', false, 19.5),
+('LBY', 'Arabic', true, 96),
+('LIE', 'German', true, 89),
+('LTU', 'Lithuanian', true, 81.599998),
+('LUX', 'Luxembourgish', true, 64.400002),
+('ESH', 'Arabic', true, 100),
+('MAC', 'Canton Chinese', false, 85.599998),
+('MDG', 'Malagasy', true, 98.900002),
+('MKD', 'Macedonian', true, 66.5),
+('MWI', 'Chichewa', true, 58.299999),
+('MDV', 'Dhivehi', true, 100),
+('MYS', 'Malay', true, 58.400002),
+('MLI', 'Bambara', false, 31.799999),
+('MLT', 'Maltese', true, 95.800003),
+('MAR', 'Arabic', true, 65),
+('MHL', 'Marshallese', true, 96.800003),
+('MTQ', 'Creole French', false, 96.599998),
+('MRT', 'Hassaniya', false, 81.699997),
+('MUS', 'Creole French', false, 70.599998),
+('MYT', 'Mahoré', false, 41.900002),
+('MEX', 'Spanish', true, 92.099998),
+('FSM', 'Trukese', false, 41.599998),
+('MDA', 'Romanian', true, 61.900002),
+('MCO', 'French', true, 41.900002),
+('MNG', 'Mongolian', true, 78.800003),
+('MSR', 'English', true, 0),
+('MOZ', 'Makua', false, 27.799999),
+('MMR', 'Burmese', true, 69),
+('NAM', 'Ovambo', false, 50.700001),
+('NRU', 'Nauru', true, 57.5),
+('NPL', 'Nepali', true, 50.400002),
+('NIC', 'Spanish', true, 97.599998),
+('NER', 'Hausa', false, 53.099998),
+('NGA', 'Joruba', false, 21.4),
+('NIU', 'Niue', false, 0),
+('NFK', 'English', true, 0),
+('NOR', 'Norwegian', true, 96.599998),
+('CIV', 'Akan', false, 30),
+('OMN', 'Arabic', true, 76.699997),
+('PAK', 'Punjabi', false, 48.200001),
+('PLW', 'Palau', true, 82.199997),
+('PAN', 'Spanish', true, 76.800003),
+('PNG', 'Papuan Languages', false, 78.099998),
+('PRY', 'Spanish', true, 55.099998),
+('PER', 'Spanish', true, 79.800003),
+('PCN', 'Pitcairnese', false, 0),
+('MNP', 'Philippene Languages', false, 34.099998),
+('PRT', 'Portuguese', true, 99),
+('PRI', 'Spanish', true, 51.299999),
+('POL', 'Polish', true, 97.599998),
+('GNQ', 'Fang', false, 84.800003),
+('QAT', 'Arabic', true, 40.700001),
+('FRA', 'French', true, 93.599998),
+('GUF', 'Creole French', false, 94.300003),
+('PYF', 'Tahitian', false, 46.400002),
+('REU', 'Creole French', false, 91.5),
+('ROM', 'Romanian', true, 90.699997),
+('RWA', 'Rwanda', true, 100),
+('SWE', 'Swedish', true, 89.5),
+('SHN', 'English', true, 0),
+('KNA', 'Creole English', false, 100),
+('LCA', 'Creole French', false, 80),
+('VCT', 'Creole English', false, 99.099998),
+('SPM', 'French', true, 0),
+('DEU', 'German', true, 91.300003),
+('SLB', 'Malenasian Languages', false, 85.599998),
+('ZMB', 'Bemba', false, 29.700001),
+('WSM', 'Samoan-English', false, 52),
+('SMR', 'Italian', true, 100),
+('STP', 'Crioulo', false, 86.300003),
+('SAU', 'Arabic', true, 95),
+('SEN', 'Wolof', true, 48.099998),
+('SYC', 'Seselwa', false, 91.300003),
+('SLE', 'Mende', false, 34.799999),
+('SGP', 'Chinese', true, 77.099998),
+('SVK', 'Slovak', true, 85.599998),
+('SVN', 'Slovene', true, 87.900002),
+('SOM', 'Somali', true, 98.300003),
+('LKA', 'Singali', true, 60.299999),
+('SDN', 'Arabic', true, 49.400002),
+('FIN', 'Finnish', true, 92.699997),
+('SUR', 'Sranantonga', false, 81),
+('SWZ', 'Swazi', true, 89.900002),
+('CHE', 'German', true, 63.599998),
+('SYR', 'Arabic', true, 90),
+('TJK', 'Tadzhik', true, 62.200001),
+('TWN', 'Min', false, 66.699997),
+('TZA', 'Nyamwesi', false, 21.1),
+('DNK', 'Danish', true, 93.5),
+('THA', 'Thai', true, 52.599998),
+('TGO', 'Ewe', true, 23.200001),
+('TKL', 'Tokelau', false, 0),
+('TON', 'Tongan', true, 98.300003),
+('TTO', 'English', false, 93.5),
+('TCD', 'Sara', false, 27.700001),
+('CZE', 'Czech', true, 81.199997),
+('TUN', 'Arabic', true, 69.900002),
+('TUR', 'Turkish', true, 87.599998),
+('TKM', 'Turkmenian', true, 76.699997),
+('TCA', 'English', true, 0),
+('TUV', 'Tuvalu', true, 92.5),
+('UGA', 'Ganda', false, 18.1),
+('UKR', 'Ukrainian', true, 64.699997),
+('HUN', 'Hungarian', true, 98.5),
+('URY', 'Spanish', true, 95.699997),
+('NCL', 'Malenasian Languages', false, 45.400002),
+('NZL', 'English', true, 87),
+('UZB', 'Uzbek', true, 72.599998),
+('BLR', 'Belorussian', true, 65.599998),
+('WLF', 'Wallis', false, 0),
+('VUT', 'Bislama', true, 56.599998),
+('VAT', 'Italian', true, 0),
+('VEN', 'Spanish', true, 96.900002),
+('RUS', 'Russian', true, 86.599998),
+('VNM', 'Vietnamese', true, 86.800003),
+('EST', 'Estonian', true, 65.300003),
+('USA', 'English', true, 86.199997),
+('VIR', 'English', true, 81.699997),
+('UMI', 'English', true, 0),
+('ZWE', 'Shona', false, 72.099998),
+('PSE', 'Arabic', false, 95.900002),
+('AFG', 'Dari', true, 32.099998),
+('NLD', 'Fries', false, 3.7),
+('ANT', 'English', false, 7.8000002),
+('ALB', 'Greek', false, 1.8),
+('DZA', 'Berberi', false, 14),
+('ASM', 'English', true, 3.0999999),
+('AND', 'Catalan', true, 32.299999),
+('AGO', 'Mbundu', false, 21.6),
+('ATG', 'English', true, 0),
+('ARE', 'Hindi', false, 0),
+('ARG', 'Italian', false, 1.7),
+('ARM', 'Azerbaijani', false, 2.5999999),
+('ABW', 'English', false, 9.5),
+('AUS', 'Italian', false, 2.2),
+('AZE', 'Russian', false, 3),
+('BHS', 'Creole French', false, 10.3),
+('BHR', 'English', false, 0),
+('BGD', 'Chakma', false, 0.40000001),
+('BRB', 'English', true, 0),
+('BEL', 'French', true, 32.599998),
+('BLZ', 'Spanish', false, 31.6),
+('BEN', 'Joruba', false, 12.2),
+('BTN', 'Nepali', false, 34.799999),
+('BOL', 'Ketua', true, 8.1000004),
+('BWA', 'Shona', false, 12.3),
+('BRA', 'German', false, 0.5),
+('GBR', 'Kymri', false, 0.89999998),
+('BRN', 'Malay-English', false, 28.799999),
+('BGR', 'Turkish', false, 9.3999996),
+('BFA', 'Ful', false, 9.6999998),
+('BDI', 'French', true, 0),
+('CHL', 'Araucan', false, 9.6000004),
+('COK', 'English', false, 0),
+('CRI', 'Creole English', false, 2),
+('DJI', 'Afar', false, 34.799999),
+('DMA', 'Creole French', false, 0),
+('DOM', 'Creole French', false, 2),
+('ECU', 'Ketua', false, 7),
+('EGY', 'Sinaberberi', false, 0),
+('SLV', 'Nahua', false, 0),
+('ERI', 'Tigre', false, 31.700001),
+('ESP', 'Catalan', false, 16.9),
+('ZAF', 'Xhosa', true, 17.700001),
+('ETH', 'Amhara', false, 30),
+('FJI', 'Hindi', false, 43.700001),
+('PHL', 'Cebuano', false, 23.299999),
+('FRO', 'Danish', true, 0),
+('GAB', 'Punu-sira-nzebi', false, 17.1),
+('GMB', 'Ful', false, 16.200001),
+('GEO', 'Russian', false, 8.8000002),
+('GHA', 'Mossi', false, 15.8),
+('GIB', 'Arabic', false, 7.4000001),
+('GRL', 'Danish', true, 12.5),
+('GLP', 'French', true, 0),
+('GUM', 'Chamorro', true, 29.6),
+('GTM', 'Quiché', false, 10.1),
+('GIN', 'Malinke', false, 23.200001),
+('GNB', 'Ful', false, 16.6),
+('GUY', 'Caribbean', false, 2.2),
+('HTI', 'French', true, 0),
+('HND', 'Garifuna', false, 1.3),
+('HKG', 'English', true, 2.2),
+('SJM', 'Russian', false, 0),
+('IDN', 'Sunda', false, 15.8),
+('IND', 'Bengali', false, 8.1999998),
+('IRQ', 'Kurdish', false, 19),
+('IRN', 'Azerbaijani', false, 16.799999),
+('IRL', 'Irish', true, 1.6),
+('ISL', 'English', false, 0),
+('ISR', 'Arabic', true, 18),
+('ITA', 'Sardinian', false, 2.7),
+('TMP', 'Portuguese', true, 0),
+('AUT', 'Serbo-Croatian', false, 2.2),
+('JAM', 'Hindi', false, 1.9),
+('JPN', 'Korean', false, 0.5),
+('YEM', 'Soqutri', false, 0),
+('JOR', 'Circassian', false, 1),
+('CXR', 'English', true, 0),
+('YUG', 'Albaniana', false, 16.5),
+('KHM', 'Vietnamese', false, 5.5),
+('CMR', 'Bamileke-bamum', false, 18.6),
+('CAN', 'French', true, 23.4),
+('CPV', 'Portuguese', true, 0),
+('KAZ', 'Russian', false, 34.700001),
+('KEN', 'Luhya', false, 13.8),
+('CAF', 'Banda', false, 23.5),
+('CHN', 'Zhuang', false, 1.4),
+('KGZ', 'Russian', true, 16.200001),
+('KIR', 'Tuvalu', false, 0.5),
+('COL', 'Chibcha', false, 0.40000001),
+('COM', 'Comorian-French', false, 12.9),
+('COG', 'Teke', false, 17.299999),
+('COD', 'Kongo', false, 16),
+('CCK', 'English', true, 0),
+('PRK', 'Chinese', false, 0.1),
+('KOR', 'Chinese', false, 0.1),
+('GRC', 'Turkish', false, 0.89999998),
+('HRV', 'Slovene', false, 0),
+('KWT', 'English', false, 0),
+('CYP', 'Turkish', true, 22.4),
+('LAO', 'Mon-khmer', false, 16.5),
+('LVA', 'Russian', false, 32.5),
+('LSO', 'Zulu', false, 15),
+('LBN', 'Armenian', false, 5.9000001),
+('LBR', 'Bassa', false, 13.7),
+('LBY', 'Berberi', false, 1),
+('LIE', 'Italian', false, 2.5),
+('LTU', 'Russian', false, 8.1000004),
+('LUX', 'Portuguese', false, 13),
+('MAC', 'Portuguese', true, 2.3),
+('MDG', 'French', true, 0),
+('MKD', 'Albaniana', false, 22.9),
+('MWI', 'Lomwe', false, 18.4),
+('MDV', 'English', false, 0),
+('MYS', 'Chinese', false, 9),
+('MLI', 'Ful', false, 13.9),
+('MLT', 'English', true, 2.0999999),
+('MAR', 'Berberi', false, 33),
+('MHL', 'English', true, 0),
+('MTQ', 'French', true, 0),
+('MRT', 'Wolof', false, 6.5999999),
+('MUS', 'Bhojpuri', false, 21.1),
+('MYT', 'French', true, 20.299999),
+('MEX', 'Náhuatl', false, 1.8),
+('FSM', 'Pohnpei', false, 23.799999),
+('MDA', 'Russian', false, 23.200001),
+('MCO', 'Monegasque', false, 16.1),
+('MNG', 'Kazakh', false, 5.9000001),
+('MOZ', 'Tsonga', false, 12.4),
+('MMR', 'Shan', false, 8.5),
+('NAM', 'Nama', false, 12.4),
+('NRU', 'Kiribati', false, 17.9),
+('NPL', 'Maithili', false, 11.9),
+('NIC', 'Miskito', false, 1.6),
+('NER', 'Songhai-zerma', false, 21.200001),
+('NGA', 'Hausa', false, 21.1),
+('NIU', 'English', true, 0),
+('NOR', 'English', false, 0.5),
+('CIV', 'Gur', false, 11.7),
+('OMN', 'Balochi', false, 0),
+('PAK', 'Pashto', false, 13.1),
+('PLW', 'Philippene Languages', false, 9.1999998),
+('PAN', 'Creole English', false, 14),
+('PNG', 'Malenasian Languages', false, 20),
+('PRY', 'Guaraní', true, 40.099998),
+('PER', 'Ketua', true, 16.4),
+('MNP', 'Chamorro', false, 30),
+('PRI', 'English', false, 47.400002),
+('POL', 'German', false, 1.3),
+('GNQ', 'Bubi', false, 8.6999998),
+('QAT', 'Urdu', false, 0),
+('FRA', 'Arabic', false, 2.5),
+('GUF', 'Indian Languages', false, 1.9),
+('PYF', 'French', true, 40.799999),
+('REU', 'Chinese', false, 2.8),
+('ROM', 'Hungarian', false, 7.1999998),
+('RWA', 'French', true, 0),
+('SWE', 'Finnish', false, 2.4000001),
+('KNA', 'English', true, 0),
+('LCA', 'English', true, 20),
+('VCT', 'English', true, 0),
+('DEU', 'Turkish', false, 2.5999999),
+('SLB', 'Papuan Languages', false, 8.6000004),
+('ZMB', 'Tongan', false, 11),
+('WSM', 'Samoan', true, 47.5),
+('STP', 'French', false, 0.69999999),
+('SEN', 'Ful', false, 21.700001),
+('SYC', 'English', true, 3.8),
+('SLE', 'Temne', false, 31.799999),
+('SGP', 'Malay', true, 14.1),
+('SVK', 'Hungarian', false, 10.5),
+('SVN', 'Serbo-Croatian', false, 7.9000001),
+('SOM', 'Arabic', true, 0),
+('LKA', 'Tamil', true, 19.6),
+('SDN', 'Dinka', false, 11.5),
+('FIN', 'Swedish', true, 5.6999998),
+('SUR', 'Hindi', false, 0),
+('SWZ', 'Zulu', false, 2),
+('CHE', 'French', true, 19.200001),
+('SYR', 'Kurdish', false, 9),
+('TJK', 'Uzbek', false, 23.200001),
+('TWN', 'Mandarin Chinese', true, 20.1),
+('TZA', 'Swahili', true, 8.8000002),
+('DNK', 'Turkish', false, 0.80000001),
+('THA', 'Lao', false, 26.9),
+('TGO', 'Kabyé', true, 13.8),
+('TKL', 'English', true, 0),
+('TON', 'English', true, 0),
+('TTO', 'Hindi', false, 3.4000001),
+('TCD', 'Arabic', true, 12.3),
+('CZE', 'Moravian', false, 12.9),
+('TUN', 'Arabic-French', false, 26.299999),
+('TUR', 'Kurdish', false, 10.6),
+('TKM', 'Uzbek', false, 9.1999998),
+('TUV', 'Kiribati', false, 7.5),
+('UGA', 'Nkole', false, 10.7),
+('UKR', 'Russian', false, 32.900002),
+('HUN', 'Romani', false, 0.5),
+('NCL', 'French', true, 34.299999),
+('NZL', 'Maori', false, 4.3000002),
+('UZB', 'Russian', false, 10.9),
+('BLR', 'Russian', true, 32),
+('WLF', 'Futuna', false, 0),
+('VUT', 'English', true, 28.299999),
+('VEN', 'Goajiro', false, 0.40000001),
+('RUS', 'Tatar', false, 3.2),
+('VNM', 'Tho', false, 1.8),
+('EST', 'Russian', false, 27.799999),
+('USA', 'Spanish', false, 7.5),
+('VIR', 'Spanish', false, 13.3),
+('ZWE', 'Ndebele', false, 16.200001),
+('PSE', 'Hebrew', false, 4.0999999),
+('AFG', 'Uzbek', false, 8.8000002),
+('NLD', 'Arabic', false, 0.89999998),
+('ANT', 'Dutch', true, 0),
+('ALB', 'Macedonian', false, 0.1),
+('ASM', 'Tongan', false, 3.0999999),
+('AND', 'Portuguese', false, 10.8),
+('AGO', 'Kongo', false, 13.2),
+('ARG', 'Indian Languages', false, 0.30000001),
+('ABW', 'Spanish', false, 7.4000001),
+('AUS', 'Greek', false, 1.6),
+('AZE', 'Lezgian', false, 2.3),
+('BGD', 'Marma', false, 0.2),
+('BEL', 'Italian', false, 2.4000001),
+('BLZ', 'Maya Languages', false, 9.6000004),
+('BEN', 'Adja', false, 11.1),
+('BTN', 'Asami', false, 15.2),
+('BOL', 'Aimará', true, 3.2),
+('BWA', 'San', false, 3.5),
+('BRA', 'Italian', false, 0.40000001),
+('GBR', 'Gaeli', false, 0.1),
+('BRN', 'Chinese', false, 9.3000002),
+('BGR', 'Romani', false, 3.7),
+('BFA', 'Gurma', false, 5.6999998),
+('BDI', 'Swahili', false, 0),
+('CHL', 'Aimará', false, 0.5),
+('CRI', 'Chibcha', false, 0.30000001),
+('DJI', 'Arabic', true, 10.6),
+('ERI', 'Afar', false, 4.3000002),
+('ESP', 'Galecian', false, 6.4000001),
+('ZAF', 'Afrikaans', true, 14.3),
+('ETH', 'Tigrinja', false, 7.1999998),
+('PHL', 'Ilocano', false, 9.3000002),
+('GAB', 'Mpongwe', false, 14.6),
+('GMB', 'Wolof', false, 12.6),
+('GEO', 'Armenian', false, 6.8000002),
+('GHA', 'Ewe', false, 11.9),
+('GUM', 'Philippene Languages', false, 19.700001),
+('GTM', 'Cakchiquel', false, 8.8999996),
+('GIN', 'Susu', false, 11),
+('GNB', 'Balante', false, 14.6),
+('GUY', 'Arawakan', false, 1.4),
+('HND', 'Creole English', false, 0.2),
+('HKG', 'Fukien', false, 1.9),
+('IDN', 'Malay', true, 12.1),
+('IND', 'Telugu', false, 7.8000002),
+('IRQ', 'Azerbaijani', false, 1.7),
+('IRN', 'Kurdish', false, 9.1000004),
+('ISR', 'Russian', false, 8.8999996),
+('ITA', 'Friuli', false, 1.2),
+('AUT', 'Turkish', false, 1.5),
+('JPN', 'Chinese', false, 0.2),
+('JOR', 'Armenian', false, 1),
+('YUG', 'Hungarian', false, 3.4000001),
+('KHM', 'Chinese', false, 3.0999999),
+('CMR', 'Duala', false, 10.9),
+('CAN', 'Chinese', false, 2.5),
+('KAZ', 'Ukrainian', false, 5),
+('KEN', 'Luo', false, 12.8),
+('CAF', 'Mandjia', false, 14.8),
+('CHN', 'Mantu', false, 0.89999998),
+('KGZ', 'Uzbek', false, 14.1),
+('COL', 'Creole English', false, 0.1),
+('COM', 'Comorian-madagassi', false, 5.5),
+('COG', 'Mboshi', false, 11.4),
+('COD', 'Mongo', false, 13.5),
+('LAO', 'Thai', false, 7.8000002),
+('LVA', 'Belorussian', false, 4.0999999),
+('LSO', 'English', true, 0),
+('LBN', 'French', false, 0),
+('LBR', 'Grebo', false, 8.8999996),
+('LIE', 'Turkish', false, 2.5),
+('LTU', 'Polish', false, 7),
+('LUX', 'Italian', false, 4.5999999),
+('MAC', 'Mandarin Chinese', false, 1.2),
+('MKD', 'Turkish', false, 4),
+('MWI', 'Yao', false, 13.2),
+('MYS', 'Tamil', false, 3.9000001),
+('MLI', 'Senufo and Minianka', false, 12),
+('MRT', 'Tukulor', false, 5.4000001),
+('MUS', 'French', false, 3.4000001),
+('MYT', 'Malagasy', false, 16.1),
+('MEX', 'Yucatec', false, 1.1),
+('FSM', 'Mortlock', false, 7.5999999),
+('MDA', 'Ukrainian', false, 8.6000004),
+('MCO', 'Italian', false, 16.1),
+('MNG', 'Dorbet', false, 2.7),
+('MOZ', 'Sena', false, 9.3999996),
+('MMR', 'Karen', false, 6.1999998),
+('NAM', 'Kavango', false, 9.6999998),
+('NRU', 'Chinese', false, 8.5),
+('NPL', 'Bhojpuri', false, 7.5),
+('NIC', 'Creole English', false, 0.5),
+('NER', 'Tamashek', false, 10.4),
+('NGA', 'Ibo', false, 18.1),
+('NOR', 'Danish', false, 0.40000001),
+('CIV', 'Malinke', false, 11.4),
+('PAK', 'Sindhi', false, 11.8),
+('PLW', 'English', true, 3.2),
+('PAN', 'Guaymí', false, 5.3000002),
+('PRY', 'Portuguese', false, 3.2),
+('PER', 'Aimará', true, 2.3),
+('MNP', 'Chinese', false, 7.0999999),
+('POL', 'Ukrainian', false, 0.60000002),
+('FRA', 'Portuguese', false, 1.2),
+('PYF', 'Chinese', false, 2.9000001),
+('REU', 'Comorian', false, 2.8),
+('ROM', 'Romani', true, 0.69999999),
+('SWE', 'Southern Slavic Languages', false, 1.3),
+('DEU', 'Southern Slavic Languages', false, 1.4),
+('SLB', 'Polynesian Languages', false, 3.8),
+('ZMB', 'Nyanja', false, 7.8000002),
+('WSM', 'English', true, 0.60000002),
+('SEN', 'Serer', false, 12.5),
+('SYC', 'French', true, 1.3),
+('SLE', 'Limba', false, 8.3000002),
+('SGP', 'Tamil', true, 7.4000001),
+('SVK', 'Romani', false, 1.7),
+('SVN', 'Hungarian', false, 0.5),
+('LKA', 'Mixed Languages', false, 19.6),
+('SDN', 'Nubian Languages', false, 8.1000004),
+('FIN', 'Russian', false, 0.40000001),
+('CHE', 'Italian', true, 7.6999998),
+('TJK', 'Russian', false, 9.6999998),
+('TWN', 'Hakka', false, 11),
+('TZA', 'Hehet', false, 6.9000001),
+('DNK', 'Arabic', false, 0.69999999),
+('THA', 'Chinese', false, 12.1),
+('TGO', 'Watyi', false, 10.3),
+('TTO', 'Creole English', false, 2.9000001),
+('TCD', 'Mayo-kebbi', false, 11.5),
+('CZE', 'Slovak', false, 3.0999999),
+('TUN', 'Arabic-French-English', false, 3.2),
+('TUR', 'Arabic', false, 1.4),
+('TKM', 'Russian', false, 6.6999998),
+('TUV', 'English', true, 0),
+('UGA', 'Kiga', false, 8.3000002),
+('UKR', 'Romanian', false, 0.69999999),
+('HUN', 'German', false, 0.40000001),
+('NCL', 'Polynesian Languages', false, 11.6),
+('UZB', 'Tadzhik', false, 4.4000001),
+('BLR', 'Ukrainian', false, 1.3),
+('VUT', 'French', true, 14.2),
+('VEN', 'Warrau', false, 0.1),
+('RUS', 'Ukrainian', false, 1.3),
+('VNM', 'Thai', false, 1.6),
+('EST', 'Ukrainian', false, 2.8),
+('USA', 'French', false, 0.69999999),
+('VIR', 'French', false, 2.5),
+('ZWE', 'English', true, 2.2),
+('AFG', 'Turkmenian', false, 1.9),
+('NLD', 'Turkish', false, 0.80000001),
+('AND', 'French', false, 6.1999998),
+('AGO', 'Luimbe-nganguela', false, 5.4000001),
+('ABW', 'Dutch', true, 5.3000002),
+('AUS', 'Canton Chinese', false, 1.1),
+('AZE', 'Armenian', false, 2),
+('BGD', 'Garo', false, 0.1),
+('BEL', 'Arabic', false, 1.6),
+('BLZ', 'Garifuna', false, 6.8000002),
+('BEN', 'Aizo', false, 8.6999998),
+('BOL', 'Guaraní', false, 0.1),
+('BWA', 'Khoekhoe', false, 2.5),
+('BRA', 'Japanese', false, 0.40000001),
+('BRN', 'English', false, 3.0999999),
+('BGR', 'Macedonian', false, 2.5999999),
+('BFA', 'Busansi', false, 3.5),
+('CHL', 'Rapa nui', false, 0.2),
+('CRI', 'Chinese', false, 0.2),
+('ERI', 'Hadareb', false, 3.8),
+('ESP', 'Basque', false, 1.6),
+('ZAF', 'Northsotho', false, 9.1000004),
+('ETH', 'Gurage', false, 4.6999998),
+('PHL', 'Hiligaynon', false, 9.1000004),
+('GAB', 'Mbete', false, 13.8),
+('GMB', 'Diola', false, 9.1999998),
+('GEO', 'Azerbaijani', false, 5.5),
+('GHA', 'Ga-adangme', false, 7.8000002),
+('GUM', 'Korean', false, 3.3),
+('GTM', 'Kekchí', false, 4.9000001),
+('GIN', 'Kissi', false, 6),
+('GNB', 'Portuguese', true, 8.1000004),
+('HND', 'Miskito', false, 0.2),
+('HKG', 'Hakka', false, 1.6),
+('IDN', 'Madura', false, 4.3000002),
+('IND', 'Marathi', false, 7.4000001),
+('IRQ', 'Assyrian', false, 0.80000001),
+('IRN', 'Gilaki', false, 5.3000002),
+('ITA', 'French', false, 0.5),
+('AUT', 'Hungarian', false, 0.40000001),
+('JPN', 'English', false, 0.1),
+('YUG', 'Romani', false, 1.4),
+('KHM', 'Tam', false, 2.4000001),
+('CMR', 'Ful', false, 9.6000004),
+('CAN', 'Italian', false, 1.7),
+('KAZ', 'German', false, 3.0999999),
+('KEN', 'Kamba', false, 11.2),
+('CAF', 'Ngbaka', false, 7.5),
+('CHN', 'Hui', false, 0.80000001),
+('KGZ', 'Ukrainian', false, 1.7),
+('COL', 'Arawakan', false, 0.1),
+('COM', 'Comorian-Arabic', false, 1.6),
+('COG', 'Mbete', false, 4.8000002),
+('COD', 'Rwanda', false, 10.3),
+('LAO', 'Lao-Soung', false, 5.1999998),
+('LVA', 'Ukrainian', false, 2.9000001),
+('LBR', 'Gio', false, 7.9000001),
+('LTU', 'Belorussian', false, 1.4),
+('LUX', 'French', true, 4.1999998),
+('MAC', 'English', false, 0.5),
+('MKD', 'Romani', false, 2.3),
+('MWI', 'Ngoni', false, 6.6999998),
+('MYS', 'Iban', false, 2.8),
+('MLI', 'Soninke', false, 8.6999998),
+('MRT', 'Soninke', false, 2.7),
+('MUS', 'Hindi', false, 1.2),
+('MEX', 'Zapotec', false, 0.60000002),
+('FSM', 'Kosrean', false, 7.3000002),
+('MDA', 'Gagauzi', false, 3.2),
+('MCO', 'English', false, 6.5),
+('MNG', 'Bajad', false, 1.9),
+('MOZ', 'Lomwe', false, 7.8000002),
+('MMR', 'Rakhine', false, 4.5),
+('NAM', 'Afrikaans', false, 9.5),
+('NRU', 'Tuvalu', false, 8.5),
+('NPL', 'Tharu', false, 5.4000001),
+('NIC', 'Sumo', false, 0.2),
+('NER', 'Ful', false, 9.6999998),
+('NGA', 'Ful', false, 11.3),
+('NOR', 'Swedish', false, 0.30000001),
+('CIV', 'Kru', false, 10.5),
+('PAK', 'Saraiki', false, 9.8000002),
+('PLW', 'Chinese', false, 1.6),
+('PAN', 'Cuna', false, 2),
+('PRY', 'German', false, 0.89999998),
+('MNP', 'Korean', false, 6.5),
+('POL', 'Belorussian', false, 0.5),
+('FRA', 'Italian', false, 0.40000001),
+('REU', 'Malagasy', false, 1.4),
+('ROM', 'German', false, 0.40000001),
+('SWE', 'Arabic', false, 0.80000001),
+('DEU', 'Italian', false, 0.69999999),
+('ZMB', 'Lozi', false, 6.4000001),
+('SEN', 'Diola', false, 5),
+('SLE', 'Kono-vai', false, 5.0999999),
+('SVK', 'Czech and Moravian', false, 1.1),
+('SDN', 'Beja', false, 6.4000001),
+('FIN', 'Estonian', false, 0.2),
+('CHE', 'Romansh', true, 0.60000002),
+('TWN', 'Ami', false, 0.60000002),
+('TZA', 'Haya', false, 5.9000001),
+('DNK', 'German', false, 0.5),
+('THA', 'Malay', false, 3.5999999),
+('TGO', 'Kotokoli', false, 5.6999998),
+('TCD', 'Kanem-bornu', false, 9),
+('CZE', 'Polish', false, 0.60000002),
+('TKM', 'Kazakh', false, 2),
+('UGA', 'Soga', false, 8.1999998),
+('UKR', 'Bulgariana', false, 0.30000001),
+('HUN', 'Serbo-Croatian', false, 0.2),
+('UZB', 'Kazakh', false, 3.8),
+('BLR', 'Polish', false, 0.60000002),
+('RUS', 'Chuvash', false, 0.89999998),
+('VNM', 'Muong', false, 1.5),
+('EST', 'Belorussian', false, 1.4),
+('USA', 'German', false, 0.69999999),
+('ZWE', 'Nyanja', false, 2.2),
+('AFG', 'Balochi', false, 0.89999998),
+('AGO', 'Nyaneka-nkhumbi', false, 5.4000001),
+('AUS', 'Arabic', false, 1),
+('BGD', 'Khasi', false, 0.1),
+('BEL', 'German', true, 1),
+('BEN', 'Bariba', false, 8.6999998),
+('BWA', 'Ndebele', false, 1.3),
+('BRA', 'Indian Languages', false, 0.2),
+('BFA', 'Dagara', false, 3.0999999),
+('ERI', 'Bilin', false, 3),
+('ZAF', 'English', true, 8.5),
+('ETH', 'Somali', false, 4.0999999),
+('PHL', 'Bicol', false, 5.6999998),
+('GMB', 'Soninke', false, 7.5999999),
+('GEO', 'Osseetti', false, 2.4000001),
+('GHA', 'Gurma', false, 3.3),
+('GUM', 'Japanese', false, 2),
+('GTM', 'Mam', false, 2.7),
+('GIN', 'Kpelle', false, 4.5999999),
+('GNB', 'Malinke', false, 6.9000001),
+('HKG', 'Chiu chau', false, 1.4),
+('IDN', 'Minangkabau', false, 2.4000001),
+('IND', 'Tamil', false, 6.3000002),
+('IRQ', 'Persian', false, 0.80000001),
+('IRN', 'Luri', false, 4.3000002),
+('ITA', 'German', false, 0.5),
+('AUT', 'Slovene', false, 0.40000001),
+('JPN', 'Philippene Languages', false, 0.1),
+('YUG', 'Slovak', false, 0.69999999),
+('CMR', 'Tikar', false, 7.4000001),
+('CAN', 'German', false, 1.6),
+('KAZ', 'Uzbek', false, 2.3),
+('KEN', 'Kalenjin', false, 10.8),
+('CAF', 'Sara', false, 6.4000001),
+('CHN', 'Miao', false, 0.69999999),
+('KGZ', 'Tatar', false, 1.3),
+('COL', 'Caribbean', false, 0.1),
+('COM', 'Comorian-Swahili', false, 0.5),
+('COG', 'Punu', false, 2.9000001),
+('COD', 'Zande', false, 6.0999999),
+('LVA', 'Polish', false, 2.0999999),
+('LBR', 'Kru', false, 7.1999998),
+('LTU', 'Ukrainian', false, 1.1),
+('LUX', 'German', true, 2.3),
+('MKD', 'Serbo-Croatian', false, 2),
+('MYS', 'English', false, 1.6),
+('MLI', 'Tamashek', false, 7.3000002),
+('MRT', 'Ful', false, 1.2),
+('MUS', 'Tamil', false, 0.80000001),
+('MEX', 'Mixtec', false, 0.60000002),
+('FSM', 'Yap', false, 5.8000002),
+('MDA', 'Bulgariana', false, 1.6),
+('MNG', 'Buryat', false, 1.7),
+('MOZ', 'Shona', false, 6.5),
+('MMR', 'Mon', false, 2.4000001),
+('NAM', 'Herero', false, 8),
+('NRU', 'English', true, 7.5),
+('NPL', 'Tamang', false, 4.9000001),
+('NER', 'Kanuri', false, 4.4000001),
+('NGA', 'Ibibio', false, 5.5999999),
+('NOR', 'Saame', false, 0),
+('CIV', '[South]Mande', false, 7.6999998),
+('PAK', 'Urdu', true, 7.5999999),
+('PAN', 'Embera', false, 0.60000002),
+('MNP', 'English', true, 4.8000002),
+('FRA', 'Spanish', false, 0.40000001),
+('REU', 'Tamil', false, 0),
+('ROM', 'Ukrainian', false, 0.30000001),
+('SWE', 'Spanish', false, 0.60000002),
+('DEU', 'Greek', false, 0.40000001),
+('ZMB', 'Chewa', false, 5.6999998),
+('SEN', 'Malinke', false, 3.8),
+('SLE', 'Bullom-sherbro', false, 3.8),
+('SVK', 'Ukrainian and Russian', false, 0.60000002),
+('SDN', 'Nuer', false, 4.9000001),
+('FIN', 'Saame', false, 0),
+('TWN', 'Atayal', false, 0.40000001),
+('TZA', 'Makonde', false, 5.9000001),
+('DNK', 'English', false, 0.30000001),
+('THA', 'Khmer', false, 1.3),
+('TGO', 'Ane', false, 5.6999998),
+('TCD', 'Ouaddai', false, 8.6999998),
+('CZE', 'German', false, 0.5),
+('UGA', 'Teso', false, 6),
+('UKR', 'Hungarian', false, 0.30000001),
+('HUN', 'Romanian', false, 0.1),
+('UZB', 'Karakalpak', false, 2),
+('RUS', 'Bashkir', false, 0.69999999),
+('VNM', 'Chinese', false, 1.4),
+('EST', 'Finnish', false, 0.69999999),
+('USA', 'Italian', false, 0.60000002),
+('AGO', 'Chokwe', false, 4.1999998),
+('AUS', 'Vietnamese', false, 0.80000001),
+('BGD', 'Santhali', false, 0.1),
+('BEL', 'Turkish', false, 0.89999998),
+('BEN', 'Somba', false, 6.6999998),
+('BFA', 'Dyula', false, 2.5999999),
+('ERI', 'Saho', false, 3),
+('ZAF', 'Tswana', false, 8.1000004),
+('ETH', 'Sidamo', false, 3.2),
+('PHL', 'Waray-waray', false, 3.8),
+('GEO', 'Abhyasi', false, 1.7),
+('GHA', 'Joruba', false, 1.3),
+('GIN', 'Yalunka', false, 2.9000001),
+('GNB', 'Mandyako', false, 4.9000001),
+('IDN', 'Batakki', false, 2.2),
+('IND', 'Urdu', false, 5.0999999),
+('IRN', 'Mazandarani', false, 3.5999999),
+('ITA', 'Albaniana', false, 0.2),
+('AUT', 'Polish', false, 0.2),
+('JPN', 'Ainu', false, 0),
+('YUG', 'Macedonian', false, 0.5),
+('CMR', 'Mandara', false, 5.6999998),
+('CAN', 'Polish', false, 0.69999999),
+('KAZ', 'Tatar', false, 2),
+('KEN', 'Gusii', false, 6.0999999),
+('CAF', 'Mbum', false, 6.4000001),
+('CHN', 'Uighur', false, 0.60000002),
+('KGZ', 'Kazakh', false, 0.80000001),
+('COG', 'Sango', false, 2.5999999),
+('COD', 'Ngala and Bangi', false, 5.8000002),
+('LVA', 'Lithuanian', false, 1.2),
+('LBR', 'Mano', false, 7.1999998),
+('MYS', 'Dusun', false, 1.1),
+('MLI', 'Songhai', false, 6.9000001),
+('MRT', 'Zenaga', false, 1.2),
+('MUS', 'Marathi', false, 0.69999999),
+('MEX', 'Otomí', false, 0.40000001),
+('FSM', 'Wolea', false, 3.7),
+('MNG', 'Dariganga', false, 1.4),
+('MOZ', 'Tswa', false, 6),
+('MMR', 'Chin', false, 2.2),
+('NAM', 'Caprivi', false, 4.6999998),
+('NPL', 'Newari', false, 3.7),
+('NGA', 'Kanuri', false, 4.0999999),
+('PAK', 'Balochi', false, 3),
+('PAN', 'Arabic', false, 0.60000002),
+('MNP', 'Carolinian', false, 4.8000002),
+('FRA', 'Turkish', false, 0.40000001),
+('ROM', 'Serbo-Croatian', false, 0.1),
+('SWE', 'Norwegian', false, 0.5),
+('DEU', 'Polish', false, 0.30000001),
+('ZMB', 'Nsenga', false, 4.3000002),
+('SEN', 'Soninke', false, 1.3),
+('SLE', 'Ful', false, 3.8),
+('SDN', 'Zande', false, 2.7),
+('TWN', 'Paiwan', false, 0.30000001),
+('TZA', 'Nyakusa', false, 5.4000001),
+('DNK', 'Swedish', false, 0.30000001),
+('THA', 'Kuy', false, 1.1),
+('TGO', 'Moba', false, 5.4000001),
+('TCD', 'Hadjarai', false, 6.6999998),
+('CZE', 'Silesiana', false, 0.40000001),
+('UGA', 'Lango', false, 5.9000001),
+('UKR', 'Belorussian', false, 0.30000001),
+('HUN', 'Slovak', false, 0.1),
+('UZB', 'Tatar', false, 1.8),
+('RUS', 'Chechen', false, 0.60000002),
+('VNM', 'Khmer', false, 1.4),
+('USA', 'Chinese', false, 0.60000002),
+('AGO', 'Luvale', false, 3.5999999),
+('AUS', 'Serbo-Croatian', false, 0.60000002),
+('BGD', 'Tripuri', false, 0.1),
+('BEN', 'Ful', false, 5.5999999),
+('ZAF', 'Southsotho', false, 7.5999999),
+('ETH', 'Walaita', false, 2.8),
+('PHL', 'Pampango', false, 3),
+('GIN', 'Loma', false, 2.3),
+('IDN', 'Bugi', false, 2.2),
+('IND', 'Gujarati', false, 4.8000002),
+('IRN', 'Balochi', false, 2.3),
+('ITA', 'Slovene', false, 0.2),
+('AUT', 'Czech', false, 0.2),
+('CMR', 'Maka', false, 4.9000001),
+('CAN', 'Spanish', false, 0.69999999),
+('KEN', 'Meru', false, 5.5),
+('CHN', 'Yi', false, 0.60000002),
+('KGZ', 'Tadzhik', false, 0.80000001),
+('COD', 'Rundi', false, 3.8),
+('LBR', 'Loma', false, 5.8000002),
+('MOZ', 'Chuabo', false, 5.6999998),
+('MMR', 'Kachin', false, 1.4),
+('NAM', 'San', false, 1.9),
+('NPL', 'Hindi', false, 3),
+('NGA', 'Edo', false, 3.3),
+('PAK', 'Hindko', false, 2.4000001),
+('SLE', 'Kuranko', false, 3.4000001),
+('SDN', 'Bari', false, 2.5),
+('TZA', 'Chaga and Pare', false, 4.9000001),
+('DNK', 'Norwegian', false, 0.30000001),
+('TGO', 'Naudemba', false, 4.0999999),
+('TCD', 'Tandjile', false, 6.5),
+('CZE', 'Romani', false, 0.30000001),
+('UGA', 'Lugbara', false, 4.6999998),
+('UKR', 'Polish', false, 0.1),
+('RUS', 'Mordva', false, 0.5),
+('VNM', 'Nung', false, 1.1),
+('USA', 'Tagalog', false, 0.40000001),
+('AGO', 'Ambo', false, 2.4000001),
+('AUS', 'German', false, 0.60000002),
+('ZAF', 'Tsonga', false, 4.3000002),
+('PHL', 'Pangasinan', false, 1.8),
+('IDN', 'Banja', false, 1.8),
+('IND', 'Kannada', false, 3.9000001),
+('IRN', 'Arabic', false, 2.2),
+('ITA', 'Romani', false, 0.2),
+('AUT', 'Romanian', false, 0.2),
+('CMR', 'Masana', false, 3.9000001),
+('CAN', 'Portuguese', false, 0.69999999),
+('KEN', 'Nyika', false, 4.8000002),
+('CHN', 'Tujia', false, 0.5),
+('COD', 'Teke', false, 2.7),
+('LBR', 'Malinke', false, 5.0999999),
+('MOZ', 'Ronga', false, 3.7),
+('MMR', 'Kayah', false, 0.40000001),
+('NAM', 'German', false, 0.89999998),
+('NGA', 'Tiv', false, 2.3),
+('PAK', 'Brahui', false, 1.2),
+('SLE', 'Yalunka', false, 3.4000001),
+('SDN', 'Fur', false, 2.0999999),
+('TZA', 'Luguru', false, 4.9000001),
+('TGO', 'Gurma', false, 3.4000001),
+('TCD', 'Gorane', false, 6.1999998),
+('CZE', 'Hungarian', false, 0.2),
+('UGA', 'Gisu', false, 4.5),
+('RUS', 'Kazakh', false, 0.40000001),
+('VNM', 'Miao', false, 0.89999998),
+('USA', 'Polish', false, 0.30000001),
+('AGO', 'Luchazi', false, 2.4000001),
+('ZAF', 'Swazi', false, 2.5),
+('PHL', 'Maguindanao', false, 1.4),
+('IDN', 'Bali', false, 1.7),
+('IND', 'Malajalam', false, 3.5999999),
+('IRN', 'Bakhtyari', false, 1.7),
+('CAN', 'Punjabi', false, 0.69999999),
+('KEN', 'Masai', false, 1.6),
+('CHN', 'Mongolian', false, 0.40000001),
+('COD', 'Boa', false, 2.3),
+('MOZ', 'Marendje', false, 3.5),
+('NGA', 'Ijo', false, 1.8),
+('SDN', 'Chilluk', false, 1.7),
+('TZA', 'Shambala', false, 4.3000002),
+('UGA', 'Acholi', false, 4.4000001),
+('RUS', 'Avarian', false, 0.40000001),
+('VNM', 'Man', false, 0.69999999),
+('USA', 'Korean', false, 0.30000001),
+('ZAF', 'Venda', false, 2.2),
+('PHL', 'Maranao', false, 1.3),
+('IND', 'Orija', false, 3.3),
+('IRN', 'Turkmenian', false, 1.6),
+('CAN', 'Ukrainian', false, 0.60000002),
+('KEN', 'Turkana', false, 1.4),
+('CHN', 'Tibetan', false, 0.40000001),
+('COD', 'Chokwe', false, 1.8),
+('MOZ', 'Nyanja', false, 3.3),
+('NGA', 'Bura', false, 1.6),
+('SDN', 'Lotuko', false, 1.5),
+('TZA', 'Gogo', false, 3.9000001),
+('UGA', 'Rwanda', false, 3.2),
+('RUS', 'Mari', false, 0.40000001),
+('USA', 'Vietnamese', false, 0.2),
+('ZAF', 'Ndebele', false, 1.5),
+('IND', 'Punjabi', false, 2.8),
+('CAN', 'Dutch', false, 0.5),
+('CHN', 'Puyi', false, 0.2),
+('TZA', 'Ha', false, 3.5),
+('RUS', 'Udmur', false, 0.30000001),
+('USA', 'Japanese', false, 0.2),
+('IND', 'Asami', false, 1.5),
+('CAN', 'Eskimo Languages', false, 0.1),
+('CHN', 'Dong', false, 0.2),
+('RUS', 'Belorussian', false, 0.30000001),
+('USA', 'Portuguese', false, 0.2);
