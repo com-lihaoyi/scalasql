@@ -29,4 +29,50 @@ object scalasql extends RootModule with ScalaModule {
 
     def testFramework = "utest.runner.Framework"
   }
+
+  def generateDocs() = T.command {
+    var isDocs = Option.empty[Int]
+    var isCode = false
+    val outputLines = collection.mutable.Buffer.empty[String]
+    for (line <- os.read.lines(os.pwd / "test" / "src" / "WorldSqlTests.scala")) {
+      val isDocsIndex = line.indexOf("// +DOCS")
+      if (isDocsIndex != -1) {
+        outputLines.append("")
+        isDocs = Some(isDocsIndex)
+        isCode = false
+      }
+      else if (line.contains("// -DOCS")) {
+        isDocs = None
+        if (isCode){
+          outputLines.append("```")
+          isCode = false
+        }
+      }
+      else for (index <- isDocs) {
+        val suffix = line.drop(index)
+        (suffix, isCode) match{
+          case ("", _) => outputLines.append("")
+
+          case (s"//$rest", false) => outputLines.append(rest.stripPrefix(" "))
+
+          case (s"//$rest", true) =>
+            outputLines.append("")
+            outputLines.append("```")
+            isCode = false
+            outputLines.append(rest.stripPrefix(" "))
+
+          case (c, true) => outputLines.append(c)
+
+          case (c, false) =>
+            outputLines.append("```scala")
+            isCode = true
+            outputLines.append(c)
+        }
+
+      }
+    }
+    os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
+  }
+
 }
+

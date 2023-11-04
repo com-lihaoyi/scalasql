@@ -11,9 +11,6 @@ object WorldSqlTests extends TestSuite {
   // above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
   // Postgres, and MySql out of the box. The `Dialect` import provides the
   // various operators and functions that may be unique to each specific database
-  // -DOCS
-
-  // +DOCS
   //
   // ## Modeling Your Schema
   //
