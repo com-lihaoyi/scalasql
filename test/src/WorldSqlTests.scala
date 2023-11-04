@@ -872,5 +872,113 @@ object WorldSqlTests extends TestSuite {
         assert(res == expected)
       }
     }
+
+    test("transactions") {
+      test("exception") {
+        try dbClient.transaction { implicit db =>
+          db.run(City.delete(_.countryCode === "SGP"))
+
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+          assert(res == Seq())
+          throw new Exception()
+        } catch{case e: Exception => /*do nothing*/}
+
+        dbClient.transaction{implicit db =>
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            )
+          )
+
+          assert(res == expected)
+        }
+      }
+      test("rollback") {
+        dbClient.transaction { implicit db =>
+          db.run(City.delete(_.countryCode === "SGP"))
+
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+          assert(res == Seq())
+          db.rollback()
+        }
+
+        dbClient.transaction{ implicit db =>
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            )
+          )
+
+          assert(res == expected)
+        }
+      }
+    }
+    test("savepoint") {
+      test("exception") {
+        dbClient.transaction { implicit db =>
+          try db.savepoint { implicit sp =>
+            db.run(City.delete(_.countryCode === "SGP"))
+
+            val res = db.run(City.select.filter(_.countryCode === "SGP"))
+            assert(res == Seq())
+            throw new Exception()
+          } catch{case e: Exception => /*do nothing*/}
+
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            )
+          )
+
+          assert(res == expected)
+        }
+
+      }
+      test("rollback") {
+        dbClient.transaction { implicit db =>
+          db.savepoint { implicit sp =>
+            db.run(City.delete(_.countryCode === "SGP"))
+
+            val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+            assert(res == Seq())
+            sp.rollback()
+          }
+
+          val res = db.run(City.select.filter(_.countryCode === "SGP"))
+
+          val expected = Seq(
+            City[Id](
+              id = 3208,
+              name = "Singapore",
+              countryCode = "SGP",
+              district = "",
+              population = 4017733
+            )
+          )
+
+          assert(res == expected)
+        }
+      }
+    }
   }
 }
