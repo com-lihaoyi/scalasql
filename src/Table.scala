@@ -14,8 +14,8 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Ba
 
   def initMetadata[V[_[_]]](): Table.Metadata[V] = macro Table.Metadata.applyImpl[V]
 
-  implicit def containerQr[E[_] <: Expr[_]]: Queryable[V[E], V[Id]] = metadata.queryable
-    .asInstanceOf[Queryable[V[E], V[Id]]]
+  implicit def containerQr[E[_] <: Expr[_]]: Queryable.Simple[V[E], V[Id]] = metadata.queryable
+    .asInstanceOf[Queryable.Simple[V[E], V[Id]]]
 
   def tableRef = new scalasql.query.TableRef(this)
 }
@@ -75,14 +75,14 @@ object Table {
     class TableQueryable[Q, R](
         flatten0: Q => Seq[(List[String], Expr[_])],
         valueReader0: OptionPickler.Reader[R]
-    ) extends Queryable[Q, R] {
+    ) extends Queryable.Simple[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(
-        implicit q: Queryable[T, _]
+        implicit q: Queryable.Simple[T, _]
     ): Seq[(List[String], Expr[_])] = { q.walk(t).map { case (k, v) => (prefix +: k, v) } }
   }
 }

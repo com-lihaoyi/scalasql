@@ -19,7 +19,7 @@ trait Select[Q, R]
       orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
-  )(implicit qr: Queryable[Q, R]): CompoundSelect[Q, R] =
+  )(implicit qr: Queryable.Simple[Q, R]): CompoundSelect[Q, R] =
     new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
 
   def newSimpleSelect[Q, R](
@@ -29,10 +29,10 @@ trait Select[Q, R]
       joins: Seq[Join],
       where: Seq[Expr[_]],
       groupBy0: Option[GroupBy]
-  )(implicit qr: Queryable[Q, R]): SimpleSelect[Q, R] =
+  )(implicit qr: Queryable.Simple[Q, R]): SimpleSelect[Q, R] =
     new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
 
-  def qr: Queryable[Q, R]
+  def qr: Queryable.Simple[Q, R]
   def isTrivialJoin: Boolean = false
   def select = this
 
@@ -40,17 +40,17 @@ trait Select[Q, R]
 
   def simple(args: Iterable[_]*) = args.forall(_.isEmpty)
 
-  def subqueryRef(implicit qr: Queryable[Q, R]) = new SubqueryRef[Q, R](this, qr)
+  def subqueryRef(implicit qr: Queryable.Simple[Q, R]) = new SubqueryRef[Q, R](this, qr)
 
-  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
-  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2]
+  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Simple[Q2, R2]): Select[Q2, R2]
+  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable.Simple[Q2, R2]): Select[Q2, R2]
   def filter(f: Q => Expr[Boolean]): Select[Q, R]
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V]
+  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Simple[E, V]): Aggregate[E, V]
 
   def groupBy[K, V, R2, R3](groupKey: Q => K)(
       groupAggregate: SelectProxy[Q] => V
-  )(implicit qrk: Queryable[K, R2], qrv: Queryable[V, R3]): Select[(K, V), (R2, R3)]
+  )(implicit qrk: Queryable.Simple[K, R2], qrv: Queryable.Simple[V, R3]): Select[(K, V), (R2, R3)]
 
   def sortBy(f: Q => Expr[_]): Select[Q, R]
   def asc: Select[Q, R]
@@ -90,15 +90,15 @@ trait Select[Q, R]
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Q, Option[Q2]), (R, Option[R2])]
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Option[Q], Q2), (Option[R], R2)]
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])]
 
 }

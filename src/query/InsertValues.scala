@@ -40,7 +40,7 @@ object InsertValues {
       prevContext: Context,
       valuesLists: Seq[Seq[Expr[_]]],
       tableName: String
-  ){
+  ) {
 
     implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
     lazy val columns = SqlStr

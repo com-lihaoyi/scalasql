@@ -11,7 +11,7 @@ class CompoundSelect[Q, R](
     val orderBy: Seq[OrderBy],
     val limit: Option[Int],
     val offset: Option[Int]
-)(implicit val qr: Queryable[Q, R])
+)(implicit val qr: Queryable.Simple[Q, R])
     extends Select[Q, R] {
 
   protected def copy[Q, R](
@@ -20,7 +20,8 @@ class CompoundSelect[Q, R](
       orderBy: Seq[OrderBy] = this.orderBy,
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
-  )(implicit qr: Queryable[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+  )(implicit qr: Queryable.Simple[Q, R]) =
+    newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
   def expr = lhs.select.expr
 
   override def select = this
@@ -28,10 +29,10 @@ class CompoundSelect[Q, R](
   def distinct: Select[Q, R] = simpleFrom(this).distinct
 
   def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
-      implicit qr: Queryable[Expr[V], V]
+      implicit qr: Queryable.Simple[Expr[V], V]
   ): Expr[V] = simpleFrom(this).queryExpr[V](f)
 
-  def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable[Q2, R2]): Select[Q2, R2] = {
+  def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Simple[Q2, R2]): Select[Q2, R2] = {
     (lhs, compoundOps) match {
       case (s: Select[Q, R], Nil) => copy(simpleFrom(s.map(f)), Nil, orderBy, limit, offset)
 
@@ -39,9 +40,9 @@ class CompoundSelect[Q, R](
     }
   }
 
-  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable[Q2, R2]): Select[Q2, R2] = {
-    simpleFrom(this).flatMap(f)
-  }
+  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(
+      implicit qr: Queryable.Simple[Q2, R2]
+  ): Select[Q2, R2] = { simpleFrom(this).flatMap(f) }
 
   def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
     (lhs, compoundOps) match {
@@ -52,32 +53,31 @@ class CompoundSelect[Q, R](
   }
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { simpleFrom(this).join0(other, on) }
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Q, Option[Q2]), (R, Option[R2])] = { simpleFrom(this).leftJoin(other)(on) }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Option[Q], Q2), (Option[R], R2)] = { simpleFrom(this).rightJoin(other)(on) }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit joinQr: Queryable[Q2, R2]
+      implicit joinQr: Queryable.Simple[Q2, R2]
   ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
     simpleFrom(this).outerJoin(other)(on)
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable[E, V]): Aggregate[E, V] = {
-    simpleFrom(this).aggregate(f)
-  }
+  def aggregate[E, V](f: SelectProxy[Q] => E)(
+      implicit qr: Queryable.Simple[E, V]
+  ): Aggregate[E, V] = { simpleFrom(this).aggregate(f) }
 
-  def groupBy[K, V, R1, R2](groupKey: Q => K)(
-      groupAggregate: SelectProxy[Q] => V
-  )(implicit qrk: Queryable[K, R1], qrv: Queryable[V, R2]): Select[(K, V), (R1, R2)] = {
-    simpleFrom(this).groupBy(groupKey)(groupAggregate)
-  }
+  def groupBy[K, V, R1, R2](groupKey: Q => K)(groupAggregate: SelectProxy[Q] => V)(
+      implicit qrk: Queryable.Simple[K, R1],
+      qrv: Queryable.Simple[V, R2]
+  ): Select[(K, V), (R1, R2)] = { simpleFrom(this).groupBy(groupKey)(groupAggregate) }
 
   def sortBy(f: Q => Expr[_]) = {
     val newOrder = Seq(OrderBy(f(expr), None, None))

@@ -19,13 +19,14 @@ trait Returning[Q, R] extends Query.Multiple[R] {
 
 trait InsertReturning[Q, R] extends Returning[Q, R]
 object InsertReturning {
-  class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
-      extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
+  class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(
+      implicit val qr: Queryable.Simple[Q, R]
+  ) extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
     def expr: Q = returning
   }
 }
 object Returning {
-  class Impl0[Q, R](qr: Queryable[Q, R], returnable: Returnable[_], returning: Q)
+  class Impl0[Q, R](qr: Queryable.Simple[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
     def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
 
@@ -48,7 +49,7 @@ object Returning {
       (prefix + suffix, flattenedExpr.map(t => Expr.getMappedType(t._2)))
     }
   }
-  class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable[Q, R])
+  class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable.Simple[Q, R])
       extends Impl0[Q, R](qr, returnable, returning) with Returning[Q, R]
 
 }

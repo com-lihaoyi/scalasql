@@ -38,7 +38,7 @@ object InsertSelect {
       exprs: Seq[Expr[_]],
       prevContext: Context,
       tableName: String
-  ){
+  ) {
 
     implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
 
