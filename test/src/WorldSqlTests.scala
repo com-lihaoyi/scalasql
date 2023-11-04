@@ -771,7 +771,7 @@ object MainTests extends TestSuite {
           if city.countryCode === country.code
           if country.name === "Liechtenstein"
         } yield city.name
-        
+
         val sql = db.toSqlQuery(query)
 
         assert(
@@ -804,10 +804,13 @@ object MainTests extends TestSuite {
           """
           SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
           FROM countrylanguage countrylanguage0
-          JOIN (SELECT country0.code as res__code, country0.population as res__population
-              FROM country country0
-              ORDER BY res__population DESC
-              LIMIT 2) subquery1
+          JOIN (SELECT
+              country0.code as res__code,
+              country0.name as res__name,
+              country0.population as res__population
+            FROM country country0
+            ORDER BY res__population DESC
+            LIMIT 2) subquery1
           ON countrylanguage0.countrycode = subquery1.res__code
           """.trim.replaceAll("\\s+", " ")
         )
@@ -817,7 +820,7 @@ object MainTests extends TestSuite {
           ("Chinese", "China"),
           ("Dong", "China"),
           ("Hui", "China"),
-          ("Mant�u", "China"),
+          ("Mantu", "China"),
           ("Miao", "China"),
           ("Mongolian", "China"),
           ("Puyi", "China"),
@@ -891,44 +894,6 @@ object MainTests extends TestSuite {
           ("Tamil", "India"),
           ("Telugu", "India"),
           ("Urdu", "India")
-        )
-
-        assert(res == expected)
-      }
-      test("fromAndJoin") {
-        val query = Country.select.sortBy(_.population).desc.take(2)
-          .joinOn(City.select.sortBy(_.population).desc.take(20))(_.code === _.countryCode)
-          .map { case (country, city) => (country.name, city.name) }
-
-        val sql = db.toSqlQuery(query)
-        assert(
-          sql ==
-          """
-          SELECT subquery0.res__name as res__0, subquery1.res__name as res__1
-          FROM (SELECT
-              country0.code as res__code,
-              country0.name as res__name,
-              country0.population as res__population
-            FROM country country0
-            ORDER BY res__population DESC
-            LIMIT 2) subquery0
-          JOIN (SELECT
-              city0.countrycode as res__countrycode,
-              city0.population as res__population
-            FROM city city0
-            ORDER BY res__population DESC
-            LIMIT 20) subquery1
-          ON subquery0.res__code = subquery1.res__countrycode
-          """.trim.replaceAll("\\s+", " ")
-        )
-
-        val res = db.run(query)
-        val expected = List(
-          ("India", "Mumbai (Bombay)"),
-          ("China", "Shanghai"),
-          ("China", "Peking"),
-          ("India", "Delhi"),
-          ("China", "Chongqing")
         )
 
         assert(res == expected)

@@ -214,7 +214,7 @@ object SimpleSelect {
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
 
-      val joins = joinsToSqlStr(query.joins, computed.fromSelectables, liveExprs, joinOns)
+      val joins = joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs), joinOns)
 
       val tables = SqlStr
         .join(query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
