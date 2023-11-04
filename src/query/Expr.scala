@@ -58,6 +58,7 @@ object Expr {
   implicit def from(x: Long): Expr[Long] = apply(x)
   implicit def from(x: Boolean): Expr[Boolean] = apply(x)
   implicit def from(x: Double): Expr[Double] = apply(x)
+  implicit def from(x: scala.math.BigDecimal): Expr[scala.math.BigDecimal] = apply(x)
   implicit def from(x: String): Expr[String] = apply(x)
   implicit def apply[T](
       x: T
