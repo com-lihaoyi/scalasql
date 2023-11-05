@@ -1030,7 +1030,7 @@ Buyer.insert.values(
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
-'
+
 
 
 *
@@ -1068,7 +1068,7 @@ Buyer.insert
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
-'
+
 
 
 *
@@ -1113,7 +1113,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -1162,7 +1162,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -1218,7 +1218,7 @@ Buyer.insert.select(
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -1267,7 +1267,7 @@ Buyer.insert.select(
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -1312,7 +1312,7 @@ Purchase.delete(_.id `=` 2)
 Purchase.select
 ```
 
-'
+
 
 
 *
@@ -1357,7 +1357,7 @@ Purchase.delete(_.id <> 2)
 Purchase.select
 ```
 
-'
+
 
 
 *
@@ -1394,7 +1394,7 @@ Purchase.delete(_ => true)
 Purchase.select
 ```
 
-'
+
 
 
 *
@@ -3461,7 +3461,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
-'
+
 
 
 *
@@ -3477,7 +3477,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
-'
+
 
 
 *
@@ -3514,7 +3514,7 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
-'
+
 
 
 *
@@ -3530,7 +3530,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
-'
+
 
 
 *
@@ -3569,7 +3569,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3585,7 +3585,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3622,7 +3622,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3638,7 +3638,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3682,7 +3682,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3732,7 +3732,7 @@ Buyer
 Buyer.select.filter(_.id `=` 1).map(_.name)
 ```
 
-'
+
 
 
 *
@@ -3780,7 +3780,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3829,7 +3829,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -3869,7 +3869,7 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
-'
+
 
 
 *
@@ -3915,7 +3915,7 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
-'
+
 
 
 *
@@ -3962,7 +3962,7 @@ Buyer.insert
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
-'
+
 
 
 *
@@ -4002,7 +4002,7 @@ Buyer.insert
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
-'
+
 
 
 *
@@ -4050,7 +4050,7 @@ Buyer.insert
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -4106,7 +4106,7 @@ Buyer.insert
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -4153,7 +4153,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
-'
+
 
 
 *
@@ -4216,7 +4216,7 @@ Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
 Purchase.select
 ```
 
-'
+
 
 
 *
@@ -4353,7 +4353,7 @@ Buyer.insert
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -4400,7 +4400,7 @@ Buyer.insert
 Buyer.select
 ```
 
-'
+
 
 
 *
@@ -4508,7 +4508,7 @@ DataTypes.insert.values(
 )
 ```
 
-'
+
 
 
 *
@@ -4524,7 +4524,7 @@ DataTypes.insert.values(
 DataTypes.select
 ```
 
-'
+
 
 
 *
@@ -4543,7 +4543,7 @@ NonRoundTripTypes.insert.values(
 )
 ```
 
-'
+
 
 
 *
@@ -4559,7 +4559,7 @@ NonRoundTripTypes.insert.values(
 NonRoundTripTypes.select
 ```
 
-'
+
 
 
 *
@@ -4581,7 +4581,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 )
 ```
 
-'
+
 
 
 *
@@ -5230,7 +5230,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5251,7 +5251,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5272,7 +5272,7 @@ try {
 } catch { case e: FooException => /*donothing*/ }
 ```
 
-'
+
 
 
 
@@ -5295,7 +5295,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5323,7 +5323,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5348,7 +5348,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5382,7 +5382,7 @@ try {
 }
 ```
 
-'
+
 
 
 
@@ -5406,7 +5406,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5436,7 +5436,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5469,7 +5469,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5502,7 +5502,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5533,7 +5533,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5563,7 +5563,7 @@ try {
 } catch { case e: FooException => /*donothing*/ }
 ```
 
-'
+
 
 
 
@@ -5594,7 +5594,7 @@ try {
 } catch { case e: FooException => /*donothing*/ }
 ```
 
-'
+
 
 
 
@@ -5625,7 +5625,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5657,7 +5657,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5688,7 +5688,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5719,7 +5719,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5750,7 +5750,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-'
+
 
 
 
@@ -5768,7 +5768,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5796,7 +5796,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5820,7 +5820,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5847,7 +5847,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5874,7 +5874,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5897,7 +5897,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5922,7 +5922,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 
@@ -5942,7 +5942,7 @@ dbClient.transaction { db =>
 }
 ```
 
-'
+
 
 
 

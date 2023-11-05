@@ -96,7 +96,7 @@ object scalasql extends RootModule with ScalaModule {
 
     def sqlFormat(sOpt: Option[String]) = {
       sOpt match{
-        case None => "'"
+        case None => ""
         case Some(s) =>
 
           val indent = s
