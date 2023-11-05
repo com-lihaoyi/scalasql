@@ -744,8 +744,11 @@ SELECT SUBSTRING(?, ?, ?) as res
 ### InsertTests.single.simple
 
 ```scala
-Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"), _.id := 4)
+Buyer.insert.values(
+  _.name := "test buyer",
+  _.dateOfBirth := LocalDate.parse("2023-09-09"),
+  _.id := 4
+)
 ```
 
 ```sql
@@ -774,7 +777,8 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ### InsertTests.single.partial
 
 ```scala
-Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+Buyer.insert
+  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
 ```
 
 ```sql
@@ -891,7 +895,9 @@ Seq(
 ```scala
 Buyer.insert.select(
   identity,
-  Buyer.select.filter(_.name <> "Li Haoyi").map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
+  Buyer.select
+    .filter(_.name <> "Li Haoyi")
+    .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
 )
 ```
 
@@ -1138,7 +1144,9 @@ Seq(
 ### SelectTests.filter.multiple
 
 ```scala
-ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
+ShippingInfo.select
+  .filter(_.buyerId `=` 2)
+  .filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
 ```
 
 ```sql
@@ -1160,7 +1168,9 @@ Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-0
 ### SelectTests.filter.dotSingle.pass
 
 ```scala
-ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
+ShippingInfo.select
+  .filter(_.buyerId `=` 2)
+  .filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
   .single
 ```
 
@@ -1183,7 +1193,8 @@ ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06
 ### SelectTests.filter.combined
 
 ```scala
-ShippingInfo.select.filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06"))
+ShippingInfo.select
+  .filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06"))
 ```
 
 ```sql
@@ -1305,7 +1316,13 @@ Seq(
 Product.select.map(p =>
   (
     p.name,
-    Purchase.select.filter(_.productId === p.id).sortBy(_.total).desc.take(1).map(_.total).exprQuery
+    Purchase.select
+      .filter(_.productId === p.id)
+      .sortBy(_.total)
+      .desc
+      .take(1)
+      .map(_.total)
+      .exprQuery
   )
 )
 ```
@@ -1439,7 +1456,10 @@ Seq((2, 900.0), (4, 493.8), (5, 10000.0))
 ### SelectTests.groupBy.filterHaving
 
 ```scala
-Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
+Purchase.select
+  .filter(_.count > 5)
+  .groupBy(_.productId)(_.sumBy(_.total))
+  .filter(_._2 > 100)
 ```
 
 ```sql
@@ -1512,7 +1532,8 @@ Seq(
 ### SelectTests.nonEmpty
 
 ```scala
-Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
+Buyer.select
+  .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
 ```
 
 ```sql
@@ -1534,7 +1555,8 @@ Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
 ### SelectTests.isEmpty
 
 ```scala
-Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
+Buyer.select
+  .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
 ```
 
 ```sql
@@ -1592,8 +1614,10 @@ Seq(
 
 ```scala
 Product.select.map(p =>
-  caseWhen((p.price > 200) -> (p.name + " EXPENSIVE"), (p.price > 5) -> (p.name + " NORMAL"))
-    .`else` { p.name + " UNKNOWN" }
+  caseWhen(
+    (p.price > 200) -> (p.name + " EXPENSIVE"),
+    (p.price > 5) -> (p.name + " NORMAL")
+  ).`else` { p.name + " UNKNOWN" }
 )
 ```
 
@@ -1692,7 +1716,9 @@ Seq(
 ### JoinTests.joinFilterMap
 
 ```scala
-Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "James Bond")
+Buyer.select
+  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+  .filter(_._1.name `=` "James Bond")
   .map(_._2.shippingDate)
 ```
 
@@ -1798,9 +1824,10 @@ Seq(
 ### JoinTests.flatMap
 
 ```scala
-Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
-  c.id `=` p.buyerId && c.name `=` "James Bond"
-}.map(_._2.shippingDate)
+Buyer.select
+  .flatMap(c => ShippingInfo.select.map((c, _)))
+  .filter { case (c, p) => c.id `=` p.buyerId && c.name `=` "James Bond" }
+  .map(_._2.shippingDate)
 ```
 
 ```sql
@@ -2203,7 +2230,11 @@ FROM (SELECT purchase0.total as res__total
 ### CompoundSelectTests.aggregate
 
 ```scala
-Purchase.select.sortBy(_.total).desc.take(3).aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
+Purchase.select
+  .sortBy(_.total)
+  .desc
+  .take(3)
+  .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
 ```
 
 ```sql
@@ -2223,7 +2254,9 @@ FROM (SELECT purchase0.total as res__total
 ### CompoundSelectTests.union
 
 ```scala
-Product.select.map(_.name.toLowerCase).union(Product.select.map(_.kebabCaseName.toLowerCase))
+Product.select
+  .map(_.name.toLowerCase)
+  .union(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
 ```sql
@@ -2236,14 +2269,25 @@ FROM product product0
 
 
 ```scala
-Seq("camera", "cookie", "face mask", "face-mask", "guitar", "skate board", "skate-board", "socks")
+Seq(
+  "camera",
+  "cookie",
+  "face mask",
+  "face-mask",
+  "guitar",
+  "skate board",
+  "skate-board",
+  "socks"
+)
 ```
 
 
 ### CompoundSelectTests.unionAll
 
 ```scala
-Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
+Product.select
+  .map(_.name.toLowerCase)
+  .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
 ```sql
@@ -2276,7 +2320,9 @@ Seq(
 ### CompoundSelectTests.intersect
 
 ```scala
-Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.kebabCaseName.toLowerCase))
+Product.select
+  .map(_.name.toLowerCase)
+  .intersect(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
 ```sql
@@ -2296,7 +2342,9 @@ Seq("camera", "cookie", "guitar", "socks")
 ### CompoundSelectTests.except
 
 ```scala
-Product.select.map(_.name.toLowerCase).except(Product.select.map(_.kebabCaseName.toLowerCase))
+Product.select
+  .map(_.name.toLowerCase)
+  .except(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
 ```sql
@@ -2316,8 +2364,11 @@ Seq("face mask", "skate board")
 ### CompoundSelectTests.unionAllUnionSort
 
 ```scala
-Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
-  .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity)
+Product.select
+  .map(_.name.toLowerCase)
+  .unionAll(Buyer.select.map(_.name.toLowerCase))
+  .union(Product.select.map(_.kebabCaseName.toLowerCase))
+  .sortBy(identity)
 ```
 
 ```sql
@@ -2353,8 +2404,13 @@ Seq(
 ### CompoundSelectTests.unionAllUnionSortLimit
 
 ```scala
-Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
-  .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity).drop(4).take(4)
+Product.select
+  .map(_.name.toLowerCase)
+  .unionAll(Buyer.select.map(_.name.toLowerCase))
+  .union(Product.select.map(_.kebabCaseName.toLowerCase))
+  .sortBy(identity)
+  .drop(4)
+  .take(4)
 ```
 
 ```sql
@@ -2380,7 +2436,8 @@ Seq("guitar", "james bond", "li haoyi", "skate board")
 ### CompoundSelectTests.exceptAggregate
 
 ```scala
-Product.select.map(p => (p.name.toLowerCase, p.price))
+Product.select
+  .map(p => (p.name.toLowerCase, p.price))
   // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
   // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
   .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
@@ -2411,7 +2468,8 @@ FROM (SELECT
 ### CompoundSelectTests.unionAllAggregate
 
 ```scala
-Product.select.map(p => (p.name.toLowerCase, p.price))
+Product.select
+  .map(p => (p.name.toLowerCase, p.price))
   // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
   // as they are not selected by the enclosing query, and cannot affect the UNION ALL
   .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
@@ -2439,9 +2497,9 @@ FROM (SELECT product0.price as res__1
 ### SubQueryTests.sortTakeJoin
 
 ```scala
-Purchase.select.joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id).map {
-  case (purchase, product) => purchase.total
-}
+Purchase.select
+  .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
+  .map { case (purchase, product) => purchase.total }
 ```
 
 ```sql
@@ -2486,10 +2544,12 @@ Seq(10000.0)
 ### SubQueryTests.sortTakeFromAndJoin
 
 ```scala
-Product.select.sortBy(_.price).desc.take(3)
-  .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId).map {
-    case (product, purchase) => (product.name, purchase.count)
-  }
+Product.select
+  .sortBy(_.price)
+  .desc
+  .take(3)
+  .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
+  .map { case (product, purchase) => (product.name, purchase.count) }
 ```
 
 ```sql
@@ -2679,7 +2739,9 @@ Seq(
 ### SubQueryTests.selectLimitUnionSelect
 
 ```scala
-Buyer.select.map(_.name.toLowerCase).take(2)
+Buyer.select
+  .map(_.name.toLowerCase)
+  .take(2)
   .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
@@ -2703,7 +2765,8 @@ Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "c
 ### SubQueryTests.selectUnionSelectLimit
 
 ```scala
-Buyer.select.map(_.name.toLowerCase)
+Buyer.select
+  .map(_.name.toLowerCase)
   .unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2))
 ```
 
@@ -2728,7 +2791,9 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ### UpdateTests.update
 
 ```scala
-Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
 ```sql
@@ -2812,7 +2877,8 @@ Seq(LocalDate.parse("2019-04-07"))
 ### UpdateTests.multiple
 
 ```scala
-Buyer.update(_.name `=` "James Bond")
+Buyer
+  .update(_.name `=` "James Bond")
   .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
 ```
 
@@ -2898,7 +2964,9 @@ Seq(LocalDate.parse("2001-02-03"))
 ### UpdateJoinTests.update
 
 ```scala
-Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
 ```sql
@@ -2982,7 +3050,8 @@ Seq(LocalDate.parse("2019-04-07"))
 ### UpdateJoinTests.multiple
 
 ```scala
-Buyer.update(_.name `=` "James Bond")
+Buyer
+  .update(_.name `=` "James Bond")
   .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
 ```
 
@@ -3248,8 +3317,10 @@ Seq(value)
 ### DataTypesTests.nonRoundTrip
 
 ```scala
-NonRoundTripTypes.insert
-  .values(_.myOffsetDateTime := value.myOffsetDateTime, _.myZonedDateTime := value.myZonedDateTime)
+NonRoundTripTypes.insert.values(
+  _.myOffsetDateTime := value.myOffsetDateTime,
+  _.myZonedDateTime := value.myZonedDateTime
+)
 ```
 
 
@@ -3276,8 +3347,12 @@ Seq(normalize(value))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3314,8 +3389,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3346,8 +3425,12 @@ Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3380,8 +3463,12 @@ Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3414,8 +3501,12 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3448,8 +3539,12 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3482,8 +3577,12 @@ Seq[OptCols[Id]]()
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3516,8 +3615,12 @@ Seq[OptCols[Id]]()
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3550,8 +3653,12 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3584,8 +3691,12 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3622,8 +3733,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3652,8 +3767,12 @@ Seq(None, Some(11), Some(13), None)
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3666,7 +3785,8 @@ OptCols.insert
 ### OptionalTests.flatMap
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
+OptCols.select
+  .map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
 ```
 
 ```sql
@@ -3691,8 +3811,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3730,8 +3854,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3769,8 +3897,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3807,8 +3939,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3845,8 +3981,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3886,8 +4026,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3923,8 +4067,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3960,8 +4108,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -3997,8 +4149,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -4034,8 +4190,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
@@ -4071,8 +4231,12 @@ Seq(
 ### OptionalTests
 
 ```scala
-OptCols.insert
-  .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4))
+)
 ```
 
 
