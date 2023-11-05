@@ -1,4 +1,11 @@
-# h2
+# h2 Reference Query Library
+
+This page contains example queries for the `h2` database, taken
+from the ScalaSql test suite. You can use this as a reference to see
+what kinds of operations ScalaSql supports when working on `h2`,
+and how these operations are translated into raw SQL to be sent to
+the database for execution.
+
 ## ExprBooleanOps
 ### ExprBooleanOps.and
 
@@ -13,10 +20,12 @@ Expr(true) && Expr(true)
     ```
 
 
+
 *
     ```scala
     true
     ```
+
 
 
 ----
@@ -32,10 +41,12 @@ Expr(false) && Expr(true)
     ```
 
 
+
 *
     ```scala
     false
     ```
+
 
 
 ### ExprBooleanOps.or
@@ -51,10 +62,12 @@ Expr(false) || Expr(false)
     ```
 
 
+
 *
     ```scala
     false
     ```
+
 
 
 ----
@@ -70,10 +83,12 @@ Expr(false) || Expr(false)
     ```
 
 
+
 *
     ```scala
     true
     ```
+
 
 
 ## ExprIntOps
@@ -90,10 +105,12 @@ Expr(6) + Expr(2)
     ```
 
 
+
 *
     ```scala
     8
     ```
+
 
 
 ### ExprIntOps.minus
@@ -109,10 +126,12 @@ Expr(6) - Expr(2)
     ```
 
 
+
 *
     ```scala
     4
     ```
+
 
 
 ### ExprIntOps.times
@@ -128,10 +147,12 @@ Expr(6) * Expr(2)
     ```
 
 
+
 *
     ```scala
     12
     ```
+
 
 
 ### ExprIntOps.divide
@@ -147,10 +168,12 @@ Expr(6) / Expr(2)
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ### ExprIntOps.modulo
@@ -166,10 +189,12 @@ Expr(6) % Expr(2)
     ```
 
 
+
 *
     ```scala
     0
     ```
+
 
 
 ### ExprIntOps.bitwiseAnd
@@ -185,10 +210,12 @@ Expr(6) & Expr(2)
     ```
 
 
+
 *
     ```scala
     2
     ```
+
 
 
 ### ExprIntOps.bitwiseOr
@@ -204,10 +231,12 @@ Expr(6) | Expr(3)
     ```
 
 
+
 *
     ```scala
     7
     ```
+
 
 
 ### ExprIntOps.between
@@ -223,10 +252,12 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
+
 *
     ```scala
     true
     ```
+
 
 
 ### ExprIntOps.unaryPlus
@@ -242,10 +273,12 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
+
 *
     ```scala
     -4
     ```
+
 
 
 ### ExprIntOps.unaryMinus
@@ -261,10 +294,12 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
+
 *
     ```scala
     4
     ```
+
 
 
 ### ExprIntOps.unaryTilde
@@ -280,10 +315,12 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ### ExprIntOps.abs
@@ -299,10 +336,12 @@ Expr(-4).abs
     ```
 
 
+
 *
     ```scala
     4
     ```
+
 
 
 ### ExprIntOps.mod
@@ -318,10 +357,12 @@ Expr(8).mod(Expr(3))
     ```
 
 
+
 *
     ```scala
     2
     ```
+
 
 
 ### ExprIntOps.ceil
@@ -337,10 +378,12 @@ Expr(4.3).ceil
     ```
 
 
+
 *
     ```scala
     5.0
     ```
+
 
 
 ### ExprIntOps.floor
@@ -356,10 +399,12 @@ Expr(4.7).floor
     ```
 
 
+
 *
     ```scala
     4.0
     ```
+
 
 
 ----
@@ -375,10 +420,12 @@ Expr(4.7).floor
     ```
 
 
+
 *
     ```scala
     4.0
     ```
+
 
 
 ## ExprSeqNumericOps
@@ -395,10 +442,12 @@ Purchase.select.map(_.count).sum
     ```
 
 
+
 *
     ```scala
     140
     ```
+
 
 
 ### ExprSeqNumericOps.min
@@ -414,10 +463,12 @@ Purchase.select.map(_.count).min
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ### ExprSeqNumericOps.max
@@ -433,10 +484,12 @@ Purchase.select.map(_.count).max
     ```
 
 
+
 *
     ```scala
     100
     ```
+
 
 
 ### ExprSeqNumericOps.avg
@@ -452,10 +505,12 @@ Purchase.select.map(_.count).avg
     ```
 
 
+
 *
     ```scala
     20
     ```
+
 
 
 ## ExprSeqOps
@@ -472,10 +527,12 @@ Purchase.select.size
     ```
 
 
+
 *
     ```scala
     7
     ```
+
 
 
 ### ExprSeqOps.sumBy.simple
@@ -491,10 +548,12 @@ Purchase.select.sumBy(_.count)
     ```
 
 
+
 *
     ```scala
     140
     ```
+
 
 
 ### ExprSeqOps.sumBy.some
@@ -510,10 +569,12 @@ Purchase.select.sumByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option(140)
     ```
+
 
 
 ### ExprSeqOps.sumBy.none
@@ -529,10 +590,12 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option.empty[Int]
     ```
+
 
 
 ### ExprSeqOps.minBy.simple
@@ -548,10 +611,12 @@ Purchase.select.minBy(_.count)
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ### ExprSeqOps.minBy.some
@@ -567,10 +632,12 @@ Purchase.select.minByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option(3)
     ```
+
 
 
 ### ExprSeqOps.minBy.none
@@ -586,10 +653,12 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option.empty[Int]
     ```
+
 
 
 ### ExprSeqOps.maxBy.simple
@@ -605,10 +674,12 @@ Purchase.select.maxBy(_.count)
     ```
 
 
+
 *
     ```scala
     100
     ```
+
 
 
 ### ExprSeqOps.maxBy.some
@@ -624,10 +695,12 @@ Purchase.select.maxByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option(100)
     ```
+
 
 
 ### ExprSeqOps.maxBy.none
@@ -643,10 +716,12 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option.empty[Int]
     ```
+
 
 
 ### ExprSeqOps.avgBy.simple
@@ -662,10 +737,12 @@ Purchase.select.avgBy(_.count)
     ```
 
 
+
 *
     ```scala
     20
     ```
+
 
 
 ### ExprSeqOps.avgBy.some
@@ -681,10 +758,12 @@ Purchase.select.avgByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option(20)
     ```
+
 
 
 ### ExprSeqOps.avgBy.none
@@ -700,10 +779,12 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
     ```
 
 
+
 *
     ```scala
     Option.empty[Int]
     ```
+
 
 
 ## ExprStringOps
@@ -720,10 +801,12 @@ Expr("hello") + Expr("world")
     ```
 
 
+
 *
     ```scala
     "helloworld"
     ```
+
 
 
 ### ExprStringOps.like
@@ -739,10 +822,12 @@ Expr("hello").like("he%")
     ```
 
 
+
 *
     ```scala
     true
     ```
+
 
 
 ### ExprStringOps.length
@@ -758,10 +843,12 @@ Expr("hello").length
     ```
 
 
+
 *
     ```scala
     5
     ```
+
 
 
 ### ExprStringOps.octetLength
@@ -777,10 +864,12 @@ Expr("叉烧包").octetLength
     ```
 
 
+
 *
     ```scala
     9
     ```
+
 
 
 ### ExprStringOps.position
@@ -796,10 +885,12 @@ Expr("hello").indexOf("ll")
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ### ExprStringOps.toLowerCase
@@ -815,10 +906,12 @@ Expr("Hello").toLowerCase
     ```
 
 
+
 *
     ```scala
     "hello"
     ```
+
 
 
 ### ExprStringOps.trim
@@ -834,10 +927,12 @@ Expr("  Hello ").trim
     ```
 
 
+
 *
     ```scala
     "Hello"
     ```
+
 
 
 ### ExprStringOps.ltrim
@@ -853,10 +948,12 @@ Expr("  Hello ").ltrim
     ```
 
 
+
 *
     ```scala
     "Hello "
     ```
+
 
 
 ### ExprStringOps.rtrim
@@ -872,10 +969,12 @@ Expr("  Hello ").rtrim
     ```
 
 
+
 *
     ```scala
     "  Hello"
     ```
+
 
 
 ### ExprStringOps.substring
@@ -891,10 +990,12 @@ Expr("Hello").substring(2, 2)
     ```
 
 
+
 *
     ```scala
     "el"
     ```
+
 
 
 ## Insert
@@ -915,10 +1016,12 @@ Buyer.insert.values(
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -927,12 +1030,14 @@ Buyer.insert.values(
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
+'
 
 
 *
     ```scala
     Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
+
 
 
 ### Insert.single.partial
@@ -949,10 +1054,12 @@ Buyer.insert
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -961,12 +1068,14 @@ Buyer.insert
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
+'
 
 
 *
     ```scala
     Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
+
 
 
 ### Insert.batch.simple
@@ -990,10 +1099,12 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ----
@@ -1002,6 +1113,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
 Buyer.select
 ```
 
+'
 
 
 *
@@ -1015,6 +1127,7 @@ Buyer.select
       Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
     )
     ```
+
 
 
 ### Insert.batch.partial
@@ -1035,10 +1148,12 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ----
@@ -1047,6 +1162,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 Buyer.select
 ```
 
+'
 
 
 *
@@ -1061,6 +1177,7 @@ Buyer.select
       Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
     )
     ```
+
 
 
 ### Insert.select.caseclass
@@ -1087,10 +1204,12 @@ Buyer.insert.select(
     ```
 
 
+
 *
     ```scala
     2
     ```
+
 
 
 ----
@@ -1099,6 +1218,7 @@ Buyer.insert.select(
 Buyer.select
 ```
 
+'
 
 
 *
@@ -1111,6 +1231,7 @@ Buyer.select
       Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
+
 
 
 ### Insert.select.simple
@@ -1132,10 +1253,12 @@ Buyer.insert.select(
     ```
 
 
+
 *
     ```scala
     2
     ```
+
 
 
 ----
@@ -1144,6 +1267,7 @@ Buyer.insert.select(
 Buyer.select
 ```
 
+'
 
 
 *
@@ -1157,6 +1281,7 @@ Buyer.select
       Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
+
 
 
 ## Delete
@@ -1173,10 +1298,12 @@ Purchase.delete(_.id `=` 2)
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -1185,6 +1312,7 @@ Purchase.delete(_.id `=` 2)
 Purchase.select
 ```
 
+'
 
 
 *
@@ -1201,6 +1329,7 @@ Purchase.select
     ```
 
 
+
 ### Delete.multiple
 
 ```scala
@@ -1214,10 +1343,12 @@ Purchase.delete(_.id <> 2)
     ```
 
 
+
 *
     ```scala
     6
     ```
+
 
 
 ----
@@ -1226,12 +1357,14 @@ Purchase.delete(_.id <> 2)
 Purchase.select
 ```
 
+'
 
 
 *
     ```scala
     Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
     ```
+
 
 
 ### Delete.all
@@ -1247,10 +1380,12 @@ Purchase.delete(_ => true)
     ```
 
 
+
 *
     ```scala
     7
     ```
+
 
 
 ----
@@ -1259,6 +1394,7 @@ Purchase.delete(_ => true)
 Purchase.select
 ```
 
+'
 
 
 *
@@ -1267,6 +1403,7 @@ Purchase.select
       // all Deleted
     )
     ```
+
 
 
 ## Select
@@ -1283,10 +1420,12 @@ Expr(1)
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ### Select.table
@@ -1306,6 +1445,7 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1314,6 +1454,7 @@ Buyer.select
       Buyer[Id](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
     )
     ```
+
 
 
 ### Select.filter.single
@@ -1334,6 +1475,7 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1341,6 +1483,7 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
       ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
     )
     ```
+
 
 
 ### Select.filter.multiple
@@ -1364,10 +1507,12 @@ ShippingInfo.select
     ```
 
 
+
 *
     ```scala
     Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
     ```
+
 
 
 ### Select.filter.dotSingle.pass
@@ -1392,10 +1537,12 @@ ShippingInfo.select
     ```
 
 
+
 *
     ```scala
     ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
     ```
+
 
 
 ### Select.filter.combined
@@ -1418,10 +1565,12 @@ ShippingInfo.select
     ```
 
 
+
 *
     ```scala
     Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
     ```
+
 
 
 ### Select.map.single
@@ -1437,10 +1586,12 @@ Buyer.select.map(_.name)
     ```
 
 
+
 *
     ```scala
     Seq("James Bond", "叉烧包", "Li Haoyi")
     ```
+
 
 
 ### Select.map.tuple2
@@ -1456,10 +1607,12 @@ Buyer.select.map(c => (c.name, c.id))
     ```
 
 
+
 *
     ```scala
     Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
     ```
+
 
 
 ### Select.map.tuple3
@@ -1479,6 +1632,7 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1487,6 +1641,7 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
       ("Li Haoyi", 3, LocalDate.parse("1965-08-09"))
     )
     ```
+
 
 
 ### Select.map.interpolateInMap
@@ -1502,10 +1657,12 @@ Product.select.map(_.price * 2)
     ```
 
 
+
 *
     ```scala
     Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
     ```
+
 
 
 ### Select.map.heterogenousTuple
@@ -1526,6 +1683,7 @@ Buyer.select.map(c => (c.id, c))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1534,6 +1692,7 @@ Buyer.select.map(c => (c.id, c))
       (3, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     ```
+
 
 
 ### Select.exprQuery
@@ -1567,6 +1726,7 @@ Product.select.map(p =>
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1578,6 +1738,7 @@ Product.select.map(p =>
       ("Cookie", 1.3)
     )
     ```
+
 
 
 ### Select.subquery
@@ -1594,10 +1755,12 @@ Buyer.select.subquery.map(_.name)
     ```
 
 
+
 *
     ```scala
     Seq("James Bond", "叉烧包", "Li Haoyi")
     ```
+
 
 
 ### Select.filterMap
@@ -1613,10 +1776,12 @@ Product.select.filter(_.price < 100).map(_.name)
     ```
 
 
+
 *
     ```scala
     Seq("Face Mask", "Socks", "Cookie")
     ```
+
 
 
 ### Select.aggregate.single
@@ -1632,10 +1797,12 @@ Purchase.select.aggregate(_.sumBy(_.total))
     ```
 
 
+
 *
     ```scala
     12343.2
     ```
+
 
 
 ### Select.aggregate.multiple
@@ -1651,10 +1818,12 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
     ```
 
 
+
 *
     ```scala
     (12343.2, 10000.0)
     ```
+
 
 
 ### Select.groupBy.simple
@@ -1672,10 +1841,12 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
     ```
 
 
+
 *
     ```scala
     Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
     ```
+
 
 
 ### Select.groupBy.having
@@ -1694,10 +1865,12 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
     ```
 
 
+
 *
     ```scala
     Seq((2, 900.0), (4, 493.8), (5, 10000.0))
     ```
+
 
 
 ### Select.groupBy.filterHaving
@@ -1720,10 +1893,12 @@ Purchase.select
     ```
 
 
+
 *
     ```scala
     Seq((1, 888.0), (5, 10000.0))
     ```
+
 
 
 ### Select.distinct.nondistinct
@@ -1739,10 +1914,12 @@ Purchase.select.map(_.shippingInfoId)
     ```
 
 
+
 *
     ```scala
     Seq(1, 1, 1, 2, 2, 3, 3)
     ```
+
 
 
 ### Select.distinct.distinct
@@ -1758,10 +1935,12 @@ Purchase.select.map(_.shippingInfoId).distinct
     ```
 
 
+
 *
     ```scala
     Seq(1, 2, 3)
     ```
+
 
 
 ### Select.contains
@@ -1779,6 +1958,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1786,6 +1966,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
+
 
 
 ### Select.nonEmpty
@@ -1808,10 +1989,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
     ```
+
 
 
 ### Select.isEmpty
@@ -1834,10 +2017,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     ```
+
 
 
 ### Select.case.when
@@ -1865,6 +2050,7 @@ Product.select.map(p =>
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1876,6 +2062,7 @@ Product.select.map(p =>
       "Cookie CHEAP"
     )
     ```
+
 
 
 ### Select.case.else
@@ -1902,6 +2089,7 @@ Product.select.map(p =>
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1913,6 +2101,7 @@ Product.select.map(p =>
       "Cookie UNKNOWN"
     )
     ```
+
 
 
 ## Join
@@ -1938,6 +2127,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1951,6 +2141,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
       )
     )
     ```
+
 
 
 ### Join.joinSelectFilter
@@ -1975,6 +2166,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -1988,6 +2180,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
       )
     )
     ```
+
 
 
 ### Join.joinFilterMap
@@ -2009,10 +2202,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(LocalDate.parse("2012-04-05"))
     ```
+
 
 
 ### Join.selfJoin
@@ -2036,6 +2231,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2053,6 +2249,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
       )
     )
     ```
+
 
 
 ### Join.selfJoin2
@@ -2076,6 +2273,7 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2107,6 +2305,7 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
     ```
 
 
+
 ### Join.flatMap
 
 ```scala
@@ -2126,10 +2325,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(LocalDate.parse("2012-04-05"))
     ```
+
 
 
 ### Join.flatMap2
@@ -2150,10 +2351,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq(LocalDate.parse("2012-04-05"))
     ```
+
 
 
 ### Join.leftJoin
@@ -2177,6 +2380,7 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2195,6 +2399,7 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
       (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
     )
     ```
+
 
 
 ### Join.rightJoin
@@ -2218,6 +2423,7 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2236,6 +2442,7 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
       (None, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     ```
+
 
 
 ### Join.outerJoin
@@ -2269,6 +2476,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2289,6 +2497,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
     ```
 
 
+
 ## CompoundSelect
 ### CompoundSelect.sort.simple
 
@@ -2303,10 +2512,12 @@ Product.select.sortBy(_.price).map(_.name)
     ```
 
 
+
 *
     ```scala
     Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
     ```
+
 
 
 ### CompoundSelect.sort.twice
@@ -2329,6 +2540,7 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2341,6 +2553,7 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
       Purchase[Id](3, 1, 3, 5, 15.7)
     )
     ```
+
 
 
 ### CompoundSelect.sort.sortLimit
@@ -2356,10 +2569,12 @@ Product.select.sortBy(_.price).map(_.name).take(2)
     ```
 
 
+
 *
     ```scala
     Seq("Cookie", "Socks")
     ```
+
 
 
 ### CompoundSelect.sort.sortOffset
@@ -2375,10 +2590,12 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
     ```
 
 
+
 *
     ```scala
     Seq("Face Mask", "Skate Board", "Guitar", "Camera")
     ```
+
 
 
 ### CompoundSelect.sort.sortLimitTwiceHigher
@@ -2394,10 +2611,12 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
     ```
 
 
+
 *
     ```scala
     Seq("Cookie", "Socks")
     ```
+
 
 
 ### CompoundSelect.sort.sortLimitTwiceLower
@@ -2413,10 +2632,12 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
     ```
 
 
+
 *
     ```scala
     Seq("Cookie")
     ```
+
 
 
 ### CompoundSelect.sort.sortLimitOffset
@@ -2432,10 +2653,12 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
     ```
 
 
+
 *
     ```scala
     Seq("Face Mask", "Skate Board")
     ```
+
 
 
 ### CompoundSelect.sort.sortLimitOffsetTwice
@@ -2451,10 +2674,12 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
     ```
 
 
+
 *
     ```scala
     Seq("Guitar")
     ```
+
 
 
 ### CompoundSelect.sort.sortOffsetLimit
@@ -2470,10 +2695,12 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
     ```
 
 
+
 *
     ```scala
     Seq("Face Mask", "Skate Board")
     ```
+
 
 
 ### CompoundSelect.distinct
@@ -2493,10 +2720,12 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
     ```
 
 
+
 *
     ```scala
     Seq(1, 2)
     ```
+
 
 
 ### CompoundSelect.flatMap
@@ -2519,10 +2748,12 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
     ```
 
 
+
 *
     ```scala
     Seq("Camera", "Face Mask", "Guitar")
     ```
+
 
 
 ### CompoundSelect.sumBy
@@ -2542,10 +2773,12 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
     ```
 
 
+
 *
     ```scala
     11788.0
     ```
+
 
 
 ### CompoundSelect.aggregate
@@ -2569,10 +2802,12 @@ Purchase.select
     ```
 
 
+
 *
     ```scala
     (11788.0, 3929.0)
     ```
+
 
 
 ### CompoundSelect.union
@@ -2594,6 +2829,7 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2607,6 +2843,7 @@ Product.select
       "socks"
     )
     ```
+
 
 
 ### CompoundSelect.unionAll
@@ -2628,6 +2865,7 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2645,6 +2883,7 @@ Product.select
       "cookie"
     )
     ```
+
 
 
 ### CompoundSelect.intersect
@@ -2666,10 +2905,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq("camera", "cookie", "guitar", "socks")
     ```
+
 
 
 ### CompoundSelect.except
@@ -2691,10 +2932,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq("face mask", "skate board")
     ```
+
 
 
 ### CompoundSelect.unionAllUnionSort
@@ -2722,6 +2965,7 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -2738,6 +2982,7 @@ Product.select
       "叉烧包"
     )
     ```
+
 
 
 ### CompoundSelect.unionAllUnionSortLimit
@@ -2769,10 +3014,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq("guitar", "james bond", "li haoyi", "skate board")
     ```
+
 
 
 ### CompoundSelect.exceptAggregate
@@ -2804,10 +3051,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     (123.45, 8.88)
     ```
+
 
 
 ### CompoundSelect.unionAllAggregate
@@ -2835,10 +3084,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     (1000.0, 0.1)
     ```
+
 
 
 ## SubQuery
@@ -2863,10 +3114,12 @@ Purchase.select
     ```
 
 
+
 *
     ```scala
     Seq(10000.0)
     ```
+
 
 
 ### SubQuery.sortTakeFrom
@@ -2889,10 +3142,12 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
     ```
 
 
+
 *
     ```scala
     Seq(10000.0)
     ```
+
 
 
 ### SubQuery.sortTakeFromAndJoin
@@ -2929,10 +3184,12 @@ Product.select
     ```
 
 
+
 *
     ```scala
     Seq(("Camera", 10))
     ```
+
 
 
 ### SubQuery.sortLimitSortLimit
@@ -2956,10 +3213,12 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
     ```
 
 
+
 *
     ```scala
     Seq("Face Mask", "Skate Board")
     ```
+
 
 
 ### SubQuery.sortGroupBy
@@ -2983,10 +3242,12 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
     ```
 
 
+
 *
     ```scala
     Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
     ```
+
 
 
 ### SubQuery.groupByJoin
@@ -3012,6 +3273,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -3023,6 +3285,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
       ("Socks", 15.7)
     )
     ```
+
 
 
 ### SubQuery.subqueryInFilter
@@ -3046,10 +3309,12 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
     ```
 
 
+
 *
     ```scala
     Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     ```
+
 
 
 ### SubQuery.subqueryInMap
@@ -3070,6 +3335,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -3078,6 +3344,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
       (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
     )
     ```
+
 
 
 ### SubQuery.subqueryInMapNested
@@ -3101,6 +3368,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -3109,6 +3377,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
       (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
     )
     ```
+
 
 
 ### SubQuery.selectLimitUnionSelect
@@ -3134,10 +3403,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
     ```
+
 
 
 ### SubQuery.selectUnionSelectLimit
@@ -3162,10 +3433,12 @@ Buyer.select
     ```
 
 
+
 *
     ```scala
     Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
     ```
+
 
 
 ## Update
@@ -3184,10 +3457,12 @@ Buyer
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3196,6 +3471,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
@@ -3204,18 +3480,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("1965-08-09" /* not updated */ )
     ```
+
 
 
 ### Update.bulk
@@ -3231,10 +3510,12 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ----
@@ -3243,12 +3524,14 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("2019-04-07")
     ```
+
 
 
 ----
@@ -3257,12 +3540,14 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("2019-04-07")
     ```
+
 
 
 ### Update.multiple
@@ -3280,10 +3565,12 @@ Buyer
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3292,6 +3579,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
@@ -3300,18 +3588,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
     ```scala
     Seq(LocalDate.parse("2019-04-07"))
     ```
+
 
 
 ### Update.dynamic
@@ -3327,10 +3618,12 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3339,6 +3632,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
@@ -3347,18 +3641,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
     ```scala
     Seq(LocalDate.parse("2001-02-03"))
     ```
+
 
 
 ## UpdateJoin
@@ -3377,10 +3674,12 @@ Buyer
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3389,6 +3688,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
@@ -3397,18 +3697,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("1965-08-09" /* not updated */ )
     ```
+
 
 
 ### UpdateJoin.bulk
@@ -3424,10 +3727,12 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
     ```
 
 
+
 *
     ```scala
     3
     ```
+
 
 
 ----
@@ -3436,12 +3741,14 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("2019-04-07")
     ```
+
 
 
 ----
@@ -3450,12 +3757,14 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
+'
 
 
 *
     ```scala
     LocalDate.parse("2019-04-07")
     ```
+
 
 
 ### UpdateJoin.multiple
@@ -3473,10 +3782,12 @@ Buyer
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3485,6 +3796,7 @@ Buyer
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
@@ -3493,18 +3805,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
     ```scala
     Seq(LocalDate.parse("2019-04-07"))
     ```
+
 
 
 ### UpdateJoin.dynamic
@@ -3520,10 +3835,12 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3532,6 +3849,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
@@ -3540,18 +3858,21 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
+
 ----
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 ```
 
+'
 
 
 *
     ```scala
     Seq(LocalDate.parse("2001-02-03"))
     ```
+
 
 
 ## UpdateSubQuery
@@ -3570,10 +3891,12 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
     ```
 
 
+
 *
     ```scala
     6
     ```
+
 
 
 ----
@@ -3582,6 +3905,7 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
+'
 
 
 *
@@ -3595,6 +3919,7 @@ Product.select.map(p => (p.id, p.name, p.price))
       (6, "Cookie", 1000.0)
     )
     ```
+
 
 
 ### UpdateSubQuery.whereSubquery
@@ -3612,10 +3937,12 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
     ```
 
 
+
 *
     ```scala
     1
     ```
+
 
 
 ----
@@ -3624,6 +3951,7 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
+'
 
 
 *
@@ -3637,6 +3965,7 @@ Product.select.map(p => (p.id, p.name, p.price))
       (6, "Cookie", 0.1)
     )
     ```
+
 
 
 ## H2Dialect
@@ -3653,10 +3982,12 @@ Expr("xxHellox").ltrim("x")
     ```
 
 
+
 *
     ```scala
     "Hellox"
     ```
+
 
 
 ### H2Dialect.rtrim2
@@ -3672,10 +4003,12 @@ Expr("xxHellox").rtrim("x")
     ```
 
 
+
 *
     ```scala
     "xxHello"
     ```
+
 
 
 ### H2Dialect.lpad
@@ -3691,10 +4024,12 @@ Expr("Hello").lpad(10, "xy")
     ```
 
 
+
 *
     ```scala
     "xxxxxHello"
     ```
+
 
 
 ### H2Dialect.rpad
@@ -3710,10 +4045,12 @@ Expr("Hello").rpad(10, "xy")
     ```
 
 
+
 *
     ```scala
     "Helloxxxxx"
     ```
+
 
 
 ## DataTypes
@@ -3735,6 +4072,7 @@ DataTypes.insert.values(
 )
 ```
 
+'
 
 
 *
@@ -3743,18 +4081,21 @@ DataTypes.insert.values(
     ```
 
 
+
 ----
 
 ```scala
 DataTypes.select
 ```
 
+'
 
 
 *
     ```scala
     Seq(value)
     ```
+
 
 
 ### DataTypes.nonRoundTrip
@@ -3766,6 +4107,7 @@ NonRoundTripTypes.insert.values(
 )
 ```
 
+'
 
 
 *
@@ -3774,18 +4116,21 @@ NonRoundTripTypes.insert.values(
     ```
 
 
+
 ----
 
 ```scala
 NonRoundTripTypes.select
 ```
 
+'
 
 
 *
     ```scala
     Seq(normalize(value))
     ```
+
 
 
 ## Optional
@@ -3800,12 +4145,14 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 )
 ```
 
+'
 
 
 *
     ```scala
     4
     ```
+
 
 
 ### Optional.selectAll
@@ -3824,6 +4171,7 @@ OptCols.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -3833,6 +4181,7 @@ OptCols.select
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.groupByMaxGet
@@ -3850,10 +4199,12 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
     ```
 
 
+
 *
     ```scala
     Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
     ```
+
 
 
 ### Optional.isDefined
@@ -3873,10 +4224,12 @@ OptCols.select.filter(_.myInt.isDefined)
     ```
 
 
+
 *
     ```scala
     Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
     ```
+
 
 
 ### Optional.isEmpty
@@ -3896,10 +4249,12 @@ OptCols.select.filter(_.myInt.isEmpty)
     ```
 
 
+
 *
     ```scala
     Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
     ```
+
 
 
 ### Optional.sqlEquals.nonOptionHit
@@ -3919,10 +4274,12 @@ OptCols.select.filter(_.myInt `=` 1)
     ```
 
 
+
 *
     ```scala
     Seq(OptCols[Id](Some(1), Some(2)))
     ```
+
 
 
 ### Optional.sqlEquals.nonOptionMiss
@@ -3942,10 +4299,12 @@ OptCols.select.filter(_.myInt `=` 2)
     ```
 
 
+
 *
     ```scala
     Seq[OptCols[Id]]()
     ```
+
 
 
 ### Optional.sqlEquals.optionMiss
@@ -3965,10 +4324,12 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
     ```
 
 
+
 *
     ```scala
     Seq[OptCols[Id]]()
     ```
+
 
 
 ### Optional.scalaEquals.someHit
@@ -3988,10 +4349,12 @@ OptCols.select.filter(_.myInt === Option(1))
     ```
 
 
+
 *
     ```scala
     Seq(OptCols[Id](Some(1), Some(2)))
     ```
+
 
 
 ### Optional.scalaEquals.noneHit
@@ -4011,10 +4374,12 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
     ```
 
 
+
 *
     ```scala
     Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
     ```
+
 
 
 ### Optional.map
@@ -4033,6 +4398,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4042,6 +4408,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.map2
@@ -4057,10 +4424,12 @@ OptCols.select.map(_.myInt.map(_ + 10))
     ```
 
 
+
 *
     ```scala
     Seq(None, Some(11), Some(13), None)
     ```
+
 
 
 ### Optional.flatMap
@@ -4080,6 +4449,7 @@ OptCols.select
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4090,6 +4460,7 @@ OptCols.select
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.mapGet
@@ -4108,6 +4479,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4118,6 +4490,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.rawGet
@@ -4136,6 +4509,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4146,6 +4520,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.getOrElse
@@ -4164,6 +4539,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4173,6 +4549,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
       OptCols[Id](Some(-1), Some(4))
     )
     ```
+
 
 
 ### Optional.orElse
@@ -4191,6 +4568,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4200,6 +4578,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
       OptCols[Id](Some(4), Some(4))
     )
     ```
+
 
 
 ### Optional.filter
@@ -4221,6 +4600,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4230,6 +4610,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.sorting.nullsLast
@@ -4247,6 +4628,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4256,6 +4638,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.sorting.nullsFirst
@@ -4273,6 +4656,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4282,6 +4666,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
       OptCols[Id](Some(3), None)
     )
     ```
+
 
 
 ### Optional.sorting.ascNullsLast
@@ -4299,6 +4684,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4308,6 +4694,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.sorting.ascNullsFirst
@@ -4325,6 +4712,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4334,6 +4722,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
       OptCols[Id](Some(3), None)
     )
     ```
+
 
 
 ### Optional.sorting.descNullsLast
@@ -4351,6 +4740,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4360,6 +4750,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
       OptCols[Id](None, Some(4))
     )
     ```
+
 
 
 ### Optional.sorting.descNullsFirst
@@ -4377,6 +4768,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
     ```
 
 
+
 *
     ```scala
     Seq(
@@ -4386,4 +4778,735 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
       OptCols[Id](Some(1), Some(2))
     )
     ```
+
+
+
+## Transaction
+### Transaction.simple.commit
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_ => true)) ==> 7
+
+  db.run(Purchase.select.size) ==> 0
+}
+```
+
+'
+
+
+
+
+### Transaction.simple.rollback
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_ => true)) ==> 7
+
+  db.run(Purchase.select.size) ==> 0
+
+  db.rollback()
+
+  db.run(Purchase.select.size) ==> 7
+}
+```
+
+'
+
+
+
+
+### Transaction.simple.throw
+
+```scala
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
+
+    db.run(Purchase.delete(_ => true)) ==> 7
+
+    db.run(Purchase.select.size) ==> 0
+
+    throw new FooException
+  }
+} catch { case e: FooException => /*donothing*/ }
+```
+
+'
+
+
+
+
+### Transaction.savepoint.commit
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+  }
+
+  db.run(Purchase.select.size) ==> 0
+}
+```
+
+'
+
+
+
+
+### Transaction.savepoint.throw
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  try {
+    db.savepoint { sp =>
+      db.run(Purchase.delete(_ => true)) ==> 4
+      db.run(Purchase.select.size) ==> 0
+      throw new FooException
+    }
+  } catch {
+    case e: FooException => /*donothing*/
+  }
+
+  db.run(Purchase.select.size) ==> 4
+}
+```
+
+'
+
+
+
+
+### Transaction.savepoint.rollback
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+    sp.rollback()
+    db.run(Purchase.select.size) ==> 4
+  }
+
+  db.run(Purchase.select.size) ==> 4
+}
+```
+
+'
+
+
+
+
+### Transaction.savepoint.throwDouble
+
+```scala
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
+
+    db.run(Purchase.delete(_.id <= 3)) ==> 3
+    db.run(Purchase.select.size) ==> 4
+
+    try {
+      db.savepoint { sp =>
+        db.run(Purchase.delete(_ => true)) ==> 4
+        db.run(Purchase.select.size) ==> 0
+        throw new FooException
+      }
+    } catch {
+      case e: FooException =>
+        db.run(Purchase.select.size) ==> 4
+        throw e
+    }
+
+    db.run(Purchase.select.size) ==> 4
+  }
+} catch {
+  case e: FooException => /*donothing*/
+}
+```
+
+'
+
+
+
+
+### Transaction.savepoint.rollbackDouble
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+    db.rollback()
+  }
+
+  db.run(Purchase.select.size) ==> 7
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.commit
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+    }
+
+    db.run(Purchase.select.size) ==> 1
+  }
+
+  db.run(Purchase.select.size) ==> 1
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.throw.inner
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    try {
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
+      }
+    } catch { case e: FooException => /*donothing*/ }
+
+    db.run(Purchase.select.size) ==> 3
+  }
+
+  db.run(Purchase.select.size) ==> 3
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.throw.middle
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  try {
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
+
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+      }
+
+      db.run(Purchase.select.size) ==> 1
+      throw new FooException
+    }
+  } catch { case e: FooException => /*donothing*/ }
+
+  db.run(Purchase.select.size) ==> 5
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.throw.innerMiddle
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  try {
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
+
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
+      }
+    }
+  } catch { case e: FooException => /*donothing*/ }
+
+  db.run(Purchase.select.size) ==> 5
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.throw.middleOuter
+
+```scala
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
+
+    db.run(Purchase.delete(_.id <= 2)) ==> 2
+    db.run(Purchase.select.size) ==> 5
+
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
+
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+      }
+      db.run(Purchase.select.size) ==> 1
+      throw new FooException
+    }
+  }
+} catch { case e: FooException => /*donothing*/ }
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.throw.innerMiddleOuter
+
+```scala
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
+
+    db.run(Purchase.delete(_.id <= 2)) ==> 2
+    db.run(Purchase.select.size) ==> 5
+
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
+
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
+      }
+    }
+
+    db.run(Purchase.select.size) ==> 5
+  }
+} catch { case e: FooException => /*donothing*/ }
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.rollback.inner
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      sp2.rollback()
+    }
+
+    db.run(Purchase.select.size) ==> 3
+  }
+
+  db.run(Purchase.select.size) ==> 3
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.rollback.middle
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+    }
+
+    db.run(Purchase.select.size) ==> 1
+    sp1.rollback()
+    db.run(Purchase.select.size) ==> 5
+  }
+
+  db.run(Purchase.select.size) ==> 5
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.rollback.innerMiddle
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      sp1.rollback()
+      db.run(Purchase.select.size) ==> 5
+    }
+    db.run(Purchase.select.size) ==> 5
+  }
+
+  db.run(Purchase.select.size) ==> 5
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.rollback.middleOuter
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+    }
+
+    db.run(Purchase.select.size) ==> 1
+    db.rollback()
+    db.run(Purchase.select.size) ==> 7
+  }
+  db.run(Purchase.select.size) ==> 7
+}
+```
+
+'
+
+
+
+
+### Transaction.doubleSavepoint.rollback.innerMiddleOuter
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
+
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
+
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      db.rollback()
+      db.run(Purchase.select.size) ==> 7
+    }
+    db.run(Purchase.select.size) ==> 7
+  }
+
+  db.run(Purchase.select.size) ==> 7
+}
+```
+
+'
+
+
+
+
+## DbApi
+### DbApi.run
+
+```scala
+dbClient.transaction { db =>
+  db.run(Buyer.select) ==> List(
+    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+  )
+}
+```
+
+'
+
+
+
+
+### DbApi.runQuery
+
+```scala
+dbClient.transaction { db =>
+  val filterId = 2
+  val output = db.runQuery(sql"SELECT name FROM buyer WHERE id = $filterId") { rs =>
+    val output = mutable.Buffer.empty[String]
+
+    while (
+      rs.next() match {
+        case false => false
+        case true =>
+          output.append(rs.getString(1))
+          true
+      }
+    ) ()
+    output
+  }
+
+  assert(output == Seq("叉烧包"))
+}
+```
+
+'
+
+
+
+
+### DbApi.runUpdate
+
+```scala
+dbClient.transaction { db =>
+  val newName = "Moo Moo Cow"
+  val newDateOfBirth = LocalDate.parse("2000-01-01")
+  val count = db
+    .runUpdate(sql"INSERT INTO buyer (name, date_of_birth) VALUES($newName, $newDateOfBirth)")
+  assert(count == 1)
+
+  db.run(Buyer.select) ==> List(
+    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+    Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+  )
+}
+```
+
+'
+
+
+
+
+### DbApi.runRawQuery.simple
+
+```scala
+dbClient.transaction { db =>
+  val output = db.runRawQuery("SELECT name FROM buyer") { rs =>
+    val output = mutable.Buffer.empty[String]
+
+    while (
+      rs.next() match {
+        case false => false
+        case true =>
+          output.append(rs.getString(1))
+          true
+      }
+    ) ()
+    output
+  }
+
+  assert(output == Seq("James Bond", "叉烧包", "Li Haoyi"))
+}
+```
+
+'
+
+
+
+
+### DbApi.runRawQuery.interpolated
+
+```scala
+dbClient.transaction { db =>
+  val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", 2) { rs =>
+    val output = mutable.Buffer.empty[String]
+
+    while (
+      rs.next() match {
+        case false => false
+        case true =>
+          output.append(rs.getString(1))
+          true
+      }
+    ) ()
+    output
+  }
+
+  assert(output == Seq("叉烧包"))
+}
+```
+
+'
+
+
+
+
+### DbApi.runRawUpdate.Simple
+
+```scala
+dbClient.transaction { db =>
+  val count = db.runRawUpdate(
+    "INSERT INTO buyer (name, date_of_birth) VALUES('Moo Moo Cow', '2000-01-01')"
+  )
+  assert(count == 1)
+
+  db.run(Buyer.select) ==> List(
+    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+    Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+  )
+}
+```
+
+'
+
+
+
+
+### DbApi.runRawUpdate.prepared
+
+```scala
+dbClient.transaction { db =>
+  val count = db.runRawUpdate(
+    "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
+    "Moo Moo Cow",
+    LocalDate.parse("2000-01-01")
+  )
+  assert(count == 1)
+
+  db.run(Buyer.select) ==> List(
+    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+    Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+  )
+}
+```
+
+'
+
+
+
+
+### DbApi.stream
+
+```scala
+dbClient.transaction { db =>
+  val output = collection.mutable.Buffer.empty[String]
+
+  db.stream(Buyer.select).generate { buyer =>
+    output.append(buyer.name)
+    if (buyer.id >= 2) Generator.End else Generator.Continue
+  }
+
+  output ==> List("James Bond", "叉烧包")
+}
+```
+
+'
+
+
 

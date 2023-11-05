@@ -8,8 +8,8 @@ object UtestFramework {
       suiteLine: Int,
       testPath: Seq[String],
       queryCodeString: String,
-      sqlString: String,
-      resultCodeString: String
+      sqlString: Option[String],
+      resultCodeString: Option[String]
   )
 
   object Record {

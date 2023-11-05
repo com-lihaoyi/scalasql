@@ -81,34 +81,9 @@ object scalasql extends RootModule with ScalaModule {
     os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
   }
   def generateQueryLibrary() = T.command {
-    def sqlFormat(s: String) = {
-      if (s == null) ""
-      else{
-
-        val indent = s
-          .linesIterator
-          .filter(_.trim.nonEmpty)
-          .map(_.takeWhile(_ == ' ').size)
-          .minOption
-          .getOrElse(0)
-
-        val dedented = s
-          .linesIterator
-          .map(_.drop(indent))
-          .mkString("\n    ")
-          .trim
-        s"""
-           |*
-           |    ```sql
-           |    $dedented
-           |    ```
-           |""".stripMargin
-      }
-    }
-
     val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
 
-    val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString, r.resultCodeString))
+    val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
     val formattedScalaStrs = {
       val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
       mill.scalalib.scalafmt.ScalafmtWorkerModule
@@ -119,9 +94,58 @@ object scalasql extends RootModule with ScalaModule {
     }
     val scalafmt = rawScalaStrs.zip(formattedScalaStrs).toMap
 
+    def sqlFormat(sOpt: Option[String]) = {
+      sOpt match{
+        case None => "'"
+        case Some(s) =>
+
+          val indent = s
+            .linesIterator
+            .filter(_.trim.nonEmpty)
+            .map(_.takeWhile(_ == ' ').size)
+            .minOption
+            .getOrElse(0)
+
+          val dedented = s
+            .linesIterator
+            .map(_.drop(indent))
+            .mkString("\n    ")
+            .trim
+          s"""
+             |*
+             |    ```sql
+             |    $dedented
+             |    ```
+             |""".stripMargin
+      }
+    }
+
+    def renderResult(resultOpt: Option[String]) = {
+      resultOpt match{
+        case None => ""
+        case Some(result) =>
+          s"""
+             |*
+             |    ```scala
+             |    ${scalafmt(result).linesIterator.mkString("\n    ")}
+             |    ```
+             |""".stripMargin
+      }
+    }
+
+
     for ((dbName, dbGroup) <- records.groupBy(_.suiteName.split('.').apply(1))) {
       val outputLines = mutable.Buffer.empty[String]
-      outputLines.append(s"# $dbName")
+      outputLines.append(
+        s"""# $dbName Reference Query Library
+           |
+           |This page contains example queries for the `$dbName` database, taken
+           |from the ScalaSql test suite. You can use this as a reference to see
+           |what kinds of operations ScalaSql supports when working on `$dbName`,
+           |and how these operations are translated into raw SQL to be sent to
+           |the database for execution.
+           |""".stripMargin
+      )
       for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
         val seen = mutable.Set.empty[String]
         outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
@@ -146,10 +170,7 @@ object scalasql extends RootModule with ScalaModule {
                  |
                  |${sqlFormat(r.sqlString)}
                  |
-                 |*
-                 |    ```scala
-                 |    ${scalafmt(r.resultCodeString).linesIterator.mkString("\n    ")}
-                 |    ```
+                 |${renderResult(r.resultCodeString)}
                  |
                  |""".stripMargin
             )
@@ -167,8 +188,8 @@ case class Record(suiteName: String,
                   suiteLine: Int,
                   testPath: Seq[String],
                   queryCodeString: String,
-                  sqlString: String,
-                  resultCodeString: String)
+                  sqlString: Option[String],
+                  resultCodeString: Option[String])
 
 object Record {
   implicit val rw: upickle.default.ReadWriter[Record] = upickle.default.macroRW

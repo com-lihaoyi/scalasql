@@ -7,10 +7,12 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-/**
- * Tests for queries operations that force subqueries to be used.
- */
+
 trait SubQueryTests extends ScalaSqlSuite {
+  def description =
+    "Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries " +
+    "to preserve the Scala semantics of the various operators"
+
   def tests = Tests {
     test("sortTakeJoin") - checker(
       query = Text {

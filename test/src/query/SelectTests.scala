@@ -7,10 +7,9 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-/**
- * Tests for basic query operations: map, filter, join, etc.
- */
 trait SelectTests extends ScalaSqlSuite {
+  def description = "Basic `SELECT`` operations: map, filter, join, etc."
+
   def tests = Tests {
     test("constant") - checker(query = Text { Expr(1) }, sql = "SELECT ? as res", value = 1)
 

@@ -7,7 +7,7 @@ import utils.SqliteSuite
  * Tests for all the aggregate operators that we provide by default
  */
 object FailureTests extends SqliteSuite {
-
+  def description = "Things that should not compile or should give runtime errors"
   def tests = Tests {
     test("equals") - {
       val ex = intercept[Exception] { Expr(1) == 2 }

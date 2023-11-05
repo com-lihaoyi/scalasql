@@ -8,6 +8,7 @@ import utils.MySqlSuite
 import java.time.LocalDate
 
 trait MySqlDialectTests extends MySqlSuite {
+  def description = "Operations specific to working with MySql Databases"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("reverse") -

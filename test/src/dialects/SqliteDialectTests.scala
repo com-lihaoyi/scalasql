@@ -6,6 +6,7 @@ import utest._
 import utils.SqliteSuite
 
 trait SqliteDialectTests extends SqliteSuite {
+  def description = "Operations specific to working with Sqlite Databases"
   def tests = Tests {
 
     test("ltrim2") - checker(

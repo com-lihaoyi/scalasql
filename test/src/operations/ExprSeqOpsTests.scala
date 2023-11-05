@@ -4,10 +4,9 @@ import scalasql._
 import utest._
 import utils.ScalaSqlSuite
 
-/**
- * Tests for all the aggregate operators that we provide by default
- */
+
 trait ExprSeqOpsTests extends ScalaSqlSuite {
+  def description = "Operations that can be performed on `Expr[Seq[_]]`"
   def tests = Tests {
     test("size") - checker(
       query = Purchase.select.size,

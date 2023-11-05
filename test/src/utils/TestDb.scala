@@ -15,7 +15,8 @@ class TestDb(
     testDataFileName: String,
     dialectConfig: DialectConfig,
     suiteName: String,
-    suiteLine: Int
+    suiteLine: Int,
+    description: String
 ) {
 
   def reset() = {
@@ -23,6 +24,21 @@ class TestDb(
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
+  def recorded[T](f: sourcecode.Text[() => T])(implicit tp: utest.framework.TestPath): T = {
+    val res = f.value()
+    UtestFramework.recorded.append(
+      UtestFramework.Record(
+        suiteName = suiteName.stripSuffix("Tests$"),
+        suiteLine = suiteLine,
+        testPath = tp.value,
+        queryCodeString = f.source match {case s"() =>$rest" => rest},
+        sqlString = None,
+        resultCodeString = None
+      )
+    )
+
+    res
+  }
   def apply[T, V](
       query: sourcecode.Text[T],
       sql: String = null,
@@ -54,8 +70,8 @@ class TestDb(
         suiteLine = suiteLine,
         testPath = tp.value,
         queryCodeString = query.source,
-        sqlString = matchedSql.orNull,
-        resultCodeString = value.source
+        sqlString = matchedSql,
+        resultCodeString = Some(value.source)
       )
     )
 

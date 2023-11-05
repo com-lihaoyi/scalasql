@@ -7,10 +7,9 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-/**
- * Tests for joins
- */
+
 trait JoinTests extends ScalaSqlSuite {
+  def description = "inner `JOIN`s, `JOIN ON`s, self-joins, `LEFT`/`RIGHT`/`OUTER` `JOIN`s"
   def tests = Tests {
     test("joinFilter") - checker(
       query = Text {

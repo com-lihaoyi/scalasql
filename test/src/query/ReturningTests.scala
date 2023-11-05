@@ -13,6 +13,7 @@ import java.time.LocalDate
  */
 trait ReturningTests extends ScalaSqlSuite {
   this: ReturningDialect =>
+  def description = "Queries using `INSERT` or `UPDATE` with `RETURNING`"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("insert") {

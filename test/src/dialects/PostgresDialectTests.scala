@@ -6,6 +6,7 @@ import utest._
 import utils.PostgresSuite
 
 trait PostgresDialectTests extends PostgresSuite {
+  def description = "Operations specific to working with Postgres Databases"
   def tests = Tests {
 
     test("ltrim2") - checker(

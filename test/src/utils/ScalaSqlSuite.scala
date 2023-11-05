@@ -12,6 +12,7 @@ abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
   def checker: TestDb
 
   lazy val dbClient = checker.dbClient
+  def description: String
 }
 
 trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
@@ -21,7 +22,8 @@ trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
     "customer-data.sql",
     dialects.SqliteDialect,
     getClass.getName,
-    suiteLine.value
+    suiteLine.value,
+    description
   )
 
   checker.reset()
@@ -34,7 +36,8 @@ trait HsqlDbSuite extends ScalaSqlSuite with HsqlDbDialect {
     "customer-data.sql",
     dialects.HsqlDbDialect,
     getClass.getName,
-    suiteLine.value
+    suiteLine.value,
+    description
   )
 
   checker.reset()
@@ -47,7 +50,8 @@ trait H2Suite extends ScalaSqlSuite with H2Dialect {
     "customer-data.sql",
     dialects.H2Dialect,
     getClass.getName,
-    suiteLine.value
+    suiteLine.value,
+    description
   )
 
   checker.reset()
@@ -60,7 +64,8 @@ trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
     "customer-data.sql",
     dialects.PostgresDialect,
     getClass.getName,
-    suiteLine.value
+    suiteLine.value,
+    description
   )
 
   checker.reset()
@@ -73,7 +78,8 @@ trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {
     "customer-data.sql",
     dialects.MySqlDialect,
     getClass.getName,
-    suiteLine.value
+    suiteLine.value,
+    description
   )
 
   checker.reset()

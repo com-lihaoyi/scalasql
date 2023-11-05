@@ -5,6 +5,7 @@ import scalasql.utils.HsqlDbSuite
 import utest._
 
 trait HsqlDbDialectTests extends HsqlDbSuite {
+  def description = "Operations specific to working with HsqlDb Databases"
   def tests = Tests {
 
     test("ltrim2") - checker(

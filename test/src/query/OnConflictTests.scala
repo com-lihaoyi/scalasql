@@ -8,11 +8,10 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-/**
- * Tests for basic insert operations
- */
+
 trait OnConflictTests extends ScalaSqlSuite {
   this: OnConflictOps with ReturningDialect =>
+  def description = "Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 
@@ -47,7 +46,8 @@ trait OnConflictTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
-            RETURNING buyer.name as res""",
+            RETURNING buyer.name as res
+          """,
           value = Seq.empty[String]
         )
       }
@@ -67,7 +67,8 @@ trait OnConflictTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
-            RETURNING buyer.name as res""",
+            RETURNING buyer.name as res
+          """,
           value = Seq("test buyer")
         )
       }
@@ -145,7 +146,8 @@ trait OnConflictTests extends ScalaSqlSuite {
           INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
           ON CONFLICT (id) DO UPDATE
           SET name = UPPER(buyer.name)
-          RETURNING buyer.name as res""",
+          RETURNING buyer.name as res
+        """,
         value = "JAMES BOND"
       )
     }

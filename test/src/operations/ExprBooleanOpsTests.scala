@@ -5,10 +5,9 @@ import scalasql.query.Expr
 import utest._
 import utils.ScalaSqlSuite
 
-/**
- * Tests for all the individual symbolic operators and functions that we provide by default
- */
+
 trait ExprBooleanOpsTests extends ScalaSqlSuite {
+  def description = "Operations that can be performed on `Expr[Boolean]`"
   def tests = Tests {
     test("and") {
       checker(query = Expr(true) && Expr(true), sql = "SELECT ? AND ? as res", value = true)

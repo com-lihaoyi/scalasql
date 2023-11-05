@@ -7,10 +7,8 @@ import utils.ScalaSqlSuite
 
 import java.sql.Date
 
-/**
- * Tests for basic update operations
- */
 trait UpdateSubQueryTests extends ScalaSqlSuite {
+  def description = "`UPDATE` queries that use Subqueries"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 

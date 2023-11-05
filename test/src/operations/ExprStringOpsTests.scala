@@ -5,10 +5,8 @@ import scalasql.query.Expr
 import utest._
 import utils.ScalaSqlSuite
 
-/**
- * Tests for all the individual symbolic operators and functions that we provide by default
- */
 trait ExprStringOpsTests extends ScalaSqlSuite {
+  def description = "Operations that can be performed on `Expr[String]`"
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),

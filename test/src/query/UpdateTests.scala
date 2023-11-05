@@ -7,10 +7,9 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-/**
- * Tests for basic update operations
- */
+
 trait UpdateTests extends ScalaSqlSuite {
+  def description = "Basic `UPDATE` queries"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("update") - {

@@ -12,10 +12,10 @@ object OptCols extends Table[OptCols] {
   val metadata = initMetadata
 }
 
-/**
- * Tests for basic query operations: map, filter, join, etc.
- */
+
 trait OptionalTests extends ScalaSqlSuite {
+  def description =
+    "Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 

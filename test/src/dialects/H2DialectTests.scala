@@ -5,6 +5,7 @@ import scalasql.utils.H2Suite
 import utest._
 
 trait H2DialectTests extends H2Suite {
+  def description = "Operations specific to working with H2 Databases"
   def tests = Tests {
 
     test("ltrim2") - checker(
