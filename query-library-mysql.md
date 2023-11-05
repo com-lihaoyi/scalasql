@@ -1,6 +1,6 @@
 # mysql
-## ExprBooleanOpsTests
-### ExprBooleanOpsTests.and
+## ExprBooleanOps
+### ExprBooleanOps.and
 
 ```scala
 Expr(true) && Expr(true)
@@ -19,7 +19,26 @@ Expr(true) && Expr(true)
     ```
 
 
-### ExprBooleanOpsTests.or
+----
+
+```scala
+Expr(false) && Expr(true)
+```
+
+
+*
+    ```sql
+    SELECT ? AND ? as res
+    ```
+
+
+*
+    ```scala
+    false
+    ```
+
+
+### ExprBooleanOps.or
 
 ```scala
 Expr(false) || Expr(false)
@@ -57,8 +76,8 @@ Expr(false) || Expr(false)
     ```
 
 
-## ExprExprIntOpsTests
-### ExprExprIntOpsTests.plus
+## ExprExprIntOps
+### ExprExprIntOps.plus
 
 ```scala
 Expr(6) + Expr(2)
@@ -77,7 +96,7 @@ Expr(6) + Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.minus
+### ExprExprIntOps.minus
 
 ```scala
 Expr(6) - Expr(2)
@@ -96,7 +115,7 @@ Expr(6) - Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.times
+### ExprExprIntOps.times
 
 ```scala
 Expr(6) * Expr(2)
@@ -115,7 +134,7 @@ Expr(6) * Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.divide
+### ExprExprIntOps.divide
 
 ```scala
 Expr(6) / Expr(2)
@@ -134,7 +153,7 @@ Expr(6) / Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.modulo
+### ExprExprIntOps.modulo
 
 ```scala
 Expr(6) % Expr(2)
@@ -153,7 +172,7 @@ Expr(6) % Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.bitwiseAnd
+### ExprExprIntOps.bitwiseAnd
 
 ```scala
 Expr(6) & Expr(2)
@@ -172,7 +191,7 @@ Expr(6) & Expr(2)
     ```
 
 
-### ExprExprIntOpsTests.bitwiseOr
+### ExprExprIntOps.bitwiseOr
 
 ```scala
 Expr(6) | Expr(3)
@@ -191,7 +210,7 @@ Expr(6) | Expr(3)
     ```
 
 
-### ExprExprIntOpsTests.between
+### ExprExprIntOps.between
 
 ```scala
 Expr(4).between(Expr(2), Expr(6))
@@ -210,7 +229,7 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
-### ExprExprIntOpsTests.unaryPlus
+### ExprExprIntOps.unaryPlus
 
 ```scala
 +Expr(-4)
@@ -229,7 +248,7 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
-### ExprExprIntOpsTests.unaryMinus
+### ExprExprIntOps.unaryMinus
 
 ```scala
 -Expr(-4)
@@ -248,7 +267,7 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
-### ExprExprIntOpsTests.unaryTilde
+### ExprExprIntOps.unaryTilde
 
 ```scala
 ~Expr(-4)
@@ -267,7 +286,7 @@ Expr(4).between(Expr(2), Expr(6))
     ```
 
 
-### ExprExprIntOpsTests.abs
+### ExprExprIntOps.abs
 
 ```scala
 Expr(-4).abs
@@ -286,7 +305,7 @@ Expr(-4).abs
     ```
 
 
-### ExprExprIntOpsTests.mod
+### ExprExprIntOps.mod
 
 ```scala
 Expr(8).mod(Expr(3))
@@ -305,7 +324,7 @@ Expr(8).mod(Expr(3))
     ```
 
 
-### ExprExprIntOpsTests.ceil
+### ExprExprIntOps.ceil
 
 ```scala
 Expr(4.3).ceil
@@ -324,7 +343,7 @@ Expr(4.3).ceil
     ```
 
 
-### ExprExprIntOpsTests.floor
+### ExprExprIntOps.floor
 
 ```scala
 Expr(4.7).floor
@@ -362,8 +381,8 @@ Expr(4.7).floor
     ```
 
 
-## ExprSeqNumericOpsTests
-### ExprSeqNumericOpsTests.sum
+## ExprSeqNumericOps
+### ExprSeqNumericOps.sum
 
 ```scala
 Purchase.select.map(_.count).sum
@@ -382,7 +401,7 @@ Purchase.select.map(_.count).sum
     ```
 
 
-### ExprSeqNumericOpsTests.min
+### ExprSeqNumericOps.min
 
 ```scala
 Purchase.select.map(_.count).min
@@ -401,7 +420,7 @@ Purchase.select.map(_.count).min
     ```
 
 
-### ExprSeqNumericOpsTests.max
+### ExprSeqNumericOps.max
 
 ```scala
 Purchase.select.map(_.count).max
@@ -420,7 +439,7 @@ Purchase.select.map(_.count).max
     ```
 
 
-### ExprSeqNumericOpsTests.avg
+### ExprSeqNumericOps.avg
 
 ```scala
 Purchase.select.map(_.count).avg
@@ -439,8 +458,8 @@ Purchase.select.map(_.count).avg
     ```
 
 
-## ExprSeqOpsTests
-### ExprSeqOpsTests.size
+## ExprSeqOps
+### ExprSeqOps.size
 
 ```scala
 Purchase.select.size
@@ -459,7 +478,7 @@ Purchase.select.size
     ```
 
 
-### ExprSeqOpsTests.sumBy.simple
+### ExprSeqOps.sumBy.simple
 
 ```scala
 Purchase.select.sumBy(_.count)
@@ -478,7 +497,7 @@ Purchase.select.sumBy(_.count)
     ```
 
 
-### ExprSeqOpsTests.sumBy.some
+### ExprSeqOps.sumBy.some
 
 ```scala
 Purchase.select.sumByOpt(_.count)
@@ -497,7 +516,7 @@ Purchase.select.sumByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.sumBy.none
+### ExprSeqOps.sumBy.none
 
 ```scala
 Purchase.select.filter(_ => false).sumByOpt(_.count)
@@ -516,7 +535,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.minBy.simple
+### ExprSeqOps.minBy.simple
 
 ```scala
 Purchase.select.minBy(_.count)
@@ -535,7 +554,7 @@ Purchase.select.minBy(_.count)
     ```
 
 
-### ExprSeqOpsTests.minBy.some
+### ExprSeqOps.minBy.some
 
 ```scala
 Purchase.select.minByOpt(_.count)
@@ -554,7 +573,7 @@ Purchase.select.minByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.minBy.none
+### ExprSeqOps.minBy.none
 
 ```scala
 Purchase.select.filter(_ => false).minByOpt(_.count)
@@ -573,7 +592,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.maxBy.simple
+### ExprSeqOps.maxBy.simple
 
 ```scala
 Purchase.select.maxBy(_.count)
@@ -592,7 +611,7 @@ Purchase.select.maxBy(_.count)
     ```
 
 
-### ExprSeqOpsTests.maxBy.some
+### ExprSeqOps.maxBy.some
 
 ```scala
 Purchase.select.maxByOpt(_.count)
@@ -611,7 +630,7 @@ Purchase.select.maxByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.maxBy.none
+### ExprSeqOps.maxBy.none
 
 ```scala
 Purchase.select.filter(_ => false).maxByOpt(_.count)
@@ -630,7 +649,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.avgBy.simple
+### ExprSeqOps.avgBy.simple
 
 ```scala
 Purchase.select.avgBy(_.count)
@@ -649,7 +668,7 @@ Purchase.select.avgBy(_.count)
     ```
 
 
-### ExprSeqOpsTests.avgBy.some
+### ExprSeqOps.avgBy.some
 
 ```scala
 Purchase.select.avgByOpt(_.count)
@@ -668,7 +687,7 @@ Purchase.select.avgByOpt(_.count)
     ```
 
 
-### ExprSeqOpsTests.avgBy.none
+### ExprSeqOps.avgBy.none
 
 ```scala
 Purchase.select.filter(_ => false).avgByOpt(_.count)
@@ -687,8 +706,8 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
     ```
 
 
-## ExprStringOpsTests
-### ExprStringOpsTests.plus
+## ExprStringOps
+### ExprStringOps.plus
 
 ```scala
 Expr("hello") + Expr("world")
@@ -707,7 +726,7 @@ Expr("hello") + Expr("world")
     ```
 
 
-### ExprStringOpsTests.like
+### ExprStringOps.like
 
 ```scala
 Expr("hello").like("he%")
@@ -726,7 +745,7 @@ Expr("hello").like("he%")
     ```
 
 
-### ExprStringOpsTests.length
+### ExprStringOps.length
 
 ```scala
 Expr("hello").length
@@ -745,7 +764,7 @@ Expr("hello").length
     ```
 
 
-### ExprStringOpsTests.octetLength
+### ExprStringOps.octetLength
 
 ```scala
 Expr("叉烧包").octetLength
@@ -764,7 +783,7 @@ Expr("叉烧包").octetLength
     ```
 
 
-### ExprStringOpsTests.position
+### ExprStringOps.position
 
 ```scala
 Expr("hello").indexOf("ll")
@@ -783,7 +802,7 @@ Expr("hello").indexOf("ll")
     ```
 
 
-### ExprStringOpsTests.toLowerCase
+### ExprStringOps.toLowerCase
 
 ```scala
 Expr("Hello").toLowerCase
@@ -802,7 +821,7 @@ Expr("Hello").toLowerCase
     ```
 
 
-### ExprStringOpsTests.trim
+### ExprStringOps.trim
 
 ```scala
 Expr("  Hello ").trim
@@ -821,7 +840,7 @@ Expr("  Hello ").trim
     ```
 
 
-### ExprStringOpsTests.ltrim
+### ExprStringOps.ltrim
 
 ```scala
 Expr("  Hello ").ltrim
@@ -840,7 +859,7 @@ Expr("  Hello ").ltrim
     ```
 
 
-### ExprStringOpsTests.rtrim
+### ExprStringOps.rtrim
 
 ```scala
 Expr("  Hello ").rtrim
@@ -859,7 +878,7 @@ Expr("  Hello ").rtrim
     ```
 
 
-### ExprStringOpsTests.substring
+### ExprStringOps.substring
 
 ```scala
 Expr("Hello").substring(2, 2)
@@ -878,8 +897,8 @@ Expr("Hello").substring(2, 2)
     ```
 
 
-## InsertTests
-### InsertTests.single.simple
+## Insert
+### Insert.single.simple
 
 ```scala
 Buyer.insert.values(
@@ -916,7 +935,7 @@ Buyer.select.filter(_.name `=` "test buyer")
     ```
 
 
-### InsertTests.single.partial
+### Insert.single.partial
 
 ```scala
 Buyer.insert
@@ -950,7 +969,7 @@ Buyer.select.filter(_.name `=` "test buyer")
     ```
 
 
-### InsertTests.batch.simple
+### Insert.batch.simple
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
@@ -998,7 +1017,7 @@ Buyer.select
     ```
 
 
-### InsertTests.batch.partial
+### Insert.batch.partial
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -1044,7 +1063,7 @@ Buyer.select
     ```
 
 
-### InsertTests.select.caseclass
+### Insert.select.caseclass
 
 ```scala
 Buyer.insert.select(
@@ -1094,7 +1113,7 @@ Buyer.select
     ```
 
 
-### InsertTests.select.simple
+### Insert.select.simple
 
 ```scala
 Buyer.insert.select(
@@ -1140,8 +1159,8 @@ Buyer.select
     ```
 
 
-## DeleteTests
-### DeleteTests.single
+## Delete
+### Delete.single
 
 ```scala
 Purchase.delete(_.id `=` 2)
@@ -1182,7 +1201,7 @@ Purchase.select
     ```
 
 
-### DeleteTests.multiple
+### Delete.multiple
 
 ```scala
 Purchase.delete(_.id <> 2)
@@ -1215,7 +1234,7 @@ Purchase.select
     ```
 
 
-### DeleteTests.all
+### Delete.all
 
 ```scala
 Purchase.delete(_ => true)
@@ -1250,8 +1269,8 @@ Purchase.select
     ```
 
 
-## SelectTests
-### SelectTests.constant
+## Select
+### Select.constant
 
 ```scala
 Expr(1)
@@ -1270,7 +1289,7 @@ Expr(1)
     ```
 
 
-### SelectTests.table
+### Select.table
 
 ```scala
 Buyer.select
@@ -1297,7 +1316,7 @@ Buyer.select
     ```
 
 
-### SelectTests.filter.single
+### Select.filter.single
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2)
@@ -1324,7 +1343,7 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
     ```
 
 
-### SelectTests.filter.multiple
+### Select.filter.multiple
 
 ```scala
 ShippingInfo.select
@@ -1351,7 +1370,7 @@ ShippingInfo.select
     ```
 
 
-### SelectTests.filter.dotSingle.pass
+### Select.filter.dotSingle.pass
 
 ```scala
 ShippingInfo.select
@@ -1379,7 +1398,7 @@ ShippingInfo.select
     ```
 
 
-### SelectTests.filter.combined
+### Select.filter.combined
 
 ```scala
 ShippingInfo.select
@@ -1405,7 +1424,7 @@ ShippingInfo.select
     ```
 
 
-### SelectTests.map.single
+### Select.map.single
 
 ```scala
 Buyer.select.map(_.name)
@@ -1424,7 +1443,7 @@ Buyer.select.map(_.name)
     ```
 
 
-### SelectTests.map.tuple2
+### Select.map.tuple2
 
 ```scala
 Buyer.select.map(c => (c.name, c.id))
@@ -1443,7 +1462,7 @@ Buyer.select.map(c => (c.name, c.id))
     ```
 
 
-### SelectTests.map.tuple3
+### Select.map.tuple3
 
 ```scala
 Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
@@ -1470,7 +1489,7 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
     ```
 
 
-### SelectTests.map.interpolateInMap
+### Select.map.interpolateInMap
 
 ```scala
 Product.select.map(_.price * 2)
@@ -1489,7 +1508,7 @@ Product.select.map(_.price * 2)
     ```
 
 
-### SelectTests.map.heterogenousTuple
+### Select.map.heterogenousTuple
 
 ```scala
 Buyer.select.map(c => (c.id, c))
@@ -1517,7 +1536,7 @@ Buyer.select.map(c => (c.id, c))
     ```
 
 
-### SelectTests.exprQuery
+### Select.exprQuery
 
 ```scala
 Product.select.map(p =>
@@ -1561,7 +1580,7 @@ Product.select.map(p =>
     ```
 
 
-### SelectTests.subquery
+### Select.subquery
 
 ```scala
 Buyer.select.subquery.map(_.name)
@@ -1581,7 +1600,7 @@ Buyer.select.subquery.map(_.name)
     ```
 
 
-### SelectTests.filterMap
+### Select.filterMap
 
 ```scala
 Product.select.filter(_.price < 100).map(_.name)
@@ -1600,7 +1619,7 @@ Product.select.filter(_.price < 100).map(_.name)
     ```
 
 
-### SelectTests.aggregate.single
+### Select.aggregate.single
 
 ```scala
 Purchase.select.aggregate(_.sumBy(_.total))
@@ -1619,7 +1638,7 @@ Purchase.select.aggregate(_.sumBy(_.total))
     ```
 
 
-### SelectTests.aggregate.multiple
+### Select.aggregate.multiple
 
 ```scala
 Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
@@ -1638,7 +1657,7 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
     ```
 
 
-### SelectTests.groupBy.simple
+### Select.groupBy.simple
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
@@ -1659,7 +1678,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
     ```
 
 
-### SelectTests.groupBy.having
+### Select.groupBy.having
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
@@ -1681,7 +1700,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
     ```
 
 
-### SelectTests.groupBy.filterHaving
+### Select.groupBy.filterHaving
 
 ```scala
 Purchase.select
@@ -1707,7 +1726,7 @@ Purchase.select
     ```
 
 
-### SelectTests.distinct.nondistinct
+### Select.distinct.nondistinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId)
@@ -1726,7 +1745,7 @@ Purchase.select.map(_.shippingInfoId)
     ```
 
 
-### SelectTests.distinct.distinct
+### Select.distinct.distinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId).distinct
@@ -1745,7 +1764,7 @@ Purchase.select.map(_.shippingInfoId).distinct
     ```
 
 
-### SelectTests.contains
+### Select.contains
 
 ```scala
 Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
@@ -1769,7 +1788,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
     ```
 
 
-### SelectTests.nonEmpty
+### Select.nonEmpty
 
 ```scala
 Buyer.select
@@ -1795,7 +1814,7 @@ Buyer.select
     ```
 
 
-### SelectTests.isEmpty
+### Select.isEmpty
 
 ```scala
 Buyer.select
@@ -1821,7 +1840,7 @@ Buyer.select
     ```
 
 
-### SelectTests.case.when
+### Select.case.when
 
 ```scala
 Product.select.map(p =>
@@ -1859,7 +1878,7 @@ Product.select.map(p =>
     ```
 
 
-### SelectTests.case.else
+### Select.case.else
 
 ```scala
 Product.select.map(p =>
@@ -1896,8 +1915,8 @@ Product.select.map(p =>
     ```
 
 
-## JoinTests
-### JoinTests.joinFilter
+## Join
+### Join.joinFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1934,7 +1953,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
     ```
 
 
-### JoinTests.joinSelectFilter
+### Join.joinSelectFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1971,7 +1990,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
     ```
 
 
-### JoinTests.joinFilterMap
+### Join.joinFilterMap
 
 ```scala
 Buyer.select
@@ -1996,7 +2015,7 @@ Buyer.select
     ```
 
 
-### JoinTests.selfJoin
+### Join.selfJoin
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id `=` _.id)
@@ -2036,7 +2055,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
     ```
 
 
-### JoinTests.selfJoin2
+### Join.selfJoin2
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id <> _.id)
@@ -2088,7 +2107,7 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
     ```
 
 
-### JoinTests.flatMap
+### Join.flatMap
 
 ```scala
 Buyer.select
@@ -2113,7 +2132,7 @@ Buyer.select
     ```
 
 
-### JoinTests.flatMap2
+### Join.flatMap2
 
 ```scala
 Buyer.select
@@ -2137,7 +2156,7 @@ Buyer.select
     ```
 
 
-### JoinTests.leftJoin
+### Join.leftJoin
 
 ```scala
 Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
@@ -2178,7 +2197,7 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
     ```
 
 
-### JoinTests.rightJoin
+### Join.rightJoin
 
 ```scala
 ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
@@ -2219,7 +2238,7 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
     ```
 
 
-### JoinTests.outerJoin
+### Join.outerJoin
 
 ```scala
 ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
@@ -2270,8 +2289,8 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
     ```
 
 
-## CompoundSelectTests
-### CompoundSelectTests.sort.simple
+## CompoundSelect
+### CompoundSelect.sort.simple
 
 ```scala
 Product.select.sortBy(_.price).map(_.name)
@@ -2290,7 +2309,7 @@ Product.select.sortBy(_.price).map(_.name)
     ```
 
 
-### CompoundSelectTests.sort.twice
+### CompoundSelect.sort.twice
 
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
@@ -2324,7 +2343,7 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
     ```
 
 
-### CompoundSelectTests.sort.sortLimit
+### CompoundSelect.sort.sortLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
@@ -2343,7 +2362,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
     ```
 
 
-### CompoundSelectTests.sort.sortOffset
+### CompoundSelect.sort.sortOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2)
@@ -2362,7 +2381,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
     ```
 
 
-### CompoundSelectTests.sort.sortLimitTwiceHigher
+### CompoundSelect.sort.sortLimitTwiceHigher
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
@@ -2381,7 +2400,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
     ```
 
 
-### CompoundSelectTests.sort.sortLimitTwiceLower
+### CompoundSelect.sort.sortLimitTwiceLower
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(1)
@@ -2400,7 +2419,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
     ```
 
 
-### CompoundSelectTests.sort.sortLimitOffset
+### CompoundSelect.sort.sortLimitOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -2419,7 +2438,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
     ```
 
 
-### CompoundSelectTests.sort.sortLimitOffsetTwice
+### CompoundSelect.sort.sortLimitOffsetTwice
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
@@ -2438,7 +2457,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
     ```
 
 
-### CompoundSelectTests.sort.sortOffsetLimit
+### CompoundSelect.sort.sortOffsetLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -2457,7 +2476,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
     ```
 
 
-### CompoundSelectTests.distinct
+### CompoundSelect.distinct
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
@@ -2480,7 +2499,7 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
     ```
 
 
-### CompoundSelectTests.flatMap
+### CompoundSelect.flatMap
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
@@ -2506,7 +2525,7 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
     ```
 
 
-### CompoundSelectTests.sumBy
+### CompoundSelect.sumBy
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
@@ -2529,7 +2548,7 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
     ```
 
 
-### CompoundSelectTests.aggregate
+### CompoundSelect.aggregate
 
 ```scala
 Purchase.select
@@ -2556,7 +2575,7 @@ Purchase.select
     ```
 
 
-### CompoundSelectTests.union
+### CompoundSelect.union
 
 ```scala
 Product.select
@@ -2590,7 +2609,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.unionAll
+### CompoundSelect.unionAll
 
 ```scala
 Product.select
@@ -2628,7 +2647,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.intersect
+### CompoundSelect.intersect
 
 ```scala
 Product.select
@@ -2653,7 +2672,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.except
+### CompoundSelect.except
 
 ```scala
 Product.select
@@ -2678,7 +2697,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.unionAllUnionSort
+### CompoundSelect.unionAllUnionSort
 
 ```scala
 Product.select
@@ -2721,7 +2740,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.unionAllUnionSortLimit
+### CompoundSelect.unionAllUnionSortLimit
 
 ```scala
 Product.select
@@ -2756,7 +2775,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.exceptAggregate
+### CompoundSelect.exceptAggregate
 
 ```scala
 Product.select
@@ -2791,7 +2810,7 @@ Product.select
     ```
 
 
-### CompoundSelectTests.unionAllAggregate
+### CompoundSelect.unionAllAggregate
 
 ```scala
 Product.select
@@ -2822,8 +2841,8 @@ Product.select
     ```
 
 
-## SubQueryTests
-### SubQueryTests.sortTakeJoin
+## SubQuery
+### SubQuery.sortTakeJoin
 
 ```scala
 Purchase.select
@@ -2850,7 +2869,7 @@ Purchase.select
     ```
 
 
-### SubQueryTests.sortTakeFrom
+### SubQuery.sortTakeFrom
 
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
@@ -2876,7 +2895,7 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
     ```
 
 
-### SubQueryTests.sortTakeFromAndJoin
+### SubQuery.sortTakeFromAndJoin
 
 ```scala
 Product.select
@@ -2916,7 +2935,7 @@ Product.select
     ```
 
 
-### SubQueryTests.sortLimitSortLimit
+### SubQuery.sortLimitSortLimit
 
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
@@ -2943,7 +2962,7 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
     ```
 
 
-### SubQueryTests.sortGroupBy
+### SubQuery.sortGroupBy
 
 ```scala
 Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
@@ -2970,7 +2989,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
     ```
 
 
-### SubQueryTests.groupByJoin
+### SubQuery.groupByJoin
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
@@ -3006,7 +3025,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
     ```
 
 
-### SubQueryTests.subqueryInFilter
+### SubQuery.subqueryInFilter
 
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
@@ -3033,7 +3052,7 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
     ```
 
 
-### SubQueryTests.subqueryInMap
+### SubQuery.subqueryInMap
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
@@ -3061,7 +3080,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
     ```
 
 
-### SubQueryTests.subqueryInMapNested
+### SubQuery.subqueryInMapNested
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
@@ -3092,7 +3111,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
     ```
 
 
-### SubQueryTests.selectLimitUnionSelect
+### SubQuery.selectLimitUnionSelect
 
 ```scala
 Buyer.select
@@ -3121,7 +3140,7 @@ Buyer.select
     ```
 
 
-### SubQueryTests.selectUnionSelectLimit
+### SubQuery.selectUnionSelectLimit
 
 ```scala
 Buyer.select
@@ -3149,8 +3168,8 @@ Buyer.select
     ```
 
 
-## UpdateTests
-### UpdateTests.update
+## Update
+### Update.update
 
 ```scala
 Buyer
@@ -3174,32 +3193,32 @@ Buyer
 ----
 
 ```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
 
 
 *
     ```scala
-    Seq(LocalDate.parse("2019-04-07"))
+    LocalDate.parse("2019-04-07")
     ```
 
 
 ----
 
 ```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
+Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
 
 
 *
     ```scala
-    Seq(LocalDate.parse("1965-08-09"))
+    LocalDate.parse("1965-08-09" /* not updated */ )
     ```
 
 
-### UpdateTests.bulk
+### Update.bulk
 
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -3221,32 +3240,32 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ----
 
 ```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 ```
 
 
 
 *
     ```scala
-    Seq(LocalDate.parse("2019-04-07"))
+    LocalDate.parse("2019-04-07")
     ```
 
 
 ----
 
 ```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
+Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 ```
 
 
 
 *
     ```scala
-    Seq(LocalDate.parse("2019-04-07"))
+    LocalDate.parse("2019-04-07")
     ```
 
 
-### UpdateTests.multiple
+### Update.multiple
 
 ```scala
 Buyer
@@ -3277,7 +3296,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-    Seq[LocalDate]()
+    Seq[LocalDate]( /* not found due to rename */ )
     ```
 
 
@@ -3295,7 +3314,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
     ```
 
 
-### UpdateTests.dynamic
+### Update.dynamic
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
@@ -3324,7 +3343,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-    Seq[LocalDate]()
+    Seq[LocalDate]( /* not found due to rename */ )
     ```
 
 
@@ -3342,8 +3361,8 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
     ```
 
 
-## UpdateJoinTests
-### UpdateJoinTests.join
+## UpdateJoin
+### UpdateJoin.join
 
 ```scala
 Buyer
@@ -3382,7 +3401,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
-### UpdateJoinTests.multijoin
+### UpdateJoin.multijoin
 
 ```scala
 Buyer
@@ -3427,7 +3446,7 @@ Buyer.select.filter(_.id `=` 1).map(_.name)
     ```
 
 
-### UpdateJoinTests.joinSubquery
+### UpdateJoin.joinSubquery
 
 ```scala
 Buyer
@@ -3473,7 +3492,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
-### UpdateJoinTests.joinSubqueryEliminatedColumn
+### UpdateJoin.joinSubqueryEliminatedColumn
 
 ```scala
 Buyer
@@ -3520,8 +3539,8 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
     ```
 
 
-## MySqlDialectTests
-### MySqlDialectTests.reverse
+## MySqlDialect
+### MySqlDialect.reverse
 
 ```scala
 Expr("Hello").reverse
@@ -3540,7 +3559,7 @@ Expr("Hello").reverse
     ```
 
 
-### MySqlDialectTests.lpad
+### MySqlDialect.lpad
 
 ```scala
 Expr("Hello").lpad(10, "xy")
@@ -3559,7 +3578,7 @@ Expr("Hello").lpad(10, "xy")
     ```
 
 
-### MySqlDialectTests.rpad
+### MySqlDialect.rpad
 
 ```scala
 Expr("Hello").rpad(10, "xy")
@@ -3578,7 +3597,7 @@ Expr("Hello").rpad(10, "xy")
     ```
 
 
-### MySqlDialectTests.conflict.ignore
+### MySqlDialect.conflict.ignore
 
 ```scala
 Buyer.insert
@@ -3603,7 +3622,7 @@ Buyer.insert
     ```
 
 
-### MySqlDialectTests.conflict.update
+### MySqlDialect.conflict.update
 
 ```scala
 Buyer.insert
@@ -3646,7 +3665,7 @@ Buyer.select
     ```
 
 
-### MySqlDialectTests.conflict.updateComputed
+### MySqlDialect.conflict.updateComputed
 
 ```scala
 Buyer.insert
@@ -3689,8 +3708,8 @@ Buyer.select
     ```
 
 
-## DataTypesTests
-### DataTypesTests.constant
+## DataTypes
+### DataTypes.constant
 
 ```scala
 DataTypes.insert.values(
@@ -3730,7 +3749,7 @@ DataTypes.select
     ```
 
 
-### DataTypesTests.nonRoundTrip
+### DataTypes.nonRoundTrip
 
 ```scala
 NonRoundTripTypes.insert.values(
@@ -3761,8 +3780,8 @@ NonRoundTripTypes.select
     ```
 
 
-## OptionalTests
-### OptionalTests
+## Optional
+### Optional
 
 ```scala
 OptCols.insert.batched(_.myInt, _.myInt2)(
@@ -3781,7 +3800,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
     ```
 
 
-### OptionalTests.selectAll
+### Optional.selectAll
 
 ```scala
 OptCols.select
@@ -3808,7 +3827,7 @@ OptCols.select
     ```
 
 
-### OptionalTests.groupByMaxGet
+### Optional.groupByMaxGet
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -3829,7 +3848,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
     ```
 
 
-### OptionalTests.isDefined
+### Optional.isDefined
 
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
@@ -3852,7 +3871,7 @@ OptCols.select.filter(_.myInt.isDefined)
     ```
 
 
-### OptionalTests.isEmpty
+### Optional.isEmpty
 
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
@@ -3875,7 +3894,7 @@ OptCols.select.filter(_.myInt.isEmpty)
     ```
 
 
-### OptionalTests.sqlEquals.nonOptionHit
+### Optional.sqlEquals.nonOptionHit
 
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
@@ -3898,7 +3917,7 @@ OptCols.select.filter(_.myInt `=` 1)
     ```
 
 
-### OptionalTests.sqlEquals.nonOptionMiss
+### Optional.sqlEquals.nonOptionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` 2)
@@ -3921,7 +3940,7 @@ OptCols.select.filter(_.myInt `=` 2)
     ```
 
 
-### OptionalTests.sqlEquals.optionMiss
+### Optional.sqlEquals.optionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` Option.empty[Int])
@@ -3944,7 +3963,7 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
     ```
 
 
-### OptionalTests.scalaEquals.someHit
+### Optional.scalaEquals.someHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
@@ -3967,7 +3986,7 @@ OptCols.select.filter(_.myInt === Option(1))
     ```
 
 
-### OptionalTests.scalaEquals.noneHit
+### Optional.scalaEquals.noneHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option.empty[Int])
@@ -3990,7 +4009,7 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
     ```
 
 
-### OptionalTests.map
+### Optional.map
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
@@ -4017,7 +4036,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
     ```
 
 
-### OptionalTests.map2
+### Optional.map2
 
 ```scala
 OptCols.select.map(_.myInt.map(_ + 10))
@@ -4036,7 +4055,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
     ```
 
 
-### OptionalTests.flatMap
+### Optional.flatMap
 
 ```scala
 OptCols.select
@@ -4065,7 +4084,7 @@ OptCols.select
     ```
 
 
-### OptionalTests.mapGet
+### Optional.mapGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
@@ -4093,7 +4112,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
     ```
 
 
-### OptionalTests.rawGet
+### Optional.rawGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
@@ -4121,7 +4140,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
     ```
 
 
-### OptionalTests.getOrElse
+### Optional.getOrElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
@@ -4148,7 +4167,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
     ```
 
 
-### OptionalTests.orElse
+### Optional.orElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
@@ -4175,7 +4194,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
     ```
 
 
-### OptionalTests.filter
+### Optional.filter
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
@@ -4205,7 +4224,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
     ```
 
 
-### OptionalTests.sorting.nullsLast
+### Optional.sorting.nullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
@@ -4231,7 +4250,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
     ```
 
 
-### OptionalTests.sorting.nullsFirst
+### Optional.sorting.nullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsFirst
@@ -4257,7 +4276,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
     ```
 
 
-### OptionalTests.sorting.ascNullsLast
+### Optional.sorting.ascNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsLast
@@ -4283,7 +4302,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
     ```
 
 
-### OptionalTests.sorting.ascNullsFirst
+### Optional.sorting.ascNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsFirst
@@ -4309,7 +4328,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
     ```
 
 
-### OptionalTests.sorting.descNullsLast
+### Optional.sorting.descNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsLast
@@ -4335,7 +4354,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
     ```
 
 
-### OptionalTests.sorting.descNullsFirst
+### Optional.sorting.descNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsFirst
