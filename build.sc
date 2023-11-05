@@ -92,11 +92,13 @@ object scalasql extends RootModule with ScalaModule {
         val dedented = s
           .linesIterator
           .map(_.drop(indent))
-          .mkString("\n")
+          .mkString("\n    ")
           .trim
-        s"""```sql
-           |$dedented
-           |```
+        s"""
+           |*
+           |    ```sql
+           |    $dedented
+           |    ```
            |""".stripMargin
       }
     }
