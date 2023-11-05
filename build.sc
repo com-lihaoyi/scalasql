@@ -34,10 +34,12 @@ object scalasql extends RootModule with ScalaModule {
     def testFramework = "scalasql.UtestFramework"
   }
 
+  val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
   def generateTutorial() = T.command {
     var isDocs = Option.empty[Int]
     var isCode = false
     val outputLines = collection.mutable.Buffer.empty[String]
+    outputLines.append(generatedCodeHeader)
     for (line <- os.read.lines(os.pwd / "test" / "src" / "WorldSqlTests.scala")) {
       val isDocsIndex = line.indexOf("// +DOCS")
       if (isDocsIndex != -1) {
@@ -140,6 +142,7 @@ object scalasql extends RootModule with ScalaModule {
 
 
     val outputLines = mutable.Buffer.empty[String]
+    outputLines.append(generatedCodeHeader)
     outputLines.append(
       s"""# ScalaSql Reference Library
          |
@@ -195,7 +198,7 @@ object scalasql extends RootModule with ScalaModule {
         }
       }
     }
-    os.write.over(os.pwd / s"reference-library.md", outputLines.mkString("\n"))
+    os.write.over(os.pwd / s"reference.md", outputLines.mkString("\n"))
   }
 
 }

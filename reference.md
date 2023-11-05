@@ -1,3 +1,4 @@
+[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)
 # ScalaSql Reference Library
 
 This page contains example queries for the ScalaSql, taken from the

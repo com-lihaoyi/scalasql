@@ -1,3 +1,4 @@
+[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)
 
 ## Importing Your Database Dialect
 To begin using ScalaSql, you need the following imports:
@@ -69,7 +70,7 @@ case class Country[+T[_]](
     region: T[String],
     surfaceArea: T[Int],
     indepYear: T[Option[Int]],
-    population: T[Int],
+    population: T[Long],
     lifeExpectancy: T[Option[Double]],
     gnp: T[Option[scala.math.BigDecimal]],
     gnpOld: T[Option[scala.math.BigDecimal]],
@@ -89,7 +90,7 @@ case class City[+T[_]](
     name: T[String],
     countryCode: T[String],
     district: T[String],
-    population: T[Int]
+    population: T[Long]
 )
 
 object City extends Table[City]() {
@@ -362,7 +363,8 @@ the `city` table to look for `Singapore` and get the entire row as a `City[Id]`,
 but also want to fetch the uppercase name and the population-in-millions. As
 you would expect, you get a tuple of `(City[Id], String, Int)` back.
 ```scala
-val query = City.select.filter(_.name === "Singapore")
+val query = City.select
+  .filter(_.name === "Singapore")
   .map(c => (c, c.name.toUpperCase, c.population / 1000000))
   .single
 
@@ -381,11 +383,12 @@ db.toSqlQuery(query) ==> """
     city0.name = ?
   """.trim.replaceAll("\\s+", " ")
 
-db.run(query) ==> (
-  City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
-  "SINGAPORE",
-  4 // population in millions
-)
+db.run(query) ==>
+  (
+    City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+    "SINGAPORE",
+    4 // population in millions
+  )
 ```
 
 ## Aggregates
@@ -395,7 +398,7 @@ query all cities in China and sum up their populations
 ```scala
 val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
 db.toSqlQuery(query) ==>
-"SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
+  "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
 
 db.run(query) ==> 175953614
 ```
@@ -415,7 +418,7 @@ greater than one million
 ```scala
 val query = Country.select.filter(_.population > 1000000).size
 db.toSqlQuery(query) ==>
-"SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
+  "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
 
 db.run(query) ==> 154
 ```
@@ -424,11 +427,9 @@ If you want to perform multiple aggregates at once, you can use the `.aggregate`
 function. Below, we run a single query that returns the minimum, average, and
 maximum populations across all countries in our dataset
 ```scala
-val query = Country.select.aggregate(cs =>
-  (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population))
-)
-db.toSqlQuery(query) ==>
-"""
+val query = Country.select
+  .aggregate(cs => (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population)))
+db.toSqlQuery(query) ==> """
 SELECT
   MIN(country0.population) as res__0,
   AVG(country0.population) as res__1,
@@ -444,7 +445,11 @@ db.run(query) ==> (0, 25434098, 1277558000)
 You can use `.sortBy` to order the returned rows, and `.drop` and `.take`
 to select a range of rows within the entire result set:
 ```scala
-val query = City.select.sortBy(_.population).desc.drop(5).take(5)
+val query = City.select
+  .sortBy(_.population)
+  .desc
+  .drop(5)
+  .take(5)
   .map(c => (c.name, c.population))
 
 db.toSqlQuery(query) ==> """
@@ -474,12 +479,12 @@ You can perform SQL inner `JOIN`s between tables via the `.join` or `.joinOn`
 methods. Below, we use a `JOIN` to look for cities which are in the country
 named "Liechtenstein":
 ```scala
-val query = City.select.joinOn(Country)(_.countryCode === _.code)
+val query = City.select
+  .joinOn(Country)(_.countryCode === _.code)
   .filter { case (city, country) => country.name === "Liechtenstein" }
   .map { case (city, country) => city.name }
 
-db.toSqlQuery(query) ==>
-"""
+db.toSqlQuery(query) ==> """
 SELECT city0.name as res
 FROM city city0
 JOIN country country1 ON city0.countrycode = country1.code
@@ -491,12 +496,14 @@ db.run(query) ==> Seq("Schaan", "Vaduz")
 
 `LEFT JOIN`, `RIGHT JOIN`, and `OUTER JOIN`s are also supported, e.g.
 ```scala
-val query = City.select.rightJoin(Country)(_.countryCode === _.code)
+val query = City.select
+  .rightJoin(Country)(_.countryCode === _.code)
   .filter { case (cityOpt, country) => cityOpt.isEmpty }
-  .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
+  .map { case (cityOpt, country) =>
+    (cityOpt.map(_.name), country.name)
+  }
 
-db.toSqlQuery(query) ==>
-"""
+db.toSqlQuery(query) ==> """
 SELECT city0.name as res__0, country1.name as res__1
 FROM city city0
 RIGHT JOIN country country1 ON city0.countrycode = country1.code
@@ -535,6 +542,7 @@ query to find language and the name of the top 2 most populous countries:
 val query = CountryLanguage.select
   .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
   .map { case (language, country) => (language.language, country.name) }
+  .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
   SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
@@ -547,24 +555,30 @@ db.toSqlQuery(query) ==> """
     ORDER BY res__population DESC
     LIMIT 2) subquery1
   ON countrylanguage0.countrycode = subquery1.res__code
+  ORDER BY res__0
   """.trim.replaceAll("\\s+", " ")
 
 db.run(query).take(5) ==> Seq(
+  ("Asami", "India"),
+  ("Bengali", "India"),
   ("Chinese", "China"),
   ("Dong", "China"),
-  ("Hui", "China"),
-  ("Mantu", "China"),
-  ("Miao", "China")
+  ("Gujarati", "India")
 )
 ```
 
 Some operations automatically generate subqueries where necessary, e.g.
 performing a `.joinOn` after you have done a `.take`:
 ```scala
-val query = Country.select.sortBy(_.population).desc.take(2)
-  .joinOn(CountryLanguage)(_.code === _.countryCode).map { case (country, language) =>
+val query = Country.select
+  .sortBy(_.population)
+  .desc
+  .take(2)
+  .joinOn(CountryLanguage)(_.code === _.countryCode)
+  .map { case (country, language) =>
     (language.language, country.name)
   }
+  .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
   SELECT countrylanguage1.language as res__0, subquery0.res__name as res__1
@@ -577,14 +591,137 @@ db.toSqlQuery(query) ==> """
     LIMIT 2) subquery0
   JOIN countrylanguage countrylanguage1
   ON subquery0.res__code = countrylanguage1.countrycode
+  ORDER BY res__0
   """.trim.replaceAll("\\s+", " ")
 
 db.run(query).take(5) ==> List(
+  ("Asami", "India"),
+  ("Bengali", "India"),
   ("Chinese", "China"),
   ("Dong", "China"),
-  ("Hui", "China"),
-  ("Mantu", "China"),
-  ("Miao", "China")
+  ("Gujarati", "India")
+)
+```
+
+
+## Realistic Queries
+
+### Languages Spoken In Most Cities
+Here's a more complicated query using the techniques we've learned so far:
+a query fetching the top 10 languages spoken by the largest number of cities
+```scala
+val query = City.select
+  .joinOn(CountryLanguage)(_.countryCode === _.countryCode)
+  .map { case (city, language) => (city.id, language.language) }
+  .groupBy { case (city, language) => language }(_.size)
+  .sortBy { case (language, cityCount) => cityCount }.desc
+  .take(10)
+
+db.toSqlQuery(query) ==> """
+ SELECT countrylanguage1.language as res__0, COUNT(1) as res__1
+ FROM city city0
+ JOIN countrylanguage countrylanguage1 ON city0.countrycode = countrylanguage1.countrycode
+ GROUP BY countrylanguage1.language
+ ORDER BY res__1 DESC
+ LIMIT 10
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> Seq(
+  ("Chinese", 1083),
+  ("German", 885),
+  ("Spanish", 881),
+  ("Italian", 857),
+  ("English", 823),
+  ("Japanese", 774),
+  ("Portuguese", 629),
+  ("Korean", 608),
+  ("Polish", 557),
+  ("French", 467)
+)
+```
+
+### Population-Weighted Average Life Expectancy Per Continent
+Another non-trivia query: listing the population-weighted
+average life expectancy per continent
+```scala
+val query = Country.select
+  .groupBy(_.continent)(group =>
+    group.sumBy(c => c.lifeExpectancy.get * c.population) / group.sumBy(_.population)
+  )
+  .sortBy(_._2).desc
+
+db.toSqlQuery(query) ==> """
+SELECT
+  country0.continent as res__0,
+  SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) as res__1
+FROM country country0
+GROUP BY country0.continent
+ORDER BY res__1 DESC
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> Seq(
+  ("Oceania", 75.90188415576932),
+  ("North America", 74.91544123695004),
+  ("Europe", 73.82361172661305),
+  ("South America", 67.54433544271905),
+  ("Asia", 67.35222776275229),
+  ("Africa", 52.031677405178264),
+  ("Antarctica", 0.0)
+)
+```
+
+### Most Populous City in each of the Three Most Populous Countries
+This example uses first gets the three largest Countries, `JOIN`s the
+Cities, uses a filter with a subquery to pick the city with the largest
+population in each country, and then returns the name and population of
+each city/country pair. The "top 3 countries" part of the query before
+the `JOIN` is automatically converted to a subquery to be compliant
+with SQL syntax
+
+```scala
+val query = Country.select
+  .sortBy(_.population).desc
+  .take(3)
+  .joinOn(City)(_.code === _.countryCode)
+  .filter{case (country, city) =>
+    city.id ===
+    City.select
+      .filter(_.countryCode === country.code)
+      .sortBy(_.population).desc
+      .map(_.id)
+      .take(1)
+      .exprQuery
+  }
+  .map {
+    case (country, city) => (country.name, country.population, city.name, city.population)
+  }
+
+db.toSqlQuery(query) ==> """
+SELECT
+  subquery0.res__name as res__0,
+  subquery0.res__population as res__1,
+  city1.name as res__2,
+  city1.population as res__3
+FROM (SELECT
+    country0.code as res__code,
+    country0.name as res__name,
+    country0.population as res__population
+  FROM country country0
+  ORDER BY res__population DESC
+  LIMIT 3) subquery0
+JOIN city city1 ON subquery0.res__code = city1.countrycode
+WHERE city1.id = (SELECT
+    city0.id as res
+    FROM city city0
+    WHERE city0.countrycode = subquery0.res__code
+    ORDER BY city0.population DESC
+    LIMIT 1)
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> Seq(
+  ("China", 1277558000, "Shanghai", 9696300),
+  ("India", 1013662000, "Mumbai (Bombay)", 10500000),
+  ("United States", 278357000, "New York", 8008278)
 )
 ```
 
@@ -594,10 +731,10 @@ a single row via `.insert.values`, passing the columns you want to insert
 (and leaving out any that the database would auto-populate)
 ```scala
 val query = City.insert.values( // ID provided by database AUTO_INCREMENT
-  _.name -> "Sentosa",
-  _.countryCode -> "SGP",
-  _.district -> "South",
-  _.population -> 1337
+  _.name := "Sentosa",
+  _.countryCode := "SGP",
+  _.district := "South",
+  _.population := 1337
 )
 db.toSqlQuery(query) ==>
   "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)"
@@ -640,8 +777,9 @@ you to select arbitrary data from the same table (or another table) to insert:
 ```scala
 val query = City.insert.select(
   c => (c.name, c.countryCode, c.district, c.population),
-  City.select.filter(_.name === "Singapore")
-    .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
+  City.select
+    .filter(_.name === "Singapore")
+    .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0L)))
 )
 
 db.toSqlQuery(query) ==> """
@@ -667,8 +805,9 @@ various `INSERT` syntaxes supported by the underlying database.
 ScalaSql allows updates via the `.update` syntax, that takes a filter
 and a list of columns to update:
 ```scala
-val query = City.update(_.countryCode === "SGP")
-  .set(_.population -> 0, _.district -> "UNKNOWN")
+val query = City
+  .update(_.countryCode === "SGP")
+  .set(_.population := 0, _.district := "UNKNOWN")
 
 db.toSqlQuery(query) ==>
   "UPDATE city SET population = ?, district = ? WHERE city.countrycode = ?"
@@ -682,8 +821,9 @@ db.run(City.select.filter(_.countryCode === "SGP").single) ==>
 You can perform computed updates by referencing columns as part of the
 expressions passed to the `.set` call:
 ```scala
-val query = City.update(_.countryCode === "SGP")
-  .set(c => c.population -> (c.population + 1000000))
+val query = City
+  .update(_.countryCode === "SGP")
+  .set(c => c.population := (c.population + 1000000))
 db.toSqlQuery(query) ==>
   "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?"
 
@@ -697,8 +837,7 @@ The filter predicate to `.update` is mandatory, to avoid performing updates acro
 an entire database table accidentally . If you really want to perform an update
 on every single row, you can pass in `_ => true` as your filter:
 ```scala
-val query = City.update(_ => true)
-  .set(_.population -> 0)
+val query = City.update(_ => true).set(_.population := 0)
 db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
 
 db.run(query)
