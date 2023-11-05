@@ -38,25 +38,6 @@ Expr(false) || Expr(false)
     ```
 
 
-----
-
-```scala
-!Expr(false)
-```
-
-
-*
-    ```sql
-    SELECT NOT ? as res
-    ```
-
-
-*
-    ```scala
-    true
-    ```
-
-
 ## ExprIntOpsTests
 ### ExprIntOpsTests.plus
 
@@ -325,25 +306,6 @@ Expr(4.3).ceil
 
 
 ### ExprIntOpsTests.floor
-
-```scala
-Expr(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) as res
-    ```
-
-
-*
-    ```scala
-    4.0
-    ```
-
-
-----
 
 ```scala
 Expr(4.7).floor
@@ -902,20 +864,6 @@ Buyer.insert.values(
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
 ### InsertTests.single.partial
 
 ```scala
@@ -933,20 +881,6 @@ Buyer.insert
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -977,27 +911,6 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
-    ```
-
-
 ### InsertTests.batch.partial
 
 ```scala
@@ -1019,28 +932,6 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 *
     ```scala
     3
-    ```
-
-
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
     ```
 
 
@@ -1074,26 +965,6 @@ Buyer.insert.select(
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
-
-
 ### InsertTests.select.simple
 
 ```scala
@@ -1119,27 +990,6 @@ Buyer.insert.select(
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
-
-
 ## DeleteTests
 ### DeleteTests.single
 
@@ -1157,28 +1007,6 @@ Purchase.delete(_.id `=` 2)
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Purchase.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
-      // id==2 got deleted
-      Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
-    )
     ```
 
 
@@ -1201,20 +1029,6 @@ Purchase.delete(_.id <> 2)
     ```
 
 
-----
-
-```scala
-Purchase.select
-```
-
-
-
-*
-    ```scala
-    Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
-    ```
-
-
 ### DeleteTests.all
 
 ```scala
@@ -1231,22 +1045,6 @@ Purchase.delete(_ => true)
 *
     ```scala
     7
-    ```
-
-
-----
-
-```scala
-Purchase.select
-```
-
-
-
-*
-    ```scala
-    Seq[Purchase[Id]](
-      // all Deleted
-    )
     ```
 
 
@@ -3180,34 +2978,6 @@ Buyer
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("1965-08-09"))
-    ```
-
-
 ### UpdateTests.bulk
 
 ```scala
@@ -3224,34 +2994,6 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 *
     ```scala
     3
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -3276,34 +3018,6 @@ Buyer
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq[LocalDate]()
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
-    ```
-
-
 ### UpdateTests.dynamic
 
 ```scala
@@ -3320,34 +3034,6 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq[LocalDate]()
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2001-02-03"))
     ```
 
 
@@ -3374,20 +3060,6 @@ Buyer
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -3423,20 +3095,6 @@ Buyer
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.id `=` 1).map(_.name)
-```
-
-
-
-*
-    ```scala
-    Seq("Camera")
-    ```
-
-
 ### UpdateJoinTests.joinSubquery
 
 ```scala
@@ -3464,20 +3122,6 @@ Buyer
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -3512,20 +3156,6 @@ Buyer
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2000-01-01"))
-    ```
-
-
 ## UpdateSubQueryTests
 ### UpdateSubQueryTests.setSubquery
 
@@ -3548,27 +3178,6 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
     ```
 
 
-----
-
-```scala
-Product.select.map(p => (p.id, p.name, p.price))
-```
-
-
-
-*
-    ```scala
-    Seq(
-      (1, "Face Mask", 1000.0),
-      (2, "Guitar", 1000.0),
-      (3, "Socks", 1000.0),
-      (4, "Skate Board", 1000.0),
-      (5, "Camera", 1000.0),
-      (6, "Cookie", 1000.0)
-    )
-    ```
-
-
 ### UpdateSubQueryTests.whereSubquery
 
 ```scala
@@ -3587,27 +3196,6 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Product.select.map(p => (p.id, p.name, p.price))
-```
-
-
-
-*
-    ```scala
-    Seq(
-      (1, "Face Mask", 8.88),
-      (2, "Guitar", 300.0),
-      (3, "Socks", 3.14),
-      (4, "Skate Board", 123.45),
-      (5, "Camera", 0.0),
-      (6, "Cookie", 0.1)
-    )
     ```
 
 
@@ -3633,20 +3221,6 @@ Buyer.insert
     ```
 
 
-----
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
 ### ReturningTests.insert.dotSingle
 
 ```scala
@@ -3666,20 +3240,6 @@ Buyer.insert
 *
     ```scala
     4
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -3713,28 +3273,6 @@ Buyer.insert
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
-    ```
-
-
 ### ReturningTests.insert.select
 
 ```scala
@@ -3765,27 +3303,6 @@ Buyer.insert
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
-
-
 ### ReturningTests.update.single
 
 ```scala
@@ -3805,20 +3322,6 @@ Buyer
 *
     ```scala
     Seq(1)
-    ```
-
-
-----
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -3862,26 +3365,6 @@ Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
 *
     ```scala
     Seq(888.0, 900.0, 15.7)
-    ```
-
-
-----
-
-```scala
-Purchase.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      // id=1,2,3 had shippingInfoId=1 and thus got deleted
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
-    )
     ```
 
 
@@ -4017,24 +3500,6 @@ Buyer.insert
     ```
 
 
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
 ### OnConflictTests.computed
 
 ```scala
@@ -4057,24 +3522,6 @@ Buyer.insert
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-Buyer.select
-```
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
     ```
 
 
@@ -4174,20 +3621,6 @@ DataTypes.insert.values(
     ```
 
 
-----
-
-```scala
-DataTypes.select
-```
-
-
-
-*
-    ```scala
-    Seq(value)
-    ```
-
-
 ### DataTypesTests.nonRoundTrip
 
 ```scala
@@ -4202,20 +3635,6 @@ NonRoundTripTypes.insert.values(
 *
     ```scala
     1
-    ```
-
-
-----
-
-```scala
-NonRoundTripTypes.select
-```
-
-
-
-*
-    ```scala
-    Seq(normalize(value))
     ```
 
 

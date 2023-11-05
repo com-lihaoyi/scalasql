@@ -135,6 +135,7 @@ object scalasql extends RootModule with ScalaModule {
             else None
 
           for(title <- titleOpt) {
+            seen.add(prettyName)
             lastSeen = prettyName
             outputLines.append(
               s"""$title
