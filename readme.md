@@ -284,4 +284,6 @@ their own operations not provided by the base library.
 * Fix WorldSqlTests's `RIGHT JOIN` example
 * Dot-delimited result names
 * Tutorial docs for `Option`/`NULL` handling
+* Docs for type mapping
+* Docs for custom expressions
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
