@@ -1,6 +1,6 @@
 # mysql
 ## scalasql.mysql.CompoundSelectTests
-### scalasql.mysql.CompoundSelectTests.sort.simple
+### CompoundSelectTests.sort.simple
 
 ```scala
 Product.select.sortBy(_.price).map(_.name)
@@ -16,7 +16,7 @@ Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.twice
+### CompoundSelectTests.sort.twice
 
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
@@ -47,7 +47,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimit
+### CompoundSelectTests.sort.sortLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
@@ -63,7 +63,7 @@ Seq("Cookie", "Socks")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortOffset
+### CompoundSelectTests.sort.sortOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2)
@@ -79,7 +79,7 @@ Seq("Face Mask", "Skate Board", "Guitar", "Camera")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimitTwiceHigher
+### CompoundSelectTests.sort.sortLimitTwiceHigher
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
@@ -95,7 +95,7 @@ Seq("Cookie", "Socks")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimitTwiceLower
+### CompoundSelectTests.sort.sortLimitTwiceLower
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(1)
@@ -111,7 +111,7 @@ Seq("Cookie")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimitOffset
+### CompoundSelectTests.sort.sortLimitOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -127,7 +127,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimitOffsetTwice
+### CompoundSelectTests.sort.sortLimitOffsetTwice
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
@@ -143,7 +143,7 @@ Seq("Guitar")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortOffsetLimit
+### CompoundSelectTests.sort.sortOffsetLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -159,7 +159,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sort.sortLimitOffset
+### CompoundSelectTests.sort.sortLimitOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).drop(1)
@@ -175,7 +175,7 @@ Seq("Socks")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.distinct
+### CompoundSelectTests.distinct
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
@@ -195,7 +195,7 @@ Seq(1, 2)
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.flatMap
+### CompoundSelectTests.flatMap
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
@@ -218,7 +218,7 @@ Seq("Camera", "Face Mask", "Guitar")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.sumBy
+### CompoundSelectTests.sumBy
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
@@ -238,7 +238,7 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.aggregate
+### CompoundSelectTests.aggregate
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
@@ -258,7 +258,7 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.union
+### CompoundSelectTests.union
 
 ```scala
 Product.select.map(_.name.toLowerCase).union(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -278,7 +278,7 @@ Seq("camera", "cookie", "face mask", "face-mask", "guitar", "skate board", "skat
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.unionAll
+### CompoundSelectTests.unionAll
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -311,7 +311,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.intersect
+### CompoundSelectTests.intersect
 
 ```scala
 Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -331,7 +331,7 @@ Seq("camera", "cookie", "guitar", "socks")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.except
+### CompoundSelectTests.except
 
 ```scala
 Product.select.map(_.name.toLowerCase).except(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -351,7 +351,7 @@ Seq("face mask", "skate board")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.unionAllUnionSort
+### CompoundSelectTests.unionAllUnionSort
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
@@ -388,7 +388,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.unionAllUnionSortLimit
+### CompoundSelectTests.unionAllUnionSortLimit
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
@@ -415,7 +415,7 @@ Seq("guitar", "james bond", "li haoyi", "skate board")
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.exceptAggregate
+### CompoundSelectTests.exceptAggregate
 
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
@@ -446,7 +446,7 @@ FROM (SELECT
 ```
 
 
-### scalasql.mysql.CompoundSelectTests.unionAllAggregate
+### CompoundSelectTests.unionAllAggregate
 
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
@@ -474,7 +474,7 @@ FROM (SELECT product0.price as res__1
 
 
 ## scalasql.mysql.DataTypesTests
-### scalasql.mysql.DataTypesTests.constant
+### DataTypesTests.constant
 
 ```scala
 DataTypes.insert.values(
@@ -499,7 +499,7 @@ DataTypes.insert.values(
 ```
 
 
-### scalasql.mysql.DataTypesTests.constant
+### DataTypesTests.constant
 
 ```scala
 DataTypes.select
@@ -512,7 +512,7 @@ Seq(value)
 ```
 
 
-### scalasql.mysql.DataTypesTests.nonRoundTrip
+### DataTypesTests.nonRoundTrip
 
 ```scala
 NonRoundTripTypes.insert
@@ -526,7 +526,7 @@ NonRoundTripTypes.insert
 ```
 
 
-### scalasql.mysql.DataTypesTests.nonRoundTrip
+### DataTypesTests.nonRoundTrip
 
 ```scala
 NonRoundTripTypes.select
@@ -540,7 +540,7 @@ Seq(normalize(value))
 
 
 ## scalasql.mysql.DeleteTests
-### scalasql.mysql.DeleteTests.single
+### DeleteTests.single
 
 ```scala
 Purchase.delete(_.id `=` 2)
@@ -556,7 +556,7 @@ DELETE FROM purchase WHERE purchase.id = ?
 ```
 
 
-### scalasql.mysql.DeleteTests.single
+### DeleteTests.single
 
 ```scala
 Purchase.select
@@ -577,7 +577,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.DeleteTests.multiple
+### DeleteTests.multiple
 
 ```scala
 Purchase.delete(_.id <> 2)
@@ -593,7 +593,7 @@ DELETE FROM purchase WHERE purchase.id <> ?
 ```
 
 
-### scalasql.mysql.DeleteTests.multiple
+### DeleteTests.multiple
 
 ```scala
 Purchase.select
@@ -606,7 +606,7 @@ Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 9
 ```
 
 
-### scalasql.mysql.DeleteTests.all
+### DeleteTests.all
 
 ```scala
 Purchase.delete(_ => true)
@@ -622,7 +622,7 @@ DELETE FROM purchase WHERE ?
 ```
 
 
-### scalasql.mysql.DeleteTests.all
+### DeleteTests.all
 
 ```scala
 Purchase.select
@@ -638,7 +638,7 @@ Seq[Purchase[Id]](
 
 
 ## scalasql.mysql.ExprBooleanOpsTests
-### scalasql.mysql.ExprBooleanOpsTests.and
+### ExprBooleanOpsTests.and
 
 ```scala
 Expr(true) && Expr(true)
@@ -654,7 +654,7 @@ true
 ```
 
 
-### scalasql.mysql.ExprBooleanOpsTests.or
+### ExprBooleanOpsTests.or
 
 ```scala
 Expr(false) || Expr(false)
@@ -670,7 +670,7 @@ false
 ```
 
 
-### scalasql.mysql.ExprBooleanOpsTests.or
+### ExprBooleanOpsTests.or
 
 ```scala
 !Expr(false)
@@ -687,7 +687,7 @@ true
 
 
 ## scalasql.mysql.ExprExprIntOpsTests
-### scalasql.mysql.ExprExprIntOpsTests.plus
+### ExprExprIntOpsTests.plus
 
 ```scala
 Expr(6) + Expr(2)
@@ -703,7 +703,7 @@ SELECT ? + ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.minus
+### ExprExprIntOpsTests.minus
 
 ```scala
 Expr(6) - Expr(2)
@@ -719,7 +719,7 @@ SELECT ? - ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.times
+### ExprExprIntOpsTests.times
 
 ```scala
 Expr(6) * Expr(2)
@@ -735,7 +735,7 @@ SELECT ? * ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.divide
+### ExprExprIntOpsTests.divide
 
 ```scala
 Expr(6) / Expr(2)
@@ -751,7 +751,7 @@ SELECT ? / ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.modulo
+### ExprExprIntOpsTests.modulo
 
 ```scala
 Expr(6) % Expr(2)
@@ -767,7 +767,7 @@ SELECT MOD(?, ?) as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.bitwiseAnd
+### ExprExprIntOpsTests.bitwiseAnd
 
 ```scala
 Expr(6) & Expr(2)
@@ -783,7 +783,7 @@ SELECT ? & ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.bitwiseOr
+### ExprExprIntOpsTests.bitwiseOr
 
 ```scala
 Expr(6) | Expr(3)
@@ -799,7 +799,7 @@ SELECT ? | ? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.between
+### ExprExprIntOpsTests.between
 
 ```scala
 Expr(4).between(Expr(2), Expr(6))
@@ -815,7 +815,7 @@ true
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.unaryPlus
+### ExprExprIntOpsTests.unaryPlus
 
 ```scala
 +Expr(-4)
@@ -831,7 +831,7 @@ SELECT +? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.unaryMinus
+### ExprExprIntOpsTests.unaryMinus
 
 ```scala
 -Expr(-4)
@@ -847,7 +847,7 @@ SELECT -? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.unaryTilde
+### ExprExprIntOpsTests.unaryTilde
 
 ```scala
 ~Expr(-4)
@@ -863,7 +863,7 @@ SELECT ~? as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.abs
+### ExprExprIntOpsTests.abs
 
 ```scala
 Expr(-4).abs
@@ -879,7 +879,7 @@ SELECT ABS(?) as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.mod
+### ExprExprIntOpsTests.mod
 
 ```scala
 Expr(8).mod(Expr(3))
@@ -895,7 +895,7 @@ SELECT MOD(?, ?) as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.ceil
+### ExprExprIntOpsTests.ceil
 
 ```scala
 Expr(4.3).ceil
@@ -911,7 +911,7 @@ SELECT CEIL(?) as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.floor
+### ExprExprIntOpsTests.floor
 
 ```scala
 Expr(4.7).floor
@@ -927,7 +927,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-### scalasql.mysql.ExprExprIntOpsTests.floor
+### ExprExprIntOpsTests.floor
 
 ```scala
 Expr(4.7).floor
@@ -944,7 +944,7 @@ SELECT FLOOR(?) as res
 
 
 ## scalasql.mysql.ExprSeqNumericOpsTests
-### scalasql.mysql.ExprSeqNumericOpsTests.sum
+### ExprSeqNumericOpsTests.sum
 
 ```scala
 Purchase.select.map(_.count).sum
@@ -960,7 +960,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqNumericOpsTests.min
+### ExprSeqNumericOpsTests.min
 
 ```scala
 Purchase.select.map(_.count).min
@@ -976,7 +976,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqNumericOpsTests.max
+### ExprSeqNumericOpsTests.max
 
 ```scala
 Purchase.select.map(_.count).max
@@ -992,7 +992,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqNumericOpsTests.avg
+### ExprSeqNumericOpsTests.avg
 
 ```scala
 Purchase.select.map(_.count).avg
@@ -1009,7 +1009,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 
 ## scalasql.mysql.ExprSeqOpsTests
-### scalasql.mysql.ExprSeqOpsTests.size
+### ExprSeqOpsTests.size
 
 ```scala
 Purchase.select.size
@@ -1025,7 +1025,7 @@ SELECT COUNT(1) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.sumBy.simple
+### ExprSeqOpsTests.sumBy.simple
 
 ```scala
 Purchase.select.sumBy(_.count)
@@ -1041,7 +1041,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.sumBy.some
+### ExprSeqOpsTests.sumBy.some
 
 ```scala
 Purchase.select.sumByOpt(_.count)
@@ -1057,7 +1057,7 @@ Option(140)
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.sumBy.none
+### ExprSeqOpsTests.sumBy.none
 
 ```scala
 Purchase.select.filter(_ => false).sumByOpt(_.count)
@@ -1073,7 +1073,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.minBy.simple
+### ExprSeqOpsTests.minBy.simple
 
 ```scala
 Purchase.select.minBy(_.count)
@@ -1089,7 +1089,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.minBy.some
+### ExprSeqOpsTests.minBy.some
 
 ```scala
 Purchase.select.minByOpt(_.count)
@@ -1105,7 +1105,7 @@ Option(3)
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.minBy.none
+### ExprSeqOpsTests.minBy.none
 
 ```scala
 Purchase.select.filter(_ => false).minByOpt(_.count)
@@ -1121,7 +1121,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.maxBy.simple
+### ExprSeqOpsTests.maxBy.simple
 
 ```scala
 Purchase.select.maxBy(_.count)
@@ -1137,7 +1137,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.maxBy.some
+### ExprSeqOpsTests.maxBy.some
 
 ```scala
 Purchase.select.maxByOpt(_.count)
@@ -1153,7 +1153,7 @@ Option(100)
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.maxBy.none
+### ExprSeqOpsTests.maxBy.none
 
 ```scala
 Purchase.select.filter(_ => false).maxByOpt(_.count)
@@ -1169,7 +1169,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.avgBy.simple
+### ExprSeqOpsTests.avgBy.simple
 
 ```scala
 Purchase.select.avgBy(_.count)
@@ -1185,7 +1185,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.avgBy.some
+### ExprSeqOpsTests.avgBy.some
 
 ```scala
 Purchase.select.avgByOpt(_.count)
@@ -1201,7 +1201,7 @@ Option(20)
 ```
 
 
-### scalasql.mysql.ExprSeqOpsTests.avgBy.none
+### ExprSeqOpsTests.avgBy.none
 
 ```scala
 Purchase.select.filter(_ => false).avgByOpt(_.count)
@@ -1218,7 +1218,7 @@ Option.empty[Int]
 
 
 ## scalasql.mysql.ExprStringOpsTests
-### scalasql.mysql.ExprStringOpsTests.plus
+### ExprStringOpsTests.plus
 
 ```scala
 Expr("hello") + Expr("world")
@@ -1234,7 +1234,7 @@ SELECT CONCAT(?, ?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.like
+### ExprStringOpsTests.like
 
 ```scala
 Expr("hello").like("he%")
@@ -1250,7 +1250,7 @@ true
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.length
+### ExprStringOpsTests.length
 
 ```scala
 Expr("hello").length
@@ -1266,7 +1266,7 @@ SELECT LENGTH(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.octetLength
+### ExprStringOpsTests.octetLength
 
 ```scala
 Expr("叉烧包").octetLength
@@ -1282,7 +1282,7 @@ SELECT OCTET_LENGTH(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.position
+### ExprStringOpsTests.position
 
 ```scala
 Expr("hello").indexOf("ll")
@@ -1298,7 +1298,7 @@ SELECT POSITION(? IN ?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.toLowerCase
+### ExprStringOpsTests.toLowerCase
 
 ```scala
 Expr("Hello").toLowerCase
@@ -1314,7 +1314,7 @@ SELECT LOWER(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.trim
+### ExprStringOpsTests.trim
 
 ```scala
 Expr("  Hello ").trim
@@ -1330,7 +1330,7 @@ SELECT TRIM(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.ltrim
+### ExprStringOpsTests.ltrim
 
 ```scala
 Expr("  Hello ").ltrim
@@ -1346,7 +1346,7 @@ SELECT LTRIM(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.rtrim
+### ExprStringOpsTests.rtrim
 
 ```scala
 Expr("  Hello ").rtrim
@@ -1362,7 +1362,7 @@ SELECT RTRIM(?) as res
 ```
 
 
-### scalasql.mysql.ExprStringOpsTests.substring
+### ExprStringOpsTests.substring
 
 ```scala
 Expr("Hello").substring(2, 2)
@@ -1379,7 +1379,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 
 
 ## scalasql.mysql.InsertTests
-### scalasql.mysql.InsertTests.single.simple
+### InsertTests.single.simple
 
 ```scala
 Buyer.insert
@@ -1396,7 +1396,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 ```
 
 
-### scalasql.mysql.InsertTests.single.simple
+### InsertTests.single.simple
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1409,7 +1409,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.mysql.InsertTests.single.partial
+### InsertTests.single.partial
 
 ```scala
 Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
@@ -1425,7 +1425,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 ```
 
 
-### scalasql.mysql.InsertTests.single.partial
+### InsertTests.single.partial
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1438,7 +1438,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.mysql.InsertTests.batch.simple
+### InsertTests.batch.simple
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
@@ -1462,7 +1462,7 @@ VALUES
 ```
 
 
-### scalasql.mysql.InsertTests.batch.simple
+### InsertTests.batch.simple
 
 ```scala
 Buyer.select
@@ -1482,7 +1482,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.InsertTests.batch.partial
+### InsertTests.batch.partial
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -1503,7 +1503,7 @@ VALUES (?, ?), (?, ?), (?, ?)
 ```
 
 
-### scalasql.mysql.InsertTests.batch.partial
+### InsertTests.batch.partial
 
 ```scala
 Buyer.select
@@ -1524,7 +1524,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.InsertTests.select.caseclass
+### InsertTests.select.caseclass
 
 ```scala
 Buyer.insert.select(
@@ -1549,7 +1549,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### scalasql.mysql.InsertTests.select.caseclass
+### InsertTests.select.caseclass
 
 ```scala
 Buyer.select
@@ -1568,7 +1568,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.InsertTests.select.simple
+### InsertTests.select.simple
 
 ```scala
 Buyer.insert.select(
@@ -1590,7 +1590,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### scalasql.mysql.InsertTests.select.simple
+### InsertTests.select.simple
 
 ```scala
 Buyer.select
@@ -1611,7 +1611,7 @@ Seq(
 
 
 ## scalasql.mysql.JoinTests
-### scalasql.mysql.JoinTests.joinFilter
+### JoinTests.joinFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1645,7 +1645,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.joinSelectFilter
+### JoinTests.joinSelectFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1679,7 +1679,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.joinFilterMap
+### JoinTests.joinFilterMap
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "James Bond")
@@ -1699,7 +1699,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.mysql.JoinTests.selfJoin
+### JoinTests.selfJoin
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id `=` _.id)
@@ -1736,7 +1736,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.selfJoin2
+### JoinTests.selfJoin2
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id <> _.id)
@@ -1785,7 +1785,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.flatMap
+### JoinTests.flatMap
 
 ```scala
 Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
@@ -1806,7 +1806,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.mysql.JoinTests.flatMap2
+### JoinTests.flatMap2
 
 ```scala
 Buyer.select
@@ -1827,7 +1827,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.mysql.JoinTests.leftJoin
+### JoinTests.leftJoin
 
 ```scala
 Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
@@ -1865,7 +1865,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.rightJoin
+### JoinTests.rightJoin
 
 ```scala
 ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
@@ -1903,7 +1903,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.JoinTests.outerJoin
+### JoinTests.outerJoin
 
 ```scala
 ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
@@ -1952,7 +1952,7 @@ Seq(
 
 
 ## scalasql.mysql.MySqlDialectTests
-### scalasql.mysql.MySqlDialectTests.reverse
+### MySqlDialectTests.reverse
 
 ```scala
 Expr("Hello").reverse
@@ -1968,7 +1968,7 @@ SELECT REVERSE(?) as res
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.lpad
+### MySqlDialectTests.lpad
 
 ```scala
 Expr("Hello").lpad(10, "xy")
@@ -1984,7 +1984,7 @@ SELECT LPAD(?, ?, ?) as res
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.rpad
+### MySqlDialectTests.rpad
 
 ```scala
 Expr("Hello").rpad(10, "xy")
@@ -2000,7 +2000,7 @@ SELECT RPAD(?, ?, ?) as res
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.conflict.ignore
+### MySqlDialectTests.conflict.ignore
 
 ```scala
 Buyer.insert.values(
@@ -2020,7 +2020,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UP
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.conflict.update
+### MySqlDialectTests.conflict.update
 
 ```scala
 Buyer.insert.values(
@@ -2040,7 +2040,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UP
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.conflict.update
+### MySqlDialectTests.conflict.update
 
 ```scala
 Buyer.select
@@ -2057,7 +2057,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.conflict.updateComputed
+### MySqlDialectTests.conflict.updateComputed
 
 ```scala
 Buyer.insert.values(
@@ -2077,7 +2077,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UP
 ```
 
 
-### scalasql.mysql.MySqlDialectTests.conflict.updateComputed
+### MySqlDialectTests.conflict.updateComputed
 
 ```scala
 Buyer.select
@@ -2095,7 +2095,7 @@ Seq(
 
 
 ## scalasql.mysql.OptionalTests
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2109,7 +2109,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.selectAll
+### OptionalTests.selectAll
 
 ```scala
 OptCols.select
@@ -2133,7 +2133,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2147,7 +2147,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.groupByMaxGet
+### OptionalTests.groupByMaxGet
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -2165,7 +2165,7 @@ Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2179,7 +2179,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.isDefined
+### OptionalTests.isDefined
 
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
@@ -2199,7 +2199,7 @@ Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2213,7 +2213,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.isEmpty
+### OptionalTests.isEmpty
 
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
@@ -2233,7 +2233,7 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2247,7 +2247,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sqlEquals.nonOptionHit
+### OptionalTests.sqlEquals.nonOptionHit
 
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
@@ -2267,7 +2267,7 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2281,7 +2281,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sqlEquals.nonOptionMiss
+### OptionalTests.sqlEquals.nonOptionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` 2)
@@ -2301,7 +2301,7 @@ Seq[OptCols[Id]]()
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2315,7 +2315,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sqlEquals.optionMiss
+### OptionalTests.sqlEquals.optionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` Option.empty[Int])
@@ -2335,7 +2335,7 @@ Seq[OptCols[Id]]()
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2349,7 +2349,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.scalaEquals.someHit
+### OptionalTests.scalaEquals.someHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
@@ -2369,7 +2369,7 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2383,7 +2383,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.scalaEquals.noneHit
+### OptionalTests.scalaEquals.noneHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option.empty[Int])
@@ -2403,7 +2403,7 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2417,7 +2417,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.map
+### OptionalTests.map
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
@@ -2441,7 +2441,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2455,7 +2455,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.map2
+### OptionalTests.map2
 
 ```scala
 OptCols.select.map(_.myInt.map(_ + 10))
@@ -2471,7 +2471,7 @@ Seq(None, Some(11), Some(13), None)
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2485,7 +2485,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.flatMap
+### OptionalTests.flatMap
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
@@ -2510,7 +2510,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2524,7 +2524,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.mapGet
+### OptionalTests.mapGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
@@ -2549,7 +2549,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2563,7 +2563,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.rawGet
+### OptionalTests.rawGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
@@ -2588,7 +2588,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2602,7 +2602,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.getOrElse
+### OptionalTests.getOrElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
@@ -2626,7 +2626,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2640,7 +2640,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.orElse
+### OptionalTests.orElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
@@ -2664,7 +2664,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2678,7 +2678,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.filter
+### OptionalTests.filter
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
@@ -2705,7 +2705,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2719,7 +2719,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.nullsLast
+### OptionalTests.sorting.nullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
@@ -2742,7 +2742,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2756,7 +2756,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.nullsFirst
+### OptionalTests.sorting.nullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsFirst
@@ -2779,7 +2779,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2793,7 +2793,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.ascNullsLast
+### OptionalTests.sorting.ascNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsLast
@@ -2816,7 +2816,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2830,7 +2830,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.ascNullsFirst
+### OptionalTests.sorting.ascNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsFirst
@@ -2853,7 +2853,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2867,7 +2867,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.descNullsLast
+### OptionalTests.sorting.descNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsLast
@@ -2890,7 +2890,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2904,7 +2904,7 @@ OptCols.insert
 ```
 
 
-### scalasql.mysql.OptionalTests.sorting.descNullsFirst
+### OptionalTests.sorting.descNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsFirst
@@ -2928,7 +2928,7 @@ Seq(
 
 
 ## scalasql.mysql.SelectTests
-### scalasql.mysql.SelectTests.constant
+### SelectTests.constant
 
 ```scala
 Expr(1)
@@ -2944,7 +2944,7 @@ SELECT ? as res
 ```
 
 
-### scalasql.mysql.SelectTests.table
+### SelectTests.table
 
 ```scala
 Buyer.select
@@ -2968,7 +2968,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.filter.single
+### SelectTests.filter.single
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2)
@@ -2992,7 +2992,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.filter.multiple
+### SelectTests.filter.multiple
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3014,7 +3014,7 @@ Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-0
 ```
 
 
-### scalasql.mysql.SelectTests.filter.dotSingle.pass
+### SelectTests.filter.dotSingle.pass
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3037,7 +3037,7 @@ ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06
 ```
 
 
-### scalasql.mysql.SelectTests.filter.combined
+### SelectTests.filter.combined
 
 ```scala
 ShippingInfo.select.filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3059,7 +3059,7 @@ Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
 ```
 
 
-### scalasql.mysql.SelectTests.map.single
+### SelectTests.map.single
 
 ```scala
 Buyer.select.map(_.name)
@@ -3075,7 +3075,7 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
 
 
-### scalasql.mysql.SelectTests.map.tuple2
+### SelectTests.map.tuple2
 
 ```scala
 Buyer.select.map(c => (c.name, c.id))
@@ -3091,7 +3091,7 @@ Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
 ```
 
 
-### scalasql.mysql.SelectTests.map.tuple3
+### SelectTests.map.tuple3
 
 ```scala
 Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
@@ -3115,7 +3115,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.map.interpolateInMap
+### SelectTests.map.interpolateInMap
 
 ```scala
 Product.select.map(_.price * 2)
@@ -3131,7 +3131,7 @@ Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
 ```
 
 
-### scalasql.mysql.SelectTests.map.heterogenousTuple
+### SelectTests.map.heterogenousTuple
 
 ```scala
 Buyer.select.map(c => (c.id, c))
@@ -3156,7 +3156,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.exprQuery
+### SelectTests.exprQuery
 
 ```scala
 Product.select.map(p =>
@@ -3191,7 +3191,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.subquery
+### SelectTests.subquery
 
 ```scala
 Buyer.select.subquery.map(_.name)
@@ -3208,7 +3208,7 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
 
 
-### scalasql.mysql.SelectTests.filterMap
+### SelectTests.filterMap
 
 ```scala
 Product.select.filter(_.price < 100).map(_.name)
@@ -3224,7 +3224,7 @@ Seq("Face Mask", "Socks", "Cookie")
 ```
 
 
-### scalasql.mysql.SelectTests.aggregate.single
+### SelectTests.aggregate.single
 
 ```scala
 Purchase.select.aggregate(_.sumBy(_.total))
@@ -3240,7 +3240,7 @@ SELECT SUM(purchase0.total) as res FROM purchase purchase0
 ```
 
 
-### scalasql.mysql.SelectTests.aggregate.multiple
+### SelectTests.aggregate.multiple
 
 ```scala
 Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
@@ -3256,7 +3256,7 @@ SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purch
 ```
 
 
-### scalasql.mysql.SelectTests.groupBy.simple
+### SelectTests.groupBy.simple
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
@@ -3274,7 +3274,7 @@ Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
 ```
 
 
-### scalasql.mysql.SelectTests.groupBy.having
+### SelectTests.groupBy.having
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
@@ -3293,7 +3293,7 @@ Seq((2, 900.0), (4, 493.8), (5, 10000.0))
 ```
 
 
-### scalasql.mysql.SelectTests.groupBy.filterHaving
+### SelectTests.groupBy.filterHaving
 
 ```scala
 Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
@@ -3313,7 +3313,7 @@ Seq((1, 888.0), (5, 10000.0))
 ```
 
 
-### scalasql.mysql.SelectTests.distinct.nondistinct
+### SelectTests.distinct.nondistinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId)
@@ -3329,7 +3329,7 @@ Seq(1, 1, 1, 2, 2, 3, 3)
 ```
 
 
-### scalasql.mysql.SelectTests.distinct.distinct
+### SelectTests.distinct.distinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId).distinct
@@ -3345,7 +3345,7 @@ Seq(1, 2, 3)
 ```
 
 
-### scalasql.mysql.SelectTests.contains
+### SelectTests.contains
 
 ```scala
 Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
@@ -3366,7 +3366,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.nonEmpty
+### SelectTests.nonEmpty
 
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
@@ -3388,7 +3388,7 @@ Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
 ```
 
 
-### scalasql.mysql.SelectTests.isEmpty
+### SelectTests.isEmpty
 
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
@@ -3410,7 +3410,7 @@ Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
 ```
 
 
-### scalasql.mysql.SelectTests.case.when
+### SelectTests.case.when
 
 ```scala
 Product.select.map(p =>
@@ -3445,7 +3445,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SelectTests.case.else
+### SelectTests.case.else
 
 ```scala
 Product.select.map(p =>
@@ -3478,7 +3478,7 @@ Seq(
 
 
 ## scalasql.mysql.SubQueryTests
-### scalasql.mysql.SubQueryTests.sortTakeJoin
+### SubQueryTests.sortTakeJoin
 
 ```scala
 Purchase.select.joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id).map {
@@ -3502,7 +3502,7 @@ Seq(10000.0)
 ```
 
 
-### scalasql.mysql.SubQueryTests.sortTakeFrom
+### SubQueryTests.sortTakeFrom
 
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
@@ -3525,7 +3525,7 @@ Seq(10000.0)
 ```
 
 
-### scalasql.mysql.SubQueryTests.sortTakeFromAndJoin
+### SubQueryTests.sortTakeFromAndJoin
 
 ```scala
 Product.select.sortBy(_.price).desc.take(3)
@@ -3560,7 +3560,7 @@ Seq(("Camera", 10))
 ```
 
 
-### scalasql.mysql.SubQueryTests.sortLimitSortLimit
+### SubQueryTests.sortLimitSortLimit
 
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
@@ -3584,7 +3584,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.mysql.SubQueryTests.sortGroupBy
+### SubQueryTests.sortGroupBy
 
 ```scala
 Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
@@ -3608,7 +3608,7 @@ Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
 ```
 
 
-### scalasql.mysql.SubQueryTests.groupByJoin
+### SubQueryTests.groupByJoin
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
@@ -3641,7 +3641,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SubQueryTests.subqueryInFilter
+### SubQueryTests.subqueryInFilter
 
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
@@ -3665,7 +3665,7 @@ Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
 ```
 
 
-### scalasql.mysql.SubQueryTests.subqueryInMap
+### SubQueryTests.subqueryInMap
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
@@ -3690,7 +3690,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SubQueryTests.subqueryInMapNested
+### SubQueryTests.subqueryInMapNested
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
@@ -3718,7 +3718,7 @@ Seq(
 ```
 
 
-### scalasql.mysql.SubQueryTests.selectLimitUnionSelect
+### SubQueryTests.selectLimitUnionSelect
 
 ```scala
 Buyer.select.map(_.name.toLowerCase).take(2)
@@ -3742,7 +3742,7 @@ Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "c
 ```
 
 
-### scalasql.mysql.SubQueryTests.selectUnionSelectLimit
+### SubQueryTests.selectUnionSelectLimit
 
 ```scala
 Buyer.select.map(_.name.toLowerCase)
@@ -3767,7 +3767,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 
 
 ## scalasql.mysql.UpdateJoinTests
-### scalasql.mysql.UpdateJoinTests.join
+### UpdateJoinTests.join
 
 ```scala
 Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
@@ -3787,7 +3787,7 @@ WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.join
+### UpdateJoinTests.join
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3800,7 +3800,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.multijoin
+### UpdateJoinTests.multijoin
 
 ```scala
 Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
@@ -3825,7 +3825,7 @@ AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.multijoin
+### UpdateJoinTests.multijoin
 
 ```scala
 Buyer.select.filter(_.id `=` 1).map(_.name)
@@ -3838,7 +3838,7 @@ Seq("Camera")
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.joinSubquery
+### UpdateJoinTests.joinSubquery
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -3866,7 +3866,7 @@ WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.joinSubquery
+### UpdateJoinTests.joinSubquery
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3879,7 +3879,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.joinSubqueryEliminatedColumn
+### UpdateJoinTests.joinSubqueryEliminatedColumn
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -3908,7 +3908,7 @@ WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateJoinTests.joinSubqueryEliminatedColumn
+### UpdateJoinTests.joinSubqueryEliminatedColumn
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3922,7 +3922,7 @@ Seq(LocalDate.parse("2000-01-01"))
 
 
 ## scalasql.mysql.UpdateTests
-### scalasql.mysql.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -3938,7 +3938,7 @@ UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3951,7 +3951,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.mysql.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -3964,7 +3964,7 @@ Seq(LocalDate.parse("1965-08-09"))
 ```
 
 
-### scalasql.mysql.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -3980,7 +3980,7 @@ UPDATE buyer SET buyer.date_of_birth = ? WHERE ?
 ```
 
 
-### scalasql.mysql.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3993,7 +3993,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.mysql.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -4006,7 +4006,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.mysql.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -4023,7 +4023,7 @@ UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4036,7 +4036,7 @@ Seq[LocalDate]()
 ```
 
 
-### scalasql.mysql.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
@@ -4049,7 +4049,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.mysql.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
@@ -4065,7 +4065,7 @@ UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-### scalasql.mysql.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4078,7 +4078,7 @@ Seq[LocalDate]()
 ```
 
 
-### scalasql.mysql.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)

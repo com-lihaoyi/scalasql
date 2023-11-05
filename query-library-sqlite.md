@@ -1,6 +1,6 @@
 # sqlite
 ## scalasql.sqlite.CompoundSelectTests
-### scalasql.sqlite.CompoundSelectTests.sort.simple
+### CompoundSelectTests.sort.simple
 
 ```scala
 Product.select.sortBy(_.price).map(_.name)
@@ -16,7 +16,7 @@ Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.twice
+### CompoundSelectTests.sort.twice
 
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
@@ -47,7 +47,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimit
+### CompoundSelectTests.sort.sortLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
@@ -63,7 +63,7 @@ Seq("Cookie", "Socks")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortOffset
+### CompoundSelectTests.sort.sortOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2)
@@ -79,7 +79,7 @@ Seq("Face Mask", "Skate Board", "Guitar", "Camera")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimitTwiceHigher
+### CompoundSelectTests.sort.sortLimitTwiceHigher
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
@@ -95,7 +95,7 @@ Seq("Cookie", "Socks")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimitTwiceLower
+### CompoundSelectTests.sort.sortLimitTwiceLower
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(1)
@@ -111,7 +111,7 @@ Seq("Cookie")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimitOffset
+### CompoundSelectTests.sort.sortLimitOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -127,7 +127,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimitOffsetTwice
+### CompoundSelectTests.sort.sortLimitOffsetTwice
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
@@ -143,7 +143,7 @@ Seq("Guitar")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortOffsetLimit
+### CompoundSelectTests.sort.sortOffsetLimit
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -159,7 +159,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sort.sortLimitOffset
+### CompoundSelectTests.sort.sortLimitOffset
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).drop(1)
@@ -175,7 +175,7 @@ Seq("Socks")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.distinct
+### CompoundSelectTests.distinct
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
@@ -195,7 +195,7 @@ Seq(1, 2)
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.flatMap
+### CompoundSelectTests.flatMap
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
@@ -218,7 +218,7 @@ Seq("Camera", "Face Mask", "Guitar")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.sumBy
+### CompoundSelectTests.sumBy
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
@@ -238,7 +238,7 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.aggregate
+### CompoundSelectTests.aggregate
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
@@ -258,7 +258,7 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.union
+### CompoundSelectTests.union
 
 ```scala
 Product.select.map(_.name.toLowerCase).union(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -278,7 +278,7 @@ Seq("camera", "cookie", "face mask", "face-mask", "guitar", "skate board", "skat
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.unionAll
+### CompoundSelectTests.unionAll
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -311,7 +311,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.intersect
+### CompoundSelectTests.intersect
 
 ```scala
 Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -331,7 +331,7 @@ Seq("camera", "cookie", "guitar", "socks")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.except
+### CompoundSelectTests.except
 
 ```scala
 Product.select.map(_.name.toLowerCase).except(Product.select.map(_.kebabCaseName.toLowerCase))
@@ -351,7 +351,7 @@ Seq("face mask", "skate board")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.unionAllUnionSort
+### CompoundSelectTests.unionAllUnionSort
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
@@ -388,7 +388,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.unionAllUnionSortLimit
+### CompoundSelectTests.unionAllUnionSortLimit
 
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
@@ -415,7 +415,7 @@ Seq("guitar", "james bond", "li haoyi", "skate board")
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.exceptAggregate
+### CompoundSelectTests.exceptAggregate
 
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
@@ -446,7 +446,7 @@ FROM (SELECT
 ```
 
 
-### scalasql.sqlite.CompoundSelectTests.unionAllAggregate
+### CompoundSelectTests.unionAllAggregate
 
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
@@ -474,7 +474,7 @@ FROM (SELECT product0.price as res__1
 
 
 ## scalasql.sqlite.DataTypesTests
-### scalasql.sqlite.DataTypesTests.constant
+### DataTypesTests.constant
 
 ```scala
 DataTypes.insert.values(
@@ -499,7 +499,7 @@ DataTypes.insert.values(
 ```
 
 
-### scalasql.sqlite.DataTypesTests.constant
+### DataTypesTests.constant
 
 ```scala
 DataTypes.select
@@ -512,7 +512,7 @@ Seq(value)
 ```
 
 
-### scalasql.sqlite.DataTypesTests.nonRoundTrip
+### DataTypesTests.nonRoundTrip
 
 ```scala
 NonRoundTripTypes.insert
@@ -526,7 +526,7 @@ NonRoundTripTypes.insert
 ```
 
 
-### scalasql.sqlite.DataTypesTests.nonRoundTrip
+### DataTypesTests.nonRoundTrip
 
 ```scala
 NonRoundTripTypes.select
@@ -540,7 +540,7 @@ Seq(normalize(value))
 
 
 ## scalasql.sqlite.DeleteTests
-### scalasql.sqlite.DeleteTests.single
+### DeleteTests.single
 
 ```scala
 Purchase.delete(_.id `=` 2)
@@ -556,7 +556,7 @@ DELETE FROM purchase WHERE purchase.id = ?
 ```
 
 
-### scalasql.sqlite.DeleteTests.single
+### DeleteTests.single
 
 ```scala
 Purchase.select
@@ -577,7 +577,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.DeleteTests.multiple
+### DeleteTests.multiple
 
 ```scala
 Purchase.delete(_.id <> 2)
@@ -593,7 +593,7 @@ DELETE FROM purchase WHERE purchase.id <> ?
 ```
 
 
-### scalasql.sqlite.DeleteTests.multiple
+### DeleteTests.multiple
 
 ```scala
 Purchase.select
@@ -606,7 +606,7 @@ Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 9
 ```
 
 
-### scalasql.sqlite.DeleteTests.all
+### DeleteTests.all
 
 ```scala
 Purchase.delete(_ => true)
@@ -622,7 +622,7 @@ DELETE FROM purchase WHERE ?
 ```
 
 
-### scalasql.sqlite.DeleteTests.all
+### DeleteTests.all
 
 ```scala
 Purchase.select
@@ -638,7 +638,7 @@ Seq[Purchase[Id]](
 
 
 ## scalasql.sqlite.ExprBooleanOpsTests
-### scalasql.sqlite.ExprBooleanOpsTests.and
+### ExprBooleanOpsTests.and
 
 ```scala
 Expr(true) && Expr(true)
@@ -654,7 +654,7 @@ true
 ```
 
 
-### scalasql.sqlite.ExprBooleanOpsTests.or
+### ExprBooleanOpsTests.or
 
 ```scala
 Expr(false) || Expr(false)
@@ -670,7 +670,7 @@ false
 ```
 
 
-### scalasql.sqlite.ExprBooleanOpsTests.or
+### ExprBooleanOpsTests.or
 
 ```scala
 !Expr(false)
@@ -687,7 +687,7 @@ true
 
 
 ## scalasql.sqlite.ExprIntOpsTests
-### scalasql.sqlite.ExprIntOpsTests.plus
+### ExprIntOpsTests.plus
 
 ```scala
 Expr(6) + Expr(2)
@@ -703,7 +703,7 @@ SELECT ? + ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.minus
+### ExprIntOpsTests.minus
 
 ```scala
 Expr(6) - Expr(2)
@@ -719,7 +719,7 @@ SELECT ? - ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.times
+### ExprIntOpsTests.times
 
 ```scala
 Expr(6) * Expr(2)
@@ -735,7 +735,7 @@ SELECT ? * ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.divide
+### ExprIntOpsTests.divide
 
 ```scala
 Expr(6) / Expr(2)
@@ -751,7 +751,7 @@ SELECT ? / ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.modulo
+### ExprIntOpsTests.modulo
 
 ```scala
 Expr(6) % Expr(2)
@@ -767,7 +767,7 @@ SELECT MOD(?, ?) as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.bitwiseAnd
+### ExprIntOpsTests.bitwiseAnd
 
 ```scala
 Expr(6) & Expr(2)
@@ -783,7 +783,7 @@ SELECT ? & ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.bitwiseOr
+### ExprIntOpsTests.bitwiseOr
 
 ```scala
 Expr(6) | Expr(3)
@@ -799,7 +799,7 @@ SELECT ? | ? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.between
+### ExprIntOpsTests.between
 
 ```scala
 Expr(4).between(Expr(2), Expr(6))
@@ -815,7 +815,7 @@ true
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.unaryPlus
+### ExprIntOpsTests.unaryPlus
 
 ```scala
 +Expr(-4)
@@ -831,7 +831,7 @@ SELECT +? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.unaryMinus
+### ExprIntOpsTests.unaryMinus
 
 ```scala
 -Expr(-4)
@@ -847,7 +847,7 @@ SELECT -? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.unaryTilde
+### ExprIntOpsTests.unaryTilde
 
 ```scala
 ~Expr(-4)
@@ -863,7 +863,7 @@ SELECT ~? as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.abs
+### ExprIntOpsTests.abs
 
 ```scala
 Expr(-4).abs
@@ -879,7 +879,7 @@ SELECT ABS(?) as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.mod
+### ExprIntOpsTests.mod
 
 ```scala
 Expr(8).mod(Expr(3))
@@ -895,7 +895,7 @@ SELECT MOD(?, ?) as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.ceil
+### ExprIntOpsTests.ceil
 
 ```scala
 Expr(4.3).ceil
@@ -911,7 +911,7 @@ SELECT CEIL(?) as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.floor
+### ExprIntOpsTests.floor
 
 ```scala
 Expr(4.7).floor
@@ -927,7 +927,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-### scalasql.sqlite.ExprIntOpsTests.floor
+### ExprIntOpsTests.floor
 
 ```scala
 Expr(4.7).floor
@@ -944,7 +944,7 @@ SELECT FLOOR(?) as res
 
 
 ## scalasql.sqlite.ExprSeqNumericOpsTests
-### scalasql.sqlite.ExprSeqNumericOpsTests.sum
+### ExprSeqNumericOpsTests.sum
 
 ```scala
 Purchase.select.map(_.count).sum
@@ -960,7 +960,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqNumericOpsTests.min
+### ExprSeqNumericOpsTests.min
 
 ```scala
 Purchase.select.map(_.count).min
@@ -976,7 +976,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqNumericOpsTests.max
+### ExprSeqNumericOpsTests.max
 
 ```scala
 Purchase.select.map(_.count).max
@@ -992,7 +992,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqNumericOpsTests.avg
+### ExprSeqNumericOpsTests.avg
 
 ```scala
 Purchase.select.map(_.count).avg
@@ -1009,7 +1009,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 
 ## scalasql.sqlite.ExprSeqOpsTests
-### scalasql.sqlite.ExprSeqOpsTests.size
+### ExprSeqOpsTests.size
 
 ```scala
 Purchase.select.size
@@ -1025,7 +1025,7 @@ SELECT COUNT(1) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.sumBy.simple
+### ExprSeqOpsTests.sumBy.simple
 
 ```scala
 Purchase.select.sumBy(_.count)
@@ -1041,7 +1041,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.sumBy.some
+### ExprSeqOpsTests.sumBy.some
 
 ```scala
 Purchase.select.sumByOpt(_.count)
@@ -1057,7 +1057,7 @@ Option(140)
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.sumBy.none
+### ExprSeqOpsTests.sumBy.none
 
 ```scala
 Purchase.select.filter(_ => false).sumByOpt(_.count)
@@ -1073,7 +1073,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.minBy.simple
+### ExprSeqOpsTests.minBy.simple
 
 ```scala
 Purchase.select.minBy(_.count)
@@ -1089,7 +1089,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.minBy.some
+### ExprSeqOpsTests.minBy.some
 
 ```scala
 Purchase.select.minByOpt(_.count)
@@ -1105,7 +1105,7 @@ Option(3)
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.minBy.none
+### ExprSeqOpsTests.minBy.none
 
 ```scala
 Purchase.select.filter(_ => false).minByOpt(_.count)
@@ -1121,7 +1121,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.maxBy.simple
+### ExprSeqOpsTests.maxBy.simple
 
 ```scala
 Purchase.select.maxBy(_.count)
@@ -1137,7 +1137,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.maxBy.some
+### ExprSeqOpsTests.maxBy.some
 
 ```scala
 Purchase.select.maxByOpt(_.count)
@@ -1153,7 +1153,7 @@ Option(100)
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.maxBy.none
+### ExprSeqOpsTests.maxBy.none
 
 ```scala
 Purchase.select.filter(_ => false).maxByOpt(_.count)
@@ -1169,7 +1169,7 @@ Option.empty[Int]
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.avgBy.simple
+### ExprSeqOpsTests.avgBy.simple
 
 ```scala
 Purchase.select.avgBy(_.count)
@@ -1185,7 +1185,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.avgBy.some
+### ExprSeqOpsTests.avgBy.some
 
 ```scala
 Purchase.select.avgByOpt(_.count)
@@ -1201,7 +1201,7 @@ Option(20)
 ```
 
 
-### scalasql.sqlite.ExprSeqOpsTests.avgBy.none
+### ExprSeqOpsTests.avgBy.none
 
 ```scala
 Purchase.select.filter(_ => false).avgByOpt(_.count)
@@ -1218,7 +1218,7 @@ Option.empty[Int]
 
 
 ## scalasql.sqlite.ExprStringOpsTests
-### scalasql.sqlite.ExprStringOpsTests.plus
+### ExprStringOpsTests.plus
 
 ```scala
 Expr("hello") + Expr("world")
@@ -1234,7 +1234,7 @@ SELECT ? || ? as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.like
+### ExprStringOpsTests.like
 
 ```scala
 Expr("hello").like("he%")
@@ -1250,7 +1250,7 @@ true
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.length
+### ExprStringOpsTests.length
 
 ```scala
 Expr("hello").length
@@ -1266,7 +1266,7 @@ SELECT LENGTH(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.octetLength
+### ExprStringOpsTests.octetLength
 
 ```scala
 Expr("叉烧包").octetLength
@@ -1282,7 +1282,7 @@ SELECT OCTET_LENGTH(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.position
+### ExprStringOpsTests.position
 
 ```scala
 Expr("hello").indexOf("ll")
@@ -1298,7 +1298,7 @@ SELECT INSTR(?, ?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.toLowerCase
+### ExprStringOpsTests.toLowerCase
 
 ```scala
 Expr("Hello").toLowerCase
@@ -1314,7 +1314,7 @@ SELECT LOWER(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.trim
+### ExprStringOpsTests.trim
 
 ```scala
 Expr("  Hello ").trim
@@ -1330,7 +1330,7 @@ SELECT TRIM(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.ltrim
+### ExprStringOpsTests.ltrim
 
 ```scala
 Expr("  Hello ").ltrim
@@ -1346,7 +1346,7 @@ SELECT LTRIM(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.rtrim
+### ExprStringOpsTests.rtrim
 
 ```scala
 Expr("  Hello ").rtrim
@@ -1362,7 +1362,7 @@ SELECT RTRIM(?) as res
 ```
 
 
-### scalasql.sqlite.ExprStringOpsTests.substring
+### ExprStringOpsTests.substring
 
 ```scala
 Expr("Hello").substring(2, 2)
@@ -1379,7 +1379,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 
 
 ## scalasql.sqlite.InsertTests
-### scalasql.sqlite.InsertTests.single.simple
+### InsertTests.single.simple
 
 ```scala
 Buyer.insert
@@ -1396,7 +1396,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 ```
 
 
-### scalasql.sqlite.InsertTests.single.simple
+### InsertTests.single.simple
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1409,7 +1409,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.sqlite.InsertTests.single.partial
+### InsertTests.single.partial
 
 ```scala
 Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
@@ -1425,7 +1425,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 ```
 
 
-### scalasql.sqlite.InsertTests.single.partial
+### InsertTests.single.partial
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1438,7 +1438,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.sqlite.InsertTests.batch.simple
+### InsertTests.batch.simple
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
@@ -1462,7 +1462,7 @@ VALUES
 ```
 
 
-### scalasql.sqlite.InsertTests.batch.simple
+### InsertTests.batch.simple
 
 ```scala
 Buyer.select
@@ -1482,7 +1482,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.InsertTests.batch.partial
+### InsertTests.batch.partial
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -1503,7 +1503,7 @@ VALUES (?, ?), (?, ?), (?, ?)
 ```
 
 
-### scalasql.sqlite.InsertTests.batch.partial
+### InsertTests.batch.partial
 
 ```scala
 Buyer.select
@@ -1524,7 +1524,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.InsertTests.select.caseclass
+### InsertTests.select.caseclass
 
 ```scala
 Buyer.insert.select(
@@ -1549,7 +1549,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### scalasql.sqlite.InsertTests.select.caseclass
+### InsertTests.select.caseclass
 
 ```scala
 Buyer.select
@@ -1568,7 +1568,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.InsertTests.select.simple
+### InsertTests.select.simple
 
 ```scala
 Buyer.insert.select(
@@ -1590,7 +1590,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### scalasql.sqlite.InsertTests.select.simple
+### InsertTests.select.simple
 
 ```scala
 Buyer.select
@@ -1611,7 +1611,7 @@ Seq(
 
 
 ## scalasql.sqlite.JoinTests
-### scalasql.sqlite.JoinTests.joinFilter
+### JoinTests.joinFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1645,7 +1645,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.joinSelectFilter
+### JoinTests.joinSelectFilter
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -1679,7 +1679,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.joinFilterMap
+### JoinTests.joinFilterMap
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "James Bond")
@@ -1699,7 +1699,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.sqlite.JoinTests.selfJoin
+### JoinTests.selfJoin
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id `=` _.id)
@@ -1736,7 +1736,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.selfJoin2
+### JoinTests.selfJoin2
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id <> _.id)
@@ -1785,7 +1785,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.flatMap
+### JoinTests.flatMap
 
 ```scala
 Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
@@ -1806,7 +1806,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.sqlite.JoinTests.flatMap2
+### JoinTests.flatMap2
 
 ```scala
 Buyer.select
@@ -1827,7 +1827,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.sqlite.JoinTests.leftJoin
+### JoinTests.leftJoin
 
 ```scala
 Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
@@ -1865,7 +1865,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.rightJoin
+### JoinTests.rightJoin
 
 ```scala
 ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
@@ -1903,7 +1903,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.JoinTests.outerJoin
+### JoinTests.outerJoin
 
 ```scala
 ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
@@ -1942,7 +1942,7 @@ Seq(
 
 
 ## scalasql.sqlite.OnConflictTests
-### scalasql.sqlite.OnConflictTests.ignore
+### OnConflictTests.ignore
 
 ```scala
 Buyer.insert.values(
@@ -1962,7 +1962,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 ```
 
 
-### scalasql.sqlite.OnConflictTests.ignore.returningEmpty
+### OnConflictTests.ignore.returningEmpty
 
 ```scala
 Buyer.insert.values(
@@ -1984,7 +1984,7 @@ Seq.empty[String]
 ```
 
 
-### scalasql.sqlite.OnConflictTests.ignore
+### OnConflictTests.ignore
 
 ```scala
 Buyer.insert.values(
@@ -2004,7 +2004,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 ```
 
 
-### scalasql.sqlite.OnConflictTests.ignore.returningOne
+### OnConflictTests.ignore.returningOne
 
 ```scala
 Buyer.insert.values(
@@ -2026,7 +2026,7 @@ Seq("test buyer")
 ```
 
 
-### scalasql.sqlite.OnConflictTests.update
+### OnConflictTests.update
 
 ```scala
 Buyer.insert.values(
@@ -2046,7 +2046,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 ```
 
 
-### scalasql.sqlite.OnConflictTests.update
+### OnConflictTests.update
 
 ```scala
 Buyer.select
@@ -2063,7 +2063,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OnConflictTests.computed
+### OnConflictTests.computed
 
 ```scala
 Buyer.insert.values(
@@ -2083,7 +2083,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 ```
 
 
-### scalasql.sqlite.OnConflictTests.computed
+### OnConflictTests.computed
 
 ```scala
 Buyer.select
@@ -2100,7 +2100,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OnConflictTests.returning
+### OnConflictTests.returning
 
 ```scala
 Buyer.insert.values(
@@ -2124,7 +2124,7 @@ RETURNING buyer.name as res
 
 
 ## scalasql.sqlite.OptionalTests
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2138,7 +2138,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.selectAll
+### OptionalTests.selectAll
 
 ```scala
 OptCols.select
@@ -2162,7 +2162,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2176,7 +2176,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.groupByMaxGet
+### OptionalTests.groupByMaxGet
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -2194,7 +2194,7 @@ Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2208,7 +2208,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.isDefined
+### OptionalTests.isDefined
 
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
@@ -2228,7 +2228,7 @@ Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2242,7 +2242,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.isEmpty
+### OptionalTests.isEmpty
 
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
@@ -2262,7 +2262,7 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2276,7 +2276,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sqlEquals.nonOptionHit
+### OptionalTests.sqlEquals.nonOptionHit
 
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
@@ -2296,7 +2296,7 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2310,7 +2310,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sqlEquals.nonOptionMiss
+### OptionalTests.sqlEquals.nonOptionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` 2)
@@ -2330,7 +2330,7 @@ Seq[OptCols[Id]]()
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2344,7 +2344,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sqlEquals.optionMiss
+### OptionalTests.sqlEquals.optionMiss
 
 ```scala
 OptCols.select.filter(_.myInt `=` Option.empty[Int])
@@ -2364,7 +2364,7 @@ Seq[OptCols[Id]]()
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2378,7 +2378,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.scalaEquals.someHit
+### OptionalTests.scalaEquals.someHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
@@ -2398,7 +2398,7 @@ Seq(OptCols[Id](Some(1), Some(2)))
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2412,7 +2412,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.scalaEquals.noneHit
+### OptionalTests.scalaEquals.noneHit
 
 ```scala
 OptCols.select.filter(_.myInt === Option.empty[Int])
@@ -2432,7 +2432,7 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2446,7 +2446,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.map
+### OptionalTests.map
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
@@ -2470,7 +2470,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2484,7 +2484,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.map2
+### OptionalTests.map2
 
 ```scala
 OptCols.select.map(_.myInt.map(_ + 10))
@@ -2500,7 +2500,7 @@ Seq(None, Some(11), Some(13), None)
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2514,7 +2514,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.flatMap
+### OptionalTests.flatMap
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
@@ -2539,7 +2539,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2553,7 +2553,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.mapGet
+### OptionalTests.mapGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
@@ -2578,7 +2578,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2592,7 +2592,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.rawGet
+### OptionalTests.rawGet
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
@@ -2617,7 +2617,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2631,7 +2631,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.getOrElse
+### OptionalTests.getOrElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
@@ -2655,7 +2655,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2669,7 +2669,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.orElse
+### OptionalTests.orElse
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
@@ -2693,7 +2693,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2707,7 +2707,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.filter
+### OptionalTests.filter
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
@@ -2734,7 +2734,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2748,7 +2748,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.nullsLast
+### OptionalTests.sorting.nullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
@@ -2771,7 +2771,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2785,7 +2785,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.nullsFirst
+### OptionalTests.sorting.nullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsFirst
@@ -2808,7 +2808,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2822,7 +2822,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.ascNullsLast
+### OptionalTests.sorting.ascNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsLast
@@ -2845,7 +2845,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2859,7 +2859,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.ascNullsFirst
+### OptionalTests.sorting.ascNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsFirst
@@ -2882,7 +2882,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2896,7 +2896,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.descNullsLast
+### OptionalTests.sorting.descNullsLast
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsLast
@@ -2919,7 +2919,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.OptionalTests
+### OptionalTests
 
 ```scala
 OptCols.insert
@@ -2933,7 +2933,7 @@ OptCols.insert
 ```
 
 
-### scalasql.sqlite.OptionalTests.sorting.descNullsFirst
+### OptionalTests.sorting.descNullsFirst
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsFirst
@@ -2957,7 +2957,7 @@ Seq(
 
 
 ## scalasql.sqlite.ReturningTests
-### scalasql.sqlite.ReturningTests.insert.single
+### ReturningTests.insert.single
 
 ```scala
 Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
@@ -2974,7 +2974,7 @@ Seq(4)
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.single
+### ReturningTests.insert.single
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -2987,7 +2987,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.dotSingle
+### ReturningTests.insert.dotSingle
 
 ```scala
 Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
@@ -3004,7 +3004,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.dotSingle
+### ReturningTests.insert.dotSingle
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -3017,7 +3017,7 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.multiple
+### ReturningTests.insert.multiple
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -3042,7 +3042,7 @@ Seq(4, 5, 6)
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.multiple
+### ReturningTests.insert.multiple
 
 ```scala
 Buyer.select
@@ -3063,7 +3063,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.select
+### ReturningTests.insert.select
 
 ```scala
 Buyer.insert.select(
@@ -3088,7 +3088,7 @@ Seq(4, 5)
 ```
 
 
-### scalasql.sqlite.ReturningTests.insert.select
+### ReturningTests.insert.select
 
 ```scala
 Buyer.select
@@ -3108,7 +3108,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.ReturningTests.update.single
+### ReturningTests.update.single
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -3125,7 +3125,7 @@ Seq(1)
 ```
 
 
-### scalasql.sqlite.ReturningTests.update.single
+### ReturningTests.update.single
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3138,7 +3138,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.sqlite.ReturningTests.update.multiple
+### ReturningTests.update.multiple
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -3158,7 +3158,7 @@ Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
 ```
 
 
-### scalasql.sqlite.ReturningTests.delete
+### ReturningTests.delete
 
 ```scala
 Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
@@ -3174,7 +3174,7 @@ Seq(888.0, 900.0, 15.7)
 ```
 
 
-### scalasql.sqlite.ReturningTests.delete
+### ReturningTests.delete
 
 ```scala
 Purchase.select
@@ -3194,7 +3194,7 @@ Seq(
 
 
 ## scalasql.sqlite.SelectTests
-### scalasql.sqlite.SelectTests.constant
+### SelectTests.constant
 
 ```scala
 Expr(1)
@@ -3210,7 +3210,7 @@ SELECT ? as res
 ```
 
 
-### scalasql.sqlite.SelectTests.table
+### SelectTests.table
 
 ```scala
 Buyer.select
@@ -3234,7 +3234,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.filter.single
+### SelectTests.filter.single
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2)
@@ -3258,7 +3258,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.filter.multiple
+### SelectTests.filter.multiple
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3280,7 +3280,7 @@ Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-0
 ```
 
 
-### scalasql.sqlite.SelectTests.filter.dotSingle.pass
+### SelectTests.filter.dotSingle.pass
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3303,7 +3303,7 @@ ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06
 ```
 
 
-### scalasql.sqlite.SelectTests.filter.combined
+### SelectTests.filter.combined
 
 ```scala
 ShippingInfo.select.filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06"))
@@ -3325,7 +3325,7 @@ Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
 ```
 
 
-### scalasql.sqlite.SelectTests.map.single
+### SelectTests.map.single
 
 ```scala
 Buyer.select.map(_.name)
@@ -3341,7 +3341,7 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
 
 
-### scalasql.sqlite.SelectTests.map.tuple2
+### SelectTests.map.tuple2
 
 ```scala
 Buyer.select.map(c => (c.name, c.id))
@@ -3357,7 +3357,7 @@ Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
 ```
 
 
-### scalasql.sqlite.SelectTests.map.tuple3
+### SelectTests.map.tuple3
 
 ```scala
 Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
@@ -3381,7 +3381,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.map.interpolateInMap
+### SelectTests.map.interpolateInMap
 
 ```scala
 Product.select.map(_.price * 2)
@@ -3397,7 +3397,7 @@ Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
 ```
 
 
-### scalasql.sqlite.SelectTests.map.heterogenousTuple
+### SelectTests.map.heterogenousTuple
 
 ```scala
 Buyer.select.map(c => (c.id, c))
@@ -3422,7 +3422,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.exprQuery
+### SelectTests.exprQuery
 
 ```scala
 Product.select.map(p =>
@@ -3457,7 +3457,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.subquery
+### SelectTests.subquery
 
 ```scala
 Buyer.select.subquery.map(_.name)
@@ -3474,7 +3474,7 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
 
 
-### scalasql.sqlite.SelectTests.filterMap
+### SelectTests.filterMap
 
 ```scala
 Product.select.filter(_.price < 100).map(_.name)
@@ -3490,7 +3490,7 @@ Seq("Face Mask", "Socks", "Cookie")
 ```
 
 
-### scalasql.sqlite.SelectTests.aggregate.single
+### SelectTests.aggregate.single
 
 ```scala
 Purchase.select.aggregate(_.sumBy(_.total))
@@ -3506,7 +3506,7 @@ SELECT SUM(purchase0.total) as res FROM purchase purchase0
 ```
 
 
-### scalasql.sqlite.SelectTests.aggregate.multiple
+### SelectTests.aggregate.multiple
 
 ```scala
 Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
@@ -3522,7 +3522,7 @@ SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purch
 ```
 
 
-### scalasql.sqlite.SelectTests.groupBy.simple
+### SelectTests.groupBy.simple
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
@@ -3540,7 +3540,7 @@ Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
 ```
 
 
-### scalasql.sqlite.SelectTests.groupBy.having
+### SelectTests.groupBy.having
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
@@ -3559,7 +3559,7 @@ Seq((2, 900.0), (4, 493.8), (5, 10000.0))
 ```
 
 
-### scalasql.sqlite.SelectTests.groupBy.filterHaving
+### SelectTests.groupBy.filterHaving
 
 ```scala
 Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
@@ -3579,7 +3579,7 @@ Seq((1, 888.0), (5, 10000.0))
 ```
 
 
-### scalasql.sqlite.SelectTests.distinct.nondistinct
+### SelectTests.distinct.nondistinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId)
@@ -3595,7 +3595,7 @@ Seq(1, 1, 1, 2, 2, 3, 3)
 ```
 
 
-### scalasql.sqlite.SelectTests.distinct.distinct
+### SelectTests.distinct.distinct
 
 ```scala
 Purchase.select.map(_.shippingInfoId).distinct
@@ -3611,7 +3611,7 @@ Seq(1, 2, 3)
 ```
 
 
-### scalasql.sqlite.SelectTests.contains
+### SelectTests.contains
 
 ```scala
 Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
@@ -3632,7 +3632,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.nonEmpty
+### SelectTests.nonEmpty
 
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
@@ -3654,7 +3654,7 @@ Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
 ```
 
 
-### scalasql.sqlite.SelectTests.isEmpty
+### SelectTests.isEmpty
 
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
@@ -3676,7 +3676,7 @@ Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
 ```
 
 
-### scalasql.sqlite.SelectTests.case.when
+### SelectTests.case.when
 
 ```scala
 Product.select.map(p =>
@@ -3711,7 +3711,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SelectTests.case.else
+### SelectTests.case.else
 
 ```scala
 Product.select.map(p =>
@@ -3744,7 +3744,7 @@ Seq(
 
 
 ## scalasql.sqlite.SqliteDialectTests
-### scalasql.sqlite.SqliteDialectTests.ltrim2
+### SqliteDialectTests.ltrim2
 
 ```scala
 Expr("xxHellox").ltrim("x")
@@ -3760,7 +3760,7 @@ SELECT LTRIM(?, ?) as res
 ```
 
 
-### scalasql.sqlite.SqliteDialectTests.rtrim2
+### SqliteDialectTests.rtrim2
 
 ```scala
 Expr("xxHellox").rtrim("x")
@@ -3777,7 +3777,7 @@ SELECT RTRIM(?, ?) as res
 
 
 ## scalasql.sqlite.SubQueryTests
-### scalasql.sqlite.SubQueryTests.sortTakeJoin
+### SubQueryTests.sortTakeJoin
 
 ```scala
 Purchase.select.joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id).map {
@@ -3801,7 +3801,7 @@ Seq(10000.0)
 ```
 
 
-### scalasql.sqlite.SubQueryTests.sortTakeFrom
+### SubQueryTests.sortTakeFrom
 
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
@@ -3824,7 +3824,7 @@ Seq(10000.0)
 ```
 
 
-### scalasql.sqlite.SubQueryTests.sortTakeFromAndJoin
+### SubQueryTests.sortTakeFromAndJoin
 
 ```scala
 Product.select.sortBy(_.price).desc.take(3)
@@ -3859,7 +3859,7 @@ Seq(("Camera", 10))
 ```
 
 
-### scalasql.sqlite.SubQueryTests.sortLimitSortLimit
+### SubQueryTests.sortLimitSortLimit
 
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
@@ -3883,7 +3883,7 @@ Seq("Face Mask", "Skate Board")
 ```
 
 
-### scalasql.sqlite.SubQueryTests.sortGroupBy
+### SubQueryTests.sortGroupBy
 
 ```scala
 Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
@@ -3907,7 +3907,7 @@ Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
 ```
 
 
-### scalasql.sqlite.SubQueryTests.groupByJoin
+### SubQueryTests.groupByJoin
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
@@ -3940,7 +3940,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SubQueryTests.subqueryInFilter
+### SubQueryTests.subqueryInFilter
 
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
@@ -3964,7 +3964,7 @@ Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
 ```
 
 
-### scalasql.sqlite.SubQueryTests.subqueryInMap
+### SubQueryTests.subqueryInMap
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
@@ -3989,7 +3989,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SubQueryTests.subqueryInMapNested
+### SubQueryTests.subqueryInMapNested
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
@@ -4017,7 +4017,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.SubQueryTests.selectLimitUnionSelect
+### SubQueryTests.selectLimitUnionSelect
 
 ```scala
 Buyer.select.map(_.name.toLowerCase).take(2)
@@ -4041,7 +4041,7 @@ Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "c
 ```
 
 
-### scalasql.sqlite.SubQueryTests.selectUnionSelectLimit
+### SubQueryTests.selectUnionSelectLimit
 
 ```scala
 Buyer.select.map(_.name.toLowerCase)
@@ -4066,7 +4066,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 
 
 ## scalasql.sqlite.UpdateJoinTests
-### scalasql.sqlite.UpdateJoinTests.join
+### UpdateJoinTests.join
 
 ```scala
 Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
@@ -4086,7 +4086,7 @@ WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.join
+### UpdateJoinTests.join
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4099,7 +4099,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.multijoin
+### UpdateJoinTests.multijoin
 
 ```scala
 Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
@@ -4125,7 +4125,7 @@ AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.multijoin
+### UpdateJoinTests.multijoin
 
 ```scala
 Buyer.select.filter(_.id `=` 1).map(_.name)
@@ -4138,7 +4138,7 @@ Seq("Camera")
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.joinSubquery
+### UpdateJoinTests.joinSubquery
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -4164,7 +4164,7 @@ WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.joinSubquery
+### UpdateJoinTests.joinSubquery
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4177,7 +4177,7 @@ Seq(LocalDate.parse("2012-04-05"))
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.joinSubqueryEliminatedColumn
+### UpdateJoinTests.joinSubqueryEliminatedColumn
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -4204,7 +4204,7 @@ WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateJoinTests.joinSubqueryEliminatedColumn
+### UpdateJoinTests.joinSubqueryEliminatedColumn
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4218,7 +4218,7 @@ Seq(LocalDate.parse("2000-01-01"))
 
 
 ## scalasql.sqlite.UpdateSubQueryTests
-### scalasql.sqlite.UpdateSubQueryTests.setSubquery
+### UpdateSubQueryTests.setSubquery
 
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
@@ -4236,7 +4236,7 @@ WHERE ?
 ```
 
 
-### scalasql.sqlite.UpdateSubQueryTests.setSubquery
+### UpdateSubQueryTests.setSubquery
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -4256,7 +4256,7 @@ Seq(
 ```
 
 
-### scalasql.sqlite.UpdateSubQueryTests.whereSubquery
+### UpdateSubQueryTests.whereSubquery
 
 ```scala
 Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
@@ -4274,7 +4274,7 @@ WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
 ```
 
 
-### scalasql.sqlite.UpdateSubQueryTests.whereSubquery
+### UpdateSubQueryTests.whereSubquery
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -4295,7 +4295,7 @@ Seq(
 
 
 ## scalasql.sqlite.UpdateTests
-### scalasql.sqlite.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -4311,7 +4311,7 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4324,7 +4324,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.sqlite.UpdateTests.update
+### UpdateTests.update
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -4337,7 +4337,7 @@ Seq(LocalDate.parse("1965-08-09"))
 ```
 
 
-### scalasql.sqlite.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -4353,7 +4353,7 @@ UPDATE buyer SET date_of_birth = ? WHERE ?
 ```
 
 
-### scalasql.sqlite.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4366,7 +4366,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.sqlite.UpdateTests.bulk
+### UpdateTests.bulk
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -4379,7 +4379,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.sqlite.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.update(_.name `=` "James Bond")
@@ -4396,7 +4396,7 @@ UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4409,7 +4409,7 @@ Seq[LocalDate]()
 ```
 
 
-### scalasql.sqlite.UpdateTests.multiple
+### UpdateTests.multiple
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
@@ -4422,7 +4422,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### scalasql.sqlite.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
@@ -4438,7 +4438,7 @@ UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-### scalasql.sqlite.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -4451,7 +4451,7 @@ Seq[LocalDate]()
 ```
 
 
-### scalasql.sqlite.UpdateTests.dynamic
+### UpdateTests.dynamic
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)

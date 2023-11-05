@@ -122,7 +122,7 @@ object scalasql extends RootModule with ScalaModule {
         for(r <- suiteGroup){
 
           outputLines.append(
-            s"""### ${(r.suiteName +: r.testPath).mkString(".")}
+            s"""### ${(r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")}
                |
                |```scala
                |${scalafmt(r.queryCodeString)}
