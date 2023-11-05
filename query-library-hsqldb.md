@@ -7,6 +7,7 @@ and how these operations are translated into raw SQL to be sent to
 the database for execution.
 
 ## ExprBooleanOps
+Operations that can be performed on `Expr[Boolean]`
 ### ExprBooleanOps.and
 
 ```scala
@@ -92,6 +93,7 @@ Expr(false) || Expr(false)
 
 
 ## ExprIntOps
+Operations that can be performed on `Expr[T]` when `T` is numeric
 ### ExprIntOps.plus
 
 ```scala
@@ -429,6 +431,7 @@ Expr(4.7).floor
 
 
 ## ExprSeqNumericOps
+Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
 ### ExprSeqNumericOps.sum
 
 ```scala
@@ -514,6 +517,7 @@ Purchase.select.map(_.count).avg
 
 
 ## ExprSeqOps
+Operations that can be performed on `Expr[Seq[_]]`
 ### ExprSeqOps.size
 
 ```scala
@@ -788,6 +792,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 
 
 ## ExprStringOps
+Operations that can be performed on `Expr[String]`
 ### ExprStringOps.plus
 
 ```scala
@@ -999,6 +1004,7 @@ Expr("Hello").substring(2, 2)
 
 
 ## Insert
+Basic `INSERT` operations
 ### Insert.single.simple
 
 ```scala
@@ -1285,6 +1291,7 @@ Buyer.select
 
 
 ## Delete
+Basic `DELETE` operations
 ### Delete.single
 
 ```scala
@@ -1407,6 +1414,7 @@ Purchase.select
 
 
 ## Select
+Basic `SELECT`` operations: map, filter, join, etc.
 ### Select.constant
 
 ```scala
@@ -2105,6 +2113,7 @@ Product.select.map(p =>
 
 
 ## Join
+inner `JOIN`s, `JOIN ON`s, self-joins, `LEFT`/`RIGHT`/`OUTER` `JOIN`s
 ### Join.joinFilter
 
 ```scala
@@ -2489,6 +2498,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 
 
 ## CompoundSelect
+Compound `SELECT` operations: sort, take, drop, union, unionAll, etc.
 ### CompoundSelect.sort.simple
 
 ```scala
@@ -3083,6 +3093,7 @@ Product.select
 
 
 ## SubQuery
+Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
 
 ```scala
@@ -3432,6 +3443,7 @@ Buyer.select
 
 
 ## Update
+Basic `UPDATE` queries
 ### Update.update
 
 ```scala
@@ -3649,6 +3661,7 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 
 
 ## UpdateSubQuery
+`UPDATE` queries that use Subqueries
 ### UpdateSubQuery.setSubquery
 
 ```scala
@@ -3742,6 +3755,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 
 ## HsqlDbDialect
+Operations specific to working with HsqlDb Databases
 ### HsqlDbDialect.ltrim2
 
 ```scala
@@ -3848,6 +3862,7 @@ Expr("Hello").rpad(10, "xy")
 
 
 ## DataTypes
+Basic operations on all the data types that ScalaSql supports mapping between Database types and Scala types
 ### DataTypes.constant
 
 ```scala
@@ -3928,6 +3943,7 @@ NonRoundTripTypes.select
 
 
 ## Optional
+Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala
 ### Optional
 
 ```scala
@@ -4576,6 +4592,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 
 ## Transaction
+Usage of transactions, rollbacks, and savepoints
 ### Transaction.simple.commit
 
 ```scala
@@ -5114,6 +5131,7 @@ dbClient.transaction { implicit db =>
 
 
 ## DbApi
+Basic usage of `db.*` operations such as `db.run`
 ### DbApi.run
 
 ```scala

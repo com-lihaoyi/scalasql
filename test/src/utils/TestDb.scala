@@ -19,6 +19,8 @@ class TestDb(
     description: String
 ) {
 
+  UtestFramework.recordedSuiteDescriptions(suiteName.stripSuffix("Tests$")) = description
+
   def reset() = {
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testSchemaFileName))
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
@@ -26,7 +28,7 @@ class TestDb(
 
   def recorded[T](f: sourcecode.Text[() => T])(implicit tp: utest.framework.TestPath): T = {
     val res = f.value()
-    UtestFramework.recorded.append(
+    UtestFramework.recordedTests.append(
       UtestFramework.Record(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
@@ -36,6 +38,7 @@ class TestDb(
         resultCodeString = None
       )
     )
+
 
     res
   }
@@ -64,7 +67,7 @@ class TestDb(
     val normalized = normalize(result)
     assert(values.exists(value => normalized == value), pprint.apply(normalized))
 
-    UtestFramework.recorded.append(
+    UtestFramework.recordedTests.append(
       UtestFramework.Record(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,

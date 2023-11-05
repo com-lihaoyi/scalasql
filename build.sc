@@ -82,6 +82,7 @@ object scalasql extends RootModule with ScalaModule {
   }
   def generateQueryLibrary() = T.command {
     val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
+    val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "recordedSuiteDescriptions.json"))
 
     val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
     val formattedScalaStrs = {
@@ -149,6 +150,7 @@ object scalasql extends RootModule with ScalaModule {
       for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
         val seen = mutable.Set.empty[String]
         outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
+        outputLines.append(suiteDescriptions(suiteName))
         var lastSeen = ""
         for(r <- suiteGroup){
 

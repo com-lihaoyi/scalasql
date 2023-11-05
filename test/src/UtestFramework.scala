@@ -1,6 +1,6 @@
 package scalasql
 
-import scalasql.UtestFramework.recorded
+import scalasql.UtestFramework.recordedTests
 
 object UtestFramework {
   case class Record(
@@ -15,20 +15,25 @@ object UtestFramework {
   object Record {
     implicit val rw: upickle.default.ReadWriter[Record] = upickle.default.macroRW
   }
-  val recorded = collection.mutable.Buffer.empty[Record]
+  val recordedTests = collection.mutable.Buffer.empty[Record]
+  val recordedSuiteDescriptions = collection.mutable.Map.empty[String, String]
 }
 class UtestFramework extends utest.runner.Framework {
   override def setup() = {
     println("Setting up CustomFramework")
-    recorded.clear()
+    recordedTests.clear()
   }
   override def teardown() = {
-    println("Tearing down CustomFramework " + recorded.size)
+    println("Tearing down CustomFramework " + recordedTests.size)
     os.write.over(
       os.pwd / "recordedTests.json",
-      upickle.default.write(UtestFramework.recorded, indent = 4)
+      upickle.default.write(UtestFramework.recordedTests, indent = 4)
     )
-    recorded.clear()
+    os.write.over(
+      os.pwd / "recordedSuiteDescriptions.json",
+      upickle.default.write(UtestFramework.recordedSuiteDescriptions, indent = 4)
+    )
+    recordedTests.clear()
   }
 
   override def exceptionStackFrameHighlighter(s: StackTraceElement): Boolean = {
