@@ -134,9 +134,10 @@ object scalasql extends RootModule with ScalaModule {
                |
                |${sqlFormat(r.sqlString)}
                |
-               |```scala
-               |${scalafmt(r.resultCodeString)}
-               |```
+               |*
+               |    ```scala
+               |    ${scalafmt(r.resultCodeString).linesIterator.map("    " + _).mkString("\n")}
+               |    ```
                |
                |""".stripMargin
           )
