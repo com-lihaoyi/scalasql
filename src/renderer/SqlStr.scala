@@ -15,17 +15,15 @@ class SqlStr(
     val isCompleteQuery: Boolean,
     private val referencedExprs: Seq[Expr.Identity]
 ) {
-  def +(other: SqlStr) = new SqlStr(
-    queryParts.init ++ Seq(queryParts.last + other.queryParts.head) ++ other.queryParts.tail,
-    params ++ other.params,
-    false,
-    referencedExprs ++ other.referencedExprs
-  )
+  def +(other: SqlStr) = {
+    new SqlStr(SqlStr.plusParts, Seq(this, other), false, Nil)
+  }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
 }
 
 object SqlStr {
+  private val plusParts = Array("", "", "")
   class Flattened(
       val queryParts: Seq[String],
       val params: Seq[Interp.TypeInterp[_]],

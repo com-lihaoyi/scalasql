@@ -5,10 +5,28 @@ import upickle.core.Visitor
 import scalasql.query.Expr
 import scalasql.renderer.{Context, SqlStr}
 
+import scala.collection.mutable
+
 /**
  * Converts back and forth between a tree-shaped JSON and flat key-value map
  */
 object FlatJson {
+  def fastSplitNonRegex(input: String, delim: String): IndexedSeq[String] = {
+    val l = mutable.ArrayBuilder.make[String]
+    var offset = 0
+    while ({
+      input.indexOf(delim, offset) match{
+        case -1 =>
+          l.addOne(input.substring(offset))
+          false
+        case index =>
+          l.addOne(input.substring(offset, index))
+          offset = index + delim.length
+          true
+      }
+    }) ()
+    l.result()
+  }
 
   def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
     x.map { case (k, v) =>

@@ -258,8 +258,11 @@ object DbApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = columnNameUnMapper(metadata.getColumnLabel(i + 1).toLowerCase)
-        .split(config.columnLabelDelimiter)
+      val k = FlatJson
+        .fastSplitNonRegex(
+          columnNameUnMapper(metadata.getColumnLabel(i + 1).toLowerCase),
+          config.columnLabelDelimiter
+        )
         .drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
