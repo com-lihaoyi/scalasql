@@ -1,5 +1,8 @@
 
-import mill._, scalalib._
+import mill._
+import scalalib._
+
+import scala.collection.mutable
 
 object scalasql extends RootModule with ScalaModule {
   def scalaVersion = "2.13.11"
@@ -117,32 +120,39 @@ object scalasql extends RootModule with ScalaModule {
     val scalafmt = rawScalaStrs.zip(formattedScalaStrs).toMap
 
     for ((dbName, dbGroup) <- records.groupBy(_.suiteName.split('.').apply(1))) {
-      val outputLines = collection.mutable.Buffer.empty[String]
+      val outputLines = mutable.Buffer.empty[String]
       outputLines.append(s"# $dbName")
       for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
+        val seen = mutable.Set.empty[String]
         outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
         var lastSeen = ""
         for(r <- suiteGroup){
 
           val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
-          val title = if (prettyName != lastSeen) s"### ${prettyName}" else "----"
-          lastSeen = prettyName
-          outputLines.append(
-            s"""$title
-               |
-               |```scala
-               |${scalafmt(r.queryCodeString)}
-               |```
-               |
-               |${sqlFormat(r.sqlString)}
-               |
-               |*
-               |    ```scala
-               |    ${scalafmt(r.resultCodeString).linesIterator.mkString("\n    ")}
-               |    ```
-               |
-               |""".stripMargin
-          )
+          val titleOpt =
+            if (prettyName != lastSeen) Some(s"### $prettyName")
+            else if (!seen(prettyName)) Some("----")
+            else None
+
+          for(title <- titleOpt) {
+            lastSeen = prettyName
+            outputLines.append(
+              s"""$title
+                 |
+                 |```scala
+                 |${scalafmt(r.queryCodeString)}
+                 |```
+                 |
+                 |${sqlFormat(r.sqlString)}
+                 |
+                 |*
+                 |    ```scala
+                 |    ${scalafmt(r.resultCodeString).linesIterator.mkString("\n    ")}
+                 |    ```
+                 |
+                 |""".stripMargin
+            )
+          }
         }
       }
       os.write.over(os.pwd / s"query-library-$dbName.md", outputLines.mkString("\n"))
