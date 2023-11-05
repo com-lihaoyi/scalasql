@@ -63,7 +63,7 @@ object MySqlDialect extends MySqlDialect {
   class Update[Q, R](
       expr: Q,
       table: TableRef,
-      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      set0: Seq[Column.Assignment[_]],
       joins: Seq[Join],
       where: Seq[Expr[_]]
   )(implicit qr: Queryable.Row[Q, R])
@@ -72,7 +72,7 @@ object MySqlDialect extends MySqlDialect {
     override def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
-        set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+        set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
@@ -93,14 +93,14 @@ object MySqlDialect extends MySqlDialect {
   class UpdateRenderer(
       joins0: Seq[Join],
       table: TableRef,
-      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      set0: Seq[Column.Assignment[_]],
       where0: Seq[Expr[_]],
       prevContext: Context
   ) extends scalasql.query.Update.Renderer(joins0, table, set0, where0, prevContext) {
     import computed.implicitCtx
-    override lazy val updateList = set0.map { case (k, v) =>
-      val colStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
-      sql"$tableName.$colStr = $v"
+    override lazy val updateList = set0.map { case assign =>
+      val colStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
+      sql"$tableName.$colStr = ${assign.value}"
     }
 
     override lazy val where = SqlStr.flatten(SqlStr.optSeq(where0) { where =>
@@ -117,13 +117,13 @@ object MySqlDialect extends MySqlDialect {
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
 
-    def onConflictUpdate(c2: Q => (Column.ColumnExpr[_], Expr[_])*): OnConflictUpdate[Q, R] =
+    def onConflictUpdate(c2: Q => Column.Assignment[_]*): OnConflictUpdate[Q, R] =
       new OnConflictUpdate(this, c2.map(_(expr)), table)
   }
 
   class OnConflictUpdate[Q, R](
       insert: OnConflictable[Q, R],
-      updates: Seq[(Column.ColumnExpr[_], Expr[_])],
+      updates: Seq[Column.Assignment[_]],
       table: TableRef
   ) extends Query[R] {
 
@@ -140,7 +140,7 @@ object MySqlDialect extends MySqlDialect {
       import computed.implicitCtx
       val (str, mapped) = insert.query.toSqlQuery
       val updatesStr = SqlStr
-        .join(updates.map { case (c, e) => SqlStr.raw(c.name) + sql" = $e" }, sql", ")
+        .join(updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" }, sql", ")
       (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
     }
   }

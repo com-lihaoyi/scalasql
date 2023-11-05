@@ -65,17 +65,17 @@ trait DataTypesTests extends ScalaSqlSuite {
       )
       checker(
         query = DataTypes.insert.values(
-          _.myTinyInt -> value.myTinyInt,
-          _.mySmallInt -> value.mySmallInt,
-          _.myInt -> value.myInt,
-          _.myBigInt -> value.myBigInt,
-          _.myDouble -> value.myDouble,
-          _.myBoolean -> value.myBoolean,
-          _.myLocalDate -> value.myLocalDate,
-          _.myLocalTime -> value.myLocalTime,
-          _.myLocalDateTime -> value.myLocalDateTime,
-//          _.myZonedDateTime -> value.myZonedDateTime,
-          _.myInstant -> value.myInstant
+          _.myTinyInt := value.myTinyInt,
+          _.mySmallInt := value.mySmallInt,
+          _.myInt := value.myInt,
+          _.myBigInt := value.myBigInt,
+          _.myDouble := value.myDouble,
+          _.myBoolean := value.myBoolean,
+          _.myLocalDate := value.myLocalDate,
+          _.myLocalTime := value.myLocalTime,
+          _.myLocalDateTime := value.myLocalDateTime,
+//          _.myZonedDateTime := value.myZonedDateTime,
+          _.myInstant := value.myInstant
         ),
         value = 1
       )
@@ -100,8 +100,8 @@ trait DataTypesTests extends ScalaSqlSuite {
 
       checker(
         query = NonRoundTripTypes.insert.values(
-          _.myOffsetDateTime -> value.myOffsetDateTime,
-          _.myZonedDateTime -> value.myZonedDateTime
+          _.myOffsetDateTime := value.myOffsetDateTime,
+          _.myZonedDateTime := value.myZonedDateTime
         ),
         value = 1
       )

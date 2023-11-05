@@ -9,7 +9,7 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
   def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)
 
-  def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): Update[Q, R]
+  def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
 
   def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
       implicit joinQr: Queryable.Row[Q2, R2]
@@ -31,7 +31,7 @@ object Update {
   class Impl[Q, R](
       val expr: Q,
       val table: TableRef,
-      val set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      val set0: Seq[Column.Assignment[_]],
       val joins: Seq[Join],
       val where: Seq[Expr[_]]
   )(implicit val qr: Queryable.Row[Q, R])
@@ -39,14 +39,14 @@ object Update {
     def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
-        set0: Seq[(Column.ColumnExpr[_], Expr[_])] = this.set0,
+        set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]): Update[Q, R] = new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
-    def set(f: (Q => (Column.ColumnExpr[_], Expr[_]))*) = { this.copy(set0 = f.map(_(expr))) }
+    def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
         implicit joinQr: Queryable.Row[Q2, R2]
@@ -65,7 +65,7 @@ object Update {
   class Renderer(
       joins0: Seq[Join],
       table: TableRef,
-      set0: Seq[(Column.ColumnExpr[_], Expr[_])],
+      set0: Seq[Column.Assignment[_]],
       where0: Seq[Expr[_]],
       prevContext: Context
   ) {
@@ -75,9 +75,9 @@ object Update {
 
     lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
 
-    lazy val updateList = set0.map { case (k, v) =>
-      val kStr = SqlStr.raw(prevContext.config.columnNameMapper(k.name))
-      sql"$kStr = $v"
+    lazy val updateList = set0.map { case assign =>
+      val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
+      sql"$kStr = ${assign.value}"
     }
     lazy val sets = SqlStr.flatten(SqlStr.join(updateList, sql", "))
 

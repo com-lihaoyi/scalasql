@@ -93,8 +93,10 @@ case class Column[T: MappedType]()(implicit val name: sourcecode.Name, val table
 }
 
 object Column {
+  case class Assignment[T](column: ColumnExpr[T], value: Expr[T])
   class ColumnExpr[T](tableRef: TableRef, val name: String)(implicit val mappedType: MappedType[T])
       extends Expr[T] {
+    def :=(v: Expr[T]) = Assignment(this, v)
     def toSqlExpr0(implicit ctx: Context) = {
       val prefix = ctx.fromNaming(tableRef) match {
         case "" => sql""

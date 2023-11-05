@@ -615,10 +615,10 @@ object WorldSqlTests extends TestSuite {
         // a single row via `.insert.values`, passing the columns you want to insert
         // (and leaving out any that the database would auto-populate)
         val query = City.insert.values( // ID provided by database AUTO_INCREMENT
-          _.name -> "Sentosa",
-          _.countryCode -> "SGP",
-          _.district -> "South",
-          _.population -> 1337
+          _.name := "Sentosa",
+          _.countryCode := "SGP",
+          _.district := "South",
+          _.population := 1337
         )
         db.toSqlQuery(query) ==>
           "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)"
@@ -696,7 +696,7 @@ object WorldSqlTests extends TestSuite {
         // ScalaSql allows updates via the `.update` syntax, that takes a filter
         // and a list of columns to update:
         val query = City.update(_.countryCode === "SGP")
-          .set(_.population -> 0, _.district -> "UNKNOWN")
+          .set(_.population := 0, _.district := "UNKNOWN")
 
         db.toSqlQuery(query) ==>
           "UPDATE city SET population = ?, district = ? WHERE city.countrycode = ?"
@@ -713,7 +713,7 @@ object WorldSqlTests extends TestSuite {
         // You can perform computed updates by referencing columns as part of the
         // expressions passed to the `.set` call:
         val query = City.update(_.countryCode === "SGP")
-          .set(c => c.population -> (c.population + 1000000))
+          .set(c => c.population := (c.population + 1000000))
         db.toSqlQuery(query) ==>
           "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?"
 
@@ -729,7 +729,7 @@ object WorldSqlTests extends TestSuite {
         // an entire database table accidentally . If you really want to perform an update
         // on every single row, you can pass in `_ => true` as your filter:
         val query = City.update(_ => true)
-          .set(_.population -> 0)
+          .set(_.population := 0)
         db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
 
         db.run(query)

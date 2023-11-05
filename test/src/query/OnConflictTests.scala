@@ -18,9 +18,9 @@ trait OnConflictTests extends ScalaSqlSuite {
     test("ignore") - {
       checker(
         query = Buyer.insert.values(
-          _.name -> "test buyer",
-          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-          _.id -> 1 // This should cause a primary key conflict
+          _.name := "test buyer",
+          _.dateOfBirth := LocalDate.parse("2023-09-09"),
+          _.id := 1 // This should cause a primary key conflict
         ).onConflictIgnore(_.id),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING",
@@ -30,9 +30,9 @@ trait OnConflictTests extends ScalaSqlSuite {
       test("returningEmpty") - {
         checker(
           query = Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 1 // This should cause a primary key conflict
+            _.name := "test buyer",
+            _.dateOfBirth := LocalDate.parse("2023-09-09"),
+            _.id := 1 // This should cause a primary key conflict
           ).onConflictIgnore(_.id).returning(_.name),
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
@@ -45,9 +45,9 @@ trait OnConflictTests extends ScalaSqlSuite {
       test("returningOne") - {
         checker(
           query = Buyer.insert.values(
-            _.name -> "test buyer",
-            _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-            _.id -> 4 // This should cause a primary key conflict
+            _.name := "test buyer",
+            _.dateOfBirth := LocalDate.parse("2023-09-09"),
+            _.id := 4 // This should cause a primary key conflict
           ).onConflictIgnore(_.id).returning(_.name),
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
@@ -62,10 +62,10 @@ trait OnConflictTests extends ScalaSqlSuite {
     test("update") - {
       checker(
         query = Buyer.insert.values(
-          _.name -> "test buyer",
-          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-          _.id -> 1 // This should cause a primary key conflict
-        ).onConflictUpdate(_.id)(_.name -> "TEST BUYER CONFLICT"),
+          _.name := "test buyer",
+          _.dateOfBirth := LocalDate.parse("2023-09-09"),
+          _.id := 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(_.name := "TEST BUYER CONFLICT"),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?",
         value = 1
@@ -85,10 +85,10 @@ trait OnConflictTests extends ScalaSqlSuite {
     test("computed") - {
       checker(
         query = Buyer.insert.values(
-          _.name -> "test buyer",
-          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-          _.id -> 1 // This should cause a primary key conflict
-        ).onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase),
+          _.name := "test buyer",
+          _.dateOfBirth := LocalDate.parse("2023-09-09"),
+          _.id := 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase),
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)",
         value = 1
@@ -108,10 +108,10 @@ trait OnConflictTests extends ScalaSqlSuite {
     test("returning") - {
       checker(
         query = Buyer.insert.values(
-          _.name -> "test buyer",
-          _.dateOfBirth -> LocalDate.parse("2023-09-09"),
-          _.id -> 1 // This should cause a primary key conflict
-        ).onConflictUpdate(_.id)(v => v.name -> v.name.toUpperCase).returning(_.name).single,
+          _.name := "test buyer",
+          _.dateOfBirth := LocalDate.parse("2023-09-09"),
+          _.id := 1 // This should cause a primary key conflict
+        ).onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase).returning(_.name).single,
         sql = """
           INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
           ON CONFLICT (id) DO UPDATE

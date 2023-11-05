@@ -7,7 +7,7 @@ trait Insert[Q, R] {
   def table: TableRef
   def qr: Queryable[Q, R]
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2]
-  def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q, R]
+  def values(f: (Q => Column.Assignment[_])*): InsertValues[Q, R]
 
   def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q, R]
   def batched[T1, T2](f1: Q => Column.ColumnExpr[T1], f2: Q => Column.ColumnExpr[T2])(
@@ -65,9 +65,9 @@ object Insert {
       newInsertSelect(this, columns(expr), select)
     }
 
-    def values(f: (Q => (Column.ColumnExpr[_], Expr[_]))*): InsertValues[Q, R] = {
+    def values(f: (Q => Column.Assignment[_])*): InsertValues[Q, R] = {
       val kvs = f.map(_(expr))
-      newInsertValues(this, columns = kvs.map(_._1), valuesLists = Seq(kvs.map(_._2)))
+      newInsertValues(this, columns = kvs.map(_.column), valuesLists = Seq(kvs.map(_.value)))
     }
 
     def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertValues[Q, R] = {
