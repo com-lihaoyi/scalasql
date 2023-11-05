@@ -179,1540 +179,210 @@ dbClient.transaction { db =>
 
 
 
-## ExprBooleanOps
-Operations that can be performed on `Expr[Boolean]`
-### ExprBooleanOps.and
+## Transaction
+Usage of transactions, rollbacks, and savepoints
+### Transaction.simple.commit
 
+Common workflow to create a transaction and run a `delete` inside of it. The effect
+of the `delete` is visible both inside the transaction and outside after the
+transaction completes successfully and commits
 
-
-```scala
-Expr(true) && Expr(true)
-```
-
-
-*
-    ```sql
-    SELECT ? AND ? as res
-    ```
-
-
-
-*
-    ```scala
-    true
-    ```
-
-
-
-----
-
-
-
-```scala
-Expr(false) && Expr(true)
-```
-
-
-*
-    ```sql
-    SELECT ? AND ? as res
-    ```
-
-
-
-*
-    ```scala
-    false
-    ```
-
-
-
-### ExprBooleanOps.or
-
-
-
-```scala
-Expr(false) || Expr(false)
-```
-
-
-*
-    ```sql
-    SELECT ? OR ? as res
-    ```
-
-
-
-*
-    ```scala
-    false
-    ```
-
-
-
-----
-
-
-
-```scala
-!Expr(false)
-```
-
-
-*
-    ```sql
-    SELECT NOT ? as res
-    ```
-
-
-
-*
-    ```scala
-    true
-    ```
-
-
-
-## ExprExprIntOps
-Operations that can be performed on `Expr[T]` when `T` is numeric
-### ExprExprIntOps.plus
-
-
-
-```scala
-Expr(6) + Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? + ? as res
-    ```
-
-
-
-*
-    ```scala
-    8
-    ```
-
-
-
-### ExprExprIntOps.minus
-
-
-
-```scala
-Expr(6) - Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? - ? as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprExprIntOps.times
-
-
-
-```scala
-Expr(6) * Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? * ? as res
-    ```
-
-
-
-*
-    ```scala
-    12
-    ```
-
-
-
-### ExprExprIntOps.divide
-
-
-
-```scala
-Expr(6) / Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? / ? as res
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprExprIntOps.modulo
-
-
-
-```scala
-Expr(6) % Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT MOD(?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    0
-    ```
-
-
-
-### ExprExprIntOps.bitwiseAnd
-
-
-
-```scala
-Expr(6) & Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? & ? as res
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-### ExprExprIntOps.bitwiseOr
-
-
-
-```scala
-Expr(6) | Expr(3)
-```
-
-
-*
-    ```sql
-    SELECT ? | ? as res
-    ```
-
-
-
-*
-    ```scala
-    7
-    ```
-
-
-
-### ExprExprIntOps.between
-
-
-
-```scala
-Expr(4).between(Expr(2), Expr(6))
-```
-
-
-*
-    ```sql
-    SELECT ? BETWEEN ? AND ? as res
-    ```
-
-
-
-*
-    ```scala
-    true
-    ```
-
-
-
-### ExprExprIntOps.unaryPlus
-
-
-
-```scala
-+Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT +? as res
-    ```
-
-
-
-*
-    ```scala
-    -4
-    ```
-
-
-
-### ExprExprIntOps.unaryMinus
-
-
-
-```scala
--Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT -? as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprExprIntOps.unaryTilde
-
-
-
-```scala
-~Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT ~? as res
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprExprIntOps.abs
-
-
-
-```scala
-Expr(-4).abs
-```
-
-
-*
-    ```sql
-    SELECT ABS(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprExprIntOps.mod
-
-
-
-```scala
-Expr(8).mod(Expr(3))
-```
-
-
-*
-    ```sql
-    SELECT MOD(?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-### ExprExprIntOps.ceil
-
-
-
-```scala
-Expr(4.3).ceil
-```
-
-
-*
-    ```sql
-    SELECT CEIL(?) as res
-    ```
-
-
-
-*
-    ```scala
-    5.0
-    ```
-
-
-
-### ExprExprIntOps.floor
-
-
-
-```scala
-Expr(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4.0
-    ```
-
-
-
-----
-
-
-
-```scala
-Expr(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4.0
-    ```
-
-
-
-## ExprSeqNumericOps
-Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
-### ExprSeqNumericOps.sum
-
-
-
-```scala
-Purchase.select.map(_.count).sum
-```
-
-
-*
-    ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    140
-    ```
-
-
-
-### ExprSeqNumericOps.min
-
-
-
-```scala
-Purchase.select.map(_.count).min
-```
-
-
-*
-    ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprSeqNumericOps.max
-
-
-
-```scala
-Purchase.select.map(_.count).max
-```
-
-
-*
-    ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    100
-    ```
-
-
-
-### ExprSeqNumericOps.avg
-
-
-
-```scala
-Purchase.select.map(_.count).avg
-```
-
-
-*
-    ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    20
-    ```
-
-
-
-## ExprSeqOps
-Operations that can be performed on `Expr[Seq[_]]`
-### ExprSeqOps.size
-
-
-
-```scala
-Purchase.select.size
-```
-
-
-*
-    ```sql
-    SELECT COUNT(1) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    7
-    ```
-
-
-
-### ExprSeqOps.sumBy.simple
-
-
-
-```scala
-Purchase.select.sumBy(_.count)
-```
-
-
-*
-    ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    140
-    ```
-
-
-
-### ExprSeqOps.sumBy.some
-
-
-
-```scala
-Purchase.select.sumByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    Option(140)
-    ```
-
-
-
-### ExprSeqOps.sumBy.none
-
-
-
-```scala
-Purchase.select.filter(_ => false).sumByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    Option.empty[Int]
-    ```
-
-
-
-### ExprSeqOps.minBy.simple
-
-
-
-```scala
-Purchase.select.minBy(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprSeqOps.minBy.some
-
-
-
-```scala
-Purchase.select.minByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    Option(3)
-    ```
-
-
-
-### ExprSeqOps.minBy.none
-
-
-
-```scala
-Purchase.select.filter(_ => false).minByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    Option.empty[Int]
-    ```
-
-
-
-### ExprSeqOps.maxBy.simple
-
-
-
-```scala
-Purchase.select.maxBy(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    100
-    ```
-
-
-
-### ExprSeqOps.maxBy.some
-
-
-
-```scala
-Purchase.select.maxByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    Option(100)
-    ```
-
-
-
-### ExprSeqOps.maxBy.none
-
-
-
-```scala
-Purchase.select.filter(_ => false).maxByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    Option.empty[Int]
-    ```
-
-
-
-### ExprSeqOps.avgBy.simple
-
-
-
-```scala
-Purchase.select.avgBy(_.count)
-```
-
-
-*
-    ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    20
-    ```
-
-
-
-### ExprSeqOps.avgBy.some
-
-
-
-```scala
-Purchase.select.avgByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
-    ```
-
-
-
-*
-    ```scala
-    Option(20)
-    ```
-
-
-
-### ExprSeqOps.avgBy.none
-
-
-
-```scala
-Purchase.select.filter(_ => false).avgByOpt(_.count)
-```
-
-
-*
-    ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    Option.empty[Int]
-    ```
-
-
-
-## ExprStringOps
-Operations that can be performed on `Expr[String]`
-### ExprStringOps.plus
-
-
-
-```scala
-Expr("hello") + Expr("world")
-```
-
-
-*
-    ```sql
-    SELECT CONCAT(?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    "helloworld"
-    ```
-
-
-
-### ExprStringOps.like
-
-
-
-```scala
-Expr("hello").like("he%")
-```
-
-
-*
-    ```sql
-    SELECT ? LIKE ? as res
-    ```
-
-
-
-*
-    ```scala
-    true
-    ```
-
-
-
-### ExprStringOps.length
-
-
-
-```scala
-Expr("hello").length
-```
-
-
-*
-    ```sql
-    SELECT LENGTH(?) as res
-    ```
-
-
-
-*
-    ```scala
-    5
-    ```
-
-
-
-### ExprStringOps.octetLength
-
-
-
-```scala
-Expr("叉烧包").octetLength
-```
-
-
-*
-    ```sql
-    SELECT OCTET_LENGTH(?) as res
-    ```
-
-
-
-*
-    ```scala
-    9
-    ```
-
-
-
-### ExprStringOps.position
-
-
-
-```scala
-Expr("hello").indexOf("ll")
-```
-
-
-*
-    ```sql
-    SELECT POSITION(? IN ?) as res
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprStringOps.toLowerCase
-
-
-
-```scala
-Expr("Hello").toLowerCase
-```
-
-
-*
-    ```sql
-    SELECT LOWER(?) as res
-    ```
-
-
-
-*
-    ```scala
-    "hello"
-    ```
-
-
-
-### ExprStringOps.trim
-
-
-
-```scala
-Expr("  Hello ").trim
-```
-
-
-*
-    ```sql
-    SELECT TRIM(?) as res
-    ```
-
-
-
-*
-    ```scala
-    "Hello"
-    ```
-
-
-
-### ExprStringOps.ltrim
-
-
-
-```scala
-Expr("  Hello ").ltrim
-```
-
-
-*
-    ```sql
-    SELECT LTRIM(?) as res
-    ```
-
-
-
-*
-    ```scala
-    "Hello "
-    ```
-
-
-
-### ExprStringOps.rtrim
-
-
-
-```scala
-Expr("  Hello ").rtrim
-```
-
-
-*
-    ```sql
-    SELECT RTRIM(?) as res
-    ```
-
-
-
-*
-    ```scala
-    "  Hello"
-    ```
-
-
-
-### ExprStringOps.substring
-
-
-
-```scala
-Expr("Hello").substring(2, 2)
-```
-
-
-*
-    ```sql
-    SELECT SUBSTRING(?, ?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    "el"
-    ```
-
-
-
-## Insert
-Basic `INSERT` operations
-### Insert.single.simple
-
-
-
-```scala
-Buyer.insert.values(
-  _.name := "test buyer",
-  _.dateOfBirth := LocalDate.parse("2023-09-09"),
-  _.id := 4
-)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
-
-### Insert.single.partial
-
-
-
-```scala
-Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
-
-### Insert.batch.simple
-
-
-
 ```scala
-Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
-  ("test buyer A", LocalDate.parse("2001-04-07"), 4),
-  ("test buyer B", LocalDate.parse("2002-05-08"), 5),
-  ("test buyer C", LocalDate.parse("2003-06-09"), 6)
-)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id)
-    VALUES
-      (?, ?, ?),
-      (?, ?, ?),
-      (?, ?, ?)
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-----
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
+  db.run(Purchase.delete(_ => true)) ==> 7
 
+  db.run(Purchase.select.size) ==> 0
+}
 
-```scala
-Buyer.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 0
 ```
-
 
 
 
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
-    ```
 
 
 
-### Insert.batch.partial
+### Transaction.simple.rollback
 
+Example of explicitly rolling back a transaction using the `db.rollback()` method.
+After rollback, the effects of the `delete` query are undone, and subsequent `select`
+queries can see the previously-deleted entries both inside and outside the transaction
 
-
 ```scala
-Buyer.insert.batched(_.name, _.dateOfBirth)(
-  ("test buyer A", LocalDate.parse("2001-04-07")),
-  ("test buyer B", LocalDate.parse("2002-05-08")),
-  ("test buyer C", LocalDate.parse("2003-06-09"))
-)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth)
-    VALUES (?, ?), (?, ?), (?, ?)
-    ```
-
-
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-*
-    ```scala
-    3
-    ```
+  db.run(Purchase.delete(_ => true)) ==> 7
 
+  db.run(Purchase.select.size) ==> 0
 
+  db.rollback()
 
-----
+  db.run(Purchase.select.size) ==> 7
+}
 
-
-
-```scala
-Buyer.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
-
 
 
 
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
-    ```
 
 
 
-### Insert.select.caseclass
+### Transaction.simple.throw
 
+Transactions are also rolled back if they terminate with an uncaught exception
 
-
 ```scala
-Buyer.insert.select(
-  identity,
-  Buyer.select
-    .filter(_.name <> "Li Haoyi")
-    .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
-)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (id, name, date_of_birth)
-    SELECT
-      buyer0.id + (SELECT MAX(buyer0.id) as res FROM buyer buyer0) as res__id,
-      buyer0.name as res__name,
-      buyer0.date_of_birth as res__date_of_birth
-    FROM buyer buyer0
-    WHERE buyer0.name <> ?
-    ```
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
 
+    db.run(Purchase.delete(_ => true)) ==> 7
 
+    db.run(Purchase.select.size) ==> 0
 
-*
-    ```scala
-    2
-    ```
+    throw new FooException
+  }
+} catch { case e: FooException => /*donothing*/ }
 
-
-
-----
-
-
-
-```scala
-Buyer.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
-
-
 
 
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
 
 
 
-### Insert.select.simple
 
+### Transaction.savepoint.commit
 
+Savepoints are like "sub" transactions: they let you declare a savepoint
+and roll back any changes to the savepoint later. If a savepoint block
+completes successfully, the savepoint changes are committed ("released")
+and remain visible later in the transaction and outside of it
 
 ```scala
-Buyer.insert.select(
-  x => (x.name, x.dateOfBirth),
-  Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 <> "Li Haoyi")
-)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth)
-    SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
-    FROM buyer buyer0
-    WHERE buyer0.name <> ?
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-----
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
 
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+  }
 
+  db.run(Purchase.select.size) ==> 0
+}
 
-```scala
-Buyer.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 0
 ```
-
 
 
 
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
 
 
 
-## Delete
-Basic `DELETE` operations
-### Delete.single
+### Transaction.savepoint.rollback
 
+Like transactions, savepoints support the `.rollback()` method, to undo any
+changes since the start of the savepoint block.
 
-
 ```scala
-Purchase.delete(_.id `=` 2)
-```
-
-
-*
-    ```sql
-    DELETE FROM purchase WHERE purchase.id = ?
-    ```
-
-
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-*
-    ```scala
-    1
-    ```
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
 
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+    sp.rollback()
+    db.run(Purchase.select.size) ==> 4
+  }
 
+  db.run(Purchase.select.size) ==> 4
+}
 
-----
-
-
-
-```scala
-Purchase.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 4
 ```
 
 
 
 
-*
-    ```scala
-    Seq(
-      Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
-      // id==2 got deleted
-      Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
-    )
-    ```
 
 
+### Transaction.savepoint.throw
 
-### Delete.multiple
+Savepoints also roll back their enclosed changes automatically if they
+terminate with an uncaught exception
 
-
-
 ```scala
-Purchase.delete(_.id <> 2)
-```
-
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-*
-    ```sql
-    DELETE FROM purchase WHERE purchase.id <> ?
-    ```
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
 
+  try {
+    db.savepoint { sp =>
+      db.run(Purchase.delete(_ => true)) ==> 4
+      db.run(Purchase.select.size) ==> 0
+      throw new FooException
+    }
+  } catch {
+    case e: FooException => /*donothing*/
+  }
 
+  db.run(Purchase.select.size) ==> 4
+}
 
-*
-    ```scala
-    6
-    ```
-
-
-
-----
-
-
-
-```scala
-Purchase.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 4
 ```
-
 
 
 
-*
-    ```scala
-    Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
-    ```
 
 
 
-### Delete.all
+### Transaction.doubleSavepoint.commit
 
+Only one transaction can be present at a time, but savepoints can be arbitrarily nested.
+Uncaught exceptions or explicit `.rollback()` calls would roll back changes done during
+the inner savepoint/transaction blocks, while leaving changes applied during outer
+savepoint/transaction blocks in-place
 
-
 ```scala
-Purchase.delete(_ => true)
-```
-
-
-*
-    ```sql
-    DELETE FROM purchase WHERE ?
-    ```
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-*
-    ```scala
-    7
-    ```
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+    }
 
+    db.run(Purchase.select.size) ==> 1
+  }
 
+  db.run(Purchase.select.size) ==> 1
+}
 
-----
-
-
-
-```scala
-Purchase.select
+dbClient.autoCommit.run(Purchase.select.size) ==> 1
 ```
-
 
 
 
-*
-    ```scala
-    Seq[Purchase[Id]](
-      // all Deleted
-    )
-    ```
 
 
 
@@ -2910,6 +1580,694 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 
 
 
+## Insert
+Basic `INSERT` operations
+### Insert.single.simple
+
+
+
+```scala
+Buyer.insert.values(
+  _.name := "test buyer",
+  _.dateOfBirth := LocalDate.parse("2023-09-09"),
+  _.id := 4
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "test buyer")
+```
+
+
+
+
+*
+    ```scala
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    ```
+
+
+
+### Insert.single.partial
+
+
+
+```scala
+Buyer.insert
+  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "test buyer")
+```
+
+
+
+
+*
+    ```scala
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    ```
+
+
+
+### Insert.batch.simple
+
+
+
+```scala
+Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
+  ("test buyer A", LocalDate.parse("2001-04-07"), 4),
+  ("test buyer B", LocalDate.parse("2002-05-08"), 5),
+  ("test buyer C", LocalDate.parse("2003-06-09"), 6)
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id)
+    VALUES
+      (?, ?, ?),
+      (?, ?, ?),
+      (?, ?, ?)
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+    )
+    ```
+
+
+
+### Insert.batch.partial
+
+
+
+```scala
+Buyer.insert.batched(_.name, _.dateOfBirth)(
+  ("test buyer A", LocalDate.parse("2001-04-07")),
+  ("test buyer B", LocalDate.parse("2002-05-08")),
+  ("test buyer C", LocalDate.parse("2003-06-09"))
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth)
+    VALUES (?, ?), (?, ?), (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      // id=4,5,6 comes from auto increment
+      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+    )
+    ```
+
+
+
+### Insert.select.caseclass
+
+
+
+```scala
+Buyer.insert.select(
+  identity,
+  Buyer.select
+    .filter(_.name <> "Li Haoyi")
+    .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth)
+    SELECT
+      buyer0.id + (SELECT MAX(buyer0.id) as res FROM buyer buyer0) as res__id,
+      buyer0.name as res__name,
+      buyer0.date_of_birth as res__date_of_birth
+    FROM buyer buyer0
+    WHERE buyer0.name <> ?
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+    )
+    ```
+
+
+
+### Insert.select.simple
+
+
+
+```scala
+Buyer.insert.select(
+  x => (x.name, x.dateOfBirth),
+  Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 <> "Li Haoyi")
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth)
+    SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
+    FROM buyer buyer0
+    WHERE buyer0.name <> ?
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      // id=4,5 comes from auto increment, 6 is filtered out in the select
+      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+    )
+    ```
+
+
+
+## Update
+Basic `UPDATE` queries
+### Update.update
+
+
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
+```
+
+
+
+
+*
+    ```scala
+    LocalDate.parse("2019-04-07")
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
+```
+
+
+
+
+*
+    ```scala
+    LocalDate.parse("1965-08-09" /* not updated */ )
+    ```
+
+
+
+### Update.bulk
+
+
+
+```scala
+Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET buyer.date_of_birth = ? WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
+```
+
+
+
+
+*
+    ```scala
+    LocalDate.parse("2019-04-07")
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
+```
+
+
+
+
+*
+    ```scala
+    LocalDate.parse("2019-04-07")
+    ```
+
+
+
+### Update.multiple
+
+
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq[LocalDate]( /* not found due to rename */ )
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2019-04-07"))
+    ```
+
+
+
+### Update.dynamic
+
+
+
+```scala
+Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq[LocalDate]( /* not found due to rename */ )
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2001-02-03"))
+    ```
+
+
+
+## Delete
+Basic `DELETE` operations
+### Delete.single
+
+
+
+```scala
+Purchase.delete(_.id `=` 2)
+```
+
+
+*
+    ```sql
+    DELETE FROM purchase WHERE purchase.id = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Purchase.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
+      // id==2 got deleted
+      Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
+      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+    )
+    ```
+
+
+
+### Delete.multiple
+
+
+
+```scala
+Purchase.delete(_.id <> 2)
+```
+
+
+*
+    ```sql
+    DELETE FROM purchase WHERE purchase.id <> ?
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+----
+
+
+
+```scala
+Purchase.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
+    ```
+
+
+
+### Delete.all
+
+
+
+```scala
+Purchase.delete(_ => true)
+```
+
+
+*
+    ```sql
+    DELETE FROM purchase WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+----
+
+
+
+```scala
+Purchase.select
+```
+
+
+
+
+*
+    ```scala
+    Seq[Purchase[Id]](
+      // all Deleted
+    )
+    ```
+
+
+
 ## CompoundSelect
 Compound `SELECT` operations: sort, take, drop, union, unionAll, etc.
 ### CompoundSelect.sort.simple
@@ -3919,248 +3277,6 @@ Buyer.select
 
 
 
-## Update
-Basic `UPDATE` queries
-### Update.update
-
-
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
-```
-
-
-*
-    ```sql
-    UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
-```
-
-
-
-
-*
-    ```scala
-    LocalDate.parse("2019-04-07")
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
-```
-
-
-
-
-*
-    ```scala
-    LocalDate.parse("1965-08-09" /* not updated */ )
-    ```
-
-
-
-### Update.bulk
-
-
-
-```scala
-Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
-```
-
-
-*
-    ```sql
-    UPDATE buyer SET buyer.date_of_birth = ? WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
-```
-
-
-
-
-*
-    ```scala
-    LocalDate.parse("2019-04-07")
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
-```
-
-
-
-
-*
-    ```scala
-    LocalDate.parse("2019-04-07")
-    ```
-
-
-
-### Update.multiple
-
-
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
-```
-
-
-*
-    ```sql
-    UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq[LocalDate]( /* not found due to rename */ )
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
-    ```
-
-
-
-### Update.dynamic
-
-
-
-```scala
-Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
-```
-
-
-*
-    ```sql
-    UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq[LocalDate]( /* not found due to rename */ )
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2001-02-03"))
-    ```
-
-
-
 ## UpdateJoin
 `UPDATE` queries that use `JOIN`s
 ### UpdateJoin.join
@@ -4372,124 +3488,229 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 
 
-## MySqlDialect
-Operations specific to working with MySql Databases
-### MySqlDialect.reverse
+## ExprBooleanOps
+Operations that can be performed on `Expr[Boolean]`
+### ExprBooleanOps.and
 
 
 
 ```scala
-Expr("Hello").reverse
+Expr(true) && Expr(true)
 ```
 
 
 *
     ```sql
-    SELECT REVERSE(?) as res
+    SELECT ? AND ? as res
     ```
 
 
 
 *
     ```scala
-    "olleH"
+    true
     ```
 
 
 
-### MySqlDialect.lpad
+----
 
 
 
 ```scala
-Expr("Hello").lpad(10, "xy")
+Expr(false) && Expr(true)
 ```
 
 
 *
     ```sql
-    SELECT LPAD(?, ?, ?) as res
+    SELECT ? AND ? as res
     ```
 
 
 
 *
     ```scala
-    "xyxyxHello"
+    false
     ```
 
 
 
-### MySqlDialect.rpad
+### ExprBooleanOps.or
 
 
 
 ```scala
-Expr("Hello").rpad(10, "xy")
+Expr(false) || Expr(false)
 ```
 
 
 *
     ```sql
-    SELECT RPAD(?, ?, ?) as res
+    SELECT ? OR ? as res
     ```
 
 
 
 *
     ```scala
-    "Helloxyxyx"
+    false
     ```
 
 
 
-### MySqlDialect.conflict.ignore
+----
 
 
 
 ```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(x => x.id := x.id)
+!Expr(false)
 ```
 
 
 *
     ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = buyer.id
+    SELECT NOT ? as res
     ```
 
 
 
 *
     ```scala
-    1
+    true
     ```
 
 
 
-### MySqlDialect.conflict.update
+## ExprExprIntOps
+Operations that can be performed on `Expr[T]` when `T` is numeric
+### ExprExprIntOps.plus
 
 
 
 ```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(_.name := "TEST BUYER CONFLICT")
+Expr(6) + Expr(2)
 ```
 
 
 *
     ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?
+    SELECT ? + ? as res
+    ```
+
+
+
+*
+    ```scala
+    8
+    ```
+
+
+
+### ExprExprIntOps.minus
+
+
+
+```scala
+Expr(6) - Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? - ? as res
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### ExprExprIntOps.times
+
+
+
+```scala
+Expr(6) * Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? * ? as res
+    ```
+
+
+
+*
+    ```scala
+    12
+    ```
+
+
+
+### ExprExprIntOps.divide
+
+
+
+```scala
+Expr(6) / Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? / ? as res
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### ExprExprIntOps.modulo
+
+
+
+```scala
+Expr(6) % Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT MOD(?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
+### ExprExprIntOps.bitwiseAnd
+
+
+
+```scala
+Expr(6) & Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? & ? as res
     ```
 
 
@@ -4501,46 +3722,156 @@ Buyer.insert
 
 
 
-----
+### ExprExprIntOps.bitwiseOr
 
 
 
 ```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
-
-### MySqlDialect.conflict.updateComputed
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(v => v.name := v.name.toUpperCase)
+Expr(6) | Expr(3)
 ```
 
 
 *
     ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = UPPER(buyer.name)
+    SELECT ? | ? as res
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### ExprExprIntOps.between
+
+
+
+```scala
+Expr(4).between(Expr(2), Expr(6))
+```
+
+
+*
+    ```sql
+    SELECT ? BETWEEN ? AND ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprExprIntOps.unaryPlus
+
+
+
+```scala
++Expr(-4)
+```
+
+
+*
+    ```sql
+    SELECT +? as res
+    ```
+
+
+
+*
+    ```scala
+    -4
+    ```
+
+
+
+### ExprExprIntOps.unaryMinus
+
+
+
+```scala
+-Expr(-4)
+```
+
+
+*
+    ```sql
+    SELECT -? as res
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### ExprExprIntOps.unaryTilde
+
+
+
+```scala
+~Expr(-4)
+```
+
+
+*
+    ```sql
+    SELECT ~? as res
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### ExprExprIntOps.abs
+
+
+
+```scala
+Expr(-4).abs
+```
+
+
+*
+    ```sql
+    SELECT ABS(?) as res
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### ExprExprIntOps.mod
+
+
+
+```scala
+Expr(8).mod(Expr(3))
+```
+
+
+*
+    ```sql
+    SELECT MOD(?, ?) as res
     ```
 
 
@@ -4552,24 +3883,698 @@ Buyer.insert
 
 
 
-----
+### ExprExprIntOps.ceil
 
 
 
 ```scala
-Buyer.select
+Expr(4.3).ceil
 ```
 
+
+*
+    ```sql
+    SELECT CEIL(?) as res
+    ```
 
 
 
 *
     ```scala
-    Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
+    5.0
+    ```
+
+
+
+### ExprExprIntOps.floor
+
+
+
+```scala
+Expr(4.7).floor
+```
+
+
+*
+    ```sql
+    SELECT FLOOR(?) as res
+    ```
+
+
+
+*
+    ```scala
+    4.0
+    ```
+
+
+
+----
+
+
+
+```scala
+Expr(4.7).floor
+```
+
+
+*
+    ```sql
+    SELECT FLOOR(?) as res
+    ```
+
+
+
+*
+    ```scala
+    4.0
+    ```
+
+
+
+## ExprSeqNumericOps
+Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
+### ExprSeqNumericOps.sum
+
+
+
+```scala
+Purchase.select.map(_.count).sum
+```
+
+
+*
+    ```sql
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    140
+    ```
+
+
+
+### ExprSeqNumericOps.min
+
+
+
+```scala
+Purchase.select.map(_.count).min
+```
+
+
+*
+    ```sql
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### ExprSeqNumericOps.max
+
+
+
+```scala
+Purchase.select.map(_.count).max
+```
+
+
+*
+    ```sql
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    100
+    ```
+
+
+
+### ExprSeqNumericOps.avg
+
+
+
+```scala
+Purchase.select.map(_.count).avg
+```
+
+
+*
+    ```sql
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    20
+    ```
+
+
+
+## ExprSeqOps
+Operations that can be performed on `Expr[Seq[_]]`
+### ExprSeqOps.size
+
+
+
+```scala
+Purchase.select.size
+```
+
+
+*
+    ```sql
+    SELECT COUNT(1) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### ExprSeqOps.sumBy.simple
+
+
+
+```scala
+Purchase.select.sumBy(_.count)
+```
+
+
+*
+    ```sql
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    140
+    ```
+
+
+
+### ExprSeqOps.sumBy.some
+
+
+
+```scala
+Purchase.select.sumByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Option(140)
+    ```
+
+
+
+### ExprSeqOps.sumBy.none
+
+
+
+```scala
+Purchase.select.filter(_ => false).sumByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    Option.empty[Int]
+    ```
+
+
+
+### ExprSeqOps.minBy.simple
+
+
+
+```scala
+Purchase.select.minBy(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### ExprSeqOps.minBy.some
+
+
+
+```scala
+Purchase.select.minByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Option(3)
+    ```
+
+
+
+### ExprSeqOps.minBy.none
+
+
+
+```scala
+Purchase.select.filter(_ => false).minByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    Option.empty[Int]
+    ```
+
+
+
+### ExprSeqOps.maxBy.simple
+
+
+
+```scala
+Purchase.select.maxBy(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    100
+    ```
+
+
+
+### ExprSeqOps.maxBy.some
+
+
+
+```scala
+Purchase.select.maxByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Option(100)
+    ```
+
+
+
+### ExprSeqOps.maxBy.none
+
+
+
+```scala
+Purchase.select.filter(_ => false).maxByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    Option.empty[Int]
+    ```
+
+
+
+### ExprSeqOps.avgBy.simple
+
+
+
+```scala
+Purchase.select.avgBy(_.count)
+```
+
+
+*
+    ```sql
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    20
+    ```
+
+
+
+### ExprSeqOps.avgBy.some
+
+
+
+```scala
+Purchase.select.avgByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Option(20)
+    ```
+
+
+
+### ExprSeqOps.avgBy.none
+
+
+
+```scala
+Purchase.select.filter(_ => false).avgByOpt(_.count)
+```
+
+
+*
+    ```sql
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    Option.empty[Int]
+    ```
+
+
+
+## ExprStringOps
+Operations that can be performed on `Expr[String]`
+### ExprStringOps.plus
+
+
+
+```scala
+Expr("hello") + Expr("world")
+```
+
+
+*
+    ```sql
+    SELECT CONCAT(?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "helloworld"
+    ```
+
+
+
+### ExprStringOps.like
+
+
+
+```scala
+Expr("hello").like("he%")
+```
+
+
+*
+    ```sql
+    SELECT ? LIKE ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprStringOps.length
+
+
+
+```scala
+Expr("hello").length
+```
+
+
+*
+    ```sql
+    SELECT LENGTH(?) as res
+    ```
+
+
+
+*
+    ```scala
+    5
+    ```
+
+
+
+### ExprStringOps.octetLength
+
+
+
+```scala
+Expr("叉烧包").octetLength
+```
+
+
+*
+    ```sql
+    SELECT OCTET_LENGTH(?) as res
+    ```
+
+
+
+*
+    ```scala
+    9
+    ```
+
+
+
+### ExprStringOps.position
+
+
+
+```scala
+Expr("hello").indexOf("ll")
+```
+
+
+*
+    ```sql
+    SELECT POSITION(? IN ?) as res
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### ExprStringOps.toLowerCase
+
+
+
+```scala
+Expr("Hello").toLowerCase
+```
+
+
+*
+    ```sql
+    SELECT LOWER(?) as res
+    ```
+
+
+
+*
+    ```scala
+    "hello"
+    ```
+
+
+
+### ExprStringOps.trim
+
+
+
+```scala
+Expr("  Hello ").trim
+```
+
+
+*
+    ```sql
+    SELECT TRIM(?) as res
+    ```
+
+
+
+*
+    ```scala
+    "Hello"
+    ```
+
+
+
+### ExprStringOps.ltrim
+
+
+
+```scala
+Expr("  Hello ").ltrim
+```
+
+
+*
+    ```sql
+    SELECT LTRIM(?) as res
+    ```
+
+
+
+*
+    ```scala
+    "Hello "
+    ```
+
+
+
+### ExprStringOps.rtrim
+
+
+
+```scala
+Expr("  Hello ").rtrim
+```
+
+
+*
+    ```sql
+    SELECT RTRIM(?) as res
+    ```
+
+
+
+*
+    ```scala
+    "  Hello"
+    ```
+
+
+
+### ExprStringOps.substring
+
+
+
+```scala
+Expr("Hello").substring(2, 2)
+```
+
+
+*
+    ```sql
+    SELECT SUBSTRING(?, ?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "el"
     ```
 
 
@@ -5360,210 +5365,205 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 
 
-## Transaction
-Usage of transactions, rollbacks, and savepoints
-### Transaction.simple.commit
+## MySqlDialect
+Operations specific to working with MySql Databases
+### MySqlDialect.reverse
 
-Common workflow to create a transaction and run a `delete` inside of it. The effect
-of the `delete` is visible both inside the transaction and outside after the
-transaction completes successfully and commits
+
 
 ```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
+Expr("Hello").reverse
+```
 
-  db.run(Purchase.delete(_ => true)) ==> 7
 
-  db.run(Purchase.select.size) ==> 0
-}
+*
+    ```sql
+    SELECT REVERSE(?) as res
+    ```
 
-dbClient.autoCommit.run(Purchase.select.size) ==> 0
+
+
+*
+    ```scala
+    "olleH"
+    ```
+
+
+
+### MySqlDialect.lpad
+
+
+
+```scala
+Expr("Hello").lpad(10, "xy")
+```
+
+
+*
+    ```sql
+    SELECT LPAD(?, ?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "xyxyxHello"
+    ```
+
+
+
+### MySqlDialect.rpad
+
+
+
+```scala
+Expr("Hello").rpad(10, "xy")
+```
+
+
+*
+    ```sql
+    SELECT RPAD(?, ?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "Helloxyxyx"
+    ```
+
+
+
+### MySqlDialect.conflict.ignore
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(x => x.id := x.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = buyer.id
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### MySqlDialect.conflict.update
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(_.name := "TEST BUYER CONFLICT")
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
 ```
 
 
 
 
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
+    ```
 
 
-### Transaction.simple.rollback
 
-Example of explicitly rolling back a transaction using the `db.rollback()` method.
-After rollback, the effects of the `delete` query are undone, and subsequent `select`
-queries can see the previously-deleted entries both inside and outside the transaction
+### MySqlDialect.conflict.updateComputed
+
+
 
 ```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(v => v.name := v.name.toUpperCase)
+```
 
-  db.run(Purchase.delete(_ => true)) ==> 7
 
-  db.run(Purchase.select.size) ==> 0
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = UPPER(buyer.name)
+    ```
 
-  db.rollback()
 
-  db.run(Purchase.select.size) ==> 7
-}
 
-dbClient.autoCommit.run(Purchase.select.size) ==> 7
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
 ```
 
 
 
 
-
-
-### Transaction.simple.throw
-
-Transactions are also rolled back if they terminate with an uncaught exception
-
-```scala
-try {
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
-
-    db.run(Purchase.delete(_ => true)) ==> 7
-
-    db.run(Purchase.select.size) ==> 0
-
-    throw new FooException
-  }
-} catch { case e: FooException => /*donothing*/ }
-
-dbClient.autoCommit.run(Purchase.select.size) ==> 7
-```
-
-
-
-
-
-
-### Transaction.savepoint.commit
-
-Savepoints are like "sub" transactions: they let you declare a savepoint
-and roll back any changes to the savepoint later. If a savepoint block
-completes successfully, the savepoint changes are committed ("released")
-and remain visible later in the transaction and outside of it
-
-```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
-
-  db.run(Purchase.delete(_.id <= 3)) ==> 3
-  db.run(Purchase.select.size) ==> 4
-
-  db.savepoint { sp =>
-    db.run(Purchase.delete(_ => true)) ==> 4
-    db.run(Purchase.select.size) ==> 0
-  }
-
-  db.run(Purchase.select.size) ==> 0
-}
-
-dbClient.autoCommit.run(Purchase.select.size) ==> 0
-```
-
-
-
-
-
-
-### Transaction.savepoint.rollback
-
-Like transactions, savepoints support the `.rollback()` method, to undo any
-changes since the start of the savepoint block.
-
-```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
-
-  db.run(Purchase.delete(_.id <= 3)) ==> 3
-  db.run(Purchase.select.size) ==> 4
-
-  db.savepoint { sp =>
-    db.run(Purchase.delete(_ => true)) ==> 4
-    db.run(Purchase.select.size) ==> 0
-    sp.rollback()
-    db.run(Purchase.select.size) ==> 4
-  }
-
-  db.run(Purchase.select.size) ==> 4
-}
-
-dbClient.autoCommit.run(Purchase.select.size) ==> 4
-```
-
-
-
-
-
-
-### Transaction.savepoint.throw
-
-Savepoints also roll back their enclosed changes automatically if they
-terminate with an uncaught exception
-
-```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
-
-  db.run(Purchase.delete(_.id <= 3)) ==> 3
-  db.run(Purchase.select.size) ==> 4
-
-  try {
-    db.savepoint { sp =>
-      db.run(Purchase.delete(_ => true)) ==> 4
-      db.run(Purchase.select.size) ==> 0
-      throw new FooException
-    }
-  } catch {
-    case e: FooException => /*donothing*/
-  }
-
-  db.run(Purchase.select.size) ==> 4
-}
-
-dbClient.autoCommit.run(Purchase.select.size) ==> 4
-```
-
-
-
-
-
-
-### Transaction.doubleSavepoint.commit
-
-Only one transaction can be present at a time, but savepoints can be arbitrarily nested.
-Uncaught exceptions or explicit `.rollback()` calls would roll back changes done during
-the inner savepoint/transaction blocks, while leaving changes applied during outer
-savepoint/transaction blocks in-place
-
-```scala
-dbClient.transaction { implicit db =>
-  db.run(Purchase.select.size) ==> 7
-
-  db.run(Purchase.delete(_.id <= 2)) ==> 2
-  db.run(Purchase.select.size) ==> 5
-
-  db.savepoint { sp1 =>
-    db.run(Purchase.delete(_.id <= 4)) ==> 2
-    db.run(Purchase.select.size) ==> 3
-
-    db.savepoint { sp2 =>
-      db.run(Purchase.delete(_.id <= 6)) ==> 2
-      db.run(Purchase.select.size) ==> 1
-    }
-
-    db.run(Purchase.select.size) ==> 1
-  }
-
-  db.run(Purchase.select.size) ==> 1
-}
-
-dbClient.autoCommit.run(Purchase.select.size) ==> 1
-```
-
-
-
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
+    ```
 
 
 

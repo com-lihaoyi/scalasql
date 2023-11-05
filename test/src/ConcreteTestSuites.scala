@@ -33,19 +33,15 @@ package mysql {
   import utils.MySqlSuite
 
   object DbApiTests extends DbApiTests with MySqlSuite
+  object TransactionTests extends TransactionTests with MySqlSuite
 
-  object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
-  object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
-  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
-  object ExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
-  object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
-  object InsertTests extends InsertTests with MySqlSuite
-  object DeleteTests extends DeleteTests with MySqlSuite
   object SelectTests extends SelectTests with MySqlSuite
   object JoinTests extends JoinTests with MySqlSuite
+  object InsertTests extends InsertTests with MySqlSuite
+  object UpdateTests extends UpdateTests with MySqlSuite
+  object DeleteTests extends DeleteTests with MySqlSuite
   object CompoundSelectTests extends CompoundSelectTests with MySqlSuite
   object SubQueryTests extends SubQueryTests with MySqlSuite
-  object UpdateTests extends UpdateTests with MySqlSuite
   object UpdateJoinTests extends UpdateJoinTests with MySqlSuite
   // MySql does not support updates with subqueries referencing same table
   // object UpdateSubQueryTests extends UpdateSubQueryTests with MySqlSuite
@@ -54,12 +50,18 @@ package mysql {
   // MySql does not support onConflictIgnore and onConflictUpdate does not take columns
   // object OnConflictTests extends OnConflictTests with MySqlSuite
 
-  object MySqlDialectTests extends MySqlDialectTests
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
+  object ExprExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
+  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
+  object ExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
   object OptionalTests extends datatypes.OptionalTests with MySqlSuite
 
-  object TransactionTests extends TransactionTests with MySqlSuite
+
+
+  object MySqlDialectTests extends MySqlDialectTests
 }
 
 package postgres {
@@ -67,7 +69,7 @@ package postgres {
   import utils.PostgresSuite
 
   object DbApiTests extends DbApiTests with PostgresSuite
-
+  object TransactionTests extends TransactionTests with PostgresSuite
 
   object SelectTests extends SelectTests with PostgresSuite
   object JoinTests extends JoinTests with PostgresSuite
@@ -87,12 +89,12 @@ package postgres {
   object ExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
 
-  object PostgresDialectTests extends PostgresDialectTests
-
   object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
+
   object OptionalTests extends datatypes.OptionalTests with PostgresSuite
 
-  object TransactionTests extends TransactionTests with PostgresSuite
+  object PostgresDialectTests extends PostgresDialectTests
+
 }
 
 package sqlite {
@@ -100,6 +102,7 @@ package sqlite {
   import utils.SqliteSuite
 
   object DbApiTests extends DbApiTests with SqliteSuite
+  object TransactionTests extends TransactionTests with SqliteSuite
 
   object SelectTests extends SelectTests with SqliteSuite
   object JoinTests extends JoinTests with SqliteSuite
@@ -119,12 +122,10 @@ package sqlite {
   object ExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
   object ExprStringOpsTests extends ExprStringOpsTests with SqliteSuite
 
-  object SqliteDialectTests extends SqliteDialectTests
-
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
   object OptionalTests extends datatypes.OptionalTests with SqliteSuite
 
-  object TransactionTests extends TransactionTests with SqliteSuite
+  object SqliteDialectTests extends SqliteDialectTests
 }
 
 package hsqldb {
@@ -132,7 +133,7 @@ package hsqldb {
   import utils.HsqlDbSuite
 
   object DbApiTests extends DbApiTests with HsqlDbSuite
-
+  object TransactionTests extends TransactionTests with HsqlDbSuite
 
   object SelectTests extends SelectTests with HsqlDbSuite
   object JoinTests extends JoinTests with HsqlDbSuite
@@ -155,12 +156,10 @@ package hsqldb {
   object ExprSeqOpsTests extends ExprSeqOpsTests with HsqlDbSuite
   object ExprStringOpsTests extends ExprStringOpsTests with HsqlDbSuite
 
-  object HsqlDbDialectTests extends HsqlDbDialectTests
-
   object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
   object OptionalTests extends datatypes.OptionalTests with HsqlDbSuite
 
-  object TransactionTests extends TransactionTests with HsqlDbSuite
+  object HsqlDbDialectTests extends HsqlDbDialectTests
 }
 
 package h2 {
@@ -168,6 +167,7 @@ package h2 {
   import utils.H2Suite
 
   object DbApiTests extends DbApiTests with H2Suite
+  object TransactionTests extends TransactionTests with H2Suite
 
   object SelectTests extends SelectTests with H2Suite
   object JoinTests extends JoinTests with H2Suite
@@ -189,9 +189,8 @@ package h2 {
   object ExprSeqOpsTests extends ExprSeqOpsTests with H2Suite
   object ExprStringOpsTests extends ExprStringOpsTests with H2Suite
 
-  object H2DialectTests extends H2DialectTests
-
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
   object OptionalTests extends datatypes.OptionalTests with H2Suite
-  object TransactionTests extends TransactionTests with H2Suite
+
+  object H2DialectTests extends H2DialectTests
 }

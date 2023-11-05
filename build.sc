@@ -34,7 +34,7 @@ object scalasql extends RootModule with ScalaModule {
     def testFramework = "scalasql.UtestFramework"
   }
 
-  def generateDocs() = T.command {
+  def generateTutorial() = T.command {
     var isDocs = Option.empty[Int]
     var isCode = false
     val outputLines = collection.mutable.Buffer.empty[String]
@@ -80,7 +80,7 @@ object scalasql extends RootModule with ScalaModule {
     }
     os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
   }
-  def generateQueryLibrary() = T.command {
+  def generateReferenceLibrary() = T.command {
     def dropDbPrefix(s: String) = s.split('.').drop(2).mkString(".")
     val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
     val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "recordedSuiteDescriptions.json"))
@@ -160,6 +160,7 @@ object scalasql extends RootModule with ScalaModule {
       .sortBy(_._2.head.suiteLine)
       .distinctBy { case (k, v) => dropDbPrefix(k)}
       .map{case (k, vs) => (dropDbPrefix(k), vs.map(r => r.copy(suiteName = dropDbPrefix(r.suiteName))))}
+
     for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
       val seen = mutable.Set.empty[String]
       outputLines.append(s"## $suiteName")
