@@ -32,7 +32,7 @@ false
 ```
 
 
-
+----
 
 ```scala
 !Expr(false)
@@ -289,7 +289,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-
+----
 
 ```scala
 Expr(4.7).floor
@@ -761,7 +761,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -791,7 +791,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -828,7 +828,7 @@ VALUES
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -869,7 +869,7 @@ VALUES (?, ?), (?, ?), (?, ?)
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -917,7 +917,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -958,7 +958,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -995,7 +995,7 @@ DELETE FROM purchase WHERE purchase.id = ?
 ```
 
 
-
+----
 
 ```scala
 Purchase.select
@@ -1032,7 +1032,7 @@ DELETE FROM purchase WHERE purchase.id <> ?
 ```
 
 
-
+----
 
 ```scala
 Purchase.select
@@ -1061,7 +1061,7 @@ DELETE FROM purchase WHERE ?
 ```
 
 
-
+----
 
 ```scala
 Purchase.select
@@ -2806,7 +2806,7 @@ UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2819,7 +2819,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -2848,7 +2848,7 @@ UPDATE buyer SET buyer.date_of_birth = ? WHERE ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2861,7 +2861,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -2892,7 +2892,7 @@ UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2905,7 +2905,7 @@ Seq[LocalDate]()
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
@@ -2934,7 +2934,7 @@ UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2947,7 +2947,7 @@ Seq[LocalDate]()
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
@@ -2983,7 +2983,7 @@ WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3024,7 +3024,7 @@ AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.id `=` 1).map(_.name)
@@ -3066,7 +3066,7 @@ WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3109,7 +3109,7 @@ WHERE buyer.name = ?
 ```
 
 
-
+----
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -3215,7 +3215,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UP
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -3254,7 +3254,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UP
 ```
 
 
-
+----
 
 ```scala
 Buyer.select
@@ -3297,7 +3297,7 @@ DataTypes.insert.values(
 ```
 
 
-
+----
 
 ```scala
 DataTypes.select
@@ -3326,7 +3326,7 @@ NonRoundTripTypes.insert.values(
 ```
 
 
-
+----
 
 ```scala
 NonRoundTripTypes.select
