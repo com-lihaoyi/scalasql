@@ -136,7 +136,7 @@ object scalasql extends RootModule with ScalaModule {
                |
                |*
                |    ```scala
-               |    ${scalafmt(r.resultCodeString).linesIterator.map("    " + _).mkString("\n")}
+               |    ${scalafmt(r.resultCodeString).linesIterator.mkString("\n    ")}
                |    ```
                |
                |""".stripMargin

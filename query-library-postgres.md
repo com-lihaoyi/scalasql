@@ -13,7 +13,7 @@ SELECT ? AND ? as res
 
 *
     ```scala
-        true
+    true
     ```
 
 
@@ -30,7 +30,7 @@ SELECT ? OR ? as res
 
 *
     ```scala
-        false
+    false
     ```
 
 
@@ -47,7 +47,7 @@ SELECT NOT ? as res
 
 *
     ```scala
-        true
+    true
     ```
 
 
@@ -65,7 +65,7 @@ SELECT ? + ? as res
 
 *
     ```scala
-        8
+    8
     ```
 
 
@@ -82,7 +82,7 @@ SELECT ? - ? as res
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -99,7 +99,7 @@ SELECT ? * ? as res
 
 *
     ```scala
-        12
+    12
     ```
 
 
@@ -116,7 +116,7 @@ SELECT ? / ? as res
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -133,7 +133,7 @@ SELECT MOD(?, ?) as res
 
 *
     ```scala
-        0
+    0
     ```
 
 
@@ -150,7 +150,7 @@ SELECT ? & ? as res
 
 *
     ```scala
-        2
+    2
     ```
 
 
@@ -167,7 +167,7 @@ SELECT ? | ? as res
 
 *
     ```scala
-        7
+    7
     ```
 
 
@@ -184,7 +184,7 @@ SELECT ? BETWEEN ? AND ? as res
 
 *
     ```scala
-        true
+    true
     ```
 
 
@@ -201,7 +201,7 @@ SELECT +? as res
 
 *
     ```scala
-        -4
+    -4
     ```
 
 
@@ -218,7 +218,7 @@ SELECT -? as res
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -235,7 +235,7 @@ SELECT ~? as res
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -252,7 +252,7 @@ SELECT ABS(?) as res
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -269,7 +269,7 @@ SELECT MOD(?, ?) as res
 
 *
     ```scala
-        2
+    2
     ```
 
 
@@ -286,7 +286,7 @@ SELECT CEIL(?) as res
 
 *
     ```scala
-        5.0
+    5.0
     ```
 
 
@@ -303,7 +303,7 @@ SELECT FLOOR(?) as res
 
 *
     ```scala
-        4.0
+    4.0
     ```
 
 
@@ -320,7 +320,7 @@ SELECT FLOOR(?) as res
 
 *
     ```scala
-        4.0
+    4.0
     ```
 
 
@@ -338,7 +338,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        140
+    140
     ```
 
 
@@ -355,7 +355,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -372,7 +372,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        100
+    100
     ```
 
 
@@ -389,7 +389,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        20
+    20
     ```
 
 
@@ -407,7 +407,7 @@ SELECT COUNT(1) as res FROM purchase purchase0
 
 *
     ```scala
-        7
+    7
     ```
 
 
@@ -424,7 +424,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        140
+    140
     ```
 
 
@@ -441,7 +441,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        Option(140)
+    Option(140)
     ```
 
 
@@ -458,7 +458,7 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
 
 *
     ```scala
-        Option.empty[Int]
+    Option.empty[Int]
     ```
 
 
@@ -475,7 +475,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -492,7 +492,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        Option(3)
+    Option(3)
     ```
 
 
@@ -509,7 +509,7 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
 
 *
     ```scala
-        Option.empty[Int]
+    Option.empty[Int]
     ```
 
 
@@ -526,7 +526,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        100
+    100
     ```
 
 
@@ -543,7 +543,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        Option(100)
+    Option(100)
     ```
 
 
@@ -560,7 +560,7 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
 
 *
     ```scala
-        Option.empty[Int]
+    Option.empty[Int]
     ```
 
 
@@ -577,7 +577,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        20
+    20
     ```
 
 
@@ -594,7 +594,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 *
     ```scala
-        Option(20)
+    Option(20)
     ```
 
 
@@ -611,7 +611,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
 
 *
     ```scala
-        Option.empty[Int]
+    Option.empty[Int]
     ```
 
 
@@ -629,7 +629,7 @@ SELECT ? || ? as res
 
 *
     ```scala
-        "helloworld"
+    "helloworld"
     ```
 
 
@@ -646,7 +646,7 @@ SELECT ? LIKE ? as res
 
 *
     ```scala
-        true
+    true
     ```
 
 
@@ -663,7 +663,7 @@ SELECT LENGTH(?) as res
 
 *
     ```scala
-        5
+    5
     ```
 
 
@@ -680,7 +680,7 @@ SELECT OCTET_LENGTH(?) as res
 
 *
     ```scala
-        9
+    9
     ```
 
 
@@ -697,7 +697,7 @@ SELECT POSITION(? IN ?) as res
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -714,7 +714,7 @@ SELECT LOWER(?) as res
 
 *
     ```scala
-        "hello"
+    "hello"
     ```
 
 
@@ -731,7 +731,7 @@ SELECT TRIM(?) as res
 
 *
     ```scala
-        "Hello"
+    "Hello"
     ```
 
 
@@ -748,7 +748,7 @@ SELECT LTRIM(?) as res
 
 *
     ```scala
-        "Hello "
+    "Hello "
     ```
 
 
@@ -765,7 +765,7 @@ SELECT RTRIM(?) as res
 
 *
     ```scala
-        "  Hello"
+    "  Hello"
     ```
 
 
@@ -782,7 +782,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 
 *
     ```scala
-        "el"
+    "el"
     ```
 
 
@@ -804,7 +804,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -818,7 +818,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-        Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -836,7 +836,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -850,7 +850,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-        Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -875,7 +875,7 @@ VALUES
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -889,7 +889,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -918,7 +918,7 @@ VALUES (?, ?), (?, ?), (?, ?)
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -932,7 +932,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -968,7 +968,7 @@ WHERE buyer0.name <> ?
 
 *
     ```scala
-        2
+    2
     ```
 
 
@@ -982,7 +982,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -1011,7 +1011,7 @@ WHERE buyer0.name <> ?
 
 *
     ```scala
-        2
+    2
     ```
 
 
@@ -1025,7 +1025,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -1050,7 +1050,7 @@ DELETE FROM purchase WHERE purchase.id = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -1064,7 +1064,7 @@ Purchase.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
       // id==2 got deleted
       Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
@@ -1089,7 +1089,7 @@ DELETE FROM purchase WHERE purchase.id <> ?
 
 *
     ```scala
-        6
+    6
     ```
 
 
@@ -1103,7 +1103,7 @@ Purchase.select
 
 *
     ```scala
-        Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
+    Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
     ```
 
 
@@ -1120,7 +1120,7 @@ DELETE FROM purchase WHERE ?
 
 *
     ```scala
-        7
+    7
     ```
 
 
@@ -1134,7 +1134,7 @@ Purchase.select
 
 *
     ```scala
-        Seq[Purchase[Id]](
+    Seq[Purchase[Id]](
       // all Deleted
     )
     ```
@@ -1154,7 +1154,7 @@ SELECT ? as res
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -1175,7 +1175,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
       Buyer[Id](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
       Buyer[Id](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
@@ -1201,7 +1201,7 @@ WHERE shipping_info0.buyer_id = ?
 
 *
     ```scala
-        Seq(
+    Seq(
       ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
       ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
     )
@@ -1229,7 +1229,7 @@ AND shipping_info0.shipping_date = ?
 
 *
     ```scala
-        Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
+    Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
     ```
 
 
@@ -1255,7 +1255,7 @@ AND shipping_info0.shipping_date = ?
 
 *
     ```scala
-        ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
+    ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
     ```
 
 
@@ -1279,7 +1279,7 @@ AND shipping_info0.shipping_date = ?
 
 *
     ```scala
-        Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+    Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
     ```
 
 
@@ -1296,7 +1296,7 @@ SELECT buyer0.name as res FROM buyer buyer0
 
 *
     ```scala
-        Seq("James Bond", "叉烧包", "Li Haoyi")
+    Seq("James Bond", "叉烧包", "Li Haoyi")
     ```
 
 
@@ -1313,7 +1313,7 @@ SELECT buyer0.name as res__0, buyer0.id as res__1 FROM buyer buyer0
 
 *
     ```scala
-        Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
+    Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
     ```
 
 
@@ -1334,7 +1334,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(
+    Seq(
       ("James Bond", 1, LocalDate.parse("2001-02-03")),
       ("叉烧包", 2, LocalDate.parse("1923-11-12")),
       ("Li Haoyi", 3, LocalDate.parse("1965-08-09"))
@@ -1355,7 +1355,7 @@ SELECT product0.price * ? as res FROM product product0
 
 *
     ```scala
-        Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
+    Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
     ```
 
 
@@ -1377,7 +1377,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(
+    Seq(
       (1, Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))),
       (2, Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))),
       (3, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
@@ -1416,7 +1416,7 @@ FROM product product0
 
 *
     ```scala
-        Seq(
+    Seq(
       ("Face Mask", 888.0),
       ("Guitar", 900.0),
       ("Socks", 15.7),
@@ -1441,7 +1441,7 @@ FROM (SELECT buyer0.name as res__name FROM buyer buyer0) subquery0
 
 *
     ```scala
-        Seq("James Bond", "叉烧包", "Li Haoyi")
+    Seq("James Bond", "叉烧包", "Li Haoyi")
     ```
 
 
@@ -1458,7 +1458,7 @@ SELECT product0.name as res FROM product product0 WHERE product0.price < ?
 
 *
     ```scala
-        Seq("Face Mask", "Socks", "Cookie")
+    Seq("Face Mask", "Socks", "Cookie")
     ```
 
 
@@ -1475,7 +1475,7 @@ SELECT SUM(purchase0.total) as res FROM purchase purchase0
 
 *
     ```scala
-        12343.2
+    12343.2
     ```
 
 
@@ -1492,7 +1492,7 @@ SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purch
 
 *
     ```scala
-        (12343.2, 10000.0)
+    (12343.2, 10000.0)
     ```
 
 
@@ -1511,7 +1511,7 @@ GROUP BY purchase0.product_id
 
 *
     ```scala
-        Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
+    Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
     ```
 
 
@@ -1531,7 +1531,7 @@ HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
 
 *
     ```scala
-        Seq((2, 900.0), (4, 493.8), (5, 10000.0))
+    Seq((2, 900.0), (4, 493.8), (5, 10000.0))
     ```
 
 
@@ -1555,7 +1555,7 @@ HAVING SUM(purchase0.total) > ?
 
 *
     ```scala
-        Seq((1, 888.0), (5, 10000.0))
+    Seq((1, 888.0), (5, 10000.0))
     ```
 
 
@@ -1572,7 +1572,7 @@ SELECT purchase0.shipping_info_id as res FROM purchase purchase0
 
 *
     ```scala
-        Seq(1, 1, 1, 2, 2, 3, 3)
+    Seq(1, 1, 1, 2, 2, 3, 3)
     ```
 
 
@@ -1589,7 +1589,7 @@ SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0
 
 *
     ```scala
-        Seq(1, 2, 3)
+    Seq(1, 2, 3)
     ```
 
 
@@ -1608,7 +1608,7 @@ WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shi
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
     )
@@ -1635,7 +1635,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
+    Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
     ```
 
 
@@ -1659,7 +1659,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
+    Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     ```
 
 
@@ -1688,7 +1688,7 @@ FROM product product0
 
 *
     ```scala
-        Seq(
+    Seq(
       "Face Mask NORMAL",
       "Guitar EXPENSIVE",
       "Socks CHEAP",
@@ -1723,7 +1723,7 @@ FROM product product0
 
 *
     ```scala
-        Seq(
+    Seq(
       "Face Mask NORMAL",
       "Guitar EXPENSIVE",
       "Socks UNKNOWN",
@@ -1757,7 +1757,7 @@ WHERE buyer0.name = ?
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
         ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
@@ -1792,7 +1792,7 @@ WHERE buyer0.name = ?
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
         ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
@@ -1824,7 +1824,7 @@ WHERE buyer0.name = ?
 
 *
     ```scala
-        Seq(LocalDate.parse("2012-04-05"))
+    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -1849,7 +1849,7 @@ JOIN buyer buyer1 ON buyer0.id = buyer1.id
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
@@ -1887,7 +1887,7 @@ JOIN buyer buyer1 ON buyer0.id <> buyer1.id
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
         Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
@@ -1935,7 +1935,7 @@ AND buyer0.name = ?
 
 *
     ```scala
-        Seq(LocalDate.parse("2012-04-05"))
+    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -1957,7 +1957,7 @@ AND buyer0.name = ?
 
 *
     ```scala
-        Seq(LocalDate.parse("2012-04-05"))
+    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -1982,7 +1982,7 @@ LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
         Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
@@ -2021,7 +2021,7 @@ RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
@@ -2060,7 +2060,7 @@ FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
 
 *
     ```scala
-        Seq(
+    Seq(
       (
         Option(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
         Option(Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")))
@@ -2092,7 +2092,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price
 
 *
     ```scala
-        Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
+    Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
     ```
 
 
@@ -2116,7 +2116,7 @@ ORDER BY res__shipping_info_id DESC, res__product_id ASC
 
 *
     ```scala
-        Seq(
+    Seq(
       Purchase[Id](6, 3, 1, 5, 44.4),
       Purchase[Id](7, 3, 6, 13, 1.3),
       Purchase[Id](4, 2, 4, 4, 493.8),
@@ -2141,7 +2141,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Cookie", "Socks")
+    Seq("Cookie", "Socks")
     ```
 
 
@@ -2158,7 +2158,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET
 
 *
     ```scala
-        Seq("Face Mask", "Skate Board", "Guitar", "Camera")
+    Seq("Face Mask", "Skate Board", "Guitar", "Camera")
     ```
 
 
@@ -2175,7 +2175,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Cookie", "Socks")
+    Seq("Cookie", "Socks")
     ```
 
 
@@ -2192,7 +2192,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Cookie")
+    Seq("Cookie")
     ```
 
 
@@ -2209,7 +2209,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Face Mask", "Skate Board")
+    Seq("Face Mask", "Skate Board")
     ```
 
 
@@ -2226,7 +2226,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Guitar")
+    Seq("Guitar")
     ```
 
 
@@ -2243,7 +2243,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Face Mask", "Skate Board")
+    Seq("Face Mask", "Skate Board")
     ```
 
 
@@ -2260,7 +2260,7 @@ SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 
 
 *
     ```scala
-        Seq("Socks")
+    Seq("Socks")
     ```
 
 
@@ -2281,7 +2281,7 @@ FROM (SELECT purchase0.shipping_info_id as res
 
 *
     ```scala
-        Seq(1, 2)
+    Seq(1, 2)
     ```
 
 
@@ -2305,7 +2305,7 @@ WHERE product1.id = subquery0.res__product_id
 
 *
     ```scala
-        Seq("Camera", "Face Mask", "Guitar")
+    Seq("Camera", "Face Mask", "Guitar")
     ```
 
 
@@ -2326,7 +2326,7 @@ FROM (SELECT purchase0.total as res__total
 
 *
     ```scala
-        11788.0
+    11788.0
     ```
 
 
@@ -2351,7 +2351,7 @@ FROM (SELECT purchase0.total as res__total
 
 *
     ```scala
-        (11788.0, 3929.0)
+    (11788.0, 3929.0)
     ```
 
 
@@ -2374,7 +2374,7 @@ FROM product product0
 
 *
     ```scala
-        Seq(
+    Seq(
       "camera",
       "cookie",
       "face mask",
@@ -2406,7 +2406,7 @@ FROM product product0
 
 *
     ```scala
-        Seq(
+    Seq(
       "face mask",
       "guitar",
       "socks",
@@ -2442,7 +2442,7 @@ FROM product product0
 
 *
     ```scala
-        Seq("camera", "cookie", "guitar", "socks")
+    Seq("camera", "cookie", "guitar", "socks")
     ```
 
 
@@ -2465,7 +2465,7 @@ FROM product product0
 
 *
     ```scala
-        Seq("face mask", "skate board")
+    Seq("face mask", "skate board")
     ```
 
 
@@ -2494,7 +2494,7 @@ ORDER BY res
 
 *
     ```scala
-        Seq(
+    Seq(
       "camera",
       "cookie",
       "face mask",
@@ -2539,7 +2539,7 @@ OFFSET 4
 
 *
     ```scala
-        Seq("guitar", "james bond", "li haoyi", "skate board")
+    Seq("guitar", "james bond", "li haoyi", "skate board")
     ```
 
 
@@ -2572,7 +2572,7 @@ FROM (SELECT
 
 *
     ```scala
-        (123.45, 8.88)
+    (123.45, 8.88)
     ```
 
 
@@ -2601,7 +2601,7 @@ FROM (SELECT product0.price as res__1
 
 *
     ```scala
-        (1000.0, 0.1)
+    (1000.0, 0.1)
     ```
 
 
@@ -2627,7 +2627,7 @@ ON purchase0.product_id = subquery1.res__id
 
 *
     ```scala
-        Seq(10000.0)
+    Seq(10000.0)
     ```
 
 
@@ -2651,7 +2651,7 @@ JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
 
 *
     ```scala
-        Seq(10000.0)
+    Seq(10000.0)
     ```
 
 
@@ -2689,7 +2689,7 @@ ON subquery0.res__id = subquery1.res__product_id
 
 *
     ```scala
-        Seq(("Camera", 10))
+    Seq(("Camera", 10))
     ```
 
 
@@ -2714,7 +2714,7 @@ LIMIT 2
 
 *
     ```scala
-        Seq("Face Mask", "Skate Board")
+    Seq("Face Mask", "Skate Board")
     ```
 
 
@@ -2739,7 +2739,7 @@ GROUP BY subquery0.res__product_id
 
 *
     ```scala
-        Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
+    Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
     ```
 
 
@@ -2766,7 +2766,7 @@ JOIN product product1 ON subquery0.res__0 = product1.id
 
 *
     ```scala
-        Seq(
+    Seq(
       ("Camera", 10000.0),
       ("Cookie", 1.3),
       ("Face Mask", 932.4),
@@ -2798,7 +2798,7 @@ WHERE (SELECT
 
 *
     ```scala
-        Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+    Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     ```
 
 
@@ -2820,7 +2820,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(
+    Seq(
       (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
       (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
       (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
@@ -2849,7 +2849,7 @@ FROM buyer buyer0
 
 *
     ```scala
-        Seq(
+    Seq(
       (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), true),
       (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
       (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
@@ -2880,7 +2880,7 @@ FROM product product0
 
 *
     ```scala
-        Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
+    Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
     ```
 
 
@@ -2906,7 +2906,7 @@ FROM (SELECT
 
 *
     ```scala
-        Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
+    Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
     ```
 
 
@@ -2926,7 +2926,7 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -2940,7 +2940,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2019-04-07"))
+    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -2954,7 +2954,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("1965-08-09"))
+    Seq(LocalDate.parse("1965-08-09"))
     ```
 
 
@@ -2971,7 +2971,7 @@ UPDATE buyer SET date_of_birth = ? WHERE ?
 
 *
     ```scala
-        3
+    3
     ```
 
 
@@ -2985,7 +2985,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2019-04-07"))
+    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -2999,7 +2999,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2019-04-07"))
+    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -3018,7 +3018,7 @@ UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3032,7 +3032,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq[LocalDate]()
+    Seq[LocalDate]()
     ```
 
 
@@ -3046,7 +3046,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2019-04-07"))
+    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -3063,7 +3063,7 @@ UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3077,7 +3077,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq[LocalDate]()
+    Seq[LocalDate]()
     ```
 
 
@@ -3091,7 +3091,7 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2001-02-03"))
+    Seq(LocalDate.parse("2001-02-03"))
     ```
 
 
@@ -3115,7 +3115,7 @@ WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3129,7 +3129,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2012-04-05"))
+    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -3159,7 +3159,7 @@ AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3173,7 +3173,7 @@ Buyer.select.filter(_.id `=` 1).map(_.name)
 
 *
     ```scala
-        Seq("Camera")
+    Seq("Camera")
     ```
 
 
@@ -3201,7 +3201,7 @@ WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3215,7 +3215,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2012-04-05"))
+    Seq(LocalDate.parse("2012-04-05"))
     ```
 
 
@@ -3244,7 +3244,7 @@ WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3258,7 +3258,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2000-01-01"))
+    Seq(LocalDate.parse("2000-01-01"))
     ```
 
 
@@ -3278,7 +3278,7 @@ WHERE ?
 
 *
     ```scala
-        6
+    6
     ```
 
 
@@ -3292,7 +3292,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 *
     ```scala
-        Seq(
+    Seq(
       (1, "Face Mask", 1000.0),
       (2, "Guitar", 1000.0),
       (3, "Socks", 1000.0),
@@ -3318,7 +3318,7 @@ WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3332,7 +3332,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 *
     ```scala
-        Seq(
+    Seq(
       (1, "Face Mask", 8.88),
       (2, "Guitar", 300.0),
       (3, "Socks", 3.14),
@@ -3359,7 +3359,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
 
 *
     ```scala
-        Seq(4)
+    Seq(4)
     ```
 
 
@@ -3373,7 +3373,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-        Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -3393,7 +3393,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -3407,7 +3407,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-        Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -3435,7 +3435,7 @@ RETURNING buyer.id as res
 
 *
     ```scala
-        Seq(4, 5, 6)
+    Seq(4, 5, 6)
     ```
 
 
@@ -3449,7 +3449,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -3485,7 +3485,7 @@ RETURNING buyer.id as res
 
 *
     ```scala
-        Seq(4, 5)
+    Seq(4, 5)
     ```
 
 
@@ -3499,7 +3499,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
@@ -3526,7 +3526,7 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as re
 
 *
     ```scala
-        Seq(1)
+    Seq(1)
     ```
 
 
@@ -3540,7 +3540,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 *
     ```scala
-        Seq(LocalDate.parse("2019-04-07"))
+    Seq(LocalDate.parse("2019-04-07"))
     ```
 
 
@@ -3562,7 +3562,7 @@ RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__
 
 *
     ```scala
-        Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
+    Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
     ```
 
 
@@ -3579,7 +3579,7 @@ DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.tota
 
 *
     ```scala
-        Seq(888.0, 900.0, 15.7)
+    Seq(888.0, 900.0, 15.7)
     ```
 
 
@@ -3593,7 +3593,7 @@ Purchase.select
 
 *
     ```scala
-        Seq(
+    Seq(
       // id=1,2,3 had shippingInfoId=1 and thus got deleted
       Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
       Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
@@ -3623,7 +3623,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 
 *
     ```scala
-        0
+    0
     ```
 
 
@@ -3649,7 +3649,7 @@ RETURNING buyer.name as res
 
 *
     ```scala
-        Seq.empty[String]
+    Seq.empty[String]
     ```
 
 
@@ -3672,7 +3672,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 
 *
     ```scala
-        0
+    0
     ```
 
 
@@ -3698,7 +3698,7 @@ RETURNING buyer.name as res
 
 *
     ```scala
-        Seq("test buyer")
+    Seq("test buyer")
     ```
 
 
@@ -3721,7 +3721,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3735,7 +3735,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
@@ -3762,7 +3762,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3776,7 +3776,7 @@ Buyer.select
 
 *
     ```scala
-        Seq(
+    Seq(
       Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
       Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
@@ -3808,7 +3808,7 @@ RETURNING buyer.name as res
 
 *
     ```scala
-        "JAMES BOND"
+    "JAMES BOND"
     ```
 
 
@@ -3826,7 +3826,7 @@ SELECT LTRIM(?, ?) as res
 
 *
     ```scala
-        "Hellox"
+    "Hellox"
     ```
 
 
@@ -3843,7 +3843,7 @@ SELECT RTRIM(?, ?) as res
 
 *
     ```scala
-        "xxHello"
+    "xxHello"
     ```
 
 
@@ -3860,7 +3860,7 @@ SELECT REVERSE(?) as res
 
 *
     ```scala
-        "olleH"
+    "olleH"
     ```
 
 
@@ -3877,7 +3877,7 @@ SELECT LPAD(?, ?, ?) as res
 
 *
     ```scala
-        "xyxyxHello"
+    "xyxyxHello"
     ```
 
 
@@ -3894,7 +3894,7 @@ SELECT RPAD(?, ?, ?) as res
 
 *
     ```scala
-        "Helloxyxyx"
+    "Helloxyxyx"
     ```
 
 
@@ -3921,7 +3921,7 @@ DataTypes.insert.values(
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3935,7 +3935,7 @@ DataTypes.select
 
 *
     ```scala
-        Seq(value)
+    Seq(value)
     ```
 
 
@@ -3952,7 +3952,7 @@ NonRoundTripTypes.insert.values(
 
 *
     ```scala
-        1
+    1
     ```
 
 
@@ -3966,7 +3966,7 @@ NonRoundTripTypes.select
 
 *
     ```scala
-        Seq(normalize(value))
+    Seq(normalize(value))
     ```
 
 
@@ -3986,7 +3986,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4006,7 +4006,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](Some(3), None),
@@ -4030,7 +4030,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4049,7 +4049,7 @@ GROUP BY opt_cols0.my_int
 
 *
     ```scala
-        Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
+    Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
     ```
 
 
@@ -4068,7 +4068,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4089,7 +4089,7 @@ WHERE opt_cols0.my_int IS NOT NULL
 
 *
     ```scala
-        Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
+    Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
     ```
 
 
@@ -4108,7 +4108,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4129,7 +4129,7 @@ WHERE opt_cols0.my_int IS NULL
 
 *
     ```scala
-        Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+    Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
     ```
 
 
@@ -4148,7 +4148,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4169,7 +4169,7 @@ WHERE opt_cols0.my_int = ?
 
 *
     ```scala
-        Seq(OptCols[Id](Some(1), Some(2)))
+    Seq(OptCols[Id](Some(1), Some(2)))
     ```
 
 
@@ -4188,7 +4188,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4209,7 +4209,7 @@ WHERE opt_cols0.my_int = ?
 
 *
     ```scala
-        Seq[OptCols[Id]]()
+    Seq[OptCols[Id]]()
     ```
 
 
@@ -4228,7 +4228,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4249,7 +4249,7 @@ WHERE opt_cols0.my_int = ?
 
 *
     ```scala
-        Seq[OptCols[Id]]()
+    Seq[OptCols[Id]]()
     ```
 
 
@@ -4268,7 +4268,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4289,7 +4289,7 @@ WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
 
 *
     ```scala
-        Seq(OptCols[Id](Some(1), Some(2)))
+    Seq(OptCols[Id](Some(1), Some(2)))
     ```
 
 
@@ -4308,7 +4308,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4329,7 +4329,7 @@ WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
 
 *
     ```scala
-        Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+    Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
     ```
 
 
@@ -4348,7 +4348,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4368,7 +4368,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(11), Some(2)),
       OptCols[Id](Some(13), None),
@@ -4392,7 +4392,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4409,7 +4409,7 @@ SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(None, Some(11), Some(13), None)
+    Seq(None, Some(11), Some(13), None)
     ```
 
 
@@ -4428,7 +4428,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4449,7 +4449,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(13), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
@@ -4474,7 +4474,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4494,7 +4494,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(4), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
@@ -4519,7 +4519,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4539,7 +4539,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(4), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
@@ -4564,7 +4564,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4584,7 +4584,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](Some(-1), None),
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](Some(3), None),
@@ -4608,7 +4608,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4628,7 +4628,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](Some(3), None),
@@ -4652,7 +4652,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4675,7 +4675,7 @@ FROM opt_cols opt_cols0
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](None, None),
@@ -4699,7 +4699,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4718,7 +4718,7 @@ ORDER BY res__my_int NULLS LAST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](Some(3), None),
       OptCols[Id](None, None),
@@ -4742,7 +4742,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4761,7 +4761,7 @@ ORDER BY res__my_int NULLS FIRST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](None, Some(4)),
       OptCols[Id](Some(1), Some(2)),
@@ -4785,7 +4785,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4804,7 +4804,7 @@ ORDER BY res__my_int ASC NULLS LAST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](Some(3), None),
       OptCols[Id](None, None),
@@ -4828,7 +4828,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4847,7 +4847,7 @@ ORDER BY res__my_int ASC NULLS FIRST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](None, Some(4)),
       OptCols[Id](Some(1), Some(2)),
@@ -4871,7 +4871,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4890,7 +4890,7 @@ ORDER BY res__my_int DESC NULLS LAST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](Some(3), None),
       OptCols[Id](Some(1), Some(2)),
       OptCols[Id](None, None),
@@ -4914,7 +4914,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 *
     ```scala
-        4
+    4
     ```
 
 
@@ -4933,7 +4933,7 @@ ORDER BY res__my_int DESC NULLS FIRST
 
 *
     ```scala
-        Seq(
+    Seq(
       OptCols[Id](None, None),
       OptCols[Id](None, Some(4)),
       OptCols[Id](Some(3), None),
