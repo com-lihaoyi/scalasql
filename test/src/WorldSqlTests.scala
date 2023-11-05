@@ -547,6 +547,7 @@ object WorldSqlTests extends TestSuite {
         val query = CountryLanguage.select
           .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
           .map { case (language, country) => (language.language, country.name) }
+          .sortBy(_._1)
 
         db.toSqlQuery(query) ==> """
           SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
@@ -559,14 +560,15 @@ object WorldSqlTests extends TestSuite {
             ORDER BY res__population DESC
             LIMIT 2) subquery1
           ON countrylanguage0.countrycode = subquery1.res__code
+          ORDER BY res__0
           """.trim.replaceAll("\\s+", " ")
 
         db.run(query).take(5) ==> Seq(
+          ("Asami", "India"),
+          ("Bengali", "India"),
           ("Chinese", "China"),
           ("Dong", "China"),
-          ("Hui", "China"),
-          ("Mantu", "China"),
-          ("Miao", "China")
+          ("Gujarati", "India")
         )
         // -DOCS
       }
@@ -578,6 +580,7 @@ object WorldSqlTests extends TestSuite {
           .joinOn(CountryLanguage)(_.code === _.countryCode).map { case (country, language) =>
             (language.language, country.name)
           }
+          .sortBy(_._1)
 
         db.toSqlQuery(query) ==> """
           SELECT countrylanguage1.language as res__0, subquery0.res__name as res__1
@@ -590,14 +593,15 @@ object WorldSqlTests extends TestSuite {
             LIMIT 2) subquery0
           JOIN countrylanguage countrylanguage1
           ON subquery0.res__code = countrylanguage1.countrycode
+          ORDER BY res__0
           """.trim.replaceAll("\\s+", " ")
 
         db.run(query).take(5) ==> List(
+          ("Asami", "India"),
+          ("Bengali", "India"),
           ("Chinese", "China"),
           ("Dong", "China"),
-          ("Hui", "China"),
-          ("Mantu", "China"),
-          ("Miao", "China")
+          ("Gujarati", "India")
         )
         // -DOCS
       }
