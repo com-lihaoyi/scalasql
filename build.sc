@@ -81,9 +81,10 @@ object scalasql extends RootModule with ScalaModule {
     os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
   }
   def generateQueryLibrary() = T.command {
+    def dropDbPrefix(s: String) = s.split('.').drop(2).mkString(".")
     val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
     val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "recordedSuiteDescriptions.json"))
-      .map{case (k, v) => (k.split('.').drop(2).mkString("."), v)}
+      .map{case (k, v) => (dropDbPrefix(k), v)}
 
     val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
     val formattedScalaStrs = {
@@ -154,11 +155,11 @@ object scalasql extends RootModule with ScalaModule {
          |""".stripMargin
     )
     val recordsWithoutDuplicateSuites = records
-      .map(r => r.copy(suiteName = r.suiteName.split('.').drop(2).mkString(".")))
-      .distinctBy(_.suiteName)
       .groupBy(_.suiteName)
       .toSeq
       .sortBy(_._2.head.suiteLine)
+      .distinctBy(_._1.split('.').drop(2).mkString("."))
+      .map{case (k, vs) => (dropDbPrefix(k), vs.map(r => r.copy(suiteName = dropDbPrefix(r.suiteName))))}
     for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
       val seen = mutable.Set.empty[String]
       outputLines.append(s"## $suiteName")
@@ -166,7 +167,7 @@ object scalasql extends RootModule with ScalaModule {
       var lastSeen = ""
       for(r <- suiteGroup){
 
-        val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
+        val prettyName = (r.suiteName ++ r.testPath).mkString(".")
         val titleOpt =
           if (prettyName == lastSeen) Some("----")
           else if (!seen(prettyName)) Some(s"### $prettyName")
