@@ -166,6 +166,8 @@ object scalasql extends RootModule with ScalaModule {
             outputLines.append(
               s"""$title
                  |
+                 |${r.docs}
+                 |
                  |```scala
                  |${scalafmt(r.queryCodeString)}
                  |```
@@ -189,6 +191,7 @@ object scalasql extends RootModule with ScalaModule {
 case class Record(suiteName: String,
                   suiteLine: Int,
                   testPath: Seq[String],
+                  docs: String,
                   queryCodeString: String,
                   sqlString: Option[String],
                   resultCodeString: Option[String])

@@ -7,6 +7,7 @@ object UtestFramework {
       suiteName: String,
       suiteLine: Int,
       testPath: Seq[String],
+      docs: String,
       queryCodeString: String,
       sqlString: Option[String],
       resultCodeString: Option[String]

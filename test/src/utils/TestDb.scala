@@ -26,13 +26,14 @@ class TestDb(
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
-  def recorded[T](f: sourcecode.Text[T])(implicit tp: utest.framework.TestPath): T = {
+  def recorded[T](docs: String, f: sourcecode.Text[T])(implicit tp: utest.framework.TestPath): T = {
     val res = f.value
     UtestFramework.recordedTests.append(
       UtestFramework.Record(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
         testPath = tp.value,
+        docs = docs,
         queryCodeString = f.source match {
           case s"{$res}" => res
           case res => res
@@ -50,7 +51,8 @@ class TestDb(
       sqls: Seq[String] = Nil,
       value: sourcecode.Text[V] = null,
       moreValues: Seq[V] = Nil,
-      normalize: V => V = (x: V) => x
+      normalize: V => V = (x: V) => x,
+      docs: String = ""
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
     val sqlResult = dbClient.autoCommit
       .toSqlQuery(query.value)
@@ -74,6 +76,7 @@ class TestDb(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
         testPath = tp.value,
+        docs = docs,
         queryCodeString = query.source,
         sqlString = matchedSql,
         resultCodeString = Some(value.source)

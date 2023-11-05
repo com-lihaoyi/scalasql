@@ -14,37 +14,32 @@ trait TransactionTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("simple") {
-      test("commit") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
+      test("commit") - checker.recorded(
+        """
+        Common workflow to create a transaction and run a `delete` inside of it. The effect
+        of the `delete` is visible both inside the transaction and outside after the
+        transaction completes successfully and commits
+        """,
+        Text {
+          dbClient.transaction { implicit db =>
+            db.run(Purchase.select.size) ==> 7
 
-          db.run(Purchase.delete(_ => true)) ==> 7
+            db.run(Purchase.delete(_ => true)) ==> 7
 
-          db.run(Purchase.select.size) ==> 0
+            db.run(Purchase.select.size) ==> 0
+          }
+
+          dbClient.autoCommit.run(Purchase.select.size) ==> 0
         }
+      )
 
-        dbClient.autoCommit.run(Purchase.select.size) ==> 0
-      })
-
-      test("rollback") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
-
-          db.run(Purchase.delete(_ => true)) ==> 7
-
-          db.run(Purchase.select.size) ==> 0
-
-          db.rollback()
-
-          db.run(Purchase.select.size) ==> 7
-        }
-
-        dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      })
-
-      test("throw") - checker.recorded(Text {
-
-        try {
+      test("rollback") - checker.recorded(
+        """
+        Example of explicitly rolling back a transaction using the `db.rollback()` method.
+        After rollback, the effects of the `delete` query are undone, and subsequent `select`
+        queries can see the previously-deleted entries both inside and outside the transaction
+        """,
+        Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -52,76 +47,120 @@ trait TransactionTests extends ScalaSqlSuite {
 
             db.run(Purchase.select.size) ==> 0
 
-            throw new FooException
-          }
-        } catch { case e: FooException => /*donothing*/ }
+            db.rollback()
 
-        dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      })
+            db.run(Purchase.select.size) ==> 7
+          }
+
+          dbClient.autoCommit.run(Purchase.select.size) ==> 7
+        }
+      )
+
+      test("throw") - checker.recorded(
+        """
+        Transactions are also rolled back if they terminate with an uncaught exception
+        """,
+        Text {
+
+          try {
+            dbClient.transaction { implicit db =>
+              db.run(Purchase.select.size) ==> 7
+
+              db.run(Purchase.delete(_ => true)) ==> 7
+
+              db.run(Purchase.select.size) ==> 0
+
+              throw new FooException
+            }
+          } catch { case e: FooException => /*donothing*/ }
+
+          dbClient.autoCommit.run(Purchase.select.size) ==> 7
+        }
+      )
     }
 
     test("savepoint") {
-      test("commit") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
+      test("commit") - checker.recorded(
+        """
+        Savepoints are like "sub" transactions: they let you declare a savepoint
+        and roll back any changes to the savepoint later. If a savepoint block
+        completes successfully, the savepoint changes are committed ("released")
+        and remain visible later in the transaction and outside of it
+        """,
+        Text {
+          dbClient.transaction { implicit db =>
+            db.run(Purchase.select.size) ==> 7
 
-          db.run(Purchase.delete(_.id <= 3)) ==> 3
-          db.run(Purchase.select.size) ==> 4
+            db.run(Purchase.delete(_.id <= 3)) ==> 3
+            db.run(Purchase.select.size) ==> 4
 
-          db.savepoint { sp =>
-            db.run(Purchase.delete(_ => true)) ==> 4
-            db.run(Purchase.select.size) ==> 0
-          }
-
-          db.run(Purchase.select.size) ==> 0
-        }
-
-        dbClient.autoCommit.run(Purchase.select.size) ==> 0
-      })
-
-      test("throw") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
-
-          db.run(Purchase.delete(_.id <= 3)) ==> 3
-          db.run(Purchase.select.size) ==> 4
-
-          try {
             db.savepoint { sp =>
               db.run(Purchase.delete(_ => true)) ==> 4
               db.run(Purchase.select.size) ==> 0
-              throw new FooException
             }
-          } catch {
-            case e: FooException => /*donothing*/
+
+            db.run(Purchase.select.size) ==> 0
           }
 
-          db.run(Purchase.select.size) ==> 4
+          dbClient.autoCommit.run(Purchase.select.size) ==> 0
         }
+      )
+      test("rollback") - checker.recorded(
+        """
+        Like transactions, savepoints support the `.rollback()` method, to undo any
+        changes since the start of the savepoint block.
+        """,
+        Text {
+          dbClient.transaction { implicit db =>
+            db.run(Purchase.select.size) ==> 7
 
-        dbClient.autoCommit.run(Purchase.select.size) ==> 4
-      })
-      test("rollback") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
+            db.run(Purchase.delete(_.id <= 3)) ==> 3
+            db.run(Purchase.select.size) ==> 4
 
-          db.run(Purchase.delete(_.id <= 3)) ==> 3
-          db.run(Purchase.select.size) ==> 4
+            db.savepoint { sp =>
+              db.run(Purchase.delete(_ => true)) ==> 4
+              db.run(Purchase.select.size) ==> 0
+              sp.rollback()
+              db.run(Purchase.select.size) ==> 4
+            }
 
-          db.savepoint { sp =>
-            db.run(Purchase.delete(_ => true)) ==> 4
-            db.run(Purchase.select.size) ==> 0
-            sp.rollback()
             db.run(Purchase.select.size) ==> 4
           }
 
-          db.run(Purchase.select.size) ==> 4
+          dbClient.autoCommit.run(Purchase.select.size) ==> 4
         }
+      )
 
-        dbClient.autoCommit.run(Purchase.select.size) ==> 4
-      })
+      test("throw") - checker.recorded(
+        """
+        Savepoints also roll back their enclosed changes automatically if they
+        terminate with an uncaught exception
+        """,
+        Text {
+          dbClient.transaction { implicit db =>
+            db.run(Purchase.select.size) ==> 7
 
-      test("throwDouble") - checker.recorded(Text {
+            db.run(Purchase.delete(_.id <= 3)) ==> 3
+            db.run(Purchase.select.size) ==> 4
+
+            try {
+              db.savepoint { sp =>
+                db.run(Purchase.delete(_ => true)) ==> 4
+                db.run(Purchase.select.size) ==> 0
+                throw new FooException
+              }
+            } catch {
+              case e: FooException => /*donothing*/
+            }
+
+            db.run(Purchase.select.size) ==> 4
+          }
+
+          dbClient.autoCommit.run(Purchase.select.size) ==> 4
+        }
+      )
+
+      test("throwDouble") {
         try {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
@@ -148,9 +187,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      })
+      }
 
-      test("rollbackDouble") - checker.recorded(Text {
+      test("rollbackDouble") {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -167,38 +206,46 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      })
+      }
     }
 
     test("doubleSavepoint") {
 
-      test("commit") - checker.recorded(Text {
-        dbClient.transaction { implicit db =>
-          db.run(Purchase.select.size) ==> 7
+      test("commit") - checker.recorded(
+        """
+        Only one transaction can be present at a time, but savepoints can be arbitrarily nested.
+        Uncaught exceptions or explicit `.rollback()` calls would roll back changes done during
+        the inner savepoint/transaction blocks, while leaving changes applied during outer
+        savepoint/transaction blocks in-place
+        """,
+        Text {
+          dbClient.transaction { implicit db =>
+            db.run(Purchase.select.size) ==> 7
 
-          db.run(Purchase.delete(_.id <= 2)) ==> 2
-          db.run(Purchase.select.size) ==> 5
+            db.run(Purchase.delete(_.id <= 2)) ==> 2
+            db.run(Purchase.select.size) ==> 5
 
-          db.savepoint { sp1 =>
-            db.run(Purchase.delete(_.id <= 4)) ==> 2
-            db.run(Purchase.select.size) ==> 3
+            db.savepoint { sp1 =>
+              db.run(Purchase.delete(_.id <= 4)) ==> 2
+              db.run(Purchase.select.size) ==> 3
 
-            db.savepoint { sp2 =>
-              db.run(Purchase.delete(_.id <= 6)) ==> 2
+              db.savepoint { sp2 =>
+                db.run(Purchase.delete(_.id <= 6)) ==> 2
+                db.run(Purchase.select.size) ==> 1
+              }
+
               db.run(Purchase.select.size) ==> 1
             }
 
             db.run(Purchase.select.size) ==> 1
           }
 
-          db.run(Purchase.select.size) ==> 1
+          dbClient.autoCommit.run(Purchase.select.size) ==> 1
         }
-
-        dbClient.autoCommit.run(Purchase.select.size) ==> 1
-      })
+      )
 
       test("throw") {
-        test("inner") - checker.recorded(Text {
+        test("inner") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -224,9 +271,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 3
-        })
+        }
 
-        test("middle") - checker.recorded(Text {
+        test("middle") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -252,9 +299,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        })
+        }
 
-        test("innerMiddle") - checker.recorded(Text {
+        test("innerMiddle") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -278,9 +325,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        })
+        }
 
-        test("middleOuter") - checker.recorded(Text {
+        test("middleOuter") {
           try {
             dbClient.transaction { implicit db =>
               db.run(Purchase.select.size) ==> 7
@@ -303,9 +350,9 @@ trait TransactionTests extends ScalaSqlSuite {
           } catch { case e: FooException => /*donothing*/ }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        })
+        }
 
-        test("innerMiddleOuter") - checker.recorded(Text {
+        test("innerMiddleOuter") {
           try {
             dbClient.transaction { implicit db =>
               db.run(Purchase.select.size) ==> 7
@@ -329,11 +376,11 @@ trait TransactionTests extends ScalaSqlSuite {
           } catch { case e: FooException => /*donothing*/ }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        })
+        }
       }
 
       test("rollback") {
-        test("inner") - checker.recorded(Text {
+        test("inner") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -357,9 +404,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 3
-        })
+        }
 
-        test("middle") - checker.recorded(Text {
+        test("middle") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -384,9 +431,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        })
+        }
 
-        test("innerMiddle") - checker.recorded(Text {
+        test("innerMiddle") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -410,9 +457,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        })
+        }
 
-        test("middleOuter") - checker.recorded(Text {
+        test("middleOuter") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -436,9 +483,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        })
+        }
 
-        test("innerMiddleOuter") - checker.recorded(Text {
+        test("innerMiddleOuter") {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -462,7 +509,7 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        })
+        }
       }
     }
   }
