@@ -28,13 +28,17 @@ trait UpdateTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
-        value = Seq(LocalDate.parse("2019-04-07"))
+        query = Text {
+          Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
+        },
+        value = LocalDate.parse("2019-04-07")
       )
 
       checker(
-        query = Text { Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth) },
-        value = Seq(LocalDate.parse("1965-08-09")) // not updated
+        query = Text {
+          Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
+        },
+        value = LocalDate.parse("1965-08-09" /* not updated */ )
       )
     }
 
@@ -51,12 +55,16 @@ trait UpdateTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
-        value = Seq(LocalDate.parse("2019-04-07"))
+        query = Text {
+          Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
+        },
+        value = LocalDate.parse("2019-04-07")
       )
       checker(
-        query = Text { Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth) },
-        value = Seq(LocalDate.parse("2019-04-07"))
+        query = Text {
+          Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
+        },
+        value = LocalDate.parse("2019-04-07")
       )
     }
 
@@ -75,8 +83,8 @@ trait UpdateTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
-        value = Seq[LocalDate]()
+        query = Text {Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)},
+        value = Seq[LocalDate](/* not found due to rename */)
       )
 
       checker(
@@ -99,7 +107,7 @@ trait UpdateTests extends ScalaSqlSuite {
 
       checker(
         query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
-        value = Seq[LocalDate]()
+        value = Seq[LocalDate]( /* not found due to rename */)
       )
 
       checker(
