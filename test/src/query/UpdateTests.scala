@@ -7,7 +7,6 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-
 trait UpdateTests extends ScalaSqlSuite {
   def description = "Basic `UPDATE` queries"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -82,8 +81,8 @@ trait UpdateTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text {Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)},
-        value = Seq[LocalDate](/* not found due to rename */)
+        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
+        value = Seq[LocalDate]( /* not found due to rename */ )
       )
 
       checker(
@@ -106,7 +105,7 @@ trait UpdateTests extends ScalaSqlSuite {
 
       checker(
         query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
-        value = Seq[LocalDate]( /* not found due to rename */)
+        value = Seq[LocalDate]( /* not found due to rename */ )
       )
 
       checker(

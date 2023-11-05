@@ -26,19 +26,18 @@ class TestDb(
     dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "test" / "resources" / testDataFileName))
   }
 
-  def recorded[T](f: sourcecode.Text[() => T])(implicit tp: utest.framework.TestPath): T = {
-    val res = f.value()
+  def recorded[T](f: sourcecode.Text[T])(implicit tp: utest.framework.TestPath): T = {
+    val res = f.value
     UtestFramework.recordedTests.append(
       UtestFramework.Record(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
         testPath = tp.value,
-        queryCodeString = f.source match {case s"() =>$rest" => rest},
+        queryCodeString = f.source,
         sqlString = None,
         resultCodeString = None
       )
     )
-
 
     res
   }

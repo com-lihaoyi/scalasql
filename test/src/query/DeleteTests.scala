@@ -6,7 +6,6 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-
 trait DeleteTests extends ScalaSqlSuite {
   def description = "Basic `DELETE` operations"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()

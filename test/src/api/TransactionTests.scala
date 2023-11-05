@@ -2,6 +2,7 @@ package scalasql.api
 
 import scalasql.Purchase
 import scalasql.utils.ScalaSqlSuite
+import sourcecode.Text
 import utest._
 
 trait TransactionTests extends ScalaSqlSuite {
@@ -13,7 +14,7 @@ trait TransactionTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("simple") {
-      test("commit") - checker.recorded{ () =>
+      test("commit") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -23,9 +24,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 0
-      }
+      })
 
-      test("rollback") - checker.recorded{ () =>
+      test("rollback") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -39,9 +40,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      }
+      })
 
-      test("throw") - checker.recorded{ () =>
+      test("throw") - checker.recorded(Text {
 
         try {
           dbClient.transaction { implicit db =>
@@ -56,11 +57,11 @@ trait TransactionTests extends ScalaSqlSuite {
         } catch { case e: FooException => /*donothing*/ }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      }
+      })
     }
 
     test("savepoint") {
-      test("commit") - checker.recorded{ () =>
+      test("commit") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -76,9 +77,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 0
-      }
+      })
 
-      test("throw") - checker.recorded{ () =>
+      test("throw") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -99,8 +100,8 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 4
-      }
-      test("rollback") - checker.recorded{ () =>
+      })
+      test("rollback") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -118,9 +119,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 4
-      }
+      })
 
-      test("throwDouble") - checker.recorded{ () =>
+      test("throwDouble") - checker.recorded(Text {
         try {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
@@ -147,9 +148,9 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      }
+      })
 
-      test("rollbackDouble") - checker.recorded{ () =>
+      test("rollbackDouble") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -166,12 +167,12 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 7
-      }
+      })
     }
 
     test("doubleSavepoint") {
 
-      test("commit") - checker.recorded{ () =>
+      test("commit") - checker.recorded(Text {
         dbClient.transaction { implicit db =>
           db.run(Purchase.select.size) ==> 7
 
@@ -194,10 +195,10 @@ trait TransactionTests extends ScalaSqlSuite {
         }
 
         dbClient.autoCommit.run(Purchase.select.size) ==> 1
-      }
+      })
 
       test("throw") {
-        test("inner") - checker.recorded{ () =>
+        test("inner") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -223,9 +224,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 3
-        }
+        })
 
-        test("middle") - checker.recorded{ () =>
+        test("middle") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -251,9 +252,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        }
+        })
 
-        test("innerMiddle") - checker.recorded{ () =>
+        test("innerMiddle") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -277,9 +278,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        }
+        })
 
-        test("middleOuter") - checker.recorded{ () =>
+        test("middleOuter") - checker.recorded(Text {
           try {
             dbClient.transaction { implicit db =>
               db.run(Purchase.select.size) ==> 7
@@ -302,9 +303,9 @@ trait TransactionTests extends ScalaSqlSuite {
           } catch { case e: FooException => /*donothing*/ }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        }
+        })
 
-        test("innerMiddleOuter") - checker.recorded{ () =>
+        test("innerMiddleOuter") - checker.recorded(Text {
           try {
             dbClient.transaction { implicit db =>
               db.run(Purchase.select.size) ==> 7
@@ -328,11 +329,11 @@ trait TransactionTests extends ScalaSqlSuite {
           } catch { case e: FooException => /*donothing*/ }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        }
+        })
       }
 
       test("rollback") {
-        test("inner") - checker.recorded{ () =>
+        test("inner") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -356,9 +357,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 3
-        }
+        })
 
-        test("middle") - checker.recorded{ () =>
+        test("middle") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -383,9 +384,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        }
+        })
 
-        test("innerMiddle") - checker.recorded{ () =>
+        test("innerMiddle") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -409,9 +410,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 5
-        }
+        })
 
-        test("middleOuter") - checker.recorded{ () =>
+        test("middleOuter") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -435,9 +436,9 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        }
+        })
 
-        test("innerMiddleOuter") - checker.recorded{ () =>
+        test("innerMiddleOuter") - checker.recorded(Text {
           dbClient.transaction { implicit db =>
             db.run(Purchase.select.size) ==> 7
 
@@ -461,7 +462,7 @@ trait TransactionTests extends ScalaSqlSuite {
           }
 
           dbClient.autoCommit.run(Purchase.select.size) ==> 7
-        }
+        })
       }
     }
   }

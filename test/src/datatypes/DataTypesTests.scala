@@ -43,11 +43,10 @@ object NonRoundTripTypes extends Table[NonRoundTripTypes] {
   val metadata = initMetadata
 }
 
-
 trait DataTypesTests extends ScalaSqlSuite {
   def description =
     "Basic operations on all the data types that ScalaSql supports " +
-    "mapping between Database types and Scala types"
+      "mapping between Database types and Scala types"
   def tests = Tests {
     test("constant") {
       val value = DataTypes[Id](

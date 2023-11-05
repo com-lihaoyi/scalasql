@@ -5,7 +5,6 @@ import scalasql.query.Expr
 import utest._
 import utils.ScalaSqlSuite
 
-
 trait ExprBooleanOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Expr[Boolean]`"
   def tests = Tests {

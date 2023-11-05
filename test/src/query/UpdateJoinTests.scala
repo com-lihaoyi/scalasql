@@ -7,7 +7,6 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-
 trait UpdateJoinTests extends ScalaSqlSuite {
   def description = "`UPDATE` queries that use `JOIN`s"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()

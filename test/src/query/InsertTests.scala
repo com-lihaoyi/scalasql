@@ -6,7 +6,6 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-
 trait InsertTests extends ScalaSqlSuite {
   def description = "Basic `INSERT` operations"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()

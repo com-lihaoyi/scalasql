@@ -4,6 +4,7 @@ import geny.Generator
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{Buyer, Id}
 import scalasql.utils.ScalaSqlSuite
+import sourcecode.Text
 import utest._
 
 import java.time.LocalDate
@@ -14,7 +15,7 @@ trait DbApiTests extends ScalaSqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 
   def tests = Tests {
-    test("run") - checker.recorded{ () =>
+    test("run") - checker.recorded(Text {
       dbClient.transaction { db =>
         db.run(Buyer.select) ==> List(
           Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -22,9 +23,9 @@ trait DbApiTests extends ScalaSqlSuite {
           Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         )
       }
-    }
+    })
 
-    test("runQuery") - checker.recorded{ () =>
+    test("runQuery") - checker.recorded(Text {
       dbClient.transaction { db =>
         val filterId = 2
         val output = db.runQuery(sql"SELECT name FROM buyer WHERE id = $filterId") { rs =>
@@ -43,9 +44,9 @@ trait DbApiTests extends ScalaSqlSuite {
 
         assert(output == Seq("叉烧包"))
       }
-    }
+    })
 
-    test("runUpdate") - checker.recorded{ () =>
+    test("runUpdate") - checker.recorded(Text {
       dbClient.transaction { db =>
         val newName = "Moo Moo Cow"
         val newDateOfBirth = LocalDate.parse("2000-01-01")
@@ -60,10 +61,10 @@ trait DbApiTests extends ScalaSqlSuite {
           Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
         )
       }
-    }
+    })
 
     test("runRawQuery") {
-      test("simple") - checker.recorded{ () =>
+      test("simple") - checker.recorded(Text {
         dbClient.transaction { db =>
           val output = db.runRawQuery("SELECT name FROM buyer") { rs =>
             val output = mutable.Buffer.empty[String]
@@ -81,9 +82,9 @@ trait DbApiTests extends ScalaSqlSuite {
 
           assert(output == Seq("James Bond", "叉烧包", "Li Haoyi"))
         }
-      }
+      })
 
-      test("interpolated") - checker.recorded{ () =>
+      test("interpolated") - checker.recorded(Text {
         dbClient.transaction { db =>
           val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", 2) { rs =>
             val output = mutable.Buffer.empty[String]
@@ -101,12 +102,12 @@ trait DbApiTests extends ScalaSqlSuite {
 
           assert(output == Seq("叉烧包"))
         }
-      }
+      })
 
     }
 
     test("runRawUpdate") {
-      test("Simple") - checker.recorded{ () =>
+      test("Simple") - checker.recorded(Text {
         dbClient.transaction { db =>
           val count = db.runRawUpdate(
             "INSERT INTO buyer (name, date_of_birth) VALUES('Moo Moo Cow', '2000-01-01')"
@@ -120,9 +121,9 @@ trait DbApiTests extends ScalaSqlSuite {
             Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
         }
-      }
+      })
 
-      test("prepared") - checker.recorded{ () =>
+      test("prepared") - checker.recorded(Text {
         dbClient.transaction { db =>
           val count = db.runRawUpdate(
             "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
@@ -138,10 +139,10 @@ trait DbApiTests extends ScalaSqlSuite {
             Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
         }
-      }
+      })
     }
 
-    test("stream") - checker.recorded{ () =>
+    test("stream") - checker.recorded(Text {
       dbClient.transaction { db =>
         val output = collection.mutable.Buffer.empty[String]
 
@@ -152,6 +153,6 @@ trait DbApiTests extends ScalaSqlSuite {
 
         output ==> List("James Bond", "叉烧包")
       }
-    }
+    })
   }
 }

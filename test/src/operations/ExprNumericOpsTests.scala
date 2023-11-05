@@ -5,7 +5,6 @@ import scalasql.query.Expr
 import utest._
 import utils.ScalaSqlSuite
 
-
 trait ExprNumericOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Expr[T]` when `T` is numeric"
   def tests = Tests {

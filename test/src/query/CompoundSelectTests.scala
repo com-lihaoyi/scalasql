@@ -7,7 +7,6 @@ import utils.ScalaSqlSuite
 
 import java.time.LocalDate
 
-
 trait CompoundSelectTests extends ScalaSqlSuite {
   def description = "Compound `SELECT` operations: sort, take, drop, union, unionAll, etc."
 

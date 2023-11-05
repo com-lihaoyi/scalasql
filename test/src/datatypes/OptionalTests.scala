@@ -12,7 +12,6 @@ object OptCols extends Table[OptCols] {
   val metadata = initMetadata
 }
 
-
 trait OptionalTests extends ScalaSqlSuite {
   def description =
     "Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala"
