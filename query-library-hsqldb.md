@@ -10,7 +10,8 @@ the database for execution.
 Basic usage of `db.*` operations such as `db.run`
 ### DbApi.run
 
-()
+Most common usage of `dbClient.transaction`/`db.run`
+to run a simple query within a transaction
 
 ```scala
 dbClient.transaction { db =>
@@ -29,7 +30,11 @@ dbClient.transaction { db =>
 
 ### DbApi.runQuery
 
-()
+`db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
+allowing you to construct SQL strings and interpolate variables within them.
+Interpolated variables automatically become prepared statement variables to
+avoid SQL injection vulnerabilities. Takes a callback providing a `java.sql.ResultSet`
+for you to use directly.
 
 ```scala
 dbClient.transaction { db =>
@@ -59,7 +64,9 @@ dbClient.transaction { db =>
 
 ### DbApi.runUpdate
 
-()
+Similar to `db.runQuery`, `db.runUpdate` allows you to pass in a `SqlStr`, but runs
+an update rather than a query and expects to receive a single number back from the
+database indicating the number of rows inserted or updated
 
 ```scala
 dbClient.transaction { db =>
@@ -85,7 +92,8 @@ dbClient.transaction { db =>
 
 ### DbApi.runRawQuery
 
-()
+`runRawQuery` is similar to `runQuery` but allows you to pass in the SQL strings
+"raw", along with `?` placeholders and interpolated variables passed separately.
 
 ```scala
 dbClient.transaction { db =>
@@ -114,7 +122,8 @@ dbClient.transaction { db =>
 
 ### DbApi.runRawUpdate
 
-()
+`runRawUpdate` is similar to `runRawQuery`, but for update queries that
+return a single number
 
 ```scala
 dbClient.transaction { db =>
@@ -141,7 +150,12 @@ dbClient.transaction { db =>
 
 ### DbApi.stream
 
-()
+`db.stream` can be run on queries that return `Seq[T]`s, and makes them
+return `geny.Generator[T]`s instead. This allows you to deserialize and
+process the returned database rows incrementally without buffering the
+entire `Seq[T]` in memory. Not that the underlying JDBC driver and the
+underlying database may each perform their own buffering depending on
+their implementation
 
 ```scala
 dbClient.transaction { db =>
@@ -165,7 +179,9 @@ dbClient.transaction { db =>
 Basic `SELECT`` operations: map, filter, join, etc.
 ### Select.constant
 
-()
+The most simple thing you can query in the database is an `Expr`. These do not need
+to be related to any database tables, and translate into raw `SELECT` calls without
+`FROM`.
 
 ```scala
 Expr(1) + Expr(2)
@@ -174,7 +190,7 @@ Expr(1) + Expr(2)
 
 *
     ```sql
-    ()
+    SELECT ? + ? as res
     ```
 
 
@@ -188,7 +204,10 @@ Expr(1) + Expr(2)
 
 ### Select.table
 
-()
+You can list the contents of a table via the query `Table.select`. It returns a
+`Seq[CaseClass[Id]]` with the entire contents of the table. Note that listing
+entire tables can be prohibitively expensive on real-world databases, and you
+should generally use `filter`s as shown below
 
 ```scala
 Buyer.select
@@ -197,7 +216,11 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__id,
+      buyer0.name as res__name,
+      buyer0.date_of_birth as res__date_of_birth
+    FROM buyer buyer0
     ```
 
 
@@ -215,7 +238,8 @@ Buyer.select
 
 ### Select.filter.single
 
-()
+ScalaSql's `.filter` translates to SQL `WHERE`, in this case we
+are searching for rows with a particular `buyerId`
 
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2)
@@ -224,7 +248,12 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__id,
+      shipping_info0.buyer_id as res__buyer_id,
+      shipping_info0.shipping_date as res__shipping_date
+    FROM shipping_info shipping_info0
+    WHERE shipping_info0.buyer_id = ?
     ```
 
 
@@ -241,7 +270,7 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
 
 ### Select.filter.multiple
 
-()
+You can stack multiple `.filter`s on a query.
 
 ```scala
 ShippingInfo.select
@@ -252,7 +281,13 @@ ShippingInfo.select
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__id,
+      shipping_info0.buyer_id as res__buyer_id,
+      shipping_info0.shipping_date as res__shipping_date
+    FROM shipping_info shipping_info0
+    WHERE shipping_info0.buyer_id = ?
+    AND shipping_info0.shipping_date = ?
     ```
 
 
@@ -266,7 +301,9 @@ ShippingInfo.select
 
 ### Select.filter.dotSingle.pass
 
-()
+Queries that you expect to return a single row can be annotated with `.single`.
+This changes the return type of the `.select` from `Seq[T]` to just `T`, and throws
+an exception if zero or multiple rows were returned
 
 ```scala
 ShippingInfo.select
@@ -278,7 +315,13 @@ ShippingInfo.select
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__id,
+      shipping_info0.buyer_id as res__buyer_id,
+      shipping_info0.shipping_date as res__shipping_date
+    FROM shipping_info shipping_info0
+    WHERE shipping_info0.buyer_id = ?
+    AND shipping_info0.shipping_date = ?
     ```
 
 
@@ -292,7 +335,7 @@ ShippingInfo.select
 
 ### Select.filter.combined
 
-()
+You can perform multiple checks in a single filter using `&&`
 
 ```scala
 ShippingInfo.select
@@ -302,7 +345,13 @@ ShippingInfo.select
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__id,
+      shipping_info0.buyer_id as res__buyer_id,
+      shipping_info0.shipping_date as res__shipping_date
+    FROM shipping_info shipping_info0
+    WHERE shipping_info0.buyer_id = ?
+    AND shipping_info0.shipping_date = ?
     ```
 
 
@@ -316,7 +365,9 @@ ShippingInfo.select
 
 ### Select.map.single
 
-()
+`.map` allows you to select exactly what you want to return from
+a query, rather than returning the entire row. Here, we return
+only the `name`s of the `Buyer`s
 
 ```scala
 Buyer.select.map(_.name)
@@ -325,7 +376,7 @@ Buyer.select.map(_.name)
 
 *
     ```sql
-    ()
+    SELECT buyer0.name as res FROM buyer buyer0
     ```
 
 
@@ -339,7 +390,7 @@ Buyer.select.map(_.name)
 
 ### Select.map.filterMap
 
-()
+The common use case of `SELECT FROM WHERE` can be achieved via `.select.filter.map` in ScalaSql
 
 ```scala
 Product.select.filter(_.price < 100).map(_.name)
@@ -348,7 +399,7 @@ Product.select.filter(_.price < 100).map(_.name)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 WHERE product0.price < ?
     ```
 
 
@@ -362,7 +413,8 @@ Product.select.filter(_.price < 100).map(_.name)
 
 ### Select.map.tuple2
 
-()
+You can return multiple values from your `.map` by returning a tuple in your query,
+which translates into a `Seq[Tuple]` being returned when the query is run
 
 ```scala
 Buyer.select.map(c => (c.name, c.id))
@@ -371,7 +423,7 @@ Buyer.select.map(c => (c.name, c.id))
 
 *
     ```sql
-    ()
+    SELECT buyer0.name as res__0, buyer0.id as res__1 FROM buyer buyer0
     ```
 
 
@@ -385,7 +437,7 @@ Buyer.select.map(c => (c.name, c.id))
 
 ### Select.map.tuple3
 
-()
+
 
 ```scala
 Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
@@ -394,7 +446,11 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.name as res__0,
+      buyer0.id as res__1,
+      buyer0.date_of_birth as res__2
+    FROM buyer buyer0
     ```
 
 
@@ -412,7 +468,7 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
 
 ### Select.map.interpolateInMap
 
-()
+You can perform operations inside the `.map` to change what you return
 
 ```scala
 Product.select.map(_.price * 2)
@@ -421,7 +477,7 @@ Product.select.map(_.price * 2)
 
 *
     ```sql
-    ()
+    SELECT product0.price * ? as res FROM product product0
     ```
 
 
@@ -435,7 +491,8 @@ Product.select.map(_.price * 2)
 
 ### Select.map.heterogenousTuple
 
-()
+`.map` can return any combination of tuples, `case class`es, and primitives,
+arbitrarily nested. here we return a tuple of `(Int, Buyer[Id])`
 
 ```scala
 Buyer.select.map(c => (c.id, c))
@@ -444,7 +501,12 @@ Buyer.select.map(c => (c.id, c))
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0,
+      buyer0.id as res__1__id,
+      buyer0.name as res__1__name,
+      buyer0.date_of_birth as res__1__date_of_birth
+    FROM buyer buyer0
     ```
 
 
@@ -462,7 +524,11 @@ Buyer.select.map(c => (c.id, c))
 
 ### Select.exprQuery
 
-()
+`SELECT` queries that return a single row and column can be used as SQL expressions
+in standard SQL databases. In ScalaSql, this is done by the `.exprQuery` method,
+which turns a `Select[T]` into an `Expr[T]`. Note that if the `Select` returns more
+than one row or column, the database may select a row arbitrarily or will throw
+an exception at runtime (depend on implenmentation)
 
 ```scala
 Product.select.map(p =>
@@ -482,7 +548,14 @@ Product.select.map(p =>
 
 *
     ```sql
-    ()
+    SELECT
+      product0.name as res__0,
+      (SELECT purchase0.total as res
+        FROM purchase purchase0
+        WHERE purchase0.product_id = product0.id
+        ORDER BY res DESC
+        LIMIT 1) as res__1
+    FROM product product0
     ```
 
 
@@ -503,7 +576,10 @@ Product.select.map(p =>
 
 ### Select.subquery
 
-()
+ScalaSql generally combines operations like `.map` and `.filter` to minimize the
+number of subqueries to keep the generated SQL readable. If you explicitly want
+a subquery for some reason (e.g. to influence the database query planner), you can
+use the `.subquery` to force a query to be translated into a standalone subquery
 
 ```scala
 Buyer.select.subquery.map(_.name)
@@ -512,7 +588,8 @@ Buyer.select.subquery.map(_.name)
 
 *
     ```sql
-    ()
+    SELECT subquery0.res__name as res
+    FROM (SELECT buyer0.name as res__name FROM buyer buyer0) subquery0
     ```
 
 
@@ -526,7 +603,8 @@ Buyer.select.subquery.map(_.name)
 
 ### Select.aggregate.single
 
-()
+You can use methods like `.sumBy` or `.sum` on your queries to generate
+SQL `SUM(...)` aggregates
 
 ```scala
 Purchase.select.sumBy(_.total)
@@ -535,7 +613,7 @@ Purchase.select.sumBy(_.total)
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.total) as res FROM purchase purchase0
     ```
 
 
@@ -549,7 +627,8 @@ Purchase.select.sumBy(_.total)
 
 ### Select.aggregate.multiple
 
-()
+If you want to perform multiple aggregates at once, you can use the `.aggregate` method
+which takes a function allowing you to call multiple aggregates inside of it
 
 ```scala
 Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
@@ -558,7 +637,7 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0
     ```
 
 
@@ -572,7 +651,10 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 
 ### Select.groupBy.simple
 
-()
+ScalaSql's `.groupBy` method translates into a SQL `GROUP BY`. Unlike the normal
+`.groupBy` provided by `scala.Seq`, ScalaSql's `.groupBy` requires you to pass
+an aggregate as a second parameter, mirroring the SQL requirement that any
+column not part of the `GROUP BY` clause has to be in an aggregate.
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
@@ -581,7 +663,9 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
 
 *
     ```sql
-    ()
+    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    FROM purchase purchase0
+    GROUP BY purchase0.product_id
     ```
 
 
@@ -595,7 +679,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
 
 ### Select.groupBy.having
 
-()
+`.filter` calls following a `.groupBy` are automatically translated to SQL `HAVING` clauses
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
@@ -604,7 +688,10 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
 
 *
     ```sql
-    ()
+    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    FROM purchase purchase0
+    GROUP BY purchase0.product_id
+    HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
     ```
 
 
@@ -618,7 +705,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
 
 ### Select.groupBy.filterHaving
 
-()
+
 
 ```scala
 Purchase.select
@@ -630,7 +717,11 @@ Purchase.select
 
 *
     ```sql
-    ()
+    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    FROM purchase purchase0
+    WHERE purchase0.count > ?
+    GROUP BY purchase0.product_id
+    HAVING SUM(purchase0.total) > ?
     ```
 
 
@@ -644,7 +735,9 @@ Purchase.select
 
 ### Select.distinct.nondistinct
 
-()
+Normal queries can allow duplicates in the returned row values, as seen below.
+You can use the `.distinct` operator (translates to SQl's `SELECT DISTINCT`)
+to eliminate those duplicates
 
 ```scala
 Purchase.select.map(_.shippingInfoId)
@@ -653,7 +746,7 @@ Purchase.select.map(_.shippingInfoId)
 
 *
     ```sql
-    ()
+    SELECT purchase0.shipping_info_id as res FROM purchase purchase0
     ```
 
 
@@ -667,7 +760,7 @@ Purchase.select.map(_.shippingInfoId)
 
 ### Select.distinct.distinct
 
-()
+
 
 ```scala
 Purchase.select.map(_.shippingInfoId).distinct
@@ -676,7 +769,7 @@ Purchase.select.map(_.shippingInfoId).distinct
 
 *
     ```sql
-    ()
+    SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0
     ```
 
 
@@ -690,7 +783,8 @@ Purchase.select.map(_.shippingInfoId).distinct
 
 ### Select.contains
 
-()
+ScalaSql's `.contains` method translates into SQL's `IN` syntax, e.g. here checking if a
+subquery contains a column as part of a `WHERE` clause
 
 ```scala
 Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
@@ -699,7 +793,9 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 
 *
     ```sql
-    ()
+    SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
+    FROM buyer buyer0
+    WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
     ```
 
 
@@ -716,7 +812,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 
 ### Select.nonEmpty
 
-()
+ScalaSql's `.nonEmpty` and `.isEmpty` translates to SQL's `EXISTS` and `NOT EXISTS` syntax
 
 ```scala
 Buyer.select
@@ -726,7 +822,13 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.name as res__0,
+      EXISTS (SELECT
+        shipping_info0.id as res
+        FROM shipping_info shipping_info0
+        WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+    FROM buyer buyer0
     ```
 
 
@@ -740,7 +842,7 @@ Buyer.select
 
 ### Select.isEmpty
 
-()
+
 
 ```scala
 Buyer.select
@@ -750,7 +852,13 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.name as res__0,
+      NOT EXISTS (SELECT
+        shipping_info0.id as res
+        FROM shipping_info shipping_info0
+        WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+    FROM buyer buyer0
     ```
 
 
@@ -764,7 +872,8 @@ Buyer.select
 
 ### Select.case.when
 
-()
+ScalaSql's `caseWhen` method translates into SQL's `CASE`/`WHEN`/`ELSE`/`END` syntax,
+allowing you to perform basic conditionals as part of your SQL query
 
 ```scala
 Product.select.map(p =>
@@ -779,7 +888,13 @@ Product.select.map(p =>
 
 *
     ```sql
-    ()
+    SELECT
+      CASE
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price <= ? THEN product0.name || ?
+      END as res
+    FROM product product0
     ```
 
 
@@ -800,7 +915,7 @@ Product.select.map(p =>
 
 ### Select.case.else
 
-()
+
 
 ```scala
 Product.select.map(p =>
@@ -814,7 +929,13 @@ Product.select.map(p =>
 
 *
     ```sql
-    ()
+    SELECT
+      CASE
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price > ? THEN product0.name || ?
+        ELSE product0.name || ?
+      END as res
+    FROM product product0
     ```
 
 
@@ -837,7 +958,7 @@ Product.select.map(p =>
 inner `JOIN`s, `JOIN ON`s, self-joins, `LEFT`/`RIGHT`/`OUTER` `JOIN`s
 ### Join.joinFilter
 
-()
+
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -846,7 +967,16 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      shipping_info1.id as res__1__id,
+      shipping_info1.buyer_id as res__1__buyer_id,
+      shipping_info1.shipping_date as res__1__shipping_date
+    FROM buyer buyer0
+    JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+    WHERE buyer0.name = ?
     ```
 
 
@@ -869,7 +999,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 ### Join.joinSelectFilter
 
-()
+
 
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
@@ -878,7 +1008,16 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      shipping_info1.id as res__1__id,
+      shipping_info1.buyer_id as res__1__buyer_id,
+      shipping_info1.shipping_date as res__1__shipping_date
+    FROM buyer buyer0
+    JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+    WHERE buyer0.name = ?
     ```
 
 
@@ -901,7 +1040,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 ### Join.joinFilterMap
 
-()
+
 
 ```scala
 Buyer.select
@@ -913,7 +1052,10 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT shipping_info1.shipping_date as res
+    FROM buyer buyer0
+    JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+    WHERE buyer0.name = ?
     ```
 
 
@@ -927,7 +1069,7 @@ Buyer.select
 
 ### Join.selfJoin
 
-()
+
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id `=` _.id)
@@ -936,7 +1078,15 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      buyer1.id as res__1__id,
+      buyer1.name as res__1__name,
+      buyer1.date_of_birth as res__1__date_of_birth
+    FROM buyer buyer0
+    JOIN buyer buyer1 ON buyer0.id = buyer1.id
     ```
 
 
@@ -963,7 +1113,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
 
 ### Join.selfJoin2
 
-()
+
 
 ```scala
 Buyer.select.joinOn(Buyer)(_.id <> _.id)
@@ -972,7 +1122,15 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      buyer1.id as res__1__id,
+      buyer1.name as res__1__name,
+      buyer1.date_of_birth as res__1__date_of_birth
+    FROM buyer buyer0
+    JOIN buyer buyer1 ON buyer0.id <> buyer1.id
     ```
 
 
@@ -1011,7 +1169,7 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
 
 ### Join.flatMap
 
-()
+
 
 ```scala
 Buyer.select
@@ -1023,7 +1181,10 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT shipping_info1.shipping_date as res
+    FROM buyer buyer0, shipping_info shipping_info1
+    WHERE buyer0.id = shipping_info1.buyer_id
+    AND buyer0.name = ?
     ```
 
 
@@ -1037,7 +1198,7 @@ Buyer.select
 
 ### Join.flatMap2
 
-()
+
 
 ```scala
 Buyer.select
@@ -1048,7 +1209,10 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT shipping_info1.shipping_date as res
+    FROM buyer buyer0, shipping_info shipping_info1
+    WHERE buyer0.id = shipping_info1.buyer_id
+    AND buyer0.name = ?
     ```
 
 
@@ -1062,7 +1226,7 @@ Buyer.select
 
 ### Join.leftJoin
 
-()
+
 
 ```scala
 Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
@@ -1071,7 +1235,15 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      shipping_info1.id as res__1__id,
+      shipping_info1.buyer_id as res__1__buyer_id,
+      shipping_info1.shipping_date as res__1__shipping_date
+    FROM buyer buyer0
+    LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ```
 
 
@@ -1099,7 +1271,7 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
 
 ### Join.rightJoin
 
-()
+
 
 ```scala
 ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
@@ -1108,7 +1280,15 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__0__id,
+      shipping_info0.buyer_id as res__0__buyer_id,
+      shipping_info0.shipping_date as res__0__shipping_date,
+      buyer1.id as res__1__id,
+      buyer1.name as res__1__name,
+      buyer1.date_of_birth as res__1__date_of_birth
+    FROM shipping_info shipping_info0
+    RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
     ```
 
 
@@ -1136,7 +1316,7 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
 
 ### Join.outerJoin
 
-()
+
 
 ```scala
 ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
@@ -1145,7 +1325,15 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 
 *
     ```sql
-    ()
+    SELECT
+      shipping_info0.id as res__0__id,
+      shipping_info0.buyer_id as res__0__buyer_id,
+      shipping_info0.shipping_date as res__0__shipping_date,
+      buyer1.id as res__1__id,
+      buyer1.name as res__1__name,
+      buyer1.date_of_birth as res__1__date_of_birth
+    FROM shipping_info shipping_info0
+    FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
     ```
 
 
@@ -1175,7 +1363,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 Basic `INSERT` operations
 ### Insert.single.simple
 
-()
+
 
 ```scala
 Buyer.insert.values(
@@ -1188,7 +1376,7 @@ Buyer.insert.values(
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
     ```
 
 
@@ -1202,7 +1390,7 @@ Buyer.insert.values(
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1220,7 +1408,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 ### Insert.single.partial
 
-()
+
 
 ```scala
 Buyer.insert
@@ -1230,7 +1418,7 @@ Buyer.insert
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
     ```
 
 
@@ -1244,7 +1432,7 @@ Buyer.insert
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -1262,7 +1450,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 ### Insert.batch.simple
 
-()
+
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
@@ -1275,7 +1463,11 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (name, date_of_birth, id)
+    VALUES
+      (?, ?, ?),
+      (?, ?, ?),
+      (?, ?, ?)
     ```
 
 
@@ -1289,7 +1481,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
 
 ----
 
-()
+
 
 ```scala
 Buyer.select
@@ -1314,7 +1506,7 @@ Buyer.select
 
 ### Insert.batch.partial
 
-()
+
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
@@ -1327,7 +1519,8 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (name, date_of_birth)
+    VALUES (?, ?), (?, ?), (?, ?)
     ```
 
 
@@ -1341,7 +1534,7 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 
 ----
 
-()
+
 
 ```scala
 Buyer.select
@@ -1367,7 +1560,7 @@ Buyer.select
 
 ### Insert.select.caseclass
 
-()
+
 
 ```scala
 Buyer.insert.select(
@@ -1381,7 +1574,13 @@ Buyer.insert.select(
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (id, name, date_of_birth)
+    SELECT
+      buyer0.id + (SELECT MAX(buyer0.id) as res FROM buyer buyer0) as res__id,
+      buyer0.name as res__name,
+      buyer0.date_of_birth as res__date_of_birth
+    FROM buyer buyer0
+    WHERE buyer0.name <> ?
     ```
 
 
@@ -1395,7 +1594,7 @@ Buyer.insert.select(
 
 ----
 
-()
+
 
 ```scala
 Buyer.select
@@ -1419,7 +1618,7 @@ Buyer.select
 
 ### Insert.select.simple
 
-()
+
 
 ```scala
 Buyer.insert.select(
@@ -1431,7 +1630,10 @@ Buyer.insert.select(
 
 *
     ```sql
-    ()
+    INSERT INTO buyer (name, date_of_birth)
+    SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
+    FROM buyer buyer0
+    WHERE buyer0.name <> ?
     ```
 
 
@@ -1445,7 +1647,7 @@ Buyer.insert.select(
 
 ----
 
-()
+
 
 ```scala
 Buyer.select
@@ -1472,7 +1674,7 @@ Buyer.select
 Basic `UPDATE` queries
 ### Update.update
 
-()
+
 
 ```scala
 Buyer
@@ -1483,7 +1685,7 @@ Buyer
 
 *
     ```sql
-    ()
+    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
     ```
 
 
@@ -1497,7 +1699,7 @@ Buyer
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
@@ -1515,7 +1717,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
@@ -1533,7 +1735,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 ### Update.bulk
 
-()
+
 
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -1542,7 +1744,7 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 
 *
     ```sql
-    ()
+    UPDATE buyer SET date_of_birth = ? WHERE ?
     ```
 
 
@@ -1556,7 +1758,7 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
@@ -1574,7 +1776,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth).single
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
@@ -1592,7 +1794,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 ### Update.multiple
 
-()
+
 
 ```scala
 Buyer
@@ -1603,7 +1805,7 @@ Buyer
 
 *
     ```sql
-    ()
+    UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
     ```
 
 
@@ -1617,7 +1819,7 @@ Buyer
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -1635,7 +1837,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
@@ -1653,7 +1855,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 ### Update.dynamic
 
-()
+
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
@@ -1662,7 +1864,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 
 *
     ```sql
-    ()
+    UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
     ```
 
 
@@ -1676,7 +1878,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -1694,7 +1896,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 ----
 
-()
+
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
@@ -1714,7 +1916,7 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 Basic `DELETE` operations
 ### Delete.single
 
-()
+
 
 ```scala
 Purchase.delete(_.id `=` 2)
@@ -1723,7 +1925,7 @@ Purchase.delete(_.id `=` 2)
 
 *
     ```sql
-    ()
+    DELETE FROM purchase WHERE purchase.id = ?
     ```
 
 
@@ -1737,7 +1939,7 @@ Purchase.delete(_.id `=` 2)
 
 ----
 
-()
+
 
 ```scala
 Purchase.select
@@ -1763,7 +1965,7 @@ Purchase.select
 
 ### Delete.multiple
 
-()
+
 
 ```scala
 Purchase.delete(_.id <> 2)
@@ -1772,7 +1974,7 @@ Purchase.delete(_.id <> 2)
 
 *
     ```sql
-    ()
+    DELETE FROM purchase WHERE purchase.id <> ?
     ```
 
 
@@ -1786,7 +1988,7 @@ Purchase.delete(_.id <> 2)
 
 ----
 
-()
+
 
 ```scala
 Purchase.select
@@ -1804,7 +2006,7 @@ Purchase.select
 
 ### Delete.all
 
-()
+
 
 ```scala
 Purchase.delete(_ => true)
@@ -1813,7 +2015,7 @@ Purchase.delete(_ => true)
 
 *
     ```sql
-    ()
+    DELETE FROM purchase WHERE ?
     ```
 
 
@@ -1827,7 +2029,7 @@ Purchase.delete(_ => true)
 
 ----
 
-()
+
 
 ```scala
 Purchase.select
@@ -1849,7 +2051,7 @@ Purchase.select
 Compound `SELECT` operations: sort, take, drop, union, unionAll, etc.
 ### CompoundSelect.sort.simple
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name)
@@ -1858,7 +2060,7 @@ Product.select.sortBy(_.price).map(_.name)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price
     ```
 
 
@@ -1872,7 +2074,7 @@ Product.select.sortBy(_.price).map(_.name)
 
 ### CompoundSelect.sort.twice
 
-()
+
 
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
@@ -1881,7 +2083,14 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 
 *
     ```sql
-    ()
+    SELECT
+      purchase0.id as res__id,
+      purchase0.shipping_info_id as res__shipping_info_id,
+      purchase0.product_id as res__product_id,
+      purchase0.count as res__count,
+      purchase0.total as res__total
+    FROM purchase purchase0
+    ORDER BY res__shipping_info_id DESC, res__product_id ASC
     ```
 
 
@@ -1903,7 +2112,7 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 
 ### CompoundSelect.sort.sortLimit
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
@@ -1912,7 +2121,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
     ```
 
 
@@ -1926,7 +2135,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
 
 ### CompoundSelect.sort.sortOffset
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2)
@@ -1935,7 +2144,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2
     ```
 
 
@@ -1949,7 +2158,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 ### CompoundSelect.sort.sortLimitTwiceHigher
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
@@ -1958,7 +2167,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
     ```
 
 
@@ -1972,7 +2181,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 
 ### CompoundSelect.sort.sortLimitTwiceLower
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(1)
@@ -1981,7 +2190,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1
     ```
 
 
@@ -1995,7 +2204,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 
 ### CompoundSelect.sort.sortLimitOffset
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -2004,7 +2213,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
     ```
 
 
@@ -2018,7 +2227,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 ### CompoundSelect.sort.sortLimitOffsetTwice
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
@@ -2027,7 +2236,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4
     ```
 
 
@@ -2041,7 +2250,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 
 ### CompoundSelect.sort.sortOffsetLimit
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
@@ -2050,7 +2259,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    ()
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
     ```
 
 
@@ -2064,7 +2273,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 ### CompoundSelect.distinct
 
-()
+
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
@@ -2073,7 +2282,11 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 
 *
     ```sql
-    ()
+    SELECT DISTINCT subquery0.res as res
+    FROM (SELECT purchase0.shipping_info_id as res
+      FROM purchase purchase0
+      ORDER BY purchase0.total DESC
+      LIMIT 3) subquery0
     ```
 
 
@@ -2087,7 +2300,7 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 
 ### CompoundSelect.flatMap
 
-()
+
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
@@ -2098,7 +2311,12 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
 
 *
     ```sql
-    ()
+    SELECT product1.name as res
+    FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
+      FROM purchase purchase0
+      ORDER BY res__total DESC
+      LIMIT 3) subquery0, product product1
+    WHERE product1.id = subquery0.res__product_id
     ```
 
 
@@ -2112,7 +2330,7 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
 
 ### CompoundSelect.sumBy
 
-()
+
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
@@ -2121,7 +2339,11 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
 
 *
     ```sql
-    ()
+    SELECT SUM(subquery0.res__total) as res
+    FROM (SELECT purchase0.total as res__total
+      FROM purchase purchase0
+      ORDER BY res__total DESC
+      LIMIT 3) subquery0
     ```
 
 
@@ -2135,7 +2357,7 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
 
 ### CompoundSelect.aggregate
 
-()
+
 
 ```scala
 Purchase.select
@@ -2148,7 +2370,11 @@ Purchase.select
 
 *
     ```sql
-    ()
+    SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
+    FROM (SELECT purchase0.total as res__total
+      FROM purchase purchase0
+      ORDER BY res__total DESC
+      LIMIT 3) subquery0
     ```
 
 
@@ -2162,7 +2388,7 @@ Purchase.select
 
 ### CompoundSelect.union
 
-()
+
 
 ```scala
 Product.select
@@ -2173,7 +2399,11 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    UNION
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
     ```
 
 
@@ -2196,7 +2426,7 @@ Product.select
 
 ### CompoundSelect.unionAll
 
-()
+
 
 ```scala
 Product.select
@@ -2207,7 +2437,11 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    UNION ALL
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
     ```
 
 
@@ -2234,7 +2468,7 @@ Product.select
 
 ### CompoundSelect.intersect
 
-()
+
 
 ```scala
 Product.select
@@ -2245,7 +2479,11 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    INTERSECT
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
     ```
 
 
@@ -2259,7 +2497,7 @@ Product.select
 
 ### CompoundSelect.except
 
-()
+
 
 ```scala
 Product.select
@@ -2270,7 +2508,11 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    EXCEPT
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
     ```
 
 
@@ -2284,7 +2526,7 @@ Product.select
 
 ### CompoundSelect.unionAllUnionSort
 
-()
+
 
 ```scala
 Product.select
@@ -2297,7 +2539,15 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    UNION ALL
+    SELECT LOWER(buyer0.name) as res
+    FROM buyer buyer0
+    UNION
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
+    ORDER BY res
     ```
 
 
@@ -2323,7 +2573,7 @@ Product.select
 
 ### CompoundSelect.unionAllUnionSortLimit
 
-()
+
 
 ```scala
 Product.select
@@ -2338,7 +2588,17 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(product0.name) as res
+    FROM product product0
+    UNION ALL
+    SELECT LOWER(buyer0.name) as res
+    FROM buyer buyer0
+    UNION
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
+    ORDER BY res
+    LIMIT 4
+    OFFSET 4
     ```
 
 
@@ -2352,7 +2612,7 @@ Product.select
 
 ### CompoundSelect.exceptAggregate
 
-()
+
 
 ```scala
 Product.select
@@ -2366,7 +2626,18 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT
+      MAX(subquery0.res__1) as res__0,
+      MIN(subquery0.res__1) as res__1
+    FROM (SELECT
+        LOWER(product0.name) as res__0,
+        product0.price as res__1
+      FROM product product0
+      EXCEPT
+      SELECT
+        LOWER(product0.kebab_case_name) as res__0,
+        product0.price as res__1
+      FROM product product0) subquery0
     ```
 
 
@@ -2380,7 +2651,7 @@ Product.select
 
 ### CompoundSelect.unionAllAggregate
 
-()
+
 
 ```scala
 Product.select
@@ -2394,7 +2665,14 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT
+      MAX(subquery0.res__1) as res__0,
+      MIN(subquery0.res__1) as res__1
+    FROM (SELECT product0.price as res__1
+      FROM product product0
+      UNION ALL
+      SELECT product0.price as res__1
+      FROM product product0) subquery0
     ```
 
 
@@ -2410,7 +2688,7 @@ Product.select
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
 
-()
+
 
 ```scala
 Purchase.select
@@ -2421,7 +2699,13 @@ Purchase.select
 
 *
     ```sql
-    ()
+    SELECT purchase0.total as res
+    FROM purchase purchase0
+    JOIN (SELECT product0.id as res__id, product0.price as res__price
+      FROM product product0
+      ORDER BY res__price DESC
+      LIMIT 1) subquery1
+    ON purchase0.product_id = subquery1.res__id
     ```
 
 
@@ -2435,7 +2719,7 @@ Purchase.select
 
 ### SubQuery.sortTakeFrom
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
@@ -2446,7 +2730,12 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
 
 *
     ```sql
-    ()
+    SELECT purchase1.total as res
+    FROM (SELECT product0.id as res__id, product0.price as res__price
+      FROM product product0
+      ORDER BY res__price DESC
+      LIMIT 1) subquery0
+    JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
     ```
 
 
@@ -2460,7 +2749,7 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
 
 ### SubQuery.sortTakeFromAndJoin
 
-()
+
 
 ```scala
 Product.select
@@ -2474,7 +2763,23 @@ Product.select
 
 *
     ```sql
-    ()
+    SELECT
+      subquery0.res__name as res__0,
+      subquery1.res__count as res__1
+    FROM (SELECT
+        product0.id as res__id,
+        product0.name as res__name,
+        product0.price as res__price
+      FROM product product0
+      ORDER BY res__price DESC
+      LIMIT 3) subquery0
+    JOIN (SELECT
+        purchase0.product_id as res__product_id,
+        purchase0.count as res__count
+      FROM purchase purchase0
+      ORDER BY res__count DESC
+      LIMIT 3) subquery1
+    ON subquery0.res__id = subquery1.res__product_id
     ```
 
 
@@ -2488,7 +2793,7 @@ Product.select
 
 ### SubQuery.sortLimitSortLimit
 
-()
+
 
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
@@ -2497,7 +2802,15 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
 
 *
     ```sql
-    ()
+    SELECT subquery0.res__name as res
+    FROM (SELECT
+        product0.name as res__name,
+        product0.price as res__price
+      FROM product product0
+      ORDER BY res__price DESC
+      LIMIT 4) subquery0
+    ORDER BY subquery0.res__price ASC
+    LIMIT 2
     ```
 
 
@@ -2511,7 +2824,7 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
 
 ### SubQuery.sortGroupBy
 
-()
+
 
 ```scala
 Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
@@ -2520,7 +2833,15 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 *
     ```sql
-    ()
+    SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
+    FROM (SELECT
+        purchase0.product_id as res__product_id,
+        purchase0.count as res__count,
+        purchase0.total as res__total
+      FROM purchase purchase0
+      ORDER BY res__count
+      LIMIT 5) subquery0
+    GROUP BY subquery0.res__product_id
     ```
 
 
@@ -2534,7 +2855,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 ### SubQuery.groupByJoin
 
-()
+
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
@@ -2545,7 +2866,15 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
 
 *
     ```sql
-    ()
+    SELECT
+      product1.name as res__0,
+      subquery0.res__1 as res__1
+    FROM (SELECT
+        purchase0.product_id as res__0,
+        SUM(purchase0.total) as res__1
+      FROM purchase purchase0
+      GROUP BY purchase0.product_id) subquery0
+    JOIN product product1 ON subquery0.res__0 = product1.id
     ```
 
 
@@ -2566,7 +2895,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
 
 ### SubQuery.subqueryInFilter
 
-()
+
 
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
@@ -2575,7 +2904,15 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__id,
+      buyer0.name as res__name,
+      buyer0.date_of_birth as res__date_of_birth
+    FROM buyer buyer0
+    WHERE (SELECT
+        COUNT(1) as res
+        FROM shipping_info shipping_info0
+        WHERE buyer0.id = shipping_info0.buyer_id) = ?
     ```
 
 
@@ -2589,7 +2926,7 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 
 ### SubQuery.subqueryInMap
 
-()
+
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
@@ -2598,7 +2935,12 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
+    FROM buyer buyer0
     ```
 
 
@@ -2616,7 +2958,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 ### SubQuery.subqueryInMapNested
 
-()
+
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
@@ -2625,7 +2967,15 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 *
     ```sql
-    ()
+    SELECT
+      buyer0.id as res__0__id,
+      buyer0.name as res__0__name,
+      buyer0.date_of_birth as res__0__date_of_birth,
+      (SELECT
+        COUNT(1) as res
+        FROM shipping_info shipping_info0
+        WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
+    FROM buyer buyer0
     ```
 
 
@@ -2643,7 +2993,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 ### SubQuery.selectLimitUnionSelect
 
-()
+
 
 ```scala
 Buyer.select
@@ -2655,7 +3005,14 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT subquery0.res as res
+    FROM (SELECT
+        LOWER(buyer0.name) as res
+      FROM buyer buyer0
+      LIMIT 2) subquery0
+    UNION ALL
+    SELECT LOWER(product0.kebab_case_name) as res
+    FROM product product0
     ```
 
 
@@ -2669,7 +3026,7 @@ Buyer.select
 
 ### SubQuery.selectUnionSelectLimit
 
-()
+
 
 ```scala
 Buyer.select
@@ -2680,7 +3037,14 @@ Buyer.select
 
 *
     ```sql
-    ()
+    SELECT LOWER(buyer0.name) as res
+    FROM buyer buyer0
+    UNION ALL
+    SELECT subquery0.res as res
+    FROM (SELECT
+        LOWER(product0.kebab_case_name) as res
+      FROM product product0
+      LIMIT 2) subquery0
     ```
 
 
@@ -2696,7 +3060,7 @@ Buyer.select
 `UPDATE` queries that use Subqueries
 ### UpdateSubQuery.setSubquery
 
-()
+
 
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
@@ -2705,7 +3069,9 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 
 *
     ```sql
-    ()
+    UPDATE product
+    SET price = (SELECT MAX(product0.price) as res FROM product product0)
+    WHERE ?
     ```
 
 
@@ -2719,7 +3085,7 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 
 ----
 
-()
+
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -2744,7 +3110,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 ### UpdateSubQuery.whereSubquery
 
-()
+
 
 ```scala
 Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
@@ -2753,7 +3119,9 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 
 *
     ```sql
-    ()
+    UPDATE product
+    SET price = ?
+    WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
     ```
 
 
@@ -2767,7 +3135,7 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 
 ----
 
-()
+
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -2794,7 +3162,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 Operations that can be performed on `Expr[Boolean]`
 ### ExprBooleanOps.and
 
-()
+
 
 ```scala
 Expr(true) && Expr(true)
@@ -2803,7 +3171,7 @@ Expr(true) && Expr(true)
 
 *
     ```sql
-    ()
+    SELECT ? AND ? as res
     ```
 
 
@@ -2817,7 +3185,7 @@ Expr(true) && Expr(true)
 
 ----
 
-()
+
 
 ```scala
 Expr(false) && Expr(true)
@@ -2826,7 +3194,7 @@ Expr(false) && Expr(true)
 
 *
     ```sql
-    ()
+    SELECT ? AND ? as res
     ```
 
 
@@ -2840,7 +3208,7 @@ Expr(false) && Expr(true)
 
 ### ExprBooleanOps.or
 
-()
+
 
 ```scala
 Expr(false) || Expr(false)
@@ -2849,7 +3217,7 @@ Expr(false) || Expr(false)
 
 *
     ```sql
-    ()
+    SELECT ? OR ? as res
     ```
 
 
@@ -2863,7 +3231,7 @@ Expr(false) || Expr(false)
 
 ----
 
-()
+
 
 ```scala
 !Expr(false)
@@ -2872,7 +3240,7 @@ Expr(false) || Expr(false)
 
 *
     ```sql
-    ()
+    SELECT NOT ? as res
     ```
 
 
@@ -2888,7 +3256,7 @@ Expr(false) || Expr(false)
 Operations that can be performed on `Expr[T]` when `T` is numeric
 ### ExprIntOps.plus
 
-()
+
 
 ```scala
 Expr(6) + Expr(2)
@@ -2897,7 +3265,7 @@ Expr(6) + Expr(2)
 
 *
     ```sql
-    ()
+    SELECT ? + ? as res
     ```
 
 
@@ -2911,7 +3279,7 @@ Expr(6) + Expr(2)
 
 ### ExprIntOps.minus
 
-()
+
 
 ```scala
 Expr(6) - Expr(2)
@@ -2920,7 +3288,7 @@ Expr(6) - Expr(2)
 
 *
     ```sql
-    ()
+    SELECT ? - ? as res
     ```
 
 
@@ -2934,7 +3302,7 @@ Expr(6) - Expr(2)
 
 ### ExprIntOps.times
 
-()
+
 
 ```scala
 Expr(6) * Expr(2)
@@ -2943,7 +3311,7 @@ Expr(6) * Expr(2)
 
 *
     ```sql
-    ()
+    SELECT ? * ? as res
     ```
 
 
@@ -2957,7 +3325,7 @@ Expr(6) * Expr(2)
 
 ### ExprIntOps.divide
 
-()
+
 
 ```scala
 Expr(6) / Expr(2)
@@ -2966,7 +3334,7 @@ Expr(6) / Expr(2)
 
 *
     ```sql
-    ()
+    SELECT ? / ? as res
     ```
 
 
@@ -2980,7 +3348,7 @@ Expr(6) / Expr(2)
 
 ### ExprIntOps.modulo
 
-()
+
 
 ```scala
 Expr(6) % Expr(2)
@@ -2989,7 +3357,7 @@ Expr(6) % Expr(2)
 
 *
     ```sql
-    ()
+    SELECT MOD(?, ?) as res
     ```
 
 
@@ -3003,7 +3371,7 @@ Expr(6) % Expr(2)
 
 ### ExprIntOps.bitwiseAnd
 
-()
+
 
 ```scala
 Expr(6) & Expr(2)
@@ -3012,7 +3380,7 @@ Expr(6) & Expr(2)
 
 *
     ```sql
-    ()
+    SELECT BITAND(?, ?) as res
     ```
 
 
@@ -3026,7 +3394,7 @@ Expr(6) & Expr(2)
 
 ### ExprIntOps.bitwiseOr
 
-()
+
 
 ```scala
 Expr(6) | Expr(3)
@@ -3035,7 +3403,7 @@ Expr(6) | Expr(3)
 
 *
     ```sql
-    ()
+    SELECT BITOR(?, ?) as res
     ```
 
 
@@ -3049,7 +3417,7 @@ Expr(6) | Expr(3)
 
 ### ExprIntOps.between
 
-()
+
 
 ```scala
 Expr(4).between(Expr(2), Expr(6))
@@ -3058,7 +3426,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    ()
+    SELECT ? BETWEEN ? AND ? as res
     ```
 
 
@@ -3072,7 +3440,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 ### ExprIntOps.unaryPlus
 
-()
+
 
 ```scala
 +Expr(-4)
@@ -3081,7 +3449,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    ()
+    SELECT +? as res
     ```
 
 
@@ -3095,7 +3463,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 ### ExprIntOps.unaryMinus
 
-()
+
 
 ```scala
 -Expr(-4)
@@ -3104,7 +3472,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    ()
+    SELECT -? as res
     ```
 
 
@@ -3118,7 +3486,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 ### ExprIntOps.unaryTilde
 
-()
+
 
 ```scala
 ~Expr(-4)
@@ -3127,7 +3495,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    ()
+    SELECT BITNOT(?) as res
     ```
 
 
@@ -3141,7 +3509,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 ### ExprIntOps.abs
 
-()
+
 
 ```scala
 Expr(-4).abs
@@ -3150,7 +3518,7 @@ Expr(-4).abs
 
 *
     ```sql
-    ()
+    SELECT ABS(?) as res
     ```
 
 
@@ -3164,7 +3532,7 @@ Expr(-4).abs
 
 ### ExprIntOps.mod
 
-()
+
 
 ```scala
 Expr(8).mod(Expr(3))
@@ -3173,7 +3541,7 @@ Expr(8).mod(Expr(3))
 
 *
     ```sql
-    ()
+    SELECT MOD(?, ?) as res
     ```
 
 
@@ -3187,7 +3555,7 @@ Expr(8).mod(Expr(3))
 
 ### ExprIntOps.ceil
 
-()
+
 
 ```scala
 Expr(4.3).ceil
@@ -3196,7 +3564,7 @@ Expr(4.3).ceil
 
 *
     ```sql
-    ()
+    SELECT CEIL(?) as res
     ```
 
 
@@ -3210,7 +3578,7 @@ Expr(4.3).ceil
 
 ### ExprIntOps.floor
 
-()
+
 
 ```scala
 Expr(4.7).floor
@@ -3219,7 +3587,7 @@ Expr(4.7).floor
 
 *
     ```sql
-    ()
+    SELECT FLOOR(?) as res
     ```
 
 
@@ -3233,7 +3601,7 @@ Expr(4.7).floor
 
 ----
 
-()
+
 
 ```scala
 Expr(4.7).floor
@@ -3242,7 +3610,7 @@ Expr(4.7).floor
 
 *
     ```sql
-    ()
+    SELECT FLOOR(?) as res
     ```
 
 
@@ -3258,7 +3626,7 @@ Expr(4.7).floor
 Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
 ### ExprSeqNumericOps.sum
 
-()
+
 
 ```scala
 Purchase.select.map(_.count).sum
@@ -3267,7 +3635,7 @@ Purchase.select.map(_.count).sum
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3281,7 +3649,7 @@ Purchase.select.map(_.count).sum
 
 ### ExprSeqNumericOps.min
 
-()
+
 
 ```scala
 Purchase.select.map(_.count).min
@@ -3290,7 +3658,7 @@ Purchase.select.map(_.count).min
 
 *
     ```sql
-    ()
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3304,7 +3672,7 @@ Purchase.select.map(_.count).min
 
 ### ExprSeqNumericOps.max
 
-()
+
 
 ```scala
 Purchase.select.map(_.count).max
@@ -3313,7 +3681,7 @@ Purchase.select.map(_.count).max
 
 *
     ```sql
-    ()
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3327,7 +3695,7 @@ Purchase.select.map(_.count).max
 
 ### ExprSeqNumericOps.avg
 
-()
+
 
 ```scala
 Purchase.select.map(_.count).avg
@@ -3336,7 +3704,7 @@ Purchase.select.map(_.count).avg
 
 *
     ```sql
-    ()
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3352,7 +3720,7 @@ Purchase.select.map(_.count).avg
 Operations that can be performed on `Expr[Seq[_]]`
 ### ExprSeqOps.size
 
-()
+
 
 ```scala
 Purchase.select.size
@@ -3361,7 +3729,7 @@ Purchase.select.size
 
 *
     ```sql
-    ()
+    SELECT COUNT(1) as res FROM purchase purchase0
     ```
 
 
@@ -3375,7 +3743,7 @@ Purchase.select.size
 
 ### ExprSeqOps.sumBy.simple
 
-()
+
 
 ```scala
 Purchase.select.sumBy(_.count)
@@ -3384,7 +3752,7 @@ Purchase.select.sumBy(_.count)
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3398,7 +3766,7 @@ Purchase.select.sumBy(_.count)
 
 ### ExprSeqOps.sumBy.some
 
-()
+
 
 ```scala
 Purchase.select.sumByOpt(_.count)
@@ -3407,7 +3775,7 @@ Purchase.select.sumByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3421,7 +3789,7 @@ Purchase.select.sumByOpt(_.count)
 
 ### ExprSeqOps.sumBy.none
 
-()
+
 
 ```scala
 Purchase.select.filter(_ => false).sumByOpt(_.count)
@@ -3430,7 +3798,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -3444,7 +3812,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
 
 ### ExprSeqOps.minBy.simple
 
-()
+
 
 ```scala
 Purchase.select.minBy(_.count)
@@ -3453,7 +3821,7 @@ Purchase.select.minBy(_.count)
 
 *
     ```sql
-    ()
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3467,7 +3835,7 @@ Purchase.select.minBy(_.count)
 
 ### ExprSeqOps.minBy.some
 
-()
+
 
 ```scala
 Purchase.select.minByOpt(_.count)
@@ -3476,7 +3844,7 @@ Purchase.select.minByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3490,7 +3858,7 @@ Purchase.select.minByOpt(_.count)
 
 ### ExprSeqOps.minBy.none
 
-()
+
 
 ```scala
 Purchase.select.filter(_ => false).minByOpt(_.count)
@@ -3499,7 +3867,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -3513,7 +3881,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
 
 ### ExprSeqOps.maxBy.simple
 
-()
+
 
 ```scala
 Purchase.select.maxBy(_.count)
@@ -3522,7 +3890,7 @@ Purchase.select.maxBy(_.count)
 
 *
     ```sql
-    ()
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3536,7 +3904,7 @@ Purchase.select.maxBy(_.count)
 
 ### ExprSeqOps.maxBy.some
 
-()
+
 
 ```scala
 Purchase.select.maxByOpt(_.count)
@@ -3545,7 +3913,7 @@ Purchase.select.maxByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3559,7 +3927,7 @@ Purchase.select.maxByOpt(_.count)
 
 ### ExprSeqOps.maxBy.none
 
-()
+
 
 ```scala
 Purchase.select.filter(_ => false).maxByOpt(_.count)
@@ -3568,7 +3936,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -3582,7 +3950,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
 
 ### ExprSeqOps.avgBy.simple
 
-()
+
 
 ```scala
 Purchase.select.avgBy(_.count)
@@ -3591,7 +3959,7 @@ Purchase.select.avgBy(_.count)
 
 *
     ```sql
-    ()
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3605,7 +3973,7 @@ Purchase.select.avgBy(_.count)
 
 ### ExprSeqOps.avgBy.some
 
-()
+
 
 ```scala
 Purchase.select.avgByOpt(_.count)
@@ -3614,7 +3982,7 @@ Purchase.select.avgByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0
     ```
 
 
@@ -3628,7 +3996,7 @@ Purchase.select.avgByOpt(_.count)
 
 ### ExprSeqOps.avgBy.none
 
-()
+
 
 ```scala
 Purchase.select.filter(_ => false).avgByOpt(_.count)
@@ -3637,7 +4005,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 
 *
     ```sql
-    ()
+    SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -3653,7 +4021,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 Operations that can be performed on `Expr[String]`
 ### ExprStringOps.plus
 
-()
+
 
 ```scala
 Expr("hello") + Expr("world")
@@ -3662,7 +4030,7 @@ Expr("hello") + Expr("world")
 
 *
     ```sql
-    ()
+    SELECT ? || ? as res
     ```
 
 
@@ -3676,7 +4044,7 @@ Expr("hello") + Expr("world")
 
 ### ExprStringOps.like
 
-()
+
 
 ```scala
 Expr("hello").like("he%")
@@ -3685,7 +4053,7 @@ Expr("hello").like("he%")
 
 *
     ```sql
-    ()
+    SELECT ? LIKE ? as res
     ```
 
 
@@ -3699,7 +4067,7 @@ Expr("hello").like("he%")
 
 ### ExprStringOps.length
 
-()
+
 
 ```scala
 Expr("hello").length
@@ -3708,7 +4076,7 @@ Expr("hello").length
 
 *
     ```sql
-    ()
+    SELECT LENGTH(?) as res
     ```
 
 
@@ -3722,7 +4090,7 @@ Expr("hello").length
 
 ### ExprStringOps.octetLength
 
-()
+
 
 ```scala
 Expr("叉烧包").octetLength
@@ -3731,7 +4099,7 @@ Expr("叉烧包").octetLength
 
 *
     ```sql
-    ()
+    SELECT OCTET_LENGTH(?) as res
     ```
 
 
@@ -3745,7 +4113,7 @@ Expr("叉烧包").octetLength
 
 ### ExprStringOps.position
 
-()
+
 
 ```scala
 Expr("hello").indexOf("ll")
@@ -3754,7 +4122,7 @@ Expr("hello").indexOf("ll")
 
 *
     ```sql
-    ()
+    SELECT INSTR(?, ?) as res
     ```
 
 
@@ -3768,7 +4136,7 @@ Expr("hello").indexOf("ll")
 
 ### ExprStringOps.toLowerCase
 
-()
+
 
 ```scala
 Expr("Hello").toLowerCase
@@ -3777,7 +4145,7 @@ Expr("Hello").toLowerCase
 
 *
     ```sql
-    ()
+    SELECT LOWER(?) as res
     ```
 
 
@@ -3791,7 +4159,7 @@ Expr("Hello").toLowerCase
 
 ### ExprStringOps.trim
 
-()
+
 
 ```scala
 Expr("  Hello ").trim
@@ -3800,7 +4168,7 @@ Expr("  Hello ").trim
 
 *
     ```sql
-    ()
+    SELECT TRIM(?) as res
     ```
 
 
@@ -3814,7 +4182,7 @@ Expr("  Hello ").trim
 
 ### ExprStringOps.ltrim
 
-()
+
 
 ```scala
 Expr("  Hello ").ltrim
@@ -3823,7 +4191,7 @@ Expr("  Hello ").ltrim
 
 *
     ```sql
-    ()
+    SELECT LTRIM(?) as res
     ```
 
 
@@ -3837,7 +4205,7 @@ Expr("  Hello ").ltrim
 
 ### ExprStringOps.rtrim
 
-()
+
 
 ```scala
 Expr("  Hello ").rtrim
@@ -3846,7 +4214,7 @@ Expr("  Hello ").rtrim
 
 *
     ```sql
-    ()
+    SELECT RTRIM(?) as res
     ```
 
 
@@ -3860,7 +4228,7 @@ Expr("  Hello ").rtrim
 
 ### ExprStringOps.substring
 
-()
+
 
 ```scala
 Expr("Hello").substring(2, 2)
@@ -3869,7 +4237,7 @@ Expr("Hello").substring(2, 2)
 
 *
     ```sql
-    ()
+    SELECT SUBSTRING(?, ?, ?) as res
     ```
 
 
@@ -3885,7 +4253,7 @@ Expr("Hello").substring(2, 2)
 Operations specific to working with HsqlDb Databases
 ### HsqlDbDialect.ltrim2
 
-()
+
 
 ```scala
 Expr("xxHellox").ltrim("x")
@@ -3894,7 +4262,7 @@ Expr("xxHellox").ltrim("x")
 
 *
     ```sql
-    ()
+    SELECT LTRIM(?, ?) as res
     ```
 
 
@@ -3908,7 +4276,7 @@ Expr("xxHellox").ltrim("x")
 
 ### HsqlDbDialect.rtrim2
 
-()
+
 
 ```scala
 Expr("xxHellox").rtrim("x")
@@ -3917,7 +4285,7 @@ Expr("xxHellox").rtrim("x")
 
 *
     ```sql
-    ()
+    SELECT RTRIM(?, ?) as res
     ```
 
 
@@ -3931,7 +4299,7 @@ Expr("xxHellox").rtrim("x")
 
 ### HsqlDbDialect.reverse
 
-()
+
 
 ```scala
 Expr("Hello").reverse
@@ -3940,7 +4308,7 @@ Expr("Hello").reverse
 
 *
     ```sql
-    ()
+    SELECT REVERSE(?) as res
     ```
 
 
@@ -3954,7 +4322,7 @@ Expr("Hello").reverse
 
 ### HsqlDbDialect.lpad
 
-()
+
 
 ```scala
 Expr("Hello").lpad(10, "xy")
@@ -3963,7 +4331,7 @@ Expr("Hello").lpad(10, "xy")
 
 *
     ```sql
-    ()
+    SELECT LPAD(?, ?, ?) as res
     ```
 
 
@@ -3977,7 +4345,7 @@ Expr("Hello").lpad(10, "xy")
 
 ### HsqlDbDialect.rpad
 
-()
+
 
 ```scala
 Expr("Hello").rpad(10, "xy")
@@ -3986,7 +4354,7 @@ Expr("Hello").rpad(10, "xy")
 
 *
     ```sql
-    ()
+    SELECT RPAD(?, ?, ?) as res
     ```
 
 
@@ -4002,7 +4370,7 @@ Expr("Hello").rpad(10, "xy")
 Basic operations on all the data types that ScalaSql supports mapping between Database types and Scala types
 ### DataTypes.constant
 
-()
+
 
 ```scala
 DataTypes.insert.values(
@@ -4032,7 +4400,7 @@ DataTypes.insert.values(
 
 ----
 
-()
+
 
 ```scala
 DataTypes.select
@@ -4050,7 +4418,7 @@ DataTypes.select
 
 ### DataTypes.nonRoundTrip
 
-()
+
 
 ```scala
 NonRoundTripTypes.insert.values(
@@ -4071,7 +4439,7 @@ NonRoundTripTypes.insert.values(
 
 ----
 
-()
+
 
 ```scala
 NonRoundTripTypes.select
@@ -4091,7 +4459,7 @@ NonRoundTripTypes.select
 Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala
 ### Optional
 
-()
+
 
 ```scala
 OptCols.insert.batched(_.myInt, _.myInt2)(
@@ -4114,7 +4482,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 ### Optional.selectAll
 
-()
+
 
 ```scala
 OptCols.select
@@ -4123,7 +4491,10 @@ OptCols.select
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4142,7 +4513,7 @@ OptCols.select
 
 ### Optional.groupByMaxGet
 
-()
+
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -4151,7 +4522,9 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__0, MAX(opt_cols0.my_int2) as res__1
+    FROM opt_cols opt_cols0
+    GROUP BY opt_cols0.my_int
     ```
 
 
@@ -4165,7 +4538,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 ### Optional.isDefined
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
@@ -4174,7 +4547,11 @@ OptCols.select.filter(_.myInt.isDefined)
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE opt_cols0.my_int IS NOT NULL
     ```
 
 
@@ -4188,7 +4565,7 @@ OptCols.select.filter(_.myInt.isDefined)
 
 ### Optional.isEmpty
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
@@ -4197,7 +4574,11 @@ OptCols.select.filter(_.myInt.isEmpty)
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE opt_cols0.my_int IS NULL
     ```
 
 
@@ -4211,7 +4592,7 @@ OptCols.select.filter(_.myInt.isEmpty)
 
 ### Optional.sqlEquals.nonOptionHit
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
@@ -4220,7 +4601,11 @@ OptCols.select.filter(_.myInt `=` 1)
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE opt_cols0.my_int = ?
     ```
 
 
@@ -4234,7 +4619,7 @@ OptCols.select.filter(_.myInt `=` 1)
 
 ### Optional.sqlEquals.nonOptionMiss
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt `=` 2)
@@ -4243,7 +4628,11 @@ OptCols.select.filter(_.myInt `=` 2)
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE opt_cols0.my_int = ?
     ```
 
 
@@ -4257,7 +4646,7 @@ OptCols.select.filter(_.myInt `=` 2)
 
 ### Optional.sqlEquals.optionMiss
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt `=` Option.empty[Int])
@@ -4266,7 +4655,11 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE opt_cols0.my_int = ?
     ```
 
 
@@ -4280,7 +4673,7 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 
 ### Optional.scalaEquals.someHit
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
@@ -4289,7 +4682,11 @@ OptCols.select.filter(_.myInt === Option(1))
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
     ```
 
 
@@ -4303,7 +4700,7 @@ OptCols.select.filter(_.myInt === Option(1))
 
 ### Optional.scalaEquals.noneHit
 
-()
+
 
 ```scala
 OptCols.select.filter(_.myInt === Option.empty[Int])
@@ -4312,7 +4709,11 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
     ```
 
 
@@ -4326,7 +4727,7 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
 
 ### Optional.map
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
@@ -4335,7 +4736,10 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int + ? as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4354,7 +4758,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
 
 ### Optional.map2
 
-()
+
 
 ```scala
 OptCols.select.map(_.myInt.map(_ + 10))
@@ -4363,7 +4767,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0
     ```
 
 
@@ -4377,7 +4781,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 ### Optional.flatMap
 
-()
+
 
 ```scala
 OptCols.select
@@ -4387,7 +4791,10 @@ OptCols.select
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4407,7 +4814,7 @@ OptCols.select
 
 ### Optional.mapGet
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
@@ -4416,7 +4823,10 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4436,7 +4846,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 
 ### Optional.rawGet
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
@@ -4445,7 +4855,10 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 
 *
     ```sql
-    ()
+    SELECT
+      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4465,7 +4878,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 
 ### Optional.getOrElse
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
@@ -4474,7 +4887,10 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 
 *
     ```sql
-    ()
+    SELECT
+      COALESCE(opt_cols0.my_int, ?) as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4493,7 +4909,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 
 ### Optional.orElse
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
@@ -4502,7 +4918,10 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 
 *
     ```sql
-    ()
+    SELECT
+      COALESCE(opt_cols0.my_int, opt_cols0.my_int2) as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4521,7 +4940,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 
 ### Optional.filter
 
-()
+
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
@@ -4530,7 +4949,13 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
 
 *
     ```sql
-    ()
+    SELECT
+      CASE
+        WHEN opt_cols0.my_int < ? THEN opt_cols0.my_int
+        ELSE NULL
+      END as res__my_int,
+      opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
     ```
 
 
@@ -4549,7 +4974,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
 
 ### Optional.sorting.nullsLast
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
@@ -4558,7 +4983,9 @@ OptCols.select.sortBy(_.myInt).nullsLast
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int NULLS LAST
     ```
 
 
@@ -4577,7 +5004,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
 
 ### Optional.sorting.nullsFirst
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsFirst
@@ -4586,7 +5013,9 @@ OptCols.select.sortBy(_.myInt).nullsFirst
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int NULLS FIRST
     ```
 
 
@@ -4605,7 +5034,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
 
 ### Optional.sorting.ascNullsLast
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsLast
@@ -4614,7 +5043,9 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int ASC NULLS LAST
     ```
 
 
@@ -4633,7 +5064,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
 
 ### Optional.sorting.ascNullsFirst
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsFirst
@@ -4642,7 +5073,9 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int ASC NULLS FIRST
     ```
 
 
@@ -4661,7 +5094,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
 
 ### Optional.sorting.descNullsLast
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsLast
@@ -4670,7 +5103,9 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int DESC NULLS LAST
     ```
 
 
@@ -4689,7 +5124,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
 
 ### Optional.sorting.descNullsFirst
 
-()
+
 
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsFirst
@@ -4698,7 +5133,9 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 *
     ```sql
-    ()
+    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    FROM opt_cols opt_cols0
+    ORDER BY res__my_int DESC NULLS FIRST
     ```
 
 
@@ -4719,7 +5156,9 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 Usage of transactions, rollbacks, and savepoints
 ### Transaction.simple.commit
 
-()
+Common workflow to create a transaction and run a `delete` inside of it. The effect
+of the `delete` is visible both inside the transaction and outside after the
+transaction completes successfully and commits
 
 ```scala
 dbClient.transaction { implicit db =>
@@ -4740,7 +5179,9 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 0
 
 ### Transaction.simple.rollback
 
-()
+Example of explicitly rolling back a transaction using the `db.rollback()` method.
+After rollback, the effects of the `delete` query are undone, and subsequent `select`
+queries can see the previously-deleted entries both inside and outside the transaction
 
 ```scala
 dbClient.transaction { implicit db =>
@@ -4765,7 +5206,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 7
 
 ### Transaction.simple.throw
 
-()
+Transactions are also rolled back if they terminate with an uncaught exception
 
 ```scala
 try {
@@ -4790,7 +5231,10 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 7
 
 ### Transaction.savepoint.commit
 
-()
+Savepoints are like "sub" transactions: they let you declare a savepoint
+and roll back any changes to the savepoint later. If a savepoint block
+completes successfully, the savepoint changes are committed ("released")
+and remain visible later in the transaction and outside of it
 
 ```scala
 dbClient.transaction { implicit db =>
@@ -4817,7 +5261,8 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 0
 
 ### Transaction.savepoint.rollback
 
-()
+Like transactions, savepoints support the `.rollback()` method, to undo any
+changes since the start of the savepoint block.
 
 ```scala
 dbClient.transaction { implicit db =>
@@ -4846,7 +5291,8 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 4
 
 ### Transaction.savepoint.throw
 
-()
+Savepoints also roll back their enclosed changes automatically if they
+terminate with an uncaught exception
 
 ```scala
 dbClient.transaction { implicit db =>
@@ -4878,7 +5324,10 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 4
 
 ### Transaction.doubleSavepoint.commit
 
-()
+Only one transaction can be present at a time, but savepoints can be arbitrarily nested.
+Uncaught exceptions or explicit `.rollback()` calls would roll back changes done during
+the inner savepoint/transaction blocks, while leaving changes applied during outer
+savepoint/transaction blocks in-place
 
 ```scala
 dbClient.transaction { implicit db =>

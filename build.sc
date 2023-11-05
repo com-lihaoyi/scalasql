@@ -103,7 +103,7 @@ object scalasql extends RootModule with ScalaModule {
         .minOption
         .getOrElse(0)
 
-      val dedented = s
+      s
         .linesIterator
         .map(_.drop(indent))
         .mkString("\n" + newIndent)
