@@ -1101,9 +1101,9 @@ Product.select.map(p =>
     ```sql
     SELECT
       CASE
-        WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-        WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-        WHEN product0.price <= ? THEN CONCAT(product0.name, ?)
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price <= ? THEN product0.name || ?
       END as res
     FROM product product0
     ```
@@ -1142,9 +1142,9 @@ Product.select.map(p =>
     ```sql
     SELECT
       CASE
-        WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-        WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-        ELSE CONCAT(product0.name, ?)
+        WHEN product0.price > ? THEN product0.name || ?
+        WHEN product0.price > ? THEN product0.name || ?
+        ELSE product0.name || ?
       END as res
     FROM product product0
     ```
@@ -1514,17 +1514,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
       buyer1.name as res__1__name,
       buyer1.date_of_birth as res__1__date_of_birth
     FROM shipping_info shipping_info0
-    LEFT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
-    UNION
-    SELECT
-      shipping_info0.id as res__0__id,
-      shipping_info0.buyer_id as res__0__buyer_id,
-      shipping_info0.shipping_date as res__0__shipping_date,
-      buyer1.id as res__1__id,
-      buyer1.name as res__1__name,
-      buyer1.date_of_birth as res__1__date_of_birth
-    FROM shipping_info shipping_info0
-    RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+    FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
     ```
 
 
@@ -1883,7 +1873,7 @@ Buyer
 
 *
     ```sql
-    UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?
+    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
     ```
 
 
@@ -1944,7 +1934,7 @@ Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 
 *
     ```sql
-    UPDATE buyer SET buyer.date_of_birth = ? WHERE ?
+    UPDATE buyer SET date_of_birth = ? WHERE ?
     ```
 
 
@@ -2005,7 +1995,7 @@ Buyer
 
 *
     ```sql
-    UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
+    UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
     ```
 
 
@@ -2066,7 +2056,7 @@ Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 
 *
     ```sql
-    UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?
+    UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
     ```
 
 
@@ -2354,7 +2344,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2
+    SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2
     ```
 
 
@@ -2827,6 +2817,891 @@ Product.select
 
 
 
+## UpdateJoin
+`UPDATE` queries that use `JOIN`s
+### UpdateJoin.join
+
+ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
+`.update.joinOn` methods
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+  .set(c => c._1.dateOfBirth := c._2.shippingDate)
+```
+
+
+*
+    ```sql
+    UPDATE buyer
+    SET date_of_birth = shipping_info0.shipping_date
+    FROM shipping_info shipping_info0
+    WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2012-04-05"))
+    ```
+
+
+
+### UpdateJoin.multijoin
+
+Multiple joins are supported, e.g. the below example where we join the `Buyer` table
+three times against `ShippingInfo`/`Purchase`/`Product` to determine what to update
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+  .joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
+  .joinOn(Product)(_._2.productId `=` _.id)
+  .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
+  .set(c => c._1._1._1.name := c._2.name)
+```
+
+
+*
+    ```sql
+    UPDATE buyer
+    SET name = product2.name
+    FROM shipping_info shipping_info0
+    JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
+    JOIN product product2 ON purchase1.product_id = product2.id
+    WHERE buyer.id = shipping_info0.buyer_id
+    AND buyer.name = ?
+    AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.id `=` 1).map(_.name)
+```
+
+
+
+
+*
+    ```scala
+    Seq("Camera")
+    ```
+
+
+
+### UpdateJoin.joinSubquery
+
+In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
+subqueries by passing in a `.select` query to `.joinOn`
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+  .set(c => c._1.dateOfBirth := c._2.shippingDate)
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
+    FROM (SELECT
+        shipping_info0.id as res__id,
+        shipping_info0.buyer_id as res__buyer_id,
+        shipping_info0.shipping_date as res__shipping_date
+      FROM shipping_info shipping_info0
+      ORDER BY res__id ASC
+      LIMIT 2) subquery0
+    WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2012-04-05"))
+    ```
+
+
+
+### UpdateJoin.joinSubqueryEliminatedColumn
+
+
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
+  // column gets eliminated since it is not used outside the subquery
+  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+  .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET date_of_birth = ?
+    FROM (SELECT
+        shipping_info0.id as res__id,
+        shipping_info0.buyer_id as res__buyer_id
+      FROM shipping_info shipping_info0
+      ORDER BY res__id ASC
+      LIMIT 2) subquery0
+    WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2000-01-01"))
+    ```
+
+
+
+## UpdateSubQuery
+`UPDATE` queries that use Subqueries
+### UpdateSubQuery.setSubquery
+
+You can use subqueries to compute the values you want to update, using
+aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
+
+```scala
+Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
+```
+
+
+*
+    ```sql
+    UPDATE product
+    SET price = (SELECT MAX(product0.price) as res FROM product product0)
+    WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+----
+
+
+
+```scala
+Product.select.map(p => (p.id, p.name, p.price))
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      (1, "Face Mask", 1000.0),
+      (2, "Guitar", 1000.0),
+      (3, "Socks", 1000.0),
+      (4, "Skate Board", 1000.0),
+      (5, "Camera", 1000.0),
+      (6, "Cookie", 1000.0)
+    )
+    ```
+
+
+
+### UpdateSubQuery.whereSubquery
+
+Subqueries and aggregates can also be used in the `WHERE` clause, defined by the
+predicate passed to `Table.update
+
+```scala
+Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
+```
+
+
+*
+    ```sql
+    UPDATE product
+    SET price = ?
+    WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Product.select.map(p => (p.id, p.name, p.price))
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      (1, "Face Mask", 8.88),
+      (2, "Guitar", 300.0),
+      (3, "Socks", 3.14),
+      (4, "Skate Board", 123.45),
+      (5, "Camera", 0.0),
+      (6, "Cookie", 0.1)
+    )
+    ```
+
+
+
+## Returning
+Queries using `INSERT` or `UPDATE` with `RETURNING`
+### Returning.insert.single
+
+ScalaSql's `.returning` clause translates to SQL's `RETURNING` syntax, letting
+you perform insertions or updates and return values from the query (rather than
+returning a single integer representing the rows affected). This is especially
+useful for retrieving the auto-generated table IDs that many databases support.
+
+Note that `.returning`/`RETURNING` is not supported in MySql, H2 or HsqlDB
+
+```scala
+Buyer.insert
+  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+  .returning(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
+    ```
+
+
+
+*
+    ```scala
+    Seq(4)
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "test buyer")
+```
+
+
+
+
+*
+    ```scala
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    ```
+
+
+
+### Returning.insert.dotSingle
+
+If your `.returning` query is expected to be a single row, the `.single` method is
+supported to convert the returned `Seq[T]` into a single `T`. `.single` throws an
+exception if zero or multiple rows are returned.
+
+```scala
+Buyer.insert
+  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+  .returning(_.id)
+  .single
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "test buyer")
+```
+
+
+
+
+*
+    ```scala
+    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    ```
+
+
+
+### Returning.insert.multiple
+
+
+
+```scala
+Buyer.insert
+  .batched(_.name, _.dateOfBirth)(
+    ("test buyer A", LocalDate.parse("2001-04-07")),
+    ("test buyer B", LocalDate.parse("2002-05-08")),
+    ("test buyer C", LocalDate.parse("2003-06-09"))
+  )
+  .returning(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth)
+    VALUES
+      (?, ?),
+      (?, ?),
+      (?, ?)
+    RETURNING buyer.id as res
+    ```
+
+
+
+*
+    ```scala
+    Seq(4, 5, 6)
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      // id=4,5,6 comes from auto increment
+      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+    )
+    ```
+
+
+
+### Returning.insert.select
+
+All variants of `.insert` and `.update` support `.returning`, e.g. the example below
+applies to `.insert.select`, and the examples further down demonstrate its usage with
+`.update` and `.delete`
+
+```scala
+Buyer.insert
+  .select(
+    x => (x.name, x.dateOfBirth),
+    Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 <> "Li Haoyi")
+  )
+  .returning(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth)
+    SELECT
+      buyer0.name as res__0,
+      buyer0.date_of_birth as res__1
+    FROM buyer buyer0
+    WHERE buyer0.name <> ?
+    RETURNING buyer.id as res
+    ```
+
+
+
+*
+    ```scala
+    Seq(4, 5)
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      // id=4,5 comes from auto increment, 6 is filtered out in the select
+      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+    )
+    ```
+
+
+
+### Returning.update.single
+
+
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
+  .returning(_.id)
+```
+
+
+*
+    ```sql
+    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res
+    ```
+
+
+
+*
+    ```scala
+    Seq(1)
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
+```
+
+
+
+
+*
+    ```scala
+    Seq(LocalDate.parse("2019-04-07"))
+    ```
+
+
+
+### Returning.update.multiple
+
+
+
+```scala
+Buyer
+  .update(_.name `=` "James Bond")
+  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
+  .returning(c => (c.id, c.name, c.dateOfBirth))
+```
+
+
+*
+    ```sql
+    UPDATE buyer
+    SET date_of_birth = ?, name = ? WHERE buyer.name = ?
+    RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
+    ```
+
+
+
+### Returning.delete
+
+
+
+```scala
+Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
+```
+
+
+*
+    ```sql
+    DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res
+    ```
+
+
+
+*
+    ```scala
+    Seq(888.0, 900.0, 15.7)
+    ```
+
+
+
+----
+
+
+
+```scala
+Purchase.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      // id=1,2,3 had shippingInfoId=1 and thus got deleted
+      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+    )
+    ```
+
+
+
+## OnConflict
+Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`
+### OnConflict.ignore
+
+ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
+
+Note that H2 and HsqlDb do not support `onConflictIgnore` and `onConflictUpdate`, while
+MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictIgnore(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
+### OnConflict.ignore.returningEmpty
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name as res
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[String]
+    ```
+
+
+
+### OnConflict.ignore.returningOne
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 4 // This should cause a primary key conflict
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name as res
+    ```
+
+
+
+*
+    ```scala
+    Seq("test buyer")
+    ```
+
+
+
+### OnConflict.update
+
+ScalaSql's `.onConflictUpdate` translates into SQL's `ON CONFLICT DO UPDATE`
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(_.id)(_.name := "TEST BUYER CONFLICT")
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
+    ```
+
+
+
+### OnConflict.computed
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
+    ```
+
+
+
+### OnConflict.returning
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
+  .returning(_.name)
+  .single
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO UPDATE
+    SET name = UPPER(buyer.name)
+    RETURNING buyer.name as res
+    ```
+
+
+
+*
+    ```scala
+    "JAMES BOND"
+    ```
+
+
+
 ## SubQuery
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
@@ -3269,220 +4144,6 @@ Product.select
 *
     ```scala
     (1000.0, 0.1)
-    ```
-
-
-
-## UpdateJoin
-`UPDATE` queries that use `JOIN`s
-### UpdateJoin.join
-
-ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
-`.update.joinOn` methods
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
-  .set(c => c._1.dateOfBirth := c._2.shippingDate)
-```
-
-
-*
-    ```sql
-    UPDATE buyer
-    JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
-    SET buyer.date_of_birth = shipping_info0.shipping_date
-    WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2012-04-05"))
-    ```
-
-
-
-### UpdateJoin.multijoin
-
-Multiple joins are supported, e.g. the below example where we join the `Buyer` table
-three times against `ShippingInfo`/`Purchase`/`Product` to determine what to update
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
-  .joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
-  .joinOn(Product)(_._2.productId `=` _.id)
-  .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
-  .set(c => c._1._1._1.name := c._2.name)
-```
-
-
-*
-    ```sql
-    UPDATE buyer
-    JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
-    JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
-    JOIN product product2 ON purchase1.product_id = product2.id
-    SET buyer.name = product2.name
-    WHERE buyer.name = ?
-    AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.id `=` 1).map(_.name)
-```
-
-
-
-
-*
-    ```scala
-    Seq("Camera")
-    ```
-
-
-
-### UpdateJoin.joinSubquery
-
-In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
-subqueries by passing in a `.select` query to `.joinOn`
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
-  .set(c => c._1.dateOfBirth := c._2.shippingDate)
-```
-
-
-*
-    ```sql
-    UPDATE
-      buyer
-      JOIN (SELECT
-          shipping_info0.id as res__id,
-          shipping_info0.buyer_id as res__buyer_id,
-          shipping_info0.shipping_date as res__shipping_date
-        FROM shipping_info shipping_info0
-        ORDER BY res__id ASC
-        LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
-    SET buyer.date_of_birth = subquery0.res__shipping_date
-    WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2012-04-05"))
-    ```
-
-
-
-### UpdateJoin.joinSubqueryEliminatedColumn
-
-
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
-  // column gets eliminated since it is not used outside the subquery
-  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
-  .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
-```
-
-
-*
-    ```sql
-    UPDATE
-      buyer
-      JOIN (SELECT
-          shipping_info0.id as res__id,
-          shipping_info0.buyer_id as res__buyer_id
-        FROM shipping_info shipping_info0
-        ORDER BY res__id ASC
-        LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
-    SET buyer.date_of_birth = ?
-    WHERE buyer.name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2000-01-01"))
     ```
 
 
@@ -4359,7 +5020,7 @@ Expr("hello") + Expr("world")
 
 *
     ```sql
-    SELECT CONCAT(?, ?) as res
+    SELECT ? || ? as res
     ```
 
 
@@ -5197,7 +5858,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int IS NULL ASC, res__my_int
+    ORDER BY res__my_int NULLS LAST
     ```
 
 
@@ -5227,7 +5888,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int IS NULL DESC, res__my_int
+    ORDER BY res__my_int NULLS FIRST
     ```
 
 
@@ -5257,7 +5918,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int IS NULL ASC, res__my_int ASC
+    ORDER BY res__my_int ASC NULLS LAST
     ```
 
 
@@ -5287,7 +5948,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int ASC
+    ORDER BY res__my_int ASC NULLS FIRST
     ```
 
 
@@ -5317,7 +5978,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int DESC
+    ORDER BY res__my_int DESC NULLS LAST
     ```
 
 
@@ -5347,7 +6008,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
     ```sql
     SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
     FROM opt_cols opt_cols0
-    ORDER BY res__my_int IS NULL DESC, res__my_int DESC
+    ORDER BY res__my_int DESC NULLS FIRST
     ```
 
 
@@ -5360,882 +6021,6 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
       OptCols[Id](Some(3), None),
       OptCols[Id](Some(1), Some(2))
     )
-    ```
-
-
-
-## MySqlDialect
-Operations specific to working with MySql Databases
-### MySqlDialect.reverse
-
-
-
-```scala
-Expr("Hello").reverse
-```
-
-
-*
-    ```sql
-    SELECT REVERSE(?) as res
-    ```
-
-
-
-*
-    ```scala
-    "olleH"
-    ```
-
-
-
-### MySqlDialect.lpad
-
-
-
-```scala
-Expr("Hello").lpad(10, "xy")
-```
-
-
-*
-    ```sql
-    SELECT LPAD(?, ?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    "xyxyxHello"
-    ```
-
-
-
-### MySqlDialect.rpad
-
-
-
-```scala
-Expr("Hello").rpad(10, "xy")
-```
-
-
-*
-    ```sql
-    SELECT RPAD(?, ?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    "Helloxyxyx"
-    ```
-
-
-
-### MySqlDialect.conflict.ignore
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(x => x.id := x.id)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = buyer.id
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-### MySqlDialect.conflict.update
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(_.name := "TEST BUYER CONFLICT")
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
-
-### MySqlDialect.conflict.updateComputed
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(v => v.name := v.name.toUpperCase)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = UPPER(buyer.name)
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
-
-## UpdateSubQuery
-`UPDATE` queries that use Subqueries
-### UpdateSubQuery.setSubquery
-
-You can use subqueries to compute the values you want to update, using
-aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
-
-```scala
-Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
-```
-
-
-*
-    ```sql
-    UPDATE product
-    SET price = (SELECT MAX(product0.price) as res FROM product product0)
-    WHERE ?
-    ```
-
-
-
-*
-    ```scala
-    6
-    ```
-
-
-
-----
-
-
-
-```scala
-Product.select.map(p => (p.id, p.name, p.price))
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      (1, "Face Mask", 1000.0),
-      (2, "Guitar", 1000.0),
-      (3, "Socks", 1000.0),
-      (4, "Skate Board", 1000.0),
-      (5, "Camera", 1000.0),
-      (6, "Cookie", 1000.0)
-    )
-    ```
-
-
-
-### UpdateSubQuery.whereSubquery
-
-Subqueries and aggregates can also be used in the `WHERE` clause, defined by the
-predicate passed to `Table.update
-
-```scala
-Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
-```
-
-
-*
-    ```sql
-    UPDATE product
-    SET price = ?
-    WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Product.select.map(p => (p.id, p.name, p.price))
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      (1, "Face Mask", 8.88),
-      (2, "Guitar", 300.0),
-      (3, "Socks", 3.14),
-      (4, "Skate Board", 123.45),
-      (5, "Camera", 0.0),
-      (6, "Cookie", 0.1)
-    )
-    ```
-
-
-
-## Returning
-Queries using `INSERT` or `UPDATE` with `RETURNING`
-### Returning.insert.single
-
-ScalaSql's `.returning` clause translates to SQL's `RETURNING` syntax, letting
-you perform insertions or updates and return values from the query (rather than
-returning a single integer representing the rows affected). This is especially
-useful for retrieving the auto-generated table IDs that many databases support.
-
-Note that `.returning`/`RETURNING` is not supported in MySql, H2 or HsqlDB
-
-```scala
-Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
-  .returning(_.id)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
-    ```
-
-
-
-*
-    ```scala
-    Seq(4)
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
-
-### Returning.insert.dotSingle
-
-If your `.returning` query is expected to be a single row, the `.single` method is
-supported to convert the returned `Seq[T]` into a single `T`. `.single` throws an
-exception if zero or multiple rows are returned.
-
-```scala
-Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
-  .returning(_.id)
-  .single
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "test buyer")
-```
-
-
-
-
-*
-    ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
-    ```
-
-
-
-### Returning.insert.multiple
-
-
-
-```scala
-Buyer.insert
-  .batched(_.name, _.dateOfBirth)(
-    ("test buyer A", LocalDate.parse("2001-04-07")),
-    ("test buyer B", LocalDate.parse("2002-05-08")),
-    ("test buyer C", LocalDate.parse("2003-06-09"))
-  )
-  .returning(_.id)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth)
-    VALUES
-      (?, ?),
-      (?, ?),
-      (?, ?)
-    RETURNING buyer.id as res
-    ```
-
-
-
-*
-    ```scala
-    Seq(4, 5, 6)
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
-    )
-    ```
-
-
-
-### Returning.insert.select
-
-All variants of `.insert` and `.update` support `.returning`, e.g. the example below
-applies to `.insert.select`, and the examples further down demonstrate its usage with
-`.update` and `.delete`
-
-```scala
-Buyer.insert
-  .select(
-    x => (x.name, x.dateOfBirth),
-    Buyer.select.map(x => (x.name, x.dateOfBirth)).filter(_._1 <> "Li Haoyi")
-  )
-  .returning(_.id)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth)
-    SELECT
-      buyer0.name as res__0,
-      buyer0.date_of_birth as res__1
-    FROM buyer buyer0
-    WHERE buyer0.name <> ?
-    RETURNING buyer.id as res
-    ```
-
-
-
-*
-    ```scala
-    Seq(4, 5)
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
-    )
-    ```
-
-
-
-### Returning.update.single
-
-
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
-  .returning(_.id)
-```
-
-
-*
-    ```sql
-    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res
-    ```
-
-
-
-*
-    ```scala
-    Seq(1)
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
-```
-
-
-
-
-*
-    ```scala
-    Seq(LocalDate.parse("2019-04-07"))
-    ```
-
-
-
-### Returning.update.multiple
-
-
-
-```scala
-Buyer
-  .update(_.name `=` "James Bond")
-  .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
-  .returning(c => (c.id, c.name, c.dateOfBirth))
-```
-
-
-*
-    ```sql
-    UPDATE buyer
-    SET date_of_birth = ?, name = ? WHERE buyer.name = ?
-    RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
-    ```
-
-
-
-*
-    ```scala
-    Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
-    ```
-
-
-
-### Returning.delete
-
-
-
-```scala
-Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
-```
-
-
-*
-    ```sql
-    DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res
-    ```
-
-
-
-*
-    ```scala
-    Seq(888.0, 900.0, 15.7)
-    ```
-
-
-
-----
-
-
-
-```scala
-Purchase.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      // id=1,2,3 had shippingInfoId=1 and thus got deleted
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
-    )
-    ```
-
-
-
-## OnConflict
-Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`
-### OnConflict.ignore
-
-ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
-
-Note that H2 and HsqlDb do not support `onConflictIgnore` and `onConflictUpdate`, while
-MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictIgnore(_.id)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING
-    ```
-
-
-
-*
-    ```scala
-    0
-    ```
-
-
-
-### OnConflict.ignore.returningEmpty
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictIgnore(_.id)
-  .returning(_.name)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
-    ON CONFLICT (id) DO NOTHING
-    RETURNING buyer.name as res
-    ```
-
-
-
-*
-    ```scala
-    Seq.empty[String]
-    ```
-
-
-
-### OnConflict.ignore.returningOne
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 4 // This should cause a primary key conflict
-  )
-  .onConflictIgnore(_.id)
-  .returning(_.name)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
-    ON CONFLICT (id) DO NOTHING
-    RETURNING buyer.name as res
-    ```
-
-
-
-*
-    ```scala
-    Seq("test buyer")
-    ```
-
-
-
-### OnConflict.update
-
-ScalaSql's `.onConflictUpdate` translates into SQL's `ON CONFLICT DO UPDATE`
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(_.id)(_.name := "TEST BUYER CONFLICT")
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
-
-### OnConflict.computed
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)
-    ```
-
-
-
-*
-    ```scala
-    1
-    ```
-
-
-
-----
-
-
-
-```scala
-Buyer.select
-```
-
-
-
-
-*
-    ```scala
-    Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
-    )
-    ```
-
-
-
-### OnConflict.returning
-
-
-
-```scala
-Buyer.insert
-  .values(
-    _.name := "test buyer",
-    _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 1 // This should cause a primary key conflict
-  )
-  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
-  .returning(_.name)
-  .single
-```
-
-
-*
-    ```sql
-    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
-    ON CONFLICT (id) DO UPDATE
-    SET name = UPPER(buyer.name)
-    RETURNING buyer.name as res
-    ```
-
-
-
-*
-    ```scala
-    "JAMES BOND"
     ```
 
 
@@ -6723,6 +6508,208 @@ Expr(4.7).floor
 *
     ```scala
     4.0
+    ```
+
+
+
+## MySqlDialect
+Operations specific to working with MySql Databases
+### MySqlDialect.reverse
+
+
+
+```scala
+Expr("Hello").reverse
+```
+
+
+*
+    ```sql
+    SELECT REVERSE(?) as res
+    ```
+
+
+
+*
+    ```scala
+    "olleH"
+    ```
+
+
+
+### MySqlDialect.lpad
+
+
+
+```scala
+Expr("Hello").lpad(10, "xy")
+```
+
+
+*
+    ```sql
+    SELECT LPAD(?, ?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "xyxyxHello"
+    ```
+
+
+
+### MySqlDialect.rpad
+
+
+
+```scala
+Expr("Hello").rpad(10, "xy")
+```
+
+
+*
+    ```sql
+    SELECT RPAD(?, ?, ?) as res
+    ```
+
+
+
+*
+    ```scala
+    "Helloxyxyx"
+    ```
+
+
+
+### MySqlDialect.conflict.ignore
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(x => x.id := x.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = buyer.id
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### MySqlDialect.conflict.update
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(_.name := "TEST BUYER CONFLICT")
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
+    ```
+
+
+
+### MySqlDialect.conflict.updateComputed
+
+
+
+```scala
+Buyer.insert
+  .values(
+    _.name := "test buyer",
+    _.dateOfBirth := LocalDate.parse("2023-09-09"),
+    _.id := 1 // This should cause a primary key conflict
+  )
+  .onConflictUpdate(v => v.name := v.name.toUpperCase)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = UPPER(buyer.name)
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+----
+
+
+
+```scala
+Buyer.select
+```
+
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    )
     ```
 
 
