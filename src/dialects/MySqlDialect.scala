@@ -46,10 +46,10 @@ object MySqlDialect extends MySqlDialect {
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     override def update(
-        f: V[Column.ColumnExpr] => Expr[Boolean]
+                         filter: V[Column.ColumnExpr] => Expr[Boolean]
     ): Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = t.tableRef
-      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(f(t.metadata.vExpr(ref))))(t.containerQr)
+      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(t.containerQr)
     }
 
     override def select: Select[V[Expr], V[Id]] = {
