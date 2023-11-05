@@ -27,7 +27,13 @@ trait OnConflictTests extends ScalaSqlSuite {
         },
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING",
-        value = 0
+        value = 0,
+        docs = """
+          ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
+
+          Note that H2 and HsqlDb do not support `onConflictIgnore` and `onConflictUpdate`, while
+          MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
+        """
       )
 
       test("returningEmpty") - {
@@ -87,7 +93,10 @@ trait OnConflictTests extends ScalaSqlSuite {
         },
         sql =
           "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = ?",
-        value = 1
+        value = 1,
+        docs = """
+          ScalaSql's `.onConflictUpdate` translates into SQL's `ON CONFLICT DO UPDATE`
+        """
       )
 
       checker(

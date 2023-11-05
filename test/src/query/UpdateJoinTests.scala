@@ -33,7 +33,11 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             WHERE buyer.name = ?
           """
         ),
-        value = 1
+        value = 1,
+        docs = """
+          ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
+          `.update.joinOn` methods
+        """
       )
 
       checker(
@@ -74,7 +78,11 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
           """
         ),
-        value = 1
+        value = 1,
+        docs = """
+          Multiple joins are supported, e.g. the below example where we join the `Buyer` table
+          three times against `ShippingInfo`/`Purchase`/`Product` to determine what to update
+        """
       )
 
       checker(query = Text { Buyer.select.filter(_.id `=` 1).map(_.name) }, value = Seq("Camera"))
@@ -114,7 +122,11 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             WHERE buyer.name = ?
           """
         ),
-        value = 1
+        value = 1,
+        docs = """
+          In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
+          subqueries by passing in a `.select` query to `.joinOn`
+        """
       )
 
       checker(

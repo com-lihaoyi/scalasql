@@ -25,7 +25,15 @@ trait ReturningTests extends ScalaSqlSuite {
               .returning(_.id)
           },
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
-          value = Seq(4)
+          value = Seq(4),
+          docs = """
+            ScalaSql's `.returning` clause translates to SQL's `RETURNING` syntax, letting
+            you perform insertions or updates and return values from the query (rather than
+            returning a single integer representing the rows affected). This is especially
+            useful for retrieving the auto-generated table IDs that many databases support.
+
+            Note that `.returning`/`RETURNING` is not supported in MySql, H2 or HsqlDB
+          """
         )
 
         checker(
@@ -44,7 +52,12 @@ trait ReturningTests extends ScalaSqlSuite {
               .single
           },
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
-          value = 4
+          value = 4,
+          docs = """
+            If your `.returning` query is expected to be a single row, the `.single` method is
+            supported to convert the returned `Seq[T]` into a single `T`. `.single` throws an
+            exception if zero or multiple rows are returned.
+          """
         )
 
         checker(
@@ -109,7 +122,12 @@ trait ReturningTests extends ScalaSqlSuite {
             WHERE buyer0.name <> ?
             RETURNING buyer.id as res
           """,
-          value = Seq(4, 5)
+          value = Seq(4, 5),
+          docs = """
+            All variants of `.insert` and `.update` support `.returning`, e.g. the example below
+            applies to `.insert.select`, and the examples further down demonstrate its usage with
+            `.update` and `.delete`
+          """
         )
 
         checker(

@@ -22,7 +22,12 @@ trait UpdateTests extends ScalaSqlSuite {
           "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?"
         ),
-        value = 1
+        value = 1,
+        docs = """
+          `Table.update` takes a predicate specifying the rows to update, and a
+          `.set` clause that allows you to specify the values assigned to columns
+          on those rows
+        """
       )
 
       checker(
@@ -49,7 +54,12 @@ trait UpdateTests extends ScalaSqlSuite {
           "UPDATE buyer SET date_of_birth = ? WHERE ?",
           "UPDATE buyer SET buyer.date_of_birth = ? WHERE ?"
         ),
-        value = 3
+        value = 3,
+        docs = """
+          The predicate to `Table.update` is mandatory, to avoid anyone forgetting to
+          provide one and accidentally bulk-updating all rows in their table. If you
+          really do want to update all rows in the table, you can provide the predicate `_ => true`
+        """
       )
 
       checker(
@@ -77,7 +87,10 @@ trait UpdateTests extends ScalaSqlSuite {
           "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?"
         ),
-        value = 1
+        value = 1,
+        docs = """
+          This example shows how to update multiple columns in a single `Table.update` call
+        """
       )
 
       checker(
@@ -100,7 +113,12 @@ trait UpdateTests extends ScalaSqlSuite {
           "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?",
           "UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?"
         ),
-        value = 1
+        value = 1,
+        docs = """
+          The values assigned to columns in `Table.update` can also be computed `Expr[T]`s,
+          not just literal Scala constants. This example shows how to to update the name of
+          the row for `James Bond` with it's existing name in uppercase
+        """
       )
 
       checker(

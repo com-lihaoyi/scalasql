@@ -19,7 +19,12 @@ trait InsertTests extends ScalaSqlSuite {
             _.id := 4
           ),
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
-          value = 1
+          value = 1,
+          docs = """
+            `Table.insert.values` inserts a single row into the given table, with the specified
+             columns assigned to the given values, and any non-specified columns left `NULL`
+             or assigned to their default values
+          """
         )
 
         checker(
@@ -33,7 +38,7 @@ trait InsertTests extends ScalaSqlSuite {
           query = Buyer.insert
             .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09")),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
-          value = 1
+          value = 1,
         )
 
         checker(
@@ -70,7 +75,12 @@ trait InsertTests extends ScalaSqlSuite {
               (?, ?, ?),
               (?, ?, ?)
           """,
-          value = 3
+          value = 3,
+          docs = """
+            `Table.insert.batched` inserts multiple rows into the given table, with the
+            relevant columns declared once in the first parameter list and the given
+            values provided as tuples in the second parameter list
+          """
         )
 
         checker(
@@ -134,7 +144,11 @@ trait InsertTests extends ScalaSqlSuite {
             FROM buyer buyer0
             WHERE buyer0.name <> ?
           """,
-          value = 2
+          value = 2,
+          docs = """
+            `Table.insert.select` inserts rows into the given table based on the given `Table.select`
+            clause, and translates directly into SQL's `INSERT INTO ... SELECT` syntax.
+          """
         )
 
         checker(

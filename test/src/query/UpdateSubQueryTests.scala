@@ -27,7 +27,11 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
             WHERE ?
           """
         ),
-        value = 6
+        value = 6,
+        docs = """
+          You can use subqueries to compute the values you want to update, using
+          aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
+        """
       )
 
       checker(
@@ -60,7 +64,11 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
             WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
           """
         ),
-        value = 1
+        value = 1,
+        docs = """
+          Subqueries and aggregates can also be used in the `WHERE` clause, defined by the
+          predicate passed to `Table.update
+        """
       )
 
       checker(

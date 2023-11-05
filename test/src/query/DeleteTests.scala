@@ -14,7 +14,11 @@ trait DeleteTests extends ScalaSqlSuite {
       checker(
         query = Purchase.delete(_.id `=` 2),
         sql = "DELETE FROM purchase WHERE purchase.id = ?",
-        value = 1
+        value = 1,
+        docs = """
+          `Table.delete` takes a mandatory predicate specifying what rows you want to delete.
+          The most common case is to specify the ID of the row you want to delete
+        """
       )
 
       checker(
@@ -34,7 +38,12 @@ trait DeleteTests extends ScalaSqlSuite {
       checker(
         query = Purchase.delete(_.id <> 2),
         sql = "DELETE FROM purchase WHERE purchase.id <> ?",
-        value = 6
+        value = 6,
+        docs = """
+          Although specifying a single ID to delete is the most common case, you can pass
+          in arbitrary predicates, e.g. in this example deleting all rows _except_ for the
+          one with a particular ID
+        """
       )
 
       checker(
@@ -44,7 +53,15 @@ trait DeleteTests extends ScalaSqlSuite {
       )
     }
     test("all") {
-      checker(query = Purchase.delete(_ => true), sql = "DELETE FROM purchase WHERE ?", value = 7)
+      checker(
+        query = Purchase.delete(_ => true),
+        sql = "DELETE FROM purchase WHERE ?",
+        value = 7,
+        docs = """
+          If you actually want to delete all rows in the table, you can explicitly
+          pass in the predicate `_ => true`
+        """
+      )
 
       checker(
         query = Purchase.select,

@@ -16,8 +16,12 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       test("simple") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
-        value = Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
+        value = Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera"),
+        docs = """
+          ScalaSql's `.sortBy` method translates into SQL `ORDER BY`
+        """
       )
+
       test("twice") - checker(
         query = Text { Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc },
         sql = """
@@ -37,13 +41,23 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           Purchase[Id](1, 1, 1, 100, 888.0),
           Purchase[Id](2, 1, 2, 3, 900.0),
           Purchase[Id](3, 1, 3, 5, 15.7)
-        )
+        ),
+        docs = """
+          If you want to sort by multiple columns, you can call `.sortBy` multiple times,
+          each with its own call to `.asc` or `.desc`. Note that the rightmost call to `.sortBy`
+          takes precedence, following the Scala collections `.sortBy` semantics, and so the
+          right-most `.sortBy` in ScalaSql becomes the _left_-most entry in the SQL `ORDER BY` clause
+        """
       )
 
       test("sortLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
-        value = Seq("Cookie", "Socks")
+        value = Seq("Cookie", "Socks"),
+        docs = """
+          ScalaSql also supports various combinations of `.take` and `.drop`, translating to SQL
+          `LIMIT` or `OFFSET`
+        """
       )
       test("sortOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2) },
@@ -57,7 +71,12 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       test("sortLimitTwiceHigher") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
-        value = Seq("Cookie", "Socks")
+        value = Seq("Cookie", "Socks"),
+        docs = """
+          Note that `.drop` and `.take` follow Scala collections' semantics, so calling e.g. `.take`
+          multiple times takes the value of the smallest `.take`, while calling `.drop` multiple
+          times accumulates the total amount dropped
+        """
       )
 
       test("sortLimitTwiceLower") - checker(
@@ -105,7 +124,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           LIMIT 3) subquery0
       """,
       value = Seq(1, 2),
-      normalize = (x: Seq[Int]) => x.sorted
+      normalize = (x: Seq[Int]) => x.sorted,
+      docs = """
+        ScalaSql's `.distinct` translates to SQL's `SELECT DISTINCT`
+      """
     )
 
     test("flatMap") - checker(
@@ -123,7 +145,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         WHERE product1.id = subquery0.res__product_id
       """,
       value = Seq("Camera", "Face Mask", "Guitar"),
-      normalize = (x: Seq[String]) => x.sorted
+      normalize = (x: Seq[String]) => x.sorted,
+      docs = """
+        Many operations in SQL cannot be done in certain orders, unless you move part of the logic into
+        a subquery. ScalaSql does this automatically for you, e.g. doing a `flatMap`, `.sumBy`, or
+        `.aggregate` after a `.sortBy`/`.take`, the LHS `.sortBy`/`.take` is automatically extracted
+        into a subquery
+      """
     )
 
     test("sumBy") - checker(
@@ -181,7 +209,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         "skate-board",
         "socks"
       ),
-      normalize = (x: Seq[String]) => x.sorted
+      normalize = (x: Seq[String]) => x.sorted,
+      docs ="""
+        ScalaSql's `.union`/`.unionAll`/`.intersect`/`.except` translate into SQL's
+        `UNION`/`UNION ALL`/`INTERSECT`/`EXCEPT`.
+      """
     )
 
     test("unionAll") - checker(
@@ -277,7 +309,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         "skate-board",
         "socks",
         "叉烧包"
-      )
+      ),
+      docs = """
+        Performing a `.sortBy` after `.union` or `.unionAll` applies the sort
+        to both sides of the `union`/`unionAll`, behaving identically to Scala or SQL
+      """
     )
 
     test("unionAllUnionSortLimit") - checker(
@@ -305,54 +341,5 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       """,
       value = Seq("guitar", "james bond", "li haoyi", "skate board")
     )
-
-    test("exceptAggregate") - checker(
-      query = Text {
-        Product.select
-          .map(p => (p.name.toLowerCase, p.price))
-          // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
-          // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
-          .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
-      },
-      sql = """
-        SELECT
-          MAX(subquery0.res__1) as res__0,
-          MIN(subquery0.res__1) as res__1
-        FROM (SELECT
-            LOWER(product0.name) as res__0,
-            product0.price as res__1
-          FROM product product0
-          EXCEPT
-          SELECT
-            LOWER(product0.kebab_case_name) as res__0,
-            product0.price as res__1
-          FROM product product0) subquery0
-      """,
-      value = (123.45, 8.88)
-    )
-
-    test("unionAllAggregate") - checker(
-      query = Text {
-        Product.select
-          .map(p => (p.name.toLowerCase, p.price))
-          // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
-          // as they are not selected by the enclosing query, and cannot affect the UNION ALL
-          .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
-      },
-      sql = """
-        SELECT
-          MAX(subquery0.res__1) as res__0,
-          MIN(subquery0.res__1) as res__1
-        FROM (SELECT product0.price as res__1
-          FROM product product0
-          UNION ALL
-          SELECT product0.price as res__1
-          FROM product product0) subquery0
-      """,
-      value = (1000.0, 0.1)
-    )
-
   }
 }

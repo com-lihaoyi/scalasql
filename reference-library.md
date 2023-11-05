@@ -1554,7 +1554,9 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 Basic `INSERT` operations
 ### Insert.single.simple
 
-
+`Table.insert.values` inserts a single row into the given table, with the specified
+ columns assigned to the given values, and any non-specified columns left `NULL`
+ or assigned to their default values
 
 ```scala
 Buyer.insert.values(
@@ -1641,7 +1643,9 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 ### Insert.batch.simple
 
-
+`Table.insert.batched` inserts multiple rows into the given table, with the
+relevant columns declared once in the first parameter list and the given
+values provided as tuples in the second parameter list
 
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
@@ -1751,7 +1755,8 @@ Buyer.select
 
 ### Insert.select.caseclass
 
-
+`Table.insert.select` inserts rows into the given table based on the given `Table.select`
+clause, and translates directly into SQL's `INSERT INTO ... SELECT` syntax.
 
 ```scala
 Buyer.insert.select(
@@ -1865,7 +1870,9 @@ Buyer.select
 Basic `UPDATE` queries
 ### Update.update
 
-
+`Table.update` takes a predicate specifying the rows to update, and a
+`.set` clause that allows you to specify the values assigned to columns
+on those rows
 
 ```scala
 Buyer
@@ -1926,7 +1933,9 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 ### Update.bulk
 
-
+The predicate to `Table.update` is mandatory, to avoid anyone forgetting to
+provide one and accidentally bulk-updating all rows in their table. If you
+really do want to update all rows in the table, you can provide the predicate `_ => true`
 
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
@@ -1985,7 +1994,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 ### Update.multiple
 
-
+This example shows how to update multiple columns in a single `Table.update` call
 
 ```scala
 Buyer
@@ -2046,7 +2055,9 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 ### Update.dynamic
 
-
+The values assigned to columns in `Table.update` can also be computed `Expr[T]`s,
+not just literal Scala constants. This example shows how to to update the name of
+the row for `James Bond` with it's existing name in uppercase
 
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
@@ -2107,7 +2118,8 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 Basic `DELETE` operations
 ### Delete.single
 
-
+`Table.delete` takes a mandatory predicate specifying what rows you want to delete.
+The most common case is to specify the ID of the row you want to delete
 
 ```scala
 Purchase.delete(_.id `=` 2)
@@ -2156,7 +2168,9 @@ Purchase.select
 
 ### Delete.multiple
 
-
+Although specifying a single ID to delete is the most common case, you can pass
+in arbitrary predicates, e.g. in this example deleting all rows _except_ for the
+one with a particular ID
 
 ```scala
 Purchase.delete(_.id <> 2)
@@ -2197,7 +2211,8 @@ Purchase.select
 
 ### Delete.all
 
-
+If you actually want to delete all rows in the table, you can explicitly
+pass in the predicate `_ => true`
 
 ```scala
 Purchase.delete(_ => true)
@@ -2242,7 +2257,7 @@ Purchase.select
 Compound `SELECT` operations: sort, take, drop, union, unionAll, etc.
 ### CompoundSelect.sort.simple
 
-
+ScalaSql's `.sortBy` method translates into SQL `ORDER BY`
 
 ```scala
 Product.select.sortBy(_.price).map(_.name)
@@ -2265,7 +2280,10 @@ Product.select.sortBy(_.price).map(_.name)
 
 ### CompoundSelect.sort.twice
 
-
+If you want to sort by multiple columns, you can call `.sortBy` multiple times,
+each with its own call to `.asc` or `.desc`. Note that the rightmost call to `.sortBy`
+takes precedence, following the Scala collections `.sortBy` semantics, and so the
+right-most `.sortBy` in ScalaSql becomes the _left_-most entry in the SQL `ORDER BY` clause
 
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
@@ -2303,7 +2321,8 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 
 ### CompoundSelect.sort.sortLimit
 
-
+ScalaSql also supports various combinations of `.take` and `.drop`, translating to SQL
+`LIMIT` or `OFFSET`
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
@@ -2349,7 +2368,9 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 ### CompoundSelect.sort.sortLimitTwiceHigher
 
-
+Note that `.drop` and `.take` follow Scala collections' semantics, so calling e.g. `.take`
+multiple times takes the value of the smallest `.take`, while calling `.drop` multiple
+times accumulates the total amount dropped
 
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
@@ -2464,7 +2485,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 ### CompoundSelect.distinct
 
-
+ScalaSql's `.distinct` translates to SQL's `SELECT DISTINCT`
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
@@ -2491,7 +2512,10 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 
 ### CompoundSelect.flatMap
 
-
+Many operations in SQL cannot be done in certain orders, unless you move part of the logic into
+a subquery. ScalaSql does this automatically for you, e.g. doing a `flatMap`, `.sumBy`, or
+`.aggregate` after a `.sortBy`/`.take`, the LHS `.sortBy`/`.take` is automatically extracted
+into a subquery
 
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
@@ -2579,7 +2603,8 @@ Purchase.select
 
 ### CompoundSelect.union
 
-
+ScalaSql's `.union`/`.unionAll`/`.intersect`/`.except` translate into SQL's
+`UNION`/`UNION ALL`/`INTERSECT`/`EXCEPT`.
 
 ```scala
 Product.select
@@ -2717,7 +2742,8 @@ Product.select
 
 ### CompoundSelect.unionAllUnionSort
 
-
+Performing a `.sortBy` after `.union` or `.unionAll` applies the sort
+to both sides of the `union`/`unionAll`, behaving identically to Scala or SQL
 
 ```scala
 Product.select
@@ -2797,80 +2823,6 @@ Product.select
 *
     ```scala
     Seq("guitar", "james bond", "li haoyi", "skate board")
-    ```
-
-
-
-### CompoundSelect.exceptAggregate
-
-
-
-```scala
-Product.select
-  .map(p => (p.name.toLowerCase, p.price))
-  // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
-  // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
-  .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-  .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
-```
-
-
-*
-    ```sql
-    SELECT
-      MAX(subquery0.res__1) as res__0,
-      MIN(subquery0.res__1) as res__1
-    FROM (SELECT
-        LOWER(product0.name) as res__0,
-        product0.price as res__1
-      FROM product product0
-      EXCEPT
-      SELECT
-        LOWER(product0.kebab_case_name) as res__0,
-        product0.price as res__1
-      FROM product product0) subquery0
-    ```
-
-
-
-*
-    ```scala
-    (123.45, 8.88)
-    ```
-
-
-
-### CompoundSelect.unionAllAggregate
-
-
-
-```scala
-Product.select
-  .map(p => (p.name.toLowerCase, p.price))
-  // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
-  // as they are not selected by the enclosing query, and cannot affect the UNION ALL
-  .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-  .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
-```
-
-
-*
-    ```sql
-    SELECT
-      MAX(subquery0.res__1) as res__0,
-      MIN(subquery0.res__1) as res__1
-    FROM (SELECT product0.price as res__1
-      FROM product product0
-      UNION ALL
-      SELECT product0.price as res__1
-      FROM product product0) subquery0
-    ```
-
-
-
-*
-    ```scala
-    (1000.0, 0.1)
     ```
 
 
@@ -3247,11 +3199,86 @@ Buyer.select
 
 
 
+### SubQuery.exceptAggregate
+
+
+
+```scala
+Product.select
+  .map(p => (p.name.toLowerCase, p.price))
+  // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
+  // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
+  .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+  .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
+```
+
+
+*
+    ```sql
+    SELECT
+      MAX(subquery0.res__1) as res__0,
+      MIN(subquery0.res__1) as res__1
+    FROM (SELECT
+        LOWER(product0.name) as res__0,
+        product0.price as res__1
+      FROM product product0
+      EXCEPT
+      SELECT
+        LOWER(product0.kebab_case_name) as res__0,
+        product0.price as res__1
+      FROM product product0) subquery0
+    ```
+
+
+
+*
+    ```scala
+    (123.45, 8.88)
+    ```
+
+
+
+### SubQuery.unionAllAggregate
+
+
+
+```scala
+Product.select
+  .map(p => (p.name.toLowerCase, p.price))
+  // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
+  // as they are not selected by the enclosing query, and cannot affect the UNION ALL
+  .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+  .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
+```
+
+
+*
+    ```sql
+    SELECT
+      MAX(subquery0.res__1) as res__0,
+      MIN(subquery0.res__1) as res__1
+    FROM (SELECT product0.price as res__1
+      FROM product product0
+      UNION ALL
+      SELECT product0.price as res__1
+      FROM product product0) subquery0
+    ```
+
+
+
+*
+    ```scala
+    (1000.0, 0.1)
+    ```
+
+
+
 ## UpdateJoin
 `UPDATE` queries that use `JOIN`s
 ### UpdateJoin.join
 
-
+ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
+`.update.joinOn` methods
 
 ```scala
 Buyer
@@ -3298,7 +3325,8 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 ### UpdateJoin.multijoin
 
-
+Multiple joins are supported, e.g. the below example where we join the `Buyer` table
+three times against `ShippingInfo`/`Purchase`/`Product` to determine what to update
 
 ```scala
 Buyer
@@ -3351,7 +3379,8 @@ Buyer.select.filter(_.id `=` 1).map(_.name)
 
 ### UpdateJoin.joinSubquery
 
-
+In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
+subqueries by passing in a `.select` query to `.joinOn`
 
 ```scala
 Buyer
@@ -5541,7 +5570,8 @@ Buyer.select
 `UPDATE` queries that use Subqueries
 ### UpdateSubQuery.setSubquery
 
-
+You can use subqueries to compute the values you want to update, using
+aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
 
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
@@ -5591,7 +5621,8 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 ### UpdateSubQuery.whereSubquery
 
-
+Subqueries and aggregates can also be used in the `WHERE` clause, defined by the
+predicate passed to `Table.update
 
 ```scala
 Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
@@ -5643,7 +5674,12 @@ Product.select.map(p => (p.id, p.name, p.price))
 Queries using `INSERT` or `UPDATE` with `RETURNING`
 ### Returning.insert.single
 
+ScalaSql's `.returning` clause translates to SQL's `RETURNING` syntax, letting
+you perform insertions or updates and return values from the query (rather than
+returning a single integer representing the rows affected). This is especially
+useful for retrieving the auto-generated table IDs that many databases support.
 
+Note that `.returning`/`RETURNING` is not supported in MySql, H2 or HsqlDB
 
 ```scala
 Buyer.insert
@@ -5686,7 +5722,9 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 ### Returning.insert.dotSingle
 
-
+If your `.returning` query is expected to be a single row, the `.single` method is
+supported to convert the returned `Seq[T]` into a single `T`. `.single` throws an
+exception if zero or multiple rows are returned.
 
 ```scala
 Buyer.insert
@@ -5790,7 +5828,9 @@ Buyer.select
 
 ### Returning.insert.select
 
-
+All variants of `.insert` and `.update` support `.returning`, e.g. the example below
+applies to `.insert.select`, and the examples further down demonstrate its usage with
+`.update` and `.delete`
 
 ```scala
 Buyer.insert
@@ -5970,7 +6010,10 @@ Purchase.select
 Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`
 ### OnConflict.ignore
 
+ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
 
+Note that H2 and HsqlDb do not support `onConflictIgnore` and `onConflictUpdate`, while
+MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
 
 ```scala
 Buyer.insert
@@ -6063,7 +6106,7 @@ Buyer.insert
 
 ### OnConflict.update
 
-
+ScalaSql's `.onConflictUpdate` translates into SQL's `ON CONFLICT DO UPDATE`
 
 ```scala
 Buyer.insert
