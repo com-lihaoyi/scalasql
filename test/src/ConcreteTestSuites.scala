@@ -50,7 +50,7 @@ package postgres {
   object SubQueryTests extends SubQueryTests with PostgresSuite
 
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
-  object ExprExprIntOpsTests extends ExprNumericOpsTests with PostgresSuite
+  object ExprIntOpsTests extends ExprNumericOpsTests with PostgresSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
@@ -185,7 +185,7 @@ package h2 {
   // H2 does not support ON CONFLICT IGNORE unless in postgres mode
   // object OnConflictTests extends OnConflictTests with H2Suite
   object SubQueryTests extends SubQueryTests with H2Suite
-  
+
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
   object ExprIntOpsTests extends ExprNumericOpsTests with H2Suite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with H2Suite

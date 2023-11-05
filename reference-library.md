@@ -4242,9 +4242,9 @@ Expr(false) || Expr(false)
 
 
 
-## ExprExprIntOps
+## ExprIntOps
 Operations that can be performed on `Expr[T]` when `T` is numeric
-### ExprExprIntOps.plus
+### ExprIntOps.plus
 
 
 
@@ -4267,7 +4267,7 @@ Expr(6) + Expr(2)
 
 
 
-### ExprExprIntOps.minus
+### ExprIntOps.minus
 
 
 
@@ -4290,7 +4290,7 @@ Expr(6) - Expr(2)
 
 
 
-### ExprExprIntOps.times
+### ExprIntOps.times
 
 
 
@@ -4313,7 +4313,7 @@ Expr(6) * Expr(2)
 
 
 
-### ExprExprIntOps.divide
+### ExprIntOps.divide
 
 
 
@@ -4336,7 +4336,7 @@ Expr(6) / Expr(2)
 
 
 
-### ExprExprIntOps.modulo
+### ExprIntOps.modulo
 
 
 
@@ -4359,7 +4359,7 @@ Expr(6) % Expr(2)
 
 
 
-### ExprExprIntOps.bitwiseAnd
+### ExprIntOps.bitwiseAnd
 
 
 
@@ -4382,7 +4382,7 @@ Expr(6) & Expr(2)
 
 
 
-### ExprExprIntOps.bitwiseOr
+### ExprIntOps.bitwiseOr
 
 
 
@@ -4405,7 +4405,7 @@ Expr(6) | Expr(3)
 
 
 
-### ExprExprIntOps.between
+### ExprIntOps.between
 
 
 
@@ -4428,7 +4428,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### ExprExprIntOps.unaryPlus
+### ExprIntOps.unaryPlus
 
 
 
@@ -4451,7 +4451,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### ExprExprIntOps.unaryMinus
+### ExprIntOps.unaryMinus
 
 
 
@@ -4474,7 +4474,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### ExprExprIntOps.unaryTilde
+### ExprIntOps.unaryTilde
 
 
 
@@ -4497,7 +4497,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### ExprExprIntOps.abs
+### ExprIntOps.abs
 
 
 
@@ -4520,7 +4520,7 @@ Expr(-4).abs
 
 
 
-### ExprExprIntOps.mod
+### ExprIntOps.mod
 
 
 
@@ -4543,7 +4543,7 @@ Expr(8).mod(Expr(3))
 
 
 
-### ExprExprIntOps.ceil
+### ExprIntOps.ceil
 
 
 
@@ -4566,7 +4566,7 @@ Expr(4.3).ceil
 
 
 
-### ExprExprIntOps.floor
+### ExprIntOps.floor
 
 
 
@@ -6138,376 +6138,6 @@ Expr("Hello").rpad(10, "xy")
 *
     ```scala
     "Helloxyxyx"
-    ```
-
-
-
-## ExprIntOps
-Operations that can be performed on `Expr[T]` when `T` is numeric
-### ExprIntOps.plus
-
-
-
-```scala
-Expr(6) + Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? + ? as res
-    ```
-
-
-
-*
-    ```scala
-    8
-    ```
-
-
-
-### ExprIntOps.minus
-
-
-
-```scala
-Expr(6) - Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? - ? as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprIntOps.times
-
-
-
-```scala
-Expr(6) * Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? * ? as res
-    ```
-
-
-
-*
-    ```scala
-    12
-    ```
-
-
-
-### ExprIntOps.divide
-
-
-
-```scala
-Expr(6) / Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? / ? as res
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprIntOps.modulo
-
-
-
-```scala
-Expr(6) % Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT MOD(?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    0
-    ```
-
-
-
-### ExprIntOps.bitwiseAnd
-
-
-
-```scala
-Expr(6) & Expr(2)
-```
-
-
-*
-    ```sql
-    SELECT ? & ? as res
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-### ExprIntOps.bitwiseOr
-
-
-
-```scala
-Expr(6) | Expr(3)
-```
-
-
-*
-    ```sql
-    SELECT ? | ? as res
-    ```
-
-
-
-*
-    ```scala
-    7
-    ```
-
-
-
-### ExprIntOps.between
-
-
-
-```scala
-Expr(4).between(Expr(2), Expr(6))
-```
-
-
-*
-    ```sql
-    SELECT ? BETWEEN ? AND ? as res
-    ```
-
-
-
-*
-    ```scala
-    true
-    ```
-
-
-
-### ExprIntOps.unaryPlus
-
-
-
-```scala
-+Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT +? as res
-    ```
-
-
-
-*
-    ```scala
-    -4
-    ```
-
-
-
-### ExprIntOps.unaryMinus
-
-
-
-```scala
--Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT -? as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprIntOps.unaryTilde
-
-
-
-```scala
-~Expr(-4)
-```
-
-
-*
-    ```sql
-    SELECT ~? as res
-    ```
-
-
-
-*
-    ```scala
-    3
-    ```
-
-
-
-### ExprIntOps.abs
-
-
-
-```scala
-Expr(-4).abs
-```
-
-
-*
-    ```sql
-    SELECT ABS(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4
-    ```
-
-
-
-### ExprIntOps.mod
-
-
-
-```scala
-Expr(8).mod(Expr(3))
-```
-
-
-*
-    ```sql
-    SELECT MOD(?, ?) as res
-    ```
-
-
-
-*
-    ```scala
-    2
-    ```
-
-
-
-### ExprIntOps.ceil
-
-
-
-```scala
-Expr(4.3).ceil
-```
-
-
-*
-    ```sql
-    SELECT CEIL(?) as res
-    ```
-
-
-
-*
-    ```scala
-    5.0
-    ```
-
-
-
-### ExprIntOps.floor
-
-
-
-```scala
-Expr(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4.0
-    ```
-
-
-
-----
-
-
-
-```scala
-Expr(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) as res
-    ```
-
-
-
-*
-    ```scala
-    4.0
     ```
 
 
