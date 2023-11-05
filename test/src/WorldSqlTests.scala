@@ -692,6 +692,12 @@ object WorldSqlTests extends TestSuite {
       test("largestCityInThreeLargestCountries"){
         // +DOCS
         // ### Most Populous City in each of the Three Most Populous Countries
+        // This example uses subqueries rather than joins to get the largest city matching
+        // each of the three largest countries. We want two columns - the name and population
+        // of the largest city - but a subquery expression in SQL can only return a single
+        // column. Thus, we extract the bulk of the "largest city" subquery into a helper
+        // method `largestCitySubquery`, which we can easily call twice and then `.map` to
+        // each of the two fields we want.
 
         def largestCitySubquery(countryCode: Expr[String]) = {
           City.select.filter(_.countryCode === countryCode).sortBy(_.population).desc.take(1)
