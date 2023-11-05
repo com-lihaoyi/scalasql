@@ -83,6 +83,7 @@ object scalasql extends RootModule with ScalaModule {
   def generateQueryLibrary() = T.command {
     val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
     val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "recordedSuiteDescriptions.json"))
+      .map{case (k, v) => (k.split('.').drop(2).mkString("."), v)}
 
     val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
     val formattedScalaStrs = {
@@ -137,54 +138,62 @@ object scalasql extends RootModule with ScalaModule {
     }
 
 
-    for ((dbName, dbGroup) <- records.groupBy(_.suiteName.split('.').apply(1))) {
-      val outputLines = mutable.Buffer.empty[String]
-      outputLines.append(
-        s"""# $dbName Reference Query Library
-           |
-           |This page contains example queries for the `$dbName` database, taken
-           |from the ScalaSql test suite. You can use this as a reference to see
-           |what kinds of operations ScalaSql supports when working on `$dbName`,
-           |and how these operations are translated into raw SQL to be sent to
-           |the database for execution.
-           |""".stripMargin
-      )
-      for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
-        val seen = mutable.Set.empty[String]
-        outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
-        outputLines.append(suiteDescriptions(suiteName))
-        var lastSeen = ""
-        for(r <- suiteGroup){
+    val outputLines = mutable.Buffer.empty[String]
+    outputLines.append(
+      s"""# ScalaSql Reference Library
+         |
+         |This page contains example queries for the ScalaSql, taken from the
+         |ScalaSql test suite. You can use this as a reference to see what kinds
+         |of operations ScalaSql supports and how these operations are translated
+         |into raw SQL to be sent to the database for execution.
+         |
+         |Note that ScalaSql may generate different SQL in certain cases for different
+         |databases, due to differences in how each database parses SQL. These differences
+         |are typically minor, and as long as you use the right `Dialect` for your database
+         |ScalaSql should do the right thing for you.
+         |""".stripMargin
+    )
+    val recordsWithoutDuplicateSuites = records
+      .map(r => r.copy(suiteName = r.suiteName.split('.').drop(2).mkString(".")))
+      .distinctBy(_.suiteName)
+      .groupBy(_.suiteName)
+      .toSeq
+      .sortBy(_._2.head.suiteLine)
+    for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
+      val seen = mutable.Set.empty[String]
+      outputLines.append(s"## $suiteName")
+      outputLines.append(suiteDescriptions(suiteName))
+      var lastSeen = ""
+      for(r <- suiteGroup){
 
-          val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
-          val titleOpt =
-            if (prettyName == lastSeen) Some("----")
-            else if (!seen(prettyName)) Some(s"### $prettyName")
-            else None
+        val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
+        val titleOpt =
+          if (prettyName == lastSeen) Some("----")
+          else if (!seen(prettyName)) Some(s"### $prettyName")
+          else None
 
-          for(title <- titleOpt) {
-            seen.add(prettyName)
-            lastSeen = prettyName
-            outputLines.append(
-              s"""$title
-                 |
-                 |${dedent(r.docs, "")}
-                 |
-                 |```scala
-                 |${scalafmt(r.queryCodeString)}
-                 |```
-                 |
-                 |${sqlFormat(r.sqlString)}
-                 |
-                 |${renderResult(r.resultCodeString)}
-                 |
-                 |""".stripMargin
-            )
-          }
+        for(title <- titleOpt) {
+          seen.add(prettyName)
+          lastSeen = prettyName
+          outputLines.append(
+            s"""$title
+               |
+               |${dedent(r.docs, "")}
+               |
+               |```scala
+               |${scalafmt(r.queryCodeString)}
+               |```
+               |
+               |${sqlFormat(r.sqlString)}
+               |
+               |${renderResult(r.resultCodeString)}
+               |
+               |""".stripMargin
+          )
         }
       }
-      os.write.over(os.pwd / s"query-library-$dbName.md", outputLines.mkString("\n"))
     }
+    os.write.over(os.pwd / s"reference-library.md", outputLines.mkString("\n"))
   }
 
 }
