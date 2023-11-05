@@ -27,11 +27,11 @@ class UtestFramework extends utest.runner.Framework {
   override def teardown() = {
     println("Tearing down CustomFramework " + recordedTests.size)
     os.write.over(
-      os.pwd / "recordedTests.json",
+      os.pwd / "out" / "recordedTests.json",
       upickle.default.write(UtestFramework.recordedTests, indent = 4)
     )
     os.write.over(
-      os.pwd / "recordedSuiteDescriptions.json",
+      os.pwd / "out" / "recordedSuiteDescriptions.json",
       upickle.default.write(UtestFramework.recordedSuiteDescriptions, indent = 4)
     )
     recordedTests.clear()
