@@ -1,5 +1,5 @@
 # h2
-## scalasql.h2.CompoundSelectTests
+## CompoundSelectTests
 ### CompoundSelectTests.sort.simple
 
 ```scala
@@ -473,7 +473,7 @@ FROM (SELECT product0.price as res__1
 ```
 
 
-## scalasql.h2.DataTypesTests
+## DataTypesTests
 ### DataTypesTests.constant
 
 ```scala
@@ -539,7 +539,7 @@ Seq(normalize(value))
 ```
 
 
-## scalasql.h2.DeleteTests
+## DeleteTests
 ### DeleteTests.single
 
 ```scala
@@ -637,7 +637,7 @@ Seq[Purchase[Id]](
 ```
 
 
-## scalasql.h2.ExprBooleanOpsTests
+## ExprBooleanOpsTests
 ### ExprBooleanOpsTests.and
 
 ```scala
@@ -686,7 +686,7 @@ true
 ```
 
 
-## scalasql.h2.ExprIntOpsTests
+## ExprIntOpsTests
 ### ExprIntOpsTests.plus
 
 ```scala
@@ -943,7 +943,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-## scalasql.h2.ExprSeqNumericOpsTests
+## ExprSeqNumericOpsTests
 ### ExprSeqNumericOpsTests.sum
 
 ```scala
@@ -1008,7 +1008,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-## scalasql.h2.ExprSeqOpsTests
+## ExprSeqOpsTests
 ### ExprSeqOpsTests.size
 
 ```scala
@@ -1217,7 +1217,7 @@ Option.empty[Int]
 ```
 
 
-## scalasql.h2.ExprStringOpsTests
+## ExprStringOpsTests
 ### ExprStringOpsTests.plus
 
 ```scala
@@ -1378,7 +1378,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 ```
 
 
-## scalasql.h2.H2DialectTests
+## H2DialectTests
 ### H2DialectTests.ltrim2
 
 ```scala
@@ -1443,7 +1443,7 @@ SELECT RPAD(?, ?, ?) as res
 ```
 
 
-## scalasql.h2.InsertTests
+## InsertTests
 ### InsertTests.single.simple
 
 ```scala
@@ -1675,7 +1675,7 @@ Seq(
 ```
 
 
-## scalasql.h2.JoinTests
+## JoinTests
 ### JoinTests.joinFilter
 
 ```scala
@@ -2016,7 +2016,7 @@ Seq(
 ```
 
 
-## scalasql.h2.OptionalTests
+## OptionalTests
 ### OptionalTests
 
 ```scala
@@ -2849,7 +2849,7 @@ Seq(
 ```
 
 
-## scalasql.h2.SelectTests
+## SelectTests
 ### SelectTests.constant
 
 ```scala
@@ -3399,7 +3399,7 @@ Seq(
 ```
 
 
-## scalasql.h2.SubQueryTests
+## SubQueryTests
 ### SubQueryTests.sortTakeJoin
 
 ```scala
@@ -3688,7 +3688,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ```
 
 
-## scalasql.h2.UpdateJoinTests
+## UpdateJoinTests
 ### UpdateJoinTests.update
 
 ```scala
@@ -3858,7 +3858,7 @@ Seq(LocalDate.parse("2001-02-03"))
 ```
 
 
-## scalasql.h2.UpdateSubQueryTests
+## UpdateSubQueryTests
 ### UpdateSubQueryTests.setSubquery
 
 ```scala
@@ -3935,7 +3935,7 @@ Seq(
 ```
 
 
-## scalasql.h2.UpdateTests
+## UpdateTests
 ### UpdateTests.update
 
 ```scala

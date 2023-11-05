@@ -1,5 +1,5 @@
 # postgres
-## scalasql.postgres.CompoundSelectTests
+## CompoundSelectTests
 ### CompoundSelectTests.sort.simple
 
 ```scala
@@ -473,7 +473,7 @@ FROM (SELECT product0.price as res__1
 ```
 
 
-## scalasql.postgres.DataTypesTests
+## DataTypesTests
 ### DataTypesTests.constant
 
 ```scala
@@ -539,7 +539,7 @@ Seq(normalize(value))
 ```
 
 
-## scalasql.postgres.DeleteTests
+## DeleteTests
 ### DeleteTests.single
 
 ```scala
@@ -637,7 +637,7 @@ Seq[Purchase[Id]](
 ```
 
 
-## scalasql.postgres.ExprBooleanOpsTests
+## ExprBooleanOpsTests
 ### ExprBooleanOpsTests.and
 
 ```scala
@@ -686,7 +686,7 @@ true
 ```
 
 
-## scalasql.postgres.ExprExprIntOpsTests
+## ExprExprIntOpsTests
 ### ExprExprIntOpsTests.plus
 
 ```scala
@@ -943,7 +943,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-## scalasql.postgres.ExprSeqNumericOpsTests
+## ExprSeqNumericOpsTests
 ### ExprSeqNumericOpsTests.sum
 
 ```scala
@@ -1008,7 +1008,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-## scalasql.postgres.ExprSeqOpsTests
+## ExprSeqOpsTests
 ### ExprSeqOpsTests.size
 
 ```scala
@@ -1217,7 +1217,7 @@ Option.empty[Int]
 ```
 
 
-## scalasql.postgres.ExprStringOpsTests
+## ExprStringOpsTests
 ### ExprStringOpsTests.plus
 
 ```scala
@@ -1378,7 +1378,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 ```
 
 
-## scalasql.postgres.InsertTests
+## InsertTests
 ### InsertTests.single.simple
 
 ```scala
@@ -1610,7 +1610,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.JoinTests
+## JoinTests
 ### JoinTests.joinFilter
 
 ```scala
@@ -1941,7 +1941,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.OnConflictTests
+## OnConflictTests
 ### OnConflictTests.ignore
 
 ```scala
@@ -2123,7 +2123,7 @@ RETURNING buyer.name as res
 ```
 
 
-## scalasql.postgres.OptionalTests
+## OptionalTests
 ### OptionalTests
 
 ```scala
@@ -2956,7 +2956,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.PostgresDialectTests
+## PostgresDialectTests
 ### PostgresDialectTests.ltrim2
 
 ```scala
@@ -3037,7 +3037,7 @@ SELECT RPAD(?, ?, ?) as res
 ```
 
 
-## scalasql.postgres.ReturningTests
+## ReturningTests
 ### ReturningTests.insert.single
 
 ```scala
@@ -3274,7 +3274,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.SelectTests
+## SelectTests
 ### SelectTests.constant
 
 ```scala
@@ -3824,7 +3824,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.SubQueryTests
+## SubQueryTests
 ### SubQueryTests.sortTakeJoin
 
 ```scala
@@ -4113,7 +4113,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ```
 
 
-## scalasql.postgres.UpdateJoinTests
+## UpdateJoinTests
 ### UpdateJoinTests.join
 
 ```scala
@@ -4265,7 +4265,7 @@ Seq(LocalDate.parse("2000-01-01"))
 ```
 
 
-## scalasql.postgres.UpdateSubQueryTests
+## UpdateSubQueryTests
 ### UpdateSubQueryTests.setSubquery
 
 ```scala
@@ -4342,7 +4342,7 @@ Seq(
 ```
 
 
-## scalasql.postgres.UpdateTests
+## UpdateTests
 ### UpdateTests.update
 
 ```scala

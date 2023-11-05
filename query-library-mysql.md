@@ -1,5 +1,5 @@
 # mysql
-## scalasql.mysql.CompoundSelectTests
+## CompoundSelectTests
 ### CompoundSelectTests.sort.simple
 
 ```scala
@@ -473,7 +473,7 @@ FROM (SELECT product0.price as res__1
 ```
 
 
-## scalasql.mysql.DataTypesTests
+## DataTypesTests
 ### DataTypesTests.constant
 
 ```scala
@@ -539,7 +539,7 @@ Seq(normalize(value))
 ```
 
 
-## scalasql.mysql.DeleteTests
+## DeleteTests
 ### DeleteTests.single
 
 ```scala
@@ -637,7 +637,7 @@ Seq[Purchase[Id]](
 ```
 
 
-## scalasql.mysql.ExprBooleanOpsTests
+## ExprBooleanOpsTests
 ### ExprBooleanOpsTests.and
 
 ```scala
@@ -686,7 +686,7 @@ true
 ```
 
 
-## scalasql.mysql.ExprExprIntOpsTests
+## ExprExprIntOpsTests
 ### ExprExprIntOpsTests.plus
 
 ```scala
@@ -943,7 +943,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-## scalasql.mysql.ExprSeqNumericOpsTests
+## ExprSeqNumericOpsTests
 ### ExprSeqNumericOpsTests.sum
 
 ```scala
@@ -1008,7 +1008,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-## scalasql.mysql.ExprSeqOpsTests
+## ExprSeqOpsTests
 ### ExprSeqOpsTests.size
 
 ```scala
@@ -1217,7 +1217,7 @@ Option.empty[Int]
 ```
 
 
-## scalasql.mysql.ExprStringOpsTests
+## ExprStringOpsTests
 ### ExprStringOpsTests.plus
 
 ```scala
@@ -1378,7 +1378,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 ```
 
 
-## scalasql.mysql.InsertTests
+## InsertTests
 ### InsertTests.single.simple
 
 ```scala
@@ -1610,7 +1610,7 @@ Seq(
 ```
 
 
-## scalasql.mysql.JoinTests
+## JoinTests
 ### JoinTests.joinFilter
 
 ```scala
@@ -1951,7 +1951,7 @@ Seq(
 ```
 
 
-## scalasql.mysql.MySqlDialectTests
+## MySqlDialectTests
 ### MySqlDialectTests.reverse
 
 ```scala
@@ -2094,7 +2094,7 @@ Seq(
 ```
 
 
-## scalasql.mysql.OptionalTests
+## OptionalTests
 ### OptionalTests
 
 ```scala
@@ -2927,7 +2927,7 @@ Seq(
 ```
 
 
-## scalasql.mysql.SelectTests
+## SelectTests
 ### SelectTests.constant
 
 ```scala
@@ -3477,7 +3477,7 @@ Seq(
 ```
 
 
-## scalasql.mysql.SubQueryTests
+## SubQueryTests
 ### SubQueryTests.sortTakeJoin
 
 ```scala
@@ -3766,7 +3766,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ```
 
 
-## scalasql.mysql.UpdateJoinTests
+## UpdateJoinTests
 ### UpdateJoinTests.join
 
 ```scala
@@ -3921,7 +3921,7 @@ Seq(LocalDate.parse("2000-01-01"))
 ```
 
 
-## scalasql.mysql.UpdateTests
+## UpdateTests
 ### UpdateTests.update
 
 ```scala

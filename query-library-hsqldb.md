@@ -1,5 +1,5 @@
 # hsqldb
-## scalasql.hsqldb.CompoundSelectTests
+## CompoundSelectTests
 ### CompoundSelectTests.sort.simple
 
 ```scala
@@ -473,7 +473,7 @@ FROM (SELECT product0.price as res__1
 ```
 
 
-## scalasql.hsqldb.DataTypesTests
+## DataTypesTests
 ### DataTypesTests.constant
 
 ```scala
@@ -539,7 +539,7 @@ Seq(normalize(value))
 ```
 
 
-## scalasql.hsqldb.DeleteTests
+## DeleteTests
 ### DeleteTests.single
 
 ```scala
@@ -637,7 +637,7 @@ Seq[Purchase[Id]](
 ```
 
 
-## scalasql.hsqldb.ExprBooleanOpsTests
+## ExprBooleanOpsTests
 ### ExprBooleanOpsTests.and
 
 ```scala
@@ -686,7 +686,7 @@ true
 ```
 
 
-## scalasql.hsqldb.ExprIntOpsTests
+## ExprIntOpsTests
 ### ExprIntOpsTests.plus
 
 ```scala
@@ -943,7 +943,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-## scalasql.hsqldb.ExprSeqNumericOpsTests
+## ExprSeqNumericOpsTests
 ### ExprSeqNumericOpsTests.sum
 
 ```scala
@@ -1008,7 +1008,7 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-## scalasql.hsqldb.ExprSeqOpsTests
+## ExprSeqOpsTests
 ### ExprSeqOpsTests.size
 
 ```scala
@@ -1217,7 +1217,7 @@ Option.empty[Int]
 ```
 
 
-## scalasql.hsqldb.ExprStringOpsTests
+## ExprStringOpsTests
 ### ExprStringOpsTests.plus
 
 ```scala
@@ -1378,7 +1378,7 @@ SELECT SUBSTRING(?, ?, ?) as res
 ```
 
 
-## scalasql.hsqldb.HsqlDbDialectTests
+## HsqlDbDialectTests
 ### HsqlDbDialectTests.ltrim2
 
 ```scala
@@ -1459,7 +1459,7 @@ SELECT RPAD(?, ?, ?) as res
 ```
 
 
-## scalasql.hsqldb.InsertTests
+## InsertTests
 ### InsertTests.single.simple
 
 ```scala
@@ -1691,7 +1691,7 @@ Seq(
 ```
 
 
-## scalasql.hsqldb.JoinTests
+## JoinTests
 ### JoinTests.joinFilter
 
 ```scala
@@ -2022,7 +2022,7 @@ Seq(
 ```
 
 
-## scalasql.hsqldb.OptionalTests
+## OptionalTests
 ### OptionalTests
 
 ```scala
@@ -2855,7 +2855,7 @@ Seq(
 ```
 
 
-## scalasql.hsqldb.SelectTests
+## SelectTests
 ### SelectTests.constant
 
 ```scala
@@ -3405,7 +3405,7 @@ Seq(
 ```
 
 
-## scalasql.hsqldb.SubQueryTests
+## SubQueryTests
 ### SubQueryTests.sortTakeJoin
 
 ```scala
@@ -3694,7 +3694,7 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ```
 
 
-## scalasql.hsqldb.UpdateSubQueryTests
+## UpdateSubQueryTests
 ### UpdateSubQueryTests.setSubquery
 
 ```scala
@@ -3771,7 +3771,7 @@ Seq(
 ```
 
 
-## scalasql.hsqldb.UpdateTests
+## UpdateTests
 ### UpdateTests.update
 
 ```scala
