@@ -446,7 +446,7 @@ object WorldSqlTests extends TestSuite {
       // +DOCS
       // ## Sort/Drop/Take
       //
-      // You can use `.sortBy` to order the returned rows, and `.drop` and .take`
+      // You can use `.sortBy` to order the returned rows, and `.drop` and `.take`
       // to select a range of rows within the entire result set:
       val query = City.select
         .sortBy(_.population)

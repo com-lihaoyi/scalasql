@@ -441,7 +441,7 @@ db.run(query) ==> (0, 25434098, 1277558000)
 
 ## Sort/Drop/Take
 
-You can use `.sortBy` to order the returned rows, and `.drop` and .take`
+You can use `.sortBy` to order the returned rows, and `.drop` and `.take`
 to select a range of rows within the entire result set:
 ```scala
 val query = City.select.sortBy(_.population).desc.drop(5).take(5)
