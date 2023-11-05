@@ -130,8 +130,8 @@ object scalasql extends RootModule with ScalaModule {
 
           val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
           val titleOpt =
-            if (prettyName != lastSeen) Some(s"### $prettyName")
-            else if (!seen(prettyName)) Some("----")
+            if (prettyName == lastSeen) Some("----")
+            else if (!seen(prettyName)) Some(s"### $prettyName")
             else None
 
           for(title <- titleOpt) {
