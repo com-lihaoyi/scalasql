@@ -287,3 +287,4 @@ their own operations not provided by the base library.
 * Docs for type mapping
 * Docs for custom expressions
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
+* Casting syntax for `Expr[T] => Expr[V]`

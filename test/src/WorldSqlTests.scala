@@ -38,7 +38,7 @@ object WorldSqlTests extends TestSuite {
       region: T[String],
       surfaceArea: T[Int],
       indepYear: T[Option[Int]],
-      population: T[Int],
+      population: T[Long],
       lifeExpectancy: T[Option[Double]],
       gnp: T[Option[scala.math.BigDecimal]],
       gnpOld: T[Option[scala.math.BigDecimal]],
@@ -58,7 +58,7 @@ object WorldSqlTests extends TestSuite {
       name: T[String],
       countryCode: T[String],
       district: T[String],
-      population: T[Int]
+      population: T[Long]
   )
 
   object City extends Table[City]() {
@@ -617,6 +617,112 @@ object WorldSqlTests extends TestSuite {
       }
     }
 
+    test("realistic") {
+      test("languagesByCities") {
+        // +DOCS
+        //
+        // ## Complicated Queries
+        // Here's a more complicated query using the techniques we've learned so far:
+        // a query fetching the top 10 languages spoken by the largest number of cities
+        val query = City.select
+          .joinOn(CountryLanguage)(_.countryCode === _.countryCode)
+          .map { case (city, language) => (city.id, language.language) }
+          .groupBy { case (city, language) => language }(_.size)
+          .sortBy { case (language, cityCount) => cityCount }.desc
+          .take(10)
+
+        db.toSqlQuery(query) ==> """
+         SELECT countrylanguage1.language as res__0, COUNT(1) as res__1
+         FROM city city0
+         JOIN countrylanguage countrylanguage1 ON city0.countrycode = countrylanguage1.countrycode
+         GROUP BY countrylanguage1.language
+         ORDER BY res__1 DESC
+         LIMIT 10
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> Seq(
+          ("Chinese", 1083),
+          ("German", 885),
+          ("Spanish", 881),
+          ("Italian", 857),
+          ("English", 823),
+          ("Japanese", 774),
+          ("Portuguese", 629),
+          ("Korean", 608),
+          ("Polish", 557),
+          ("French", 467)
+        )
+        // -DOCS
+      }
+
+      test("weightedLifeExpectancyByContinent"){
+        // +DOCS
+        // Another non-trivia query: listing the population-weighted
+        // average life expectancy per continent
+        val query = Country.select
+          .groupBy(_.continent)(group =>
+            group.sumBy(c => c.lifeExpectancy.get * c.population) / group.sumBy(_.population)
+          )
+          .sortBy(_._2).desc
+
+        db.toSqlQuery(query) ==> """
+        SELECT
+          country0.continent as res__0,
+          SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) as res__1
+        FROM country country0
+        GROUP BY country0.continent
+        ORDER BY res__1 DESC
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> Seq(
+          ("Oceania", 75.90188415576932),
+          ("North America", 74.91544123695004),
+          ("Europe", 73.82361172661305),
+          ("South America", 67.54433544271905),
+          ("Asia", 67.35222776275229),
+          ("Africa", 52.031677405178264),
+          ("Antarctica", 0.0)
+        )
+        // -DOCS
+      }
+
+      test("largestCityInThreeLargestCountries"){
+        // +DOCS
+        // Another non-trivia query: listing the population-weighted
+        // average life expectancy per continent
+        val query = Country.select
+          .sortBy(_.population).desc
+          .take(3)
+          .map(country =>
+            (
+              country.name,
+              country.population,
+              City.select.filter(_.countryCode === country.code).sortBy(_.population).desc.take(1).map(_.name).exprQuery,
+              City.select.filter(_.countryCode === country.code).sortBy(_.population).desc.take(1).map(_.population).exprQuery
+            )
+          )
+
+
+        db.toSqlQuery(query) ==> """
+        SELECT
+          country0.name as res__0, country0.population as res__1,
+          (SELECT city0.name as res FROM city city0 WHERE city0.countrycode = country0.code ORDER BY city0.population DESC LIMIT 1) as res__2,
+          (SELECT city0.population as res FROM city city0 WHERE city0.countrycode = country0.code ORDER BY res DESC LIMIT 1) as res__3
+        FROM country country0
+        ORDER BY res__1 DESC
+        LIMIT 3
+        """.trim.replaceAll("\\s+", " ")
+
+        pprint.log(db.run(query))
+        db.run(query) ==> Seq(
+          ("China", 1277558000L, "Shanghai", 9696300L),
+          ("India", 1013662000L, "Mumbai (Bombay)", 10500000L),
+          ("United States", 278357000L, "New York", 8008278L)
+        )
+        // -DOCS
+      }
+    }
+
     test("insert") {
       test("values") {
         // +DOCS
@@ -677,7 +783,7 @@ object WorldSqlTests extends TestSuite {
           c => (c.name, c.countryCode, c.district, c.population),
           City.select
             .filter(_.name === "Singapore")
-            .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
+            .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0L)))
         )
 
         db.toSqlQuery(query) ==> """
