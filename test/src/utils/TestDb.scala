@@ -33,7 +33,10 @@ class TestDb(
         suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
         testPath = tp.value,
-        queryCodeString = f.source,
+        queryCodeString = f.source match {
+          case s"{$res}" => res
+          case res => res
+        },
         sqlString = None,
         resultCodeString = None
       )

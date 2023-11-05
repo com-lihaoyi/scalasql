@@ -4786,17 +4786,15 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.simple.commit
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_ => true)) ==> 7
+  db.run(Purchase.delete(_ => true)) ==> 7
 
-    db.run(Purchase.select.size) ==> 0
-  }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 0
+  db.run(Purchase.select.size) ==> 0
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 0
 ```
 
 
@@ -4807,21 +4805,19 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.simple.rollback
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_ => true)) ==> 7
+  db.run(Purchase.delete(_ => true)) ==> 7
 
-    db.run(Purchase.select.size) ==> 0
+  db.run(Purchase.select.size) ==> 0
 
-    db.rollback()
+  db.rollback()
 
-    db.run(Purchase.select.size) ==> 7
-  }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
+  db.run(Purchase.select.size) ==> 7
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -4832,22 +4828,19 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.simple.throw
 
 ```scala
-{
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
 
-  try {
-    dbClient.transaction { implicit db =>
-      db.run(Purchase.select.size) ==> 7
+    db.run(Purchase.delete(_ => true)) ==> 7
 
-      db.run(Purchase.delete(_ => true)) ==> 7
+    db.run(Purchase.select.size) ==> 0
 
-      db.run(Purchase.select.size) ==> 0
+    throw new FooException
+  }
+} catch { case e: FooException => /*donothing*/ }
 
-      throw new FooException
-    }
-  } catch { case e: FooException => /*donothing*/ }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
-}
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -4858,23 +4851,21 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.savepoint.commit
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 3)) ==> 3
-    db.run(Purchase.select.size) ==> 4
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
 
-    db.savepoint { sp =>
-      db.run(Purchase.delete(_ => true)) ==> 4
-      db.run(Purchase.select.size) ==> 0
-    }
-
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
     db.run(Purchase.select.size) ==> 0
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 0
+  db.run(Purchase.select.size) ==> 0
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 0
 ```
 
 
@@ -4885,7 +4876,64 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.savepoint.throw
 
 ```scala
-{
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  try {
+    db.savepoint { sp =>
+      db.run(Purchase.delete(_ => true)) ==> 4
+      db.run(Purchase.select.size) ==> 0
+      throw new FooException
+    }
+  } catch {
+    case e: FooException => /*donothing*/
+  }
+
+  db.run(Purchase.select.size) ==> 4
+}
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 4
+```
+
+
+
+
+
+
+### Transaction.savepoint.rollback
+
+```scala
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
+
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+    sp.rollback()
+    db.run(Purchase.select.size) ==> 4
+  }
+
+  db.run(Purchase.select.size) ==> 4
+}
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 4
+```
+
+
+
+
+
+
+### Transaction.savepoint.throwDouble
+
+```scala
+try {
   dbClient.transaction { implicit db =>
     db.run(Purchase.select.size) ==> 7
 
@@ -4899,81 +4947,18 @@ Usage of transactions, rollbacks, and savepoints
         throw new FooException
       }
     } catch {
-      case e: FooException => /*donothing*/
+      case e: FooException =>
+        db.run(Purchase.select.size) ==> 4
+        throw e
     }
 
     db.run(Purchase.select.size) ==> 4
   }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 4
+} catch {
+  case e: FooException => /*donothing*/
 }
-```
 
-
-
-
-
-
-### Transaction.savepoint.rollback
-
-```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
-
-    db.run(Purchase.delete(_.id <= 3)) ==> 3
-    db.run(Purchase.select.size) ==> 4
-
-    db.savepoint { sp =>
-      db.run(Purchase.delete(_ => true)) ==> 4
-      db.run(Purchase.select.size) ==> 0
-      sp.rollback()
-      db.run(Purchase.select.size) ==> 4
-    }
-
-    db.run(Purchase.select.size) ==> 4
-  }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 4
-}
-```
-
-
-
-
-
-
-### Transaction.savepoint.throwDouble
-
-```scala
-{
-  try {
-    dbClient.transaction { implicit db =>
-      db.run(Purchase.select.size) ==> 7
-
-      db.run(Purchase.delete(_.id <= 3)) ==> 3
-      db.run(Purchase.select.size) ==> 4
-
-      try {
-        db.savepoint { sp =>
-          db.run(Purchase.delete(_ => true)) ==> 4
-          db.run(Purchase.select.size) ==> 0
-          throw new FooException
-        }
-      } catch {
-        case e: FooException =>
-          db.run(Purchase.select.size) ==> 4
-          throw e
-      }
-
-      db.run(Purchase.select.size) ==> 4
-    }
-  } catch {
-    case e: FooException => /*donothing*/
-  }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
-}
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -4984,24 +4969,22 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.savepoint.rollbackDouble
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 3)) ==> 3
-    db.run(Purchase.select.size) ==> 4
+  db.run(Purchase.delete(_.id <= 3)) ==> 3
+  db.run(Purchase.select.size) ==> 4
 
-    db.savepoint { sp =>
-      db.run(Purchase.delete(_ => true)) ==> 4
-      db.run(Purchase.select.size) ==> 0
-      db.rollback()
-    }
-
-    db.run(Purchase.select.size) ==> 7
+  db.savepoint { sp =>
+    db.run(Purchase.delete(_ => true)) ==> 4
+    db.run(Purchase.select.size) ==> 0
+    db.rollback()
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
+  db.run(Purchase.select.size) ==> 7
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -5012,30 +4995,28 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.commit
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-      }
-
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
       db.run(Purchase.select.size) ==> 1
     }
 
     db.run(Purchase.select.size) ==> 1
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 1
+  db.run(Purchase.select.size) ==> 1
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 1
 ```
 
 
@@ -5046,33 +5027,31 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.throw.inner
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      try {
-        db.savepoint { sp2 =>
-          db.run(Purchase.delete(_.id <= 6)) ==> 2
-          db.run(Purchase.select.size) ==> 1
-          throw new FooException
-        }
-      } catch { case e: FooException => /*donothing*/ }
-
-      db.run(Purchase.select.size) ==> 3
-    }
+    try {
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
+      }
+    } catch { case e: FooException => /*donothing*/ }
 
     db.run(Purchase.select.size) ==> 3
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 3
+  db.run(Purchase.select.size) ==> 3
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 3
 ```
 
 
@@ -5083,33 +5062,31 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.throw.middle
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    try {
-      db.savepoint { sp1 =>
-        db.run(Purchase.delete(_.id <= 4)) ==> 2
-        db.run(Purchase.select.size) ==> 3
+  try {
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
 
-        db.savepoint { sp2 =>
-          db.run(Purchase.delete(_.id <= 6)) ==> 2
-          db.run(Purchase.select.size) ==> 1
-        }
-
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
         db.run(Purchase.select.size) ==> 1
-        throw new FooException
       }
-    } catch { case e: FooException => /*donothing*/ }
 
-    db.run(Purchase.select.size) ==> 5
-  }
+      db.run(Purchase.select.size) ==> 1
+      throw new FooException
+    }
+  } catch { case e: FooException => /*donothing*/ }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 5
+  db.run(Purchase.select.size) ==> 5
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 5
 ```
 
 
@@ -5120,31 +5097,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.throw.innerMiddle
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    try {
-      db.savepoint { sp1 =>
-        db.run(Purchase.delete(_.id <= 4)) ==> 2
-        db.run(Purchase.select.size) ==> 3
+  try {
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
 
-        db.savepoint { sp2 =>
-          db.run(Purchase.delete(_.id <= 6)) ==> 2
-          db.run(Purchase.select.size) ==> 1
-          throw new FooException
-        }
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
       }
-    } catch { case e: FooException => /*donothing*/ }
+    }
+  } catch { case e: FooException => /*donothing*/ }
 
-    db.run(Purchase.select.size) ==> 5
-  }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 5
+  db.run(Purchase.select.size) ==> 5
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 5
 ```
 
 
@@ -5155,30 +5130,28 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.throw.middleOuter
 
 ```scala
-{
-  try {
-    dbClient.transaction { implicit db =>
-      db.run(Purchase.select.size) ==> 7
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
 
-      db.run(Purchase.delete(_.id <= 2)) ==> 2
-      db.run(Purchase.select.size) ==> 5
+    db.run(Purchase.delete(_.id <= 2)) ==> 2
+    db.run(Purchase.select.size) ==> 5
 
-      db.savepoint { sp1 =>
-        db.run(Purchase.delete(_.id <= 4)) ==> 2
-        db.run(Purchase.select.size) ==> 3
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
 
-        db.savepoint { sp2 =>
-          db.run(Purchase.delete(_.id <= 6)) ==> 2
-          db.run(Purchase.select.size) ==> 1
-        }
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
         db.run(Purchase.select.size) ==> 1
-        throw new FooException
       }
+      db.run(Purchase.select.size) ==> 1
+      throw new FooException
     }
-  } catch { case e: FooException => /*donothing*/ }
+  }
+} catch { case e: FooException => /*donothing*/ }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
-}
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -5189,31 +5162,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.throw.innerMiddleOuter
 
 ```scala
-{
-  try {
-    dbClient.transaction { implicit db =>
-      db.run(Purchase.select.size) ==> 7
+try {
+  dbClient.transaction { implicit db =>
+    db.run(Purchase.select.size) ==> 7
 
-      db.run(Purchase.delete(_.id <= 2)) ==> 2
-      db.run(Purchase.select.size) ==> 5
+    db.run(Purchase.delete(_.id <= 2)) ==> 2
+    db.run(Purchase.select.size) ==> 5
 
-      db.savepoint { sp1 =>
-        db.run(Purchase.delete(_.id <= 4)) ==> 2
-        db.run(Purchase.select.size) ==> 3
+    db.savepoint { sp1 =>
+      db.run(Purchase.delete(_.id <= 4)) ==> 2
+      db.run(Purchase.select.size) ==> 3
 
-        db.savepoint { sp2 =>
-          db.run(Purchase.delete(_.id <= 6)) ==> 2
-          db.run(Purchase.select.size) ==> 1
-          throw new FooException
-        }
+      db.savepoint { sp2 =>
+        db.run(Purchase.delete(_.id <= 6)) ==> 2
+        db.run(Purchase.select.size) ==> 1
+        throw new FooException
       }
-
-      db.run(Purchase.select.size) ==> 5
     }
-  } catch { case e: FooException => /*donothing*/ }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
-}
+    db.run(Purchase.select.size) ==> 5
+  }
+} catch { case e: FooException => /*donothing*/ }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -5224,31 +5195,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.rollback.inner
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-        sp2.rollback()
-      }
-
-      db.run(Purchase.select.size) ==> 3
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      sp2.rollback()
     }
 
     db.run(Purchase.select.size) ==> 3
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 3
+  db.run(Purchase.select.size) ==> 3
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 3
 ```
 
 
@@ -5259,32 +5228,30 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.rollback.middle
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-      }
-
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
       db.run(Purchase.select.size) ==> 1
-      sp1.rollback()
-      db.run(Purchase.select.size) ==> 5
     }
 
+    db.run(Purchase.select.size) ==> 1
+    sp1.rollback()
     db.run(Purchase.select.size) ==> 5
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 5
+  db.run(Purchase.select.size) ==> 5
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 5
 ```
 
 
@@ -5295,31 +5262,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.rollback.innerMiddle
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-        sp1.rollback()
-        db.run(Purchase.select.size) ==> 5
-      }
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      sp1.rollback()
       db.run(Purchase.select.size) ==> 5
     }
-
     db.run(Purchase.select.size) ==> 5
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 5
+  db.run(Purchase.select.size) ==> 5
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 5
 ```
 
 
@@ -5330,31 +5295,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.rollback.middleOuter
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-      }
-
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
       db.run(Purchase.select.size) ==> 1
-      db.rollback()
-      db.run(Purchase.select.size) ==> 7
     }
+
+    db.run(Purchase.select.size) ==> 1
+    db.rollback()
     db.run(Purchase.select.size) ==> 7
   }
-
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
+  db.run(Purchase.select.size) ==> 7
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
@@ -5365,31 +5328,29 @@ Usage of transactions, rollbacks, and savepoints
 ### Transaction.doubleSavepoint.rollback.innerMiddleOuter
 
 ```scala
-{
-  dbClient.transaction { implicit db =>
-    db.run(Purchase.select.size) ==> 7
+dbClient.transaction { implicit db =>
+  db.run(Purchase.select.size) ==> 7
 
-    db.run(Purchase.delete(_.id <= 2)) ==> 2
-    db.run(Purchase.select.size) ==> 5
+  db.run(Purchase.delete(_.id <= 2)) ==> 2
+  db.run(Purchase.select.size) ==> 5
 
-    db.savepoint { sp1 =>
-      db.run(Purchase.delete(_.id <= 4)) ==> 2
-      db.run(Purchase.select.size) ==> 3
+  db.savepoint { sp1 =>
+    db.run(Purchase.delete(_.id <= 4)) ==> 2
+    db.run(Purchase.select.size) ==> 3
 
-      db.savepoint { sp2 =>
-        db.run(Purchase.delete(_.id <= 6)) ==> 2
-        db.run(Purchase.select.size) ==> 1
-        db.rollback()
-        db.run(Purchase.select.size) ==> 7
-      }
+    db.savepoint { sp2 =>
+      db.run(Purchase.delete(_.id <= 6)) ==> 2
+      db.run(Purchase.select.size) ==> 1
+      db.rollback()
       db.run(Purchase.select.size) ==> 7
     }
-
     db.run(Purchase.select.size) ==> 7
   }
 
-  dbClient.autoCommit.run(Purchase.select.size) ==> 7
+  db.run(Purchase.select.size) ==> 7
 }
+
+dbClient.autoCommit.run(Purchase.select.size) ==> 7
 ```
 
 
