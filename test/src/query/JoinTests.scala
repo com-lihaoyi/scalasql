@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql._
+import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
 
@@ -12,7 +13,7 @@ import java.time.LocalDate
 trait JoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("joinFilter") - checker(
-      query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包"),
+      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包") },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -38,7 +39,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("joinSelectFilter") - checker(
-      query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包"),
+      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包") },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -64,8 +65,8 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("joinFilterMap") - checker(
-      query = Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId)
-        .filter(_._1.name `=` "James Bond").map(_._2.shippingDate),
+      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId)
+        .filter(_._1.name `=` "James Bond").map(_._2.shippingDate) },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
@@ -76,7 +77,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("selfJoin") - checker(
-      query = Buyer.select.joinOn(Buyer)(_.id `=` _.id),
+      query = Text{ Buyer.select.joinOn(Buyer)(_.id `=` _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -105,7 +106,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("selfJoin2") - checker(
-      query = Buyer.select.joinOn(Buyer)(_.id <> _.id),
+      query = Text{ Buyer.select.joinOn(Buyer)(_.id <> _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -147,9 +148,9 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("flatMap") - checker(
-      query = Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
+      query = Text{ Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
         c.id `=` p.buyerId && c.name `=` "James Bond"
-      }.map(_._2.shippingDate),
+      }.map(_._2.shippingDate) },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0, shipping_info shipping_info1
@@ -160,9 +161,9 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("flatMap2") - checker(
-      query = Buyer.select.flatMap(c =>
+      query = Text{ Buyer.select.flatMap(c =>
         ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" }
-      ).map(_.shippingDate),
+      ).map(_.shippingDate) },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0, shipping_info shipping_info1
@@ -173,7 +174,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("leftJoin") - checker(
-      query = Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId),
+      query = Text{ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -205,7 +206,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("rightJoin") - checker(
-      query = ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id),
+      query = Text{ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id) },
       sql = """
         SELECT
           shipping_info0.id as res__0__id,
@@ -237,7 +238,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("outerJoin") - checker(
-      query = ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id),
+      query = Text{ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id) },
       sqls = Seq(
         """
           SELECT
@@ -273,18 +274,18 @@ trait JoinTests extends ScalaSqlSuite {
       ),
       value = Seq(
         (
-          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-          Some(Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")))
+          Option(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
+          Option(Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")))
         ),
         (
-          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-          Some(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+          Option(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
+          Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
         ),
         (
-          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-          Some(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+          Option(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
+          Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
         ),
-        (None, Some(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
+        (Option.empty, Option(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
       ),
       normalize = (x: Seq[(Option[ShippingInfo[Id]], Option[Buyer[Id]])]) =>
         x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))

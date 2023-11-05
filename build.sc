@@ -17,7 +17,8 @@ object scalasql extends RootModule with ScalaModule {
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
       ivy"com.lihaoyi::mainargs:0.4.0",
       ivy"com.lihaoyi::os-lib:0.9.1",
-      ivy"com.lihaoyi::utest:0.7.11",
+      ivy"com.lihaoyi::upickle:3.1.3",
+      ivy"com.lihaoyi::utest:0.8.1-18-79b46d",
       ivy"com.h2database:h2:2.2.224",
       ivy"org.hsqldb:hsqldb:2.5.1",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
@@ -27,7 +28,7 @@ object scalasql extends RootModule with ScalaModule {
       ivy"mysql:mysql-connector-java:8.0.33",
     )
 
-    def testFramework = "utest.runner.Framework"
+    def testFramework = "scalasql.UtestFramework"
   }
 
   def generateDocs() = T.command {
@@ -76,6 +77,83 @@ object scalasql extends RootModule with ScalaModule {
     }
     os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
   }
+  def generateQueryLibrary() = T.command {
+    def sqlFormat(s: String) = {
+      if (s == null) ""
+      else{
+
+        val indent = s
+          .linesIterator
+          .filter(_.trim.nonEmpty)
+          .map(_.takeWhile(_ == ' ').size)
+          .minOption
+          .getOrElse(0)
+
+        val dedented = s
+          .linesIterator
+          .map(_.drop(indent))
+          .mkString("\n")
+          .trim
+        s"""**Generated Sql**
+           |```sql
+           |$dedented
+           |```
+           |""".stripMargin
+      }
+    }
+
+    val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "recordedTests.json"))
+
+    val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString, r.resultCodeString))
+    val formattedScalaStrs = {
+      val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
+      mill.scalalib.scalafmt.ScalafmtWorkerModule
+        .worker()
+        .reformat(tmps.map(PathRef(_)), PathRef(os.pwd / ".scalafmt.conf"))
+
+      tmps.map(os.read(_).trim)
+    }
+    val scalafmt = rawScalaStrs.zip(formattedScalaStrs).toMap
+
+    for ((dbName, dbGroup) <- records.groupBy(_.suiteName.split('.').apply(1))) {
+      val outputLines = collection.mutable.Buffer.empty[String]
+      outputLines.append(s"# $dbName")
+      for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._1)) {
+        outputLines.append(s"## $suiteName")
+        for(r <- suiteGroup){
+
+          outputLines.append(
+            s"""### ${(r.suiteName +: r.testPath).mkString(".")}
+               |
+               |**ScalaSql Query**
+               |```scala
+               |${scalafmt(r.queryCodeString)}
+               |```
+               |
+               |${sqlFormat(r.sqlString)}
+               |
+               |**Results**
+               |```scala
+               |${scalafmt(r.resultCodeString)}
+               |```
+               |
+               |""".stripMargin
+          )
+        }
+      }
+      os.write.over(os.pwd / s"query-library-$dbName.md", outputLines.mkString("\n"))
+    }
+  }
 
 }
 
+
+case class Record(suiteName: String,
+                  testPath: Seq[String],
+                  queryCodeString: String,
+                  sqlString: String,
+                  resultCodeString: String)
+
+object Record {
+  implicit val rw: upickle.default.ReadWriter[Record] = upickle.default.macroRW
+}

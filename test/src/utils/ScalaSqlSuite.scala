@@ -16,7 +16,8 @@ trait SqliteSuite extends TestSuite with SqliteDialect {
     TestClients.sqliteClient,
     "sqlite-customer-schema.sql",
     "customer-data.sql",
-    dialects.SqliteDialect
+    dialects.SqliteDialect,
+    getClass.getName
   )
 
   checker.reset()
@@ -27,7 +28,8 @@ trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
     TestClients.hsqlDbClient,
     "hsqldb-customer-schema.sql",
     "customer-data.sql",
-    dialects.HsqlDbDialect
+    dialects.HsqlDbDialect,
+    getClass.getName
   )
 
   checker.reset()
@@ -38,7 +40,8 @@ trait H2Suite extends TestSuite with H2Dialect {
     TestClients.h2Client,
     "h2-customer-schema.sql",
     "customer-data.sql",
-    dialects.H2Dialect
+    dialects.H2Dialect,
+    getClass.getName
   )
 
   checker.reset()
@@ -49,7 +52,8 @@ trait PostgresSuite extends TestSuite with PostgresDialect {
     TestClients.postgresClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
-    dialects.PostgresDialect
+    dialects.PostgresDialect,
+    getClass.getName
   )
 
   checker.reset()
@@ -60,7 +64,8 @@ trait MySqlSuite extends TestSuite with MySqlDialect {
     TestClients.mysqlClient,
     "mysql-customer-schema.sql",
     "customer-data.sql",
-    dialects.MySqlDialect
+    dialects.MySqlDialect,
+    getClass.getName
   )
 
   checker.reset()

@@ -5,7 +5,7 @@ import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import scalasql.dialects.DialectConfig
 import scalasql.query.{Expr, SubqueryRef}
-import scalasql.{Config, DatabaseClient, Queryable}
+import scalasql.{Config, DatabaseClient, Queryable, UtestFramework}
 
 import java.sql.Connection
 
@@ -13,7 +13,8 @@ class TestDb(
     val dbClient: DatabaseClient,
     testSchemaFileName: String,
     testDataFileName: String,
-    dialectConfig: DialectConfig
+    dialectConfig: DialectConfig,
+    suiteName: String
 ) {
 
   def reset() = {
@@ -22,37 +23,43 @@ class TestDb(
   }
 
   def apply[T, V](
-      query: T,
+      query: sourcecode.Text[T],
       sql: String = null,
       sqls: Seq[String] = Nil,
-      value: V = null,
+      value: sourcecode.Text[V] = null,
       moreValues: Seq[V] = Nil,
       normalize: V => V = (x: V) => x
-  )(implicit qr: Queryable[T, V]) = {
-    if (sql != null) {
-      val sqlResult = dbClient.autoCommit.toSqlQuery(query)
-        .stripSuffix(dialectConfig.defaultQueryableSuffix)
+  )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
+    val sqlResult = dbClient.autoCommit.toSqlQuery(query.value)
+      .stripSuffix(dialectConfig.defaultQueryableSuffix)
+
+    val matchedSql = (Option(sql) ++ sqls).find{ sql =>
+
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
-//      pprint.log(sqlResult)
-//      pprint.log(expectedSql)
-      assert(sqlResult == expectedSql, pprint.apply(SqlFormatter.format(sqlResult)))
-    }
-    if (sqls.nonEmpty) {
-      val sqlResult = dbClient.autoCommit.toSqlQuery(query)
-        .stripSuffix(dialectConfig.defaultQueryableSuffix)
-
-      val simplifiedSqls = sqls.map(_.trim.replaceAll("\\s+", " "))
-//      pprint.log(simplifiedSqls)
-//      pprint.log(sqlResult)
-      assert(simplifiedSqls.contains(sqlResult), pprint.apply(SqlFormatter.format(sqlResult)))
-
+      sqlResult == expectedSql
     }
 
-    val result = dbClient.autoCommit.run(query)
+    if (sql != null) {
+      assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
+    }
 
-    val values = Option(value) ++ moreValues
+    val result = dbClient.autoCommit.run(query.value)
+
+    val values = Option(value.value) ++ moreValues
     val normalized = normalize(result)
     assert(values.exists(value => normalized == value), pprint.apply(normalized))
+
+    UtestFramework.recorded.append(
+      UtestFramework.Record(
+        suiteName = suiteName.stripSuffix("$"),
+        testPath = tp.value,
+        queryCodeString = query.source,
+        sqlString = matchedSql.orNull,
+        resultCodeString = value.source
+      )
+    )
+
+    ()
   }
 }
 

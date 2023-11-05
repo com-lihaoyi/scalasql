@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql._
+import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
 
@@ -15,7 +16,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
 
     test("setSubquery") - {
       checker(
-        query = Product.update(_ => true).set(_.price := Product.select.maxBy(_.price)),
+        query = Text{ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price)) },
         sqls = Seq(
           """
             UPDATE product
@@ -32,7 +33,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Product.select.map(p => (p.id, p.name, p.price)),
+        query = Text{ Product.select.map(p => (p.id, p.name, p.price)) },
         value = Seq(
           (1, "Face Mask", 1000.0),
           (2, "Guitar", 1000.0),
@@ -46,7 +47,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
 
     test("whereSubquery") - {
       checker(
-        query = Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0),
+        query = Text{  Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)},
         sqls = Seq(
           """
             UPDATE product
@@ -63,7 +64,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Product.select.map(p => (p.id, p.name, p.price)),
+        query = Text{ Product.select.map(p => (p.id, p.name, p.price)) },
         value = Seq(
           (1, "Face Mask", 8.88),
           (2, "Guitar", 300.0),
