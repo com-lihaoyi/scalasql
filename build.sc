@@ -94,8 +94,7 @@ object scalasql extends RootModule with ScalaModule {
           .map(_.drop(indent))
           .mkString("\n")
           .trim
-        s"""**Generated Sql**
-           |```sql
+        s"""```sql
            |$dedented
            |```
            |""".stripMargin
@@ -125,14 +124,12 @@ object scalasql extends RootModule with ScalaModule {
           outputLines.append(
             s"""### ${(r.suiteName +: r.testPath).mkString(".")}
                |
-               |**ScalaSql Query**
                |```scala
                |${scalafmt(r.queryCodeString)}
                |```
                |
                |${sqlFormat(r.sqlString)}
                |
-               |**Results**
                |```scala
                |${scalafmt(r.resultCodeString)}
                |```

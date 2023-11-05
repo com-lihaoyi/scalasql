@@ -2,18 +2,15 @@
 ## scalasql.h2.CompoundSelectTests
 ### scalasql.h2.CompoundSelectTests.sort.simple
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price
 ```
 
 
-**Results**
 ```scala
 Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
 ```
@@ -21,12 +18,10 @@ Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
 
 ### scalasql.h2.CompoundSelectTests.sort.twice
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   purchase0.id as res__id,
@@ -39,7 +34,6 @@ ORDER BY res__shipping_info_id DESC, res__product_id ASC
 ```
 
 
-**Results**
 ```scala
 Seq(
   Purchase[Id](6, 3, 1, 5, 44.4),
@@ -55,18 +49,15 @@ Seq(
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimit
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
 ```
 
 
-**Results**
 ```scala
 Seq("Cookie", "Socks")
 ```
@@ -74,18 +65,15 @@ Seq("Cookie", "Socks")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortOffset
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2
 ```
 
 
-**Results**
 ```scala
 Seq("Face Mask", "Skate Board", "Guitar", "Camera")
 ```
@@ -93,18 +81,15 @@ Seq("Face Mask", "Skate Board", "Guitar", "Camera")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimitTwiceHigher
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
 ```
 
 
-**Results**
 ```scala
 Seq("Cookie", "Socks")
 ```
@@ -112,18 +97,15 @@ Seq("Cookie", "Socks")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimitTwiceLower
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1
 ```
 
 
-**Results**
 ```scala
 Seq("Cookie")
 ```
@@ -131,18 +113,15 @@ Seq("Cookie")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimitOffset
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
 ```
 
 
-**Results**
 ```scala
 Seq("Face Mask", "Skate Board")
 ```
@@ -150,18 +129,15 @@ Seq("Face Mask", "Skate Board")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimitOffsetTwice
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4
 ```
 
 
-**Results**
 ```scala
 Seq("Guitar")
 ```
@@ -169,18 +145,15 @@ Seq("Guitar")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortOffsetLimit
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
 ```
 
 
-**Results**
 ```scala
 Seq("Face Mask", "Skate Board")
 ```
@@ -188,18 +161,15 @@ Seq("Face Mask", "Skate Board")
 
 ### scalasql.h2.CompoundSelectTests.sort.sortLimitOffset
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).map(_.name).take(2).drop(1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1
 ```
 
 
-**Results**
 ```scala
 Seq("Socks")
 ```
@@ -207,12 +177,10 @@ Seq("Socks")
 
 ### scalasql.h2.CompoundSelectTests.distinct
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 ```
 
-**Generated Sql**
 ```sql
 SELECT DISTINCT subquery0.res as res
 FROM (SELECT purchase0.shipping_info_id as res
@@ -222,7 +190,6 @@ FROM (SELECT purchase0.shipping_info_id as res
 ```
 
 
-**Results**
 ```scala
 Seq(1, 2)
 ```
@@ -230,14 +197,12 @@ Seq(1, 2)
 
 ### scalasql.h2.CompoundSelectTests.flatMap
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
   Product.select.filter(_.id === p.productId).map(_.name)
 }
 ```
 
-**Generated Sql**
 ```sql
 SELECT product1.name as res
 FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
@@ -248,7 +213,6 @@ WHERE product1.id = subquery0.res__product_id
 ```
 
 
-**Results**
 ```scala
 Seq("Camera", "Face Mask", "Guitar")
 ```
@@ -256,12 +220,10 @@ Seq("Camera", "Face Mask", "Guitar")
 
 ### scalasql.h2.CompoundSelectTests.sumBy
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(subquery0.res__total) as res
 FROM (SELECT purchase0.total as res__total
@@ -271,7 +233,6 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-**Results**
 ```scala
 11788.0
 ```
@@ -279,12 +240,10 @@ FROM (SELECT purchase0.total as res__total
 
 ### scalasql.h2.CompoundSelectTests.aggregate
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.total).desc.take(3).aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
 FROM (SELECT purchase0.total as res__total
@@ -294,7 +253,6 @@ FROM (SELECT purchase0.total as res__total
 ```
 
 
-**Results**
 ```scala
 (11788.0, 3929.0)
 ```
@@ -302,12 +260,10 @@ FROM (SELECT purchase0.total as res__total
 
 ### scalasql.h2.CompoundSelectTests.union
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).union(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -317,7 +273,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq("camera", "cookie", "face mask", "face-mask", "guitar", "skate board", "skate-board", "socks")
 ```
@@ -325,12 +280,10 @@ Seq("camera", "cookie", "face mask", "face-mask", "guitar", "skate board", "skat
 
 ### scalasql.h2.CompoundSelectTests.unionAll
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -340,7 +293,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq(
   "face mask",
@@ -361,12 +313,10 @@ Seq(
 
 ### scalasql.h2.CompoundSelectTests.intersect
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).intersect(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -376,7 +326,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq("camera", "cookie", "guitar", "socks")
 ```
@@ -384,12 +333,10 @@ Seq("camera", "cookie", "guitar", "socks")
 
 ### scalasql.h2.CompoundSelectTests.except
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).except(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -399,7 +346,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq("face mask", "skate board")
 ```
@@ -407,13 +353,11 @@ Seq("face mask", "skate board")
 
 ### scalasql.h2.CompoundSelectTests.unionAllUnionSort
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
   .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity)
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -427,7 +371,6 @@ ORDER BY res
 ```
 
 
-**Results**
 ```scala
 Seq(
   "camera",
@@ -447,13 +390,11 @@ Seq(
 
 ### scalasql.h2.CompoundSelectTests.unionAllUnionSortLimit
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
   .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity).drop(4).take(4)
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(product0.name) as res
 FROM product product0
@@ -469,7 +410,6 @@ OFFSET 4
 ```
 
 
-**Results**
 ```scala
 Seq("guitar", "james bond", "li haoyi", "skate board")
 ```
@@ -477,7 +417,6 @@ Seq("guitar", "james bond", "li haoyi", "skate board")
 
 ### scalasql.h2.CompoundSelectTests.exceptAggregate
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
   // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
@@ -486,7 +425,6 @@ Product.select.map(p => (p.name.toLowerCase, p.price))
   .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   MAX(subquery0.res__1) as res__0,
@@ -503,7 +441,6 @@ FROM (SELECT
 ```
 
 
-**Results**
 ```scala
 (123.45, 8.88)
 ```
@@ -511,7 +448,6 @@ FROM (SELECT
 
 ### scalasql.h2.CompoundSelectTests.unionAllAggregate
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p => (p.name.toLowerCase, p.price))
   // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
@@ -520,7 +456,6 @@ Product.select.map(p => (p.name.toLowerCase, p.price))
   .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   MAX(subquery0.res__1) as res__0,
@@ -533,7 +468,6 @@ FROM (SELECT product0.price as res__1
 ```
 
 
-**Results**
 ```scala
 (1000.0, 0.1)
 ```
@@ -542,7 +476,6 @@ FROM (SELECT product0.price as res__1
 ## scalasql.h2.DataTypesTests
 ### scalasql.h2.DataTypesTests.constant
 
-**ScalaSql Query**
 ```scala
 DataTypes.insert.values(
   _.myTinyInt := value.myTinyInt,
@@ -561,7 +494,6 @@ DataTypes.insert.values(
 
 
 
-**Results**
 ```scala
 1
 ```
@@ -569,14 +501,12 @@ DataTypes.insert.values(
 
 ### scalasql.h2.DataTypesTests.constant
 
-**ScalaSql Query**
 ```scala
 DataTypes.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(value)
 ```
@@ -584,7 +514,6 @@ Seq(value)
 
 ### scalasql.h2.DataTypesTests.nonRoundTrip
 
-**ScalaSql Query**
 ```scala
 NonRoundTripTypes.insert
   .values(_.myOffsetDateTime := value.myOffsetDateTime, _.myZonedDateTime := value.myZonedDateTime)
@@ -592,7 +521,6 @@ NonRoundTripTypes.insert
 
 
 
-**Results**
 ```scala
 1
 ```
@@ -600,14 +528,12 @@ NonRoundTripTypes.insert
 
 ### scalasql.h2.DataTypesTests.nonRoundTrip
 
-**ScalaSql Query**
 ```scala
 NonRoundTripTypes.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(normalize(value))
 ```
@@ -616,18 +542,15 @@ Seq(normalize(value))
 ## scalasql.h2.DeleteTests
 ### scalasql.h2.DeleteTests.single
 
-**ScalaSql Query**
 ```scala
 Purchase.delete(_.id `=` 2)
 ```
 
-**Generated Sql**
 ```sql
 DELETE FROM purchase WHERE purchase.id = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -635,14 +558,12 @@ DELETE FROM purchase WHERE purchase.id = ?
 
 ### scalasql.h2.DeleteTests.single
 
-**ScalaSql Query**
 ```scala
 Purchase.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
@@ -658,18 +579,15 @@ Seq(
 
 ### scalasql.h2.DeleteTests.multiple
 
-**ScalaSql Query**
 ```scala
 Purchase.delete(_.id <> 2)
 ```
 
-**Generated Sql**
 ```sql
 DELETE FROM purchase WHERE purchase.id <> ?
 ```
 
 
-**Results**
 ```scala
 6
 ```
@@ -677,14 +595,12 @@ DELETE FROM purchase WHERE purchase.id <> ?
 
 ### scalasql.h2.DeleteTests.multiple
 
-**ScalaSql Query**
 ```scala
 Purchase.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
 ```
@@ -692,18 +608,15 @@ Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 9
 
 ### scalasql.h2.DeleteTests.all
 
-**ScalaSql Query**
 ```scala
 Purchase.delete(_ => true)
 ```
 
-**Generated Sql**
 ```sql
 DELETE FROM purchase WHERE ?
 ```
 
 
-**Results**
 ```scala
 7
 ```
@@ -711,14 +624,12 @@ DELETE FROM purchase WHERE ?
 
 ### scalasql.h2.DeleteTests.all
 
-**ScalaSql Query**
 ```scala
 Purchase.select
 ```
 
 
 
-**Results**
 ```scala
 Seq[Purchase[Id]](
   // all Deleted
@@ -729,18 +640,15 @@ Seq[Purchase[Id]](
 ## scalasql.h2.ExprBooleanOpsTests
 ### scalasql.h2.ExprBooleanOpsTests.and
 
-**ScalaSql Query**
 ```scala
 Expr(true) && Expr(true)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? AND ? as res
 ```
 
 
-**Results**
 ```scala
 true
 ```
@@ -748,18 +656,15 @@ true
 
 ### scalasql.h2.ExprBooleanOpsTests.or
 
-**ScalaSql Query**
 ```scala
 Expr(false) || Expr(false)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? OR ? as res
 ```
 
 
-**Results**
 ```scala
 false
 ```
@@ -767,18 +672,15 @@ false
 
 ### scalasql.h2.ExprBooleanOpsTests.or
 
-**ScalaSql Query**
 ```scala
 !Expr(false)
 ```
 
-**Generated Sql**
 ```sql
 SELECT NOT ? as res
 ```
 
 
-**Results**
 ```scala
 true
 ```
@@ -787,18 +689,15 @@ true
 ## scalasql.h2.ExprIntOpsTests
 ### scalasql.h2.ExprIntOpsTests.plus
 
-**ScalaSql Query**
 ```scala
 Expr(6) + Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? + ? as res
 ```
 
 
-**Results**
 ```scala
 8
 ```
@@ -806,18 +705,15 @@ SELECT ? + ? as res
 
 ### scalasql.h2.ExprIntOpsTests.minus
 
-**ScalaSql Query**
 ```scala
 Expr(6) - Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? - ? as res
 ```
 
 
-**Results**
 ```scala
 4
 ```
@@ -825,18 +721,15 @@ SELECT ? - ? as res
 
 ### scalasql.h2.ExprIntOpsTests.times
 
-**ScalaSql Query**
 ```scala
 Expr(6) * Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? * ? as res
 ```
 
 
-**Results**
 ```scala
 12
 ```
@@ -844,18 +737,15 @@ SELECT ? * ? as res
 
 ### scalasql.h2.ExprIntOpsTests.divide
 
-**ScalaSql Query**
 ```scala
 Expr(6) / Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? / ? as res
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -863,18 +753,15 @@ SELECT ? / ? as res
 
 ### scalasql.h2.ExprIntOpsTests.modulo
 
-**ScalaSql Query**
 ```scala
 Expr(6) % Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MOD(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 0
 ```
@@ -882,18 +769,15 @@ SELECT MOD(?, ?) as res
 
 ### scalasql.h2.ExprIntOpsTests.bitwiseAnd
 
-**ScalaSql Query**
 ```scala
 Expr(6) & Expr(2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT BITAND(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 2
 ```
@@ -901,18 +785,15 @@ SELECT BITAND(?, ?) as res
 
 ### scalasql.h2.ExprIntOpsTests.bitwiseOr
 
-**ScalaSql Query**
 ```scala
 Expr(6) | Expr(3)
 ```
 
-**Generated Sql**
 ```sql
 SELECT BITOR(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 7
 ```
@@ -920,18 +801,15 @@ SELECT BITOR(?, ?) as res
 
 ### scalasql.h2.ExprIntOpsTests.between
 
-**ScalaSql Query**
 ```scala
 Expr(4).between(Expr(2), Expr(6))
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? BETWEEN ? AND ? as res
 ```
 
 
-**Results**
 ```scala
 true
 ```
@@ -939,18 +817,15 @@ true
 
 ### scalasql.h2.ExprIntOpsTests.unaryPlus
 
-**ScalaSql Query**
 ```scala
 +Expr(-4)
 ```
 
-**Generated Sql**
 ```sql
 SELECT +? as res
 ```
 
 
-**Results**
 ```scala
 -4
 ```
@@ -958,18 +833,15 @@ SELECT +? as res
 
 ### scalasql.h2.ExprIntOpsTests.unaryMinus
 
-**ScalaSql Query**
 ```scala
 -Expr(-4)
 ```
 
-**Generated Sql**
 ```sql
 SELECT -? as res
 ```
 
 
-**Results**
 ```scala
 4
 ```
@@ -977,18 +849,15 @@ SELECT -? as res
 
 ### scalasql.h2.ExprIntOpsTests.unaryTilde
 
-**ScalaSql Query**
 ```scala
 ~Expr(-4)
 ```
 
-**Generated Sql**
 ```sql
 SELECT BITNOT(?) as res
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -996,18 +865,15 @@ SELECT BITNOT(?) as res
 
 ### scalasql.h2.ExprIntOpsTests.abs
 
-**ScalaSql Query**
 ```scala
 Expr(-4).abs
 ```
 
-**Generated Sql**
 ```sql
 SELECT ABS(?) as res
 ```
 
 
-**Results**
 ```scala
 4
 ```
@@ -1015,18 +881,15 @@ SELECT ABS(?) as res
 
 ### scalasql.h2.ExprIntOpsTests.mod
 
-**ScalaSql Query**
 ```scala
 Expr(8).mod(Expr(3))
 ```
 
-**Generated Sql**
 ```sql
 SELECT MOD(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 2
 ```
@@ -1034,18 +897,15 @@ SELECT MOD(?, ?) as res
 
 ### scalasql.h2.ExprIntOpsTests.ceil
 
-**ScalaSql Query**
 ```scala
 Expr(4.3).ceil
 ```
 
-**Generated Sql**
 ```sql
 SELECT CEIL(?) as res
 ```
 
 
-**Results**
 ```scala
 5.0
 ```
@@ -1053,18 +913,15 @@ SELECT CEIL(?) as res
 
 ### scalasql.h2.ExprIntOpsTests.floor
 
-**ScalaSql Query**
 ```scala
 Expr(4.7).floor
 ```
 
-**Generated Sql**
 ```sql
 SELECT FLOOR(?) as res
 ```
 
 
-**Results**
 ```scala
 4.0
 ```
@@ -1072,18 +929,15 @@ SELECT FLOOR(?) as res
 
 ### scalasql.h2.ExprIntOpsTests.floor
 
-**ScalaSql Query**
 ```scala
 Expr(4.7).floor
 ```
 
-**Generated Sql**
 ```sql
 SELECT FLOOR(?) as res
 ```
 
 
-**Results**
 ```scala
 4.0
 ```
@@ -1092,18 +946,15 @@ SELECT FLOOR(?) as res
 ## scalasql.h2.ExprSeqNumericOpsTests
 ### scalasql.h2.ExprSeqNumericOpsTests.sum
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.count).sum
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 140
 ```
@@ -1111,18 +962,15 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqNumericOpsTests.min
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.count).min
 ```
 
-**Generated Sql**
 ```sql
 SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -1130,18 +978,15 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqNumericOpsTests.max
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.count).max
 ```
 
-**Generated Sql**
 ```sql
 SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 100
 ```
@@ -1149,18 +994,15 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqNumericOpsTests.avg
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.count).avg
 ```
 
-**Generated Sql**
 ```sql
 SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 20
 ```
@@ -1169,18 +1011,15 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ## scalasql.h2.ExprSeqOpsTests
 ### scalasql.h2.ExprSeqOpsTests.size
 
-**ScalaSql Query**
 ```scala
 Purchase.select.size
 ```
 
-**Generated Sql**
 ```sql
 SELECT COUNT(1) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 7
 ```
@@ -1188,18 +1027,15 @@ SELECT COUNT(1) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqOpsTests.sumBy.simple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sumBy(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 140
 ```
@@ -1207,18 +1043,15 @@ SELECT SUM(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqOpsTests.sumBy.some
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sumByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Option(140)
 ```
@@ -1226,18 +1059,15 @@ Option(140)
 
 ### scalasql.h2.ExprSeqOpsTests.sumBy.none
 
-**ScalaSql Query**
 ```scala
 Purchase.select.filter(_ => false).sumByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
 ```
 
 
-**Results**
 ```scala
 Option.empty[Int]
 ```
@@ -1245,18 +1075,15 @@ Option.empty[Int]
 
 ### scalasql.h2.ExprSeqOpsTests.minBy.simple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.minBy(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -1264,18 +1091,15 @@ SELECT MIN(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqOpsTests.minBy.some
 
-**ScalaSql Query**
 ```scala
 Purchase.select.minByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MIN(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Option(3)
 ```
@@ -1283,18 +1107,15 @@ Option(3)
 
 ### scalasql.h2.ExprSeqOpsTests.minBy.none
 
-**ScalaSql Query**
 ```scala
 Purchase.select.filter(_ => false).minByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
 ```
 
 
-**Results**
 ```scala
 Option.empty[Int]
 ```
@@ -1302,18 +1123,15 @@ Option.empty[Int]
 
 ### scalasql.h2.ExprSeqOpsTests.maxBy.simple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.maxBy(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 100
 ```
@@ -1321,18 +1139,15 @@ SELECT MAX(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqOpsTests.maxBy.some
 
-**ScalaSql Query**
 ```scala
 Purchase.select.maxByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MAX(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Option(100)
 ```
@@ -1340,18 +1155,15 @@ Option(100)
 
 ### scalasql.h2.ExprSeqOpsTests.maxBy.none
 
-**ScalaSql Query**
 ```scala
 Purchase.select.filter(_ => false).maxByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
 ```
 
 
-**Results**
 ```scala
 Option.empty[Int]
 ```
@@ -1359,18 +1171,15 @@ Option.empty[Int]
 
 ### scalasql.h2.ExprSeqOpsTests.avgBy.simple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.avgBy(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 20
 ```
@@ -1378,18 +1187,15 @@ SELECT AVG(purchase0.count) as res FROM purchase purchase0
 
 ### scalasql.h2.ExprSeqOpsTests.avgBy.some
 
-**ScalaSql Query**
 ```scala
 Purchase.select.avgByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT AVG(purchase0.count) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Option(20)
 ```
@@ -1397,18 +1203,15 @@ Option(20)
 
 ### scalasql.h2.ExprSeqOpsTests.avgBy.none
 
-**ScalaSql Query**
 ```scala
 Purchase.select.filter(_ => false).avgByOpt(_.count)
 ```
 
-**Generated Sql**
 ```sql
 SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
 ```
 
 
-**Results**
 ```scala
 Option.empty[Int]
 ```
@@ -1417,18 +1220,15 @@ Option.empty[Int]
 ## scalasql.h2.ExprStringOpsTests
 ### scalasql.h2.ExprStringOpsTests.plus
 
-**ScalaSql Query**
 ```scala
 Expr("hello") + Expr("world")
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? || ? as res
 ```
 
 
-**Results**
 ```scala
 "helloworld"
 ```
@@ -1436,18 +1236,15 @@ SELECT ? || ? as res
 
 ### scalasql.h2.ExprStringOpsTests.like
 
-**ScalaSql Query**
 ```scala
 Expr("hello").like("he%")
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? LIKE ? as res
 ```
 
 
-**Results**
 ```scala
 true
 ```
@@ -1455,18 +1252,15 @@ true
 
 ### scalasql.h2.ExprStringOpsTests.length
 
-**ScalaSql Query**
 ```scala
 Expr("hello").length
 ```
 
-**Generated Sql**
 ```sql
 SELECT LENGTH(?) as res
 ```
 
 
-**Results**
 ```scala
 5
 ```
@@ -1474,18 +1268,15 @@ SELECT LENGTH(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.octetLength
 
-**ScalaSql Query**
 ```scala
 Expr("叉烧包").octetLength
 ```
 
-**Generated Sql**
 ```sql
 SELECT OCTET_LENGTH(?) as res
 ```
 
 
-**Results**
 ```scala
 9
 ```
@@ -1493,18 +1284,15 @@ SELECT OCTET_LENGTH(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.position
 
-**ScalaSql Query**
 ```scala
 Expr("hello").indexOf("ll")
 ```
 
-**Generated Sql**
 ```sql
 SELECT INSTR(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -1512,18 +1300,15 @@ SELECT INSTR(?, ?) as res
 
 ### scalasql.h2.ExprStringOpsTests.toLowerCase
 
-**ScalaSql Query**
 ```scala
 Expr("Hello").toLowerCase
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(?) as res
 ```
 
 
-**Results**
 ```scala
 "hello"
 ```
@@ -1531,18 +1316,15 @@ SELECT LOWER(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.trim
 
-**ScalaSql Query**
 ```scala
 Expr("  Hello ").trim
 ```
 
-**Generated Sql**
 ```sql
 SELECT TRIM(?) as res
 ```
 
 
-**Results**
 ```scala
 "Hello"
 ```
@@ -1550,18 +1332,15 @@ SELECT TRIM(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.ltrim
 
-**ScalaSql Query**
 ```scala
 Expr("  Hello ").ltrim
 ```
 
-**Generated Sql**
 ```sql
 SELECT LTRIM(?) as res
 ```
 
 
-**Results**
 ```scala
 "Hello "
 ```
@@ -1569,18 +1348,15 @@ SELECT LTRIM(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.rtrim
 
-**ScalaSql Query**
 ```scala
 Expr("  Hello ").rtrim
 ```
 
-**Generated Sql**
 ```sql
 SELECT RTRIM(?) as res
 ```
 
 
-**Results**
 ```scala
 "  Hello"
 ```
@@ -1588,18 +1364,15 @@ SELECT RTRIM(?) as res
 
 ### scalasql.h2.ExprStringOpsTests.substring
 
-**ScalaSql Query**
 ```scala
 Expr("Hello").substring(2, 2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUBSTRING(?, ?, ?) as res
 ```
 
 
-**Results**
 ```scala
 "el"
 ```
@@ -1608,18 +1381,15 @@ SELECT SUBSTRING(?, ?, ?) as res
 ## scalasql.h2.H2DialectTests
 ### scalasql.h2.H2DialectTests.ltrim2
 
-**ScalaSql Query**
 ```scala
 Expr("xxHellox").ltrim("x")
 ```
 
-**Generated Sql**
 ```sql
 SELECT LTRIM(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 "Hellox"
 ```
@@ -1627,18 +1397,15 @@ SELECT LTRIM(?, ?) as res
 
 ### scalasql.h2.H2DialectTests.rtrim2
 
-**ScalaSql Query**
 ```scala
 Expr("xxHellox").rtrim("x")
 ```
 
-**Generated Sql**
 ```sql
 SELECT RTRIM(?, ?) as res
 ```
 
 
-**Results**
 ```scala
 "xxHello"
 ```
@@ -1646,18 +1413,15 @@ SELECT RTRIM(?, ?) as res
 
 ### scalasql.h2.H2DialectTests.lpad
 
-**ScalaSql Query**
 ```scala
 Expr("Hello").lpad(10, "xy")
 ```
 
-**Generated Sql**
 ```sql
 SELECT LPAD(?, ?, ?) as res
 ```
 
 
-**Results**
 ```scala
 "xxxxxHello"
 ```
@@ -1665,18 +1429,15 @@ SELECT LPAD(?, ?, ?) as res
 
 ### scalasql.h2.H2DialectTests.rpad
 
-**ScalaSql Query**
 ```scala
 Expr("Hello").rpad(10, "xy")
 ```
 
-**Generated Sql**
 ```sql
 SELECT RPAD(?, ?, ?) as res
 ```
 
 
-**Results**
 ```scala
 "Helloxxxxx"
 ```
@@ -1685,19 +1446,16 @@ SELECT RPAD(?, ?, ?) as res
 ## scalasql.h2.InsertTests
 ### scalasql.h2.InsertTests.single.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.insert
   .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"), _.id := 4)
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -1705,14 +1463,12 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 
 ### scalasql.h2.InsertTests.single.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
 
 
-**Results**
 ```scala
 Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
@@ -1720,18 +1476,15 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 
 ### scalasql.h2.InsertTests.single.partial
 
-**ScalaSql Query**
 ```scala
 Buyer.insert.values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -1739,14 +1492,12 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 
 ### scalasql.h2.InsertTests.single.partial
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
 ```
 
 
 
-**Results**
 ```scala
 Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 ```
@@ -1754,7 +1505,6 @@ Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
 
 ### scalasql.h2.InsertTests.batch.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
   ("test buyer A", LocalDate.parse("2001-04-07"), 4),
@@ -1763,7 +1513,6 @@ Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
 )
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (name, date_of_birth, id)
 VALUES
@@ -1773,7 +1522,6 @@ VALUES
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -1781,14 +1529,12 @@ VALUES
 
 ### scalasql.h2.InsertTests.batch.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -1803,7 +1549,6 @@ Seq(
 
 ### scalasql.h2.InsertTests.batch.partial
 
-**ScalaSql Query**
 ```scala
 Buyer.insert.batched(_.name, _.dateOfBirth)(
   ("test buyer A", LocalDate.parse("2001-04-07")),
@@ -1812,14 +1557,12 @@ Buyer.insert.batched(_.name, _.dateOfBirth)(
 )
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (name, date_of_birth)
 VALUES (?, ?), (?, ?), (?, ?)
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -1827,14 +1570,12 @@ VALUES (?, ?), (?, ?), (?, ?)
 
 ### scalasql.h2.InsertTests.batch.partial
 
-**ScalaSql Query**
 ```scala
 Buyer.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -1850,7 +1591,6 @@ Seq(
 
 ### scalasql.h2.InsertTests.select.caseclass
 
-**ScalaSql Query**
 ```scala
 Buyer.insert.select(
   identity,
@@ -1858,7 +1598,6 @@ Buyer.insert.select(
 )
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (id, name, date_of_birth)
 SELECT
@@ -1870,7 +1609,6 @@ WHERE buyer0.name <> ?
 ```
 
 
-**Results**
 ```scala
 2
 ```
@@ -1878,14 +1616,12 @@ WHERE buyer0.name <> ?
 
 ### scalasql.h2.InsertTests.select.caseclass
 
-**ScalaSql Query**
 ```scala
 Buyer.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -1899,7 +1635,6 @@ Seq(
 
 ### scalasql.h2.InsertTests.select.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.insert.select(
   x => (x.name, x.dateOfBirth),
@@ -1907,7 +1642,6 @@ Buyer.insert.select(
 )
 ```
 
-**Generated Sql**
 ```sql
 INSERT INTO buyer (name, date_of_birth)
 SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
@@ -1916,7 +1650,6 @@ WHERE buyer0.name <> ?
 ```
 
 
-**Results**
 ```scala
 2
 ```
@@ -1924,14 +1657,12 @@ WHERE buyer0.name <> ?
 
 ### scalasql.h2.InsertTests.select.simple
 
-**ScalaSql Query**
 ```scala
 Buyer.select
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -1947,12 +1678,10 @@ Seq(
 ## scalasql.h2.JoinTests
 ### scalasql.h2.JoinTests.joinFilter
 
-**ScalaSql Query**
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -1967,7 +1696,6 @@ WHERE buyer0.name = ?
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -1984,12 +1712,10 @@ Seq(
 
 ### scalasql.h2.JoinTests.joinSelectFilter
 
-**ScalaSql Query**
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -2004,7 +1730,6 @@ WHERE buyer0.name = ?
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2021,13 +1746,11 @@ Seq(
 
 ### scalasql.h2.JoinTests.joinFilterMap
 
-**ScalaSql Query**
 ```scala
 Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "James Bond")
   .map(_._2.shippingDate)
 ```
 
-**Generated Sql**
 ```sql
 SELECT shipping_info1.shipping_date as res
 FROM buyer buyer0
@@ -2036,7 +1759,6 @@ WHERE buyer0.name = ?
 ```
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2012-04-05"))
 ```
@@ -2044,12 +1766,10 @@ Seq(LocalDate.parse("2012-04-05"))
 
 ### scalasql.h2.JoinTests.selfJoin
 
-**ScalaSql Query**
 ```scala
 Buyer.select.joinOn(Buyer)(_.id `=` _.id)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -2063,7 +1783,6 @@ JOIN buyer buyer1 ON buyer0.id = buyer1.id
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2084,12 +1803,10 @@ Seq(
 
 ### scalasql.h2.JoinTests.selfJoin2
 
-**ScalaSql Query**
 ```scala
 Buyer.select.joinOn(Buyer)(_.id <> _.id)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -2103,7 +1820,6 @@ JOIN buyer buyer1 ON buyer0.id <> buyer1.id
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2136,14 +1852,12 @@ Seq(
 
 ### scalasql.h2.JoinTests.flatMap
 
-**ScalaSql Query**
 ```scala
 Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
   c.id `=` p.buyerId && c.name `=` "James Bond"
 }.map(_._2.shippingDate)
 ```
 
-**Generated Sql**
 ```sql
 SELECT shipping_info1.shipping_date as res
 FROM buyer buyer0, shipping_info shipping_info1
@@ -2152,7 +1866,6 @@ AND buyer0.name = ?
 ```
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2012-04-05"))
 ```
@@ -2160,14 +1873,12 @@ Seq(LocalDate.parse("2012-04-05"))
 
 ### scalasql.h2.JoinTests.flatMap2
 
-**ScalaSql Query**
 ```scala
 Buyer.select
   .flatMap(c => ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" })
   .map(_.shippingDate)
 ```
 
-**Generated Sql**
 ```sql
 SELECT shipping_info1.shipping_date as res
 FROM buyer buyer0, shipping_info shipping_info1
@@ -2176,7 +1887,6 @@ AND buyer0.name = ?
 ```
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2012-04-05"))
 ```
@@ -2184,12 +1894,10 @@ Seq(LocalDate.parse("2012-04-05"))
 
 ### scalasql.h2.JoinTests.leftJoin
 
-**ScalaSql Query**
 ```scala
 Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -2203,7 +1911,6 @@ LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2225,12 +1932,10 @@ Seq(
 
 ### scalasql.h2.JoinTests.rightJoin
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__0__id,
@@ -2244,7 +1949,6 @@ RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2266,12 +1970,10 @@ Seq(
 
 ### scalasql.h2.JoinTests.outerJoin
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__0__id,
@@ -2295,7 +1997,6 @@ RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
 ```
 
 
-**Results**
 ```scala
 Seq(
   (
@@ -2318,7 +2019,6 @@ Seq(
 ## scalasql.h2.OptionalTests
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2326,7 +2026,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2334,12 +2033,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.selectAll
 
-**ScalaSql Query**
 ```scala
 OptCols.select
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2348,7 +2045,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2361,7 +2057,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2369,7 +2064,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2377,12 +2071,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.groupByMaxGet
 
-**ScalaSql Query**
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__0, MAX(opt_cols0.my_int2) as res__1
 FROM opt_cols opt_cols0
@@ -2390,7 +2082,6 @@ GROUP BY opt_cols0.my_int
 ```
 
 
-**Results**
 ```scala
 Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
 ```
@@ -2398,7 +2089,6 @@ Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None)
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2406,7 +2096,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2414,12 +2103,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.isDefined
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2429,7 +2116,6 @@ WHERE opt_cols0.my_int IS NOT NULL
 ```
 
 
-**Results**
 ```scala
 Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
 ```
@@ -2437,7 +2123,6 @@ Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2445,7 +2130,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2453,12 +2137,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.isEmpty
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2468,7 +2150,6 @@ WHERE opt_cols0.my_int IS NULL
 ```
 
 
-**Results**
 ```scala
 Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
@@ -2476,7 +2157,6 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2484,7 +2164,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2492,12 +2171,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sqlEquals.nonOptionHit
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2507,7 +2184,6 @@ WHERE opt_cols0.my_int = ?
 ```
 
 
-**Results**
 ```scala
 Seq(OptCols[Id](Some(1), Some(2)))
 ```
@@ -2515,7 +2191,6 @@ Seq(OptCols[Id](Some(1), Some(2)))
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2523,7 +2198,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2531,12 +2205,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sqlEquals.nonOptionMiss
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt `=` 2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2546,7 +2218,6 @@ WHERE opt_cols0.my_int = ?
 ```
 
 
-**Results**
 ```scala
 Seq[OptCols[Id]]()
 ```
@@ -2554,7 +2225,6 @@ Seq[OptCols[Id]]()
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2562,7 +2232,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2570,12 +2239,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sqlEquals.optionMiss
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt `=` Option.empty[Int])
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2585,7 +2252,6 @@ WHERE opt_cols0.my_int = ?
 ```
 
 
-**Results**
 ```scala
 Seq[OptCols[Id]]()
 ```
@@ -2593,7 +2259,6 @@ Seq[OptCols[Id]]()
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2601,7 +2266,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2609,12 +2273,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.scalaEquals.someHit
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2624,7 +2286,6 @@ WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
 ```
 
 
-**Results**
 ```scala
 Seq(OptCols[Id](Some(1), Some(2)))
 ```
@@ -2632,7 +2293,6 @@ Seq(OptCols[Id](Some(1), Some(2)))
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2640,7 +2300,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2648,12 +2307,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.scalaEquals.noneHit
 
-**ScalaSql Query**
 ```scala
 OptCols.select.filter(_.myInt === Option.empty[Int])
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int as res__my_int,
@@ -2663,7 +2320,6 @@ WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
 ```
 
 
-**Results**
 ```scala
 Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 ```
@@ -2671,7 +2327,6 @@ Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2679,7 +2334,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2687,12 +2341,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.map
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int + ? as res__my_int,
@@ -2701,7 +2353,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2714,7 +2365,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2722,7 +2372,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2730,18 +2379,15 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.map2
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(_.myInt.map(_ + 10))
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(None, Some(11), Some(13), None)
 ```
@@ -2749,7 +2395,6 @@ Seq(None, Some(11), Some(13), None)
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2757,7 +2402,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2765,12 +2409,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.flatMap
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -2779,7 +2421,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2793,7 +2434,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2801,7 +2441,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2809,12 +2448,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.mapGet
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -2823,7 +2460,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2837,7 +2473,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2845,7 +2480,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2853,12 +2487,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.rawGet
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -2867,7 +2499,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2881,7 +2512,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2889,7 +2519,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2897,12 +2526,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.getOrElse
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   COALESCE(opt_cols0.my_int, ?) as res__my_int,
@@ -2911,7 +2538,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](Some(-1), None),
@@ -2924,7 +2550,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2932,7 +2557,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2940,12 +2564,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.orElse
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   COALESCE(opt_cols0.my_int, opt_cols0.my_int2) as res__my_int,
@@ -2954,7 +2576,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -2967,7 +2588,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -2975,7 +2595,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -2983,12 +2602,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.filter
 
-**ScalaSql Query**
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   CASE
@@ -3000,7 +2617,6 @@ FROM opt_cols opt_cols0
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -3013,7 +2629,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3021,7 +2636,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3029,12 +2643,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.nullsLast
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3042,7 +2654,6 @@ ORDER BY res__my_int NULLS LAST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](Some(1), Some(2)),
@@ -3055,7 +2666,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3063,7 +2673,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3071,12 +2680,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.nullsFirst
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).nullsFirst
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3084,7 +2691,6 @@ ORDER BY res__my_int NULLS FIRST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -3097,7 +2703,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3105,7 +2710,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3113,12 +2717,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.ascNullsLast
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsLast
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3126,7 +2728,6 @@ ORDER BY res__my_int ASC NULLS LAST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](Some(1), Some(2)),
@@ -3139,7 +2740,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3147,7 +2747,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3155,12 +2754,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.ascNullsFirst
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).asc.nullsFirst
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3168,7 +2765,6 @@ ORDER BY res__my_int ASC NULLS FIRST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -3181,7 +2777,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3189,7 +2784,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3197,12 +2791,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.descNullsLast
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsLast
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3210,7 +2802,6 @@ ORDER BY res__my_int DESC NULLS LAST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](Some(3), None),
@@ -3223,7 +2814,6 @@ Seq(
 
 ### scalasql.h2.OptionalTests
 
-**ScalaSql Query**
 ```scala
 OptCols.insert
   .batched(_.myInt, _.myInt2)((None, None), (Some(1), Some(2)), (Some(3), None), (None, Some(4)))
@@ -3231,7 +2821,6 @@ OptCols.insert
 
 
 
-**Results**
 ```scala
 4
 ```
@@ -3239,12 +2828,10 @@ OptCols.insert
 
 ### scalasql.h2.OptionalTests.sorting.descNullsFirst
 
-**ScalaSql Query**
 ```scala
 OptCols.select.sortBy(_.myInt).desc.nullsFirst
 ```
 
-**Generated Sql**
 ```sql
 SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
 FROM opt_cols opt_cols0
@@ -3252,7 +2839,6 @@ ORDER BY res__my_int DESC NULLS FIRST
 ```
 
 
-**Results**
 ```scala
 Seq(
   OptCols[Id](None, None),
@@ -3266,18 +2852,15 @@ Seq(
 ## scalasql.h2.SelectTests
 ### scalasql.h2.SelectTests.constant
 
-**ScalaSql Query**
 ```scala
 Expr(1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT ? as res
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -3285,12 +2868,10 @@ SELECT ? as res
 
 ### scalasql.h2.SelectTests.table
 
-**ScalaSql Query**
 ```scala
 Buyer.select
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__id,
@@ -3300,7 +2881,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
@@ -3312,12 +2892,10 @@ Seq(
 
 ### scalasql.h2.SelectTests.filter.single
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__id,
@@ -3328,7 +2906,6 @@ WHERE shipping_info0.buyer_id = ?
 ```
 
 
-**Results**
 ```scala
 Seq(
   ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
@@ -3339,12 +2916,10 @@ Seq(
 
 ### scalasql.h2.SelectTests.filter.multiple
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__id,
@@ -3356,7 +2931,6 @@ AND shipping_info0.shipping_date = ?
 ```
 
 
-**Results**
 ```scala
 Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
 ```
@@ -3364,13 +2938,11 @@ Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-0
 
 ### scalasql.h2.SelectTests.filter.dotSingle.pass
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.filter(_.buyerId `=` 2).filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
   .single
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__id,
@@ -3382,7 +2954,6 @@ AND shipping_info0.shipping_date = ?
 ```
 
 
-**Results**
 ```scala
 ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
 ```
@@ -3390,12 +2961,10 @@ ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06
 
 ### scalasql.h2.SelectTests.filter.combined
 
-**ScalaSql Query**
 ```scala
 ShippingInfo.select.filter(p => p.buyerId `=` 2 && p.shippingDate `=` LocalDate.parse("2012-05-06"))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   shipping_info0.id as res__id,
@@ -3407,7 +2976,6 @@ AND shipping_info0.shipping_date = ?
 ```
 
 
-**Results**
 ```scala
 Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
 ```
@@ -3415,18 +2983,15 @@ Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
 
 ### scalasql.h2.SelectTests.map.single
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(_.name)
 ```
 
-**Generated Sql**
 ```sql
 SELECT buyer0.name as res FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
@@ -3434,18 +2999,15 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 
 ### scalasql.h2.SelectTests.map.tuple2
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(c => (c.name, c.id))
 ```
 
-**Generated Sql**
 ```sql
 SELECT buyer0.name as res__0, buyer0.id as res__1 FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
 ```
@@ -3453,12 +3015,10 @@ Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3))
 
 ### scalasql.h2.SelectTests.map.tuple3
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.name as res__0,
@@ -3468,7 +3028,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(
   ("James Bond", 1, LocalDate.parse("2001-02-03")),
@@ -3480,18 +3039,15 @@ Seq(
 
 ### scalasql.h2.SelectTests.map.interpolateInMap
 
-**ScalaSql Query**
 ```scala
 Product.select.map(_.price * 2)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.price * ? as res FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
 ```
@@ -3499,12 +3055,10 @@ Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2)
 
 ### scalasql.h2.SelectTests.map.heterogenousTuple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(c => (c.id, c))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0,
@@ -3515,7 +3069,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(
   (1, Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))),
@@ -3527,7 +3080,6 @@ Seq(
 
 ### scalasql.h2.SelectTests.exprQuery
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p =>
   (
@@ -3537,7 +3089,6 @@ Product.select.map(p =>
 )
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   product0.name as res__0,
@@ -3550,7 +3101,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq(
   ("Face Mask", 888.0),
@@ -3565,19 +3115,16 @@ Seq(
 
 ### scalasql.h2.SelectTests.subquery
 
-**ScalaSql Query**
 ```scala
 Buyer.select.subquery.map(_.name)
 ```
 
-**Generated Sql**
 ```sql
 SELECT subquery0.res__name as res
 FROM (SELECT buyer0.name as res__name FROM buyer buyer0) subquery0
 ```
 
 
-**Results**
 ```scala
 Seq("James Bond", "叉烧包", "Li Haoyi")
 ```
@@ -3585,18 +3132,15 @@ Seq("James Bond", "叉烧包", "Li Haoyi")
 
 ### scalasql.h2.SelectTests.filterMap
 
-**ScalaSql Query**
 ```scala
 Product.select.filter(_.price < 100).map(_.name)
 ```
 
-**Generated Sql**
 ```sql
 SELECT product0.name as res FROM product product0 WHERE product0.price < ?
 ```
 
 
-**Results**
 ```scala
 Seq("Face Mask", "Socks", "Cookie")
 ```
@@ -3604,18 +3148,15 @@ Seq("Face Mask", "Socks", "Cookie")
 
 ### scalasql.h2.SelectTests.aggregate.single
 
-**ScalaSql Query**
 ```scala
 Purchase.select.aggregate(_.sumBy(_.total))
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.total) as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 12343.2
 ```
@@ -3623,18 +3164,15 @@ SELECT SUM(purchase0.total) as res FROM purchase purchase0
 
 ### scalasql.h2.SelectTests.aggregate.multiple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 ```
 
-**Generated Sql**
 ```sql
 SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 (12343.2, 10000.0)
 ```
@@ -3642,12 +3180,10 @@ SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purch
 
 ### scalasql.h2.SelectTests.groupBy.simple
 
-**ScalaSql Query**
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
 FROM purchase purchase0
@@ -3655,7 +3191,6 @@ GROUP BY purchase0.product_id
 ```
 
 
-**Results**
 ```scala
 Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
 ```
@@ -3663,12 +3198,10 @@ Seq((1, 932.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0), (6, 1.30))
 
 ### scalasql.h2.SelectTests.groupBy.having
 
-**ScalaSql Query**
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
 FROM purchase purchase0
@@ -3677,7 +3210,6 @@ HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
 ```
 
 
-**Results**
 ```scala
 Seq((2, 900.0), (4, 493.8), (5, 10000.0))
 ```
@@ -3685,12 +3217,10 @@ Seq((2, 900.0), (4, 493.8), (5, 10000.0))
 
 ### scalasql.h2.SelectTests.groupBy.filterHaving
 
-**ScalaSql Query**
 ```scala
 Purchase.select.filter(_.count > 5).groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100)
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
 FROM purchase purchase0
@@ -3700,7 +3230,6 @@ HAVING SUM(purchase0.total) > ?
 ```
 
 
-**Results**
 ```scala
 Seq((1, 888.0), (5, 10000.0))
 ```
@@ -3708,18 +3237,15 @@ Seq((1, 888.0), (5, 10000.0))
 
 ### scalasql.h2.SelectTests.distinct.nondistinct
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.shippingInfoId)
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase0.shipping_info_id as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Seq(1, 1, 1, 2, 2, 3, 3)
 ```
@@ -3727,18 +3253,15 @@ Seq(1, 1, 1, 2, 2, 3, 3)
 
 ### scalasql.h2.SelectTests.distinct.distinct
 
-**ScalaSql Query**
 ```scala
 Purchase.select.map(_.shippingInfoId).distinct
 ```
 
-**Generated Sql**
 ```sql
 SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0
 ```
 
 
-**Results**
 ```scala
 Seq(1, 2, 3)
 ```
@@ -3746,12 +3269,10 @@ Seq(1, 2, 3)
 
 ### scalasql.h2.SelectTests.contains
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 ```
 
-**Generated Sql**
 ```sql
 SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
 FROM buyer buyer0
@@ -3759,7 +3280,6 @@ WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shi
 ```
 
 
-**Results**
 ```scala
 Seq(
   Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -3770,12 +3290,10 @@ Seq(
 
 ### scalasql.h2.SelectTests.nonEmpty
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.name as res__0,
@@ -3787,7 +3305,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
 ```
@@ -3795,12 +3312,10 @@ Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false))
 
 ### scalasql.h2.SelectTests.isEmpty
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.name as res__0,
@@ -3812,7 +3327,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
 ```
@@ -3820,7 +3334,6 @@ Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
 
 ### scalasql.h2.SelectTests.case.when
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p =>
   caseWhen(
@@ -3831,7 +3344,6 @@ Product.select.map(p =>
 )
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   CASE
@@ -3843,7 +3355,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq(
   "Face Mask NORMAL",
@@ -3858,7 +3369,6 @@ Seq(
 
 ### scalasql.h2.SelectTests.case.else
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p =>
   caseWhen((p.price > 200) -> (p.name + " EXPENSIVE"), (p.price > 5) -> (p.name + " NORMAL"))
@@ -3866,7 +3376,6 @@ Product.select.map(p =>
 )
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   CASE
@@ -3878,7 +3387,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq(
   "Face Mask NORMAL",
@@ -3894,14 +3402,12 @@ Seq(
 ## scalasql.h2.SubQueryTests
 ### scalasql.h2.SubQueryTests.sortTakeJoin
 
-**ScalaSql Query**
 ```scala
 Purchase.select.joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id).map {
   case (purchase, product) => purchase.total
 }
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase0.total as res
 FROM purchase purchase0
@@ -3913,7 +3419,6 @@ ON purchase0.product_id = subquery1.res__id
 ```
 
 
-**Results**
 ```scala
 Seq(10000.0)
 ```
@@ -3921,14 +3426,12 @@ Seq(10000.0)
 
 ### scalasql.h2.SubQueryTests.sortTakeFrom
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
   case (product, purchase) => purchase.total
 }
 ```
 
-**Generated Sql**
 ```sql
 SELECT purchase1.total as res
 FROM (SELECT product0.id as res__id, product0.price as res__price
@@ -3939,7 +3442,6 @@ JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
 ```
 
 
-**Results**
 ```scala
 Seq(10000.0)
 ```
@@ -3947,7 +3449,6 @@ Seq(10000.0)
 
 ### scalasql.h2.SubQueryTests.sortTakeFromAndJoin
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).desc.take(3)
   .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId).map {
@@ -3955,7 +3456,6 @@ Product.select.sortBy(_.price).desc.take(3)
   }
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   subquery0.res__name as res__0,
@@ -3977,7 +3477,6 @@ ON subquery0.res__id = subquery1.res__product_id
 ```
 
 
-**Results**
 ```scala
 Seq(("Camera", 10))
 ```
@@ -3985,12 +3484,10 @@ Seq(("Camera", 10))
 
 ### scalasql.h2.SubQueryTests.sortLimitSortLimit
 
-**ScalaSql Query**
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
 ```
 
-**Generated Sql**
 ```sql
 SELECT subquery0.res__name as res
 FROM (SELECT
@@ -4004,7 +3501,6 @@ LIMIT 2
 ```
 
 
-**Results**
 ```scala
 Seq("Face Mask", "Skate Board")
 ```
@@ -4012,12 +3508,10 @@ Seq("Face Mask", "Skate Board")
 
 ### scalasql.h2.SubQueryTests.sortGroupBy
 
-**ScalaSql Query**
 ```scala
 Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 ```
 
-**Generated Sql**
 ```sql
 SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
 FROM (SELECT
@@ -4031,7 +3525,6 @@ GROUP BY subquery0.res__product_id
 ```
 
 
-**Results**
 ```scala
 Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
 ```
@@ -4039,14 +3532,12 @@ Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0))
 
 ### scalasql.h2.SubQueryTests.groupByJoin
 
-**ScalaSql Query**
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
   case ((productId, total), product) => (product.name, total)
 }
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   product1.name as res__0,
@@ -4060,7 +3551,6 @@ JOIN product product1 ON subquery0.res__0 = product1.id
 ```
 
 
-**Results**
 ```scala
 Seq(
   ("Camera", 10000.0),
@@ -4075,12 +3565,10 @@ Seq(
 
 ### scalasql.h2.SubQueryTests.subqueryInFilter
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__id,
@@ -4094,7 +3582,6 @@ WHERE (SELECT
 ```
 
 
-**Results**
 ```scala
 Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
 ```
@@ -4102,12 +3589,10 @@ Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
 
 ### scalasql.h2.SubQueryTests.subqueryInMap
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -4118,7 +3603,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(
   (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
@@ -4130,12 +3614,10 @@ Seq(
 
 ### scalasql.h2.SubQueryTests.subqueryInMapNested
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
 ```
 
-**Generated Sql**
 ```sql
 SELECT
   buyer0.id as res__0__id,
@@ -4149,7 +3631,6 @@ FROM buyer buyer0
 ```
 
 
-**Results**
 ```scala
 Seq(
   (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), true),
@@ -4161,13 +3642,11 @@ Seq(
 
 ### scalasql.h2.SubQueryTests.selectLimitUnionSelect
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(_.name.toLowerCase).take(2)
   .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
 ```
 
-**Generated Sql**
 ```sql
 SELECT subquery0.res as res
 FROM (SELECT
@@ -4180,7 +3659,6 @@ FROM product product0
 ```
 
 
-**Results**
 ```scala
 Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
 ```
@@ -4188,13 +3666,11 @@ Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "c
 
 ### scalasql.h2.SubQueryTests.selectUnionSelectLimit
 
-**ScalaSql Query**
 ```scala
 Buyer.select.map(_.name.toLowerCase)
   .unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2))
 ```
 
-**Generated Sql**
 ```sql
 SELECT LOWER(buyer0.name) as res
 FROM buyer buyer0
@@ -4207,7 +3683,6 @@ FROM (SELECT
 ```
 
 
-**Results**
 ```scala
 Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ```
@@ -4216,18 +3691,15 @@ Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
 ## scalasql.h2.UpdateJoinTests
 ### scalasql.h2.UpdateJoinTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4235,14 +3707,12 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateJoinTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4250,14 +3720,12 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateJoinTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("1965-08-09"))
 ```
@@ -4265,18 +3733,15 @@ Seq(LocalDate.parse("1965-08-09"))
 
 ### scalasql.h2.UpdateJoinTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ? WHERE ?
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -4284,14 +3749,12 @@ UPDATE buyer SET date_of_birth = ? WHERE ?
 
 ### scalasql.h2.UpdateJoinTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4299,14 +3762,12 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateJoinTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4314,19 +3775,16 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateJoinTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond")
   .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4334,14 +3792,12 @@ UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateJoinTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq[LocalDate]()
 ```
@@ -4349,14 +3805,12 @@ Seq[LocalDate]()
 
 ### scalasql.h2.UpdateJoinTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4364,18 +3818,15 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateJoinTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4383,14 +3834,12 @@ UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateJoinTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq[LocalDate]()
 ```
@@ -4398,14 +3847,12 @@ Seq[LocalDate]()
 
 ### scalasql.h2.UpdateJoinTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2001-02-03"))
 ```
@@ -4414,12 +3861,10 @@ Seq(LocalDate.parse("2001-02-03"))
 ## scalasql.h2.UpdateSubQueryTests
 ### scalasql.h2.UpdateSubQueryTests.setSubquery
 
-**ScalaSql Query**
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 ```
 
-**Generated Sql**
 ```sql
 UPDATE product
 SET price = (SELECT MAX(product0.price) as res FROM product product0)
@@ -4427,7 +3872,6 @@ WHERE ?
 ```
 
 
-**Results**
 ```scala
 6
 ```
@@ -4435,14 +3879,12 @@ WHERE ?
 
 ### scalasql.h2.UpdateSubQueryTests.setSubquery
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   (1, "Face Mask", 1000.0),
@@ -4457,12 +3899,10 @@ Seq(
 
 ### scalasql.h2.UpdateSubQueryTests.whereSubquery
 
-**ScalaSql Query**
 ```scala
 Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
 ```
 
-**Generated Sql**
 ```sql
 UPDATE product
 SET price = ?
@@ -4470,7 +3910,6 @@ WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4478,14 +3917,12 @@ WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
 
 ### scalasql.h2.UpdateSubQueryTests.whereSubquery
 
-**ScalaSql Query**
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
 ```
 
 
 
-**Results**
 ```scala
 Seq(
   (1, "Face Mask", 8.88),
@@ -4501,18 +3938,15 @@ Seq(
 ## scalasql.h2.UpdateTests
 ### scalasql.h2.UpdateTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond").set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4520,14 +3954,12 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4535,14 +3967,12 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateTests.update
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("1965-08-09"))
 ```
@@ -4550,18 +3980,15 @@ Seq(LocalDate.parse("1965-08-09"))
 
 ### scalasql.h2.UpdateTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ? WHERE ?
 ```
 
 
-**Results**
 ```scala
 3
 ```
@@ -4569,14 +3996,12 @@ UPDATE buyer SET date_of_birth = ? WHERE ?
 
 ### scalasql.h2.UpdateTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4584,14 +4009,12 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateTests.bulk
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4599,19 +4022,16 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond")
   .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4619,14 +4039,12 @@ UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq[LocalDate]()
 ```
@@ -4634,14 +4052,12 @@ Seq[LocalDate]()
 
 ### scalasql.h2.UpdateTests.multiple
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2019-04-07"))
 ```
@@ -4649,18 +4065,15 @@ Seq(LocalDate.parse("2019-04-07"))
 
 ### scalasql.h2.UpdateTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
 ```
 
-**Generated Sql**
 ```sql
 UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-**Results**
 ```scala
 1
 ```
@@ -4668,14 +4081,12 @@ UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 
 ### scalasql.h2.UpdateTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq[LocalDate]()
 ```
@@ -4683,14 +4094,12 @@ Seq[LocalDate]()
 
 ### scalasql.h2.UpdateTests.dynamic
 
-**ScalaSql Query**
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 ```
 
 
 
-**Results**
 ```scala
 Seq(LocalDate.parse("2001-02-03"))
 ```
