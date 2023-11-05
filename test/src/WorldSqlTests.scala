@@ -621,7 +621,9 @@ object WorldSqlTests extends TestSuite {
       test("languagesByCities") {
         // +DOCS
         //
-        // ## Complicated Queries
+        // ## Realistic Queries
+        //
+        // ### Languages Spoken In Most Cities
         // Here's a more complicated query using the techniques we've learned so far:
         // a query fetching the top 10 languages spoken by the largest number of cities
         val query = City.select
@@ -657,6 +659,7 @@ object WorldSqlTests extends TestSuite {
 
       test("weightedLifeExpectancyByContinent"){
         // +DOCS
+        // ### Population-Weighted Average Life Expectancy Per Continent
         // Another non-trivia query: listing the population-weighted
         // average life expectancy per continent
         val query = Country.select
@@ -688,8 +691,12 @@ object WorldSqlTests extends TestSuite {
 
       test("largestCityInThreeLargestCountries"){
         // +DOCS
-        // Another non-trivia query: listing the population-weighted
-        // average life expectancy per continent
+        // ### Most Populous City in each of the Three Most Populous Countries
+
+        def largestCitySubquery(countryCode: Expr[String]) = {
+          City.select.filter(_.countryCode === countryCode).sortBy(_.population).desc.take(1)
+        }
+
         val query = Country.select
           .sortBy(_.population).desc
           .take(3)
@@ -697,11 +704,10 @@ object WorldSqlTests extends TestSuite {
             (
               country.name,
               country.population,
-              City.select.filter(_.countryCode === country.code).sortBy(_.population).desc.take(1).map(_.name).exprQuery,
-              City.select.filter(_.countryCode === country.code).sortBy(_.population).desc.take(1).map(_.population).exprQuery
+              largestCitySubquery(country.code).map(_.name).exprQuery,
+              largestCitySubquery(country.code).map(_.population).exprQuery
             )
           )
-
 
         db.toSqlQuery(query) ==> """
         SELECT
@@ -713,7 +719,6 @@ object WorldSqlTests extends TestSuite {
         LIMIT 3
         """.trim.replaceAll("\\s+", " ")
 
-        pprint.log(db.run(query))
         db.run(query) ==> Seq(
           ("China", 1277558000L, "Shanghai", 9696300L),
           ("India", 1013662000L, "Mumbai (Bombay)", 10500000L),
