@@ -158,7 +158,7 @@ object scalasql extends RootModule with ScalaModule {
       .groupBy(_.suiteName)
       .toSeq
       .sortBy(_._2.head.suiteLine)
-      .distinctBy(_._1.split('.').drop(2).mkString("."))
+      .distinctBy { case (k, v) => dropDbPrefix(k)}
       .map{case (k, vs) => (dropDbPrefix(k), vs.map(r => r.copy(suiteName = dropDbPrefix(r.suiteName))))}
     for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
       val seen = mutable.Set.empty[String]
@@ -167,7 +167,7 @@ object scalasql extends RootModule with ScalaModule {
       var lastSeen = ""
       for(r <- suiteGroup){
 
-        val prettyName = (r.suiteName ++ r.testPath).mkString(".")
+        val prettyName = (r.suiteName +: r.testPath).mkString(".")
         val titleOpt =
           if (prettyName == lastSeen) Some("----")
           else if (!seen(prettyName)) Some(s"### $prettyName")

@@ -12,7 +12,7 @@ ScalaSql should do the right thing for you.
 
 ## DbApi
 Basic usage of `db.*` operations such as `db.run`
-### D.b.A.p.i.run
+### DbApi.run
 
 Most common usage of `dbClient.transaction`/`db.run`
 to run a simple query within a transaction
@@ -32,7 +32,7 @@ dbClient.transaction { db =>
 
 
 
-### D.b.A.p.i.runQuery
+### DbApi.runQuery
 
 `db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
 allowing you to construct SQL strings and interpolate variables within them.
@@ -66,7 +66,7 @@ dbClient.transaction { db =>
 
 
 
-### D.b.A.p.i.runUpdate
+### DbApi.runUpdate
 
 Similar to `db.runQuery`, `db.runUpdate` allows you to pass in a `SqlStr`, but runs
 an update rather than a query and expects to receive a single number back from the
@@ -94,7 +94,7 @@ dbClient.transaction { db =>
 
 
 
-### D.b.A.p.i.runRawQuery
+### DbApi.runRawQuery
 
 `runRawQuery` is similar to `runQuery` but allows you to pass in the SQL strings
 "raw", along with `?` placeholders and interpolated variables passed separately.
@@ -124,7 +124,7 @@ dbClient.transaction { db =>
 
 
 
-### D.b.A.p.i.runRawUpdate
+### DbApi.runRawUpdate
 
 `runRawUpdate` is similar to `runRawQuery`, but for update queries that
 return a single number
@@ -152,7 +152,7 @@ dbClient.transaction { db =>
 
 
 
-### D.b.A.p.i.stream
+### DbApi.stream
 
 `db.stream` can be run on queries that return `Seq[T]`s, and makes them
 return `geny.Generator[T]`s instead. This allows you to deserialize and
@@ -181,7 +181,7 @@ dbClient.transaction { db =>
 
 ## ExprBooleanOps
 Operations that can be performed on `Expr[Boolean]`
-### E.x.p.r.B.o.o.l.e.a.n.O.p.s.and
+### ExprBooleanOps.and
 
 
 
@@ -227,7 +227,7 @@ Expr(false) && Expr(true)
 
 
 
-### E.x.p.r.B.o.o.l.e.a.n.O.p.s.or
+### ExprBooleanOps.or
 
 
 
@@ -275,7 +275,7 @@ Expr(false) || Expr(false)
 
 ## ExprExprIntOps
 Operations that can be performed on `Expr[T]` when `T` is numeric
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.plus
+### ExprExprIntOps.plus
 
 
 
@@ -298,7 +298,7 @@ Expr(6) + Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.minus
+### ExprExprIntOps.minus
 
 
 
@@ -321,7 +321,7 @@ Expr(6) - Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.times
+### ExprExprIntOps.times
 
 
 
@@ -344,7 +344,7 @@ Expr(6) * Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.divide
+### ExprExprIntOps.divide
 
 
 
@@ -367,7 +367,7 @@ Expr(6) / Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.modulo
+### ExprExprIntOps.modulo
 
 
 
@@ -390,7 +390,7 @@ Expr(6) % Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.bitwiseAnd
+### ExprExprIntOps.bitwiseAnd
 
 
 
@@ -413,7 +413,7 @@ Expr(6) & Expr(2)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.bitwiseOr
+### ExprExprIntOps.bitwiseOr
 
 
 
@@ -436,7 +436,7 @@ Expr(6) | Expr(3)
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.between
+### ExprExprIntOps.between
 
 
 
@@ -459,7 +459,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.unaryPlus
+### ExprExprIntOps.unaryPlus
 
 
 
@@ -482,7 +482,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.unaryMinus
+### ExprExprIntOps.unaryMinus
 
 
 
@@ -505,7 +505,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.unaryTilde
+### ExprExprIntOps.unaryTilde
 
 
 
@@ -528,7 +528,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.abs
+### ExprExprIntOps.abs
 
 
 
@@ -551,7 +551,7 @@ Expr(-4).abs
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.mod
+### ExprExprIntOps.mod
 
 
 
@@ -574,7 +574,7 @@ Expr(8).mod(Expr(3))
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.ceil
+### ExprExprIntOps.ceil
 
 
 
@@ -597,7 +597,7 @@ Expr(4.3).ceil
 
 
 
-### E.x.p.r.E.x.p.r.I.n.t.O.p.s.floor
+### ExprExprIntOps.floor
 
 
 
@@ -645,7 +645,7 @@ Expr(4.7).floor
 
 ## ExprSeqNumericOps
 Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
-### E.x.p.r.S.e.q.N.u.m.e.r.i.c.O.p.s.sum
+### ExprSeqNumericOps.sum
 
 
 
@@ -668,7 +668,7 @@ Purchase.select.map(_.count).sum
 
 
 
-### E.x.p.r.S.e.q.N.u.m.e.r.i.c.O.p.s.min
+### ExprSeqNumericOps.min
 
 
 
@@ -691,7 +691,7 @@ Purchase.select.map(_.count).min
 
 
 
-### E.x.p.r.S.e.q.N.u.m.e.r.i.c.O.p.s.max
+### ExprSeqNumericOps.max
 
 
 
@@ -714,7 +714,7 @@ Purchase.select.map(_.count).max
 
 
 
-### E.x.p.r.S.e.q.N.u.m.e.r.i.c.O.p.s.avg
+### ExprSeqNumericOps.avg
 
 
 
@@ -739,7 +739,7 @@ Purchase.select.map(_.count).avg
 
 ## ExprSeqOps
 Operations that can be performed on `Expr[Seq[_]]`
-### E.x.p.r.S.e.q.O.p.s.size
+### ExprSeqOps.size
 
 
 
@@ -762,7 +762,7 @@ Purchase.select.size
 
 
 
-### E.x.p.r.S.e.q.O.p.s.sumBy.simple
+### ExprSeqOps.sumBy.simple
 
 
 
@@ -785,7 +785,7 @@ Purchase.select.sumBy(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.sumBy.some
+### ExprSeqOps.sumBy.some
 
 
 
@@ -808,7 +808,7 @@ Purchase.select.sumByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.sumBy.none
+### ExprSeqOps.sumBy.none
 
 
 
@@ -831,7 +831,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.minBy.simple
+### ExprSeqOps.minBy.simple
 
 
 
@@ -854,7 +854,7 @@ Purchase.select.minBy(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.minBy.some
+### ExprSeqOps.minBy.some
 
 
 
@@ -877,7 +877,7 @@ Purchase.select.minByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.minBy.none
+### ExprSeqOps.minBy.none
 
 
 
@@ -900,7 +900,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.maxBy.simple
+### ExprSeqOps.maxBy.simple
 
 
 
@@ -923,7 +923,7 @@ Purchase.select.maxBy(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.maxBy.some
+### ExprSeqOps.maxBy.some
 
 
 
@@ -946,7 +946,7 @@ Purchase.select.maxByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.maxBy.none
+### ExprSeqOps.maxBy.none
 
 
 
@@ -969,7 +969,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.avgBy.simple
+### ExprSeqOps.avgBy.simple
 
 
 
@@ -992,7 +992,7 @@ Purchase.select.avgBy(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.avgBy.some
+### ExprSeqOps.avgBy.some
 
 
 
@@ -1015,7 +1015,7 @@ Purchase.select.avgByOpt(_.count)
 
 
 
-### E.x.p.r.S.e.q.O.p.s.avgBy.none
+### ExprSeqOps.avgBy.none
 
 
 
@@ -1040,7 +1040,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 
 ## ExprStringOps
 Operations that can be performed on `Expr[String]`
-### E.x.p.r.S.t.r.i.n.g.O.p.s.plus
+### ExprStringOps.plus
 
 
 
@@ -1063,7 +1063,7 @@ Expr("hello") + Expr("world")
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.like
+### ExprStringOps.like
 
 
 
@@ -1086,7 +1086,7 @@ Expr("hello").like("he%")
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.length
+### ExprStringOps.length
 
 
 
@@ -1109,7 +1109,7 @@ Expr("hello").length
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.octetLength
+### ExprStringOps.octetLength
 
 
 
@@ -1132,7 +1132,7 @@ Expr("叉烧包").octetLength
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.position
+### ExprStringOps.position
 
 
 
@@ -1155,7 +1155,7 @@ Expr("hello").indexOf("ll")
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.toLowerCase
+### ExprStringOps.toLowerCase
 
 
 
@@ -1178,7 +1178,7 @@ Expr("Hello").toLowerCase
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.trim
+### ExprStringOps.trim
 
 
 
@@ -1201,7 +1201,7 @@ Expr("  Hello ").trim
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.ltrim
+### ExprStringOps.ltrim
 
 
 
@@ -1224,7 +1224,7 @@ Expr("  Hello ").ltrim
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.rtrim
+### ExprStringOps.rtrim
 
 
 
@@ -1247,7 +1247,7 @@ Expr("  Hello ").rtrim
 
 
 
-### E.x.p.r.S.t.r.i.n.g.O.p.s.substring
+### ExprStringOps.substring
 
 
 
@@ -1272,7 +1272,7 @@ Expr("Hello").substring(2, 2)
 
 ## Insert
 Basic `INSERT` operations
-### I.n.s.e.r.t.single.simple
+### Insert.single.simple
 
 
 
@@ -1317,7 +1317,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 
 
-### I.n.s.e.r.t.single.partial
+### Insert.single.partial
 
 
 
@@ -1359,7 +1359,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 
 
-### I.n.s.e.r.t.batch.simple
+### Insert.batch.simple
 
 
 
@@ -1415,7 +1415,7 @@ Buyer.select
 
 
 
-### I.n.s.e.r.t.batch.partial
+### Insert.batch.partial
 
 
 
@@ -1469,7 +1469,7 @@ Buyer.select
 
 
 
-### I.n.s.e.r.t.select.caseclass
+### Insert.select.caseclass
 
 
 
@@ -1527,7 +1527,7 @@ Buyer.select
 
 
 
-### I.n.s.e.r.t.select.simple
+### Insert.select.simple
 
 
 
@@ -1583,7 +1583,7 @@ Buyer.select
 
 ## Delete
 Basic `DELETE` operations
-### D.e.l.e.t.e.single
+### Delete.single
 
 
 
@@ -1632,7 +1632,7 @@ Purchase.select
 
 
 
-### D.e.l.e.t.e.multiple
+### Delete.multiple
 
 
 
@@ -1673,7 +1673,7 @@ Purchase.select
 
 
 
-### D.e.l.e.t.e.all
+### Delete.all
 
 
 
@@ -1718,7 +1718,7 @@ Purchase.select
 
 ## Select
 Basic `SELECT`` operations: map, filter, join, etc.
-### S.e.l.e.c.t.constant
+### Select.constant
 
 The most simple thing you can query in the database is an `Expr`. These do not need
 to be related to any database tables, and translate into raw `SELECT` calls without
@@ -1743,7 +1743,7 @@ Expr(1) + Expr(2)
 
 
 
-### S.e.l.e.c.t.table
+### Select.table
 
 You can list the contents of a table via the query `Table.select`. It returns a
 `Seq[CaseClass[Id]]` with the entire contents of the table. Note that listing
@@ -1777,7 +1777,7 @@ Buyer.select
 
 
 
-### S.e.l.e.c.t.filter.single
+### Select.filter.single
 
 ScalaSql's `.filter` translates to SQL `WHERE`, in this case we
 are searching for rows with a particular `buyerId`
@@ -1809,7 +1809,7 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
 
 
 
-### S.e.l.e.c.t.filter.multiple
+### Select.filter.multiple
 
 You can stack multiple `.filter`s on a query.
 
@@ -1840,7 +1840,7 @@ ShippingInfo.select
 
 
 
-### S.e.l.e.c.t.filter.dotSingle.pass
+### Select.filter.dotSingle.pass
 
 Queries that you expect to return a single row can be annotated with `.single`.
 This changes the return type of the `.select` from `Seq[T]` to just `T`, and throws
@@ -1874,7 +1874,7 @@ ShippingInfo.select
 
 
 
-### S.e.l.e.c.t.filter.combined
+### Select.filter.combined
 
 You can perform multiple checks in a single filter using `&&`
 
@@ -1904,7 +1904,7 @@ ShippingInfo.select
 
 
 
-### S.e.l.e.c.t.map.single
+### Select.map.single
 
 `.map` allows you to select exactly what you want to return from
 a query, rather than returning the entire row. Here, we return
@@ -1929,7 +1929,7 @@ Buyer.select.map(_.name)
 
 
 
-### S.e.l.e.c.t.map.filterMap
+### Select.map.filterMap
 
 The common use case of `SELECT FROM WHERE` can be achieved via `.select.filter.map` in ScalaSql
 
@@ -1952,7 +1952,7 @@ Product.select.filter(_.price < 100).map(_.name)
 
 
 
-### S.e.l.e.c.t.map.tuple2
+### Select.map.tuple2
 
 You can return multiple values from your `.map` by returning a tuple in your query,
 which translates into a `Seq[Tuple]` being returned when the query is run
@@ -1976,7 +1976,7 @@ Buyer.select.map(c => (c.name, c.id))
 
 
 
-### S.e.l.e.c.t.map.tuple3
+### Select.map.tuple3
 
 
 
@@ -2007,7 +2007,7 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
 
 
 
-### S.e.l.e.c.t.map.interpolateInMap
+### Select.map.interpolateInMap
 
 You can perform operations inside the `.map` to change what you return
 
@@ -2030,7 +2030,7 @@ Product.select.map(_.price * 2)
 
 
 
-### S.e.l.e.c.t.map.heterogenousTuple
+### Select.map.heterogenousTuple
 
 `.map` can return any combination of tuples, `case class`es, and primitives,
 arbitrarily nested. here we return a tuple of `(Int, Buyer[Id])`
@@ -2063,7 +2063,7 @@ Buyer.select.map(c => (c.id, c))
 
 
 
-### S.e.l.e.c.t.exprQuery
+### Select.exprQuery
 
 `SELECT` queries that return a single row and column can be used as SQL expressions
 in standard SQL databases. In ScalaSql, this is done by the `.exprQuery` method,
@@ -2115,7 +2115,7 @@ Product.select.map(p =>
 
 
 
-### S.e.l.e.c.t.subquery
+### Select.subquery
 
 ScalaSql generally combines operations like `.map` and `.filter` to minimize the
 number of subqueries to keep the generated SQL readable. If you explicitly want
@@ -2142,7 +2142,7 @@ Buyer.select.subquery.map(_.name)
 
 
 
-### S.e.l.e.c.t.aggregate.single
+### Select.aggregate.single
 
 You can use methods like `.sumBy` or `.sum` on your queries to generate
 SQL `SUM(...)` aggregates
@@ -2166,7 +2166,7 @@ Purchase.select.sumBy(_.total)
 
 
 
-### S.e.l.e.c.t.aggregate.multiple
+### Select.aggregate.multiple
 
 If you want to perform multiple aggregates at once, you can use the `.aggregate` method
 which takes a function allowing you to call multiple aggregates inside of it
@@ -2190,7 +2190,7 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 
 
 
-### S.e.l.e.c.t.groupBy.simple
+### Select.groupBy.simple
 
 ScalaSql's `.groupBy` method translates into a SQL `GROUP BY`. Unlike the normal
 `.groupBy` provided by `scala.Seq`, ScalaSql's `.groupBy` requires you to pass
@@ -2218,7 +2218,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
 
 
 
-### S.e.l.e.c.t.groupBy.having
+### Select.groupBy.having
 
 `.filter` calls following a `.groupBy` are automatically translated to SQL `HAVING` clauses
 
@@ -2244,7 +2244,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
 
 
 
-### S.e.l.e.c.t.groupBy.filterHaving
+### Select.groupBy.filterHaving
 
 
 
@@ -2274,7 +2274,7 @@ Purchase.select
 
 
 
-### S.e.l.e.c.t.distinct.nondistinct
+### Select.distinct.nondistinct
 
 Normal queries can allow duplicates in the returned row values, as seen below.
 You can use the `.distinct` operator (translates to SQl's `SELECT DISTINCT`)
@@ -2299,7 +2299,7 @@ Purchase.select.map(_.shippingInfoId)
 
 
 
-### S.e.l.e.c.t.distinct.distinct
+### Select.distinct.distinct
 
 
 
@@ -2322,7 +2322,7 @@ Purchase.select.map(_.shippingInfoId).distinct
 
 
 
-### S.e.l.e.c.t.contains
+### Select.contains
 
 ScalaSql's `.contains` method translates into SQL's `IN` syntax, e.g. here checking if a
 subquery contains a column as part of a `WHERE` clause
@@ -2351,7 +2351,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 
 
 
-### S.e.l.e.c.t.nonEmpty
+### Select.nonEmpty
 
 ScalaSql's `.nonEmpty` and `.isEmpty` translates to SQL's `EXISTS` and `NOT EXISTS` syntax
 
@@ -2381,7 +2381,7 @@ Buyer.select
 
 
 
-### S.e.l.e.c.t.isEmpty
+### Select.isEmpty
 
 
 
@@ -2411,7 +2411,7 @@ Buyer.select
 
 
 
-### S.e.l.e.c.t.case.when
+### Select.case.when
 
 ScalaSql's `caseWhen` method translates into SQL's `CASE`/`WHEN`/`ELSE`/`END` syntax,
 allowing you to perform basic conditionals as part of your SQL query
@@ -2454,7 +2454,7 @@ Product.select.map(p =>
 
 
 
-### S.e.l.e.c.t.case.else
+### Select.case.else
 
 
 
@@ -2497,7 +2497,7 @@ Product.select.map(p =>
 
 ## Join
 inner `JOIN`s, `JOIN ON`s, self-joins, `LEFT`/`RIGHT`/`OUTER` `JOIN`s
-### J.o.i.n.joinFilter
+### Join.joinFilter
 
 
 
@@ -2538,7 +2538,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 
 
-### J.o.i.n.joinSelectFilter
+### Join.joinSelectFilter
 
 
 
@@ -2579,7 +2579,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 
 
-### J.o.i.n.joinFilterMap
+### Join.joinFilterMap
 
 
 
@@ -2608,7 +2608,7 @@ Buyer.select
 
 
 
-### J.o.i.n.selfJoin
+### Join.selfJoin
 
 
 
@@ -2652,7 +2652,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
 
 
 
-### J.o.i.n.selfJoin2
+### Join.selfJoin2
 
 
 
@@ -2708,7 +2708,7 @@ Buyer.select.joinOn(Buyer)(_.id <> _.id)
 
 
 
-### J.o.i.n.flatMap
+### Join.flatMap
 
 
 
@@ -2737,7 +2737,7 @@ Buyer.select
 
 
 
-### J.o.i.n.flatMap2
+### Join.flatMap2
 
 
 
@@ -2765,7 +2765,7 @@ Buyer.select
 
 
 
-### J.o.i.n.leftJoin
+### Join.leftJoin
 
 
 
@@ -2810,7 +2810,7 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
 
 
 
-### J.o.i.n.rightJoin
+### Join.rightJoin
 
 
 
@@ -2855,7 +2855,7 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
 
 
 
-### J.o.i.n.outerJoin
+### Join.outerJoin
 
 
 
@@ -2912,7 +2912,7 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 
 ## CompoundSelect
 Compound `SELECT` operations: sort, take, drop, union, unionAll, etc.
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.simple
+### CompoundSelect.sort.simple
 
 
 
@@ -2935,7 +2935,7 @@ Product.select.sortBy(_.price).map(_.name)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.twice
+### CompoundSelect.sort.twice
 
 
 
@@ -2973,7 +2973,7 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortLimit
+### CompoundSelect.sort.sortLimit
 
 
 
@@ -2996,7 +2996,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortOffset
+### CompoundSelect.sort.sortOffset
 
 
 
@@ -3019,7 +3019,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortLimitTwiceHigher
+### CompoundSelect.sort.sortLimitTwiceHigher
 
 
 
@@ -3042,7 +3042,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortLimitTwiceLower
+### CompoundSelect.sort.sortLimitTwiceLower
 
 
 
@@ -3065,7 +3065,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortLimitOffset
+### CompoundSelect.sort.sortLimitOffset
 
 
 
@@ -3088,7 +3088,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortLimitOffsetTwice
+### CompoundSelect.sort.sortLimitOffsetTwice
 
 
 
@@ -3111,7 +3111,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sort.sortOffsetLimit
+### CompoundSelect.sort.sortOffsetLimit
 
 
 
@@ -3134,7 +3134,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.distinct
+### CompoundSelect.distinct
 
 
 
@@ -3161,7 +3161,7 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.flatMap
+### CompoundSelect.flatMap
 
 
 
@@ -3191,7 +3191,7 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.sumBy
+### CompoundSelect.sumBy
 
 
 
@@ -3218,7 +3218,7 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.aggregate
+### CompoundSelect.aggregate
 
 
 
@@ -3249,7 +3249,7 @@ Purchase.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.union
+### CompoundSelect.union
 
 
 
@@ -3287,7 +3287,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.unionAll
+### CompoundSelect.unionAll
 
 
 
@@ -3329,7 +3329,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.intersect
+### CompoundSelect.intersect
 
 
 
@@ -3358,7 +3358,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.except
+### CompoundSelect.except
 
 
 
@@ -3387,7 +3387,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.unionAllUnionSort
+### CompoundSelect.unionAllUnionSort
 
 
 
@@ -3434,7 +3434,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.unionAllUnionSortLimit
+### CompoundSelect.unionAllUnionSortLimit
 
 
 
@@ -3473,7 +3473,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.exceptAggregate
+### CompoundSelect.exceptAggregate
 
 
 
@@ -3512,7 +3512,7 @@ Product.select
 
 
 
-### C.o.m.p.o.u.n.d.S.e.l.e.c.t.unionAllAggregate
+### CompoundSelect.unionAllAggregate
 
 
 
@@ -3549,7 +3549,7 @@ Product.select
 
 ## SubQuery
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
-### S.u.b.Q.u.e.r.y.sortTakeJoin
+### SubQuery.sortTakeJoin
 
 
 
@@ -3580,7 +3580,7 @@ Purchase.select
 
 
 
-### S.u.b.Q.u.e.r.y.sortTakeFrom
+### SubQuery.sortTakeFrom
 
 
 
@@ -3610,7 +3610,7 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
 
 
 
-### S.u.b.Q.u.e.r.y.sortTakeFromAndJoin
+### SubQuery.sortTakeFromAndJoin
 
 
 
@@ -3654,7 +3654,7 @@ Product.select
 
 
 
-### S.u.b.Q.u.e.r.y.sortLimitSortLimit
+### SubQuery.sortLimitSortLimit
 
 
 
@@ -3685,7 +3685,7 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
 
 
 
-### S.u.b.Q.u.e.r.y.sortGroupBy
+### SubQuery.sortGroupBy
 
 
 
@@ -3716,7 +3716,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 
 
-### S.u.b.Q.u.e.r.y.groupByJoin
+### SubQuery.groupByJoin
 
 
 
@@ -3756,7 +3756,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
 
 
 
-### S.u.b.Q.u.e.r.y.subqueryInFilter
+### SubQuery.subqueryInFilter
 
 
 
@@ -3787,7 +3787,7 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 
 
 
-### S.u.b.Q.u.e.r.y.subqueryInMap
+### SubQuery.subqueryInMap
 
 
 
@@ -3819,7 +3819,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 
 
-### S.u.b.Q.u.e.r.y.subqueryInMapNested
+### SubQuery.subqueryInMapNested
 
 
 
@@ -3854,7 +3854,7 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 
 
 
-### S.u.b.Q.u.e.r.y.selectLimitUnionSelect
+### SubQuery.selectLimitUnionSelect
 
 
 
@@ -3887,7 +3887,7 @@ Buyer.select
 
 
 
-### S.u.b.Q.u.e.r.y.selectUnionSelectLimit
+### SubQuery.selectUnionSelectLimit
 
 
 
@@ -3921,7 +3921,7 @@ Buyer.select
 
 ## Update
 Basic `UPDATE` queries
-### U.p.d.a.t.e.update
+### Update.update
 
 
 
@@ -3982,7 +3982,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 
 
-### U.p.d.a.t.e.bulk
+### Update.bulk
 
 
 
@@ -4041,7 +4041,7 @@ Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth).single
 
 
 
-### U.p.d.a.t.e.multiple
+### Update.multiple
 
 
 
@@ -4102,7 +4102,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 
 
-### U.p.d.a.t.e.dynamic
+### Update.dynamic
 
 
 
@@ -4163,7 +4163,7 @@ Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
 
 ## UpdateJoin
 `UPDATE` queries that use `JOIN`s
-### U.p.d.a.t.e.J.o.i.n.join
+### UpdateJoin.join
 
 
 
@@ -4210,7 +4210,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 
 
-### U.p.d.a.t.e.J.o.i.n.multijoin
+### UpdateJoin.multijoin
 
 
 
@@ -4263,7 +4263,7 @@ Buyer.select.filter(_.id `=` 1).map(_.name)
 
 
 
-### U.p.d.a.t.e.J.o.i.n.joinSubquery
+### UpdateJoin.joinSubquery
 
 
 
@@ -4317,7 +4317,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 
 
-### U.p.d.a.t.e.J.o.i.n.joinSubqueryEliminatedColumn
+### UpdateJoin.joinSubqueryEliminatedColumn
 
 
 
@@ -4374,7 +4374,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 ## MySqlDialect
 Operations specific to working with MySql Databases
-### M.y.S.q.l.D.i.a.l.e.c.t.reverse
+### MySqlDialect.reverse
 
 
 
@@ -4397,7 +4397,7 @@ Expr("Hello").reverse
 
 
 
-### M.y.S.q.l.D.i.a.l.e.c.t.lpad
+### MySqlDialect.lpad
 
 
 
@@ -4420,7 +4420,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 
-### M.y.S.q.l.D.i.a.l.e.c.t.rpad
+### MySqlDialect.rpad
 
 
 
@@ -4443,7 +4443,7 @@ Expr("Hello").rpad(10, "xy")
 
 
 
-### M.y.S.q.l.D.i.a.l.e.c.t.conflict.ignore
+### MySqlDialect.conflict.ignore
 
 
 
@@ -4472,7 +4472,7 @@ Buyer.insert
 
 
 
-### M.y.S.q.l.D.i.a.l.e.c.t.conflict.update
+### MySqlDialect.conflict.update
 
 
 
@@ -4523,7 +4523,7 @@ Buyer.select
 
 
 
-### M.y.S.q.l.D.i.a.l.e.c.t.conflict.updateComputed
+### MySqlDialect.conflict.updateComputed
 
 
 
@@ -4576,7 +4576,7 @@ Buyer.select
 
 ## DataTypes
 Basic operations on all the data types that ScalaSql supports mapping between Database types and Scala types
-### D.a.t.a.T.y.p.e.s.constant
+### DataTypes.constant
 
 
 
@@ -4624,7 +4624,7 @@ DataTypes.select
 
 
 
-### D.a.t.a.T.y.p.e.s.nonRoundTrip
+### DataTypes.nonRoundTrip
 
 
 
@@ -4665,7 +4665,7 @@ NonRoundTripTypes.select
 
 ## Optional
 Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala
-### O.p.t.i.o.n.a.l
+### Optional
 
 
 
@@ -4688,7 +4688,7 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 
 
-### O.p.t.i.o.n.a.l.selectAll
+### Optional.selectAll
 
 
 
@@ -4719,7 +4719,7 @@ OptCols.select
 
 
 
-### O.p.t.i.o.n.a.l.groupByMaxGet
+### Optional.groupByMaxGet
 
 
 
@@ -4744,7 +4744,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 
 
-### O.p.t.i.o.n.a.l.isDefined
+### Optional.isDefined
 
 
 
@@ -4771,7 +4771,7 @@ OptCols.select.filter(_.myInt.isDefined)
 
 
 
-### O.p.t.i.o.n.a.l.isEmpty
+### Optional.isEmpty
 
 
 
@@ -4798,7 +4798,7 @@ OptCols.select.filter(_.myInt.isEmpty)
 
 
 
-### O.p.t.i.o.n.a.l.sqlEquals.nonOptionHit
+### Optional.sqlEquals.nonOptionHit
 
 
 
@@ -4825,7 +4825,7 @@ OptCols.select.filter(_.myInt `=` 1)
 
 
 
-### O.p.t.i.o.n.a.l.sqlEquals.nonOptionMiss
+### Optional.sqlEquals.nonOptionMiss
 
 
 
@@ -4852,7 +4852,7 @@ OptCols.select.filter(_.myInt `=` 2)
 
 
 
-### O.p.t.i.o.n.a.l.sqlEquals.optionMiss
+### Optional.sqlEquals.optionMiss
 
 
 
@@ -4879,7 +4879,7 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 
 
 
-### O.p.t.i.o.n.a.l.scalaEquals.someHit
+### Optional.scalaEquals.someHit
 
 
 
@@ -4906,7 +4906,7 @@ OptCols.select.filter(_.myInt === Option(1))
 
 
 
-### O.p.t.i.o.n.a.l.scalaEquals.noneHit
+### Optional.scalaEquals.noneHit
 
 
 
@@ -4933,7 +4933,7 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
 
 
 
-### O.p.t.i.o.n.a.l.map
+### Optional.map
 
 
 
@@ -4964,7 +4964,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
 
 
 
-### O.p.t.i.o.n.a.l.map2
+### Optional.map2
 
 
 
@@ -4987,7 +4987,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 
 
-### O.p.t.i.o.n.a.l.flatMap
+### Optional.flatMap
 
 
 
@@ -5020,7 +5020,7 @@ OptCols.select
 
 
 
-### O.p.t.i.o.n.a.l.mapGet
+### Optional.mapGet
 
 
 
@@ -5052,7 +5052,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 
 
 
-### O.p.t.i.o.n.a.l.rawGet
+### Optional.rawGet
 
 
 
@@ -5084,7 +5084,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 
 
 
-### O.p.t.i.o.n.a.l.getOrElse
+### Optional.getOrElse
 
 
 
@@ -5115,7 +5115,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 
 
 
-### O.p.t.i.o.n.a.l.orElse
+### Optional.orElse
 
 
 
@@ -5146,7 +5146,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 
 
 
-### O.p.t.i.o.n.a.l.filter
+### Optional.filter
 
 
 
@@ -5180,7 +5180,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
 
 
 
-### O.p.t.i.o.n.a.l.sorting.nullsLast
+### Optional.sorting.nullsLast
 
 
 
@@ -5210,7 +5210,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
 
 
 
-### O.p.t.i.o.n.a.l.sorting.nullsFirst
+### Optional.sorting.nullsFirst
 
 
 
@@ -5240,7 +5240,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
 
 
 
-### O.p.t.i.o.n.a.l.sorting.ascNullsLast
+### Optional.sorting.ascNullsLast
 
 
 
@@ -5270,7 +5270,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
 
 
 
-### O.p.t.i.o.n.a.l.sorting.ascNullsFirst
+### Optional.sorting.ascNullsFirst
 
 
 
@@ -5300,7 +5300,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
 
 
 
-### O.p.t.i.o.n.a.l.sorting.descNullsLast
+### Optional.sorting.descNullsLast
 
 
 
@@ -5330,7 +5330,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
 
 
 
-### O.p.t.i.o.n.a.l.sorting.descNullsFirst
+### Optional.sorting.descNullsFirst
 
 
 
@@ -5362,7 +5362,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 ## Transaction
 Usage of transactions, rollbacks, and savepoints
-### T.r.a.n.s.a.c.t.i.o.n.simple.commit
+### Transaction.simple.commit
 
 Common workflow to create a transaction and run a `delete` inside of it. The effect
 of the `delete` is visible both inside the transaction and outside after the
@@ -5385,7 +5385,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 0
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.simple.rollback
+### Transaction.simple.rollback
 
 Example of explicitly rolling back a transaction using the `db.rollback()` method.
 After rollback, the effects of the `delete` query are undone, and subsequent `select`
@@ -5412,7 +5412,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 7
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.simple.throw
+### Transaction.simple.throw
 
 Transactions are also rolled back if they terminate with an uncaught exception
 
@@ -5437,7 +5437,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 7
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.savepoint.commit
+### Transaction.savepoint.commit
 
 Savepoints are like "sub" transactions: they let you declare a savepoint
 and roll back any changes to the savepoint later. If a savepoint block
@@ -5467,7 +5467,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 0
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.savepoint.rollback
+### Transaction.savepoint.rollback
 
 Like transactions, savepoints support the `.rollback()` method, to undo any
 changes since the start of the savepoint block.
@@ -5497,7 +5497,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 4
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.savepoint.throw
+### Transaction.savepoint.throw
 
 Savepoints also roll back their enclosed changes automatically if they
 terminate with an uncaught exception
@@ -5530,7 +5530,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 4
 
 
 
-### T.r.a.n.s.a.c.t.i.o.n.doubleSavepoint.commit
+### Transaction.doubleSavepoint.commit
 
 Only one transaction can be present at a time, but savepoints can be arbitrarily nested.
 Uncaught exceptions or explicit `.rollback()` calls would roll back changes done during
@@ -5569,7 +5569,7 @@ dbClient.autoCommit.run(Purchase.select.size) ==> 1
 
 ## UpdateSubQuery
 `UPDATE` queries that use Subqueries
-### U.p.d.a.t.e.S.u.b.Q.u.e.r.y.setSubquery
+### UpdateSubQuery.setSubquery
 
 
 
@@ -5619,7 +5619,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 
 
-### U.p.d.a.t.e.S.u.b.Q.u.e.r.y.whereSubquery
+### UpdateSubQuery.whereSubquery
 
 
 
@@ -5671,7 +5671,7 @@ Product.select.map(p => (p.id, p.name, p.price))
 
 ## Returning
 Queries using `INSERT` or `UPDATE` with `RETURNING`
-### R.e.t.u.r.n.i.n.g.insert.single
+### Returning.insert.single
 
 
 
@@ -5714,7 +5714,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 
 
-### R.e.t.u.r.n.i.n.g.insert.dotSingle
+### Returning.insert.dotSingle
 
 
 
@@ -5758,7 +5758,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 
 
-### R.e.t.u.r.n.i.n.g.insert.multiple
+### Returning.insert.multiple
 
 
 
@@ -5818,7 +5818,7 @@ Buyer.select
 
 
 
-### R.e.t.u.r.n.i.n.g.insert.select
+### Returning.insert.select
 
 
 
@@ -5877,7 +5877,7 @@ Buyer.select
 
 
 
-### R.e.t.u.r.n.i.n.g.update.single
+### Returning.update.single
 
 
 
@@ -5921,7 +5921,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 
 
 
-### R.e.t.u.r.n.i.n.g.update.multiple
+### Returning.update.multiple
 
 
 
@@ -5949,7 +5949,7 @@ Buyer
 
 
 
-### R.e.t.u.r.n.i.n.g.delete
+### Returning.delete
 
 
 
@@ -5998,7 +5998,7 @@ Purchase.select
 
 ## OnConflict
 Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`
-### O.n.C.o.n.f.l.i.c.t.ignore
+### OnConflict.ignore
 
 
 
@@ -6027,7 +6027,7 @@ Buyer.insert
 
 
 
-### O.n.C.o.n.f.l.i.c.t.ignore.returningEmpty
+### OnConflict.ignore.returningEmpty
 
 
 
@@ -6059,7 +6059,7 @@ Buyer.insert
 
 
 
-### O.n.C.o.n.f.l.i.c.t.ignore.returningOne
+### OnConflict.ignore.returningOne
 
 
 
@@ -6091,7 +6091,7 @@ Buyer.insert
 
 
 
-### O.n.C.o.n.f.l.i.c.t.update
+### OnConflict.update
 
 
 
@@ -6142,7 +6142,7 @@ Buyer.select
 
 
 
-### O.n.C.o.n.f.l.i.c.t.computed
+### OnConflict.computed
 
 
 
@@ -6193,7 +6193,7 @@ Buyer.select
 
 
 
-### O.n.C.o.n.f.l.i.c.t.returning
+### OnConflict.returning
 
 
 
@@ -6229,7 +6229,7 @@ Buyer.insert
 
 ## PostgresDialect
 Operations specific to working with Postgres Databases
-### P.o.s.t.g.r.e.s.D.i.a.l.e.c.t.ltrim2
+### PostgresDialect.ltrim2
 
 
 
@@ -6252,7 +6252,7 @@ Expr("xxHellox").ltrim("x")
 
 
 
-### P.o.s.t.g.r.e.s.D.i.a.l.e.c.t.rtrim2
+### PostgresDialect.rtrim2
 
 
 
@@ -6275,7 +6275,7 @@ Expr("xxHellox").rtrim("x")
 
 
 
-### P.o.s.t.g.r.e.s.D.i.a.l.e.c.t.reverse
+### PostgresDialect.reverse
 
 
 
@@ -6298,7 +6298,7 @@ Expr("Hello").reverse
 
 
 
-### P.o.s.t.g.r.e.s.D.i.a.l.e.c.t.lpad
+### PostgresDialect.lpad
 
 
 
@@ -6321,7 +6321,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 
-### P.o.s.t.g.r.e.s.D.i.a.l.e.c.t.rpad
+### PostgresDialect.rpad
 
 
 
@@ -6346,7 +6346,7 @@ Expr("Hello").rpad(10, "xy")
 
 ## ExprIntOps
 Operations that can be performed on `Expr[T]` when `T` is numeric
-### E.x.p.r.I.n.t.O.p.s.plus
+### ExprIntOps.plus
 
 
 
@@ -6369,7 +6369,7 @@ Expr(6) + Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.minus
+### ExprIntOps.minus
 
 
 
@@ -6392,7 +6392,7 @@ Expr(6) - Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.times
+### ExprIntOps.times
 
 
 
@@ -6415,7 +6415,7 @@ Expr(6) * Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.divide
+### ExprIntOps.divide
 
 
 
@@ -6438,7 +6438,7 @@ Expr(6) / Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.modulo
+### ExprIntOps.modulo
 
 
 
@@ -6461,7 +6461,7 @@ Expr(6) % Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.bitwiseAnd
+### ExprIntOps.bitwiseAnd
 
 
 
@@ -6484,7 +6484,7 @@ Expr(6) & Expr(2)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.bitwiseOr
+### ExprIntOps.bitwiseOr
 
 
 
@@ -6507,7 +6507,7 @@ Expr(6) | Expr(3)
 
 
 
-### E.x.p.r.I.n.t.O.p.s.between
+### ExprIntOps.between
 
 
 
@@ -6530,7 +6530,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.I.n.t.O.p.s.unaryPlus
+### ExprIntOps.unaryPlus
 
 
 
@@ -6553,7 +6553,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.I.n.t.O.p.s.unaryMinus
+### ExprIntOps.unaryMinus
 
 
 
@@ -6576,7 +6576,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.I.n.t.O.p.s.unaryTilde
+### ExprIntOps.unaryTilde
 
 
 
@@ -6599,7 +6599,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 
-### E.x.p.r.I.n.t.O.p.s.abs
+### ExprIntOps.abs
 
 
 
@@ -6622,7 +6622,7 @@ Expr(-4).abs
 
 
 
-### E.x.p.r.I.n.t.O.p.s.mod
+### ExprIntOps.mod
 
 
 
@@ -6645,7 +6645,7 @@ Expr(8).mod(Expr(3))
 
 
 
-### E.x.p.r.I.n.t.O.p.s.ceil
+### ExprIntOps.ceil
 
 
 
@@ -6668,7 +6668,7 @@ Expr(4.3).ceil
 
 
 
-### E.x.p.r.I.n.t.O.p.s.floor
+### ExprIntOps.floor
 
 
 
@@ -6716,7 +6716,7 @@ Expr(4.7).floor
 
 ## SqliteDialect
 Operations specific to working with Sqlite Databases
-### S.q.l.i.t.e.D.i.a.l.e.c.t.ltrim2
+### SqliteDialect.ltrim2
 
 
 
@@ -6739,7 +6739,7 @@ Expr("xxHellox").ltrim("x")
 
 
 
-### S.q.l.i.t.e.D.i.a.l.e.c.t.rtrim2
+### SqliteDialect.rtrim2
 
 
 
@@ -6764,7 +6764,7 @@ Expr("xxHellox").rtrim("x")
 
 ## HsqlDbDialect
 Operations specific to working with HsqlDb Databases
-### H.s.q.l.D.b.D.i.a.l.e.c.t.ltrim2
+### HsqlDbDialect.ltrim2
 
 
 
@@ -6787,7 +6787,7 @@ Expr("xxHellox").ltrim("x")
 
 
 
-### H.s.q.l.D.b.D.i.a.l.e.c.t.rtrim2
+### HsqlDbDialect.rtrim2
 
 
 
@@ -6810,7 +6810,7 @@ Expr("xxHellox").rtrim("x")
 
 
 
-### H.s.q.l.D.b.D.i.a.l.e.c.t.reverse
+### HsqlDbDialect.reverse
 
 
 
@@ -6833,7 +6833,7 @@ Expr("Hello").reverse
 
 
 
-### H.s.q.l.D.b.D.i.a.l.e.c.t.lpad
+### HsqlDbDialect.lpad
 
 
 
@@ -6856,7 +6856,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 
-### H.s.q.l.D.b.D.i.a.l.e.c.t.rpad
+### HsqlDbDialect.rpad
 
 
 
@@ -6881,7 +6881,7 @@ Expr("Hello").rpad(10, "xy")
 
 ## H2Dialect
 Operations specific to working with H2 Databases
-### H.2.D.i.a.l.e.c.t.ltrim2
+### H2Dialect.ltrim2
 
 
 
@@ -6904,7 +6904,7 @@ Expr("xxHellox").ltrim("x")
 
 
 
-### H.2.D.i.a.l.e.c.t.rtrim2
+### H2Dialect.rtrim2
 
 
 
@@ -6927,7 +6927,7 @@ Expr("xxHellox").rtrim("x")
 
 
 
-### H.2.D.i.a.l.e.c.t.lpad
+### H2Dialect.lpad
 
 
 
@@ -6950,7 +6950,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 
-### H.2.D.i.a.l.e.c.t.rpad
+### H2Dialect.rpad
 
 
 
