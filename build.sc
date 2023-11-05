@@ -95,27 +95,29 @@ object scalasql extends RootModule with ScalaModule {
     }
     val scalafmt = rawScalaStrs.zip(formattedScalaStrs).toMap
 
+    def dedent(s: String, newIndent: String) = {
+      val indent = s
+        .linesIterator
+        .filter(_.trim.nonEmpty)
+        .map(_.takeWhile(_ == ' ').size)
+        .minOption
+        .getOrElse(0)
+
+      val dedented = s
+        .linesIterator
+        .map(_.drop(indent))
+        .mkString("\n" + newIndent)
+        .trim
+    }
     def sqlFormat(sOpt: Option[String]) = {
       sOpt match{
         case None => ""
         case Some(s) =>
 
-          val indent = s
-            .linesIterator
-            .filter(_.trim.nonEmpty)
-            .map(_.takeWhile(_ == ' ').size)
-            .minOption
-            .getOrElse(0)
-
-          val dedented = s
-            .linesIterator
-            .map(_.drop(indent))
-            .mkString("\n    ")
-            .trim
           s"""
              |*
              |    ```sql
-             |    $dedented
+             |    ${dedent(s, "    ")}
              |    ```
              |""".stripMargin
       }
@@ -166,7 +168,7 @@ object scalasql extends RootModule with ScalaModule {
             outputLines.append(
               s"""$title
                  |
-                 |${r.docs}
+                 |${dedent(r.docs, "")}
                  |
                  |```scala
                  |${scalafmt(r.queryCodeString)}
