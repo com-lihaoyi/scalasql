@@ -692,43 +692,56 @@ object WorldSqlTests extends TestSuite {
       test("largestCityInThreeLargestCountries"){
         // +DOCS
         // ### Most Populous City in each of the Three Most Populous Countries
-        // This example uses subqueries rather than joins to get the largest city matching
-        // each of the three largest countries. We want two columns - the name and population
-        // of the largest city - but a subquery expression in SQL can only return a single
-        // column. Thus, we extract the bulk of the "largest city" subquery into a helper
-        // method `largestCitySubquery`, which we can easily call twice and then `.map` to
-        // each of the two fields we want.
-
-        def largestCitySubquery(countryCode: Expr[String]) = {
-          City.select.filter(_.countryCode === countryCode).sortBy(_.population).desc.take(1)
-        }
+        // This example uses first gets the three largest Countries, `JOIN`s the
+        // Cities, uses a filter with a subquery to pick the city with the largest
+        // population in each country, and then returns the name and population of
+        // each city/country pair. The "top 3 countries" part of the query before
+        // the `JOIN` is automatically converted to a subquery to be compliant
+        // with SQL syntax
 
         val query = Country.select
           .sortBy(_.population).desc
           .take(3)
-          .map(country =>
-            (
-              country.name,
-              country.population,
-              largestCitySubquery(country.code).map(_.name).exprQuery,
-              largestCitySubquery(country.code).map(_.population).exprQuery
-            )
-          )
+          .joinOn(City)(_.code === _.countryCode)
+          .filter{case (country, city) =>
+            city.id ===
+            City.select
+              .filter(_.countryCode === country.code)
+              .sortBy(_.population).desc
+              .map(_.id)
+              .take(1)
+              .exprQuery
+          }
+          .map {
+            case (country, city) => (country.name, country.population, city.name, city.population)
+          }
 
         db.toSqlQuery(query) ==> """
         SELECT
-          country0.name as res__0, country0.population as res__1,
-          (SELECT city0.name as res FROM city city0 WHERE city0.countrycode = country0.code ORDER BY city0.population DESC LIMIT 1) as res__2,
-          (SELECT city0.population as res FROM city city0 WHERE city0.countrycode = country0.code ORDER BY res DESC LIMIT 1) as res__3
-        FROM country country0
-        ORDER BY res__1 DESC
-        LIMIT 3
+          subquery0.res__name as res__0,
+          subquery0.res__population as res__1,
+          city1.name as res__2,
+          city1.population as res__3
+        FROM (SELECT
+            country0.code as res__code,
+            country0.name as res__name,
+            country0.population as res__population
+          FROM country country0
+          ORDER BY res__population DESC
+          LIMIT 3) subquery0
+        JOIN city city1 ON subquery0.res__code = city1.countrycode
+        WHERE city1.id = (SELECT
+            city0.id as res
+            FROM city city0
+            WHERE city0.countrycode = subquery0.res__code
+            ORDER BY city0.population DESC
+            LIMIT 1)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq(
-          ("China", 1277558000L, "Shanghai", 9696300L),
-          ("India", 1013662000L, "Mumbai (Bombay)", 10500000L),
-          ("United States", 278357000L, "New York", 8008278L)
+          ("China", 1277558000, "Shanghai", 9696300),
+          ("India", 1013662000, "Mumbai (Bombay)", 10500000),
+          ("United States", 278357000, "New York", 8008278)
         )
         // -DOCS
       }

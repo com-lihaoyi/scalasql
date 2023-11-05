@@ -60,7 +60,7 @@ object Context {
     val fromSelectables = selectables.map(f => (f, computeSelectable(f))).toMap
     val fromSelectables0 = selectables.map(f => (f, computeSelectable0(f))).toMap
 
-    val exprNaming = fromSelectables0.flatMap { case (k, vs) =>
+    val exprNaming = prevContext.exprNaming ++ fromSelectables0.flatMap { case (k, vs) =>
       vs.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
     }
 

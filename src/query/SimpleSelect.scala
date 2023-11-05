@@ -62,7 +62,7 @@ class SimpleSelect[Q, R](
     }
   }
 
-  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] =
+  def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): SimpleSelect[Q2, R2] =
     copy(expr = f(expr))
 
   def flatMap[Q2, R2](
@@ -172,8 +172,11 @@ class SimpleSelect[Q, R](
 object SimpleSelect {
 
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
-    val computed = Context
-      .compute(prevContext, query.from ++ query.joins.flatMap(_.from.map(_.from)), None)
+    val computed = Context.compute(
+      prevContext,
+      query.from ++ query.joins.flatMap(_.from.map(_.from)),
+      None
+    )
 
     import computed.implicitCtx
 

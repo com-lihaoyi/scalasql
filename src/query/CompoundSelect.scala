@@ -33,7 +33,9 @@ class CompoundSelect[Q, R](
 
   def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     (lhs, compoundOps) match {
-      case (s: Select[Q, R], Nil) => copy(simpleFrom(s.map(f)), Nil, orderBy, limit, offset)
+      case (s: SimpleSelect[Q, R], Nil) =>
+        val mapped = s.map(f)
+        copy[Q2, R2](mapped, Nil, orderBy, limit, offset)
 
       case _ => simpleFrom(this).map(f)
     }

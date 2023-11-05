@@ -87,8 +87,9 @@ trait Select[Q, R]
     case s: CompoundSelect[Q, R] => s.subquery
   }
 
-  def subquery: SimpleSelect[Q, R] =
+  def subquery: SimpleSelect[Q, R] = {
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
+  }
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
