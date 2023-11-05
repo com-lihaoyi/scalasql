@@ -283,4 +283,5 @@ their own operations not provided by the base library.
 * Flat joins (Quill Style)
 * Fix WorldSqlTests's `RIGHT JOIN` example
 * Dot-delimited result names
+* Tutorial docs for `Option`/`NULL` handling
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
