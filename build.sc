@@ -119,10 +119,14 @@ object scalasql extends RootModule with ScalaModule {
       outputLines.append(s"# $dbName")
       for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
         outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
+        var lastSeen = ""
         for(r <- suiteGroup){
 
+          val prettyName = (r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")
+          val title = if (prettyName != lastSeen) s"### ${prettyName}" else ""
+          lastSeen = prettyName
           outputLines.append(
-            s"""### ${(r.suiteName.split('.').drop(2) ++ r.testPath).mkString(".")}
+            s"""$title
                |
                |```scala
                |${scalafmt(r.queryCodeString)}

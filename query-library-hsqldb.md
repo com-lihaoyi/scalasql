@@ -32,7 +32,7 @@ false
 ```
 
 
-### ExprBooleanOpsTests.or
+
 
 ```scala
 !Expr(false)
@@ -289,7 +289,7 @@ SELECT FLOOR(?) as res
 ```
 
 
-### ExprIntOpsTests.floor
+
 
 ```scala
 Expr(4.7).floor
@@ -761,7 +761,7 @@ INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
 ```
 
 
-### InsertTests.single.simple
+
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -791,7 +791,7 @@ INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)
 ```
 
 
-### InsertTests.single.partial
+
 
 ```scala
 Buyer.select.filter(_.name `=` "test buyer")
@@ -828,7 +828,7 @@ VALUES
 ```
 
 
-### InsertTests.batch.simple
+
 
 ```scala
 Buyer.select
@@ -869,7 +869,7 @@ VALUES (?, ?), (?, ?), (?, ?)
 ```
 
 
-### InsertTests.batch.partial
+
 
 ```scala
 Buyer.select
@@ -917,7 +917,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### InsertTests.select.caseclass
+
 
 ```scala
 Buyer.select
@@ -958,7 +958,7 @@ WHERE buyer0.name <> ?
 ```
 
 
-### InsertTests.select.simple
+
 
 ```scala
 Buyer.select
@@ -995,7 +995,7 @@ DELETE FROM purchase WHERE purchase.id = ?
 ```
 
 
-### DeleteTests.single
+
 
 ```scala
 Purchase.select
@@ -1032,7 +1032,7 @@ DELETE FROM purchase WHERE purchase.id <> ?
 ```
 
 
-### DeleteTests.multiple
+
 
 ```scala
 Purchase.select
@@ -1061,7 +1061,7 @@ DELETE FROM purchase WHERE ?
 ```
 
 
-### DeleteTests.all
+
 
 ```scala
 Purchase.select
@@ -2796,7 +2796,7 @@ UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?
 ```
 
 
-### UpdateTests.update
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2809,7 +2809,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### UpdateTests.update
+
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -2838,7 +2838,7 @@ UPDATE buyer SET date_of_birth = ? WHERE ?
 ```
 
 
-### UpdateTests.bulk
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2851,7 +2851,7 @@ Seq(LocalDate.parse("2019-04-07"))
 ```
 
 
-### UpdateTests.bulk
+
 
 ```scala
 Buyer.select.filter(_.name `=` "Li Haoyi").map(_.dateOfBirth)
@@ -2882,7 +2882,7 @@ UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?
 ```
 
 
-### UpdateTests.multiple
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2895,7 +2895,7 @@ Seq[LocalDate]()
 ```
 
 
-### UpdateTests.multiple
+
 
 ```scala
 Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
@@ -2924,7 +2924,7 @@ UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?
 ```
 
 
-### UpdateTests.dynamic
+
 
 ```scala
 Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
@@ -2937,7 +2937,7 @@ Seq[LocalDate]()
 ```
 
 
-### UpdateTests.dynamic
+
 
 ```scala
 Buyer.select.filter(_.name `=` "JAMES BOND").map(_.dateOfBirth)
@@ -2969,7 +2969,7 @@ WHERE ?
 ```
 
 
-### UpdateSubQueryTests.setSubquery
+
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -3007,7 +3007,7 @@ WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
 ```
 
 
-### UpdateSubQueryTests.whereSubquery
+
 
 ```scala
 Product.select.map(p => (p.id, p.name, p.price))
@@ -3134,7 +3134,7 @@ DataTypes.insert.values(
 ```
 
 
-### DataTypesTests.constant
+
 
 ```scala
 DataTypes.select
@@ -3163,7 +3163,7 @@ NonRoundTripTypes.insert.values(
 ```
 
 
-### DataTypesTests.nonRoundTrip
+
 
 ```scala
 NonRoundTripTypes.select
