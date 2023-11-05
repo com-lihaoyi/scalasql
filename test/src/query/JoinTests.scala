@@ -35,36 +35,15 @@ trait JoinTests extends ScalaSqlSuite {
           Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
           ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
         )
-      )
+      ),
+      docs = """
+        ScalaSql's `.join` or `.joinOn` methods correspond to SQL `JOIN` and `JOIN ... ON ...`.
+        These perform an inner join between two tables, with an optional `ON` predicate. You can
+        also `.filter` and `.map` the results of the join, making use of the columns joined from
+        the two tables
+      """
     )
 
-    test("joinSelectFilter") - checker(
-      query = Text {
-        Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
-      },
-      sql = """
-        SELECT
-          buyer0.id as res__0__id,
-          buyer0.name as res__0__name,
-          buyer0.date_of_birth as res__0__date_of_birth,
-          shipping_info1.id as res__1__id,
-          shipping_info1.buyer_id as res__1__buyer_id,
-          shipping_info1.shipping_date as res__1__shipping_date
-        FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
-        WHERE buyer0.name = ?
-      """,
-      value = Seq(
-        (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
-        ),
-        (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
-        )
-      )
-    )
 
     test("joinFilterMap") - checker(
       query = Text {
@@ -108,7 +87,13 @@ trait JoinTests extends ScalaSqlSuite {
           Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
           Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         )
-      )
+      ),
+      docs = """
+        ScalaSql supports a "self join", where a table is joined with itself. This
+        is done by simply having the same table be on the left-hand-side and right-hand-side
+        of your `.join` or `.joinOn` method. The two example self-joins below are trivial,
+        but illustrate how to do it in case you want to do a self-join in a more realistic setting.
+      """
     )
 
     test("selfJoin2") - checker(
@@ -156,8 +141,8 @@ trait JoinTests extends ScalaSqlSuite {
     test("flatMap") - checker(
       query = Text {
         Buyer.select
-          .flatMap(c => ShippingInfo.select.map((c, _)))
-          .filter { case (c, p) => c.id `=` p.buyerId && c.name `=` "James Bond" }
+          .flatMap(b => ShippingInfo.select.map((b, _)))
+          .filter { case (b, s) => b.id `=` s.buyerId && b.name `=` "James Bond" }
           .map(_._2.shippingDate)
       },
       sql = """
@@ -166,16 +151,22 @@ trait JoinTests extends ScalaSqlSuite {
         WHERE buyer0.id = shipping_info1.buyer_id
         AND buyer0.name = ?
       """,
-      value = Seq(LocalDate.parse("2012-04-05"))
+      value = Seq(LocalDate.parse("2012-04-05")),
+      docs = """
+        You can also perform inner joins via `flatMap`, either by directly
+        calling `.flatMap` or via `for`-comprehensions as below. This can help
+        reduce the boilerplate when dealing with lots of joins.
+      """
     )
 
-    test("flatMap2") - checker(
+
+    test("flatMapFor") - checker(
       query = Text {
-        Buyer.select
-          .flatMap(c =>
-            ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" }
-          )
-          .map(_.shippingDate)
+        for{
+          b <- Buyer.select
+          s <- ShippingInfo.select
+          if b.id `=` s.buyerId && b.name `=` "James Bond"
+        } yield s.shippingDate
       },
       sql = """
         SELECT shipping_info1.shipping_date as res
@@ -183,7 +174,10 @@ trait JoinTests extends ScalaSqlSuite {
         WHERE buyer0.id = shipping_info1.buyer_id
         AND buyer0.name = ?
       """,
-      value = Seq(LocalDate.parse("2012-04-05"))
+      value = Seq(LocalDate.parse("2012-04-05")),
+      docs = """
+        You can also perform inner joins via `flatMap
+      """
     )
 
     test("leftJoin") - checker(
@@ -215,7 +209,11 @@ trait JoinTests extends ScalaSqlSuite {
         (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
       ),
       normalize =
-        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id))
+        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
+      docs = """
+        ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
+        `.leftJoin`/`.rightJoin`/`.outerJoin` methods
+      """
     )
 
     test("rightJoin") - checker(
