@@ -46,10 +46,12 @@ object MySqlDialect extends MySqlDialect {
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     override def update(
-                         filter: V[Column.ColumnExpr] => Expr[Boolean]
+        filter: V[Column.ColumnExpr] => Expr[Boolean]
     ): Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = t.tableRef
-      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(t.containerQr)
+      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(
+        t.containerQr
+      )
     }
 
     override def select: Select[V[Expr], V[Id]] = {
@@ -139,8 +141,10 @@ object MySqlDialect extends MySqlDialect {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
       val (str, mapped) = insert.query.toSqlQuery
-      val updatesStr = SqlStr
-        .join(updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" }, sql", ")
+      val updatesStr = SqlStr.join(
+        updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
+        sql", "
+      )
       (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
     }
   }
@@ -181,9 +185,11 @@ object MySqlDialect extends MySqlDialect {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
-      leftJoin(other)(on).map { case (l, r) => (Option(l), r) }.union(rightJoin(other)(on).map {
-        case (l, r) => (l, Option(r))
-      })
+      leftJoin(other)(on)
+        .map { case (l, r) => (Option(l), r) }
+        .union(rightJoin(other)(on).map { case (l, r) =>
+          (l, Option(r))
+        })
     }
   }
 

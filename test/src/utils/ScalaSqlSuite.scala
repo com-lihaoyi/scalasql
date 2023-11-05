@@ -6,7 +6,9 @@ import utest.TestSuite
 
 import java.sql.DriverManager
 
-abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line) extends TestSuite with Dialect {
+abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
+    extends TestSuite
+    with Dialect {
   def checker: TestDb
 
   lazy val dbClient = checker.dbClient

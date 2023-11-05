@@ -17,11 +17,14 @@ trait HsqlDbDialect extends Dialect {
 
 object HsqlDbDialect extends HsqlDbDialect {
   class ExprStringOps(val v: Expr[String])
-      extends operations.ExprStringOps(v) with TrimOps with PadOps {
+      extends operations.ExprStringOps(v)
+      with TrimOps
+      with PadOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 
   class ExprNumericOps[T: Numeric: MappedType](val v: Expr[T])
-      extends operations.ExprNumericOps[T](v) with BitwiseFunctionOps[T]
+      extends operations.ExprNumericOps[T](v)
+      with BitwiseFunctionOps[T]
 }

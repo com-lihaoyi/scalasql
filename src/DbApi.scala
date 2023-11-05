@@ -142,12 +142,15 @@ object DbApi {
       val ctx = Context(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
       val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
       val flattened = SqlStr.flatten(sqlStr)
-      val queryStr = flattened.queryParts.zipAll(flattened.params, "", null).map {
-        case (part, null) => part
-        case (part, param) =>
-          val jdbcTypeString = param.mappedType.typeString
-          if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
-      }.mkString
+      val queryStr = flattened.queryParts
+        .zipAll(flattened.params, "", null)
+        .map {
+          case (part, null) => part
+          case (part, param) =>
+            val jdbcTypeString = param.mappedType.typeString
+            if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
+        }
+        .mkString
 
       (queryStr, flattened.params, mappedTypes)
     }
@@ -193,7 +196,8 @@ object DbApi {
       val statement = connection.prepareStatement(str)
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
-      Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds).find(_ != -1)
+      Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds)
+        .find(_ != -1)
         .foreach(statement.setQueryTimeout)
 
       for ((p, n) <- params.zipWithIndex) {
@@ -255,7 +259,8 @@ object DbApi {
 
     for (i <- Range(0, metadata.getColumnCount)) {
       val k = columnNameUnMapper(metadata.getColumnLabel(i + 1).toLowerCase)
-        .split(config.columnLabelDelimiter).drop(1)
+        .split(config.columnLabelDelimiter)
+        .drop(1)
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
       val isNull = resultSet.getObject(i + 1) == null

@@ -4,6 +4,7 @@ import scalasql.{Column, Id, Table}
 import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Update}
 
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
+
   /**
    * Constructs a `SELECT` query
    */

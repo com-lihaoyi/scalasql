@@ -356,7 +356,8 @@ object WorldSqlTests extends TestSuite {
         // the `city` table to look for `Singapore` and get the entire row as a `City[Id]`,
         // but also want to fetch the uppercase name and the population-in-millions. As
         // you would expect, you get a tuple of `(City[Id], String, Int)` back.
-        val query = City.select.filter(_.name === "Singapore")
+        val query = City.select
+          .filter(_.name === "Singapore")
           .map(c => (c, c.name.toUpperCase, c.population / 1000000))
           .single
 
@@ -375,11 +376,12 @@ object WorldSqlTests extends TestSuite {
             city0.name = ?
           """.trim.replaceAll("\\s+", " ")
 
-        db.run(query) ==> (
-          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
-          "SINGAPORE",
-          4 // population in millions
-        )
+        db.run(query) ==>
+          (
+            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+            "SINGAPORE",
+            4 // population in millions
+          )
         // -DOCS
       }
     }
@@ -393,7 +395,7 @@ object WorldSqlTests extends TestSuite {
         // query all cities in China and sum up their populations
         val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
         db.toSqlQuery(query) ==>
-        "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
+          "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
 
         db.run(query) ==> 175953614
         // -DOCS
@@ -415,7 +417,7 @@ object WorldSqlTests extends TestSuite {
         // greater than one million
         val query = Country.select.filter(_.population > 1000000).size
         db.toSqlQuery(query) ==>
-        "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
+          "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
 
         db.run(query) ==> 154
         // -DOCS
@@ -425,11 +427,9 @@ object WorldSqlTests extends TestSuite {
         // If you want to perform multiple aggregates at once, you can use the `.aggregate`
         // function. Below, we run a single query that returns the minimum, average, and
         // maximum populations across all countries in our dataset
-        val query = Country.select.aggregate(cs =>
-          (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population))
-        )
-        db.toSqlQuery(query) ==>
-        """
+        val query = Country.select
+          .aggregate(cs => (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population)))
+        db.toSqlQuery(query) ==> """
         SELECT
           MIN(country0.population) as res__0,
           AVG(country0.population) as res__1,
@@ -448,7 +448,11 @@ object WorldSqlTests extends TestSuite {
       //
       // You can use `.sortBy` to order the returned rows, and `.drop` and .take`
       // to select a range of rows within the entire result set:
-      val query = City.select.sortBy(_.population).desc.drop(5).take(5)
+      val query = City.select
+        .sortBy(_.population)
+        .desc
+        .drop(5)
+        .take(5)
         .map(c => (c.name, c.population))
 
       db.toSqlQuery(query) ==> """
@@ -480,12 +484,12 @@ object WorldSqlTests extends TestSuite {
         // You can perform SQL inner `JOIN`s between tables via the `.join` or `.joinOn`
         // methods. Below, we use a `JOIN` to look for cities which are in the country
         // named "Liechtenstein":
-        val query = City.select.joinOn(Country)(_.countryCode === _.code)
+        val query = City.select
+          .joinOn(Country)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Liechtenstein" }
           .map { case (city, country) => city.name }
 
-        db.toSqlQuery(query) ==>
-        """
+        db.toSqlQuery(query) ==> """
         SELECT city0.name as res
         FROM city city0
         JOIN country country1 ON city0.countrycode = country1.code
@@ -495,15 +499,17 @@ object WorldSqlTests extends TestSuite {
         db.run(query) ==> Seq("Schaan", "Vaduz")
         // -DOCS
       }
-      test("right"){
+      test("right") {
         // +DOCS
         // `LEFT JOIN`, `RIGHT JOIN`, and `OUTER JOIN`s are also supported, e.g.
-        val query = City.select.rightJoin(Country)(_.countryCode === _.code)
+        val query = City.select
+          .rightJoin(Country)(_.countryCode === _.code)
           .filter { case (cityOpt, country) => cityOpt.isEmpty }
-          .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
+          .map { case (cityOpt, country) =>
+            (cityOpt.map(_.name), country.name)
+          }
 
-        db.toSqlQuery(query) ==>
-        """
+        db.toSqlQuery(query) ==> """
         SELECT city0.name as res__0, country1.name as res__1
         FROM city city0
         RIGHT JOIN country country1 ON city0.countrycode = country1.code
@@ -576,8 +582,12 @@ object WorldSqlTests extends TestSuite {
         // +DOCS
         // Some operations automatically generate subqueries where necessary, e.g.
         // performing a `.joinOn` after you have done a `.take`:
-        val query = Country.select.sortBy(_.population).desc.take(2)
-          .joinOn(CountryLanguage)(_.code === _.countryCode).map { case (country, language) =>
+        val query = Country.select
+          .sortBy(_.population)
+          .desc
+          .take(2)
+          .joinOn(CountryLanguage)(_.code === _.countryCode)
+          .map { case (country, language) =>
             (language.language, country.name)
           }
           .sortBy(_._1)
@@ -665,7 +675,8 @@ object WorldSqlTests extends TestSuite {
         // you to select arbitrary data from the same table (or another table) to insert:
         val query = City.insert.select(
           c => (c.name, c.countryCode, c.district, c.population),
-          City.select.filter(_.name === "Singapore")
+          City.select
+            .filter(_.name === "Singapore")
             .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0)))
         )
 
@@ -695,7 +706,8 @@ object WorldSqlTests extends TestSuite {
         //
         // ScalaSql allows updates via the `.update` syntax, that takes a filter
         // and a list of columns to update:
-        val query = City.update(_.countryCode === "SGP")
+        val query = City
+          .update(_.countryCode === "SGP")
           .set(_.population := 0, _.district := "UNKNOWN")
 
         db.toSqlQuery(query) ==>
@@ -708,11 +720,12 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
 
-      test("computed"){
+      test("computed") {
         // +DOCS
         // You can perform computed updates by referencing columns as part of the
         // expressions passed to the `.set` call:
-        val query = City.update(_.countryCode === "SGP")
+        val query = City
+          .update(_.countryCode === "SGP")
           .set(c => c.population := (c.population + 1000000))
         db.toSqlQuery(query) ==>
           "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?"
@@ -723,13 +736,12 @@ object WorldSqlTests extends TestSuite {
           City[Id](3208, "Singapore", "SGP", district = "", population = 5017733)
         // -DOCS
       }
-      test("all"){
+      test("all") {
         // +DOCS
         // The filter predicate to `.update` is mandatory, to avoid performing updates across
         // an entire database table accidentally . If you really want to perform an update
         // on every single row, you can pass in `_ => true` as your filter:
-        val query = City.update(_ => true)
-          .set(_.population := 0)
+        val query = City.update(_ => true).set(_.population := 0)
         db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
 
         db.run(query)

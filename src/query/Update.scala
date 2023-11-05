@@ -95,7 +95,8 @@ object Update {
       sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
     })
 
-    lazy val joinOns = joins0.drop(1)
+    lazy val joinOns = joins0
+      .drop(1)
       .map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
 
     lazy val joins = optSeq(joins0.drop(1))(

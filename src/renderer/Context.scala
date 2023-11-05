@@ -40,7 +40,8 @@ object Context {
     }
 
     def computeSelectable(t: From) = t match {
-      case t: TableRef => (
+      case t: TableRef =>
+        (
           Map.empty[Expr.Identity, SqlStr],
           (liveExprs: Option[Set[Expr.Identity]]) =>
             SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +

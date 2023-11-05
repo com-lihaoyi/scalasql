@@ -15,7 +15,9 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
 object PostgresDialect extends PostgresDialect {
   class ExprStringOps(val v: Expr[String])
-      extends operations.ExprStringOps(v) with TrimOps with PadOps {
+      extends operations.ExprStringOps(v)
+      with TrimOps
+      with PadOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
 
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }

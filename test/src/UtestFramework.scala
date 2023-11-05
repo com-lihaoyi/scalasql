@@ -2,20 +2,22 @@ package scalasql
 
 import scalasql.UtestFramework.recorded
 
-object UtestFramework{
-  case class Record(suiteName: String,
-                    suiteLine: Int,
-                    testPath: Seq[String],
-                    queryCodeString: String,
-                    sqlString: String,
-                    resultCodeString: String)
+object UtestFramework {
+  case class Record(
+      suiteName: String,
+      suiteLine: Int,
+      testPath: Seq[String],
+      queryCodeString: String,
+      sqlString: String,
+      resultCodeString: String
+  )
 
-  object Record{
+  object Record {
     implicit val rw: upickle.default.ReadWriter[Record] = upickle.default.macroRW
   }
   val recorded = collection.mutable.Buffer.empty[Record]
 }
-class UtestFramework extends utest.runner.Framework{
+class UtestFramework extends utest.runner.Framework {
   override def setup() = {
     println("Setting up CustomFramework")
     recorded.clear()

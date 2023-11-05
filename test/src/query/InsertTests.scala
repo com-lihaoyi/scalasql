@@ -123,7 +123,8 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.insert.select(
             identity,
-            Buyer.select.filter(_.name <> "Li Haoyi")
+            Buyer.select
+              .filter(_.name <> "Li Haoyi")
               .map(b => b.copy(id = b.id + Buyer.select.maxBy(_.id)))
           ),
           sql = """

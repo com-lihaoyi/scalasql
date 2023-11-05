@@ -20,17 +20,19 @@ trait OptionalTests extends ScalaSqlSuite {
   def tests = Tests {
 
     checker(
-      query = Text{ OptCols.insert.batched(_.myInt, _.myInt2)(
-        (None, None),
-        (Some(1), Some(2)),
-        (Some(3), None),
-        (None, Some(4))
-      ) },
+      query = Text {
+        OptCols.insert.batched(_.myInt, _.myInt2)(
+          (None, None),
+          (Some(1), Some(2)),
+          (Some(3), None),
+          (None, Some(4))
+        )
+      },
       value = 4
     )
 
     test("selectAll") - checker(
-      query = Text{ OptCols.select },
+      query = Text { OptCols.select },
       sql = """
         SELECT
           opt_cols0.my_int as res__my_int,
@@ -46,7 +48,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("groupByMaxGet") - checker(
-      query = Text{ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get)) },
+      query = Text { OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get)) },
       sql = """
         SELECT opt_cols0.my_int as res__0, MAX(opt_cols0.my_int2) as res__1
         FROM opt_cols opt_cols0
@@ -57,7 +59,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("isDefined") - checker(
-      query = Text{ OptCols.select.filter(_.myInt.isDefined)},
+      query = Text { OptCols.select.filter(_.myInt.isDefined) },
       sql = """
         SELECT
           opt_cols0.my_int as res__my_int,
@@ -68,7 +70,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("isEmpty") - checker(
-      query = Text{ OptCols.select.filter(_.myInt.isEmpty) },
+      query = Text { OptCols.select.filter(_.myInt.isEmpty) },
       sql = """
         SELECT
           opt_cols0.my_int as res__my_int,
@@ -80,7 +82,7 @@ trait OptionalTests extends ScalaSqlSuite {
 
     test("sqlEquals") {
       test("nonOptionHit") - checker(
-        query = Text{ OptCols.select.filter(_.myInt `=` 1) },
+        query = Text { OptCols.select.filter(_.myInt `=` 1) },
         sql = """
           SELECT
             opt_cols0.my_int as res__my_int,
@@ -92,7 +94,7 @@ trait OptionalTests extends ScalaSqlSuite {
       )
 
       test("nonOptionMiss") - checker(
-        query = Text{ OptCols.select.filter(_.myInt `=` 2) },
+        query = Text { OptCols.select.filter(_.myInt `=` 2) },
         sql = """
           SELECT
             opt_cols0.my_int as res__my_int,
@@ -104,7 +106,7 @@ trait OptionalTests extends ScalaSqlSuite {
       )
 
       test("optionMiss") - checker( // SQL null = null is false
-        query = Text{ OptCols.select.filter(_.myInt `=` Option.empty[Int]) },
+        query = Text { OptCols.select.filter(_.myInt `=` Option.empty[Int]) },
         sql = """
           SELECT
             opt_cols0.my_int as res__my_int,
@@ -117,7 +119,7 @@ trait OptionalTests extends ScalaSqlSuite {
     }
     test("scalaEquals") {
       test("someHit") - checker(
-        query = Text{ OptCols.select.filter(_.myInt === Option(1)) },
+        query = Text { OptCols.select.filter(_.myInt === Option(1)) },
         sql = """
           SELECT
             opt_cols0.my_int as res__my_int,
@@ -129,7 +131,7 @@ trait OptionalTests extends ScalaSqlSuite {
       )
 
       test("noneHit") - checker(
-        query = Text{ OptCols.select.filter(_.myInt === Option.empty[Int]) },
+        query = Text { OptCols.select.filter(_.myInt === Option.empty[Int]) },
         sql = """
           SELECT
             opt_cols0.my_int as res__my_int,
@@ -142,7 +144,7 @@ trait OptionalTests extends ScalaSqlSuite {
     }
 
     test("map") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10))) },
+      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10))) },
       sql = """
       SELECT
         opt_cols0.my_int + ? as res__my_int,
@@ -158,14 +160,16 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("map2") - checker(
-      query = Text{ OptCols.select.map(_.myInt.map(_ + 10)) },
+      query = Text { OptCols.select.map(_.myInt.map(_ + 10)) },
       sql = "SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0",
       value = Seq(None, Some(11), Some(13), None)
     )
 
     test("flatMap") - checker(
-      query = Text{ OptCols.select
-        .map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10)))) },
+      query = Text {
+        OptCols.select
+          .map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
+      },
       sql = """
         SELECT
           opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -182,7 +186,9 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("mapGet") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1))) },
+      query = Text {
+        OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
+      },
       sql = """
         SELECT
           opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -199,7 +205,9 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("rawGet") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1)) },
+      query = Text {
+        OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
+      },
       sql = """
         SELECT
           opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
@@ -216,7 +224,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("getOrElse") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1))) },
+      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1))) },
       sql = """
         SELECT
           COALESCE(opt_cols0.my_int, ?) as res__my_int,
@@ -232,7 +240,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("orElse") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2))) },
+      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2))) },
       sql = """
         SELECT
           COALESCE(opt_cols0.my_int, opt_cols0.my_int2) as res__my_int,
@@ -248,7 +256,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("filter") - checker(
-      query = Text{ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2))) },
+      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2))) },
       sql = """
         SELECT
           CASE
@@ -267,7 +275,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
     test("sorting") {
       test("nullsLast") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).nullsLast },
+        query = Text { OptCols.select.sortBy(_.myInt).nullsLast },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
@@ -288,7 +296,7 @@ trait OptionalTests extends ScalaSqlSuite {
         )
       )
       test("nullsFirst") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).nullsFirst },
+        query = Text { OptCols.select.sortBy(_.myInt).nullsFirst },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
@@ -309,7 +317,7 @@ trait OptionalTests extends ScalaSqlSuite {
         )
       )
       test("ascNullsLast") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).asc.nullsLast },
+        query = Text { OptCols.select.sortBy(_.myInt).asc.nullsLast },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
@@ -330,7 +338,7 @@ trait OptionalTests extends ScalaSqlSuite {
         )
       )
       test("ascNullsFirst") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).asc.nullsFirst },
+        query = Text { OptCols.select.sortBy(_.myInt).asc.nullsFirst },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
@@ -351,7 +359,7 @@ trait OptionalTests extends ScalaSqlSuite {
         )
       )
       test("descNullsLast") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).desc.nullsLast },
+        query = Text { OptCols.select.sortBy(_.myInt).desc.nullsLast },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
@@ -372,7 +380,7 @@ trait OptionalTests extends ScalaSqlSuite {
         )
       )
       test("descNullsFirst") - checker(
-        query = Text{ OptCols.select.sortBy(_.myInt).desc.nullsFirst },
+        query = Text { OptCols.select.sortBy(_.myInt).desc.nullsFirst },
         sqls = Seq(
           """
             SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2

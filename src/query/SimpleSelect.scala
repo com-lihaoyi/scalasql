@@ -50,11 +50,15 @@ class SimpleSelect[Q, R](
       f: Q => Context => SqlStr
   )(implicit qr2: Queryable.Row[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>
-      this.copy(expr = Expr[V] { implicit ctx: Context =>
-        val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
+      this
+        .copy(expr = Expr[V] { implicit ctx: Context =>
+          val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
 
-        f(expr)(newCtx)
-      }).toSqlQuery._1.withCompleteQuery(true)
+          f(expr)(newCtx)
+        })
+        .toSqlQuery
+        ._1
+        .withCompleteQuery(true)
     }
   }
 
@@ -130,14 +134,15 @@ class SimpleSelect[Q, R](
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
     val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
     if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
-    else copy(
-      expr = newExpr,
-      exprPrefix = exprPrefix,
-      from = Seq(this.subqueryRef),
-      joins = Nil,
-      where = Nil,
-      groupBy0 = groupByOpt
-    )
+    else
+      copy(
+        expr = newExpr,
+        exprPrefix = exprPrefix,
+        from = Seq(this.subqueryRef),
+        joins = Nil,
+        where = Nil,
+        groupBy0 = groupByOpt
+      )
   }
 
   def sortBy(f: Q => Expr[_]) = {
@@ -202,12 +207,14 @@ object SimpleSelect {
 
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
 
-      val exprStr = SqlStr.flatten(SqlStr.join(
-        query.flattenedExpr.zip(exprsStrs).collect {
-          case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
-        },
-        sql", "
-      ))
+      val exprStr = SqlStr.flatten(
+        SqlStr.join(
+          query.flattenedExpr.zip(exprsStrs).collect {
+            case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
+          },
+          sql", "
+        )
+      )
 
       val joinOns = query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
 

@@ -7,8 +7,9 @@ object Main {
   def main(args: Array[String]): Unit = {
     // org.xerial:sqlite-jdbc:3.43.0.0
     val conn = java.sql.DriverManager
-      .getConnection(s"${TestClients.postgres.getJdbcUrl}&user=${TestClients.postgres
-          .getUsername}&password=${TestClients.postgres.getPassword}")
+      .getConnection(
+        s"${TestClients.postgres.getJdbcUrl}&user=${TestClients.postgres.getUsername}&password=${TestClients.postgres.getPassword}"
+      )
     val statement = conn.createStatement()
     statement.executeUpdate(
       "CREATE TABLE thing ( id SERIAL PRIMARY KEY, date DATE);" +

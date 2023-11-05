@@ -43,7 +43,8 @@ object InsertSelect {
     implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
 
     lazy val columns = SqlStr.join(
-      exprs.map(_.asInstanceOf[Column.ColumnExpr[_]])
+      exprs
+        .map(_.asInstanceOf[Column.ColumnExpr[_]])
         .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
       sql", "
     )

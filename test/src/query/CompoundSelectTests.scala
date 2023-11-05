@@ -15,12 +15,12 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
     test("sort") {
       test("simple") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name) },
+        query = Text { Product.select.sortBy(_.price).map(_.name) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
         value = Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera")
       )
       test("twice") - checker(
-        query = Text{ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc },
+        query = Text { Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc },
         sql = """
           SELECT
             purchase0.id as res__id,
@@ -42,12 +42,12 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       )
 
       test("sortLimit") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).take(2) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).take(2) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Seq("Cookie", "Socks")
       )
       test("sortOffset") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).drop(2) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).drop(2) },
         sqls = Seq(
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2",
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2"
@@ -56,40 +56,40 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       )
 
       test("sortLimitTwiceHigher") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Seq("Cookie", "Socks")
       )
 
       test("sortLimitTwiceLower") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).take(2).take(1) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(1) },
         sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1",
         value = Seq("Cookie")
       )
 
       test("sortLimitOffset") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffsetTwice") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1) },
         sql =
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
         value = Seq("Guitar")
       )
 
       test("sortOffsetLimit") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffset") - checker(
-        query = Text{ Product.select.sortBy(_.price).map(_.name).take(2).drop(1) },
+        query = Text { Product.select.sortBy(_.price).map(_.name).take(2).drop(1) },
         sql =
           "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
         value = Seq("Socks")
@@ -97,7 +97,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     }
 
     test("distinct") - checker(
-      query = Text{ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct },
+      query = Text { Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct },
       sql = """
         SELECT DISTINCT subquery0.res as res
         FROM (SELECT purchase0.shipping_info_id as res
@@ -110,8 +110,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("flatMap") - checker(
-      query = Text{ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
-        Product.select.filter(_.id === p.productId).map(_.name) }
+      query = Text {
+        Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
+          Product.select.filter(_.id === p.productId).map(_.name)
+        }
       },
       sql = """
         SELECT product1.name as res
@@ -126,7 +128,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("sumBy") - checker(
-      query = Text{ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total) },
+      query = Text { Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total) },
       sql = """
         SELECT SUM(subquery0.res__total) as res
         FROM (SELECT purchase0.total as res__total
@@ -139,8 +141,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("aggregate") - checker(
-      query = Text{ Purchase.select.sortBy(_.total).desc.take(3)
-        .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total))) },
+      query = Text {
+        Purchase.select
+          .sortBy(_.total)
+          .desc
+          .take(3)
+          .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
+      },
       sql = """
         SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
         FROM (SELECT purchase0.total as res__total
@@ -153,8 +160,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("union") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase)
-        .union(Product.select.map(_.kebabCaseName.toLowerCase)) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .union(Product.select.map(_.kebabCaseName.toLowerCase))
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -176,8 +186,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("unionAll") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase)
-        .unionAll(Product.select.map(_.kebabCaseName.toLowerCase)) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -202,8 +215,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("intersect") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase)
-        .intersect(Product.select.map(_.kebabCaseName.toLowerCase)) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .intersect(Product.select.map(_.kebabCaseName.toLowerCase))
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -216,8 +232,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("except") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase)
-        .except(Product.select.map(_.kebabCaseName.toLowerCase)) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .except(Product.select.map(_.kebabCaseName.toLowerCase))
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -229,8 +248,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("unionAllUnionSort") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
-        .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase))
+          .sortBy(identity)
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -258,8 +282,15 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("unionAllUnionSortLimit") - checker(
-      query = Text{ Product.select.map(_.name.toLowerCase).unionAll(Buyer.select.map(_.name.toLowerCase))
-        .union(Product.select.map(_.kebabCaseName.toLowerCase)).sortBy(identity).drop(4).take(4) },
+      query = Text {
+        Product.select
+          .map(_.name.toLowerCase)
+          .unionAll(Buyer.select.map(_.name.toLowerCase))
+          .union(Product.select.map(_.kebabCaseName.toLowerCase))
+          .sortBy(identity)
+          .drop(4)
+          .take(4)
+      },
       sql = """
         SELECT LOWER(product0.name) as res
         FROM product product0
@@ -277,11 +308,14 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("exceptAggregate") - checker(
-      query = Text{ Product.select.map(p => (p.name.toLowerCase, p.price))
-        // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
-        // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
-        .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-        .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))) },
+      query = Text {
+        Product.select
+          .map(p => (p.name.toLowerCase, p.price))
+          // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` are not eliminated, because
+          // they are important to the semantics of EXCEPT (and other non-UNION-ALL operators)
+          .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
+      },
       sql = """
         SELECT
           MAX(subquery0.res__1) as res__0,
@@ -300,11 +334,14 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     )
 
     test("unionAllAggregate") - checker(
-      query = Text{ Product.select.map(p => (p.name.toLowerCase, p.price))
-        // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
-        // as they are not selected by the enclosing query, and cannot affect the UNION ALL
-        .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
-        .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2))) },
+      query = Text {
+        Product.select
+          .map(p => (p.name.toLowerCase, p.price))
+          // `p.name.toLowerCase` and  `p.kebabCaseName.toLowerCase` get eliminated,
+          // as they are not selected by the enclosing query, and cannot affect the UNION ALL
+          .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
+          .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
+      },
       sql = """
         SELECT
           MAX(subquery0.res__1) as res__0,

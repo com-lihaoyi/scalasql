@@ -21,7 +21,8 @@ trait InsertReturning[Q, R] extends Returning[Q, R]
 object InsertReturning {
   class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(
       implicit val qr: Queryable.Row[Q, R]
-  ) extends Returning.Impl0[Q, R](qr, returnable, returning) with InsertReturning[Q, R] {
+  ) extends Returning.Impl0[Q, R](qr, returnable, returning)
+      with InsertReturning[Q, R] {
     def expr: Q = returning
   }
 }
@@ -50,6 +51,7 @@ object Returning {
     }
   }
   class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable.Row[Q, R])
-      extends Impl0[Q, R](qr, returnable, returning) with Returning[Q, R]
+      extends Impl0[Q, R](qr, returnable, returning)
+      with Returning[Q, R]
 
 }

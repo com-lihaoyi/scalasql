@@ -46,8 +46,7 @@ object Table {
         if (c.prefix.actualType.member(name) != NoSymbol) {
           q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
         } else {
-          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name
-              .toString}, ${c.prefix}).expr($tableRef)"
+          q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
         }
       }
 

@@ -36,12 +36,15 @@ trait H2Dialect extends Dialect {
 object H2Dialect extends H2Dialect {
 
   class ExprStringOps(val v: Expr[String])
-      extends operations.ExprStringOps(v) with TrimOps with PadOps {
+      extends operations.ExprStringOps(v)
+      with TrimOps
+      with PadOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
   }
 
   class ExprNumericOps[T: Numeric: MappedType](val v: Expr[T])
-      extends operations.ExprNumericOps[T](v) with BitwiseFunctionOps[T]
+      extends operations.ExprNumericOps[T](v)
+      with BitwiseFunctionOps[T]
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     override def select: Select[V[Expr], V[Id]] = {
@@ -88,9 +91,11 @@ object H2Dialect extends H2Dialect {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
-      leftJoin(other)(on).map { case (l, r) => (Option(l), r) }.union(rightJoin(other)(on).map {
-        case (l, r) => (l, Option(r))
-      })
+      leftJoin(other)(on)
+        .map { case (l, r) => (Option(l), r) }
+        .union(rightJoin(other)(on).map { case (l, r) =>
+          (l, Option(r))
+        })
     }
   }
 

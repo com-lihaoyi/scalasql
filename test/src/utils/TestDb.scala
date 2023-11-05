@@ -31,18 +31,16 @@ class TestDb(
       moreValues: Seq[V] = Nil,
       normalize: V => V = (x: V) => x
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
-    val sqlResult = dbClient.autoCommit.toSqlQuery(query.value)
+    val sqlResult = dbClient.autoCommit
+      .toSqlQuery(query.value)
       .stripSuffix(dialectConfig.defaultQueryableSuffix)
 
-    val matchedSql = (Option(sql) ++ sqls).find{ sql =>
-
+    val matchedSql = (Option(sql) ++ sqls).find { sql =>
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       sqlResult == expectedSql
     }
 
-    if (sql != null) {
-      assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
-    }
+    if (sql != null) { assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult))) }
 
     val result = dbClient.autoCommit.run(query.value)
 
@@ -57,7 +55,7 @@ class TestDb(
         testPath = tp.value,
         queryCodeString = query.source,
         sqlString = matchedSql.orNull,
-        resultCodeString = value.source,
+        resultCodeString = value.source
       )
     )
 

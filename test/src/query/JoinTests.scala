@@ -13,7 +13,9 @@ import java.time.LocalDate
 trait JoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("joinFilter") - checker(
-      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包") },
+      query = Text {
+        Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
+      },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -39,7 +41,9 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("joinSelectFilter") - checker(
-      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包") },
+      query = Text {
+        Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
+      },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -65,8 +69,12 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("joinFilterMap") - checker(
-      query = Text{ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId)
-        .filter(_._1.name `=` "James Bond").map(_._2.shippingDate) },
+      query = Text {
+        Buyer.select
+          .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+          .filter(_._1.name `=` "James Bond")
+          .map(_._2.shippingDate)
+      },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
@@ -77,7 +85,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("selfJoin") - checker(
-      query = Text{ Buyer.select.joinOn(Buyer)(_.id `=` _.id) },
+      query = Text { Buyer.select.joinOn(Buyer)(_.id `=` _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -106,7 +114,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("selfJoin2") - checker(
-      query = Text{ Buyer.select.joinOn(Buyer)(_.id <> _.id) },
+      query = Text { Buyer.select.joinOn(Buyer)(_.id <> _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -148,9 +156,12 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("flatMap") - checker(
-      query = Text{ Buyer.select.flatMap(c => ShippingInfo.select.map((c, _))).filter { case (c, p) =>
-        c.id `=` p.buyerId && c.name `=` "James Bond"
-      }.map(_._2.shippingDate) },
+      query = Text {
+        Buyer.select
+          .flatMap(c => ShippingInfo.select.map((c, _)))
+          .filter { case (c, p) => c.id `=` p.buyerId && c.name `=` "James Bond" }
+          .map(_._2.shippingDate)
+      },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0, shipping_info shipping_info1
@@ -161,9 +172,13 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("flatMap2") - checker(
-      query = Text{ Buyer.select.flatMap(c =>
-        ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" }
-      ).map(_.shippingDate) },
+      query = Text {
+        Buyer.select
+          .flatMap(c =>
+            ShippingInfo.select.filter { p => c.id `=` p.buyerId && c.name `=` "James Bond" }
+          )
+          .map(_.shippingDate)
+      },
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0, shipping_info shipping_info1
@@ -174,7 +189,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("leftJoin") - checker(
-      query = Text{ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId) },
+      query = Text { Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -206,7 +221,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("rightJoin") - checker(
-      query = Text{ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id) },
+      query = Text { ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id) },
       sql = """
         SELECT
           shipping_info0.id as res__0__id,
@@ -238,7 +253,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("outerJoin") - checker(
-      query = Text{ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id) },
+      query = Text { ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id) },
       sqls = Seq(
         """
           SELECT

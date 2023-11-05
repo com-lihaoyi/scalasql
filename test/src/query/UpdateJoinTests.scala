@@ -15,8 +15,12 @@ trait UpdateJoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("join") - {
       checker(
-        query = Text{ Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
-          .set(c => c._1.dateOfBirth := c._2.shippingDate) },
+        query = Text {
+          Buyer
+            .update(_.name `=` "James Bond")
+            .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+            .set(c => c._1.dateOfBirth := c._2.shippingDate)
+        },
         sqls = Seq(
           """
             UPDATE buyer
@@ -35,17 +39,22 @@ trait UpdateJoinTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text{ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
+        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
         value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
 
     test("multijoin") - {
       checker(
-        query = Text{ Buyer.update(_.name `=` "James Bond").joinOn(ShippingInfo)(_.id `=` _.buyerId)
-          .joinOn(Purchase)(_._2.id `=` _.shippingInfoId).joinOn(Product)(_._2.productId `=` _.id)
-          .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
-          .set(c => c._1._1._1.name := c._2.name) },
+        query = Text {
+          Buyer
+            .update(_.name `=` "James Bond")
+            .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+            .joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
+            .joinOn(Product)(_._2.productId `=` _.id)
+            .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
+            .set(c => c._1._1._1.name := c._2.name)
+        },
         sqls = Seq(
           """
             UPDATE buyer
@@ -70,14 +79,17 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         value = 1
       )
 
-      checker(query = Text{ Buyer.select.filter(_.id `=` 1).map(_.name) }, value = Seq("Camera"))
+      checker(query = Text { Buyer.select.filter(_.id `=` 1).map(_.name) }, value = Seq("Camera"))
     }
 
     test("joinSubquery") - {
       checker(
-        query = Text{ Buyer.update(_.name `=` "James Bond")
-          .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
-          .set(c => c._1.dateOfBirth := c._2.shippingDate) },
+        query = Text {
+          Buyer
+            .update(_.name `=` "James Bond")
+            .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+            .set(c => c._1.dateOfBirth := c._2.shippingDate)
+        },
         sqls = Seq(
           """
             UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
@@ -108,17 +120,20 @@ trait UpdateJoinTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text{ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
+        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
         value = Seq(LocalDate.parse("2012-04-05"))
       )
     }
     test("joinSubqueryEliminatedColumn") - {
       checker(
-        query = Text{ Buyer.update(_.name `=` "James Bond")
-          // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
-          // column gets eliminated since it is not used outside the subquery
-          .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
-          .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01")) },
+        query = Text {
+          Buyer
+            .update(_.name `=` "James Bond")
+            // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
+            // column gets eliminated since it is not used outside the subquery
+            .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+            .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
+        },
         sqls = Seq(
           """
             UPDATE buyer SET date_of_birth = ?
@@ -147,7 +162,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = Text{ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
+        query = Text { Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth) },
         value = Seq(LocalDate.parse("2000-01-01"))
       )
     }
