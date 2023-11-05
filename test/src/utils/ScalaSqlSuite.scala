@@ -6,66 +6,72 @@ import utest.TestSuite
 
 import java.sql.DriverManager
 
-trait ScalaSqlSuite extends TestSuite with Dialect {
+abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line) extends TestSuite with Dialect {
   def checker: TestDb
+
   lazy val dbClient = checker.dbClient
 }
 
-trait SqliteSuite extends TestSuite with SqliteDialect {
+trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
   val checker = new TestDb(
     TestClients.sqliteClient,
     "sqlite-customer-schema.sql",
     "customer-data.sql",
     dialects.SqliteDialect,
-    getClass.getName
+    getClass.getName,
+    suiteLine.value
   )
 
   checker.reset()
 }
 
-trait HsqlDbSuite extends TestSuite with HsqlDbDialect {
+trait HsqlDbSuite extends ScalaSqlSuite with HsqlDbDialect {
   val checker = new TestDb(
     TestClients.hsqlDbClient,
     "hsqldb-customer-schema.sql",
     "customer-data.sql",
     dialects.HsqlDbDialect,
-    getClass.getName
+    getClass.getName,
+    suiteLine.value
   )
 
   checker.reset()
 }
 
-trait H2Suite extends TestSuite with H2Dialect {
+trait H2Suite extends ScalaSqlSuite with H2Dialect {
   val checker = new TestDb(
     TestClients.h2Client,
     "h2-customer-schema.sql",
     "customer-data.sql",
     dialects.H2Dialect,
-    getClass.getName
+    getClass.getName,
+    suiteLine.value
   )
 
   checker.reset()
 }
 
-trait PostgresSuite extends TestSuite with PostgresDialect {
+trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
   val checker = new TestDb(
     TestClients.postgresClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
     dialects.PostgresDialect,
-    getClass.getName
+    getClass.getName,
+    suiteLine.value
   )
 
   checker.reset()
 }
 
-trait MySqlSuite extends TestSuite with MySqlDialect {
+trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {
   val checker = new TestDb(
     TestClients.mysqlClient,
     "mysql-customer-schema.sql",
     "customer-data.sql",
     dialects.MySqlDialect,
-    getClass.getName
+    getClass.getName,
+    suiteLine.value
   )
 
   checker.reset()

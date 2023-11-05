@@ -14,7 +14,8 @@ class TestDb(
     testSchemaFileName: String,
     testDataFileName: String,
     dialectConfig: DialectConfig,
-    suiteName: String
+    suiteName: String,
+    suiteLine: Int
 ) {
 
   def reset() = {
@@ -52,10 +53,11 @@ class TestDb(
     UtestFramework.recorded.append(
       UtestFramework.Record(
         suiteName = suiteName.stripSuffix("$"),
+        suiteLine = suiteLine,
         testPath = tp.value,
         queryCodeString = query.source,
         sqlString = matchedSql.orNull,
-        resultCodeString = value.source
+        resultCodeString = value.source,
       )
     )
 

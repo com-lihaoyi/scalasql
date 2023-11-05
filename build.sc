@@ -117,7 +117,7 @@ object scalasql extends RootModule with ScalaModule {
     for ((dbName, dbGroup) <- records.groupBy(_.suiteName.split('.').apply(1))) {
       val outputLines = collection.mutable.Buffer.empty[String]
       outputLines.append(s"# $dbName")
-      for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._1)) {
+      for((suiteName, suiteGroup) <- dbGroup.groupBy(_.suiteName).toSeq.sortBy(_._2.head.suiteLine)) {
         outputLines.append(s"## ${suiteName.split('.').drop(2).mkString(".")}")
         for(r <- suiteGroup){
 
@@ -146,6 +146,7 @@ object scalasql extends RootModule with ScalaModule {
 
 
 case class Record(suiteName: String,
+                  suiteLine: Int,
                   testPath: Seq[String],
                   queryCodeString: String,
                   sqlString: String,

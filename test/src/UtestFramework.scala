@@ -4,6 +4,7 @@ import scalasql.UtestFramework.recorded
 
 object UtestFramework{
   case class Record(suiteName: String,
+                    suiteLine: Int,
                     testPath: Seq[String],
                     queryCodeString: String,
                     sqlString: String,

@@ -6,7 +6,7 @@ import utils.SqliteSuite
 /**
  * Tests for all the aggregate operators that we provide by default
  */
-object FailureTests extends TestSuite with SqliteSuite {
+object FailureTests extends SqliteSuite {
 
   def tests = Tests {
     test("equals") - {
