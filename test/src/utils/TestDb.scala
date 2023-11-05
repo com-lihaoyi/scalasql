@@ -50,7 +50,7 @@ class TestDb(
 
     UtestFramework.recorded.append(
       UtestFramework.Record(
-        suiteName = suiteName.stripSuffix("$"),
+        suiteName = suiteName.stripSuffix("Tests$"),
         suiteLine = suiteLine,
         testPath = tp.value,
         queryCodeString = query.source,

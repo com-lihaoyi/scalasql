@@ -10,12 +10,14 @@ import utils.ScalaSqlSuite
  */
 trait ExprBooleanOpsTests extends ScalaSqlSuite {
   def tests = Tests {
-    test("and") -
+    test("and") {
       checker(query = Expr(true) && Expr(true), sql = "SELECT ? AND ? as res", value = true)
+      checker(query = Expr(false) && Expr(true), sql = "SELECT ? AND ? as res", value = false)
+    }
 
-    test("or") -
+    test("or") {
       checker(query = Expr(false) || Expr(false), sql = "SELECT ? OR ? as res", value = false)
-
-    test("or") - checker(query = !Expr(false), sql = "SELECT NOT ? as res", value = true)
+      checker(query = !Expr(false), sql = "SELECT NOT ? as res", value = true)
+    }
   }
 }
