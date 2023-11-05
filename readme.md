@@ -279,11 +279,12 @@ their own operations not provided by the base library.
 # TODO
 
 * Scala 3 support
-* Tutorial Docs and Reference Docs
 * Flat joins (Quill Style)
 * Fix WorldSqlTests's `RIGHT JOIN` example
 * Dot-delimited result names
 * Tutorial docs for `Option`/`NULL` handling
+* Scaladoc for everything, especiall `Query`s
+* `private`ize and `protected`ize everything possible
 * Docs for type mapping
 * Docs for custom expressions
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
