@@ -6,20 +6,25 @@
 1. **A database library suitable for use for "getting started"**: prioritizing ease
    of use and simplicity over performance, flexibility, or purity.
 
-2. **Typed, structured queries**: your queries should be able to return primitives,
+2. **Vanilla-Scala-Like Syntax and Semantics**: ScalaSql aims to look like normal
+   operations on Scala collections, Scala tuples, Scala `case class`es. Naturally
+   there will be some differences, some incidental and some fundamental. But the 
+   hope is that any Scala programmer who picks up ScalaSql will be able to begin
+   using it effectively leveraging all they already know about programming in Scala,
+   without having to learn an entirely new DSL
+
+3. **Typed, structured queries**: your queries should be able to return primitives,
    `case class`es, tuples, collections, etc.. A large portion of JDBC boilerplate
    is translating logic "Scala collections" operations into SQL, and translating
    the "flat" key-value SQL result sets back into something more structured. This
    library aims to automate that process
 
-3. **Minimal boilerplate**: both at table definition-site and at query-site. We
+4. **Minimal boilerplate**: both at table definition-site and at query-site. We
    should not need to duplicate case class field definitions 3-5 times in order to
    define our table schema.
 
-4. **Simple types, as far as possible**
-
 5. **Low implementation/maintenance burden**: we don't have a VC funded company behind
-   this library, so it should be both implementable and maintainable by ~1 person
+   this library, so it should be both implementable and maintainable by <~>1 person
    in free time
 
 6. **90% coverage of common SQL APIs, user-extensible to handle the rest**: we should
@@ -30,26 +35,29 @@
 
 ## Non-Goals
 
-1. **Reactive support like or deep IO-Monad integration**, like
-   [SLICK](https://github.com/slick/slick) or
-   [ZIO-Quill](https://github.com/zio/zio-quill). The fundamental
-   database operations using JDBC are neither async nor pure. Anyone who wants to use
-   ScalaSql in reactive/io-monad environments can easily wrap it as necessary.
+1. **Novel Programming Paradigms**: [SLICK](https://github.com/slick/slick) went all-in
+   on Reactive/Async programming, while large portions of the Scala community are all in
+   on various flavors of pure functional programming (IO Monads, Finally Tagless, etc.).
+   ScalaSql doesn't know about any of that: it performs the bare minimum translation of
+   Scala code to blocking JDBC executions and JDBC result sets back to Scala values.
+   Anyone who wants something different can wrap as necessary.
 
-2. **Compile-time query execution**: like [ZIO-Quill](https://github.com/zio/zio-quill).
-   Not because I don't want it (high runtime performance + compile-time logging of
-   queries is great!) but because it adds enough complexity I don't think I'll be
-   able to implement it in a reasonable timeframe
+2. **Compile-time query generation**: like [ZIO-Quill](https://github.com/zio/zio-quill).
+   Not because I don't want it: high runtime performance + compile-time logging of
+   queries is great!. But because compile-time query generation adds enough complexity 
+   that I wouldn't able to implement it in a reasonable timeframe and won't be able to
+   maintain it effectively on a shoe-string time budget going forward.
 
-3. **Database query planning and index usage**: Databases often have problems
-   around their query plans being un-predictable or non-deterministic, such that
-   even with the appropriate indices the query planner may decide not to use them.
-   This is not something we can fix at the client layer
+3. **Novel Database Designs**: Databases often have problems around un-predictable 
+   query plans, limited options for defining indices, confusing performance characteristics,
+   and many other things. ScalaSql aims to fix none of these problems: it just aims to 
+   provide a nicer way to define SQL queries in Scala code, and return the results
+   as Scala values. Someone else can improve the databases themselves.
 
 4. **Full Coverage of SQL APIs**: the full set of SQL APIs is huge, different for
    each database, and ever-changing. We thus do not aim to have complete coverage,
    aiming instead for common use cases and leaving more esoteric things to the user
-   to extend the library to support.
+   to either extend the library to support or drop down to raw SQL.
 
 
 ## Comparisons
