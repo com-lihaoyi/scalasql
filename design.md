@@ -24,7 +24,7 @@
    define our table schema.
 
 5. **Low implementation/maintenance burden**: we don't have a VC funded company behind
-   this library, so it should be both implementable and maintainable by <~>1 person
+   this library, so it should be both implementable and maintainable by <1 person
    in free time
 
 6. **90% coverage of common SQL APIs, user-extensible to handle the rest**: we should
