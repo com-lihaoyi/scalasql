@@ -3707,7 +3707,8 @@ Buyer.insert
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
 
-
+A ScalaSql `.joinOn` referencing a `.select` translates straightforwardly
+into a SQL `JOIN` on a subquery
 
 ```scala
 Purchase.select
@@ -3738,7 +3739,11 @@ Purchase.select
 
 ### SubQuery.sortTakeFrom
 
-
+Some sequences of operations cannot be expressed as a single SQL query,
+and thus translate into an outer query wrapping a subquery inside the `FROM`.
+An example of this is performing a `.joinOn` after a `.take`: SQL does not
+allow you to put `JOIN`s after `LIMIT`s, and so the only way to write this
+in SQL is as a subquery.
 
 ```scala
 Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
@@ -3768,7 +3773,8 @@ Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productI
 
 ### SubQuery.sortTakeFromAndJoin
 
-
+This example shows a ScalaSql query that results in a subquery in both
+the `FROM` and the `JOIN` clause of the generated SQL query.
 
 ```scala
 Product.select
@@ -3812,7 +3818,9 @@ Product.select
 
 ### SubQuery.sortLimitSortLimit
 
-
+Performing multiple sorts with `.take`s in between is also something
+that requires subqueries, as a single query only allows a single `LIMIT`
+clause after the `ORDER BY`
 
 ```scala
 Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
@@ -3914,7 +3922,11 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` 
 
 ### SubQuery.subqueryInFilter
 
-
+You can use `.select`s and aggregate operations like `.size` anywhere an expression is
+expected; these translate into SQL subqueries as expressions. SQL
+subqueries-as-expressions require that the subquery returns exactly 1 row and 1 column,
+which is something the aggregate operation (in this case `.sum`/`COUNT(1)`) helps us
+ensure. Here, we do subquery in a `.filter`/`WHERE`.
 
 ```scala
 Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 0)
@@ -3945,7 +3957,8 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 
 ### SubQuery.subqueryInMap
 
-
+Similar to the above example, but we do the subquery/aggregate in
+a `.map` instead of a `.filter`
 
 ```scala
 Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size))
@@ -4145,6 +4158,79 @@ Product.select
 *
     ```scala
     (1000.0, 0.1)
+    ```
+
+
+
+### SubQuery.deeplyNested
+
+Subqueries can be arbitrarily nested. This example traverses four tables
+to find the price of the most expensive product bought by each Buyer, but
+instead of using `JOIN`s it uses subqueries nested 4 layers deep. While this
+example is contrived, it demonstrates how nested ScalaSql `.select` calls
+translate directly into nested SQL subqueries.
+
+```scala
+Buyer.select.map { buyer =>
+  buyer.name ->
+    ShippingInfo.select
+      .filter(_.buyerId === buyer.id)
+      .map { shippingInfo =>
+        Purchase.select
+          .filter(_.shippingInfoId === shippingInfo.id)
+          .map { purchase =>
+            Product.select
+              .filter(_.id === purchase.productId)
+              .map(_.price)
+              .sortBy(identity)
+              .desc
+              .take(1)
+              .exprQuery
+          }
+          .sortBy(identity)
+          .desc
+          .take(1)
+          .exprQuery
+      }
+      .sortBy(identity)
+      .desc
+      .take(1)
+      .exprQuery
+}
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.name as res__0,
+      (SELECT
+        (SELECT
+          (SELECT product0.price as res
+          FROM product product0
+          WHERE product0.id = purchase0.product_id
+          ORDER BY res DESC
+          LIMIT 1) as res
+        FROM purchase purchase0
+        WHERE purchase0.shipping_info_id = shipping_info0.id
+        ORDER BY res DESC
+        LIMIT 1) as res
+      FROM shipping_info shipping_info0
+      WHERE shipping_info0.buyer_id = buyer0.id
+      ORDER BY res DESC
+      LIMIT 1) as res__1
+    FROM buyer buyer0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", 1000.0),
+      ("叉烧包", 300.0),
+      ("Li Haoyi", 0.0)
+    )
     ```
 
 

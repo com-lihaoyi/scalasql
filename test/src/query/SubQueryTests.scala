@@ -28,7 +28,11 @@ trait SubQueryTests extends ScalaSqlSuite {
           LIMIT 1) subquery1
         ON purchase0.product_id = subquery1.res__id
       """,
-      value = Seq(10000.0)
+      value = Seq(10000.0),
+      docs = """
+        A ScalaSql `.joinOn` referencing a `.select` translates straightforwardly
+        into a SQL `JOIN` on a subquery
+      """
     )
 
     test("sortTakeFrom") - checker(
@@ -45,7 +49,14 @@ trait SubQueryTests extends ScalaSqlSuite {
           LIMIT 1) subquery0
         JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
       """,
-      value = Seq(10000.0)
+      value = Seq(10000.0),
+      docs = """
+        Some sequences of operations cannot be expressed as a single SQL query,
+        and thus translate into an outer query wrapping a subquery inside the `FROM`.
+        An example of this is performing a `.joinOn` after a `.take`: SQL does not
+        allow you to put `JOIN`s after `LIMIT`s, and so the only way to write this
+        in SQL is as a subquery.
+      """
     )
 
     test("sortTakeFromAndJoin") - checker(
@@ -76,7 +87,11 @@ trait SubQueryTests extends ScalaSqlSuite {
           LIMIT 3) subquery1
         ON subquery0.res__id = subquery1.res__product_id
       """,
-      value = Seq(("Camera", 10))
+      value = Seq(("Camera", 10)),
+      docs = """
+        This example shows a ScalaSql query that results in a subquery in both
+        the `FROM` and the `JOIN` clause of the generated SQL query.
+      """
     )
 
     test("sortLimitSortLimit") - checker(
@@ -94,7 +109,12 @@ trait SubQueryTests extends ScalaSqlSuite {
         ORDER BY subquery0.res__price ASC
         LIMIT 2
       """,
-      value = Seq("Face Mask", "Skate Board")
+      value = Seq("Face Mask", "Skate Board"),
+      docs = """
+        Performing multiple sorts with `.take`s in between is also something
+        that requires subqueries, as a single query only allows a single `LIMIT`
+        clause after the `ORDER BY`
+      """
     )
 
     test("sortGroupBy") - checker(
@@ -159,7 +179,14 @@ trait SubQueryTests extends ScalaSqlSuite {
             FROM shipping_info shipping_info0
             WHERE buyer0.id = shipping_info0.buyer_id) = ?
       """,
-      value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+      value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))),
+      docs = """
+        You can use `.select`s and aggregate operations like `.size` anywhere an expression is
+        expected; these translate into SQL subqueries as expressions. SQL
+        subqueries-as-expressions require that the subquery returns exactly 1 row and 1 column,
+        which is something the aggregate operation (in this case `.sum`/`COUNT(1)`) helps us
+        ensure. Here, we do subquery in a `.filter`/`WHERE`.
+      """
     )
     test("subqueryInMap") - checker(
       query = Text {
@@ -177,7 +204,11 @@ trait SubQueryTests extends ScalaSqlSuite {
         (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
         (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
         (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
-      )
+      ),
+      docs = """
+        Similar to the above example, but we do the subquery/aggregate in
+        a `.map` instead of a `.filter`
+      """
     )
     test("subqueryInMapNested") - checker(
       query = Text {
@@ -290,6 +321,66 @@ trait SubQueryTests extends ScalaSqlSuite {
           FROM product product0) subquery0
       """,
       value = (1000.0, 0.1)
+    )
+
+    test("deeplyNested") - checker(
+      query = Text{
+        Buyer.select.map{buyer =>
+          buyer.name ->
+          ShippingInfo.select
+            .filter(_.buyerId === buyer.id)
+            .map{shippingInfo =>
+              Purchase.select
+                .filter(_.shippingInfoId === shippingInfo.id)
+                .map{purchase =>
+                  Product.select
+                    .filter(_.id === purchase.productId)
+                    .map(_.price)
+                    .sortBy(identity).desc
+                    .take(1)
+                    .exprQuery
+                }
+                .sortBy(identity).desc
+                .take(1)
+                .exprQuery
+            }
+            .sortBy(identity).desc
+            .take(1)
+            .exprQuery
+        }
+      },
+      sql = """
+      SELECT
+        buyer0.name as res__0,
+        (SELECT
+          (SELECT
+            (SELECT product0.price as res
+            FROM product product0
+            WHERE product0.id = purchase0.product_id
+            ORDER BY res DESC
+            LIMIT 1) as res
+          FROM purchase purchase0
+          WHERE purchase0.shipping_info_id = shipping_info0.id
+          ORDER BY res DESC
+          LIMIT 1) as res
+        FROM shipping_info shipping_info0
+        WHERE shipping_info0.buyer_id = buyer0.id
+        ORDER BY res DESC
+        LIMIT 1) as res__1
+      FROM buyer buyer0
+      """,
+      value = Seq(
+        ("James Bond", 1000.0),
+        ("叉烧包", 300.0),
+        ("Li Haoyi", 0.0)
+      ),
+      docs = """
+        Subqueries can be arbitrarily nested. This example traverses four tables
+        to find the price of the most expensive product bought by each Buyer, but
+        instead of using `JOIN`s it uses subqueries nested 4 layers deep. While this
+        example is contrived, it demonstrates how nested ScalaSql `.select` calls
+        translate directly into nested SQL subqueries.
+      """
     )
   }
 }

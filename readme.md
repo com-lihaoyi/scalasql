@@ -75,3 +75,4 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`
 * Casting syntax for `Expr[T] => Expr[V]`
 * Docs/Tests for extending ScalaSql with custom expressions and custom queries  
+* Rename either `exprQuery` or `queryExpr`, having both is confusing  
