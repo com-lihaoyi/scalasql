@@ -21,7 +21,7 @@ object scalasql extends RootModule with ScalaModule {
       ivy"com.lihaoyi::mainargs:0.4.0",
       ivy"com.lihaoyi::os-lib:0.9.1",
       ivy"com.lihaoyi::upickle:3.1.3",
-      ivy"com.lihaoyi::utest:0.8.1-18-79b46d",
+      ivy"com.lihaoyi::utest:0.8.2",
       ivy"com.h2database:h2:2.2.224",
       ivy"org.hsqldb:hsqldb:2.5.1",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
