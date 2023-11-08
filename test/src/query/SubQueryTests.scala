@@ -338,15 +338,15 @@ trait SubQueryTests extends ScalaSqlSuite {
                     .map(_.price)
                     .sortBy(identity).desc
                     .take(1)
-                    .exprQuery
+                    .toExpr
                 }
                 .sortBy(identity).desc
                 .take(1)
-                .exprQuery
+                .toExpr
             }
             .sortBy(identity).desc
             .take(1)
-            .exprQuery
+            .toExpr
         }
       },
       sql = """
@@ -383,7 +383,7 @@ trait SubQueryTests extends ScalaSqlSuite {
 
         To turn the ScalaSql `Select[T]` into an `Expr[T]`, you can either use
         an aggregate method like `.sumBy(...): Expr[Int]` that generates a `SUM(...)`
-        aggregate, or via the `.exprQuery` method that leaves the subquery untouched.
+        aggregate, or via the `.toExpr` method that leaves the subquery untouched.
         SQL requires that subqueries used as expressions must return a single row
         and single column, and if the query returns some other number of rows/columns
         most databases will throw an exception, though some like Sqlite will pick

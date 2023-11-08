@@ -228,7 +228,7 @@ trait SelectTests extends ScalaSqlSuite {
       )
     }
 
-    test("exprQuery") - checker(
+    test("toExpr") - checker(
       query = Text {
         Product.select.map(p =>
           (
@@ -239,7 +239,7 @@ trait SelectTests extends ScalaSqlSuite {
               .desc
               .take(1)
               .map(_.total)
-              .exprQuery
+              .toExpr
           )
         )
       },
@@ -262,7 +262,7 @@ trait SelectTests extends ScalaSqlSuite {
       ),
       docs = """
         `SELECT` queries that return a single row and column can be used as SQL expressions
-        in standard SQL databases. In ScalaSql, this is done by the `.exprQuery` method,
+        in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
         which turns a `Select[T]` into an `Expr[T]`. Note that if the `Select` returns more
         than one row or column, the database may select a row arbitrarily or will throw
         an exception at runtime (depend on implenmentation)

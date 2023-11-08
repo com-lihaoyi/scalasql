@@ -710,7 +710,7 @@ object WorldSqlTests extends TestSuite {
               .sortBy(_.population).desc
               .map(_.id)
               .take(1)
-              .exprQuery
+              .toExpr
           }
           .map {
             case (country, city) => (country.name, country.population, city.name, city.population)

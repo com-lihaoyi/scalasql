@@ -734,10 +734,10 @@ Buyer.select.map(c => (c.id, c))
 
 
 
-### Select.exprQuery
+### Select.toExpr
 
 `SELECT` queries that return a single row and column can be used as SQL expressions
-in standard SQL databases. In ScalaSql, this is done by the `.exprQuery` method,
+in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
 which turns a `Select[T]` into an `Expr[T]`. Note that if the `Select` returns more
 than one row or column, the database may select a row arbitrarily or will throw
 an exception at runtime (depend on implenmentation)
@@ -752,7 +752,7 @@ Product.select.map(p =>
       .desc
       .take(1)
       .map(_.total)
-      .exprQuery
+      .toExpr
   )
 )
 ```
@@ -4172,7 +4172,7 @@ translate directly into nested SQL subqueries.
 
 To turn the ScalaSql `Select[T]` into an `Expr[T]`, you can either use
 an aggregate method like `.sumBy(...): Expr[Int]` that generates a `SUM(...)`
-aggregate, or via the `.exprQuery` method that leaves the subquery untouched.
+aggregate, or via the `.toExpr` method that leaves the subquery untouched.
 SQL requires that subqueries used as expressions must return a single row
 and single column, and if the query returns some other number of rows/columns
 most databases will throw an exception, though some like Sqlite will pick
@@ -4193,17 +4193,17 @@ Buyer.select.map { buyer =>
               .sortBy(identity)
               .desc
               .take(1)
-              .exprQuery
+              .toExpr
           }
           .sortBy(identity)
           .desc
           .take(1)
-          .exprQuery
+          .toExpr
       }
       .sortBy(identity)
       .desc
       .take(1)
-      .exprQuery
+      .toExpr
 }
 ```
 

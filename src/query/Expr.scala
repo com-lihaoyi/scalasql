@@ -33,11 +33,11 @@ object Expr {
   def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
-  implicit def ExprQueryable[E[_] <: Expr[_], T](
+  implicit def toExprable[E[_] <: Expr[_], T](
       implicit valueReader0: OptionPickler.Reader[T]
-  ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
+  ): Queryable.Row[E[T], T] = new toExprable[E, T]()
 
-  class ExprQueryable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
+  class toExprable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
       extends Queryable.Row[E[T], T] {
     def walk(q: E[T]) = Seq(Nil -> q)
 
