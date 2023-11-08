@@ -93,15 +93,15 @@ trait Select[Q, R]
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Q, Option[Q2]), (R, Option[R2])]
+  ): Select[(Q, Nullable[Q2]), (R, Option[R2])]
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Option[Q], Q2), (Option[R], R2)]
+  ): Select[(Nullable[Q], Q2), (Option[R], R2)]
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])]
+  ): Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])]
 
 }
 

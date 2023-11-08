@@ -65,7 +65,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * Flat joins (Quill Style)
-* Fix WorldSqlTests's `RIGHT JOIN` example
 * Dot-delimited result names
 * Tutorial docs for `Option`/`NULL` handling
 * Scaladoc for everything, especiall `Query`s
@@ -75,3 +74,5 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`, test/example with HiikariCP
 * Casting syntax for `Expr[T] => Expr[V]`
 * Docs/Tests for extending ScalaSql with custom expressions and custom queries  
+* Add `.head`
+* `string_agg`, `array_agg`, other agg functions

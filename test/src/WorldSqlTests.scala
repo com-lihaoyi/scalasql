@@ -505,21 +505,30 @@ object WorldSqlTests extends TestSuite {
         val query = City.select
           .rightJoin(Country)(_.countryCode === _.code)
           .filter { case (cityOpt, country) => cityOpt.isEmpty }
-          .map { case (cityOpt, country) =>
-            (cityOpt.map(_.name), country.name)
-          }
+          .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
         db.toSqlQuery(query) ==> """
         SELECT city0.name as res__0, country1.name as res__1
         FROM city city0
         RIGHT JOIN country country1 ON city0.countrycode = country1.code
-        WHERE ?
+        WHERE city0.id IS NULL AND city0.name IS NULL
+        AND city0.countrycode IS NULL
+        AND city0.district IS NULL
+        AND city0.population IS NULL
         """.trim.replaceAll("\\s+", " ")
 
-        db.run(query) ==> Seq()
+        db.run(query) ==> Seq(
+          (None, "Antarctica"),
+          (None, "Bouvet Island"),
+          (None, "British Indian Ocean Territory"),
+          (None, "South Georgia and the South Sandwich Islands"),
+          (None, "Heard Island and McDonald Islands"),
+          (None, "French Southern territories"),
+          (None, "United States Minor Outlying Islands")
+        )
         // Note that when you use a left/right/outer join, the corresponding
-        // rows are provided to you as `Option[T]` rather than plain `T`s, e.g.
-        // `cityOpt: Option[City[Expr]]` above.
+        // rows are provided to you as `scalasql.Nullable[T]` rather than plain `T`s, e.g.
+        // `cityOpt: scalasql.Nullable[City[Expr]]` above.
         //
         // -DOCS
       }

@@ -1,21 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{
-  AscDesc,
-  CompoundSelect,
-  Expr,
-  From,
-  GroupBy,
-  InsertValues,
-  Join,
-  Joinable,
-  Nulls,
-  OrderBy,
-  Query,
-  TableRef,
-  Update
-}
+import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, Joinable, Nullable, Nulls, OrderBy, Query, TableRef, Update}
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -184,11 +170,11 @@ object MySqlDialect extends MySqlDialect {
       with Select[Q, R] {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
-    ): scalasql.query.Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
+    ): scalasql.query.Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)
-        .map { case (l, r) => (Option(l), r) }
+        .map { case (l, r) => (Nullable(l), r) }
         .union(rightJoin(other)(on).map { case (l, r) =>
-          (l, Option(r))
+          (l, Nullable(r))
         })
     }
   }

@@ -2,7 +2,7 @@ package scalasql
 
 import utils.OptionPickler.Reader
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.query.{Expr, Query}
+import scalasql.query.{Expr, Nullable, Query}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.utils.OptionPickler
 
@@ -141,12 +141,12 @@ object Queryable {
           )
       )
     }
-    implicit def OptionQueryable[Q, R](
+    implicit def NullableQueryable[Q, R](
         implicit qr: Queryable.Row[Q, R]
-    ): Queryable.Row[Option[Q], Option[R]] = new Queryable.Row[Option[Q], Option[R]] {
-      def walk(q: Option[Q]): Seq[(List[String], Expr[_])] = qr.walk(q.get)
+    ): Queryable.Row[Nullable[Q], Option[R]] = new Queryable.Row[Nullable[Q], Option[R]] {
+      def walk(q: Nullable[Q]): Seq[(List[String], Expr[_])] = qr.walk(q.get)
 
-      def valueReader(q: Option[Q]): OptionPickler.Reader[Option[R]] = {
+      def valueReader(q: Nullable[Q]): OptionPickler.Reader[Option[R]] = {
         new OptionPickler.NullableReader(qr.valueReader(q.get))
           .asInstanceOf[OptionPickler.Reader[Option[R]]]
       }

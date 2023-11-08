@@ -102,20 +102,20 @@ class SimpleSelect[Q, R](
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, Option[Q2]), (R, Option[R2])] = {
-    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Option(o)))
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, Nullable[Q2]), (R, Option[R2])] = {
+    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Nullable(o)))
   }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Option[Q], Q2), (Option[R], R2)] = {
-    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Option(e), o))
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Nullable[Q], Q2), (Option[R], R2)] = {
+    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Nullable(e), o))
   }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
-    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (Option(e), Option(o)))
+  ): Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
+    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (Nullable(e), Nullable(o)))
   }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {

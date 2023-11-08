@@ -59,15 +59,15 @@ class CompoundSelect[Q, R](
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Q, Option[Q2]), (R, Option[R2])] = { simpleFrom(this).leftJoin(other)(on) }
+  ): Select[(Q, Nullable[Q2]), (R, Option[R2])] = { simpleFrom(this).leftJoin(other)(on) }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Option[Q], Q2), (Option[R], R2)] = { simpleFrom(this).rightJoin(other)(on) }
+  ): Select[(Nullable[Q], Q2), (Option[R], R2)] = { simpleFrom(this).rightJoin(other)(on) }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Option[Q], Option[Q2]), (Option[R], Option[R2])] = {
+  ): Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
     simpleFrom(this).outerJoin(other)(on)
   }
 

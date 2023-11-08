@@ -72,20 +72,30 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(startIndex: Int, endIndex: Int, depth: Int, visitor: Visitor[_, _]): (Any, Int, Int) = {
+    def rec(startIndex: Int,
+            endIndex: Int,
+            depth: Int,
+            visitor: Visitor[_, _],
+            parentVisitorNullable: Boolean): (Any, Int, Int) = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
-        val v = values(startIndex)
+        val v0 = values(startIndex)
+        val v =
+          if (parentVisitorNullable || !visitor.isInstanceOf[OptionPickler.NullableReader[_]]) v0
+          else if (nulls(startIndex)) None
+          else Some(v0)
+
         (v, if (nulls(startIndex)) 1 else 0, if (nulls(startIndex)) 0 else 1)
 
         // Hack to check if a random key looks like a number,
         // in which case this data represents an array
       } else if (keys(startIndex)(depth).head.isDigit) {
         val arrVisitor = visitor.visitArray(-1, -1).narrow
+        val arrVisitorNullable = arrVisitor.isInstanceOf[OptionPickler.NullableArrVisitor[_, _]]
         var nulls = 0
         var nonNulls = 0
         groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
           val (v, subNulls, subNonNulls) =
-            rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor)
+            rec(chunkStart, chunkEnd, depth + 1, arrVisitor.subVisitor, arrVisitorNullable)
           arrVisitor.visitValue(v, -1)
           nulls += subNulls
           nonNulls += subNonNulls
@@ -93,20 +103,22 @@ object FlatJson {
 
         val result0 = arrVisitor.visitEnd(-1)
         val result =
-          if (!arrVisitor.isInstanceOf[OptionPickler.NullableArrVisitor[_, _]]) result0
-          else (if (nulls != 0 && nonNulls == 0) None
-                else Some(result0))
+          if (parentVisitorNullable || !arrVisitorNullable) result0
+          else if (nulls != 0 && nonNulls == 0) None
+          else Some(result0)
+
         (result, nulls, nonNulls)
       } else {
 
         val objVisitor = visitor.visitObject(-1, true, -1).narrow
+        val objVisitorNullable = objVisitor.isInstanceOf[OptionPickler.NullableObjVisitor[_, _]]
         var nulls = 0
         var nonNulls = 0
         groupedOn(startIndex, endIndex, depth) { (key, chunkStart, chunkEnd) =>
           val keyVisitor = objVisitor.visitKey(-1)
           objVisitor.visitKeyValue(keyVisitor.visitString(key, -1))
           val (v, subNulls, subNonNulls) =
-            rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor)
+            rec(chunkStart, chunkEnd, depth + 1, objVisitor.subVisitor, objVisitorNullable)
           objVisitor.visitValue(v, -1)
           nulls += subNulls
           nonNulls += subNonNulls
@@ -115,14 +127,14 @@ object FlatJson {
         val result0 = objVisitor.visitEnd(-1)
 
         val result =
-          if (!objVisitor.isInstanceOf[OptionPickler.NullableObjVisitor[_, _]]) result0
-          else (if (nulls != 0 && nonNulls == 0) None
-                else Some(result0))
+          if (parentVisitorNullable || !objVisitorNullable) result0
+          else if (nulls != 0 && nonNulls == 0) None
+          else Some(result0)
 
         (result, nulls, nonNulls)
       }
     }
 
-    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]])._1.asInstanceOf[V]
+    rec(0, keys.length, 0, rowVisitor.asInstanceOf[Visitor[Any, Any]], false)._1.asInstanceOf[V]
   }
 }
