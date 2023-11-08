@@ -5,6 +5,10 @@ import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 
+/**
+ * Represents a set of nullable columns that come from a `LEFT`/`RIGHT`/`OUTER` `JOIN`
+ * clause.
+ */
 trait Nullable[Q]{
   def get: Q
   def isEmpty(implicit qr: Queryable[Q, _]): Expr[Boolean]

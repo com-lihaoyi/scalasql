@@ -4,7 +4,10 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table}
-
+/**
+ * A SQL `SELECT` query, with
+ * `ORDER BY`, `LIMIT`, `OFFSET`, or `UNION` clauses
+ */
 class CompoundSelect[Q, R](
     val lhs: SimpleSelect[Q, R],
     val compoundOps: Seq[CompoundSelect.Op[Q, R]],
@@ -84,22 +87,25 @@ class CompoundSelect[Q, R](
   def sortBy(f: Q => Expr[_]) = {
     val newOrder = Seq(OrderBy(f(expr), None, None))
 
-    if (simple(limit, offset)) copy(orderBy = newOrder ++ orderBy)
+    if (limit.isEmpty && offset.isEmpty) copy(orderBy = newOrder ++ orderBy)
     else newCompoundSelect(simpleFrom(this), compoundOps, newOrder, None, None)
   }
 
   def asc =
     copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Asc))) ++ orderBy.drop(1))
+
   def desc =
     copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Desc))) ++ orderBy.drop(1))
+
   def nullsFirst =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.First))) ++ orderBy.drop(1))
+
   def nullsLast =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, simpleFrom(other))
-    if (simple(orderBy, limit, offset)) copy(compoundOps = compoundOps ++ Seq(op2))
+    if (orderBy.isEmpty && limit.isEmpty && offset.isEmpty) copy(compoundOps = compoundOps ++ Seq(op2))
     else newCompoundSelect(simpleFrom(this), Seq(op2), Nil, None, None)
   }
 
@@ -119,7 +125,7 @@ object CompoundSelect {
     lazy val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
 
     lazy val newCtx = lhsToSqlQuery.context
-      .copy(exprNaming = lhsToSqlQuery.context.exprNaming ++ lhsMap)
+      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsMap)
 
     lazy val sortOpt = SqlStr.flatten(orderToSqlStr(newCtx))
 

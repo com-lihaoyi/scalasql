@@ -505,11 +505,11 @@ object WorldSqlTests extends TestSuite {
         // +DOCS
         // ## Joins
         //
-        // You can perform SQL inner `JOIN`s between tables via the `.join` or `.joinOn`
+        // You can perform SQL inner `JOIN`s between tables via the `.join` or `.join`
         // methods. Below, we use a `JOIN` to look for cities which are in the country
         // named "Liechtenstein":
         val query = City.select
-          .joinOn(Country)(_.countryCode === _.code)
+          .join(Country)(_.countryCode === _.code)
           .filter { case (city, country) => country.name === "Liechtenstein" }
           .map { case (city, country) => city.name }
 
@@ -581,10 +581,10 @@ object WorldSqlTests extends TestSuite {
       test("join") {
         // +DOCS
         // ScalaSql in general allows you to use SQL Subqueries anywhere you would use
-        // a table. e.g. you can pass a Subquery to `.joinOn`, as we do in the below
+        // a table. e.g. you can pass a Subquery to `.join`, as we do in the below
         // query to find language and the name of the top 2 most populous countries:
         val query = CountryLanguage.select
-          .joinOn(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
+          .join(Country.select.sortBy(_.population).desc.take(2))(_.countryCode === _.code)
           .map { case (language, country) => (language.language, country.name) }
           .sortBy(_._1)
 
@@ -614,12 +614,12 @@ object WorldSqlTests extends TestSuite {
       test("from") {
         // +DOCS
         // Some operations automatically generate subqueries where necessary, e.g.
-        // performing a `.joinOn` after you have done a `.take`:
+        // performing a `.join` after you have done a `.take`:
         val query = Country.select
           .sortBy(_.population)
           .desc
           .take(2)
-          .joinOn(CountryLanguage)(_.code === _.countryCode)
+          .join(CountryLanguage)(_.code === _.countryCode)
           .map { case (country, language) =>
             (language.language, country.name)
           }
@@ -660,7 +660,7 @@ object WorldSqlTests extends TestSuite {
         // Here's a more complicated query using the techniques we've learned so far:
         // a query fetching the top 10 languages spoken by the largest number of cities
         val query = City.select
-          .joinOn(CountryLanguage)(_.countryCode === _.countryCode)
+          .join(CountryLanguage)(_.countryCode === _.countryCode)
           .map { case (city, language) => (city.id, language.language) }
           .groupBy { case (city, language) => language }(_.size)
           .sortBy { case (language, cityCount) => cityCount }.desc
@@ -735,7 +735,7 @@ object WorldSqlTests extends TestSuite {
         val query = Country.select
           .sortBy(_.population).desc
           .take(3)
-          .joinOn(City)(_.code === _.countryCode)
+          .join(City)(_.code === _.countryCode)
           .filter{case (country, city) =>
             city.id ===
             City.select

@@ -8,26 +8,77 @@ import scalasql.utils.{FlatJson, OptionPickler}
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
 
+/**
+ * An interface to the SQL database allowing you to run queries.
+ */
 trait DbApi {
-  def savepoint[T](block: DbApi.Savepoint => T): T
-  def rollback(): Unit
-
+  /**
+   * Converts the given query [[Q]] into a string. Useful for debugging and logging
+   */
   def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
+
+  /**
+   * Runs the given query [[Q]] and returns a value of type [[R]]
+   */
   def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
       implicit qr: Queryable[Q, R]
   ): R
+
+  /**
+   * Runs the given query [[Q]] and returns a [[Generator]] of values of type [[R]].
+   * allow you to process the results in a streaming fashion without materializing
+   * the entire list of results in memory
+   */
   def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
       implicit qr: Queryable[Q, Seq[R]]
   ): Generator[R]
-  def runUpdate(sql: SqlStr): Int
-  def runRawUpdate(sql: String, variables: Any*): Int
-  def runRawUpdateBatch(sql: Seq[String]): Seq[Int]
+
+  /**
+   * Runs a [[SqlStr]] and takes a callback [[block]] allowing you to process the
+   * resultant [[ResultSet]]
+   */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
+
+  /**
+   * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
+   * [[block]] allowing you to process the resultant [[ResultSet]]
+   */
   def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T
+
+  /**
+   * Runs an [[SqlStr]] containing an `UPDATE` or `INSERT` query and returns the
+   * number of rows affected
+   */
+  def runUpdate(sql: SqlStr): Int
+
+  /**
+   * Runs an `java.lang.String` (and any interpolated variables) containing an
+   * `UPDATE` or `INSERT` query and returns the number of rows affected
+   */
+  def runRawUpdate(sql: String, variables: Any*): Int
+
+  /**
+   * Runs a batch of update queries, as `java.lang.String`s, and returns
+   * the number of rows affected by each one
+   */
+  def runRawUpdateBatch(sql: Seq[String]): Seq[Int]
+
+}
+
+/**
+ * An interface to a SQL database *transaction*, allowing you to run queries,
+ * create savepoints, or roll back the transaction.
+ */
+trait DbTxn extends DbApi{
+  def savepoint[T](block: DbApi.Savepoint => T): T
+  def rollback(): Unit
 }
 
 object DbApi {
 
+  /**
+   * A SQL `SAVEPOINT`, with an ID, name, and the ability to roll back to when it was created
+   */
   trait Savepoint {
     def savepointId: Int
     def savepointName: String
@@ -40,7 +91,7 @@ object DbApi {
       dialectConfig: DialectConfig,
       autoCommit: Boolean,
       rollBack0: () => Unit
-  ) extends DbApi {
+  ) extends DbTxn{
     val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
 
     def savepoint[T](block: DbApi.Savepoint => T): T = {
@@ -139,7 +190,7 @@ object DbApi {
     def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[MappedType[_]]) = {
-      val ctx = Context(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
+      val ctx = Context.Impl(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
       val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
       val flattened = SqlStr.flatten(sqlStr)
       val queryStr = flattened.queryParts

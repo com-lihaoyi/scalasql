@@ -3,11 +3,11 @@ package scalasql.renderer
 import scalasql.MappedType
 import scalasql.query.Expr
 
-import java.sql.JDBCType
-
 /**
- * Represents a SQL query with interpolated `?`s expressions and the associated
- * interpolated values, of type [[Interp]]
+ * A SQL query with interpolated `?`s expressions and the associated
+ * interpolated values, of type [[Interp]]. Accumulates SQL snippets, parameters,
+ * and referenced expressions in a tree structure to minimize copying overhead,
+ * until [[SqlStr.flatten]] is called to convert it into a [[SqlStr.Flattened]]
  */
 class SqlStr(
     private val queryParts: Seq[String],
@@ -31,9 +31,22 @@ object SqlStr {
       val referencedExprs: Seq[Expr.Identity]
   ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
 
+  /**
+   * Helper method turn an `Option[T]` into a [[SqlStr]], returning
+   * the empty string if the `Option` is `None`
+   */
   def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
+
+  /**
+   * Helper method turn an `Seq[T]` into a [[SqlStr]], returning
+   * the empty string if the `Seq` is empty
+   */
   def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else sql""
 
+  /**
+   * Flattens out a [[SqlStr]] into a single flattened [[SqlStr.Flattened]] object,
+   * at which point you can use its `queryParts`, `params`, `referencedExprs`, etc.
+   */
   def flatten(self: SqlStr): Flattened = {
     val finalParts = collection.mutable.Buffer[String]()
     val finalArgs = collection.mutable.Buffer[Interp.TypeInterp[_]]()
@@ -70,14 +83,24 @@ object SqlStr {
     new Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery, finalExprs.toSeq)
   }
 
+  /**
+   * Provides the sql"..." syntax for constructing [[SqlStr]]s
+   */
   implicit class SqlStringSyntax(sc: StringContext) {
     def sql(args: Interp*) = new SqlStr(sc.parts, args, false, Nil)
   }
 
+  /**
+   * Joins a `Seq` of [[SqlStr]]s into a single [[SqlStr]] using the given [[sep]] separator
+   */
   def join(strs: Seq[SqlStr], sep: SqlStr = sql""): SqlStr = {
     if (strs.isEmpty) sql"" else strs.reduce(_ + sep + _)
   }
 
+  /**
+   * Converts a raw `String` into a [[SqlStr]]. Note that this must be used
+   * carefully to avoid SQL injection attacks.
+   */
   def raw(s: String, referencedExprs: Seq[Expr.Identity] = Nil) =
     new SqlStr(Seq(s), Nil, false, referencedExprs)
 
@@ -85,6 +108,9 @@ object SqlStr {
     def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
   }
 
+  /**
+   * Something that can be interpolated into a [[SqlStr]].
+   */
   sealed trait Interp
   object Interp {
     implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =

@@ -7,22 +7,8 @@ import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
 
 /**
- * Models the various components of a SQL query:
- *
- * {{{
- *  SELECT DISTINCT column, AGG_FUNC(column_or_expression), …
- *  FROM mytable
- *  JOIN another_table ON mytable.column = another_table.column
- *  WHERE constraint_expression
- *  GROUP BY column HAVING constraint_expression
- *  ORDER BY column ASC/DESC
- *  LIMIT count OFFSET COUNT;
- * }}}
- *
- * Good syntax reference:
- *
- * https://www.cockroachlabs.com/docs/stable/selection-queries#set-operations
- * https://www.postgresql.org/docs/current/sql-select.html
+ * A `SELECT` query, with `FROM`/`JOIN`/`WHERE`/`GROUP BY`
+ * clauses, but without `ORDER BY`/`LIMIT`/`TAKE`/`UNION` clauses
  */
 class SimpleSelect[Q, R](
     val expr: Q,
@@ -52,7 +38,7 @@ class SimpleSelect[Q, R](
     Expr[V] { implicit outerCtx: Context =>
       this
         .copy(expr = Expr[V] { implicit ctx: Context =>
-          val newCtx = ctx.copy(fromNaming = outerCtx.fromNaming ++ ctx.fromNaming)
+          val newCtx = ctx.withFromNaming(outerCtx.fromNaming ++ ctx.fromNaming)
 
           f(expr)(newCtx)
         })

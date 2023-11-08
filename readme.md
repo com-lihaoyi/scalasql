@@ -67,7 +67,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Flat joins (Quill Style)
 * Dot-delimited result names
 * Tutorial docs for `Option`/`NULL` handling
-* Scaladoc for everything, especiall `Query`s
 * `private`ize and `protected`ize everything possible
 * Docs for type mapping
 * Docs for custom expressions

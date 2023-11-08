@@ -22,6 +22,16 @@ trait Queryable[-Q, R] {
 }
 
 object Queryable {
+  /**
+   * A [[Queryable]] that represents a part of a single database row. [[Queryable.Row]]s
+   * can be nested within other [[Queryable]]s, but [[Queryable]]s in general cannot. e.g.
+   *
+   * - `Select[Int]` is valid because `Select[Q]` takes a `Queryable.Row[Q]`, and
+   *   there is a `Queryable.Row[Int]` available
+   *
+   * - `Select[Select[Int]]` is invalid because although there is a `Queryable[Select[Q]]`
+   *   available, there is no `Queryable.Row[Select[Q]]`, as `Select[Q]` returns multiple rows
+   */
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
@@ -48,8 +58,6 @@ object Queryable {
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
     }
-
-    import scalasql.utils.OptionPickler._
 
     implicit def Tuple2Queryable[Q1, Q2, R1, R2](
         implicit q1: Queryable.Row[Q1, R1],

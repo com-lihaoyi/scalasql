@@ -2,6 +2,9 @@ package scalasql.query
 
 import scalasql.{Column, Queryable, query}
 
+/**
+ * A SQL `INSERT` query
+ */
 trait Insert[Q, R] {
   def expr: Q
   def table: TableRef

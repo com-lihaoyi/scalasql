@@ -5,6 +5,9 @@ import scalasql.{Column, MappedType, Queryable}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
+/**
+ * A SQL `UPDATE` query
+ */
 trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
   def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)

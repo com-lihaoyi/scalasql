@@ -4,6 +4,9 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.{MappedType, Queryable}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
+/**
+ * A SQL `DELETE` query
+ */
 trait Delete[Q] extends Query[Int] with Returnable[Q]
 
 object Delete {

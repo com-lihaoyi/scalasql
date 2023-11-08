@@ -5,6 +5,10 @@ import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.{MappedType, Queryable}
 import scalasql.utils.OptionPickler
 
+/**
+ * A query that could support a `RETURNING` clause, typically
+ * an `INSERT` or `UPDATE`
+ */
 trait Returnable[Q] {
   def expr: Q
   def table: TableRef
@@ -13,6 +17,9 @@ trait Returnable[Q] {
 
 trait InsertReturnable[Q] extends Returnable[Q]
 
+/**
+ * A query with a `RETURNING` clause
+ */
 trait Returning[Q, R] extends Query.Multiple[R] {
   def single: Query.Single[R] = new Query.Single(this)
 }

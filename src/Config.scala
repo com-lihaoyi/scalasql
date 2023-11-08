@@ -1,5 +1,8 @@
 package scalasql
 
+/**
+ * Things you to do to configure ScalaSql
+ */
 trait Config {
   def columnLabelPrefix = "res"
   def columnLabelDelimiter = "__"

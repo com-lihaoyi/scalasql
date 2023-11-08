@@ -12,7 +12,7 @@ trait JoinTests extends ScalaSqlSuite {
   def tests = Tests {
     test("joinFilter") - checker(
       query = Text {
-        Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
+        Buyer.select.join(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
       },
       sql = """
         SELECT
@@ -37,7 +37,7 @@ trait JoinTests extends ScalaSqlSuite {
         )
       ),
       docs = """
-        ScalaSql's `.join` or `.joinOn` methods correspond to SQL `JOIN` and `JOIN ... ON ...`.
+        ScalaSql's `.join` or `.join` methods correspond to SQL `JOIN` and `JOIN ... ON ...`.
         These perform an inner join between two tables, with an optional `ON` predicate. You can
         also `.filter` and `.map` the results of the join, making use of the columns joined from
         the two tables
@@ -48,7 +48,7 @@ trait JoinTests extends ScalaSqlSuite {
     test("joinFilterMap") - checker(
       query = Text {
         Buyer.select
-          .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+          .join(ShippingInfo)(_.id `=` _.buyerId)
           .filter(_._1.name `=` "James Bond")
           .map(_._2.shippingDate)
       },
@@ -62,7 +62,7 @@ trait JoinTests extends ScalaSqlSuite {
     )
 
     test("selfJoin") - checker(
-      query = Text { Buyer.select.joinOn(Buyer)(_.id `=` _.id) },
+      query = Text { Buyer.select.join(Buyer)(_.id `=` _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,
@@ -91,13 +91,13 @@ trait JoinTests extends ScalaSqlSuite {
       docs = """
         ScalaSql supports a "self join", where a table is joined with itself. This
         is done by simply having the same table be on the left-hand-side and right-hand-side
-        of your `.join` or `.joinOn` method. The two example self-joins below are trivial,
+        of your `.join` or `.join` method. The two example self-joins below are trivial,
         but illustrate how to do it in case you want to do a self-join in a more realistic setting.
       """
     )
 
     test("selfJoin2") - checker(
-      query = Text { Buyer.select.joinOn(Buyer)(_.id <> _.id) },
+      query = Text { Buyer.select.join(Buyer)(_.id <> _.id) },
       sql = """
         SELECT
           buyer0.id as res__0__id,

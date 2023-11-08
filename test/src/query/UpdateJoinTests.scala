@@ -16,7 +16,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         query = Text {
           Buyer
             .update(_.name `=` "James Bond")
-            .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+            .join(ShippingInfo)(_.id `=` _.buyerId)
             .set(c => c._1.dateOfBirth := c._2.shippingDate)
         },
         sqls = Seq(
@@ -36,7 +36,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         value = 1,
         docs = """
           ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
-          `.update.joinOn` methods
+          `.update.join` methods
         """
       )
 
@@ -51,9 +51,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         query = Text {
           Buyer
             .update(_.name `=` "James Bond")
-            .joinOn(ShippingInfo)(_.id `=` _.buyerId)
-            .joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
-            .joinOn(Product)(_._2.productId `=` _.id)
+            .join(ShippingInfo)(_.id `=` _.buyerId)
+            .join(Purchase)(_._2.id `=` _.shippingInfoId)
+            .join(Product)(_._2.productId `=` _.id)
             .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
             .set(c => c._1._1._1.name := c._2.name)
         },
@@ -93,7 +93,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         query = Text {
           Buyer
             .update(_.name `=` "James Bond")
-            .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+            .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
             .set(c => c._1.dateOfBirth := c._2.shippingDate)
         },
         sqls = Seq(
@@ -125,7 +125,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         value = 1,
         docs = """
           In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
-          subqueries by passing in a `.select` query to `.joinOn`
+          subqueries by passing in a `.select` query to `.join`
         """
       )
 
@@ -141,7 +141,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             .update(_.name `=` "James Bond")
             // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
             // column gets eliminated since it is not used outside the subquery
-            .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+            .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
             .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
         },
         sqls = Seq(

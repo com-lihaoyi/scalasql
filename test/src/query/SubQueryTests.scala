@@ -16,7 +16,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     test("sortTakeJoin") - checker(
       query = Text {
         Purchase.select
-          .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
+          .join(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
           .map { case (purchase, product) => purchase.total }
       },
       sql = """
@@ -30,14 +30,14 @@ trait SubQueryTests extends ScalaSqlSuite {
       """,
       value = Seq(10000.0),
       docs = """
-        A ScalaSql `.joinOn` referencing a `.select` translates straightforwardly
+        A ScalaSql `.join` referencing a `.select` translates straightforwardly
         into a SQL `JOIN` on a subquery
       """
     )
 
     test("sortTakeFrom") - checker(
       query = Text {
-        Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
+        Product.select.sortBy(_.price).desc.take(1).join(Purchase)(_.id `=` _.productId).map {
           case (product, purchase) => purchase.total
         }
       },
@@ -53,7 +53,7 @@ trait SubQueryTests extends ScalaSqlSuite {
       docs = """
         Some sequences of operations cannot be expressed as a single SQL query,
         and thus translate into an outer query wrapping a subquery inside the `FROM`.
-        An example of this is performing a `.joinOn` after a `.take`: SQL does not
+        An example of this is performing a `.join` after a `.take`: SQL does not
         allow you to put `JOIN`s after `LIMIT`s, and so the only way to write this
         in SQL is as a subquery.
       """
@@ -65,7 +65,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           .sortBy(_.price)
           .desc
           .take(3)
-          .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
+          .join(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
           .map { case (product, purchase) => (product.name, purchase.count) }
       },
       sql = """
@@ -138,7 +138,7 @@ trait SubQueryTests extends ScalaSqlSuite {
 
     test("groupByJoin") - checker(
       query = Text {
-        Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
+        Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).join(Product)(_._1 `=` _.id).map {
           case ((productId, total), product) => (product.name, total)
         }
       },

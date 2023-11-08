@@ -5,7 +5,8 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
 /**
- * Something that supports aggregate operations
+ * Something that supports aggregate operations. Most commonly a [[Select]], but
+ * also could be a [[SelectProxy]]
  */
 trait Aggregatable[Q] {
   def expr: Q

@@ -5,7 +5,7 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
 /**
- * Represents a single "value" in your SQL query that can be mapped to and from
+ * A single "value" in your SQL query that can be mapped to and from
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {

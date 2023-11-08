@@ -1170,13 +1170,13 @@ Product.select.map(p =>
 inner `JOIN`s, `JOIN ON`s, self-joins, `LEFT`/`RIGHT`/`OUTER` `JOIN`s
 ### Join.joinFilter
 
-ScalaSql's `.join` or `.joinOn` methods correspond to SQL `JOIN` and `JOIN ... ON ...`.
+ScalaSql's `.join` or `.join` methods correspond to SQL `JOIN` and `JOIN ... ON ...`.
 These perform an inner join between two tables, with an optional `ON` predicate. You can
 also `.filter` and `.map` the results of the join, making use of the columns joined from
 the two tables
 
 ```scala
-Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
+Buyer.select.join(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧包")
 ```
 
 
@@ -1218,7 +1218,7 @@ Buyer.select.joinOn(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉�
 
 ```scala
 Buyer.select
-  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+  .join(ShippingInfo)(_.id `=` _.buyerId)
   .filter(_._1.name `=` "James Bond")
   .map(_._2.shippingDate)
 ```
@@ -1245,11 +1245,11 @@ Buyer.select
 
 ScalaSql supports a "self join", where a table is joined with itself. This
 is done by simply having the same table be on the left-hand-side and right-hand-side
-of your `.join` or `.joinOn` method. The two example self-joins below are trivial,
+of your `.join` or `.join` method. The two example self-joins below are trivial,
 but illustrate how to do it in case you want to do a self-join in a more realistic setting.
 
 ```scala
-Buyer.select.joinOn(Buyer)(_.id `=` _.id)
+Buyer.select.join(Buyer)(_.id `=` _.id)
 ```
 
 
@@ -1293,7 +1293,7 @@ Buyer.select.joinOn(Buyer)(_.id `=` _.id)
 
 
 ```scala
-Buyer.select.joinOn(Buyer)(_.id <> _.id)
+Buyer.select.join(Buyer)(_.id <> _.id)
 ```
 
 
@@ -2823,12 +2823,12 @@ Product.select
 ### UpdateJoin.join
 
 ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
-`.update.joinOn` methods
+`.update.join` methods
 
 ```scala
 Buyer
   .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
+  .join(ShippingInfo)(_.id `=` _.buyerId)
   .set(c => c._1.dateOfBirth := c._2.shippingDate)
 ```
 
@@ -2876,9 +2876,9 @@ three times against `ShippingInfo`/`Purchase`/`Product` to determine what to upd
 ```scala
 Buyer
   .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo)(_.id `=` _.buyerId)
-  .joinOn(Purchase)(_._2.id `=` _.shippingInfoId)
-  .joinOn(Product)(_._2.productId `=` _.id)
+  .join(ShippingInfo)(_.id `=` _.buyerId)
+  .join(Purchase)(_._2.id `=` _.shippingInfoId)
+  .join(Product)(_._2.productId `=` _.id)
   .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
   .set(c => c._1._1._1.name := c._2.name)
 ```
@@ -2926,12 +2926,12 @@ Buyer.select.filter(_.id `=` 1).map(_.name)
 ### UpdateJoin.joinSubquery
 
 In addition to `JOIN`ing against another table, you can also perform `JOIN`s against
-subqueries by passing in a `.select` query to `.joinOn`
+subqueries by passing in a `.select` query to `.join`
 
 ```scala
 Buyer
   .update(_.name `=` "James Bond")
-  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+  .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
   .set(c => c._1.dateOfBirth := c._2.shippingDate)
 ```
 
@@ -2985,7 +2985,7 @@ Buyer
   .update(_.name `=` "James Bond")
   // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
   // column gets eliminated since it is not used outside the subquery
-  .joinOn(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
+  .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
   .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
 ```
 
@@ -3707,12 +3707,12 @@ Buyer.insert
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
 
-A ScalaSql `.joinOn` referencing a `.select` translates straightforwardly
+A ScalaSql `.join` referencing a `.select` translates straightforwardly
 into a SQL `JOIN` on a subquery
 
 ```scala
 Purchase.select
-  .joinOn(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
+  .join(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
   .map { case (purchase, product) => purchase.total }
 ```
 
@@ -3741,12 +3741,12 @@ Purchase.select
 
 Some sequences of operations cannot be expressed as a single SQL query,
 and thus translate into an outer query wrapping a subquery inside the `FROM`.
-An example of this is performing a `.joinOn` after a `.take`: SQL does not
+An example of this is performing a `.join` after a `.take`: SQL does not
 allow you to put `JOIN`s after `LIMIT`s, and so the only way to write this
 in SQL is as a subquery.
 
 ```scala
-Product.select.sortBy(_.price).desc.take(1).joinOn(Purchase)(_.id `=` _.productId).map {
+Product.select.sortBy(_.price).desc.take(1).join(Purchase)(_.id `=` _.productId).map {
   case (product, purchase) => purchase.total
 }
 ```
@@ -3781,7 +3781,7 @@ Product.select
   .sortBy(_.price)
   .desc
   .take(3)
-  .joinOn(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
+  .join(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
   .map { case (product, purchase) => (product.name, purchase.count) }
 ```
 
@@ -3885,7 +3885,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 
 ```scala
-Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).joinOn(Product)(_._1 `=` _.id).map {
+Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).join(Product)(_._1 `=` _.id).map {
   case ((productId, total), product) => (product.name, total)
 }
 ```

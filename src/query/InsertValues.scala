@@ -6,9 +6,7 @@ import scalasql.utils.OptionPickler
 import scalasql.{Column, MappedType, Queryable}
 
 /**
- * Syntax reference
- *
- * https://www.postgresql.org/docs/current/sql-update.html
+ * A SQL `INSERT VALUES` query
  */
 trait InsertValues[Q, R] extends InsertReturnable[Q] with Query[Int] {
   def columns: Seq[Column.ColumnExpr[_]]
@@ -42,7 +40,7 @@ object InsertValues {
       tableName: String
   ) {
 
-    implicit lazy val ctx = prevContext.copy(fromNaming = Map(), exprNaming = Map())
+    implicit lazy val ctx = prevContext.withExprNaming(Map()).withFromNaming(Map())
     lazy val columns = SqlStr
       .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
     lazy val values = SqlStr.join(

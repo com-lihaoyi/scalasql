@@ -5,6 +5,9 @@ import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, U
 import renderer.SqlStr.SqlStringSyntax
 import scalasql.utils.OptionPickler
 
+/**
+ * In-code representation of a SQL table, associated with a given `case class` [[V]].
+ */
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base {
 
   val tableName = name.value

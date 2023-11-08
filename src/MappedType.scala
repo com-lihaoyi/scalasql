@@ -22,7 +22,15 @@ import java.time.{
 // Official JDBC mapping docs
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/index.html
 // https://docs.oracle.com/javase/1.5.0/docs/guide/jdbc/getstart/mapping.html#1055162
-sealed trait MappedType[T] {
+
+/**
+ * A mapping between a Scala type [[T]] and a JDBC type, defined by
+ * it's [[jdbcType]], [[typeString]], and [[get]] and [[put]] operations.
+ *
+ * Defaults are provided for most common Scala primitives, but you can also provide
+ * your own by defining an `implicit val foo: MappedType[T]`
+ */
+trait MappedType[T] {
   def jdbcType: JDBCType
   def typeString: String = jdbcType.toString
   def nullable: Boolean = false

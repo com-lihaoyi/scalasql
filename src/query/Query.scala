@@ -4,13 +4,16 @@ import scalasql.{MappedType, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
+/**
+ * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
+ * a [[Query.Single]] that returns a single row
+ */
 trait Query[R] {
   def walk(): Seq[(List[String], Expr[_])]
   def singleRow: Boolean
   def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
   def valueReader: OptionPickler.Reader[R]
   def isExecuteUpdate: Boolean = false
-
 }
 
 object Query {

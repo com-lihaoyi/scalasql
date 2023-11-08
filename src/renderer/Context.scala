@@ -1,17 +1,41 @@
 package scalasql.renderer
 
 import scalasql.Config
-import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef}
+import scalasql.query.{Expr, From, SubqueryRef, TableRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
-case class Context(
-    fromNaming: Map[From, String],
-    exprNaming: Map[Expr.Identity, SqlStr],
-    config: Config,
-    defaultQueryableSuffix: String
-)
+/**
+ * The contextual information necessary for rendering a ScalaSql query or expression
+ * into a SQL string
+ *
+ * @param fromNaming any [[From]]/`FROM` clauses that are in scope, and the aliases those
+ *                   clauses are given
+ * @param exprNaming any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and
+ *                   what those expressions are named in SQL
+ * @param config The ScalaSql configuration
+ * @param defaultQueryableSuffix the suffix necessary for turning an expression into a valid
+ *                               SQL query, e.g. some databases allow `SELECT foo` while others
+ *                               require `SELECT foo FROM (VALUES (0))`
+ */
+trait Context{
+  def fromNaming: Map[From, String]
+  def exprNaming: Map[Expr.Identity, SqlStr]
+  def config: Config
+  def defaultQueryableSuffix: String
+
+  def withFromNaming(fromNaming: Map[From, String]): Context
+  def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
+}
 
 object Context {
+  case class Impl(fromNaming: Map[From, String],
+                  exprNaming: Map[Expr.Identity, SqlStr],
+                  config: Config,
+                  defaultQueryableSuffix: String) extends Context {
+    def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
+
+    def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context = copy(exprNaming = exprNaming)
+  }
   case class Computed(
       namedFromsMap: Map[From, String],
       fromSelectables: Map[
@@ -64,7 +88,7 @@ object Context {
       vs.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
     }
 
-    val ctx: Context = prevContext.copy(fromNaming = namedFromsMap, exprNaming = exprNaming)
+    val ctx: Context = Impl(namedFromsMap, exprNaming, prevContext.config, prevContext.defaultQueryableSuffix)
 
     Computed(namedFromsMap, fromSelectables, exprNaming, ctx)
   }

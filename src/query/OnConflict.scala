@@ -4,6 +4,9 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{Column, MappedType}
 import scalasql.renderer.{Context, SqlStr}
 
+/**
+ * A query with a SQL `ON CONFLICT` clause, typically an `INSERT` or an `UPDATE`
+ */
 class OnConflict[Q, R](query: Query[R] with InsertReturnable[Q], expr: Q, table: TableRef) {
   def onConflictIgnore(c: (Q => Column.ColumnExpr[_])*) =
     new OnConflict.Ignore(query, c.map(_(expr)), table)

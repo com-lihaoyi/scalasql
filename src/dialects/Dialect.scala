@@ -4,7 +4,10 @@ import scalasql.operations.{CaseWhen, TableOps}
 import scalasql.query.{Aggregatable, Expr, Select}
 import scalasql.{MappedType, Queryable, Table, operations}
 
-object Dialect {}
+/**
+ * Base type for all SQL dialects. A Dialect proides extension methods, extension operators,
+ * and custom implementations of various query classes that may differ between databases
+ */
 trait Dialect extends DialectConfig {
   implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
