@@ -17,7 +17,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
  *                               SQL query, e.g. some databases allow `SELECT foo` while others
  *                               require `SELECT foo FROM (VALUES (0))`
  */
-trait Context{
+trait Context {
   def fromNaming: Map[From, String]
   def exprNaming: Map[Expr.Identity, SqlStr]
   def config: Config
@@ -28,13 +28,16 @@ trait Context{
 }
 
 object Context {
-  case class Impl(fromNaming: Map[From, String],
-                  exprNaming: Map[Expr.Identity, SqlStr],
-                  config: Config,
-                  defaultQueryableSuffix: String) extends Context {
+  case class Impl(
+      fromNaming: Map[From, String],
+      exprNaming: Map[Expr.Identity, SqlStr],
+      config: Config,
+      defaultQueryableSuffix: String
+  ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
-    def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context = copy(exprNaming = exprNaming)
+    def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context =
+      copy(exprNaming = exprNaming)
   }
   case class Computed(
       namedFromsMap: Map[From, String],
@@ -88,7 +91,8 @@ object Context {
       vs.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
     }
 
-    val ctx: Context = Impl(namedFromsMap, exprNaming, prevContext.config, prevContext.defaultQueryableSuffix)
+    val ctx: Context =
+      Impl(namedFromsMap, exprNaming, prevContext.config, prevContext.defaultQueryableSuffix)
 
     Computed(namedFromsMap, fromSelectables, exprNaming, ctx)
   }

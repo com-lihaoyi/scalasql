@@ -663,7 +663,8 @@ object WorldSqlTests extends TestSuite {
           .join(CountryLanguage)(_.countryCode === _.countryCode)
           .map { case (city, language) => (city.id, language.language) }
           .groupBy { case (city, language) => language }(_.size)
-          .sortBy { case (language, cityCount) => cityCount }.desc
+          .sortBy { case (language, cityCount) => cityCount }
+          .desc
           .take(10)
 
         db.toSqlQuery(query) ==> """
@@ -690,7 +691,7 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
 
-      test("weightedLifeExpectancyByContinent"){
+      test("weightedLifeExpectancyByContinent") {
         // +DOCS
         // ### Population-Weighted Average Life Expectancy Per Continent
         // Another non-trivia query: listing the population-weighted
@@ -699,7 +700,8 @@ object WorldSqlTests extends TestSuite {
           .groupBy(_.continent)(group =>
             group.sumBy(c => c.lifeExpectancy.get * c.population) / group.sumBy(_.population)
           )
-          .sortBy(_._2).desc
+          .sortBy(_._2)
+          .desc
 
         db.toSqlQuery(query) ==> """
         SELECT
@@ -722,7 +724,7 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
 
-      test("largestCityInThreeLargestCountries"){
+      test("largestCityInThreeLargestCountries") {
         // +DOCS
         // ### Most Populous City in each of the Three Most Populous Countries
         // This example uses first gets the three largest Countries, `JOIN`s the
@@ -733,20 +735,22 @@ object WorldSqlTests extends TestSuite {
         // with SQL syntax
 
         val query = Country.select
-          .sortBy(_.population).desc
+          .sortBy(_.population)
+          .desc
           .take(3)
           .join(City)(_.code === _.countryCode)
-          .filter{case (country, city) =>
+          .filter { case (country, city) =>
             city.id ===
-            City.select
-              .filter(_.countryCode === country.code)
-              .sortBy(_.population).desc
-              .map(_.id)
-              .take(1)
-              .toExpr
+              City.select
+                .filter(_.countryCode === country.code)
+                .sortBy(_.population)
+                .desc
+                .map(_.id)
+                .take(1)
+                .toExpr
           }
-          .map {
-            case (country, city) => (country.name, country.population, city.name, city.population)
+          .map { case (country, city) =>
+            (country.name, country.population, city.name, city.population)
           }
 
         db.toSqlQuery(query) ==> """

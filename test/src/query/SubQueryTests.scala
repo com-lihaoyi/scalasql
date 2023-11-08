@@ -272,7 +272,6 @@ trait SubQueryTests extends ScalaSqlSuite {
       value = Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
     )
 
-
     test("exceptAggregate") - checker(
       query = Text {
         Product.select
@@ -282,8 +281,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           .except(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
           .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
       },
-      sql =
-        """
+      sql = """
         SELECT
           MAX(subquery0.res__1) as res__0,
           MIN(subquery0.res__1) as res__1
@@ -309,8 +307,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           .unionAll(Product.select.map(p => (p.kebabCaseName.toLowerCase, p.price)))
           .aggregate(ps => (ps.maxBy(_._2), ps.minBy(_._2)))
       },
-      sql =
-        """
+      sql = """
         SELECT
           MAX(subquery0.res__1) as res__0,
           MIN(subquery0.res__1) as res__1
@@ -324,29 +321,32 @@ trait SubQueryTests extends ScalaSqlSuite {
     )
 
     test("deeplyNested") - checker(
-      query = Text{
-        Buyer.select.map{buyer =>
+      query = Text {
+        Buyer.select.map { buyer =>
           buyer.name ->
-          ShippingInfo.select
-            .filter(_.buyerId === buyer.id)
-            .map{shippingInfo =>
-              Purchase.select
-                .filter(_.shippingInfoId === shippingInfo.id)
-                .map{purchase =>
-                  Product.select
-                    .filter(_.id === purchase.productId)
-                    .map(_.price)
-                    .sortBy(identity).desc
-                    .take(1)
-                    .toExpr
-                }
-                .sortBy(identity).desc
-                .take(1)
-                .toExpr
-            }
-            .sortBy(identity).desc
-            .take(1)
-            .toExpr
+            ShippingInfo.select
+              .filter(_.buyerId === buyer.id)
+              .map { shippingInfo =>
+                Purchase.select
+                  .filter(_.shippingInfoId === shippingInfo.id)
+                  .map { purchase =>
+                    Product.select
+                      .filter(_.id === purchase.productId)
+                      .map(_.price)
+                      .sortBy(identity)
+                      .desc
+                      .take(1)
+                      .toExpr
+                  }
+                  .sortBy(identity)
+                  .desc
+                  .take(1)
+                  .toExpr
+              }
+              .sortBy(identity)
+              .desc
+              .take(1)
+              .toExpr
         }
       },
       sql = """

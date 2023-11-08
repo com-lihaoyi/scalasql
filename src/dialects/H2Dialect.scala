@@ -2,7 +2,19 @@ package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
 import scalasql.{Column, Id, MappedType, Queryable, Table, dialects, operations}
-import scalasql.query.{CompoundSelect, Expr, From, GroupBy, InsertSelect, InsertValues, Join, Joinable, Nullable, OrderBy, Query}
+import scalasql.query.{
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertSelect,
+  InsertValues,
+  Join,
+  Joinable,
+  Nullable,
+  OrderBy,
+  Query
+}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 

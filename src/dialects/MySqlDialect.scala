@@ -1,7 +1,22 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, Joinable, Nullable, Nulls, OrderBy, Query, TableRef, Update}
+import scalasql.query.{
+  AscDesc,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertValues,
+  Join,
+  Joinable,
+  Nullable,
+  Nulls,
+  OrderBy,
+  Query,
+  TableRef,
+  Update
+}
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler

@@ -43,13 +43,17 @@ object OptionPickler
   }
 
   trait NullableVisitor
-  class NullableArrVisitor[-K, +T](v0: ArrVisitor[K, T]) extends ArrVisitor[K, T] with NullableVisitor {
+  class NullableArrVisitor[-K, +T](v0: ArrVisitor[K, T])
+      extends ArrVisitor[K, T]
+      with NullableVisitor {
     def subVisitor: Visitor[_, _] = new NullableReader(v0.subVisitor.asInstanceOf[Reader[_]])
     def visitValue(v: K, index: Int) = v0.visitValue(v, index)
     def visitEnd(index: Int) = v0.visitEnd(index)
   }
 
-  class NullableObjVisitor[-K, +T](v0: ObjVisitor[K, T]) extends ObjVisitor[K, T] with NullableVisitor  {
+  class NullableObjVisitor[-K, +T](v0: ObjVisitor[K, T])
+      extends ObjVisitor[K, T]
+      with NullableVisitor {
     def subVisitor: Visitor[_, _] = new NullableReader(v0.subVisitor.asInstanceOf[Reader[_]])
     def visitValue(v: K, index: Int) = v0.visitValue(v, index)
     def visitEnd(index: Int) = v0.visitEnd(index)

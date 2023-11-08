@@ -12,6 +12,7 @@ import java.sql.{PreparedStatement, ResultSet, Statement}
  * An interface to the SQL database allowing you to run queries.
  */
 trait DbApi {
+
   /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging
    */
@@ -69,7 +70,7 @@ trait DbApi {
  * An interface to a SQL database *transaction*, allowing you to run queries,
  * create savepoints, or roll back the transaction.
  */
-trait DbTxn extends DbApi{
+trait DbTxn extends DbApi {
   def savepoint[T](block: DbApi.Savepoint => T): T
   def rollback(): Unit
 }
@@ -91,7 +92,7 @@ object DbApi {
       dialectConfig: DialectConfig,
       autoCommit: Boolean,
       rollBack0: () => Unit
-  ) extends DbTxn{
+  ) extends DbTxn {
     val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
 
     def savepoint[T](block: DbApi.Savepoint => T): T = {

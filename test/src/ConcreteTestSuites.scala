@@ -28,7 +28,6 @@ import scalasql.dialects.{
   H2DialectTests
 }
 
-
 package postgres {
 
   import utils.PostgresSuite
@@ -94,8 +93,6 @@ package mysql {
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
   object OptionalTests extends datatypes.OptionalTests with MySqlSuite
-
-
 
   object MySqlDialectTests extends MySqlDialectTests
 }

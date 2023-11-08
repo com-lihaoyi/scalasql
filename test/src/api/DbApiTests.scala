@@ -74,7 +74,9 @@ trait DbApiTests extends ScalaSqlSuite {
           val newName = "Moo Moo Cow"
           val newDateOfBirth = LocalDate.parse("2000-01-01")
           val count = db
-            .runUpdate(sql"INSERT INTO buyer (name, date_of_birth) VALUES($newName, $newDateOfBirth)")
+            .runUpdate(
+              sql"INSERT INTO buyer (name, date_of_birth) VALUES($newName, $newDateOfBirth)"
+            )
           assert(count == 1)
 
           db.run(Buyer.select) ==> List(
@@ -113,8 +115,6 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
 
-
-
     test("runRawUpdate") - checker.recorded(
       """
       `runRawUpdate` is similar to `runRawQuery`, but for update queries that
@@ -138,7 +138,6 @@ trait DbApiTests extends ScalaSqlSuite {
         }
       }
     )
-
 
     test("stream") - checker.recorded(
       """

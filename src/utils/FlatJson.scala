@@ -15,7 +15,7 @@ object FlatJson {
     val l = mutable.ArrayBuilder.make[String]
     var offset = 0
     while ({
-      input.indexOf(delim, offset) match{
+      input.indexOf(delim, offset) match {
         case -1 =>
           l.addOne(input.substring(offset))
           false
@@ -72,11 +72,13 @@ object FlatJson {
      * Recurse over the 2D collection of `keys` using `startIndex`, `endIndex`, and `depth`
      * to minimize the allocation of intermediate data structures
      */
-    def rec(startIndex: Int,
-            endIndex: Int,
-            depth: Int,
-            visitor: Visitor[_, _],
-            parentVisitorNullable: Boolean): (Any, Int, Int) = {
+    def rec(
+        startIndex: Int,
+        endIndex: Int,
+        depth: Int,
+        visitor: Visitor[_, _],
+        parentVisitorNullable: Boolean
+    ): (Any, Int, Int) = {
       if (startIndex == endIndex - 1 && depth == keys(startIndex).length) {
         val v0 = values(startIndex)
         val v =

@@ -22,6 +22,7 @@ trait Queryable[-Q, R] {
 }
 
 object Queryable {
+
   /**
    * A [[Queryable]] that represents a part of a single database row. [[Queryable.Row]]s
    * can be nested within other [[Queryable]]s, but [[Queryable]]s in general cannot. e.g.

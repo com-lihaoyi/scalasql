@@ -210,7 +210,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         "socks"
       ),
       normalize = (x: Seq[String]) => x.sorted,
-      docs ="""
+      docs = """
         ScalaSql's `.union`/`.unionAll`/`.intersect`/`.except` translate into SQL's
         `UNION`/`UNION ALL`/`INTERSECT`/`EXCEPT`.
       """

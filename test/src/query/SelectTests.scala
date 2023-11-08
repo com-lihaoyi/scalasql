@@ -165,8 +165,7 @@ trait SelectTests extends ScalaSqlSuite {
         },
         sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",
         value = Seq("Face Mask", "Socks", "Cookie"),
-        docs =
-          """
+        docs = """
           The common use case of `SELECT FROM WHERE` can be achieved via `.select.filter.map` in ScalaSql
         """
       )
@@ -283,7 +282,6 @@ trait SelectTests extends ScalaSqlSuite {
         use the `.subquery` to force a query to be translated into a standalone subquery
       """
     )
-
 
     test("aggregate") {
       test("single") - checker(

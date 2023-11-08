@@ -4,6 +4,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table}
+
 /**
  * A SQL `SELECT` query, with
  * `ORDER BY`, `LIMIT`, `OFFSET`, or `UNION` clauses
@@ -105,7 +106,8 @@ class CompoundSelect[Q, R](
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, simpleFrom(other))
-    if (orderBy.isEmpty && limit.isEmpty && offset.isEmpty) copy(compoundOps = compoundOps ++ Seq(op2))
+    if (orderBy.isEmpty && limit.isEmpty && offset.isEmpty)
+      copy(compoundOps = compoundOps ++ Seq(op2))
     else newCompoundSelect(simpleFrom(this), Seq(op2), Nil, None, None)
   }
 

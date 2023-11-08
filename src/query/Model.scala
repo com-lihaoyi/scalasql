@@ -10,6 +10,7 @@ case class OrderBy(expr: Expr[_], ascDesc: Option[AscDesc], nulls: Option[Nulls]
 sealed trait AscDesc
 
 object AscDesc {
+
   /**
    * Models a SQL `ASC` clause
    */
@@ -24,6 +25,7 @@ object AscDesc {
 sealed trait Nulls
 
 object Nulls {
+
   /**
    * Models a SQL `NULLS FIRST` clause
    */
@@ -53,6 +55,6 @@ case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
  * Models a SQL `JOIN` clause
  */
 case class Join(prefix: Option[String], from: Seq[Join.From])
-object Join{
+object Join {
   case class From(from: scalasql.query.From, on: Option[Expr[_]])
 }

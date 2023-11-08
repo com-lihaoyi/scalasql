@@ -38,7 +38,7 @@ trait InsertTests extends ScalaSqlSuite {
           query = Buyer.insert
             .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09")),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
-          value = 1,
+          value = 1
         )
 
         checker(

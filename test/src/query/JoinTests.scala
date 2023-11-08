@@ -44,7 +44,6 @@ trait JoinTests extends ScalaSqlSuite {
       """
     )
 
-
     test("joinFilterMap") - checker(
       query = Text {
         Buyer.select
@@ -159,10 +158,9 @@ trait JoinTests extends ScalaSqlSuite {
       """
     )
 
-
     test("flatMapFor") - checker(
       query = Text {
-        for{
+        for {
           b <- Buyer.select
           s <- ShippingInfo.select
           if b.id `=` s.buyerId && b.name `=` "James Bond"
