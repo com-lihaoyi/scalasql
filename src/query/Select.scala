@@ -80,6 +80,8 @@ trait Select[Q, R]
 
   def single: Query.Single[R] = new Query.Single(this)
 
+  def head: Query.Single[R] = take(1).single
+
   def toExpr(implicit mt: MappedType[R]): Expr[R] = Expr { implicit ctx => this.toSqlQuery._1 }
 
   def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {

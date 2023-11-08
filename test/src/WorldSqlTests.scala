@@ -217,6 +217,30 @@ object WorldSqlTests extends TestSuite {
         //
         // -DOCS
       }
+      test("head") {
+
+        // +DOCS
+        // You can also use `.head` rather than `.single`, for cases where you
+        // want a single result row and want additional result rows to be ignored
+        // rather than causing an exception. `.head` is short for `.take(1).single`
+
+        val query = City.select.filter(_.name === "Singapore").head
+
+        db.toSqlQuery(query) ==> """
+        SELECT
+          city0.id as res__id,
+          city0.name as res__name,
+          city0.countrycode as res__countrycode,
+          city0.district as res__district,
+          city0.population as res__population
+        FROM city city0
+        WHERE city0.name = ?
+        LIMIT 1
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+        // -DOCS
+      }
 
       test("singleId") {
 
