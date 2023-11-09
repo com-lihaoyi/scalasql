@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps}
-import scalasql.query.{Aggregatable, Expr, Select}
+import scalasql.query.{Aggregatable, Expr, Nullable, Select}
 import scalasql.{MappedType, Queryable, Table, operations}
 
 /**
@@ -14,10 +14,20 @@ trait Dialect extends DialectConfig {
   implicit def ExprNumericOpsConv[T: Numeric: MappedType](
       v: Expr[T]
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
+
   implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
+
   implicit def ExprOptionOpsConv[T: MappedType](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)
+
+  implicit def NullableExprOpsConv[T: MappedType](v: Nullable[Expr[T]]): operations.ExprOps =
+    new operations.ExprOps(Nullable.toExpr(v))
+
+  implicit def NullableExprOptionOpsConv[T: MappedType](v: Nullable[Expr[T]]): operations.ExprOptionOps[T] =
+    new operations.ExprOptionOps(Nullable.toExpr(v))
+
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
+
   implicit def AggNumericOpsConv[V: Numeric: MappedType](v: Aggregatable[Expr[V]])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
