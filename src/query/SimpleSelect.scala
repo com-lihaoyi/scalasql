@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{Config, MappedType, Queryable}
@@ -62,30 +63,18 @@ class SimpleSelect[Q, R](
 
         case other: FlatJoinMapResult[Q, Q2, R, R2] =>
           val thisTrivial = groupBy0.isEmpty
-          val otherJoin = joinInfo0(
-            None,
-            other.from.select,
-            Some(other.on),
-            other.from.isTrivialJoin
-          )
-
+          val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on(other.expr)))))
           copy(
-            expr = other.f,
+            expr = other.f(other.expr),
             exprPrefix = if (thisTrivial) exprPrefix else None,
             from = if (thisTrivial) from else Seq(this.subqueryRef),
-            joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin) ++ joinOns,
+            joins = (if (thisTrivial) joins else Nil) ++ joinOns ++ Seq(otherJoin),
             where = if (thisTrivial) where else Nil,
             groupBy0 = if (thisTrivial) groupBy0 else None
           )
         case other: FlatJoinFlatMapResult[Q, Q2, R, R2] =>
-          val otherJoin = joinInfo0(
-            None,
-            other.from.select,
-            Some(other.on),
-            other.from.isTrivialJoin
-          )
+          val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on(other.expr)))))
           rec(other.f, joinOns ++ Seq(otherJoin))
-
       }
     }
     rec(f(expr), Nil)

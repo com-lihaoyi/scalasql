@@ -4,25 +4,27 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.{MappedType, Queryable}
 
 trait FlatMapJoinRhs[Q2, R2]
-class FlatJoinMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
-                                      val on: Expr[Boolean],
+class FlatJoinMapResult[Q, Q2, R, R2](val from: From,
+                                      val expr: Q,
+                                      val on: Q => Expr[Boolean],
                                       val qr: Queryable.Row[Q2, R2],
-                                      val f: Q2) extends FlatMapJoinRhs[Q2, R2]
+                                      val f: Q => Q2) extends FlatMapJoinRhs[Q2, R2]
 
-class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
-                                          val on: Expr[Boolean],
+class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: From,
+                                          val expr: Q,
+                                          val on: Q => Expr[Boolean],
                                           val qr: Queryable.Row[Q2, R2],
                                           val f: FlatMapJoinRhs[Q2, R2]) extends FlatMapJoinRhs[Q2, R2]
 
-class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boolean]) {
+class FlatJoinMapper[Q, Q2, R, R2](from: From, expr: Q, on: Q => Expr[Boolean]) {
   def map(f: Q => Q2)
          (implicit qr: Queryable.Row[Q2, R2]): FlatJoinMapResult[Q, Q2, R, R2] = {
-    new FlatJoinMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
+    new FlatJoinMapResult[Q, Q2, R, R2](from, expr, on, qr, f)
   }
 
   def flatMap(f: Q => FlatMapJoinRhs[Q2, R2])
              (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
-    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
+    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, expr, on, qr, f(expr))
   }
 }
 /**
@@ -55,6 +57,7 @@ trait Select[Q, R]
     with Query.Multiple[R]
     with FlatMapJoinRhs[Q, R]{
 
+  def toFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],

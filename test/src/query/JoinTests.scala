@@ -439,19 +439,20 @@ trait JoinTests extends ScalaSqlSuite {
           } yield (b.name, pr.price)
         },
         sql = """
-          SELECT buyer0.name as res__0, purchase2.total as res__1
+          SELECT buyer0.name as res__0, product3.price as res__1
           FROM buyer buyer0
           JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
           JOIN purchase purchase2 ON purchase2.shipping_info_id = shipping_info1.id
+          JOIN product product3 ON product3.id = purchase2.product_id
         """,
         value = Seq[(String, Double)](
-          ("James Bond", 15.7),
-          ("James Bond", 888.0),
-          ("James Bond", 900.0),
-          ("Li Haoyi", 1.3),
-          ("Li Haoyi", 44.4),
-          ("叉烧包", 493.8),
-          ("叉烧包", 10000.0)
+          ("James Bond", 3.14),
+          ("James Bond", 8.88),
+          ("James Bond", 300.0),
+          ("Li Haoyi", 0.1),
+          ("Li Haoyi", 8.88),
+          ("叉烧包", 123.45),
+          ("叉烧包", 1000.0)
         ),
         docs = """
           "flat" joins using `for`-comprehensions can have multiple clauses as well

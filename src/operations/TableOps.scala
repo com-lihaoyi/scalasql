@@ -3,9 +3,12 @@ package scalasql.operations
 import scalasql.{Column, Id, Table}
 import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Update}
 
-class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
+class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
 
-  def expr = t.metadata.vExpr(t.tableRef).asInstanceOf[V[Expr]]
+  def toFromExpr = {
+    val ref = t.tableRef
+    (ref, t.metadata.vExpr(ref).asInstanceOf[V[Expr]])
+  }
   /**
    * Constructs a `SELECT` query
    */
