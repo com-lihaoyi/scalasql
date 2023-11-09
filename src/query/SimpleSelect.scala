@@ -73,6 +73,25 @@ class SimpleSelect[Q, R](
           where = if (thisTrivial) where else Nil,
           groupBy0 = if (thisTrivial) groupBy0 else None
         )
+      case other: FlatJoinFlatMapResult[Q, Q2, R, R2] =>
+        val thisTrivial = groupBy0.isEmpty
+        val otherJoin = Join(
+          None,
+          Seq(Join.From(other.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.on)))
+        )
+        val otherJoin2 = Join(
+          None,
+          Seq(Join.From(other.f.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.f.on)))
+        )
+
+        copy(
+          expr = other.f.f,
+          exprPrefix = if (thisTrivial) exprPrefix else None,
+          from = if (thisTrivial) from else Seq(this.subqueryRef),
+          joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin, otherJoin2),
+          where = if (thisTrivial) where else Nil,
+          groupBy0 = if (thisTrivial) groupBy0 else None
+        )
     }
 
   }

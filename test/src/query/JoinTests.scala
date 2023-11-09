@@ -425,36 +425,40 @@ trait JoinTests extends ScalaSqlSuite {
           ("叉烧包", LocalDate.parse("2012-04-05")),
           ("Li Haoyi", LocalDate.parse("2012-05-06"))
         ),
-        docs =
-          """
-          ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
-          `.leftJoin`/`.rightJoin`/`.outerJoin` methods
+        docs = """
+          "flat" joins using `for`-comprehensions are allowed
         """
       )
-//      test("join2") - checker(
-//        query = Text {
-//          for{
-//            b <- Buyer.select
-//            si <- ShippingInfo.select.joinX(_.id `=` b.id)
-//            p <- Purchase.select.joinX(_.shippingInfoId `=` si.id)
-//          } yield (b.name, p.total)
-//        },
-//        sql = """
-//          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
-//          FROM buyer buyer0
-//          JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
-//        """,
-//        value = Seq[(String, LocalDate)](
-//          ("James Bond", LocalDate.parse("2010-02-03")),
-//          ("叉烧包", LocalDate.parse("2012-04-05")),
-//          ("Li Haoyi", LocalDate.parse("2012-05-06"))
-//        ),
-//        docs =
-//          """
-//          ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
-//          `.leftJoin`/`.rightJoin`/`.outerJoin` methods
-//        """
-//      )
+      test("join2") - checker(
+        query = Text {
+          Buyer.select.flatMap{b =>
+            ShippingInfo.select.joinX(_.id `=` b.id).flatMap{si =>
+              Purchase.select.joinX(_.shippingInfoId `=` si.id).map{p =>
+                (b.name, p.total)
+              }
+            }
+          }
+        },
+        sql = """
+          SELECT buyer0.name as res__0, purchase2.total as res__1
+          FROM buyer buyer0
+          JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
+          JOIN purchase purchase2 ON purchase2.shipping_info_id = shipping_info1.id
+        """,
+        value = Seq[(String, Double)](
+          ("James Bond", 15.7),
+          ("James Bond", 888.0),
+          ("James Bond", 900.0),
+          ("Li Haoyi", 1.3),
+          ("Li Haoyi", 44.4),
+          ("叉烧包", 493.8),
+          ("叉烧包", 10000.0)
+        ),
+        docs = """
+          "flat" joins using `for`-comprehensions can have multiple clauses as well
+        """,
+        normalize = (x: Seq[(String, Double)]) => x.sorted
+      )
     }
   }
 }

@@ -12,7 +12,7 @@ class FlatJoinMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
 class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
                                           val on: Expr[Boolean],
                                           val qr: Queryable.Row[Q2, R2],
-                                          val f: FlatJoinMapResult[Q, Q2, R, R2]) extends FlatMapJoinRhs[Q2, R2]
+                                          val f: FlatJoinMapResult[_, Q2, _, R2]) extends FlatMapJoinRhs[Q2, R2]
 
 class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boolean]) {
   def map(f: Q => Q2)
@@ -20,15 +20,10 @@ class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boole
     new FlatJoinMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
   }
 
-  def flatMap(f: Q => FlatJoinMapResult[Q, Q2, R, R2])
+  def flatMap(f: Q => FlatJoinMapResult[_, Q2, _, R2])
              (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
     new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
   }
-
-//  def flatMap(f: Q => FlatJoinFlatMapResult[Q, Q2, R, R2])
-//             (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
-//    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, Left(f(expr)))
-//  }
 }
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
