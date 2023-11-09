@@ -233,10 +233,68 @@ trait JoinTests extends ScalaSqlSuite {
       normalize =
         (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => t._1 -> t._2.map(_.toEpochDay)),
       docs = """
-        `.leftJoin`s return a `Nullable[T]` for the right hand entry. This is similar
-        to `Option[T]` in Scala, supports a similar set of operations (e.g. `.map`),
-        and becomes an `Option[T]` after the query is executed
+        `.leftJoin`s return a `Nullable[Q]` for the right hand entry. This is similar
+        to `Option[Q]` in Scala, supports a similar set of operations (e.g. `.map`),
+        and becomes an `Option[Q]` after the query is executed
       """
+    )
+
+    test("leftJoinExpr") - checker(
+      query = Text {
+        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map{case (b, si) => (b.name, si.map(_.shippingDate))}
+          .sortBy(_._2.toExpr)
+          .nullsFirst
+      },
+      sqls = Seq(
+        """
+          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          FROM buyer buyer0
+          LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          ORDER BY res__1 NULLS FIRST
+        """,
+        // MySQL doesn't support NULLS FIRST syntax and needs a workaround
+        """
+          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          FROM buyer buyer0
+          LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          ORDER BY res__1 IS NULL DESC, res__1
+        """
+      ),
+      value = Seq(
+        ("Li Haoyi", None),
+        ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
+        ("James Bond", Some(LocalDate.parse("2012-04-05"))),
+        ("叉烧包", Some(LocalDate.parse("2012-05-06")))
+      ),
+
+      docs = """
+        `Nullable[Expr[T]]`s can be converted to `Expr[Option[T]]`s via the `.toExpr`
+        method. This allows them to participate in any database query logic than any
+        other `Epxr[Option[T]]`s can participate in, such as being used as sort
+        key or in computing return values (below)
+      """
+    )
+
+    test("leftJoinExpr2") - checker(
+      query = Text {
+        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map{case (b, si) => (b.name, si.map(_.shippingDate).toExpr > b.dateOfBirth)}
+      },
+      sql = """
+        SELECT
+          buyer0.name as res__0,
+          shipping_info1.shipping_date > buyer0.date_of_birth as res__1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+      """,
+      value = Seq(
+        ("James Bond", true),
+        ("Li Haoyi", false),
+        ("叉烧包", true),
+        ("叉烧包", true)
+      ),
+      normalize = (x: Seq[(String, Boolean)]) => x.sorted
     )
 
     test("rightJoin") - checker(
