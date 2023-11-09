@@ -55,7 +55,7 @@ class SimpleSelect[Q, R](
   def flatMap[Q2, R2](
       f: Q => FlatMapJoinRhs[Q2, R2]
   )(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    def rec(thing: FlatMapJoinRhs[Q2, R2], joinOns: Seq[Join]): Select[Q2, R2] = {
+    def rec(thing: FlatMapJoinRhs[Q2, R2], joinOns: Seq[Join], wheres: Seq[Expr[Boolean]]): Select[Q2, R2] = {
       thing match{
         case other: Select[Q2, R2] =>
           val simple = simpleFrom(other)
@@ -69,15 +69,15 @@ class SimpleSelect[Q, R](
             exprPrefix = if (thisTrivial) exprPrefix else None,
             from = if (thisTrivial) from else Seq(this.subqueryRef),
             joins = (if (thisTrivial) joins else Nil) ++ joinOns ++ Seq(otherJoin),
-            where = if (thisTrivial) where else Nil,
+            where = (if (thisTrivial) where else Nil) ++ other.where ++ wheres,
             groupBy0 = if (thisTrivial) groupBy0 else None
           )
         case other: FlatJoinFlatMapResult[Q, Q2, R, R2] =>
           val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on(other.expr)))))
-          rec(other.f, joinOns ++ Seq(otherJoin))
+          rec(other.f, joinOns ++ Seq(otherJoin), wheres ++ other.where)
       }
     }
-    rec(f(expr), Nil)
+    rec(f(expr), Nil, Nil)
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q, R] = {

@@ -8,24 +8,29 @@ class FlatJoinMapResult[Q, Q2, R, R2](val from: From,
                                       val expr: Q,
                                       val on: Q => Expr[Boolean],
                                       val qr: Queryable.Row[Q2, R2],
-                                      val f: Q => Q2) extends FlatMapJoinRhs[Q2, R2]
+                                      val f: Q => Q2,
+                                      val where: Seq[Expr[Boolean]]) extends FlatMapJoinRhs[Q2, R2]
 
 class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: From,
                                           val expr: Q,
                                           val on: Q => Expr[Boolean],
                                           val qr: Queryable.Row[Q2, R2],
-                                          val f: FlatMapJoinRhs[Q2, R2]) extends FlatMapJoinRhs[Q2, R2]
+                                          val f: FlatMapJoinRhs[Q2, R2],
+                                          val where: Seq[Expr[Boolean]]) extends FlatMapJoinRhs[Q2, R2]
 
-class FlatJoinMapper[Q, Q2, R, R2](from: From, expr: Q, on: Q => Expr[Boolean]) {
+class FlatJoinMapper[Q, Q2, R, R2](from: From, expr: Q, on: Q => Expr[Boolean], where: Seq[Expr[Boolean]]) {
   def map(f: Q => Q2)
          (implicit qr: Queryable.Row[Q2, R2]): FlatJoinMapResult[Q, Q2, R, R2] = {
-    new FlatJoinMapResult[Q, Q2, R, R2](from, expr, on, qr, f)
+    new FlatJoinMapResult[Q, Q2, R, R2](from, expr, on, qr, f, where)
   }
 
   def flatMap(f: Q => FlatMapJoinRhs[Q2, R2])
              (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
-    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, expr, on, qr, f(expr))
+    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, expr, on, qr, f(expr), where)
   }
+
+  def withFilter(x: Q => Expr[Boolean]): FlatJoinMapper[Q, Q2, R, R2] =
+    new FlatJoinMapper(from, expr, on, where ++ Seq(x(expr)))
 }
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,

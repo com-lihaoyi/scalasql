@@ -412,7 +412,7 @@ trait JoinTests extends ScalaSqlSuite {
         query = Text {
           for{
             b <- Buyer.select
-            si <- ShippingInfo.joinX(_.id `=` b.id)
+            si <- ShippingInfo.join(_.id `=` b.id)
           } yield (b.name, si.shippingDate)
         },
         sql = """
@@ -420,44 +420,46 @@ trait JoinTests extends ScalaSqlSuite {
           FROM buyer buyer0
           JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
         """,
-        value = Seq[(String, LocalDate)](
+        value = Seq(
           ("James Bond", LocalDate.parse("2010-02-03")),
           ("叉烧包", LocalDate.parse("2012-04-05")),
           ("Li Haoyi", LocalDate.parse("2012-05-06"))
         ),
         docs = """
-          "flat" joins using `for`-comprehensions are allowed
+          "flat" joins using `for`-comprehensions are allowed. These allow you to
+          "flatten out" the nested tuples you get from normal `.join` clauses,
+          letting you write natural looking queries without deeply nested tuples.
         """
       )
       test("join3") - checker(
         query = Text {
           for{
             b <- Buyer.select
-            si <- ShippingInfo.joinX(_.id `=` b.id)
-            p <- Purchase.joinX(_.shippingInfoId `=` si.id)
-            pr <- Product.joinX(_.id `=` p.productId)
-          } yield (b.name, pr.price)
+            if b.name === "Li Haoyi"
+            si <- ShippingInfo.join(_.id `=` b.id)
+            pu <- Purchase.join(_.shippingInfoId `=` si.id)
+            pr <- Product.join(_.id `=` pu.productId)
+            if pr.price > 1.0
+          } yield (b.name, pr.name, pr.price)
         },
         sql = """
-          SELECT buyer0.name as res__0, product3.price as res__1
+          SELECT buyer0.name as res__0, product3.name as res__1, product3.price as res__2
           FROM buyer buyer0
           JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
           JOIN purchase purchase2 ON purchase2.shipping_info_id = shipping_info1.id
           JOIN product product3 ON product3.id = purchase2.product_id
+          WHERE buyer0.name = ? AND product3.price > ?
         """,
-        value = Seq[(String, Double)](
-          ("James Bond", 3.14),
-          ("James Bond", 8.88),
-          ("James Bond", 300.0),
-          ("Li Haoyi", 0.1),
-          ("Li Haoyi", 8.88),
-          ("叉烧包", 123.45),
-          ("叉烧包", 1000.0)
+        value = Seq(
+          ("Li Haoyi", "Face Mask", 8.88)
         ),
         docs = """
-          "flat" joins using `for`-comprehensions can have multiple clauses as well
-        """,
-        normalize = (x: Seq[(String, Double)]) => x.sorted
+          "flat" joins using `for`-comprehensions can have multiple `.join` clauses that
+          translate to SQL `JOIN ON`s, as well as `if` clauses that translate to SQL
+          `WHERE` clauses. This example uses multiple flat `.join`s together with `if`
+          clauses to query the products purchased by the user `"Li Haoyi"` that have
+          a price more than `1.0` dollars
+        """
       )
     }
   }
