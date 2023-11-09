@@ -23,28 +23,41 @@ trait JoinOps[C[_, _], Q, R] {
   )(implicit joinQr: Queryable.Row[Q2, _]) = {
     val otherSelect = other.select
 
-    val otherJoin =
-      if (other.isTrivialJoin)
-        Join(
-          joinPrefix,
-          Seq(
-            Join.From(
-              otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head,
-              on.map(_(expr, otherSelect.expr))
-            )
-          )
-        )
-      else
-        Join(
-          joinPrefix,
-          Seq(
-            Join.From(
-              new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable.Row[Q2, R2]]),
-              on.map(_(expr, otherSelect.expr))
-            )
-          )
-        )
+    val otherJoin = joinInfo0(
+      joinPrefix,
+      otherSelect,
+      on.map(_(expr, otherSelect.expr)),
+      other.isTrivialJoin
+    )
+
 
     (Seq(otherJoin), otherSelect)
+  }
+  protected def joinInfo0[Q2, R2](
+      joinPrefix: Option[String],
+      otherSelect: Select[Q2, R2],
+      on: Option[Expr[Boolean]],
+      isTrivialJoin: Boolean
+  )(implicit joinQr: Queryable.Row[Q2, _]) = {
+    if (isTrivialJoin)
+      Join(
+        joinPrefix,
+        Seq(
+          Join.From(
+            otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head,
+            on
+          )
+        )
+      )
+    else
+      Join(
+        joinPrefix,
+        Seq(
+          Join.From(
+            new SubqueryRef(otherSelect, joinQr.asInstanceOf[Queryable.Row[Q2, R2]]),
+            on
+          )
+        )
+      )
   }
 }

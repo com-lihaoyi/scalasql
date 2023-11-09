@@ -412,7 +412,7 @@ trait JoinTests extends ScalaSqlSuite {
         query = Text {
           for{
             b <- Buyer.select
-            si <- ShippingInfo.select.joinX(_.id `=` b.id)
+            si <- ShippingInfo.joinX(_.id `=` b.id)
           } yield (b.name, si.shippingDate)
         },
         sql = """
@@ -429,15 +429,14 @@ trait JoinTests extends ScalaSqlSuite {
           "flat" joins using `for`-comprehensions are allowed
         """
       )
-      test("join2") - checker(
+      test("join3") - checker(
         query = Text {
-          Buyer.select.flatMap{b =>
-            ShippingInfo.select.joinX(_.id `=` b.id).flatMap{si =>
-              Purchase.select.joinX(_.shippingInfoId `=` si.id).map{p =>
-                (b.name, p.total)
-              }
-            }
-          }
+          for{
+            b <- Buyer.select
+            si <- ShippingInfo.joinX(_.id `=` b.id)
+            p <- Purchase.joinX(_.shippingInfoId `=` si.id)
+            pr <- Product.joinX(_.id `=` p.productId)
+          } yield (b.name, pr.price)
         },
         sql = """
           SELECT buyer0.name as res__0, purchase2.total as res__1

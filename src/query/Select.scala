@@ -12,7 +12,7 @@ class FlatJoinMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
 class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
                                           val on: Expr[Boolean],
                                           val qr: Queryable.Row[Q2, R2],
-                                          val f: FlatJoinMapResult[_, Q2, _, R2]) extends FlatMapJoinRhs[Q2, R2]
+                                          val f: FlatMapJoinRhs[Q2, R2]) extends FlatMapJoinRhs[Q2, R2]
 
 class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boolean]) {
   def map(f: Q => Q2)
@@ -20,7 +20,7 @@ class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boole
     new FlatJoinMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
   }
 
-  def flatMap(f: Q => FlatJoinMapResult[_, Q2, _, R2])
+  def flatMap(f: Q => FlatMapJoinRhs[Q2, R2])
              (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
     new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
   }
@@ -236,9 +236,7 @@ trait Select[Q, R]
   }
 
 
-  def joinX[Q2, R2](on: Q => Expr[Boolean]): FlatJoinMapper[Q, Q2, R, R2] = {
-    new FlatJoinMapper[Q, Q2, R, R2](this, expr, on(expr))
-  }
+
 
   /**
    * Performs a `LEFT JOIN` on the given [[other]], typically a [[Table]] or [[Select]].

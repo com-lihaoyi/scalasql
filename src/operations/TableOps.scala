@@ -5,6 +5,7 @@ import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Upd
 
 class TableOps[V[_[_]]](t: Table[V]) extends Joinable[V[Expr], V[Id]] {
 
+  def expr = t.metadata.vExpr(t.tableRef).asInstanceOf[V[Expr]]
   /**
    * Constructs a `SELECT` query
    */

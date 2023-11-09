@@ -54,46 +54,41 @@ class SimpleSelect[Q, R](
   def flatMap[Q2, R2](
       f: Q => FlatMapJoinRhs[Q2, R2]
   )(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    f(expr) match{
-      case other: Select[Q2, R2] =>
-        val simple = simpleFrom(other)
-        simple.copy(from = this.from ++ simple.from)
-      case other: FlatJoinMapResult[Q, Q2, R, R2] =>
-        val thisTrivial = groupBy0.isEmpty
-        val otherJoin = Join(
-          None,
-          Seq(Join.From(other.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.on)))
-        )
+    def rec(thing: FlatMapJoinRhs[Q2, R2], joinOns: Seq[Join]): Select[Q2, R2] = {
+      thing match{
+        case other: Select[Q2, R2] =>
+          val simple = simpleFrom(other)
+          simple.copy(from = this.from ++ simple.from)
 
-        copy(
-          expr = other.f,
-          exprPrefix = if (thisTrivial) exprPrefix else None,
-          from = if (thisTrivial) from else Seq(this.subqueryRef),
-          joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin),
-          where = if (thisTrivial) where else Nil,
-          groupBy0 = if (thisTrivial) groupBy0 else None
-        )
-      case other: FlatJoinFlatMapResult[Q, Q2, R, R2] =>
-        val thisTrivial = groupBy0.isEmpty
-        val otherJoin = Join(
-          None,
-          Seq(Join.From(other.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.on)))
-        )
-        val otherJoin2 = Join(
-          None,
-          Seq(Join.From(other.f.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.f.on)))
-        )
+        case other: FlatJoinMapResult[Q, Q2, R, R2] =>
+          val thisTrivial = groupBy0.isEmpty
+          val otherJoin = joinInfo0(
+            None,
+            other.from.select,
+            Some(other.on),
+            other.from.isTrivialJoin
+          )
 
-        copy(
-          expr = other.f.f,
-          exprPrefix = if (thisTrivial) exprPrefix else None,
-          from = if (thisTrivial) from else Seq(this.subqueryRef),
-          joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin, otherJoin2),
-          where = if (thisTrivial) where else Nil,
-          groupBy0 = if (thisTrivial) groupBy0 else None
-        )
+          copy(
+            expr = other.f,
+            exprPrefix = if (thisTrivial) exprPrefix else None,
+            from = if (thisTrivial) from else Seq(this.subqueryRef),
+            joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin) ++ joinOns,
+            where = if (thisTrivial) where else Nil,
+            groupBy0 = if (thisTrivial) groupBy0 else None
+          )
+        case other: FlatJoinFlatMapResult[Q, Q2, R, R2] =>
+          val otherJoin = joinInfo0(
+            None,
+            other.from.select,
+            Some(other.on),
+            other.from.isTrivialJoin
+          )
+          rec(other.f, joinOns ++ Seq(otherJoin))
+
+      }
     }
-
+    rec(f(expr), Nil)
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
