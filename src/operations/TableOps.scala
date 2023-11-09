@@ -5,16 +5,22 @@ import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Upd
 
 class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
 
-  def toFromExpr = {
+  def toFromExpr0 = {
     val ref = t.tableRef
-    (ref, t.metadata.vExpr(ref).asInstanceOf[V[Expr]])
+    (ref, t.metadata.vExpr(ref))
   }
+
+  def toFromExpr = {
+    val (ref, expr) = toFromExpr0
+    (ref, expr.asInstanceOf[V[Expr]])
+  }
+
   /**
    * Constructs a `SELECT` query
    */
   def select: Select[V[Expr], V[Id]] = {
-    val ref = t.tableRef
-    new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
+    val (ref, expr) = toFromExpr
+    new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
       t.containerQr
     )
   }
@@ -24,8 +30,8 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    * rows you want to delete
    */
   def update(filter: V[Column.ColumnExpr] => Expr[Boolean]): Update[V[Column.ColumnExpr], V[Id]] = {
-    val ref = t.tableRef
-    new Update.Impl(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(
+    val (ref, expr) = toFromExpr0
+    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(
       t.containerQr
     )
   }
@@ -34,8 +40,8 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    * Constructs a `INSERT` query
    */
   def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
-    val ref = t.tableRef
-    new Insert.Impl(t.metadata.vExpr(ref), ref)(t.containerQr)
+    val (ref, expr) = toFromExpr0
+    new Insert.Impl(expr, ref)(t.containerQr)
   }
 
   /**
@@ -43,8 +49,8 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    * rows you want to delete
    */
   def delete(filter: V[Column.ColumnExpr] => Expr[Boolean]): Delete[V[Column.ColumnExpr]] = {
-    val ref = t.tableRef
-    new Delete.Impl(t.metadata.vExpr(ref), filter(t.metadata.vExpr(ref)), ref)
+    val (ref, expr) = toFromExpr0
+    new Delete.Impl(expr, filter(t.metadata.vExpr(ref)), ref)
   }
 
   def isTrivialJoin = true
