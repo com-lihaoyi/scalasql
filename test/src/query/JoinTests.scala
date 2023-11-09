@@ -214,6 +214,31 @@ trait JoinTests extends ScalaSqlSuite {
       """
     )
 
+    test("leftJoinMap") - checker(
+      query = Text {
+        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map{case (b, si) => (b.name, si.map(_.shippingDate))}
+      },
+      sql = """
+        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+      """,
+      value = Seq(
+        ("James Bond" , Some(LocalDate.parse("2012-04-05"))),
+        ("Li Haoyi", None),
+        ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
+        ("叉烧包", Some(LocalDate.parse("2012-05-06"))),
+      ),
+      normalize =
+        (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => t._1 -> t._2.map(_.toEpochDay)),
+      docs = """
+        `.leftJoin`s return a `Nullable[T]` for the right hand entry. This is similar
+        to `Option[T]` in Scala, supports a similar set of operations (e.g. `.map`),
+        and becomes an `Option[T]` after the query is executed
+      """
+    )
+
     test("rightJoin") - checker(
       query = Text { ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id) },
       sql = """
