@@ -3,6 +3,33 @@ package scalasql.query
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.{MappedType, Queryable}
 
+trait FlatMapJoinRhs[Q2, R2]
+class FlatJoinMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
+                                      val on: Expr[Boolean],
+                                      val qr: Queryable.Row[Q2, R2],
+                                      val f: Q2) extends FlatMapJoinRhs[Q2, R2]
+
+class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: Joinable[Q, R],
+                                          val on: Expr[Boolean],
+                                          val qr: Queryable.Row[Q2, R2],
+                                          val f: FlatJoinMapResult[Q, Q2, R, R2]) extends FlatMapJoinRhs[Q2, R2]
+
+class FlatJoinMapper[Q, Q2, R, R2](from: Joinable[Q, R], expr: Q, on: Expr[Boolean]) {
+  def map(f: Q => Q2)
+         (implicit qr: Queryable.Row[Q2, R2]): FlatJoinMapResult[Q, Q2, R, R2] = {
+    new FlatJoinMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
+  }
+
+  def flatMap(f: Q => FlatJoinMapResult[Q, Q2, R, R2])
+             (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
+    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, f(expr))
+  }
+
+//  def flatMap(f: Q => FlatJoinFlatMapResult[Q, Q2, R, R2])
+//             (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
+//    new FlatJoinFlatMapResult[Q, Q2, R, R2](from, on, qr, Left(f(expr)))
+//  }
+}
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
  * `ORDER BY`, `LIMIT`, `OFFSET` clauses
@@ -30,7 +57,8 @@ trait Select[Q, R]
     with From
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query.Multiple[R] {
+    with Query.Multiple[R]
+    with FlatMapJoinRhs[Q, R]{
 
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
@@ -71,7 +99,8 @@ trait Select[Q, R]
    * Performs an implicit `JOIN` between this [[Select]] and the one returned by the
    * callback function [[f]]
    */
-  def flatMap[Q2, R2](f: Q => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
+  def flatMap[Q2, R2](f: Q => FlatMapJoinRhs[Q2, R2])
+                     (implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
 
   /**
    * Filters this [[Select]] with the given predicate, translates into a SQL `WHERE` clause
@@ -209,6 +238,11 @@ trait Select[Q, R]
    */
   def subquery: SimpleSelect[Q, R] = {
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
+  }
+
+
+  def joinX[Q2, R2](on: Q => Expr[Boolean]): FlatJoinMapper[Q, Q2, R, R2] = {
+    new FlatJoinMapper[Q, Q2, R, R2](this, expr, on(expr))
   }
 
   /**

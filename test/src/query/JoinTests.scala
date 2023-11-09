@@ -406,5 +406,55 @@ trait JoinTests extends ScalaSqlSuite {
       normalize = (x: Seq[(Option[ShippingInfo[Id]], Option[Buyer[Id]])]) =>
         x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
     )
+
+    test("flatJoins"){
+      test("join") - checker(
+        query = Text {
+          for{
+            b <- Buyer.select
+            si <- ShippingInfo.select.joinX(_.id `=` b.id)
+          } yield (b.name, si.shippingDate)
+        },
+        sql = """
+          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          FROM buyer buyer0
+          JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
+        """,
+        value = Seq[(String, LocalDate)](
+          ("James Bond", LocalDate.parse("2010-02-03")),
+          ("叉烧包", LocalDate.parse("2012-04-05")),
+          ("Li Haoyi", LocalDate.parse("2012-05-06"))
+        ),
+        docs =
+          """
+          ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
+          `.leftJoin`/`.rightJoin`/`.outerJoin` methods
+        """
+      )
+//      test("join2") - checker(
+//        query = Text {
+//          for{
+//            b <- Buyer.select
+//            si <- ShippingInfo.select.joinX(_.id `=` b.id)
+//            p <- Purchase.select.joinX(_.shippingInfoId `=` si.id)
+//          } yield (b.name, p.total)
+//        },
+//        sql = """
+//          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+//          FROM buyer buyer0
+//          JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
+//        """,
+//        value = Seq[(String, LocalDate)](
+//          ("James Bond", LocalDate.parse("2010-02-03")),
+//          ("叉烧包", LocalDate.parse("2012-04-05")),
+//          ("Li Haoyi", LocalDate.parse("2012-05-06"))
+//        ),
+//        docs =
+//          """
+//          ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
+//          `.leftJoin`/`.rightJoin`/`.outerJoin` methods
+//        """
+//      )
+    }
   }
 }

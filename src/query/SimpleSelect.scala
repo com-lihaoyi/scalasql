@@ -52,11 +52,29 @@ class SimpleSelect[Q, R](
     copy(expr = f(expr))
 
   def flatMap[Q2, R2](
-      f: Q => Select[Q2, R2]
+      f: Q => FlatMapJoinRhs[Q2, R2]
   )(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    val other = f(expr)
-    val simple = simpleFrom(other)
-    simple.copy(from = this.from ++ simple.from)
+    f(expr) match{
+      case other: Select[Q2, R2] =>
+        val simple = simpleFrom(other)
+        simple.copy(from = this.from ++ simple.from)
+      case other: FlatJoinMapResult[Q, Q2, R, R2] =>
+        val thisTrivial = groupBy0.isEmpty
+        val otherJoin = Join(
+          None,
+          Seq(Join.From(other.from.asInstanceOf[SimpleSelect[_, _]].from.head, Some(other.on)))
+        )
+
+        copy(
+          expr = other.f,
+          exprPrefix = if (thisTrivial) exprPrefix else None,
+          from = if (thisTrivial) from else Seq(this.subqueryRef),
+          joins = (if (thisTrivial) joins else Nil) ++ Seq(otherJoin),
+          where = if (thisTrivial) where else Nil,
+          groupBy0 = if (thisTrivial) groupBy0 else None
+        )
+    }
+
   }
 
   def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
