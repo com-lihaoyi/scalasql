@@ -66,16 +66,8 @@ class SimpleSelect[Q, R](
           simple.copy(from = this.from ++ simple.from)
 
         case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
-          val thisTrivial = groupBy0.isEmpty
           val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
-          copy(
-            expr = other.f,
-            exprPrefix = if (thisTrivial) exprPrefix else None,
-            from = if (thisTrivial) from else Seq(this.subqueryRef),
-            joins = (if (thisTrivial) joins else Nil) ++ joinOns ++ Seq(otherJoin),
-            where = (if (thisTrivial) where else Nil) ++ other.where ++ wheres,
-            groupBy0 = if (thisTrivial) groupBy0 else None
-          )
+          joinCopy0(other.f, joinOns ++ Seq(otherJoin), other.where ++ wheres)
 
         case other: FlatJoin.FlatMapResult[Q, Q2, R, R2] =>
           val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
@@ -99,17 +91,31 @@ class SimpleSelect[Q, R](
       on: Option[(Q, Q2) => Expr[Boolean]],
       joinPrefix: Option[String]
   )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
-    val thisTrivial = groupBy0.isEmpty
+
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
-    copy(
-      expr = f(expr, otherSelect.expr),
-      exprPrefix = if (thisTrivial) exprPrefix else None,
-      from = if (thisTrivial) from else Seq(this.subqueryRef),
-      joins = (if (thisTrivial) joins else Nil) ++ otherJoin,
-      where = if (thisTrivial) where else Nil,
-      groupBy0 = if (thisTrivial) groupBy0 else None
-    )
+    joinCopy0(f(expr, otherSelect.expr), otherJoin, Nil)
+  }
+
+  private def joinCopy0[Q3, R3](newExpr: Q3, newJoins: Seq[Join], newWheres: Seq[Expr[Boolean]])(
+      implicit jqr: Queryable.Row[Q3, R3]
+  ): SimpleSelect[Q3, R3] = {
+    // If this doesn't have a `groupBy` yet, then we can simply append another join. Otherwise
+    // we have to wrap `this` in a subquery
+    if (groupBy0.isEmpty) {
+      copy(
+        expr = newExpr,
+        exprPrefix = exprPrefix,
+        joins = joins ++ newJoins,
+        where = where ++ newWheres
+      )
+    } else {
+      subquery.copy(
+        expr = newExpr,
+        joins = newJoins,
+        where = newWheres
+      )
+    }
   }
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(

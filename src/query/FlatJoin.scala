@@ -2,8 +2,7 @@ package scalasql.query
 
 import scalasql.Queryable
 
-
-object FlatJoin{
+object FlatJoin {
   trait Rhs[Q2, R2]
   class MapResult[Q, Q2, R, R2](
       val from: From,

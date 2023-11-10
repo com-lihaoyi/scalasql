@@ -3,7 +3,6 @@ package scalasql.query
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.{MappedType, Queryable}
 
-
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
  * `ORDER BY`, `LIMIT`, `OFFSET` clauses
