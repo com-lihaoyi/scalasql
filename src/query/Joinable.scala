@@ -8,8 +8,8 @@ trait Joinable[Q, R] {
   def isTrivialJoin: Boolean
 
   def toFromExpr: (From, Q)
-  def join[Q2, R2](on: Q => Expr[Boolean]): FlatJoinMapper[Q, Q2, R, R2] = {
+  def join[Q2, R2](on: Q => Expr[Boolean]): FlatJoin.Mapper[Q, Q2, R, R2] = {
     val (from, expr) = toFromExpr
-    new FlatJoinMapper[Q, Q2, R, R2](from, expr, on, Nil)
+    new FlatJoin.Mapper[Q, Q2, R, R2](from, expr, on(expr), Nil)
   }
 }

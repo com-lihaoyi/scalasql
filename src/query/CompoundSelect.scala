@@ -45,7 +45,7 @@ class CompoundSelect[Q, R](
     }
   }
 
-  def flatMap[Q2, R2](f: Q => FlatMapJoinRhs[Q2, R2])(
+  def flatMap[Q2, R2](f: Q => FlatJoin.Rhs[Q2, R2])(
       implicit qr: Queryable.Row[Q2, R2]
   ): Select[Q2, R2] = { simpleFrom(this).flatMap(f) }
 
