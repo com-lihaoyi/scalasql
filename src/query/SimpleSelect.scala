@@ -62,18 +62,21 @@ class SimpleSelect[Q, R](
     ): Select[Q2, R2] = thing match {
       case other: Select[Q2, R2] =>
         val inner = simpleFrom(other)
-//        assert(inner.groupBy0.isEmpty)
 
-        pprint.log(this.groupBy0.isEmpty)
-        pprint.log(inner.groupBy0.isEmpty)
         val self = if (this.groupBy0.isEmpty) this else this.subquery
-        val inner2 = if (inner.groupBy0.isEmpty) inner else inner.subquery
+        val inner2 = inner.groupBy0 match{
+          case None => inner
+          case Some(g) => g.select().subquery
+        }
 
         val innerFromJoin = Join(Some("CROSS"), inner2.from.map(f => Join.From(f, None)))
-        inner2.copy(
+        newSimpleSelect(
+          expr = inner.expr,
+          exprPrefix = None,
           from = self.from,
           joins = self.joins ++ Seq(innerFromJoin) ++ inner2.joins,
-          where = self.where ++ inner2.where
+          where = self.where ++ inner2.where,
+          groupBy0 = None
         )
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
@@ -165,17 +168,23 @@ class SimpleSelect[Q, R](
     val groupKeyValue = groupKey(expr)
     val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
-    val groupByOpt = Some(GroupBy(groupKeyExpr, Nil))
-    if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
-    else
-      copy(
-        expr = newExpr,
-        exprPrefix = exprPrefix,
-        from = Seq(this.subqueryRef),
-        joins = Nil,
-        where = Nil,
-        groupBy0 = groupByOpt
-      )
+
+    // Weird hack to store the post-groupby `Select` as part of the `GroupBy`
+    // object, because `.flatMap` sometimes need us to roll back any subsequent
+    // `.map`s (???)
+    lazy val groupByOpt: Option[GroupBy] = Some(GroupBy(groupKeyExpr, () => res, Nil))
+    lazy val res =
+      if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
+      else
+        copy(
+          expr = newExpr,
+          exprPrefix = exprPrefix,
+          from = Seq(this.subqueryRef),
+          joins = Nil,
+          where = Nil,
+          groupBy0 = groupByOpt
+        )
+    res
   }
 
   def sortBy(f: Q => Expr[_]) = {
@@ -216,7 +225,7 @@ object SimpleSelect {
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
-      sql" GROUP BY ${groupBy.expr}${havingOpt}"
+      sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 
     lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>

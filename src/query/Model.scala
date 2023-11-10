@@ -49,7 +49,7 @@ class SubqueryRef[Q, R](val value: Select[Q, R], val qr: Queryable[Q, R]) extend
 /**
  * Models a SQL `GROUP BY` clause
  */
-case class GroupBy(expr: Expr[_], having: Seq[Expr[_]])
+case class GroupBy(key: Expr[_], select: () => Select[_, _], having: Seq[Expr[_]])
 
 /**
  * Models a SQL `JOIN` clause

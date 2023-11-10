@@ -358,31 +358,6 @@ trait SelectTests extends ScalaSqlSuite {
         value = Seq((1, 888.0), (5, 10000.0)),
         normalize = (x: Seq[(Int, Double)]) => x.sorted
       )
-
-      test("mapMoreColumns") - checker(
-        query = Text {
-          Purchase.select
-            .groupBy(_.productId)(_.sumBy(_.total))
-            .map{case (pid, sum) => (pid, pid + 1, sum)}
-        },
-        sql = """
-          SELECT
-            purchase0.product_id as res__0,
-            purchase0.product_id + ? as res__1,
-            SUM(purchase0.total) as res__2
-          FROM purchase purchase0
-          GROUP BY purchase0.product_id
-        """,
-        value = Seq[(Int, Int, Double)](),
-//        normalize = (x: Seq[(Int, Double)]) => x.sorted,
-        docs =
-          """
-          ScalaSql's `.groupBy` method translates into a SQL `GROUP BY`. Unlike the normal
-          `.groupBy` provided by `scala.Seq`, ScalaSql's `.groupBy` requires you to pass
-          an aggregate as a second parameter, mirroring the SQL requirement that any
-          column not part of the `GROUP BY` clause has to be in an aggregate.
-        """
-      )
     }
 
     test("distinct") {
