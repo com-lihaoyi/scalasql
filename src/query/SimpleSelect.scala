@@ -89,9 +89,9 @@ class SimpleSelect[Q, R](
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
-  def join0[Q2, R2](other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, None)((_, _)) }
+  ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, prefix)((_, _)) }
 
   protected def joinCopy[Q2, R2, Q3, R3](
       other: Joinable[Q2, R2],

@@ -495,6 +495,30 @@ trait JoinTests extends ScalaSqlSuite {
         x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
     )
 
+    test("crossJoin") - checker(
+      query = Text {
+        Buyer.select.crossJoin(ShippingInfo)
+          .filter{case (b, s) => b.id `=` s.buyerId }
+          .map{case (b, s) => (b.name, s.shippingDate)}
+      },
+      sql = """
+        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        FROM buyer buyer0
+        CROSS JOIN shipping_info shipping_info1
+        WHERE buyer0.id = shipping_info1.buyer_id
+        """,
+      value = Seq(
+        ("James Bond", LocalDate.parse("2012-04-05")),
+        ("叉烧包", LocalDate.parse("2010-02-03")),
+        ("叉烧包", LocalDate.parse("2012-05-06")),
+      ),
+      docs = """
+        `.crossJoin` can be used to generate a SQL `CROSS JOIN`, which allows you
+        to perform a `JOIN` with an `ON` clause in a consistent way across databases
+      """,
+      normalize = (x: Seq[(String, LocalDate)]) => x.sortBy(t => (t._1, t._2.toEpochDay))
+    )
+
     test("flatJoins") {
       test("join") - checker(
         query = Text {
