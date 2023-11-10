@@ -172,13 +172,12 @@ class SimpleSelect[Q, R](
   def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
-
-  lazy val flattenedExpr = qr.walk(expr)
 }
 
 object SimpleSelect {
 
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
+    lazy val flattenedExpr = query.qr.walk(query.expr)
     val computed = Context.compute(
       prevContext,
       query.from ++ query.joins.flatMap(_.from.map(_.from)),
@@ -198,7 +197,7 @@ object SimpleSelect {
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
     })
 
-    lazy val jsonQueryMap = query.flattenedExpr.map { case (k, v) =>
+    lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
       val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
       val exprId = Expr.getIdentity(v)
 
@@ -208,7 +207,7 @@ object SimpleSelect {
     lazy val lhsMap = jsonQueryMap
 
     lazy val exprsStrs = {
-      FlatJson.flatten(query.flattenedExpr, implicitCtx).map { case (k, v) =>
+      FlatJson.flatten(flattenedExpr, implicitCtx).map { case (k, v) =>
         sql"$v as ${SqlStr.raw(implicitCtx.config.tableNameMapper(k))}"
       }
     }
@@ -219,7 +218,7 @@ object SimpleSelect {
 
       val exprStr = SqlStr.flatten(
         SqlStr.join(
-          query.flattenedExpr.zip(exprsStrs).collect {
+          flattenedExpr.zip(exprsStrs).collect {
             case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
           },
           sql", "
@@ -242,6 +241,6 @@ object SimpleSelect {
 
     lazy val context = implicitCtx
 
-    lazy val mappedTypes = query.flattenedExpr.map(t => Expr.getMappedType(t._2))
+    lazy val mappedTypes = flattenedExpr.map(t => Expr.getMappedType(t._2))
   }
 }
