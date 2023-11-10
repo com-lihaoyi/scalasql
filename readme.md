@@ -64,7 +64,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 # TODO
 
 * Scala 3 support
-* Flat joins (Quill Style)
 * Dot-delimited result names
 * Tutorial docs for `Option`/`NULL` handling
 * Docs for type mapping

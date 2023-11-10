@@ -73,11 +73,11 @@ class SimpleSelect[Q, R](
         )
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
-        val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
+        val otherJoin = Join(other.prefix, Seq(Join.From(other.from, Some(other.on))))
         joinCopy0(other.f, joinOns ++ Seq(otherJoin), other.where ++ wheres)
 
       case other: FlatJoin.FlatMapResult[Q, Q2, R, R2] =>
-        val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
+        val otherJoin = Join(other.prefix, Seq(Join.From(other.from, Some(other.on))))
         rec(other.f, joinOns ++ Seq(otherJoin), wheres ++ other.where)
     }
 

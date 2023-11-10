@@ -12,6 +12,10 @@ trait Joinable[Q, R] {
     val (from, expr) = joinableToFromExpr
     new FlatJoin.Mapper[Q, Q2, R, R2](from, expr, on(expr), Nil)
   }
+  def leftJoin[Q2, R2](on: Q => Expr[Boolean]): FlatJoin.NullableMapper[Q, Q2, R, R2] = {
+    val (from, expr) = joinableToFromExpr
+    new FlatJoin.NullableMapper[Q, Q2, R, R2](from, Nullable(expr), on(expr), Nil)
+  }
 }
 object Joinable {
   def getSelect[Q, R](x: Joinable[Q, R]) = x.joinableSelect

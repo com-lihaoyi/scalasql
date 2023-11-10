@@ -546,24 +546,25 @@ trait JoinTests extends ScalaSqlSuite {
         query = Text {
           for {
             b <- Buyer.select
-            si <- ShippingInfo.join(_.id `=` b.id)
+            si <- ShippingInfo.join(_.buyerId `=` b.id)
           } yield (b.name, si.shippingDate)
         },
         sql = """
           SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
           FROM buyer buyer0
-          JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
+          JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
         """,
         value = Seq(
-          ("James Bond", LocalDate.parse("2010-02-03")),
-          ("叉烧包", LocalDate.parse("2012-04-05")),
-          ("Li Haoyi", LocalDate.parse("2012-05-06"))
+          ("James Bond", LocalDate.parse("2012-04-05")),
+          ("叉烧包", LocalDate.parse("2010-02-03")),
+          ("叉烧包", LocalDate.parse("2012-05-06"))
         ),
         docs = """
           "flat" joins using `for`-comprehensions are allowed. These allow you to
           "flatten out" the nested tuples you get from normal `.join` clauses,
           letting you write natural looking queries without deeply nested tuples.
-        """
+        """,
+        normalize = (x: Seq[(String, LocalDate)]) => x.sortBy(t => (t._1, t._2.toEpochDay))
       )
       test("join3") - checker(
         query = Text {
@@ -594,6 +595,31 @@ trait JoinTests extends ScalaSqlSuite {
           clauses to query the products purchased by the user `"Li Haoyi"` that have
           a price more than `1.0` dollars
         """
+      )
+
+      test("leftJoin") - checker(
+        query = Text {
+          for {
+            b <- Buyer.select
+            si <- ShippingInfo.leftJoin(_.buyerId `=` b.id)
+          } yield (b.name, si.map(_.shippingDate))
+        },
+        sql = """
+          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          FROM buyer buyer0
+          LEFT JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
+        """,
+        value = Seq(
+          ("James Bond", Some(LocalDate.parse("2012-04-05"))),
+          ("Li Haoyi", None),
+          ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
+          ("叉烧包", Some(LocalDate.parse("2012-05-06")))
+        ),
+        docs = """
+          Flat joins can also support `.leftJoin`s, where the table being joined
+          is given to you as a `Nullable[T]`
+        """,
+        normalize = (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => (t._1, t._2.map(_.toEpochDay)))
       )
     }
   }
