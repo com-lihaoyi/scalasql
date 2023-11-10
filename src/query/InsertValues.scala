@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{Column, MappedType, Queryable}
@@ -22,15 +22,15 @@ object InsertValues {
     def table = insert.table
     def expr: Q = insert.expr
 
-    override def renderToSql(implicit ctx: Context) = (
+    protected override def renderToSql(implicit ctx: Context) = (
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),
       Seq(MappedType.IntType)
     )
     def queryWalkExprs() = Nil
-    override def queryIsSingleRow = true
-    override def queryIsExecuteUpdate = true
+    protected override def queryIsSingleRow = true
+    protected override def queryIsExecuteUpdate = true
 
-    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
+    protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   class Renderer(
@@ -45,7 +45,9 @@ object InsertValues {
       .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
     lazy val values = SqlStr.join(
       valuesLists
-        .map(values => sql"(" + SqlStr.join(values.map(_.renderToSql._1), sql", ") + sql")"),
+        .map(values =>
+          sql"(" + SqlStr.join(values.map(Renderable.renderToSql(_)._1), sql", ") + sql")"
+        ),
       sql", "
     )
     def render() = {

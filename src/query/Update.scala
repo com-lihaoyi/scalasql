@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.{Column, MappedType, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -14,7 +14,11 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
 
   def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
 
-  def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def join0[Q2, R2](
+      prefix: Option[String],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Update[(Q, Q2), (R, R2)]
 
@@ -51,17 +55,21 @@ object Update {
 
     def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
 
-    def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+    def join0[Q2, R2](
+        prefix: Option[String],
+        other: Joinable[Q2, R2],
+        on: Option[(Q, Q2) => Expr[Boolean]]
+    )(
         implicit joinQr: Queryable.Row[Q2, R2]
     ) = {
       val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }
 
-    override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+    protected override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
+    protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 
   }
 
@@ -98,7 +106,7 @@ object Update {
 
     lazy val joinOns = joins0
       .drop(1)
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.renderToSql._1))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
 
     lazy val joins = optSeq(joins0.drop(1))(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)

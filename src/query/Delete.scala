@@ -15,10 +15,10 @@ object Delete {
     def queryWalkExprs() = Nil
     def queryIsSingleRow = true
 
-    def renderToSql(implicit ctx: Context) =
+    protected def renderToSql(implicit ctx: Context) =
       (new Renderer(table, filter, ctx).render(), Seq(MappedType.IntType))
 
-    def queryValueReader = implicitly
+    protected def queryValueReader = implicitly
   }
 
   class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context) {

@@ -35,7 +35,8 @@ object InsertReturning {
 object Returning {
   class Impl0[Q, R](qr: Queryable.Row[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
-    def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
+    protected def queryValueReader =
+      OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
 
     def queryWalkExprs() = qr.walk(returning)
 
@@ -48,7 +49,7 @@ object Returning {
       val computed = Context.compute(ctx0, Nil, Some(returnable.table))
       import computed.implicitCtx
 
-      val (prefix, prevExprs) = returnable.renderToSql
+      val (prefix, prevExprs) = Renderable.renderToSql(returnable)
       val flattenedExpr = qr.walk(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"

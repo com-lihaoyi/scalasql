@@ -17,7 +17,7 @@ import scalasql.query.{
   TableRef,
   Update
 }
-import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -55,7 +55,7 @@ object MySqlDialect extends MySqlDialect {
       )
     }
 
-    override def select: Select[V[Expr], V[Id]] = {
+    override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = t.tableRef
       new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
         t.containerQr
@@ -107,10 +107,10 @@ object MySqlDialect extends MySqlDialect {
     }
 
     override lazy val where = SqlStr.flatten(SqlStr.optSeq(where0) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(Renderable.renderToSql(_)._1), sql" AND ")
     })
     override lazy val joinOns = joins0
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.renderToSql._1))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
 
     override lazy val joins = optSeq(joins0)(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
@@ -131,17 +131,19 @@ object MySqlDialect extends MySqlDialect {
   ) extends Query[R] {
 
     override def queryIsExecuteUpdate = true
-    def queryWalkExprs() = insert.query.queryWalkExprs()
+    protected def queryWalkExprs() = Query.getWalkExprs(insert.query)
 
-    def queryIsSingleRow = insert.query.queryIsSingleRow
+    protected def queryIsSingleRow = Query.getIsSingleRow(insert.query)
 
-    def queryValueReader = insert.query.queryValueReader
+    protected def queryValueReader = Query.getValueReader(insert.query)
 
-    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(
+      ctx
+    )
     def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val (str, mapped) = insert.query.renderToSql
+      val (str, mapped) = Renderable.renderToSql(insert.query)
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
         sql", "
@@ -218,7 +220,7 @@ object MySqlDialect extends MySqlDialect {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>
-            val exprStr = orderBy.expr.renderToSql(newCtx)._1
+            val exprStr = Renderable.renderToSql(orderBy.expr)(newCtx)._1
 
             (orderBy.ascDesc, orderBy.nulls) match {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"

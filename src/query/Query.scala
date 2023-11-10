@@ -10,14 +10,17 @@ import scalasql.utils.OptionPickler
  * a [[Query.Single]] that returns a single row
  */
 trait Query[R] extends Renderable {
-  def queryWalkExprs(): Seq[(List[String], Expr[_])]
-  def queryIsSingleRow: Boolean
-  def queryValueReader: OptionPickler.Reader[R]
-  def queryIsExecuteUpdate: Boolean = false
+  protected def queryWalkExprs(): Seq[(List[String], Expr[_])]
+  protected def queryIsSingleRow: Boolean
+  protected def queryValueReader: OptionPickler.Reader[R]
+  protected def queryIsExecuteUpdate: Boolean = false
 }
 
 object Query {
 
+  def getWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
+  def getIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
+  def getValueReader[R](q: Query[R]) = q.queryValueReader
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walk(q: Q) = q.queryWalkExprs()
@@ -27,18 +30,17 @@ object Query {
     override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = q.renderToSql(ctx)
   }
 
-  trait Multiple[R] extends Query[Seq[R]] {
-    def queryValueReader: OptionPickler.SeqLikeReader[Seq, R]
-  }
+  trait Multiple[R] extends Query[Seq[R]]
 
   class Single[R](query: Multiple[R]) extends Query[R] {
     override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
-    def queryWalkExprs() = query.queryWalkExprs()
+    protected def queryWalkExprs() = query.queryWalkExprs()
 
-    def queryIsSingleRow: Boolean = true
+    protected def queryIsSingleRow: Boolean = true
 
-    def renderToSql(implicit ctx: Context) = query.renderToSql
+    protected def renderToSql(implicit ctx: Context) = Renderable.renderToSql(query)
 
-    def queryValueReader = query.queryValueReader.r
+    protected def queryValueReader =
+      Query.getValueReader(query).asInstanceOf[OptionPickler.SeqLikeReader[Seq, R]].r
   }
 }

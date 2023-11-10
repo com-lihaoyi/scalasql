@@ -3,6 +3,7 @@ package scalasql.utils
 import scalasql.Config
 import upickle.core.Visitor
 import scalasql.query.Expr
+import scalasql.renderer.SqlStr.Renderable
 import scalasql.renderer.{Context, SqlStr}
 
 import scala.collection.mutable
@@ -32,7 +33,7 @@ object FlatJson {
     x.map { case (k, v) =>
       (
         (context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter),
-        v.renderToSql(context)._1
+        Renderable.renderToSql(v)(context)._1
       )
     }
   }

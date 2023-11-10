@@ -1,7 +1,7 @@
 package scalasql.renderer
 
 import scalasql.query.Expr
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.utils.FlatJson
 
 object ExprsToSql {
@@ -29,7 +29,7 @@ object ExprsToSql {
 
   def booleanExprs(prefix: SqlStr, exprs: Seq[Expr[_]])(implicit ctx: Context) = {
     SqlStr.optSeq(exprs.filter(!Expr.getIsLiteralTrue(_))) { having =>
-      prefix + SqlStr.join(having.map(_.renderToSql._1), sql" AND ")
+      prefix + SqlStr.join(having.map(Renderable.renderToSql(_)._1), sql" AND ")
     }
   }
 }

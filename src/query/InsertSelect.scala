@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.{Column, MappedType, Queryable}
 import scalasql.utils.OptionPickler
@@ -17,18 +17,18 @@ object InsertSelect {
 
     def table = insert.table
 
-    override def renderToSql(implicit ctx: Context) = (
+    protected override def renderToSql(implicit ctx: Context) = (
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render(),
       Seq(MappedType.IntType)
     )
 
-    override def queryIsExecuteUpdate = true
+    protected override def queryIsExecuteUpdate = true
 
-    def queryWalkExprs() = Nil
+    protected def queryWalkExprs() = Nil
 
-    override def queryIsSingleRow = true
+    protected override def queryIsSingleRow = true
 
-    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
+    protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   class Renderer(
@@ -47,7 +47,7 @@ object InsertSelect {
       sql", "
     )
 
-    lazy val selectSql = select.renderToSql._1.withCompleteQuery(false)
+    lazy val selectSql = Renderable.renderToSql(select)._1.withCompleteQuery(false)
 
     lazy val tableNameStr = SqlStr.raw(ctx.config.tableNameMapper(tableName))
     def render() = sql"INSERT INTO $tableNameStr ($columns) $selectSql"

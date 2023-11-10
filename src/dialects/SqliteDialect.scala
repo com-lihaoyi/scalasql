@@ -25,7 +25,7 @@ object SqliteDialect extends SqliteDialect {
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
 
-    override def select: Select[V[Expr], V[Id]] = {
+    override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = t.tableRef
       new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
         t.containerQr

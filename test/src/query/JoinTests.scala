@@ -262,7 +262,6 @@ trait JoinTests extends ScalaSqlSuite {
       normalize = (x: Seq[(String, LocalDate, Int, LocalDate)]) => x.sortBy(t => (t._1, t._3))
     )
 
-
     test("mapForGroupBy") - checker(
       query = Text {
         for ((name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth)))
@@ -519,9 +518,10 @@ trait JoinTests extends ScalaSqlSuite {
 
     test("crossJoin") - checker(
       query = Text {
-        Buyer.select.crossJoin(ShippingInfo)
-          .filter{case (b, s) => b.id `=` s.buyerId }
-          .map{case (b, s) => (b.name, s.shippingDate)}
+        Buyer.select
+          .crossJoin(ShippingInfo)
+          .filter { case (b, s) => b.id `=` s.buyerId }
+          .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
@@ -532,7 +532,7 @@ trait JoinTests extends ScalaSqlSuite {
       value = Seq(
         ("James Bond", LocalDate.parse("2012-04-05")),
         ("叉烧包", LocalDate.parse("2010-02-03")),
-        ("叉烧包", LocalDate.parse("2012-05-06")),
+        ("叉烧包", LocalDate.parse("2012-05-06"))
       ),
       docs = """
         `.crossJoin` can be used to generate a SQL `CROSS JOIN`, which allows you

@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{MappedType, Queryable, Table}
@@ -25,9 +25,9 @@ class CompoundSelect[Q, R](
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
-  def expr = lhs.select.expr
+  def expr = Joinable.getSelect(lhs).expr
 
-  override def select = this
+  override def joinableSelect = this
 
   def distinct: Select[Q, R] = simpleFrom(this).distinct
 
@@ -57,7 +57,11 @@ class CompoundSelect[Q, R](
     }
   }
 
-  def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def join0[Q2, R2](
+      prefix: Option[String],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { simpleFrom(this).join0(prefix, other, on) }
 
@@ -114,7 +118,7 @@ class CompoundSelect[Q, R](
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  protected def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
 }
@@ -190,7 +194,7 @@ object CompoundSelect {
               case Nulls.First => sql" NULLS FIRST"
               case Nulls.Last => sql" NULLS LAST"
             }
-            orderBy.expr.renderToSql(newCtx)._1 + ascDesc + nulls
+            Renderable.renderToSql(orderBy.expr)(newCtx)._1 + ascDesc + nulls
           },
           sql", "
         )

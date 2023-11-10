@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.{Config, MappedType, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
@@ -20,7 +20,7 @@ class SimpleSelect[Q, R](
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R])
     extends Select[Q, R] {
-  override def select = this
+  override def joinableSelect = this
 
   def copy[Q, R](
       expr: Q = this.expr,
@@ -89,7 +89,11 @@ class SimpleSelect[Q, R](
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
-  def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  def join0[Q2, R2](
+      prefix: Option[String],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, prefix)((_, _)) }
 
@@ -187,7 +191,7 @@ class SimpleSelect[Q, R](
   def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
   def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
-  def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  protected def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
 }
@@ -239,7 +243,8 @@ object SimpleSelect {
         )
       )
 
-      val joinOns = query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(t.renderToSql._1))))
+      val joinOns =
+        query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
 
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)

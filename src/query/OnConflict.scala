@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.{Column, MappedType}
 import scalasql.renderer.{Context, SqlStr}
 
@@ -22,10 +22,10 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     def expr = query.expr
-    def queryWalkExprs() = query.queryWalkExprs()
-    def queryIsSingleRow = query.queryIsSingleRow
-    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-      val (str, mapped) = query.renderToSql
+    protected def queryWalkExprs() = Query.getWalkExprs(query)
+    protected def queryIsSingleRow = Query.getIsSingleRow(query)
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+      val (str, mapped) = Renderable.renderToSql(query)
       (
         str +
           sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING",
@@ -35,7 +35,7 @@ object OnConflict {
 
     override def queryIsExecuteUpdate = true
 
-    def queryValueReader = query.queryValueReader
+    protected def queryValueReader = Query.getValueReader(query)
 
   }
 
@@ -47,13 +47,15 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     def expr = query.expr
-    def queryWalkExprs() = query.queryWalkExprs()
-    def queryIsSingleRow = query.queryIsSingleRow
-    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
+    protected def queryWalkExprs() = Query.getWalkExprs(query)
+    protected def queryIsSingleRow = Query.getIsSingleRow(query)
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(
+      ctx
+    )
     def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val (str, mapped) = query.renderToSql
+      val (str, mapped) = Renderable.renderToSql(query)
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
@@ -62,6 +64,6 @@ object OnConflict {
       (str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr", mapped)
     }
     override def queryIsExecuteUpdate = true
-    def queryValueReader = query.queryValueReader
+    protected def queryValueReader = Query.getValueReader(query)
   }
 }

@@ -33,7 +33,7 @@ trait Select[Q, R]
     with Query.Multiple[R]
     with FlatJoin.Rhs[Q, R] {
 
-  def toFromExpr = (new SubqueryRef(this, qr), expr)
+  def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
@@ -54,8 +54,8 @@ trait Select[Q, R]
     new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]
-  def isTrivialJoin: Boolean = false
-  def select = this
+  protected def joinableIsTrivial: Boolean = false
+  protected def joinableSelect = this
 
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
@@ -166,7 +166,7 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+  protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
     val renderer = getRenderer(ctx)
 
     (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)

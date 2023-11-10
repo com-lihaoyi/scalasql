@@ -19,7 +19,11 @@ trait JoinOps[C[_, _], Q, R] {
       implicit qr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)] = join0(Some("CROSS"), other, None)
 
-  protected def join0[Q2, R2](prefix: Option[String], other: Joinable[Q2, R2], on: Option[(Q, Q2) => Expr[Boolean]])(
+  protected def join0[Q2, R2](
+      prefix: Option[String],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)]
 
@@ -28,13 +32,13 @@ trait JoinOps[C[_, _], Q, R] {
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(implicit joinQr: Queryable.Row[Q2, _]) = {
-    val otherSelect = other.select
+    val otherSelect = Joinable.getSelect(other)
 
     val otherJoin = joinInfo0(
       joinPrefix,
       otherSelect,
       on.map(_(expr, otherSelect.expr)),
-      other.isTrivialJoin
+      Joinable.getIsTrivial(other)
     )
 
     (Seq(otherJoin), otherSelect)

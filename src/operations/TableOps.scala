@@ -5,25 +5,27 @@ import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Upd
 
 class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
 
-  def toFromExpr0 = {
+  protected def toFromExpr0 = {
     val ref = t.tableRef
     (ref, t.metadata.vExpr(ref))
   }
 
-  def toFromExpr = {
+  protected def joinableToFromExpr = {
     val (ref, expr) = toFromExpr0
     (ref, expr.asInstanceOf[V[Expr]])
+  }
+
+  protected def joinableSelect: Select[V[Expr], V[Id]] = {
+    val (ref, expr) = joinableToFromExpr
+    new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
+      t.containerQr
+    )
   }
 
   /**
    * Constructs a `SELECT` query
    */
-  def select: Select[V[Expr], V[Id]] = {
-    val (ref, expr) = toFromExpr
-    new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
-      t.containerQr
-    )
-  }
+  def select = joinableSelect
 
   /**
    * Constructs a `UPDATE` query with the given [[filter]] to select the
@@ -53,5 +55,5 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
     new Delete.Impl(expr, filter(t.metadata.vExpr(ref)), ref)
   }
 
-  def isTrivialJoin = true
+  protected def joinableIsTrivial = true
 }
