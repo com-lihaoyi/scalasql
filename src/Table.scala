@@ -100,9 +100,10 @@ object Column {
       extends Expr[T] {
     def :=(v: Expr[T]) = Assignment(this, v)
     def toSqlExpr0(implicit ctx: Context) = {
-      val prefix = ctx.fromNaming(tableRef) match {
-        case "" => sql""
-        case s => SqlStr.raw(s) + sql"."
+      val prefix = ctx.fromNaming.get(tableRef) match {
+        case Some("") => sql""
+        case Some(s) => SqlStr.raw(s) + sql"."
+        case None => sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(tableRef.value.tableName)}."
       }
 
       prefix + SqlStr.raw(ctx.config.columnNameMapper(name))

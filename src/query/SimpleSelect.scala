@@ -62,14 +62,18 @@ class SimpleSelect[Q, R](
     ): Select[Q2, R2] = thing match {
       case other: Select[Q2, R2] =>
         val inner = simpleFrom(other)
-        assert(inner.groupBy0.isEmpty)
-        val self = if (this.groupBy0.isEmpty) this else this.subquery
+//        assert(inner.groupBy0.isEmpty)
 
-        val innerFromJoin = Join(Some("CROSS"), inner.from.map(f => Join.From(f, None)))
-        inner.copy(
+        pprint.log(this.groupBy0.isEmpty)
+        pprint.log(inner.groupBy0.isEmpty)
+        val self = if (this.groupBy0.isEmpty) this else this.subquery
+        val inner2 = if (inner.groupBy0.isEmpty) inner else inner.subquery
+
+        val innerFromJoin = Join(Some("CROSS"), inner2.from.map(f => Join.From(f, None)))
+        inner2.copy(
           from = self.from,
-          joins = self.joins ++ Seq(innerFromJoin) ++ inner.joins,
-          where = self.where ++ inner.where
+          joins = self.joins ++ Seq(innerFromJoin) ++ inner2.joins,
+          where = self.where ++ inner2.where
         )
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
