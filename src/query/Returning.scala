@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.{MappedType, Queryable}
 import scalasql.utils.OptionPickler
@@ -9,10 +9,9 @@ import scalasql.utils.OptionPickler
  * A query that could support a `RETURNING` clause, typically
  * an `INSERT` or `UPDATE`
  */
-trait Returnable[Q] {
+trait Returnable[Q] extends Renderable {
   def expr: Q
   def table: TableRef
-  def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
 }
 
 trait InsertReturnable[Q] extends Returnable[Q]
@@ -36,20 +35,20 @@ object InsertReturning {
 object Returning {
   class Impl0[Q, R](qr: Queryable.Row[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
-    def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
+    def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(returning), implicitly)
 
-    def walk() = qr.walk(returning)
+    def queryWalkExprs() = qr.walk(returning)
 
-    override def singleRow = false
+    override def queryIsSingleRow = false
 
-    override def toSqlQuery(implicit ctx0: Context): (SqlStr, Seq[MappedType[_]]) =
+    override def renderToSql(implicit ctx0: Context): (SqlStr, Seq[MappedType[_]]) =
       toSqlQuery0(ctx0)
 
     def toSqlQuery0(ctx0: Context): (SqlStr, Seq[MappedType[_]]) = {
       val computed = Context.compute(ctx0, Nil, Some(returnable.table))
       import computed.implicitCtx
 
-      val (prefix, prevExprs) = returnable.toSqlQuery
+      val (prefix, prevExprs) = returnable.renderToSql
       val flattenedExpr = qr.walk(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"

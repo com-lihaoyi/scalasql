@@ -22,10 +22,10 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     def expr = query.expr
-    def walk() = query.walk()
-    def singleRow = query.singleRow
-    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
-      val (str, mapped) = query.toSqlQuery
+    def queryWalkExprs() = query.queryWalkExprs()
+    def queryIsSingleRow = query.queryIsSingleRow
+    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+      val (str, mapped) = query.renderToSql
       (
         str +
           sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING",
@@ -33,9 +33,9 @@ object OnConflict {
       )
     }
 
-    override def isExecuteUpdate = true
+    override def queryIsExecuteUpdate = true
 
-    def valueReader = query.valueReader
+    def queryValueReader = query.queryValueReader
 
   }
 
@@ -47,13 +47,13 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     def expr = query.expr
-    def walk() = query.walk()
-    def singleRow = query.singleRow
-    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
+    def queryWalkExprs() = query.queryWalkExprs()
+    def queryIsSingleRow = query.queryIsSingleRow
+    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
     def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val (str, mapped) = query.toSqlQuery
+      val (str, mapped) = query.renderToSql
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
@@ -61,7 +61,7 @@ object OnConflict {
       )
       (str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr", mapped)
     }
-    override def isExecuteUpdate = true
-    def valueReader = query.valueReader
+    override def queryIsExecuteUpdate = true
+    def queryValueReader = query.queryValueReader
   }
 }

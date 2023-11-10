@@ -22,15 +22,15 @@ object InsertValues {
     def table = insert.table
     def expr: Q = insert.expr
 
-    override def toSqlQuery(implicit ctx: Context) = (
+    override def renderToSql(implicit ctx: Context) = (
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),
       Seq(MappedType.IntType)
     )
-    def walk() = Nil
-    override def singleRow = true
-    override def isExecuteUpdate = true
+    def queryWalkExprs() = Nil
+    override def queryIsSingleRow = true
+    override def queryIsExecuteUpdate = true
 
-    override def valueReader: OptionPickler.Reader[Int] = implicitly
+    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   class Renderer(
@@ -45,7 +45,7 @@ object InsertValues {
       .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
     lazy val values = SqlStr.join(
       valuesLists
-        .map(values => sql"(" + SqlStr.join(values.map(_.toSqlQuery._1), sql", ") + sql")"),
+        .map(values => sql"(" + SqlStr.join(values.map(_.renderToSql._1), sql", ") + sql")"),
       sql", "
     )
     def render() = {

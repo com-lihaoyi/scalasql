@@ -19,9 +19,9 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   ): Update[(Q, Q2), (R, R2)]
 
   def qr: Queryable.Row[Q, R]
-  override def isExecuteUpdate = true
-  override def singleRow = false
-  def walk() = Nil
+  override def queryIsExecuteUpdate = true
+  override def queryIsSingleRow = false
+  def queryWalkExprs() = Nil
 }
 
 object Update {
@@ -58,10 +58,10 @@ object Update {
       this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
     }
 
-    override def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+    override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    override def valueReader: OptionPickler.Reader[Int] = implicitly
+    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 
   }
 
@@ -95,12 +95,12 @@ object Update {
     }
 
     lazy val where = SqlStr.flatten(SqlStr.optSeq(fromOns ++ where0) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
     })
 
     lazy val joinOns = joins0
       .drop(1)
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(t.renderToSql._1))))
 
     lazy val joins = optSeq(joins0.drop(1))(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)

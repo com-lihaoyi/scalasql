@@ -43,7 +43,7 @@ class SimpleSelect[Q, R](
 
           f(expr)(newCtx)
         })
-        .toSqlQuery
+        .renderToSql
         ._1
         .withCompleteQuery(true)
     }
@@ -55,8 +55,12 @@ class SimpleSelect[Q, R](
   def flatMap[Q2, R2](
       f: Q => FlatMapJoinRhs[Q2, R2]
   )(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    def rec(thing: FlatMapJoinRhs[Q2, R2], joinOns: Seq[Join], wheres: Seq[Expr[Boolean]]): Select[Q2, R2] = {
-      thing match{
+    def rec(
+        thing: FlatMapJoinRhs[Q2, R2],
+        joinOns: Seq[Join],
+        wheres: Seq[Expr[Boolean]]
+    ): Select[Q2, R2] = {
+      thing match {
         case other: Select[Q2, R2] =>
           val simple = simpleFrom(other)
           simple.copy(from = this.from ++ simple.from)
@@ -128,7 +132,7 @@ class SimpleSelect[Q, R](
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
-      implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery,
+      implicit ctx => this.copy(expr = selectProxyExpr).renderToSql,
       selectProxyExpr
     )(qr)
   }
@@ -169,7 +173,7 @@ class SimpleSelect[Q, R](
   def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
   def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
-  def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
 }
@@ -187,12 +191,12 @@ object SimpleSelect {
     import computed.implicitCtx
 
     lazy val filtersOpt = SqlStr.flatten(SqlStr.optSeq(query.where) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.toSqlQuery._1), sql" AND ")
+      sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
     })
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
-        sql" HAVING " + SqlStr.join(having.map(_.toSqlQuery._1), sql" AND ")
+        sql" HAVING " + SqlStr.join(having.map(_.renderToSql._1), sql" AND ")
       }
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
     })
@@ -225,7 +229,7 @@ object SimpleSelect {
         )
       )
 
-      val joinOns = query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(t.toSqlQuery._1))))
+      val joinOns = query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(t.renderToSql._1))))
 
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)

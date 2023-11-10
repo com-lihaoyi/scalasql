@@ -15,8 +15,7 @@ trait Nullable[Q] {
 
 }
 object Nullable {
-  implicit def toExpr[T](n: Nullable[Expr[T]])
-                                  (implicit mt: MappedType[T]): Expr[Option[T]] =
+  implicit def toExpr[T](n: Nullable[Expr[T]])(implicit mt: MappedType[T]): Expr[Option[T]] =
     Expr { implicit ctx => sql"${n.get}" }
 
   def apply[Q](t: Q): Nullable[Q] = new Nullable[Q] {

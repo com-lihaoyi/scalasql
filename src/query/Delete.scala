@@ -11,14 +11,14 @@ trait Delete[Q] extends Query[Int] with Returnable[Q]
 
 object Delete {
   class Impl[Q](val expr: Q, filter: Expr[Boolean], val table: TableRef) extends Delete[Q] {
-    override def isExecuteUpdate = true
-    def walk() = Nil
-    def singleRow = true
+    override def queryIsExecuteUpdate = true
+    def queryWalkExprs() = Nil
+    def queryIsSingleRow = true
 
-    def toSqlQuery(implicit ctx: Context) =
+    def renderToSql(implicit ctx: Context) =
       (new Renderer(table, filter, ctx).render(), Seq(MappedType.IntType))
 
-    def valueReader = implicitly
+    def queryValueReader = implicitly
   }
 
   class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context) {

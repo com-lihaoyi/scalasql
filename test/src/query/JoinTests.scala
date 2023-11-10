@@ -216,8 +216,9 @@ trait JoinTests extends ScalaSqlSuite {
 
     test("leftJoinMap") - checker(
       query = Text {
-        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map{case (b, si) => (b.name, si.map(_.shippingDate))}
+        Buyer.select
+          .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
       },
       sql = """
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
@@ -225,10 +226,10 @@ trait JoinTests extends ScalaSqlSuite {
         LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
       """,
       value = Seq(
-        ("James Bond" , Some(LocalDate.parse("2012-04-05"))),
+        ("James Bond", Some(LocalDate.parse("2012-04-05"))),
         ("Li Haoyi", None),
         ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
-        ("叉烧包", Some(LocalDate.parse("2012-05-06"))),
+        ("叉烧包", Some(LocalDate.parse("2012-05-06")))
       ),
       normalize =
         (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => t._1 -> t._2.map(_.toEpochDay)),
@@ -241,8 +242,9 @@ trait JoinTests extends ScalaSqlSuite {
 
     test("leftJoinExpr") - checker(
       query = Text {
-        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map{case (b, si) => (b.name, si.map(_.shippingDate))}
+        Buyer.select
+          .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
           .sortBy(_._2)
           .nullsFirst
       },
@@ -267,7 +269,6 @@ trait JoinTests extends ScalaSqlSuite {
         ("James Bond", Some(LocalDate.parse("2012-04-05"))),
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
       ),
-
       docs = """
         `Nullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
         them to participate in any database query logic than any other `Expr[Option[T]]`s
@@ -278,8 +279,9 @@ trait JoinTests extends ScalaSqlSuite {
 
     test("leftJoinExpr2") - checker(
       query = Text {
-        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map{case (b, si) => (b.name, si.map(_.shippingDate) > b.dateOfBirth)}
+        Buyer.select
+          .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map { case (b, si) => (b.name, si.map(_.shippingDate) > b.dateOfBirth) }
       },
       sql = """
         SELECT
@@ -298,8 +300,9 @@ trait JoinTests extends ScalaSqlSuite {
     )
     test("leftJoinExprExplicit") - checker(
       query = Text {
-        Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map{case (b, si) => (b.name, Nullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth)}
+        Buyer.select
+          .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map { case (b, si) => (b.name, Nullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth) }
       },
       sql = """
         SELECT
@@ -407,10 +410,10 @@ trait JoinTests extends ScalaSqlSuite {
         x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
     )
 
-    test("flatJoins"){
+    test("flatJoins") {
       test("join") - checker(
         query = Text {
-          for{
+          for {
             b <- Buyer.select
             si <- ShippingInfo.join(_.id `=` b.id)
           } yield (b.name, si.shippingDate)
@@ -433,7 +436,7 @@ trait JoinTests extends ScalaSqlSuite {
       )
       test("join3") - checker(
         query = Text {
-          for{
+          for {
             b <- Buyer.select
             if b.name === "Li Haoyi"
             si <- ShippingInfo.join(_.id `=` b.id)

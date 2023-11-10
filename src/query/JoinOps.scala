@@ -30,7 +30,6 @@ trait JoinOps[C[_, _], Q, R] {
       other.isTrivialJoin
     )
 
-
     (Seq(otherJoin), otherSelect)
   }
   protected def joinInfo0[Q2, R2](

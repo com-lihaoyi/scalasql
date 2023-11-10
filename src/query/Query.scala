@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.renderer.SqlStr.Renderable
 import scalasql.{MappedType, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
@@ -8,37 +9,36 @@ import scalasql.utils.OptionPickler
  * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
  * a [[Query.Single]] that returns a single row
  */
-trait Query[R] {
-  def walk(): Seq[(List[String], Expr[_])]
-  def singleRow: Boolean
-  def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
-  def valueReader: OptionPickler.Reader[R]
-  def isExecuteUpdate: Boolean = false
+trait Query[R] extends Renderable {
+  def queryWalkExprs(): Seq[(List[String], Expr[_])]
+  def queryIsSingleRow: Boolean
+  def queryValueReader: OptionPickler.Reader[R]
+  def queryIsExecuteUpdate: Boolean = false
 }
 
 object Query {
 
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
-    override def isExecuteUpdate(q: Q) = q.isExecuteUpdate
-    override def walk(q: Q) = q.walk()
-    override def singleRow(q: Q) = q.singleRow
+    override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
+    override def walk(q: Q) = q.queryWalkExprs()
+    override def singleRow(q: Q) = q.queryIsSingleRow
 
-    override def valueReader(q: Q): OptionPickler.Reader[R] = q.valueReader
-    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = q.toSqlQuery(ctx)
+    override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader
+    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = q.renderToSql(ctx)
   }
 
   trait Multiple[R] extends Query[Seq[R]] {
-    def valueReader: OptionPickler.SeqLikeReader[Seq, R]
+    def queryValueReader: OptionPickler.SeqLikeReader[Seq, R]
   }
 
   class Single[R](query: Multiple[R]) extends Query[R] {
-    override def isExecuteUpdate = query.isExecuteUpdate
-    def walk() = query.walk()
+    override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
+    def queryWalkExprs() = query.queryWalkExprs()
 
-    def singleRow: Boolean = true
+    def queryIsSingleRow: Boolean = true
 
-    def toSqlQuery(implicit ctx: Context) = query.toSqlQuery
+    def renderToSql(implicit ctx: Context) = query.renderToSql
 
-    def valueReader = query.valueReader.r
+    def queryValueReader = query.queryValueReader.r
   }
 }

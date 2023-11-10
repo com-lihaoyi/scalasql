@@ -19,8 +19,8 @@ class Aggregate[Q, R](toSqlQuery0: Context => (SqlStr, Seq[MappedType[_]]), expr
     qr: Queryable[Q, R]
 ) extends Query[R] {
 
-  def walk(): Seq[(List[String], Expr[_])] = qr.walk(expr)
-  def singleRow: Boolean = true
-  def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
-  def valueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
+  def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
+  def queryIsSingleRow: Boolean = true
+  def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(ctx)
+  def queryValueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
 }

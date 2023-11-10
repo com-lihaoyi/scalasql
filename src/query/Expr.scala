@@ -10,7 +10,7 @@ import scalasql.utils.OptionPickler
  */
 trait Expr[T] extends SqlStr.Renderable {
   protected def mappedType: MappedType[T]
-  final def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+  final def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
     (ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0), Seq(mappedType))
   }
 

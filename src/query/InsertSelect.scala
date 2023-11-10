@@ -17,18 +17,18 @@ object InsertSelect {
 
     def table = insert.table
 
-    override def toSqlQuery(implicit ctx: Context) = (
+    override def renderToSql(implicit ctx: Context) = (
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render(),
       Seq(MappedType.IntType)
     )
 
-    override def isExecuteUpdate = true
+    override def queryIsExecuteUpdate = true
 
-    def walk() = Nil
+    def queryWalkExprs() = Nil
 
-    override def singleRow = true
+    override def queryIsSingleRow = true
 
-    override def valueReader: OptionPickler.Reader[Int] = implicitly
+    override def queryValueReader: OptionPickler.Reader[Int] = implicitly
   }
 
   class Renderer(
@@ -47,7 +47,7 @@ object InsertSelect {
       sql", "
     )
 
-    lazy val selectSql = select.toSqlQuery._1.withCompleteQuery(false)
+    lazy val selectSql = select.renderToSql._1.withCompleteQuery(false)
 
     lazy val tableNameStr = SqlStr.raw(ctx.config.tableNameMapper(tableName))
     def render() = sql"INSERT INTO $tableNameStr ($columns) $selectSql"

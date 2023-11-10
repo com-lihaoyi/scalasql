@@ -105,7 +105,7 @@ object SqlStr {
     new SqlStr(Seq(s), Nil, false, referencedExprs)
 
   trait Renderable {
-    def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
+    def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
   }
 
   /**
@@ -114,7 +114,7 @@ object SqlStr {
   sealed trait Interp
   object Interp {
     implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
-      SqlStrInterp(t.toSqlQuery(ctx)._1)
+      SqlStrInterp(t.renderToSql(ctx)._1)
 
     implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
 

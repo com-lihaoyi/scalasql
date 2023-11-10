@@ -4,34 +4,44 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.{MappedType, Queryable}
 
 trait FlatMapJoinRhs[Q2, R2]
-class FlatJoinMapResult[Q, Q2, R, R2](val from: From,
-                                      val expr: Q,
-                                      val on: Q => Expr[Boolean],
-                                      val qr: Queryable.Row[Q2, R2],
-                                      val f: Q => Q2,
-                                      val where: Seq[Expr[Boolean]]) extends FlatMapJoinRhs[Q2, R2]
+class FlatJoinMapResult[Q, Q2, R, R2](
+    val from: From,
+    val expr: Q,
+    val on: Q => Expr[Boolean],
+    val qr: Queryable.Row[Q2, R2],
+    val f: Q => Q2,
+    val where: Seq[Expr[Boolean]]
+) extends FlatMapJoinRhs[Q2, R2]
 
-class FlatJoinFlatMapResult[Q, Q2, R, R2](val from: From,
-                                          val expr: Q,
-                                          val on: Q => Expr[Boolean],
-                                          val qr: Queryable.Row[Q2, R2],
-                                          val f: FlatMapJoinRhs[Q2, R2],
-                                          val where: Seq[Expr[Boolean]]) extends FlatMapJoinRhs[Q2, R2]
+class FlatJoinFlatMapResult[Q, Q2, R, R2](
+    val from: From,
+    val expr: Q,
+    val on: Q => Expr[Boolean],
+    val qr: Queryable.Row[Q2, R2],
+    val f: FlatMapJoinRhs[Q2, R2],
+    val where: Seq[Expr[Boolean]]
+) extends FlatMapJoinRhs[Q2, R2]
 
-class FlatJoinMapper[Q, Q2, R, R2](from: From, expr: Q, on: Q => Expr[Boolean], where: Seq[Expr[Boolean]]) {
-  def map(f: Q => Q2)
-         (implicit qr: Queryable.Row[Q2, R2]): FlatJoinMapResult[Q, Q2, R, R2] = {
+class FlatJoinMapper[Q, Q2, R, R2](
+    from: From,
+    expr: Q,
+    on: Q => Expr[Boolean],
+    where: Seq[Expr[Boolean]]
+) {
+  def map(f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): FlatJoinMapResult[Q, Q2, R, R2] = {
     new FlatJoinMapResult[Q, Q2, R, R2](from, expr, on, qr, f, where)
   }
 
-  def flatMap(f: Q => FlatMapJoinRhs[Q2, R2])
-             (implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
+  def flatMap(
+      f: Q => FlatMapJoinRhs[Q2, R2]
+  )(implicit qr: Queryable.Row[Q2, R2]): FlatJoinFlatMapResult[Q, Q2, R, R2] = {
     new FlatJoinFlatMapResult[Q, Q2, R, R2](from, expr, on, qr, f(expr), where)
   }
 
   def withFilter(x: Q => Expr[Boolean]): FlatJoinMapper[Q, Q2, R, R2] =
     new FlatJoinMapper(from, expr, on, where ++ Seq(x(expr)))
 }
+
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
  * `ORDER BY`, `LIMIT`, `OFFSET` clauses
@@ -60,7 +70,7 @@ trait Select[Q, R]
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
     with Query.Multiple[R]
-    with FlatMapJoinRhs[Q, R]{
+    with FlatMapJoinRhs[Q, R] {
 
   def toFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
@@ -102,8 +112,9 @@ trait Select[Q, R]
    * Performs an implicit `JOIN` between this [[Select]] and the one returned by the
    * callback function [[f]]
    */
-  def flatMap[Q2, R2](f: Q => FlatMapJoinRhs[Q2, R2])
-                     (implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
+  def flatMap[Q2, R2](f: Q => FlatMapJoinRhs[Q2, R2])(
+      implicit qr: Queryable.Row[Q2, R2]
+  ): Select[Q2, R2]
 
   /**
    * Filters this [[Select]] with the given predicate, translates into a SQL `WHERE` clause
@@ -194,13 +205,13 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  def toSqlQuery(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+  def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
     val renderer = getRenderer(ctx)
 
     (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)
   }
-  def walk() = qr.walk(expr)
-  override def singleRow = false
+  def queryWalkExprs() = qr.walk(expr)
+  override def queryIsSingleRow = false
 
   def getRenderer(prevContext: Context): Select.Renderer
 
@@ -227,7 +238,7 @@ trait Select[Q, R]
    * with some like Sqlite simply taking the first row while others like Postgres/MySql
    * throwing exceptions
    */
-  def toExpr(implicit mt: MappedType[R]): Expr[R] = Expr { implicit ctx => this.toSqlQuery._1 }
+  def toExpr(implicit mt: MappedType[R]): Expr[R] = Expr { implicit ctx => this.renderToSql._1 }
 
   protected def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s
@@ -242,9 +253,6 @@ trait Select[Q, R]
   def subquery: SimpleSelect[Q, R] = {
     newSimpleSelect(expr, None, Seq(subqueryRef(qr)), Nil, Nil, None)(qr)
   }
-
-
-
 
   /**
    * Performs a `LEFT JOIN` on the given [[other]], typically a [[Table]] or [[Select]].

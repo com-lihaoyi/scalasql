@@ -23,7 +23,9 @@ trait Dialect extends DialectConfig {
   implicit def NullableExprOpsConv[T: MappedType](v: Nullable[Expr[T]]): operations.ExprOps =
     new operations.ExprOps(Nullable.toExpr(v))
 
-  implicit def NullableExprOptionOpsConv[T: MappedType](v: Nullable[Expr[T]]): operations.ExprOptionOps[T] =
+  implicit def NullableExprOptionOpsConv[T: MappedType](
+      v: Nullable[Expr[T]]
+  ): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(Nullable.toExpr(v))
 
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps

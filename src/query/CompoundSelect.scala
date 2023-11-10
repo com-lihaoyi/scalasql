@@ -114,7 +114,7 @@ class CompoundSelect[Q, R](
   def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  def valueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
+  def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
   def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
 }
@@ -190,7 +190,7 @@ object CompoundSelect {
               case Nulls.First => sql" NULLS FIRST"
               case Nulls.Last => sql" NULLS LAST"
             }
-            orderBy.expr.toSqlQuery(newCtx)._1 + ascDesc + nulls
+            orderBy.expr.renderToSql(newCtx)._1 + ascDesc + nulls
           },
           sql", "
         )
