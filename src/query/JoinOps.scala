@@ -13,7 +13,7 @@ trait JoinOps[C[_, _], Q, R] {
   ): C[(Q, Q2), (R, R2)] = join0(None, other, Some(on))
 
   /**
-   *
+   * Performs a `CROSS JOIN`, which is an `INNER JOIN` but without the `ON` clause
    */
   def crossJoin[Q2, R2](other: Joinable[Q2, R2])(
       implicit qr: Queryable.Row[Q2, R2]
