@@ -9,8 +9,7 @@ import scalasql.utils.OptionPickler
  * A query that could support a `RETURNING` clause, typically
  * an `INSERT` or `UPDATE`
  */
-trait Returnable[Q] extends Renderable {
-  def expr: Q
+trait Returnable[Q] extends Renderable with WithExpr[Q] {
   def table: TableRef
 }
 
@@ -29,7 +28,7 @@ object InsertReturning {
       implicit val qr: Queryable.Row[Q, R]
   ) extends Returning.Impl0[Q, R](qr, returnable, returning)
       with InsertReturning[Q, R] {
-    def expr: Q = returning
+    protected def expr: Q = returning
   }
 }
 object Returning {

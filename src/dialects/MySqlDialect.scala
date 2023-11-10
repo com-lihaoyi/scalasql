@@ -15,7 +15,8 @@ import scalasql.query.{
   OrderBy,
   Query,
   TableRef,
-  Update
+  Update,
+  WithExpr
 }
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
@@ -34,7 +35,7 @@ trait MySqlDialect extends Dialect {
   implicit def OnConflictableUpdate[Q, R](
       query: InsertValues[Q, R]
   ): MySqlDialect.OnConflictable[Q, Int] =
-    new MySqlDialect.OnConflictable[Q, Int](query, query.expr, query.table)
+    new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 }
 
 object MySqlDialect extends MySqlDialect {

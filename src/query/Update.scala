@@ -63,7 +63,7 @@ object Update {
         implicit joinQr: Queryable.Row[Q2, R2]
     ) = {
       val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
-      this.copy(expr = (expr, otherSelect.expr), joins = joins ++ otherJoin)
+      this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
     }
 
     protected override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =

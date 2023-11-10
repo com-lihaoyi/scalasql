@@ -105,7 +105,7 @@ class SimpleSelect[Q, R](
 
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
-    joinCopy0(f(expr, otherSelect.expr), otherJoin, Nil)
+    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)
   }
 
   private def joinCopy0[Q3, R3](newExpr: Q3, newJoins: Seq[Join], newWheres: Seq[Expr[Boolean]])(

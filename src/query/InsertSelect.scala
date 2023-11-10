@@ -13,7 +13,7 @@ trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
 object InsertSelect {
   class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
       extends InsertSelect[Q, C, R, R2] {
-    def expr = insert.expr
+    protected def expr = WithExpr.get(insert)
 
     def table = insert.table
 

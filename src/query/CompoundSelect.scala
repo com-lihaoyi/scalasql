@@ -25,7 +25,7 @@ class CompoundSelect[Q, R](
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
-  def expr = Joinable.getSelect(lhs).expr
+  protected def expr = WithExpr.get(Joinable.getSelect(lhs))
 
   protected override def joinableSelect = this
 

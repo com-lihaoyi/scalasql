@@ -20,7 +20,7 @@ object InsertValues {
   )(implicit val qr: Queryable[Q, R])
       extends InsertValues[Q, R] {
     def table = insert.table
-    def expr: Q = insert.expr
+    protected def expr: Q = WithExpr.get(insert)
 
     protected override def renderToSql(implicit ctx: Context) = (
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),

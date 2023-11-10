@@ -21,7 +21,7 @@ object OnConflict {
       val table: TableRef
   ) extends Query[R]
       with InsertReturnable[Q] {
-    def expr = query.expr
+    protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
     protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
@@ -46,7 +46,7 @@ object OnConflict {
       val table: TableRef
   ) extends Query[R]
       with InsertReturnable[Q] {
-    def expr = query.expr
+    protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
     protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(

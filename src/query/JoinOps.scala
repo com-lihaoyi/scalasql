@@ -2,8 +2,7 @@ package scalasql.query
 
 import scalasql.{Queryable, Table}
 
-trait JoinOps[C[_, _], Q, R] {
-  def expr: Q
+trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
 
   /**
    * Performs a `JOIN`/`INNER JOIN` on the given [[other]], typically a [[Table]] or [[Select]].

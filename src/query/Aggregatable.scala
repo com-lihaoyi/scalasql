@@ -8,8 +8,7 @@ import scalasql.utils.OptionPickler
  * Something that supports aggregate operations. Most commonly a [[Select]], but
  * also could be a [[SelectProxy]]
  */
-trait Aggregatable[Q] {
-  def expr: Q
+trait Aggregatable[Q] extends WithExpr[Q] {
   def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V]
