@@ -910,7 +910,7 @@ object WorldSqlTests extends TestSuite {
         // an entire database table accidentally . If you really want to perform an update
         // on every single row, you can pass in `_ => true` as your filter:
         val query = City.update(_ => true).set(_.population := 0)
-        db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
+        db.toSqlQuery(query) ==> "UPDATE city SET population = ?"
 
         db.run(query)
 

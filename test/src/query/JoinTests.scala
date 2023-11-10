@@ -241,8 +241,7 @@ trait JoinTests extends ScalaSqlSuite {
           shipping_info1.shipping_date as res__3
         FROM (SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
           FROM buyer buyer0
-          GROUP BY buyer0.name
-          HAVING ?) subquery0
+          GROUP BY buyer0.name) subquery0
         CROSS JOIN shipping_info shipping_info1
       """,
       value = Seq(
@@ -261,6 +260,29 @@ trait JoinTests extends ScalaSqlSuite {
         being generated
       """,
       normalize = (x: Seq[(String, LocalDate, Int, LocalDate)]) => x.sortBy(t => (t._1, t._3))
+    )
+
+
+    test("mapForGroupBy") - checker(
+      query = Text {
+        for ((name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth)))
+          yield (name, dateOfBirth)
+      },
+      sql = """
+        SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
+        FROM buyer buyer0
+        GROUP BY buyer0.name
+      """,
+      value = Seq(
+        ("James Bond", LocalDate.parse("2001-02-03")),
+        ("Li Haoyi", LocalDate.parse("1965-08-09")),
+        ("叉烧包", LocalDate.parse("1923-11-12"))
+      ),
+      docs = """
+        Using non-trivial queries in the `for`-comprehension may result in subqueries
+        being generated
+      """,
+      normalize = (x: Seq[(String, LocalDate)]) => x.sortBy(_._1)
     )
 
     test("leftJoin") - checker(

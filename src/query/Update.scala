@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{SqlStringSyntax, optSeq}
 import scalasql.{Column, MappedType, Queryable}
-import scalasql.renderer.{Context, JoinsToSql, SqlStr}
+import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 /**
@@ -84,7 +84,7 @@ object Update {
     }
     lazy val sets = SqlStr.flatten(SqlStr.join(updateList, sql", "))
 
-    lazy val liveExprs = sets.referencedExprs.toSet ++ where.referencedExprs
+    lazy val liveExprs = sets.referencedExprs.toSet ++ SqlStr.flatten(where).referencedExprs
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
       val froms = firstJoin.from.map { jf => computed.fromSelectables(jf.from)._2 }
       sql" FROM " + SqlStr.join(froms.map(_(Some(liveExprs))), sql", ")
@@ -94,9 +94,7 @@ object Update {
       case Some(firstJoin) => firstJoin.from.flatMap(_.on)
     }
 
-    lazy val where = SqlStr.flatten(SqlStr.optSeq(fromOns ++ where0) { where =>
-      sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
-    })
+    lazy val where = ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0)
 
     lazy val joinOns = joins0
       .drop(1)

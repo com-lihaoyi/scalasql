@@ -204,15 +204,10 @@ object SimpleSelect {
 
     import computed.implicitCtx
 
-    lazy val filtersOpt =
-      SqlStr.flatten(SqlStr.optSeq(query.where.filter(!Expr.getIsLiteralTrue(_))) { where =>
-        sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
-      })
+    lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
-      val havingOpt = SqlStr.optSeq(groupBy.having) { having =>
-        sql" HAVING " + SqlStr.join(having.map(_.renderToSql._1), sql" AND ")
-      }
+      val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
       sql" GROUP BY ${groupBy.expr}${havingOpt}"
     })
 
