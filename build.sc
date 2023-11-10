@@ -13,6 +13,7 @@ object scalasql extends RootModule with ScalaModule {
     ivy"org.apache.logging.log4j:log4j-api:2.20.0",
     ivy"org.apache.logging.log4j:log4j-core:2.20.0",
     ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
+    ivy"com.lihaoyi::pprint:0.8.1",
   )
 
   object test extends ScalaTests {

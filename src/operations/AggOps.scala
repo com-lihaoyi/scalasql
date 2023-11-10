@@ -15,7 +15,7 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _]) {
   ): Expr[V] = v.queryExpr(expr => implicit ctx => sql"SUM(${f(expr)})")
 
   /** Finds the minimum value in a column */
-  def minBy[V: Numeric: MappedType](f: T => Expr[V])(
+  def minBy[V: MappedType](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = v.queryExpr(expr => implicit ctx => sql"MIN(${f(expr)})")
 

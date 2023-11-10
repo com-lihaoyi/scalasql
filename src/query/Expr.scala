@@ -24,9 +24,17 @@ trait Expr[T] extends SqlStr.Renderable {
   )
   private lazy val exprIdentity: Expr.Identity = new Expr.Identity()
   private def exprToString: String = super.toString
+
+  /**
+   * Some syntax like `for` comprehensions likes to generate spurious `Expr(true)`
+   * clauses. We need to mark them as such so we can filter them out later during
+   * code generation
+   */
+  protected def exprIsLiteralTrue: Boolean = false
 }
 
 object Expr {
+  def getIsLiteralTrue[T](e: Expr[T]): Boolean = e.exprIsLiteralTrue
   def getMappedType[T](e: Expr[T]): MappedType[T] = e.mappedType
   def getToString[T](e: Expr[T]): String = e.exprToString
 
@@ -54,17 +62,26 @@ object Expr {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
+
   implicit def from(x: Int): Expr[Int] = apply(x)
   implicit def from(x: Long): Expr[Long] = apply(x)
-  implicit def from(x: Boolean): Expr[Boolean] = apply(x)
+  implicit def from(x: Boolean): Expr[Boolean] = apply0(x, x)
   implicit def from(x: Double): Expr[Double] = apply(x)
   implicit def from(x: scala.math.BigDecimal): Expr[scala.math.BigDecimal] = apply(x)
   implicit def from(x: String): Expr[String] = apply(x)
-  implicit def apply[T](
-      x: T
-  )(implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = new Expr[T] {
+  implicit def apply[T](x: T)
+                        (implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = {
+    apply0[T](x)(conv, mappedType0)
+  }
+  def apply0[T](
+      x: T, exprIsLiteralTrue0: Boolean = false
+  )(implicit conv: T => SqlStr.Interp,
+    mappedType0: MappedType[T],
+    ): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
       new SqlStr(Seq("", ""), Seq(conv(x)), false, Nil)
+    protected override def exprIsLiteralTrue = exprIsLiteralTrue0
   }
+
 }

@@ -59,21 +59,27 @@ class SimpleSelect[Q, R](
         thing: FlatJoin.Rhs[Q2, R2],
         joinOns: Seq[Join],
         wheres: Seq[Expr[Boolean]]
-    ): Select[Q2, R2] = {
-      thing match {
-        case other: Select[Q2, R2] =>
-          val simple = simpleFrom(other)
-          simple.copy(from = this.from ++ simple.from)
+    ): Select[Q2, R2] = thing match {
+      case other: Select[Q2, R2] =>
+        val (self, simple) =
+          if (this.groupBy0.isEmpty) (this, simpleFrom(other))
+          else (this.subquery, other.subquery)
 
-        case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
-          val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
-          joinCopy0(other.f, joinOns ++ Seq(otherJoin), other.where ++ wheres)
+        simple.copy(
+          from = self.from ++ simple.from,
+          joins = self.joins ++ simple.joins,
+          where = self.where ++ simple.where
+        )
 
-        case other: FlatJoin.FlatMapResult[Q, Q2, R, R2] =>
-          val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
-          rec(other.f, joinOns ++ Seq(otherJoin), wheres ++ other.where)
-      }
+      case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
+        val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
+        joinCopy0(other.f, joinOns ++ Seq(otherJoin), other.where ++ wheres)
+
+      case other: FlatJoin.FlatMapResult[Q, Q2, R, R2] =>
+        val otherJoin = Join(None, Seq(Join.From(other.from, Some(other.on))))
+        rec(other.f, joinOns ++ Seq(otherJoin), wheres ++ other.where)
     }
+
     rec(f(expr), Nil, Nil)
   }
 
@@ -197,7 +203,7 @@ object SimpleSelect {
 
     import computed.implicitCtx
 
-    lazy val filtersOpt = SqlStr.flatten(SqlStr.optSeq(query.where) { where =>
+    lazy val filtersOpt = SqlStr.flatten(SqlStr.optSeq(query.where.filter(!Expr.getIsLiteralTrue(_))) { where =>
       sql" WHERE " + SqlStr.join(where.map(_.renderToSql._1), sql" AND ")
     })
 
