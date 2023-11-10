@@ -569,7 +569,8 @@ object WorldSqlTests extends TestSuite {
 
       db.toSqlQuery(query) ==> """
         SELECT city0.name as res
-        FROM city city0, country country1
+        FROM city city0
+        CROSS JOIN country country1
         WHERE city0.countrycode = country1.code AND country1.name = ?
         """.trim.replaceAll("\\s+", " ")
 

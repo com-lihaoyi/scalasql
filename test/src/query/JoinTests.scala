@@ -146,7 +146,8 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT shipping_info1.shipping_date as res
-        FROM buyer buyer0, shipping_info shipping_info1
+        FROM buyer buyer0
+        CROSS JOIN shipping_info shipping_info1
         WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
       """,
       value = Seq(LocalDate.parse("2012-04-05")),
@@ -167,7 +168,8 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT shipping_info1.shipping_date as res
-        FROM buyer buyer0, shipping_info shipping_info1
+        FROM buyer buyer0
+        CROSS JOIN shipping_info shipping_info1
         WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
       """,
       value = Seq(LocalDate.parse("2012-04-05")),
@@ -185,7 +187,8 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT shipping_info1.shipping_date as res
-        FROM buyer buyer0, shipping_info shipping_info1
+        FROM buyer buyer0
+        CROSS JOIN shipping_info shipping_info1
         WHERE buyer0.name = ? AND buyer0.id = shipping_info1.buyer_id
       """,
       value = Seq(LocalDate.parse("2012-04-05")),
@@ -201,10 +204,11 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT buyer0.name as res__0, product3.name as res__1
-        FROM buyer buyer0, purchase purchase1
-        JOIN shipping_info shipping_info2 ON buyer0.id = shipping_info2.buyer_id
-        JOIN product product3 ON purchase1.product_id = product3.id
-        WHERE shipping_info2.id = purchase1.shipping_info_id
+        FROM buyer buyer0
+        JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        CROSS JOIN purchase purchase2
+        JOIN product product3 ON purchase2.product_id = product3.id
+        WHERE shipping_info1.id = purchase2.shipping_info_id
       """,
       value = Seq(
         ("James Bond", "Camera"),
@@ -226,32 +230,37 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           (name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth))
-          (shippingInfoId, shippingDate) <- ShippingInfo.select.groupBy(_.id)(_.minBy(_.shippingDate))
-        } yield (name, dateOfBirth, shippingInfoId, shippingDate)
+          shippingInfo <- ShippingInfo.select
+        } yield (name, dateOfBirth, shippingInfo.id, shippingInfo.shippingDate)
       },
       sql = """
         SELECT
           subquery0.res__0 as res__0,
           subquery0.res__1 as res__1,
           shipping_info1.id as res__2,
-          MIN(shipping_info1.shipping_date) as res__3
+          shipping_info1.shipping_date as res__3
         FROM (SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
           FROM buyer buyer0
           GROUP BY buyer0.name
-          HAVING ?) subquery0,
-          shipping_info shipping_info1
-        GROUP BY shipping_info1.id
-        HAVING ?
+          HAVING ?) subquery0
+        CROSS JOIN shipping_info shipping_info1
       """,
       value = Seq(
         ("James Bond", LocalDate.parse("2001-02-03"), 1, LocalDate.parse("2010-02-03")),
         ("James Bond", LocalDate.parse("2001-02-03"), 2, LocalDate.parse("2012-04-05")),
-        ("James Bond", LocalDate.parse("2001-02-03"), 3, LocalDate.parse("2012-05-06"))
+        ("James Bond", LocalDate.parse("2001-02-03"), 3, LocalDate.parse("2012-05-06")),
+        ("Li Haoyi", LocalDate.parse("1965-08-09"), 1, LocalDate.parse("2010-02-03")),
+        ("Li Haoyi", LocalDate.parse("1965-08-09"), 2, LocalDate.parse("2012-04-05")),
+        ("Li Haoyi", LocalDate.parse("1965-08-09"), 3, LocalDate.parse("2012-05-06")),
+        ("叉烧包", LocalDate.parse("1923-11-12"), 1, LocalDate.parse("2010-02-03")),
+        ("叉烧包", LocalDate.parse("1923-11-12"), 2, LocalDate.parse("2012-04-05")),
+        ("叉烧包", LocalDate.parse("1923-11-12"), 3, LocalDate.parse("2012-05-06")),
       ),
       docs = """
         Using non-trivial queries in the `for`-comprehension may result in subqueries
         being generated
-      """
+      """,
+      normalize = (x: Seq[(String, LocalDate, Int, LocalDate)]) => x.sortBy(t => (t._1, t._3))
     )
 
     test("leftJoin") - checker(

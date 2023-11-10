@@ -61,14 +61,15 @@ class SimpleSelect[Q, R](
         wheres: Seq[Expr[Boolean]]
     ): Select[Q2, R2] = thing match {
       case other: Select[Q2, R2] =>
-        val (self, simple) =
-          if (this.groupBy0.isEmpty) (this, simpleFrom(other))
-          else (this.subquery, other.subquery)
+        val inner = simpleFrom(other)
+        assert(inner.groupBy0.isEmpty)
+        val self = if (this.groupBy0.isEmpty) this else this.subquery
 
-        simple.copy(
-          from = self.from ++ simple.from,
-          joins = self.joins ++ simple.joins,
-          where = self.where ++ simple.where
+        val innerFromJoin = Join(Some("CROSS"), inner.from.map(f => Join.From(f, None)))
+        inner.copy(
+          from = self.from,
+          joins = self.joins ++ Seq(innerFromJoin) ++ inner.joins,
+          where = self.where ++ inner.where
         )
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>

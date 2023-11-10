@@ -141,7 +141,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
-          LIMIT 3) subquery0, product product1
+          LIMIT 3) subquery0
+        CROSS JOIN product product1
         WHERE product1.id = subquery0.res__product_id
       """,
       value = Seq("Camera", "Face Mask", "Guitar"),
