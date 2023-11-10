@@ -25,7 +25,7 @@ object SqliteDialect extends SqliteDialect {
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
 
-    override def joinableSelect: Select[V[Expr], V[Id]] = {
+    protected override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = t.tableRef
       new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
         t.containerQr
@@ -76,7 +76,7 @@ object SqliteDialect extends SqliteDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    override def getRenderer(prevContext: Context) = {
+    protected override def getRenderer(prevContext: Context) = {
       new CompoundSelectRenderer(this, prevContext)
     }
   }

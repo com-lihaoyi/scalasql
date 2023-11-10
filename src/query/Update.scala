@@ -43,7 +43,7 @@ object Update {
       val where: Seq[Expr[_]]
   )(implicit val qr: Queryable.Row[Q, R])
       extends Update[Q, R] {
-    def copy[Q, R](
+    protected def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
         set0: Seq[Column.Assignment[_]] = this.set0,

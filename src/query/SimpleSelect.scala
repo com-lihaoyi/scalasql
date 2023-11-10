@@ -20,9 +20,9 @@ class SimpleSelect[Q, R](
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R])
     extends Select[Q, R] {
-  override def joinableSelect = this
+  protected override def joinableSelect = this
 
-  def copy[Q, R](
+  protected def copy[Q, R](
       expr: Q = this.expr,
       exprPrefix: Option[String] = this.exprPrefix,
       from: Seq[From] = this.from,
@@ -193,11 +193,11 @@ class SimpleSelect[Q, R](
 
   protected def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
-  def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
+  protected def getRenderer(prevContext: Context) = new SimpleSelect.Renderer(this, prevContext)
 }
 
 object SimpleSelect {
-
+  def getRenderer(s: SimpleSelect[_, _], prevContext: Context) = s.getRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     val computed = Context.compute(

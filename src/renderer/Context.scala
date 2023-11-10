@@ -1,7 +1,7 @@
 package scalasql.renderer
 
 import scalasql.Config
-import scalasql.query.{Expr, From, SubqueryRef, TableRef}
+import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 /**
@@ -63,7 +63,7 @@ object Context {
 
     def computeSelectable0(t: From) = t match {
       case t: TableRef => Map.empty[Expr.Identity, SqlStr]
-      case t: SubqueryRef[_, _] => t.value.getRenderer(prevContext).lhsMap
+      case t: SubqueryRef[_, _] => Select.getRenderer(t.value, prevContext).lhsMap
     }
 
     def computeSelectable(t: From) = t match {
@@ -76,7 +76,7 @@ object Context {
         )
 
       case t: SubqueryRef[_, _] =>
-        val toSqlQuery = t.value.getRenderer(prevContext)
+        val toSqlQuery = Select.getRenderer(t.value, prevContext)
         (
           toSqlQuery.lhsMap,
           (liveExprs: Option[Set[Expr.Identity]]) =>

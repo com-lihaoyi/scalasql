@@ -27,7 +27,7 @@ class CompoundSelect[Q, R](
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
   def expr = Joinable.getSelect(lhs).expr
 
-  override def joinableSelect = this
+  protected override def joinableSelect = this
 
   def distinct: Select[Q, R] = simpleFrom(this).distinct
 
@@ -120,7 +120,7 @@ class CompoundSelect[Q, R](
 
   protected def queryValueReader = OptionPickler.SeqLikeReader(qr.valueReader(expr), implicitly)
 
-  def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
+  protected def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
 }
 
 object CompoundSelect {
@@ -128,7 +128,7 @@ object CompoundSelect {
 
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.Renderer {
 
-    lazy val lhsToSqlQuery = query.lhs.getRenderer(prevContext)
+    lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
     lazy val newCtx = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsMap)
@@ -153,7 +153,7 @@ object CompoundSelect {
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
-          val rhsToSqlQuery = op.rhs.getRenderer(prevContext)
+          val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
 
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those

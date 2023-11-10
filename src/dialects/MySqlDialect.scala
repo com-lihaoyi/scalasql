@@ -55,7 +55,7 @@ object MySqlDialect extends MySqlDialect {
       )
     }
 
-    override def joinableSelect: Select[V[Expr], V[Id]] = {
+    protected override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = t.tableRef
       new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
         t.containerQr
@@ -72,7 +72,7 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
-    override def copy[Q, R](
+    protected override def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
         set0: Seq[Column.Assignment[_]] = this.set0,
@@ -205,7 +205,8 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    override def getRenderer(prevContext: Context) = new CompoundSelectRenderer(this, prevContext)
+    protected override def getRenderer(prevContext: Context) =
+      new CompoundSelectRenderer(this, prevContext)
   }
 
   class CompoundSelectRenderer[Q, R](

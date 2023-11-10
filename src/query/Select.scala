@@ -33,7 +33,7 @@ trait Select[Q, R]
     with Query.Multiple[R]
     with FlatJoin.Rhs[Q, R] {
 
-  def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
+  protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
@@ -171,10 +171,10 @@ trait Select[Q, R]
 
     (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)
   }
-  def queryWalkExprs() = qr.walk(expr)
-  override def queryIsSingleRow = false
+  protected def queryWalkExprs() = qr.walk(expr)
+  protected override def queryIsSingleRow = false
 
-  def getRenderer(prevContext: Context): Select.Renderer
+  protected def getRenderer(prevContext: Context): Select.Renderer
 
   /**
    * Asserts that this query returns exactly one row, and returns a single
@@ -239,6 +239,7 @@ trait Select[Q, R]
 }
 
 object Select {
+  def getRenderer(s: Select[_, _], prevContext: Context) = s.getRenderer(prevContext)
   trait Renderer {
     def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
