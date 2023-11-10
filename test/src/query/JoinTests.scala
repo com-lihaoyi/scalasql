@@ -191,7 +191,7 @@ trait JoinTests extends ScalaSqlSuite {
         CROSS JOIN shipping_info shipping_info1
         WHERE buyer0.name = ? AND buyer0.id = shipping_info1.buyer_id
       """,
-      value = Seq(LocalDate.parse("2012-04-05")),
+      value = Seq(LocalDate.parse("2012-04-05"))
     )
 
     test("flatMapForJoin") - checker(
@@ -254,7 +254,7 @@ trait JoinTests extends ScalaSqlSuite {
         ("Li Haoyi", LocalDate.parse("1965-08-09"), 3, LocalDate.parse("2012-05-06")),
         ("叉烧包", LocalDate.parse("1923-11-12"), 1, LocalDate.parse("2010-02-03")),
         ("叉烧包", LocalDate.parse("1923-11-12"), 2, LocalDate.parse("2012-04-05")),
-        ("叉烧包", LocalDate.parse("1923-11-12"), 3, LocalDate.parse("2012-05-06")),
+        ("叉烧包", LocalDate.parse("1923-11-12"), 3, LocalDate.parse("2012-05-06"))
       ),
       docs = """
         Using non-trivial queries in the `for`-comprehension may result in subqueries
