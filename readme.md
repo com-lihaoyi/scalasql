@@ -73,3 +73,4 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Docs/Tests for extending ScalaSql with custom expressions and custom queries  
 * `string_agg`, `array_agg`, other agg functions
 * Turn on Acyclic enforcement
+* Support Postgres/MySQL lateral joins
