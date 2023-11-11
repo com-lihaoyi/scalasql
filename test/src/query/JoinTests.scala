@@ -140,7 +140,7 @@ trait JoinTests extends ScalaSqlSuite {
     test("flatMap") - checker(
       query = Text {
         Buyer.select
-          .flatMap(b => ShippingInfo.select.map((b, _)))
+          .flatMap(b => ShippingInfo.crossJoin().map((b, _)))
           .filter { case (b, s) => b.id `=` s.buyerId && b.name `=` "James Bond" }
           .map(_._2.shippingDate)
       },
@@ -162,7 +162,7 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select
+          s <- ShippingInfo.crossJoin()
           if b.id `=` s.buyerId && b.name `=` "James Bond"
         } yield s.shippingDate
       },
@@ -182,7 +182,7 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select.filter(_.name `=` "James Bond")
-          s <- ShippingInfo.select.filter(b.id `=` _.buyerId)
+          s <- ShippingInfo.crossJoin().filter(b.id `=` _.buyerId)
         } yield s.shippingDate
       },
       sql = """
@@ -198,7 +198,7 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           (b, si) <- Buyer.select.join(ShippingInfo)(_.id `=` _.buyerId)
-          (pu, pr) <- Purchase.select.join(Product)(_.productId `=` _.id)
+          (pu, pr) <- Purchase.select.join(Product)(_.productId `=` _.id).crossJoin()
           if si.id `=` pu.shippingInfoId
         } yield (b.name, pr.name)
       },
@@ -230,7 +230,7 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           (name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth))
-          shippingInfo <- ShippingInfo.select
+          shippingInfo <- ShippingInfo.crossJoin()
         } yield (name, dateOfBirth, shippingInfo.id, shippingInfo.shippingDate)
       },
       sql = """
@@ -265,7 +265,7 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           (name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth))
-          (shippingInfoId, shippingDate) <- ShippingInfo.select.groupBy(_.id)(_.minBy(_.shippingDate))
+          (shippingInfoId, shippingDate) <- ShippingInfo.select.groupBy(_.id)(_.minBy(_.shippingDate)).crossJoin()
         } yield (name, dateOfBirth, shippingInfoId, shippingDate)
       },
       sql = """
@@ -301,6 +301,38 @@ trait JoinTests extends ScalaSqlSuite {
         being generated
       """,
       normalize = (x: Seq[(String, LocalDate, Int, LocalDate)]) => x.sortBy(t => (t._1, t._3))
+    )
+    test("flatMapForCompound") - checker(
+      query = Text {
+        for {
+          b <- Buyer.select.sortBy(_.id).asc.take(1)
+          si <- ShippingInfo.select.sortBy(_.id).asc.take(1).crossJoin()
+        } yield (b.name, si.shippingDate)
+      },
+      sql = """
+        SELECT
+          subquery0.res__name as res__0,
+          subquery1.res__shipping_date as res__1
+        FROM
+          (SELECT buyer0.id as res__id, buyer0.name as res__name
+          FROM buyer buyer0
+          ORDER BY res__id ASC
+          LIMIT 1) subquery0
+        CROSS JOIN (SELECT
+            shipping_info0.id as res__id,
+            shipping_info0.shipping_date as res__shipping_date
+          FROM shipping_info shipping_info0
+          ORDER BY res__id ASC
+          LIMIT 1) subquery1
+      """,
+      value = Seq(
+        ("James Bond", LocalDate.parse("2010-02-03"))
+      ),
+      docs = """
+        Using non-trivial queries in the `for`-comprehension may result in subqueries
+        being generated
+      """,
+//      normalize = (x: Seq[(String, , LocalDate)]) => x.sortBy(t => (t._1, t._2))
     )
 
     test("mapForGroupBy") - checker(

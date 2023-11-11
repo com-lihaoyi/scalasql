@@ -563,7 +563,7 @@ object WorldSqlTests extends TestSuite {
       // ScalaSql also supports performing `JOIN`s via Scala's for-comprehension syntax:
       val query = for {
         city <- City.select
-        country <- Country.select if city.countryCode === country.code
+        country <- Country.crossJoin() if city.countryCode === country.code
         if country.name === "Liechtenstein"
       } yield city.name
 

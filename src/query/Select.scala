@@ -30,8 +30,7 @@ trait Select[Q, R]
     with From
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query.Multiple[R]
-    with FlatJoin.Rhs[Q, R] {
+    with Query.Multiple[R] {
 
   protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](

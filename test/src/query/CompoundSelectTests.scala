@@ -133,7 +133,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     test("flatMap") - checker(
       query = Text {
         Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
-          Product.select.filter(_.id === p.productId).map(_.name)
+          Product.crossJoin().filter(_.id === p.productId).map(_.name)
         }
       },
       sql = """
