@@ -5,7 +5,7 @@ import scalasql.Queryable
 object FlatJoin {
   trait Rhs[Q2, R2]
   class MapResult[Q, Q2, R, R2](
-                               val prefix: Option[String],
+      val prefix: Option[String],
       val from: From,
       val on: Option[Expr[Boolean]],
       val qr: Queryable.Row[Q2, R2],
@@ -14,7 +14,7 @@ object FlatJoin {
   ) extends Rhs[Q2, R2]
 
   class FlatMapResult[Q, Q2, R, R2](
-                                     val prefix: Option[String],
+      val prefix: Option[String],
       val from: From,
       val on: Option[Expr[Boolean]],
       val qr: Queryable.Row[Q2, R2],
@@ -23,7 +23,7 @@ object FlatJoin {
   ) extends Rhs[Q2, R2]
 
   class Mapper[Q, Q2, R, R2](
-                            prefix: Option[String],
+      prefix: Option[String],
       from: From,
       expr: Q,
       on: Option[Expr[Boolean]],

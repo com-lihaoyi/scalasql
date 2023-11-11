@@ -203,12 +203,15 @@ trait JoinTests extends ScalaSqlSuite {
         } yield (b.name, pr.name)
       },
       sql = """
-        SELECT buyer0.name as res__0, product3.name as res__1
+        SELECT buyer0.name as res__0, subquery2.res__1__name as res__1
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
-        CROSS JOIN purchase purchase2
-        JOIN product product3 ON purchase2.product_id = product3.id
-        WHERE shipping_info1.id = purchase2.shipping_info_id
+        CROSS JOIN (SELECT
+            purchase0.shipping_info_id as res__0__shipping_info_id,
+            product1.name as res__1__name
+          FROM purchase purchase0
+          JOIN product product1 ON purchase0.product_id = product1.id) subquery2
+        WHERE shipping_info1.id = subquery2.res__0__shipping_info_id
       """,
       value = Seq(
         ("James Bond", "Camera"),
@@ -265,7 +268,9 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           (name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth))
-          (shippingInfoId, shippingDate) <- ShippingInfo.select.groupBy(_.id)(_.minBy(_.shippingDate)).crossJoin()
+          (shippingInfoId, shippingDate) <- ShippingInfo.select
+            .groupBy(_.id)(_.minBy(_.shippingDate))
+            .crossJoin()
         } yield (name, dateOfBirth, shippingInfoId, shippingDate)
       },
       sql = """
@@ -294,7 +299,7 @@ trait JoinTests extends ScalaSqlSuite {
         ("Li Haoyi", LocalDate.parse("1965-08-09"), 3, LocalDate.parse("2012-05-06")),
         ("叉烧包", LocalDate.parse("1923-11-12"), 1, LocalDate.parse("2010-02-03")),
         ("叉烧包", LocalDate.parse("1923-11-12"), 2, LocalDate.parse("2012-04-05")),
-        ("叉烧包", LocalDate.parse("1923-11-12"), 3, LocalDate.parse("2012-05-06")),
+        ("叉烧包", LocalDate.parse("1923-11-12"), 3, LocalDate.parse("2012-05-06"))
       ),
       docs = """
         Using non-trivial queries in the `for`-comprehension may result in subqueries
@@ -331,7 +336,7 @@ trait JoinTests extends ScalaSqlSuite {
       docs = """
         Using non-trivial queries in the `for`-comprehension may result in subqueries
         being generated
-      """,
+      """
 //      normalize = (x: Seq[(String, , LocalDate)]) => x.sortBy(t => (t._1, t._2))
     )
 
@@ -692,7 +697,8 @@ trait JoinTests extends ScalaSqlSuite {
           Flat joins can also support `.leftJoin`s, where the table being joined
           is given to you as a `Nullable[T]`
         """,
-        normalize = (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => (t._1, t._2.map(_.toEpochDay)))
+        normalize =
+          (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => (t._1, t._2.map(_.toEpochDay)))
       )
     }
   }
