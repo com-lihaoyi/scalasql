@@ -60,24 +60,6 @@ class SimpleSelect[Q, R](
         joinOns: Seq[Join],
         wheres: Seq[Expr[Boolean]]
     ): Select[Q2, R2] = thing match {
-      case other: Select[Q2, R2] =>
-        val inner = simpleFrom(other)
-
-        val self = if (this.groupBy0.isEmpty) this else this.subquery
-        val inner2 = inner.groupBy0 match{
-          case None => inner
-          case Some(g) => g.select().subquery
-        }
-
-        val innerFromJoin = Join(Some("CROSS"), inner2.from.map(f => Join.From(f, None)))
-        newSimpleSelect(
-          expr = inner.expr,
-          exprPrefix = None,
-          from = self.from,
-          joins = self.joins ++ Seq(innerFromJoin) ++ inner2.joins,
-          where = self.where ++ inner2.where,
-          groupBy0 = None
-        )
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
         val otherJoin = Join(other.prefix, Seq(Join.From(other.from, other.on)))
