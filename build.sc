@@ -1,20 +1,23 @@
 import $file.generateDocs
-import mill._
-import scalalib._
+import mill._, scalalib._
 
-import scala.collection.mutable
+val scalaVersions = Seq("2.13.8", "3.3.1")
 
-object scalasql extends RootModule with ScalaModule {
-  def scalaVersion = "2.13.11"
+object scalasql extends Cross[ScalaSql](scalaVersions)
+trait ScalaSql extends CrossScalaModule{
+  def scalaVersion = crossScalaVersion
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode:0.3.1",
     ivy"com.lihaoyi::upickle-implicits:3.1.3",
-    ivy"org.scala-lang:scala-reflect:$scalaVersion",
+
     ivy"org.apache.logging.log4j:log4j-api:2.20.0",
     ivy"org.apache.logging.log4j:log4j-core:2.20.0",
     ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
     ivy"com.lihaoyi::pprint:0.8.1",
+  ) ++ Option.when(scalaVersion().startsWith("2."))(
+    ivy"org.scala-lang:scala-reflect:$scalaVersion"
   )
+
 
   object test extends ScalaTests {
     def ivyDeps = Agg(
