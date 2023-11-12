@@ -46,7 +46,7 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
     * [H2](scalasql/test/src/example/H2Example.scala)
     * [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
-    * [HikariCP](scalasql/test/src/example/HikariExample.scala) (and other connection pools)
+    * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 * [ScalaSql Tutorial](tutorial.md): walks you through getting started with ScalaSql,
   connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
