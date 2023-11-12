@@ -47,7 +47,7 @@ def generateTutorial() = T.command {
     os.pwd / "tutorial.md"
   )
   generateDocs.generateTutorial(
-    os.pwd / "scalasql" / "test" / "src" / "utils" / "ScalaSqlSuite.scala",
+    os.pwd / "scalasql" / "test" / "src" / "utils" / "TestClients.scala",
     os.pwd / "databases.md"
   )
 }
