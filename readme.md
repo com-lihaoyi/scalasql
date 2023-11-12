@@ -38,8 +38,8 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ## Documentation
 
-* ScalaSql Quickstart Examples: self-contained examples of how to set up and use 
-  ScalaSql with a variety of supported databases, performing simple DDL and 
+* ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with
+  a variety of supported databases and perform simple DDL and 
   `SELECT`/`INSERT`/`UPDATE`/`DELETE` operations:
     * [Postgres](scalasql/test/src/example/PostgresExample.scala)
     * [MySql](scalasql/test/src/example/MySqlExample.scala)
