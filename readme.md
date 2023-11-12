@@ -48,7 +48,7 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     * [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
     * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
-* [ScalaSql Tutorial](tutorial.md): walks you through getting started with ScalaSql,
+* [ScalaSql Tutorial](tutorial.md): a structured walkthrough of how to use ScalaSql,
   connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
   against it to perform useful work. Ideal for newcomers to work through from top
   to bottom when getting started with the library.
