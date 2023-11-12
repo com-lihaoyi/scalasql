@@ -13,16 +13,11 @@ object TableMacros{
 
     val queryParams = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
-      if (c.prefix.actualType.member(name) != NoSymbol) {
-        q"${c.prefix}.${TermName(name.toString)}.expr($tableRef)"
-      } else {
-        q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
-      }
+      q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
     }
 
     val flattenExprs = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
-
       q"_root_.scalasql.Table.Internal.flattenPrefixed(table.${TermName(name.toString)}, ${name.toString})"
     }
 
