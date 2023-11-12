@@ -1,6 +1,6 @@
 package scalasql.utils
 
-import scalasql.MappedType
+import scalasql.TypeMapper
 import upickle.core.{ArrVisitor, ObjVisitor, Visitor}
 import upickle.core.compat.Factory
 
@@ -10,7 +10,7 @@ object OptionPickler
     with upickle.implicits.Generated
     with upickle.implicits.MacroImplicits {
 
-  implicit def reader[T: MappedType]: SimpleReader[T] = new SimpleReader[T] {
+  implicit def reader[T: TypeMapper]: SimpleReader[T] = new SimpleReader[T] {
     override def expectedMsg: String = ???
   }
   override def taggedExpectedMsg: String = ???

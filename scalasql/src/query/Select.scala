@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
@@ -165,7 +165,7 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+  protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
     val renderer = getRenderer(ctx)
 
     (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)
@@ -198,7 +198,7 @@ trait Select[Q, R]
    * with some like Sqlite simply taking the first row while others like Postgres/MySql
    * throwing exceptions
    */
-  def toExpr(implicit mt: MappedType[R]): Expr[R] = Expr { implicit ctx => this.renderToSql._1 }
+  def toExpr(implicit mt: TypeMapper[R]): Expr[R] = Expr { implicit ctx => this.renderToSql._1 }
 
   protected def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s
@@ -242,6 +242,6 @@ object Select {
   trait Renderer {
     def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
-    def mappedTypes: Seq[MappedType[_]]
+    def mappedTypes: Seq[TypeMapper[_]]
   }
 }

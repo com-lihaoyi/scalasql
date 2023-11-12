@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -15,7 +15,7 @@ trait JoinNullable[Q] {
 
 }
 object JoinNullable {
-  implicit def toExpr[T](n: JoinNullable[Expr[T]])(implicit mt: MappedType[T]): Expr[Option[T]] =
+  implicit def toExpr[T](n: JoinNullable[Expr[T]])(implicit mt: TypeMapper[T]): Expr[Option[T]] =
     Expr { implicit ctx => sql"${n.get}" }
 
   def apply[Q](t: Q): JoinNullable[Q] = new JoinNullable[Q] {

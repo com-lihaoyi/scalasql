@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{Config, MappedType, Queryable}
+import scalasql.{Config, TypeMapper, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -9,8 +9,8 @@ import scalasql.utils.OptionPickler
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  protected def mappedType: MappedType[T]
-  protected final def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+  protected def mappedType: TypeMapper[T]
+  protected final def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
     (ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0), Seq(mappedType))
   }
 
@@ -35,7 +35,7 @@ trait Expr[T] extends SqlStr.Renderable {
 
 object Expr {
   def getIsLiteralTrue[T](e: Expr[T]): Boolean = e.exprIsLiteralTrue
-  def getMappedType[T](e: Expr[T]): MappedType[T] = e.mappedType
+  def getMappedType[T](e: Expr[T]): TypeMapper[T] = e.mappedType
   def getToString[T](e: Expr[T]): String = e.exprToString
 
   def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
@@ -54,11 +54,11 @@ object Expr {
     def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
   }
 
-  def apply[T](f: Context => SqlStr)(implicit mappedType: MappedType[T]): Expr[T] = new Simple[T](f)
+  def apply[T](f: Context => SqlStr)(implicit mappedType: TypeMapper[T]): Expr[T] = new Simple[T](f)
   implicit def optionalize[T](e: Expr[T]): Expr[Option[T]] = {
-    new Simple[Option[T]](e.toSqlExpr0(_))(MappedType.OptionType(getMappedType(e)))
+    new Simple[Option[T]](e.toSqlExpr0(_))(TypeMapper.OptionType(getMappedType(e)))
   }
-  class Simple[T](f: Context => SqlStr)(implicit val mappedType: MappedType[T]) extends Expr[T] {
+  class Simple[T](f: Context => SqlStr)(implicit val mappedType: TypeMapper[T]) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
@@ -70,13 +70,13 @@ object Expr {
   implicit def from(x: String): Expr[String] = apply(x)
   implicit def apply[T](
       x: T
-  )(implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = {
+  )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = {
     apply0[T](x)(conv, mappedType0)
   }
   def apply0[T](
       x: T,
       exprIsLiteralTrue0: Boolean = false
-  )(implicit conv: T => SqlStr.Interp, mappedType0: MappedType[T]): Expr[T] = new Expr[T] {
+  )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
       new SqlStr(Seq("", ""), Seq(conv(x)), false, Nil)

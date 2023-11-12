@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Column, MappedType}
+import scalasql.{Column, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -24,7 +24,7 @@ object OnConflict {
     protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
-    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val (str, mapped) = Renderable.renderToSql(query)
       (
         str +
@@ -49,10 +49,10 @@ object OnConflict {
     protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
-    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(
       ctx
     )
-    def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    def toSqlQuery0(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
       val (str, mapped) = Renderable.renderToSql(query)

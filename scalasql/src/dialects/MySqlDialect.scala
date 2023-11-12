@@ -43,10 +43,10 @@ trait MySqlDialect extends Dialect {
 
 object MySqlDialect extends MySqlDialect {
   class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
-    override def cast[V: MappedType]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[MappedType[V]] match{
-        case MappedType.ByteType | MappedType.ShortType | MappedType.IntType | MappedType.LongType => "SIGNED"
-        case MappedType.StringType => "BINARY"
+    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
+      val s = implicitly[TypeMapper[V]] match{
+        case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType | TypeMapper.LongType => "SIGNED"
+        case TypeMapper.StringType => "BINARY"
         case s => s.typeString
       }
 
@@ -95,14 +95,14 @@ object MySqlDialect extends MySqlDialect {
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
 
-    override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    override def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       toSqlQuery0(this, ctx)
     }
 
     def toSqlQuery0[Q, R](
         q: Update.Impl[Q, R],
         prevContext: Context
-    ): (SqlStr, Seq[MappedType[_]]) = {
+    ): (SqlStr, Seq[TypeMapper[_]]) = {
       new UpdateRenderer(q.joins, q.table, q.set0, q.where, prevContext).render()
     }
 
@@ -150,10 +150,10 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryValueReader = Query.getValueReader(insert.query)
 
-    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) = toSqlQuery0(
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(
       ctx
     )
-    def toSqlQuery0(ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    def toSqlQuery0(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
       val (str, mapped) = Renderable.renderToSql(insert.query)

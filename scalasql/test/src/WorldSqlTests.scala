@@ -378,7 +378,7 @@ object WorldSqlTests extends TestSuite {
         // |        `java.time.Instant` |               `TIMESTAMP` |
         // | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
         //
-        // but you can define `MappedType`s
+        // but you can define `TypeMapper`s
         // for your own types if you want to be able to use them to represent types in the database
         // -DOCS
       }
@@ -567,7 +567,7 @@ object WorldSqlTests extends TestSuite {
 
       db.run(query) ==> 80
 
-      // You can `.cast` to any type with a `MappedType[T]` defined, which is the
+      // You can `.cast` to any type with a `TypeMapper[T]` defined, which is the
       // same set of types you can lift into queries.
       //
       //

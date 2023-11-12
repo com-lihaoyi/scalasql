@@ -18,7 +18,7 @@ trait Queryable[-Q, R] {
   def valueReader(q: Q): Reader[R]
   def singleRow(q: Q): Boolean
 
-  def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]])
+  def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]])
 }
 
 object Queryable {
@@ -36,7 +36,7 @@ object Queryable {
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
-    def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = {
+    def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val walked = this.walk(q)
       val res = ExprsToSql(walked, sql"", ctx)
       (

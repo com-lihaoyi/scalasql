@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{Column, MappedType, Queryable}
+import scalasql.{Column, TypeMapper, Queryable}
 
 /**
  * A SQL `INSERT VALUES` query
@@ -24,7 +24,7 @@ object InsertValues {
 
     protected override def renderToSql(implicit ctx: Context) = (
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),
-      Seq(MappedType.IntType)
+      Seq(TypeMapper.IntType)
     )
     def queryWalkExprs() = Nil
     protected override def queryIsSingleRow = true

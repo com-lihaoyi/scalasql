@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -8,7 +8,7 @@ import scalasql.renderer.{Context, SqlStr}
  * the caller to perform multiple aggregations within a single query.
  */
 class SelectProxy[Q](val expr: Q) extends Aggregatable[Q] {
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
+  def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = { Expr[V] { implicit c => f(expr)(c) } }
 }

@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.Renderable
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -27,7 +27,7 @@ object Query {
     override def singleRow(q: Q) = q.queryIsSingleRow
 
     override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader
-    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
       Renderable.renderToSql(q)(ctx)
   }
 

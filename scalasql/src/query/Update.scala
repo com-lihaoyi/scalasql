@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.{Column, MappedType, Queryable}
+import scalasql.{Column, TypeMapper, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -66,7 +66,7 @@ object Update {
       this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
     }
 
-    protected override def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+    protected override def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
       new Renderer(joins, table, set0, where, ctx).render()
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
@@ -113,7 +113,7 @@ object Update {
     )
 
     def render() =
-      (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(MappedType.IntType))
+      (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(TypeMapper.IntType))
 
   }
 }

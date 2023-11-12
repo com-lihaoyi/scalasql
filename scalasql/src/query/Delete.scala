@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 /**
@@ -16,7 +16,7 @@ object Delete {
     def queryIsSingleRow = true
 
     protected def renderToSql(implicit ctx: Context) =
-      (new Renderer(table, filter, ctx).render(), Seq(MappedType.IntType))
+      (new Renderer(table, filter, ctx).render(), Seq(TypeMapper.IntType))
 
     protected def queryValueReader = implicitly
   }

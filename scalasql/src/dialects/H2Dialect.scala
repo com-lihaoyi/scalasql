@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.{Column, Id, MappedType, Queryable, Table, dialects, operations}
+import scalasql.{Column, Id, TypeMapper, Queryable, Table, dialects, operations}
 import scalasql.query.{
   CompoundSelect,
   Expr,
@@ -25,7 +25,7 @@ trait H2Dialect extends Dialect {
 
   override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps =
     new H2Dialect.ExprStringOps(v)
-  override implicit def ExprNumericOpsConv[T: Numeric: MappedType](
+  override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
       v: Expr[T]
   ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
 
@@ -43,7 +43,7 @@ object H2Dialect extends H2Dialect {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class ExprNumericOps[T: Numeric: MappedType](val v: Expr[T])
+  class ExprNumericOps[T: Numeric: TypeMapper](val v: Expr[T])
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
 

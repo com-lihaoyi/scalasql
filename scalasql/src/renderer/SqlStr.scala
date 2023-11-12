@@ -1,6 +1,6 @@
 package scalasql.renderer
 
-import scalasql.MappedType
+import scalasql.TypeMapper
 import scalasql.query.Expr
 
 /**
@@ -105,7 +105,7 @@ object SqlStr {
     new SqlStr(Seq(s), Nil, false, referencedExprs)
 
   trait Renderable {
-    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[MappedType[_]])
+    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]])
   }
 
   object Renderable {
@@ -131,12 +131,12 @@ object SqlStr {
     implicit def doubleInterp(value: Double): Interp = typeInterp(value)
     implicit def longInterp(value: Long): Interp = typeInterp(value)
 
-    implicit def optionInterp[T: MappedType](value: Option[T]): Interp =
-      typeInterp(value)(MappedType.OptionType)
+    implicit def optionInterp[T: TypeMapper](value: Option[T]): Interp =
+      typeInterp(value)(TypeMapper.OptionType)
 
-    implicit def typeInterp[T: MappedType](value: T): Interp = TypeInterp(value)
-    case class TypeInterp[T: MappedType](value: T) extends Interp {
-      def mappedType: MappedType[T] = implicitly[MappedType[T]]
+    implicit def typeInterp[T: TypeMapper](value: T): Interp = TypeInterp(value)
+    case class TypeInterp[T: TypeMapper](value: T) extends Interp {
+      def mappedType: TypeMapper[T] = implicitly[TypeMapper[T]]
     }
   }
 }

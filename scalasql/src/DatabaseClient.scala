@@ -10,10 +10,10 @@ trait DatabaseClient {
   /**
    * Opens a database transaction within the given [[block]], automatically committing it
    * if the block returns successfully and rolling it back if the blow fails with an uncaught
-   * exception. Within the block, you provides a [[DbTxn]] you can use to run queries, create
+   * exception. Within the block, you provides a [[DbApi.Txn]] you can use to run queries, create
    * savepoints, or roll back the transaction.
    */
-  def transaction[T](block: DbTxn => T): T
+  def transaction[T](block: DbApi.Txn => T): T
 
   /**
    * Provides a [[DbApi]] that you can use to run queries in "auto-commit" mode, such
@@ -35,7 +35,7 @@ object DatabaseClient {
       dialectConfig: DialectConfig
   ) extends DatabaseClient {
 
-    def transaction[T](block: DbTxn => T): T = {
+    def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
       val txn =
         new DbApi.Impl(connection, config, dialectConfig, false, () => connection.rollback())
@@ -65,7 +65,7 @@ object DatabaseClient {
       finally connection.close()
     }
 
-    def transaction[T](block: DbTxn => T): T = withConnection(_.transaction(block))
+    def transaction[T](block: DbApi.Txn => T): T = withConnection(_.transaction(block))
 
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection

@@ -13,7 +13,7 @@ import scalasql.query.{
   SubqueryRef,
   TableRef
 }
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.utils.FlatJson
 
 object JoinsToSql {

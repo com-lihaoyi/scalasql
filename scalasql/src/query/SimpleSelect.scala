@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Config, MappedType, Queryable}
+import scalasql.{Config, TypeMapper, Queryable}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
 
@@ -33,7 +33,7 @@ class SimpleSelect[Q, R](
     newSimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
   def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
 
-  def queryExpr[V: MappedType](
+  def queryExpr[V: TypeMapper](
       f: Q => Context => SqlStr
   )(implicit qr2: Queryable.Row[Expr[V], V]): Expr[V] = {
     Expr[V] { implicit outerCtx: Context =>

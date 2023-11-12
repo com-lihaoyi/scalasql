@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.{MappedType, Queryable}
+import scalasql.{TypeMapper, Queryable}
 import scalasql.utils.OptionPickler
 
 /**
@@ -41,10 +41,10 @@ object Returning {
 
     override def queryIsSingleRow = false
 
-    override def renderToSql(implicit ctx0: Context): (SqlStr, Seq[MappedType[_]]) =
+    override def renderToSql(implicit ctx0: Context): (SqlStr, Seq[TypeMapper[_]]) =
       toSqlQuery0(ctx0)
 
-    def toSqlQuery0(ctx0: Context): (SqlStr, Seq[MappedType[_]]) = {
+    def toSqlQuery0(ctx0: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val computed = Context.compute(ctx0, Nil, Some(returnable.table))
       import computed.implicitCtx
 

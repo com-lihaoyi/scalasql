@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{MappedType, operations}
+import scalasql.{TypeMapper, operations}
 import scalasql.query.Expr
 import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
@@ -19,10 +19,10 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
 object PostgresDialect extends PostgresDialect {
   class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
-    override def cast[V: MappedType]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[MappedType[V]] match {
-        case MappedType.ByteType => "INTEGER"
-        case MappedType.StringType => "VARCHAR"
+    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
+      val s = implicitly[TypeMapper[V]] match {
+        case TypeMapper.ByteType => "INTEGER"
+        case TypeMapper.StringType => "VARCHAR"
         case s => s.typeString
       }
 

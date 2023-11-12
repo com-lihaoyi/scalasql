@@ -50,14 +50,14 @@ object Table {
   }
 }
 
-case class Column[T: MappedType]()(implicit val name: sourcecode.Name, val table: Table.Base) {
+case class Column[T: TypeMapper]()(implicit val name: sourcecode.Name, val table: Table.Base) {
   def expr(tableRef: TableRef): Column.ColumnExpr[T] =
     new Column.ColumnExpr[T](tableRef, name.value)
 }
 
 object Column {
   case class Assignment[T](column: ColumnExpr[T], value: Expr[T])
-  class ColumnExpr[T](tableRef: TableRef, val name: String)(implicit val mappedType: MappedType[T])
+  class ColumnExpr[T](tableRef: TableRef, val name: String)(implicit val mappedType: TypeMapper[T])
       extends Expr[T] {
     def :=(v: Expr[T]) = Assignment(this, v)
     def toSqlExpr0(implicit ctx: Context) = {

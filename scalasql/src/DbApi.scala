@@ -66,17 +66,17 @@ trait DbApi extends AutoCloseable {
 
 }
 
-/**
- * An interface to a SQL database *transaction*, allowing you to run queries,
- * create savepoints, or roll back the transaction.
- */
-trait DbTxn extends DbApi {
-  def savepoint[T](block: DbApi.Savepoint => T): T
-  def rollback(): Unit
-}
+
 
 object DbApi {
-
+  /**
+   * An interface to a SQL database *transaction*, allowing you to run queries,
+   * create savepoints, or roll back the transaction.
+   */
+  trait Txn extends DbApi {
+    def savepoint[T](block: DbApi.Savepoint => T): T
+    def rollback(): Unit
+  }
   /**
    * A SQL `SAVEPOINT`, with an ID, name, and the ability to roll back to when it was created
    */
@@ -92,7 +92,7 @@ object DbApi {
       dialectConfig: DialectConfig,
       autoCommit: Boolean,
       rollBack0: () => Unit
-  ) extends DbTxn {
+  ) extends DbApi.Txn {
     val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
 
     def savepoint[T](block: DbApi.Savepoint => T): T = {
@@ -190,7 +190,7 @@ object DbApi {
 
     def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
-    ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[MappedType[_]]) = {
+    ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
       val ctx = Context.Impl(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
       val (sqlStr, mappedTypes) = qr.toSqlQuery(query, ctx)
       val flattened = SqlStr.flatten(sqlStr)
@@ -253,7 +253,7 @@ object DbApi {
         .foreach(statement.setQueryTimeout)
 
       for ((p, n) <- params.zipWithIndex) {
-        p.mappedType.asInstanceOf[MappedType[Any]].put(statement, n + 1, p.value)
+        p.mappedType.asInstanceOf[TypeMapper[Any]].put(statement, n + 1, p.value)
       }
 
       val walked = qr.walk(query)
@@ -301,7 +301,7 @@ object DbApi {
   def handleResultRow[V](
       resultSet: ResultSet,
       rowVisitor: Visitor[_, V],
-      exprs: Seq[MappedType[_]],
+      exprs: Seq[TypeMapper[_]],
       config: Config,
       columnNameUnMapper: Map[String, String]
   ): V = {

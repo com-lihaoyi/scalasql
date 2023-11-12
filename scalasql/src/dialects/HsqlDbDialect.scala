@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{MappedType, operations}
+import scalasql.{TypeMapper, operations}
 import scalasql.query.Expr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -10,7 +10,7 @@ trait HsqlDbDialect extends Dialect {
 
   override implicit def ExprStringOpsConv(v: Expr[String]): HsqlDbDialect.ExprStringOps =
     new HsqlDbDialect.ExprStringOps(v)
-  override implicit def ExprNumericOpsConv[T: Numeric: MappedType](
+  override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
       v: Expr[T]
   ): HsqlDbDialect.ExprNumericOps[T] = new HsqlDbDialect.ExprNumericOps(v)
 }
@@ -24,7 +24,7 @@ object HsqlDbDialect extends HsqlDbDialect {
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 
-  class ExprNumericOps[T: Numeric: MappedType](val v: Expr[T])
+  class ExprNumericOps[T: Numeric: TypeMapper](val v: Expr[T])
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
 }

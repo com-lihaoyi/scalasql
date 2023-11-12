@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{MappedType, Queryable, Table}
+import scalasql.{TypeMapper, Queryable, Table}
 
 /**
  * A SQL `SELECT` query, with
@@ -31,7 +31,7 @@ class CompoundSelect[Q, R](
 
   def distinct: Select[Q, R] = simpleFrom(this).distinct
 
-  def queryExpr[V: MappedType](f: Q => Context => SqlStr)(
+  def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = simpleFrom(this).queryExpr[V](f)
 

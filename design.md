@@ -213,7 +213,7 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
  Queryable#{walk,toSqlQuery}           Queryable#valueReader
            |    |                            ^     ^
            |    |                            |     |
-    SqlStr |    +------Seq[MappedType]-------+     | ResultSet
+    SqlStr |    +------Seq[TypeMapper]-------+     | ResultSet
            |                                       |
            |                                       |
            +---------> java.sql.execute -----------+
@@ -222,12 +222,12 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
 1. We start off constructing a query of type `Q`: an expression, query, or
    case-class/tuple containing expressions.
 
-2. These get converted into a `SqlStr` and `Seq[MappedType]` using the 
+2. These get converted into a `SqlStr` and `Seq[TypeMapper]` using the 
    `Queryable[Q, R]` typeclass
 
 3. We execute the `SqlStr` using JDBC/`java.sql` APIs and get back a `ResultSet`
 
-4. We use `Queryable[Q, R]#valueReader` and `Seq[MappedType]` to convert the 
+4. We use `Queryable[Q, R]#valueReader` and `Seq[TypeMapper]` to convert the 
   `ResultSet` back into a Scala type `R`: typically primitive types, collections, 
   or case-classes/tuples containing primitive types
 

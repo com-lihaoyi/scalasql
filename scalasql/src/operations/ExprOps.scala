@@ -1,6 +1,6 @@
 package scalasql.operations
 
-import scalasql.MappedType
+import scalasql.TypeMapper
 import scalasql.query.Expr
 import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
@@ -41,7 +41,7 @@ class ExprOps(v: Expr[_]) {
   /** Less than or equal to */
   def <=[V](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => sql"$v <= $x" }
 
-  def cast[V: MappedType]: Expr[V] = Expr { implicit ctx =>
-    sql"CAST($v AS ${SqlStr.raw(implicitly[MappedType[V]].typeString)})"
+  def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
+    sql"CAST($v AS ${SqlStr.raw(implicitly[TypeMapper[V]].typeString)})"
   }
 }

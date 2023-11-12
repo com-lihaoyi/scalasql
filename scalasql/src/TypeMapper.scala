@@ -28,84 +28,84 @@ import java.time.{
  * it's [[jdbcType]], [[typeString]], and [[get]] and [[put]] operations.
  *
  * Defaults are provided for most common Scala primitives, but you can also provide
- * your own by defining an `implicit val foo: MappedType[T]`
+ * your own by defining an `implicit val foo: TypeMapper[T]`
  */
-trait MappedType[T] {
+trait TypeMapper[T] {
   def jdbcType: JDBCType
   def typeString: String = jdbcType.toString
   def nullable: Boolean = false
   def get(r: ResultSet, idx: Int): T
   def put(r: PreparedStatement, idx: Int, v: T): Unit
 }
-object MappedType {
-  implicit object StringType extends MappedType[String] {
+object TypeMapper {
+  implicit object StringType extends TypeMapper[String] {
     def jdbcType = JDBCType.LONGVARCHAR
     def get(r: ResultSet, idx: Int) = r.getString(idx)
     def put(r: PreparedStatement, idx: Int, v: String) = r.setString(idx, v)
   }
 
-  implicit object ByteType extends MappedType[Byte] {
+  implicit object ByteType extends TypeMapper[Byte] {
     def jdbcType = JDBCType.TINYINT
     def get(r: ResultSet, idx: Int) = r.getByte(idx)
     def put(r: PreparedStatement, idx: Int, v: Byte) = r.setByte(idx, v)
   }
 
-  implicit object ShortType extends MappedType[Short] {
+  implicit object ShortType extends TypeMapper[Short] {
     def jdbcType = JDBCType.SMALLINT
     def get(r: ResultSet, idx: Int) = r.getShort(idx)
     def put(r: PreparedStatement, idx: Int, v: Short) = r.setShort(idx, v)
   }
 
-  implicit object IntType extends MappedType[Int] {
+  implicit object IntType extends TypeMapper[Int] {
     def jdbcType = JDBCType.INTEGER
     def get(r: ResultSet, idx: Int) = r.getInt(idx)
     def put(r: PreparedStatement, idx: Int, v: Int) = r.setInt(idx, v)
   }
 
-  implicit object LongType extends MappedType[Long] {
+  implicit object LongType extends TypeMapper[Long] {
     def jdbcType = JDBCType.BIGINT
     def get(r: ResultSet, idx: Int) = r.getLong(idx)
     def put(r: PreparedStatement, idx: Int, v: Long) = r.setLong(idx, v)
   }
 
-  implicit object DoubleType extends MappedType[Double] {
+  implicit object DoubleType extends TypeMapper[Double] {
     def jdbcType = JDBCType.DOUBLE
     def get(r: ResultSet, idx: Int) = r.getDouble(idx)
     def put(r: PreparedStatement, idx: Int, v: Double) = r.setDouble(idx, v)
   }
 
-  implicit object BigDecimalType extends MappedType[scala.math.BigDecimal] {
+  implicit object BigDecimalType extends TypeMapper[scala.math.BigDecimal] {
     def jdbcType = JDBCType.DOUBLE
     def get(r: ResultSet, idx: Int) = r.getBigDecimal(idx)
     def put(r: PreparedStatement, idx: Int, v: scala.math.BigDecimal) = r
       .setBigDecimal(idx, v.bigDecimal)
   }
 
-  implicit object BooleanType extends MappedType[Boolean] {
+  implicit object BooleanType extends TypeMapper[Boolean] {
     def jdbcType = JDBCType.BOOLEAN
     def get(r: ResultSet, idx: Int) = r.getBoolean(idx)
     def put(r: PreparedStatement, idx: Int, v: Boolean) = r.setBoolean(idx, v)
   }
 
-  implicit object LocalDateType extends MappedType[LocalDate] {
+  implicit object LocalDateType extends TypeMapper[LocalDate] {
     def jdbcType = JDBCType.DATE
     def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalDate])
     def put(r: PreparedStatement, idx: Int, v: LocalDate) = r.setObject(idx, v)
   }
 
-  implicit object LocalTimeType extends MappedType[LocalTime] {
+  implicit object LocalTimeType extends TypeMapper[LocalTime] {
     def jdbcType = JDBCType.TIME
     def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalTime])
     def put(r: PreparedStatement, idx: Int, v: LocalTime) = r.setObject(idx, v)
   }
 
-  implicit object LocalDateTimeType extends MappedType[LocalDateTime] {
+  implicit object LocalDateTimeType extends TypeMapper[LocalDateTime] {
     def jdbcType = JDBCType.TIMESTAMP
     def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[LocalDateTime])
     def put(r: PreparedStatement, idx: Int, v: LocalDateTime) = r.setObject(idx, v)
   }
 
-  implicit object ZonedDateTimeType extends MappedType[ZonedDateTime] {
+  implicit object ZonedDateTimeType extends TypeMapper[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     override def typeString = "TIMESTAMP WITH TIME ZONE"
     def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant.atZone(ZoneId.systemDefault())
@@ -113,21 +113,21 @@ object MappedType {
       .setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
   }
 
-  implicit object InstantType extends MappedType[Instant] {
+  implicit object InstantType extends TypeMapper[Instant] {
     def jdbcType = JDBCType.TIMESTAMP
     def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant
     def put(r: PreparedStatement, idx: Int, v: Instant) = r
       .setTimestamp(idx, java.sql.Timestamp.from(v))
   }
 
-  implicit object OffsetTimeType extends MappedType[OffsetTime] {
+  implicit object OffsetTimeType extends TypeMapper[OffsetTime] {
     def jdbcType = JDBCType.TIME_WITH_TIMEZONE
     override def typeString = "TIME WITH TIME ZONE"
     def get(r: ResultSet, idx: Int) = r.getObject(idx, classOf[OffsetTime])
     def put(r: PreparedStatement, idx: Int, v: OffsetTime) = r.setObject(idx, v)
   }
 
-  implicit object OffsetDateTimeType extends MappedType[OffsetDateTime] {
+  implicit object OffsetDateTimeType extends TypeMapper[OffsetDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     override def typeString = "TIMESTAMP WITH TIME ZONE"
 
@@ -139,8 +139,8 @@ object MappedType {
     }
   }
 
-  implicit def OptionType[T](implicit inner: MappedType[T]): MappedType[Option[T]] =
-    new MappedType[Option[T]] {
+  implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
+    new TypeMapper[Option[T]] {
       def jdbcType: JDBCType = inner.jdbcType
       override def nullable = true
       def get(r: ResultSet, idx: Int): Option[T] = {
