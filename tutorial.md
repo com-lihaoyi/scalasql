@@ -1,5 +1,11 @@
 [//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)
 
+
+This tutorials is a tour of how to use ScalaSql, from the most basic concepts
+to writing some realistic queries. If you are browsing this on Github, you
+can open the `Outline` pane on the right to browse the section headers to
+see what we will cover and find anything specific of interest to you.
+
 ## Setup
 ### Importing Your Database Dialect
 To begin using ScalaSql, you need the following imports:
@@ -51,6 +57,16 @@ CREATE TABLE IF NOT EXISTS countrylanguage (
     percentage real NOT NULL
 );
 ```
+
+You can also check out the self-contained examples below if you want to use other
+supported databases, to see what kind of set up is necessary for each one
+
+* [Postgres](scalasql/test/src/example/PostgresExample.scala)
+* [MySql](scalasql/test/src/example/MySqlExample.scala)
+* [Sqlite](scalasql/test/src/example/SqliteExample.scala)
+* [H2](scalasql/test/src/example/H2Example.scala)
+* [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
+* [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 ### Modeling Your Schema
 
@@ -166,11 +182,8 @@ etc., each returning an `Expr[T]` for the respective type `T`. Each type of
 `Expr[T]` has a set of operations representing what operations the database
 supports on that type of expression.
 
-All database operations run in a _transaction_, represented by the
-`.transaction{}` block. If a the block fails with an exception, changes
-made in the transaction are rolled back. This does not affect the read-only
-queries we are doing now, but becomes more important once we start doing
-create/update/delete queries later on.
+You can check out the [ScalaSql Reference](reference.md) if you want a
+comprehensive list of built-in operations on various `Expr[T]` types.
 
 
 ## Select
