@@ -2,10 +2,10 @@ package scalasql.utils
 import scalasql.Table
 import scala.language.experimental.macros
 
-object TableMacros{
+object TableMacros {
   def applyImpl[V[_[_]]](
-                          c: scala.reflect.macros.blackbox.Context
-                        )()(implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Table.Metadata[V]] = {
+      c: scala.reflect.macros.blackbox.Context
+  )()(implicit wtt: c.WeakTypeTag[V[Any]]): c.Expr[Table.Metadata[V]] = {
     import c.universe._
 
     val tableRef = TermName(c.freshName("tableRef"))
@@ -23,8 +23,7 @@ object TableMacros{
 
     val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
 
-    c.Expr[Table.Metadata[V]](
-      q"""
+    c.Expr[Table.Metadata[V]](q"""
     new _root_.scalasql.Table.Metadata[$wtt](
       new _root_.scalasql.Table.Internal.TableQueryable(
         table => $allFlattenedExprs,
@@ -36,6 +35,6 @@ object TableMacros{
   }
 
 }
-trait TableMacros{
+trait TableMacros {
   def initMetadata[V[_[_]]](): Table.Metadata[V] = macro TableMacros.applyImpl[V]
 }

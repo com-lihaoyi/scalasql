@@ -65,7 +65,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * Dot-delimited result names
-* Tutorial docs for `Option`/`NULL` handling
 * Docs for type mapping
 * Docs for custom expressions
 * Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`, test/example with HiikariCP

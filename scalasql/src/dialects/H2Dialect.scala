@@ -11,7 +11,7 @@ import scalasql.query.{
   InsertValues,
   Join,
   Joinable,
-  Nullable,
+  JoinNullable,
   OrderBy,
   Query
 }
@@ -91,11 +91,11 @@ object H2Dialect extends H2Dialect {
       with Select[Q, R] {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
-    ): scalasql.query.Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
+    ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)
-        .map { case (l, r) => (Nullable(l), r) }
+        .map { case (l, r) => (JoinNullable(l), r) }
         .union(rightJoin(other)(on).map { case (l, r) =>
-          (l, Nullable(r))
+          (l, JoinNullable(r))
         })
     }
   }

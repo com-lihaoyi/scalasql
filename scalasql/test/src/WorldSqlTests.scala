@@ -500,6 +500,88 @@ object WorldSqlTests extends TestSuite {
       // -DOCS
     }
 
+    test("nullable") {
+      test("operations") {
+        // +DOCS
+        // ## Nullable Columns
+        //
+        // Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
+        // meaning `Expr[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
+        // meaning `Option[V]`) in the returned data. `Expr[Option[V]]` supports a similar
+        // set of operations as `Option[V]`: `isDefined`, `isEmpty`, `map`, `flatMap`, `get`,
+        // `orElse`, etc., but returning `Expr[V]`s rather than plain `V`s.
+        val query = Country.select
+          .filter(_.capital.isEmpty)
+          .size
+
+        db.toSqlQuery(query) ==> """
+        SELECT COUNT(1) as res
+        FROM country country0
+        WHERE country0.capital IS NULL
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> 7
+        // -DOCS
+      }
+      test("equality") {
+        // +DOCS
+        // ScalaSQL supports two different kinds of equality:
+        //
+        // ```scala
+        // // Scala equality
+        // a === b
+        // a !== b
+        // // SQL equality
+        // a `=` b
+        // a <> b
+        // ```
+        //
+        // Most of the time these two things are the same, except when `a` or `b`
+        // are nullable. In that case:
+        //
+        // * SQL equality follows SQL rules that `NULL = anything`
+        //   is always `false`, and `NULL <> anything` is also always false.
+        //
+        // * Scala equality follows Scala rules that `None === None` is `true`
+        //
+        // The difference between these two operations can be seen below, where
+        // using SQL equality to compare the `capital` column against a `None`
+        // value translates directly into a SQL `=` which always returns false
+        // because the right hand value is `None`/`NULL`, thus returning zero
+        // countries:
+
+        val myOptionalCityId: Option[Int] = None
+        val query = Country.select
+          .filter(_.capital `=` myOptionalCityId)
+          .size
+
+        db.toSqlQuery(query) ==> """
+        SELECT COUNT(1) as res
+        FROM country country0
+        WHERE country0.capital = ?
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> 0
+
+        // Whereas using Scala equality with `===` translates into a more
+        // verbose `(country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?`
+        // expression, returning `true` when both left-hand and right-hand values
+        // are `None`/`NULL`, thus successfully returning all countries for which
+        // the `capital` column is `NULL`
+        val query2 = Country.select
+          .filter(_.capital === myOptionalCityId)
+          .size
+
+        db.toSqlQuery(query2) ==> """
+        SELECT COUNT(1) as res
+        FROM country country0
+        WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query2) ==> 7
+        // -DOCS
+      }
+    }
     test("joins") {
       test("inner") {
         // +DOCS
@@ -528,17 +610,14 @@ object WorldSqlTests extends TestSuite {
         // `LEFT JOIN`, `RIGHT JOIN`, and `OUTER JOIN`s are also supported, e.g.
         val query = City.select
           .rightJoin(Country)(_.countryCode === _.code)
-          .filter { case (cityOpt, country) => cityOpt.isEmpty }
+          .filter { case (cityOpt, country) => cityOpt.isEmpty(_.id) }
           .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
         db.toSqlQuery(query) ==> """
         SELECT city0.name as res__0, country1.name as res__1
         FROM city city0
         RIGHT JOIN country country1 ON city0.countrycode = country1.code
-        WHERE city0.id IS NULL AND city0.name IS NULL
-        AND city0.countrycode IS NULL
-        AND city0.district IS NULL
-        AND city0.population IS NULL
+        WHERE city0.id IS NULL
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq(
@@ -551,8 +630,11 @@ object WorldSqlTests extends TestSuite {
           (None, "United States Minor Outlying Islands")
         )
         // Note that when you use a left/right/outer join, the corresponding
-        // rows are provided to you as `scalasql.Nullable[T]` rather than plain `T`s, e.g.
-        // `cityOpt: scalasql.Nullable[City[Expr]]` above.
+        // rows are provided to you as `scalasql.JoinNullable[T]` rather than plain `T`s, e.g.
+        // `cityOpt: scalasql.JoinNullable[City[Expr]]` above. `JoinNullable[T]` can be checked
+        // for presence/absence using `.isEmpty` and specifying a specific column to check,
+        // and can be converted to an `Expr[Option[T]]` by `.map`ing itt to a particular
+        // `Expr[T]`.
         //
         // -DOCS
       }
@@ -560,19 +642,22 @@ object WorldSqlTests extends TestSuite {
 
     test("flatMap") {
       // +DOCS
-      // ScalaSql also supports performing `JOIN`s via Scala's for-comprehension syntax:
+      // ScalaSql also supports performing `JOIN`s via Scala's `for`-comprehension syntax and `.join`.
+      // `for`-comprehensions also support `.crossJoin()`  for joins without an `ON` clause, and
+      // `.leftJoin()` returning `JoinNullable[T]` for joins where joined table may not have corresponding
+      // rows.
       val query = for {
         city <- City.select
-        country <- Country.crossJoin() if city.countryCode === country.code
+        country <- Country.join(city.countryCode === _.code)
         if country.name === "Liechtenstein"
       } yield city.name
 
       db.toSqlQuery(query) ==> """
         SELECT city0.name as res
         FROM city city0
-        CROSS JOIN country country1
-        WHERE city0.countrycode = country1.code AND country1.name = ?
-        """.trim.replaceAll("\\s+", " ")
+        JOIN country country1 ON city0.countrycode = country1.code
+        WHERE country1.name = ?
+      """.trim.replaceAll("\\s+", " ")
 
       db.run(query) ==> Seq("Schaan", "Vaduz")
       // -DOCS

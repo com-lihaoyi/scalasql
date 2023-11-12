@@ -219,21 +219,21 @@ trait Select[Q, R]
    */
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Q, Nullable[Q2]), (R, Option[R2])]
+  ): Select[(Q, JoinNullable[Q2]), (R, Option[R2])]
 
   /**
    * Performs a `RIGHT JOIN` on the given [[other]], typically a [[Table]] or [[Select]].
    */
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Nullable[Q], Q2), (Option[R], R2)]
+  ): Select[(JoinNullable[Q], Q2), (Option[R], R2)]
 
   /**
    * Performs a `OUTER JOIN` on the given [[other]], typically a [[Table]] or [[Select]].
    */
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])]
+  ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])]
 
 }
 

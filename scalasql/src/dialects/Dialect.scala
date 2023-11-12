@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps}
-import scalasql.query.{Aggregatable, Expr, Nullable, Select}
+import scalasql.query.{Aggregatable, Expr, JoinNullable, Select}
 import scalasql.{MappedType, Queryable, Table, operations}
 
 /**
@@ -20,13 +20,13 @@ trait Dialect extends DialectConfig {
   implicit def ExprOptionOpsConv[T: MappedType](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)
 
-  implicit def NullableExprOpsConv[T: MappedType](v: Nullable[Expr[T]]): operations.ExprOps =
-    new operations.ExprOps(Nullable.toExpr(v))
+  implicit def NullableExprOpsConv[T: MappedType](v: JoinNullable[Expr[T]]): operations.ExprOps =
+    new operations.ExprOps(JoinNullable.toExpr(v))
 
   implicit def NullableExprOptionOpsConv[T: MappedType](
-      v: Nullable[Expr[T]]
+      v: JoinNullable[Expr[T]]
   ): operations.ExprOptionOps[T] =
-    new operations.ExprOptionOps(Nullable.toExpr(v))
+    new operations.ExprOptionOps(JoinNullable.toExpr(v))
 
   implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
 

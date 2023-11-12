@@ -19,12 +19,10 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
           """
             UPDATE product
             SET price = (SELECT MAX(product0.price) as res FROM product product0)
-            WHERE ?
           """,
           """
             UPDATE product
             SET product.price = (SELECT MAX(product0.price) as res FROM product product0)
-            WHERE ?
           """
         ),
         value = 6,

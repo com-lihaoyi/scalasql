@@ -51,8 +51,8 @@ trait UpdateTests extends ScalaSqlSuite {
           Buyer.update(_ => true).set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
         },
         sqls = Seq(
-          "UPDATE buyer SET date_of_birth = ? WHERE ?",
-          "UPDATE buyer SET buyer.date_of_birth = ? WHERE ?"
+          "UPDATE buyer SET date_of_birth = ?",
+          "UPDATE buyer SET buyer.date_of_birth = ?"
         ),
         value = 3,
         docs = """

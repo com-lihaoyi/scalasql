@@ -71,11 +71,13 @@ object OptionPickler
     }
   }
 
-  def annotate[V]
-    (rw: scalasql.utils.OptionPickler.Reader[V], n: String):
-      scalasql.utils.OptionPickler.TaggedReader[V] = ???
-    def annotate[V]
-    (rw: scalasql.utils.OptionPickler.ObjectWriter[V], n: String, checker:
-      upickle.core.Annotator.Checker):
-      scalasql.utils.OptionPickler.TaggedWriter[V] = ???
+  def annotate[V](
+      rw: scalasql.utils.OptionPickler.Reader[V],
+      n: String
+  ): scalasql.utils.OptionPickler.TaggedReader[V] = ???
+  def annotate[V](
+      rw: scalasql.utils.OptionPickler.ObjectWriter[V],
+      n: String,
+      checker: upickle.core.Annotator.Checker
+  ): scalasql.utils.OptionPickler.TaggedWriter[V] = ???
 }

@@ -27,7 +27,8 @@ object Query {
     override def singleRow(q: Q) = q.queryIsSingleRow
 
     override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader
-    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) = Renderable.renderToSql(q)(ctx)
+    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[MappedType[_]]) =
+      Renderable.renderToSql(q)(ctx)
   }
 
   trait Multiple[R] extends Query[Seq[R]]

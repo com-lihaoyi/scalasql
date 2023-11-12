@@ -120,20 +120,20 @@ class SimpleSelect[Q, R](
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, Nullable[Q2]), (R, Option[R2])] = {
-    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, Nullable(o)))
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = {
+    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, JoinNullable(o)))
   }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
-  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Nullable[Q], Q2), (Option[R], R2)] = {
-    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (Nullable(e), o))
+  )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(JoinNullable[Q], Q2), (Option[R], R2)] = {
+    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (JoinNullable(e), o))
   }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
-    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (Nullable(e), Nullable(o)))
+  ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
+    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (JoinNullable(e), JoinNullable(o)))
   }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
@@ -188,11 +188,13 @@ class SimpleSelect[Q, R](
 
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
-  protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] = new SimpleSelect.Renderer(this, prevContext)
+  protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
+    new SimpleSelect.Renderer(this, prevContext)
 }
 
 object SimpleSelect {
-  def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] = s.getRenderer(prevContext)
+  def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
+    s.getRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     val computed = Context.compute(

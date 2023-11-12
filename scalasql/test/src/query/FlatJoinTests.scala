@@ -85,7 +85,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
       ),
       docs = """
         Flat joins can also support `.leftJoin`s, where the table being joined
-        is given to you as a `Nullable[T]`
+        is given to you as a `JoinNullable[T]`
       """,
       normalize =
         (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => (t._1, t._2.map(_.toEpochDay)))
@@ -292,6 +292,5 @@ trait FlatJoinTests extends ScalaSqlSuite {
       """
     )
 
-    
   }
 }

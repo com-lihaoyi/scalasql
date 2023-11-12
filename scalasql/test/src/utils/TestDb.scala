@@ -22,8 +22,12 @@ class TestDb(
   UtestFramework.recordedSuiteDescriptions(suiteName.stripSuffix("Tests$")) = description
 
   def reset() = {
-    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / testSchemaFileName))
-    dbClient.autoCommit.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / testDataFileName))
+    dbClient.autoCommit.runRawUpdate(
+      os.read(os.pwd / "scalasql" / "test" / "resources" / testSchemaFileName)
+    )
+    dbClient.autoCommit.runRawUpdate(
+      os.read(os.pwd / "scalasql" / "test" / "resources" / testDataFileName)
+    )
   }
 
   def recorded[T](docs: String, f: sourcecode.Text[T])(implicit tp: utest.framework.TestPath): T = {
@@ -58,12 +62,15 @@ class TestDb(
       .toSqlQuery(query.value)
       .stripSuffix(dialectConfig.defaultQueryableSuffix)
 
-    val matchedSql = (Option(sql) ++ sqls).find { sql =>
+    val allCheckedSqls = Option(sql) ++ sqls
+    val matchedSql = allCheckedSqls.find { sql =>
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
       sqlResult == expectedSql
     }
 
-    if (sql != null) { assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult))) }
+    if (allCheckedSqls.nonEmpty) {
+      assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
+    }
 
     val result = dbClient.autoCommit.run(query.value)
 

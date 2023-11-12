@@ -137,7 +137,6 @@ trait JoinTests extends ScalaSqlSuite {
       normalize = (x: Seq[(Buyer[Id], Buyer[Id])]) => x.sortBy(t => (t._1.id, t._2.id))
     )
 
-
     test("mapForGroupBy") - checker(
       query = Text {
         for ((name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth)))
@@ -216,7 +215,7 @@ trait JoinTests extends ScalaSqlSuite {
       normalize =
         (x: Seq[(String, Option[LocalDate])]) => x.sortBy(t => t._1 -> t._2.map(_.toEpochDay)),
       docs = """
-        `.leftJoin`s return a `Nullable[Q]` for the right hand entry. This is similar
+        `.leftJoin`s return a `JoinNullable[Q]` for the right hand entry. This is similar
         to `Option[Q]` in Scala, supports a similar set of operations (e.g. `.map`),
         and becomes an `Option[Q]` after the query is executed
       """
@@ -252,10 +251,34 @@ trait JoinTests extends ScalaSqlSuite {
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
       ),
       docs = """
-        `Nullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
+        `JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
         them to participate in any database query logic than any other `Expr[Option[T]]`s
         can participate in, such as being used as sort key or in computing return values
         (below).
+      """
+    )
+    test("leftJoinIsEmpty") - checker(
+      query = Text {
+        Buyer.select
+          .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+          .map { case (b, si) => (b.name, !si.isEmpty(_.id)) }
+          .distinct
+          .sortBy(_._1)
+      },
+      sql = """
+        SELECT DISTINCT buyer0.name as res__0, NOT shipping_info1.id IS NULL as res__1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        ORDER BY res__0
+      """,
+      value = Seq(
+        ("James Bond", true),
+        ("Li Haoyi", false),
+        ("叉烧包", true)
+      ),
+      docs = """
+        You can use the `.isEmpty` method on `JoinNullable[T]` to check whether a joined table
+        is `NULL`, by specifying a specific non-nullable column to test against.
       """
     )
 
@@ -284,7 +307,9 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         Buyer.select
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map { case (b, si) => (b.name, Nullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth) }
+          .map { case (b, si) =>
+            (b.name, JoinNullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth)
+          }
       },
       sql = """
         SELECT
@@ -301,8 +326,8 @@ trait JoinTests extends ScalaSqlSuite {
       ),
       normalize = (x: Seq[(String, Boolean)]) => x.sorted,
       docs = """
-        The conversion from `Nullable[T]` to `Expr[Option[T]]` can also be performed
-        explicitly via `Nullable.toExpr(...)`
+        The conversion from `JoinNullable[T]` to `Expr[Option[T]]` can also be performed
+        explicitly via `JoinNullable.toExpr(...)`
       """
     )
 

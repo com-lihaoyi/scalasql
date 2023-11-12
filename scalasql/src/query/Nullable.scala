@@ -8,21 +8,22 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
  * Represents a set of nullable columns that come from a `LEFT`/`RIGHT`/`OUTER` `JOIN`
  * clause.
  */
-trait Nullable[Q] {
+trait JoinNullable[Q] {
   def get: Q
-  def isEmpty(implicit qr: Queryable[Q, _]): Expr[Boolean]
-  def map[V](f: Q => V): Nullable[V]
+  def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean]
+  def map[V](f: Q => V): JoinNullable[V]
 
 }
-object Nullable {
-  implicit def toExpr[T](n: Nullable[Expr[T]])(implicit mt: MappedType[T]): Expr[Option[T]] =
+object JoinNullable {
+  implicit def toExpr[T](n: JoinNullable[Expr[T]])(implicit mt: MappedType[T]): Expr[Option[T]] =
     Expr { implicit ctx => sql"${n.get}" }
 
-  def apply[Q](t: Q): Nullable[Q] = new Nullable[Q] {
+  def apply[Q](t: Q): JoinNullable[Q] = new JoinNullable[Q] {
     def get: Q = t
-    def isEmpty(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr { implicit ctx =>
-      SqlStr.join(qr.walk(t).map { case (s, e) => sql"$e IS NULL" }, sql" AND ")
+    def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        sql"${f(t)} IS NULL"
     }
-    def map[V](f: Q => V) = Nullable(f(t))
+    def map[V](f: Q => V) = JoinNullable(f(t))
   }
 }

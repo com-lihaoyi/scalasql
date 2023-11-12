@@ -8,7 +8,9 @@ import scalasql.utils.OptionPickler
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */
-abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name) extends Table.Base with scalasql.utils.TableMacros{
+abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
+    extends Table.Base
+    with scalasql.utils.TableMacros {
 
   val tableName = name.value
   implicit def self: Table[V] = this

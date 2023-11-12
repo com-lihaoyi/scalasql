@@ -10,7 +10,7 @@ import scalasql.query.{
   InsertValues,
   Join,
   Joinable,
-  Nullable,
+  JoinNullable,
   Nulls,
   OrderBy,
   Query,
@@ -19,7 +19,7 @@ import scalasql.query.{
   WithExpr
 }
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.renderer.{Context, JoinsToSql, SqlStr}
+import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 trait MySqlDialect extends Dialect {
@@ -107,9 +107,7 @@ object MySqlDialect extends MySqlDialect {
       sql"$tableName.$colStr = ${assign.value}"
     }
 
-    override lazy val where = SqlStr.flatten(SqlStr.optSeq(where0) { where =>
-      sql" WHERE " + SqlStr.join(where.map(Renderable.renderToSql(_)._1), sql" AND ")
-    })
+    override lazy val where = ExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
 
@@ -188,11 +186,11 @@ object MySqlDialect extends MySqlDialect {
       with Select[Q, R] {
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
-    ): scalasql.query.Select[(Nullable[Q], Nullable[Q2]), (Option[R], Option[R2])] = {
+    ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)
-        .map { case (l, r) => (Nullable(l), r) }
+        .map { case (l, r) => (JoinNullable(l), r) }
         .union(rightJoin(other)(on).map { case (l, r) =>
-          (l, Nullable(r))
+          (l, JoinNullable(r))
         })
     }
   }
