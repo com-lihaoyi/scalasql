@@ -43,6 +43,9 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   against it to perform useful work. Ideal for newcomers to work through from top
   to bottom when getting started with the library.
 
+* [ScalaSql Database Examples](databases.md): examples of how to connect to various
+  databases using ScalaSQL
+
 * [ScalaSql Reference](reference.md): a detailed listing of ScalaSql functionality,
   comprehensively covering everything that ScalaSql supports, in a single easily searchable
   place. Ideal for looking up exactly methods/operators ScalaSql supports, looking up
