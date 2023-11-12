@@ -15,6 +15,7 @@ import java.sql.DriverManager
 
 
 ```
+### Sqlite
 The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
 ```scala
 lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
@@ -25,6 +26,7 @@ lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
 
 
 ```
+### HsqlDB
 The example HsqlDB database comes from the library `org.hsqldb:hsqldb:2.5.1`
 ```scala
 lazy val hsqlDbClient = new scalasql.DatabaseClient.Connection(
@@ -35,6 +37,7 @@ lazy val hsqlDbClient = new scalasql.DatabaseClient.Connection(
 
 
 ```
+### H2
 The example H2 database comes from the library `com.h2database:h2:2.2.224`
 ```scala
 lazy val h2Client = new scalasql.DatabaseClient.Connection(
@@ -45,6 +48,7 @@ lazy val h2Client = new scalasql.DatabaseClient.Connection(
 
 
 ```
+### MySql
 The example MySQLContainer comes from the library `org.testcontainers:mysql:1.19.1`
 ```scala
 lazy val mysql = {
@@ -67,6 +71,7 @@ lazy val mysqlClient = new scalasql.DatabaseClient.Connection(
 
 
 ```
+### Postgres
 The example PostgreSQLContainer comes from the library `org.testcontainers:postgresql:1.19.1`
 ```scala
 lazy val postgres = {
@@ -84,6 +89,7 @@ lazy val postgresClient = new scalasql.DatabaseClient.Connection(
 
 
 ```
+### HikariCP
 HikariDataSource comes from the library `com.zaxxer:HikariCP:5.1.0`
 ```scala
 val hikariDataSource = new com.zaxxer.hikari.HikariDataSource()

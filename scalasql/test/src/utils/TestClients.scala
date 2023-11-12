@@ -16,6 +16,7 @@ object TestClients {
   import java.sql.DriverManager
 
 
+  // ### Sqlite
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
   lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
@@ -23,6 +24,7 @@ object TestClients {
     config = new scalasql.Config {}
   )
 
+  // ### HsqlDB
   // The example HsqlDB database comes from the library `org.hsqldb:hsqldb:2.5.1`
   lazy val hsqlDbClient = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
@@ -30,6 +32,7 @@ object TestClients {
     config = new scalasql.Config {}
   )
 
+  // ### H2
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   lazy val h2Client = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection("jdbc:h2:mem:mydb"),
@@ -37,6 +40,7 @@ object TestClients {
     config = new scalasql.Config {}
   )
 
+  // ### MySql
   // The example MySQLContainer comes from the library `org.testcontainers:mysql:1.19.1`
   lazy val mysql = {
     println("Initializing MySql")
@@ -56,6 +60,7 @@ object TestClients {
     config = new scalasql.Config {}
   )
 
+  // ### Postgres
   // The example PostgreSQLContainer comes from the library `org.testcontainers:postgresql:1.19.1`
   lazy val postgres = {
     println("Initializing Postgres")
@@ -70,6 +75,7 @@ object TestClients {
     config = new scalasql.Config {}
   )
 
+  // ### HikariCP
   // HikariDataSource comes from the library `com.zaxxer:HikariCP:5.1.0`
   val hikariDataSource = new com.zaxxer.hikari.HikariDataSource()
   hikariDataSource.setJdbcUrl(postgres.getJdbcUrl)
