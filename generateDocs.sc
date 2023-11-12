@@ -1,11 +1,11 @@
 import collection.mutable
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
-def generateTutorial() =  {
+def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
   var isDocs = Option.empty[Int]
   var isCode = false
   val outputLines = collection.mutable.Buffer.empty[String]
   outputLines.append(generatedCodeHeader)
-  for (line <- os.read.lines(os.pwd / "test" / "src" / "WorldSqlTests.scala")) {
+  for (line <- os.read.lines(sourcePath)) {
     val isDocsIndex = line.indexOf("// +DOCS")
     if (isDocsIndex != -1) {
       outputLines.append("")
@@ -45,7 +45,7 @@ def generateTutorial() =  {
 
     }
   }
-  os.write.over(os.pwd / "tutorial.md", outputLines.mkString("\n"))
+  os.write.over(destPath, outputLines.mkString("\n"))
 }
 def generateReference(scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropDbPrefix(s: String) = s.split('.').drop(2).mkString(".")

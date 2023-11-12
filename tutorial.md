@@ -115,7 +115,7 @@ passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dial
 you are targeting (in this case `H2Dialect`).
 
 ```scala
-val dbClient = new DatabaseClient(
+val dbClient = new DatabaseClient.Connection(
   java.sql.DriverManager
     .getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
   new Config {
@@ -125,16 +125,22 @@ val dbClient = new DatabaseClient(
   scalasql.dialects.H2Dialect
 )
 
-val db = dbClient.autoCommit
-db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world-schema.sql"))
-db.runRawUpdate(os.read(os.pwd / "test" / "resources" / "world-data.sql"))
+val db = dbClient.getAutoCommitClientConnection
+db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
+db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
 
 
 ```
-We use `dbClient.autoCommit` in order to create a client that will automatically
-run every SQL command in a new transaction and commit it. For the majority of
-examples in this page, the exact transaction configuration doesn't matter, so
-using the auto-committing `db` API will help focus on the queries at hand.
+We use `dbClient.getAutoCommitClientConnection` in order to create a client that
+will automatically run every SQL command in a new transaction and commit it. For
+the majority of examples in this page, the exact transaction configuration doesn't
+matter, so using the auto-committing `db` API will help focus on the queries at hand.
+Note that when using a connection pool or `javax.sql.DataSource`, you will need to
+explicitly `.close()` the client returned by `getAutoCommitClientConnection` when you
+are done with it, to avoid leaking connections. Later in this tutorial we will
+see how to use `.transaction{}` blocks to create explicit transactions that can
+be rolled back or committed
+
 
 Lastly, we will run the `world.sql` script to initialize the database, and
 we're ready to begin writing queries!
@@ -243,6 +249,28 @@ own result row from this query: not zero rows, and not more than one row. This
 causes `db.run` to return a `City[Id]` rather than `Seq[City[Id]]`, and throw
 an exception if zero or multiple rows are returned by the query.
 
+
+You can also use `.head` rather than `.single`, for cases where you
+want a single result row and want additional result rows to be ignored
+rather than causing an exception. `.head` is short for `.take(1).single`
+
+```scala
+val query = City.select.filter(_.name === "Singapore").head
+
+db.toSqlQuery(query) ==> """
+SELECT
+  city0.id as res__id,
+  city0.name as res__name,
+  city0.countrycode as res__countrycode,
+  city0.district as res__district,
+  city0.population as res__population
+FROM city city0
+WHERE city0.name = ?
+LIMIT 1
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+```
 
 Apart from filtering by name, it is also very common to filter by ID,
 as shown below:
@@ -473,6 +501,87 @@ the order of returned rows is arbitrary and may differ between databases
 and implementations
 
 
+## Nullable Columns
+
+Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
+meaning `Expr[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
+meaning `Option[V]`) in the returned data. `Expr[Option[V]]` supports a similar
+set of operations as `Option[V]`: `isDefined`, `isEmpty`, `map`, `flatMap`, `get`,
+`orElse`, etc., but returning `Expr[V]`s rather than plain `V`s.
+```scala
+val query = Country.select
+  .filter(_.capital.isEmpty)
+  .size
+
+db.toSqlQuery(query) ==> """
+SELECT COUNT(1) as res
+FROM country country0
+WHERE country0.capital IS NULL
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> 7
+```
+
+ScalaSQL supports two different kinds of equality:
+
+```scala
+// Scala equality
+a === b
+a !== b
+// SQL equality
+a `=` b
+a <> b
+```
+
+Most of the time these two things are the same, except when `a` or `b`
+are nullable. In that case:
+
+* SQL equality follows SQL rules that `NULL = anything`
+  is always `false`, and `NULL <> anything` is also always false.
+
+* Scala equality follows Scala rules that `None === None` is `true`
+
+The difference between these two operations can be seen below, where
+using SQL equality to compare the `capital` column against a `None`
+value translates directly into a SQL `=` which always returns false
+because the right hand value is `None`/`NULL`, thus returning zero
+countries:
+
+```scala
+val myOptionalCityId: Option[Int] = None
+val query = Country.select
+  .filter(_.capital `=` myOptionalCityId)
+  .size
+
+db.toSqlQuery(query) ==> """
+SELECT COUNT(1) as res
+FROM country country0
+WHERE country0.capital = ?
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> 0
+
+
+```
+Whereas using Scala equality with `===` translates into a more
+verbose `(country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?`
+expression, returning `true` when both left-hand and right-hand values
+are `None`/`NULL`, thus successfully returning all countries for which
+the `capital` column is `NULL`
+```scala
+val query2 = Country.select
+  .filter(_.capital === myOptionalCityId)
+  .size
+
+db.toSqlQuery(query2) ==> """
+SELECT COUNT(1) as res
+FROM country country0
+WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query2) ==> 7
+```
+
 ## Joins
 
 You can perform SQL inner `JOIN`s between tables via the `.join` or `.join`
@@ -498,39 +607,52 @@ db.run(query) ==> Seq("Schaan", "Vaduz")
 ```scala
 val query = City.select
   .rightJoin(Country)(_.countryCode === _.code)
-  .filter { case (cityOpt, country) => cityOpt.isEmpty }
-  .map { case (cityOpt, country) =>
-    (cityOpt.map(_.name), country.name)
-  }
+  .filter { case (cityOpt, country) => cityOpt.isEmpty(_.id) }
+  .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
 db.toSqlQuery(query) ==> """
 SELECT city0.name as res__0, country1.name as res__1
 FROM city city0
 RIGHT JOIN country country1 ON city0.countrycode = country1.code
-WHERE ?
+WHERE city0.id IS NULL
 """.trim.replaceAll("\\s+", " ")
 
-db.run(query) ==> Seq()
+db.run(query) ==> Seq(
+  (None, "Antarctica"),
+  (None, "Bouvet Island"),
+  (None, "British Indian Ocean Territory"),
+  (None, "South Georgia and the South Sandwich Islands"),
+  (None, "Heard Island and McDonald Islands"),
+  (None, "French Southern territories"),
+  (None, "United States Minor Outlying Islands")
+)
 
 ```
 Note that when you use a left/right/outer join, the corresponding
-rows are provided to you as `Option[T]` rather than plain `T`s, e.g.
-`cityOpt: Option[City[Expr]]` above.
+rows are provided to you as `scalasql.JoinNullable[T]` rather than plain `T`s, e.g.
+`cityOpt: scalasql.JoinNullable[City[Expr]]` above. `JoinNullable[T]` can be checked
+for presence/absence using `.isEmpty` and specifying a specific column to check,
+and can be converted to an `Expr[Option[T]]` by `.map`ing itt to a particular
+`Expr[T]`.
 
 
-ScalaSql also supports performing `JOIN`s via Scala's for-comprehension syntax:
+ScalaSql also supports performing `JOIN`s via Scala's `for`-comprehension syntax and `.join`.
+`for`-comprehensions also support `.crossJoin()`  for joins without an `ON` clause, and
+`.leftJoin()` returning `JoinNullable[T]` for joins where joined table may not have corresponding
+rows.
 ```scala
 val query = for {
   city <- City.select
-  country <- Country.select if city.countryCode === country.code
+  country <- Country.join(city.countryCode === _.code)
   if country.name === "Liechtenstein"
 } yield city.name
 
 db.toSqlQuery(query) ==> """
   SELECT city0.name as res
-  FROM city city0, country country1
-  WHERE city0.countrycode = country1.code AND country1.name = ?
-  """.trim.replaceAll("\\s+", " ")
+  FROM city city0
+  JOIN country country1 ON city0.countrycode = country1.code
+  WHERE country1.name = ?
+""".trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
 ```
@@ -614,7 +736,8 @@ val query = City.select
   .join(CountryLanguage)(_.countryCode === _.countryCode)
   .map { case (city, language) => (city.id, language.language) }
   .groupBy { case (city, language) => language }(_.size)
-  .sortBy { case (language, cityCount) => cityCount }.desc
+  .sortBy { case (language, cityCount) => cityCount }
+  .desc
   .take(10)
 
 db.toSqlQuery(query) ==> """
@@ -648,7 +771,8 @@ val query = Country.select
   .groupBy(_.continent)(group =>
     group.sumBy(c => c.lifeExpectancy.get * c.population) / group.sumBy(_.population)
   )
-  .sortBy(_._2).desc
+  .sortBy(_._2)
+  .desc
 
 db.toSqlQuery(query) ==> """
 SELECT
@@ -680,20 +804,22 @@ with SQL syntax
 
 ```scala
 val query = Country.select
-  .sortBy(_.population).desc
+  .sortBy(_.population)
+  .desc
   .take(3)
   .join(City)(_.code === _.countryCode)
-  .filter{case (country, city) =>
+  .filter { case (country, city) =>
     city.id ===
-    City.select
-      .filter(_.countryCode === country.code)
-      .sortBy(_.population).desc
-      .map(_.id)
-      .take(1)
-      .toExpr
+      City.select
+        .filter(_.countryCode === country.code)
+        .sortBy(_.population)
+        .desc
+        .map(_.id)
+        .take(1)
+        .toExpr
   }
-  .map {
-    case (country, city) => (country.name, country.population, city.name, city.population)
+  .map { case (country, city) =>
+    (country.name, country.population, city.name, city.population)
   }
 
 db.toSqlQuery(query) ==> """
@@ -838,7 +964,7 @@ an entire database table accidentally . If you really want to perform an update
 on every single row, you can pass in `_ => true` as your filter:
 ```scala
 val query = City.update(_ => true).set(_.population := 0)
-db.toSqlQuery(query) ==> "UPDATE city SET population = ? WHERE ?"
+db.toSqlQuery(query) ==> "UPDATE city SET population = ?"
 
 db.run(query)
 

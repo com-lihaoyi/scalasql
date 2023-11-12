@@ -33,20 +33,28 @@ trait ScalaSql extends CrossScalaModule{
       ivy"org.postgresql:postgresql:42.6.0",
       ivy"org.testcontainers:mysql:1.19.1",
       ivy"mysql:mysql-connector-java:8.0.33",
+      ivy"com.zaxxer:HikariCP:5.1.0"
     )
 
     def testFramework = "scalasql.UtestFramework"
   }
+}
 
-  val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
-  def generateTutorial() = T.command {
-    generateDocs.generateTutorial()
-  }
-  def generateReference() = T.command {
-    generateDocs.generateReference((sources, config) =>
-      mill.scalalib.scalafmt.ScalafmtWorkerModule
-        .worker()
-        .reformat(sources.map(PathRef(_)), PathRef(config))
-    )
-  }
+val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
+def generateTutorial() = T.command {
+  generateDocs.generateTutorial(
+    os.pwd / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
+    os.pwd / "tutorial.md"
+  )
+  generateDocs.generateTutorial(
+    os.pwd / "scalasql" / "test" / "src" / "utils" / "ScalaSqlSuite.scala",
+    os.pwd / "databases.md"
+  )
+}
+def generateReference() = T.command {
+  generateDocs.generateReference((sources, config) =>
+    mill.scalalib.scalafmt.ScalafmtWorkerModule
+      .worker()
+      .reformat(sources.map(PathRef(_)), PathRef(config))
+  )
 }

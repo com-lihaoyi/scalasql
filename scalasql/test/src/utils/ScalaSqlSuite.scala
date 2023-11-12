@@ -1,6 +1,6 @@
 package scalasql.utils
 
-import scalasql.dialects
+import scalasql.{DatabaseClient, DbApi, dialects}
 import scalasql.dialects._
 import utest.TestSuite
 
@@ -69,6 +69,25 @@ trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
   )
 
   checker.reset()
+}
+
+trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
+  val checker = new TestDb(
+    TestClients.postgresHiikariClient,
+    "postgres-customer-schema.sql",
+    "customer-data.sql",
+    dialects.PostgresDialect,
+    getClass.getName,
+    suiteLine.value,
+    description
+  )
+
+  checker.reset()
+
+  override def utestAfterAll(): Unit = {
+    super.utestAfterAll()
+    checker.autoCommitConnection.close()
+  }
 }
 
 trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {

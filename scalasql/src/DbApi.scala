@@ -11,7 +11,7 @@ import java.sql.{PreparedStatement, ResultSet, Statement}
 /**
  * An interface to the SQL database allowing you to run queries.
  */
-trait DbApi {
+trait DbApi extends AutoCloseable{
 
   /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging
@@ -288,6 +288,8 @@ object DbApi {
         }
       }
     }
+
+    def close() = connection.close()
   }
 
   class SavepointApiImpl(savepoint: java.sql.Savepoint, rollback0: () => Unit) extends Savepoint {

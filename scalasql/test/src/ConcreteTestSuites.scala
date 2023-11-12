@@ -64,6 +64,41 @@ package postgres {
 
 }
 
+package hikari {
+
+  import utils.HikariSuite
+
+  object DbApiTests extends DbApiTests with HikariSuite
+  object TransactionTests extends TransactionTests with HikariSuite
+
+  object SelectTests extends SelectTests with HikariSuite
+  object JoinTests extends JoinTests with HikariSuite
+  object FlatJoinTests extends FlatJoinTests with HikariSuite
+  object InsertTests extends InsertTests with HikariSuite
+  object UpdateTests extends UpdateTests with HikariSuite
+  object DeleteTests extends DeleteTests with HikariSuite
+  object CompoundSelectTests extends CompoundSelectTests with HikariSuite
+  object UpdateJoinTests extends UpdateJoinTests with HikariSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with HikariSuite
+  object ReturningTests extends ReturningTests with HikariSuite
+  object OnConflictTests extends OnConflictTests with HikariSuite
+
+  object SubQueryTests extends SubQueryTests with HikariSuite
+
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with HikariSuite
+  object ExprIntOpsTests extends ExprNumericOpsTests with HikariSuite
+  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HikariSuite
+  object ExprSeqOpsTests extends ExprSeqOpsTests with HikariSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with HikariSuite
+
+  object DataTypesTests extends datatypes.DataTypesTests with HikariSuite
+
+  object OptionalTests extends datatypes.OptionalTests with HikariSuite
+
+  object PostgresDialectTests extends PostgresDialectTests
+
+}
+
 package mysql {
 
   import utils.MySqlSuite

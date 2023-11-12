@@ -21,11 +21,12 @@ class TestDb(
 
   UtestFramework.recordedSuiteDescriptions(suiteName.stripSuffix("Tests$")) = description
 
+  val autoCommitConnection = dbClient.getAutoCommitClientConnection
   def reset() = {
-    dbClient.autoCommit.runRawUpdate(
+    autoCommitConnection.runRawUpdate(
       os.read(os.pwd / "scalasql" / "test" / "resources" / testSchemaFileName)
     )
-    dbClient.autoCommit.runRawUpdate(
+    autoCommitConnection.runRawUpdate(
       os.read(os.pwd / "scalasql" / "test" / "resources" / testDataFileName)
     )
   }
@@ -58,7 +59,7 @@ class TestDb(
       normalize: V => V = (x: V) => x,
       docs: String = ""
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
-    val sqlResult = dbClient.autoCommit
+    val sqlResult = autoCommitConnection
       .toSqlQuery(query.value)
       .stripSuffix(dialectConfig.defaultQueryableSuffix)
 
@@ -72,7 +73,7 @@ class TestDb(
       assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
     }
 
-    val result = dbClient.autoCommit.run(query.value)
+    val result = autoCommitConnection.run(query.value)
 
     val values = Option(value.value) ++ moreValues
     val normalized = normalize(result)
