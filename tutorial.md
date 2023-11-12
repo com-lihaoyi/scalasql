@@ -1,6 +1,7 @@
 [//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)
 
-## Importing Your Database Dialect
+## Setup
+### Importing Your Database Dialect
 To begin using ScalaSql, you need the following imports:
 ```scala
 import scalasql._
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS countrylanguage (
 );
 ```
 
-## Modeling Your Schema
+### Modeling Your Schema
 
 Next, you need to define your data model classes. In ScalaSql, your data model
 is defined using `case class`es with each field wrapped in the wrapper type
@@ -109,7 +110,7 @@ object CountryLanguage extends Table[CountryLanguage]() {
 }
 ```
 
-## Creating Your Database Client
+### Creating Your Database Client
 Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
 passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
 you are targeting (in this case `H2Dialect`).
@@ -210,7 +211,7 @@ fetched the entire database table into memory. This can be a problem with non-tr
 datasets, and for that you
 
 
-## Filtering
+### Filtering
 
 To avoid loading the entire database table into your Scala program, you can
 add filters to the query before running it. Below, we add a filter to only
@@ -340,7 +341,7 @@ db.run(query).take(2) ==> Seq(
 )
 ```
 
-## Lifting
+### Lifting
 Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
 `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
 already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
@@ -391,7 +392,7 @@ assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
 assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
 ```
 
-## Mapping
+### Mapping
 
 You can use `.map` to select exactly what values you want to return from a query.
 Below, we query the `country` table, but only want the `name` and `continent` of
@@ -447,7 +448,7 @@ db.run(query) ==>
   )
 ```
 
-## Aggregates
+### Aggregates
 
 You can perform simple aggregates like `.sum` as below, where we
 query all cities in China and sum up their populations
@@ -496,7 +497,7 @@ FROM country country0
 db.run(query) ==> (0, 25434098, 1277558000)
 ```
 
-## Sort/Drop/Take
+### Sort/Drop/Take
 
 You can use `.sortBy` to order the returned rows, and `.drop` and `.take`
 to select a range of rows within the entire result set:
@@ -529,7 +530,7 @@ the order of returned rows is arbitrary and may differ between databases
 and implementations
 
 
-## Types and Casting
+### Casting
 
 You can use `.cast` to generate SQL `CAST` calls between data types. Below,
 we use it to query Singapore's life expectancy and convert it from a `Double`
@@ -556,7 +557,7 @@ same set of types you can lift into queries.
 
 
 
-## Nullable Columns
+### Nullable Columns
 
 Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
 meaning `Expr[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
@@ -637,7 +638,7 @@ WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
 db.run(query2) ==> 7
 ```
 
-## Joins
+### Joins
 
 You can perform SQL inner `JOIN`s between tables via the `.join` or `.join`
 methods. Below, we use a `JOIN` to look for cities which are in the country

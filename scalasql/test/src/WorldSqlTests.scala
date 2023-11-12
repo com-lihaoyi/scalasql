@@ -3,7 +3,8 @@ import utest._
 
 object WorldSqlTests extends TestSuite {
   // +DOCS
-  // ## Importing Your Database Dialect
+  // ## Setup
+  // ### Importing Your Database Dialect
   // To begin using ScalaSql, you need the following imports:
   import scalasql._
   import scalasql.dialects.H2Dialect._
@@ -20,7 +21,7 @@ object WorldSqlTests extends TestSuite {
   // +INCLUDE scalasql/test/resources/world-schema.sql
   // ```
   //
-  // ## Modeling Your Schema
+  // ### Modeling Your Schema
   //
   // Next, you need to define your data model classes. In ScalaSql, your data model
   // is defined using `case class`es with each field wrapped in the wrapper type
@@ -79,7 +80,7 @@ object WorldSqlTests extends TestSuite {
 
   def tests = Tests {
     // +DOCS
-    // ## Creating Your Database Client
+    // ### Creating Your Database Client
     // Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
     // passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
     // you are targeting (in this case `H2Dialect`).
@@ -185,7 +186,7 @@ object WorldSqlTests extends TestSuite {
       test("singleName") {
 
         // +DOCS
-        // ## Filtering
+        // ### Filtering
         //
         // To avoid loading the entire database table into your Scala program, you can
         // add filters to the query before running it. Below, we add a filter to only
@@ -328,7 +329,7 @@ object WorldSqlTests extends TestSuite {
     test("lifting") {
       test("implicit") {
         // +DOCS
-        // ## Lifting
+        // ### Lifting
         // Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
         // `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
         // already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
@@ -384,7 +385,7 @@ object WorldSqlTests extends TestSuite {
     test("mapping") {
       test("tuple2") {
         // +DOCS
-        // ## Mapping
+        // ### Mapping
         //
         // You can use `.map` to select exactly what values you want to return from a query.
         // Below, we query the `country` table, but only want the `name` and `continent` of
@@ -446,7 +447,7 @@ object WorldSqlTests extends TestSuite {
     test("aggregate") {
       test("sum") {
         // +DOCS
-        // ## Aggregates
+        // ### Aggregates
         //
         // You can perform simple aggregates like `.sum` as below, where we
         // query all cities in China and sum up their populations
@@ -501,7 +502,7 @@ object WorldSqlTests extends TestSuite {
 
     test("sortLimitOffset") {
       // +DOCS
-      // ## Sort/Drop/Take
+      // ### Sort/Drop/Take
       //
       // You can use `.sortBy` to order the returned rows, and `.drop` and `.take`
       // to select a range of rows within the entire result set:
@@ -534,7 +535,7 @@ object WorldSqlTests extends TestSuite {
     }
     test("casting") {
       // +DOCS
-      // ## Types and Casting
+      // ### Casting
       //
       // You can use `.cast` to generate SQL `CAST` calls between data types. Below,
       // we use it to query Singapore's life expectancy and convert it from a `Double`
@@ -563,7 +564,7 @@ object WorldSqlTests extends TestSuite {
     test("nullable") {
       test("operations") {
         // +DOCS
-        // ## Nullable Columns
+        // ### Nullable Columns
         //
         // Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
         // meaning `Expr[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
@@ -645,7 +646,7 @@ object WorldSqlTests extends TestSuite {
     test("joins") {
       test("inner") {
         // +DOCS
-        // ## Joins
+        // ### Joins
         //
         // You can perform SQL inner `JOIN`s between tables via the `.join` or `.join`
         // methods. Below, we use a `JOIN` to look for cities which are in the country
