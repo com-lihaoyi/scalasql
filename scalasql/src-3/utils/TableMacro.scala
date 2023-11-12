@@ -3,11 +3,11 @@ package scalasql.utils
 import scala.quoted.*
 
 trait TableMacros{
-  inline def initMetadata[V[_[_]]](): scalasql.Table.Metadata[V] = ${TableMacros.initMetadata0[V]()}
+  inline def initMetadata[V[_[_]]]()(using table: scalasql.Table[V]): scalasql.Table.Metadata[V] = ${TableMacros.initMetadata0[V]()('table)}
 
 }
 object TableMacros{
-  def initMetadata0[V[_[_]]]()(using Type[V], Quotes): Expr[scalasql.Table.Metadata[V]] = {
+  def initMetadata0[V[_[_]]]()(table: Expr[scalasql.Table[V]])(using Type[V], Quotes): Expr[scalasql.Table.Metadata[V]] = {
     import quotes.reflect._
     println(Type.of[V])
     println(Type.of[V[Expr]])
