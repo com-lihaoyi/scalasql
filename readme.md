@@ -38,13 +38,19 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ## Documentation
 
+* ScalaSql Quickstart Examples: self-contained examples of how to use ScalaSql with
+  the supported databases:
+    * [Postgres](scalasql/test/src/example/PostgresExample.scala)
+    * [MySql](scalasql/test/src/example/MySqlExample.scala)
+    * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
+    * [H2](scalasql/test/src/example/H2Example.scala)
+    * [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
+    * [HikariCP](scalasql/test/src/example/HikariExample.scala) (and other connection pools)
+
 * [ScalaSql Tutorial](tutorial.md): walks you through getting started with ScalaSql,
   connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
   against it to perform useful work. Ideal for newcomers to work through from top
   to bottom when getting started with the library.
-
-* [ScalaSql Database Examples](databases.md): examples of how to connect to various
-  databases using ScalaSQL
 
 * [ScalaSql Reference](reference.md): a detailed listing of ScalaSql functionality,
   comprehensively covering everything that ScalaSql supports, in a single easily searchable

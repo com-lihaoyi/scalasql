@@ -17,7 +17,7 @@ abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
 
 trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
   val checker = new TestDb(
-    TestClients.sqliteClient,
+    scalasql.example.SqliteExample.sqliteClient,
     "sqlite-customer-schema.sql",
     "customer-data.sql",
     dialects.SqliteDialect,
@@ -31,7 +31,7 @@ trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
 
 trait HsqlDbSuite extends ScalaSqlSuite with HsqlDbDialect {
   val checker = new TestDb(
-    TestClients.hsqlDbClient,
+    scalasql.example.HsqlDbExample.hsqlDbClient,
     "hsqldb-customer-schema.sql",
     "customer-data.sql",
     dialects.HsqlDbDialect,
@@ -45,7 +45,7 @@ trait HsqlDbSuite extends ScalaSqlSuite with HsqlDbDialect {
 
 trait H2Suite extends ScalaSqlSuite with H2Dialect {
   val checker = new TestDb(
-    TestClients.h2Client,
+    scalasql.example.H2Example.h2Client,
     "h2-customer-schema.sql",
     "customer-data.sql",
     dialects.H2Dialect,
@@ -59,7 +59,7 @@ trait H2Suite extends ScalaSqlSuite with H2Dialect {
 
 trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
   val checker = new TestDb(
-    TestClients.postgresClient,
+    scalasql.example.PostgresExample.postgresClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
     dialects.PostgresDialect,
@@ -73,7 +73,7 @@ trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
 
 trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
   val checker = new TestDb(
-    TestClients.postgresHiikariClient,
+    scalasql.example.HikariCpExample.hikariClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
     dialects.PostgresDialect,
@@ -92,7 +92,7 @@ trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
 
 trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {
   val checker = new TestDb(
-    TestClients.mysqlClient,
+    scalasql.example.MySqlExample.mysqlClient,
     "mysql-customer-schema.sql",
     "customer-data.sql",
     dialects.MySqlDialect,
