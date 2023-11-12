@@ -46,7 +46,7 @@ object MySqlDialect extends MySqlDialect {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match{
         case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType | TypeMapper.LongType => "SIGNED"
-        case TypeMapper.StringType => "BINARY"
+        case TypeMapper.StringType => "CHAR"
         case s => s.typeString
       }
 

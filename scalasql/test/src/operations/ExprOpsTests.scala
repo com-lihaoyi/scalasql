@@ -94,7 +94,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         sqls = Seq(
           "SELECT CAST(? AS LONGVARCHAR) as res",
           "SELECT CAST(? AS VARCHAR) as res",
-          "SELECT CAST(? AS BINARY) as res"
+          "SELECT CAST(? AS CHAR) as res"
         ),
         value = "1234.5678"
       )
