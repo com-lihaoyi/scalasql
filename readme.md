@@ -75,7 +75,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * Dot-delimited result names
-* Docs for type mapping
 * Docs for custom expressions
 * Docs/Tests for extending ScalaSql with custom expressions and custom queries  
 * `string_agg`, `array_agg`, other agg functions
