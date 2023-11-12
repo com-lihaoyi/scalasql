@@ -70,7 +70,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Dot-delimited result names
 * Docs for type mapping
 * Docs for custom expressions
-* Integrate `java.sql.DataSource` as an alternative to `java.sql.Connection`, test/example with HiikariCP
 * Casting syntax for `Expr[T] => Expr[V]`
 * Docs/Tests for extending ScalaSql with custom expressions and custom queries  
 * `string_agg`, `array_agg`, other agg functions
