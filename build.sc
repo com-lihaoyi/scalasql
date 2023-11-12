@@ -46,10 +46,6 @@ def generateTutorial() = T.command {
     os.pwd / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
     os.pwd / "tutorial.md"
   )
-  generateDocs.generateTutorial(
-    os.pwd / "scalasql" / "test" / "src" / "utils" / "TestClients.scala",
-    os.pwd / "databases.md"
-  )
 }
 def generateReference() = T.command {
   generateDocs.generateReference((sources, config) =>

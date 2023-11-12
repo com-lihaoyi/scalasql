@@ -26,6 +26,9 @@ trait MySqlDialect extends Dialect {
   def defaultQueryableSuffix = ""
   def castParams = false
 
+  override implicit def ExprOpsConv(v: Expr[_]): MySqlDialect.ExprOps =
+    new MySqlDialect.ExprOps(v)
+
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
 
@@ -39,6 +42,17 @@ trait MySqlDialect extends Dialect {
 }
 
 object MySqlDialect extends MySqlDialect {
+  class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
+    override def cast[V: MappedType]: Expr[V] = Expr { implicit ctx =>
+      val s = implicitly[MappedType[V]] match{
+        case MappedType.ByteType | MappedType.ShortType | MappedType.IntType | MappedType.LongType => "SIGNED"
+        case MappedType.StringType => "BINARY"
+        case s => s.typeString
+      }
+
+      sql"CAST($v AS ${SqlStr.raw(s)})"
+    }
+  }
   class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 

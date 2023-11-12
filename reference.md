@@ -4817,6 +4817,399 @@ Buyer.select.map { buyer =>
 
 
 
+## ExprOps
+Operations that can be performed on `Expr[T]` for any `T`
+### ExprOps.numeric.greaterThan
+
+
+
+```scala
+Expr(6) > Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? > ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.numeric.lessThan
+
+
+
+```scala
+Expr(6) < Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? < ? as res
+    ```
+
+
+
+*
+    ```scala
+    false
+    ```
+
+
+
+### ExprOps.numeric.greaterThanOrEquals
+
+
+
+```scala
+Expr(6) >= Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? >= ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.numeric.lessThanOrEquals
+
+
+
+```scala
+Expr(6) <= Expr(2)
+```
+
+
+*
+    ```sql
+    SELECT ? <= ? as res
+    ```
+
+
+
+*
+    ```scala
+    false
+    ```
+
+
+
+### ExprOps.string.greaterThan
+
+
+
+```scala
+Expr("A") > Expr("B")
+```
+
+
+*
+    ```sql
+    SELECT ? > ? as res
+    ```
+
+
+
+*
+    ```scala
+    false
+    ```
+
+
+
+### ExprOps.string.lessThan
+
+
+
+```scala
+Expr("A") < Expr("B")
+```
+
+
+*
+    ```sql
+    SELECT ? < ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.string.greaterThanOrEquals
+
+
+
+```scala
+Expr("A") >= Expr("B")
+```
+
+
+*
+    ```sql
+    SELECT ? >= ? as res
+    ```
+
+
+
+*
+    ```scala
+    false
+    ```
+
+
+
+### ExprOps.string.lessThanOrEquals
+
+
+
+```scala
+Expr("A") <= Expr("B")
+```
+
+
+*
+    ```sql
+    SELECT ? <= ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.boolean.greaterThan
+
+
+
+```scala
+Expr(true) > Expr(false)
+```
+
+
+*
+    ```sql
+    SELECT ? > ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.boolean.lessThan
+
+
+
+```scala
+Expr(true) < Expr(true)
+```
+
+
+*
+    ```sql
+    SELECT ? < ? as res
+    ```
+
+
+
+*
+    ```scala
+    false
+    ```
+
+
+
+### ExprOps.boolean.greaterThanOrEquals
+
+
+
+```scala
+Expr(true) >= Expr(true)
+```
+
+
+*
+    ```sql
+    SELECT ? >= ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.boolean.lessThanOrEquals
+
+
+
+```scala
+Expr(true) <= Expr(true)
+```
+
+
+*
+    ```sql
+    SELECT ? <= ? as res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprOps.cast.byte
+
+
+
+```scala
+Expr(45.12).cast[Byte]
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS INTEGER) as res
+    ```
+
+
+
+*
+    ```scala
+    45: Byte
+    ```
+
+
+
+### ExprOps.cast.short
+
+
+
+```scala
+Expr(1234.1234).cast[Short]
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS SMALLINT) as res
+    ```
+
+
+
+*
+    ```scala
+    1234: Short
+    ```
+
+
+
+### ExprOps.cast.int
+
+
+
+```scala
+Expr(1234.1234).cast[Int]
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS INTEGER) as res
+    ```
+
+
+
+*
+    ```scala
+    1234
+    ```
+
+
+
+### ExprOps.cast.long
+
+
+
+```scala
+Expr(1234.1234).cast[Long]
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS BIGINT) as res
+    ```
+
+
+
+*
+    ```scala
+    1234L
+    ```
+
+
+
+### ExprOps.cast.string
+
+
+
+```scala
+Expr(1234.5678).cast[String]
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS VARCHAR) as res
+    ```
+
+
+
+*
+    ```scala
+    "1234.5678"
+    ```
+
+
+
 ## ExprBooleanOps
 Operations that can be performed on `Expr[Boolean]`
 ### ExprBooleanOps.and

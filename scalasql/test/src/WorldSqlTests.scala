@@ -339,6 +339,33 @@ object WorldSqlTests extends TestSuite {
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
 
+        // Lifting of Scala values into your ScalaSql queries is dependent on there being
+        // an implicit `scalasql.TypeMapper[T]` in scope. By default, the following mappings
+        // are provided:
+        //
+        // |    Scala Primitive Type |             Database Type |
+        // |------------------------:|--------------------------:|
+        // |          `scala.String` |             `LONGVARCHAR` |
+        // |            `scala.Byte` |                 `TINYINT` |
+        // |           `scala.Short` |                `SMALLINT` |
+        // |             `scala.Int` |                 `INTEGER` |
+        // |            `scala.Long` |                  `BIGINT` |
+        // |           `scala.Float` |                  `DOUBLE` |
+        // |          `scala.Double` |                  `DOUBLE` |
+        // | `scala.math.BigDecimal` |                  `DOUBLE` |
+        // |         `scala.Boolean` |                 `BOOLEAN` |
+        //
+        // |        Scala DateTime Type |             Database Type |
+        // |---------------------------:|--------------------------:|
+        // |      `java.time.LocalDate` |                    `DATE` |
+        // |      `java.time.LocalTime` |                    `TIME` |
+        // |  `java.time.LocalDateTime` |               `TIMESTAMP` |
+        // |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
+        // |        `java.time.Instant` |               `TIMESTAMP` |
+        // | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
+        //
+        // but you can define `MappedType`s
+        // for your own types if you want to be able to use them to represent types in the database
         // -DOCS
       }
 
@@ -502,6 +529,33 @@ object WorldSqlTests extends TestSuite {
       // You can also use `.drop` and `.take` without `.sortBy`, but in that case
       // the order of returned rows is arbitrary and may differ between databases
       // and implementations
+      //
+      // -DOCS
+    }
+    test("casting") {
+      // +DOCS
+      // ## Types and Casting
+      //
+      // You can use `.cast` to generate SQL `CAST` calls between data types. Below,
+      // we use it to query Singapore's life expectancy and convert it from a `Double`
+      // precision floating point number to an `Int`:
+
+      val query = Country.select
+        .filter(_.name === "Singapore")
+        .map(_.lifeExpectancy.cast[Int])
+        .single
+
+      db.toSqlQuery(query) ==> """
+        SELECT CAST(country0.lifeexpectancy AS INTEGER) as res
+        FROM country country0
+        WHERE country0.name = ?
+      """.trim.replaceAll("\\s+", " ")
+
+      db.run(query) ==> 80
+
+      // You can `.cast` to any type with a `MappedType[T]` defined, which is the
+      // same set of types you can lift into queries.
+      //
       //
       // -DOCS
     }
