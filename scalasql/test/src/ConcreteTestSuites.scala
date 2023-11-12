@@ -12,6 +12,7 @@ import query.{
   DeleteTests,
   SelectTests,
   JoinTests,
+  FlatJoinTests,
   CompoundSelectTests,
   SubQueryTests,
   UpdateTests,
@@ -37,6 +38,7 @@ package postgres {
 
   object SelectTests extends SelectTests with PostgresSuite
   object JoinTests extends JoinTests with PostgresSuite
+  object FlatJoinTests extends FlatJoinTests with PostgresSuite
   object InsertTests extends InsertTests with PostgresSuite
   object UpdateTests extends UpdateTests with PostgresSuite
   object DeleteTests extends DeleteTests with PostgresSuite
@@ -71,6 +73,7 @@ package mysql {
 
   object SelectTests extends SelectTests with MySqlSuite
   object JoinTests extends JoinTests with MySqlSuite
+  object FlatJoinTests extends FlatJoinTests with MySqlSuite
   object InsertTests extends InsertTests with MySqlSuite
   object UpdateTests extends UpdateTests with MySqlSuite
   object DeleteTests extends DeleteTests with MySqlSuite
@@ -106,6 +109,7 @@ package sqlite {
 
   object SelectTests extends SelectTests with SqliteSuite
   object JoinTests extends JoinTests with SqliteSuite
+  object FlatJoinTests extends FlatJoinTests with SqliteSuite
   object InsertTests extends InsertTests with SqliteSuite
   object UpdateTests extends UpdateTests with SqliteSuite
   object DeleteTests extends DeleteTests with SqliteSuite
@@ -137,6 +141,7 @@ package hsqldb {
 
   object SelectTests extends SelectTests with HsqlDbSuite
   object JoinTests extends JoinTests with HsqlDbSuite
+  object FlatJoinTests extends FlatJoinTests with HsqlDbSuite
   object InsertTests extends InsertTests with HsqlDbSuite
   object UpdateTests extends UpdateTests with HsqlDbSuite
   object DeleteTests extends DeleteTests with HsqlDbSuite
@@ -171,6 +176,7 @@ package h2 {
 
   object SelectTests extends SelectTests with H2Suite
   object JoinTests extends JoinTests with H2Suite
+  object FlatJoinTests extends FlatJoinTests with H2Suite
   object InsertTests extends InsertTests with H2Suite
   object UpdateTests extends UpdateTests with H2Suite
   object DeleteTests extends DeleteTests with H2Suite

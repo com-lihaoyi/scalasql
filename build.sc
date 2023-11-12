@@ -1,7 +1,7 @@
 import $file.generateDocs
 import mill._, scalalib._
 
-val scalaVersions = Seq("2.13.8", "3.3.1")
+val scalaVersions = Seq("2.13.8"/*, "3.3.1"*/)
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends CrossScalaModule{
