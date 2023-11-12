@@ -12,7 +12,6 @@ trait TransactionTests extends ScalaSqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   class FooException extends Exception
 
-
   def tests = Tests {
     test("simple") {
       test("commit") - checker.recorded(

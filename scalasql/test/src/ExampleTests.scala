@@ -1,7 +1,6 @@
 package scalasql
 import utest._
 
-
 /**
  * Make sure the examples all have passing main methods
  */

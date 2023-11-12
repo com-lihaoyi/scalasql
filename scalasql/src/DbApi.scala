@@ -11,7 +11,7 @@ import java.sql.{PreparedStatement, ResultSet, Statement}
 /**
  * An interface to the SQL database allowing you to run queries.
  */
-trait DbApi extends AutoCloseable{
+trait DbApi extends AutoCloseable {
 
   /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging

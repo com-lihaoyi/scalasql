@@ -5,7 +5,8 @@ import scalasql.dialects.DialectConfig
  * A database client. Primarily allows you to access the database within a [[transaction]]
  * block or via [[getAutoCommitClientConnection]]
  */
-trait DatabaseClient{
+trait DatabaseClient {
+
   /**
    * Opens a database transaction within the given [[block]], automatically committing it
    * if the block returns successfully and rolling it back if the blow fails with an uncaught
@@ -16,12 +17,17 @@ trait DatabaseClient{
 
   /**
    * Provides a [[DbApi]] that you can use to run queries in "auto-commit" mode, such
-   * that every query runs in its own transaction and is committed automatically on-completion
+   * that every query runs in its own transaction and is committed automatically on-completion.
+   *
+   * This can be useful for interactive testing, but requires that you manually manage the
+   * closing of the connection to avoid leaking connections (if using a connection pool like
+   * HikariCP), and should be avoided in most production environments in favor of
+   * `.transaction{...}` blocks.
    */
   def getAutoCommitClientConnection: DbApi
 }
 
-object DatabaseClient{
+object DatabaseClient {
 
   class Connection(
       connection: java.sql.Connection,
@@ -29,10 +35,10 @@ object DatabaseClient{
       dialectConfig: DialectConfig
   ) extends DatabaseClient {
 
-
     def transaction[T](block: DbTxn => T): T = {
       connection.setAutoCommit(false)
-      val txn = new DbApi.Impl(connection, config, dialectConfig, false, () => connection.rollback())
+      val txn =
+        new DbApi.Impl(connection, config, dialectConfig, false, () => connection.rollback())
       try block(txn)
       catch {
         case e: Throwable =>
@@ -40,7 +46,6 @@ object DatabaseClient{
           throw e
       } finally connection.setAutoCommit(true)
     }
-
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
