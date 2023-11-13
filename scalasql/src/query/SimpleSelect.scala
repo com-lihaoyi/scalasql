@@ -44,7 +44,6 @@ class SimpleSelect[Q, R](
           f(expr)(newCtx)
         })
         .renderToSql
-        ._1
         .withCompleteQuery(true)
     }
   }
@@ -139,7 +138,7 @@ class SimpleSelect[Q, R](
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
-      implicit ctx => this.copy(expr = selectProxyExpr).renderToSql,
+      implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery(ctx),
       selectProxyExpr
     )(qr)
   }
@@ -189,13 +188,13 @@ class SimpleSelect[Q, R](
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
-    new SimpleSelect.Renderer(this, prevContext)
+    new SimpleSelect.Renderer(this, prevContext, qr.toSqlQuery(expr, prevContext)._2)
 }
 
 object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.getRenderer(prevContext)
-  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
+  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context, mts: Seq[TypeMapper[_]]) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     val computed = Context.compute(
       prevContext,
@@ -241,7 +240,7 @@ object SimpleSelect {
       )
 
       val joinOns =
-        query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
+        query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
@@ -257,6 +256,6 @@ object SimpleSelect {
 
     lazy val context = implicitCtx
 
-    lazy val mappedTypes = flattenedExpr.map(t => Expr.getMappedType(t._2))
+    lazy val mappedTypes = mts
   }
 }

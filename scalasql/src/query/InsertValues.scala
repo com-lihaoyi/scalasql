@@ -22,7 +22,7 @@ object InsertValues {
     def table = insert.table
     protected def expr: Q = WithExpr.get(insert)
 
-    protected override def renderToSql(implicit ctx: Context) = (
+    override def toSqlQuery(ctx: Context) = (
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render(),
       Seq(TypeMapper.IntType)
     )
@@ -46,7 +46,7 @@ object InsertValues {
     lazy val values = SqlStr.join(
       valuesLists
         .map(values =>
-          sql"(" + SqlStr.join(values.map(Renderable.renderToSql(_)._1), sql", ") + sql")"
+          sql"(" + SqlStr.join(values.map(Renderable.renderToSql(_)), sql", ") + sql")"
         ),
       sql", "
     )

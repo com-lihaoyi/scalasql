@@ -95,7 +95,7 @@ object MySqlDialect extends MySqlDialect {
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
 
-    override def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+    override def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       toSqlQuery0(this, ctx)
     }
 
@@ -123,7 +123,7 @@ object MySqlDialect extends MySqlDialect {
 
     override lazy val where = ExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
     override lazy val joins = optSeq(joins0)(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
@@ -150,13 +150,11 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryValueReader = Query.getValueReader(insert.query)
 
-    protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(
-      ctx
-    )
-    def toSqlQuery0(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+
+    def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val (str, mapped) = Renderable.renderToSql(insert.query)
+      val (str, mapped) = insert.query.toSqlQuery(ctx)
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
         sql", "
@@ -234,7 +232,7 @@ object MySqlDialect extends MySqlDialect {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>
-            val exprStr = Renderable.renderToSql(orderBy.expr)(newCtx)._1
+            val exprStr = Renderable.renderToSql(orderBy.expr)(newCtx)
 
             (orderBy.ascDesc, orderBy.nulls) match {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"

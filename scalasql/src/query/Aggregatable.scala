@@ -20,6 +20,6 @@ class Aggregate[Q, R](toSqlQuery0: Context => (SqlStr, Seq[TypeMapper[_]]), expr
 
   protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
   protected def queryIsSingleRow: Boolean = true
-  protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(ctx)
+  def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(ctx)
   protected def queryValueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
 }

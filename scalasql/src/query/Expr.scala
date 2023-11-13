@@ -1,7 +1,8 @@
 package scalasql.query
 
-import scalasql.{Config, TypeMapper, Queryable}
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.{Config, Queryable, TypeMapper}
+import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
 /**
@@ -9,9 +10,9 @@ import scalasql.utils.OptionPickler
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  protected def mappedType: TypeMapper[T]
-  protected final def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
-    (ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0), Seq(mappedType))
+//  protected def mappedType: TypeMapper[T]
+  protected final def renderToSql(implicit ctx: Context): SqlStr = {
+    ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
   }
 
   protected def toSqlExpr0(implicit ctx: Context): SqlStr
@@ -35,30 +36,38 @@ trait Expr[T] extends SqlStr.Renderable {
 
 object Expr {
   def getIsLiteralTrue[T](e: Expr[T]): Boolean = e.exprIsLiteralTrue
-  def getMappedType[T](e: Expr[T]): TypeMapper[T] = e.mappedType
   def getToString[T](e: Expr[T]): String = e.exprToString
 
   def getIdentity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
   implicit def toExprable[E[_] <: Expr[_], T](
-      implicit valueReader0: OptionPickler.Reader[T]
+      implicit valueReader0: OptionPickler.Reader[T], mt: TypeMapper[T]
   ): Queryable.Row[E[T], T] = new toExprable[E, T]()
 
-  class toExprable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T])
+  class toExprable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T], mt: TypeMapper[T])
       extends Queryable.Row[E[T], T] {
     def walk(q: E[T]) = Seq(Nil -> q)
 
     def valueReader = valueReader0
 
     def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
+
+    def toSqlQuery(q: E[T], ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+      val walked = this.walk(q)
+      val res = ExprsToSql(walked, sql"", ctx)
+      (
+        if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
+        Seq(mt)
+      )
+    }
   }
 
-  def apply[T](f: Context => SqlStr)(implicit mappedType: TypeMapper[T]): Expr[T] = new Simple[T](f)
+  def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
   implicit def optionalize[T](e: Expr[T]): Expr[Option[T]] = {
-    new Simple[Option[T]](e.toSqlExpr0(_))(TypeMapper.OptionType(getMappedType(e)))
+    new Simple[Option[T]](e.toSqlExpr0(_))
   }
-  class Simple[T](f: Context => SqlStr)(implicit val mappedType: TypeMapper[T]) extends Expr[T] {
+  class Simple[T](f: Context => SqlStr) extends Expr[T] {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 

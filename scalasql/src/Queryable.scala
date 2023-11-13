@@ -36,25 +36,28 @@ object Queryable {
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
-    def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
-      val walked = this.walk(q)
-      val res = ExprsToSql(walked, sql"", ctx)
-      (
-        if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
-        walked.map(t => Expr.getMappedType(t._2))
-      )
-    }
+
   }
   object Row {
 
     private class TupleNQueryable[Q, R](
         val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
+        val toSqlQueries: (Q, Context) => Seq[(SqlStr, Seq[TypeMapper[_]])],
         val valueReader0: Q => Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q) = {
         walk0(q).zipWithIndex.map { case (v, i) => (i.toString, v) }.flatMap { case (prefix, vs0) =>
           vs0.map { case (k, v) => (prefix +: k, v) }
         }
+      }
+
+      def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+        val walked = this.walk(q)
+        val res = ExprsToSql(walked, sql"", ctx)
+        (
+          if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
+          toSqlQueries(q, ctx).flatMap(_._2)
+        )
       }
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
@@ -66,6 +69,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2), (R1, R2)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2)),
+        (q, ctx) => Seq(q1.toSqlQuery(q._1, ctx), q2.toSqlQuery(q._2, ctx)),
         t => utils.OptionPickler.Tuple2Reader(q1.valueReader(t._1), q2.valueReader(t._2))
       )
     }
@@ -77,6 +81,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3), (R1, R2, R3)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
+        (q, ctx) => Seq(q1.toSqlQuery(q._1, ctx), q2.toSqlQuery(q._2, ctx), q3.toSqlQuery(q._3, ctx)),
         t =>
           utils.OptionPickler
             .Tuple3Reader(q1.valueReader(t._1), q2.valueReader(t._2), q3.valueReader(t._3))
@@ -91,6 +96,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
+        (q, ctx) => Seq(q1.toSqlQuery(q._1, ctx), q2.toSqlQuery(q._2, ctx), q3.toSqlQuery(q._3, ctx), q4.toSqlQuery(q._4, ctx)),
         t =>
           utils.OptionPickler.Tuple4Reader(
             q1.valueReader(t._1),
@@ -110,6 +116,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
+        (q, ctx) => Seq(q1.toSqlQuery(q._1, ctx), q2.toSqlQuery(q._2, ctx), q3.toSqlQuery(q._3, ctx), q4.toSqlQuery(q._4, ctx), q5.toSqlQuery(q._5, ctx)),
         t =>
           utils.OptionPickler.Tuple5Reader(
             q1.valueReader(t._1),
@@ -139,6 +146,7 @@ object Queryable {
             q5.walk(t._5),
             q6.walk(t._6)
           ),
+        (q, ctx) => Seq(q1.toSqlQuery(q._1, ctx), q2.toSqlQuery(q._2, ctx), q3.toSqlQuery(q._3, ctx), q4.toSqlQuery(q._4, ctx), q5.toSqlQuery(q._5, ctx), q6.toSqlQuery(q._6, ctx)),
         t =>
           utils.OptionPickler.Tuple6Reader(
             q1.valueReader(t._1),
@@ -159,6 +167,8 @@ object Queryable {
         new OptionPickler.NullableReader(qr.valueReader(q.get))
           .asInstanceOf[OptionPickler.Reader[Option[R]]]
       }
+
+      def toSqlQuery(q: JoinNullable[Q], ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = qr.toSqlQuery(q.get, ctx)
     }
   }
 

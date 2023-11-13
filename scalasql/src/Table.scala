@@ -1,6 +1,6 @@
 package scalasql
 import scala.language.experimental.macros
-import renderer.{Context, JoinsToSql, SqlStr}
+import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
 import scalasql.utils.OptionPickler
@@ -37,11 +37,23 @@ object Table {
   object Internal {
     class TableQueryable[Q, R](
         flatten0: Q => Seq[(List[String], Expr[_])],
+        val toSqlQueries: (Q, Context) => Seq[(SqlStr, Seq[TypeMapper[_]])],
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
 
+
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
+
+
+      def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+        val walked = this.walk(q)
+        val res = ExprsToSql(walked, sql"", ctx)
+        (
+          if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
+          toSqlQueries(q, ctx).flatMap(_._2)
+        )
+      }
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(

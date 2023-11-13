@@ -165,7 +165,7 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  protected def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+  def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
     val renderer = getRenderer(ctx)
 
     (renderer.render(None).withCompleteQuery(true), renderer.mappedTypes)
@@ -198,7 +198,7 @@ trait Select[Q, R]
    * with some like Sqlite simply taking the first row while others like Postgres/MySql
    * throwing exceptions
    */
-  def toExpr(implicit mt: TypeMapper[R]): Expr[R] = Expr { implicit ctx => this.renderToSql._1 }
+  def toExpr(implicit mt: TypeMapper[R]): Expr[R] = Expr { implicit ctx => this.renderToSql }
 
   protected def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s

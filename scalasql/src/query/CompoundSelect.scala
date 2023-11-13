@@ -194,7 +194,7 @@ object CompoundSelect {
               case Nulls.First => sql" NULLS FIRST"
               case Nulls.Last => sql" NULLS LAST"
             }
-            Renderable.renderToSql(orderBy.expr)(newCtx)._1 + ascDesc + nulls
+            Renderable.renderToSql(orderBy.expr)(newCtx) + ascDesc + nulls
           },
           sql", "
         )

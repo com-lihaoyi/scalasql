@@ -66,7 +66,7 @@ object Update {
       this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
     }
 
-    protected override def renderToSql(implicit ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
+    override def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
       new Renderer(joins, table, set0, where, ctx).render()
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
@@ -106,7 +106,7 @@ object Update {
 
     lazy val joinOns = joins0
       .drop(1)
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)._1))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
     lazy val joins = optSeq(joins0.drop(1))(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)

@@ -14,6 +14,9 @@ trait Query[R] extends Renderable {
   protected def queryIsSingleRow: Boolean
   protected def queryValueReader: OptionPickler.Reader[R]
   protected def queryIsExecuteUpdate: Boolean = false
+
+  protected override def renderToSql(implicit ctx: Context): SqlStr = toSqlQuery(ctx)._1
+  def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]])
 }
 
 object Query {
@@ -27,8 +30,7 @@ object Query {
     override def singleRow(q: Q) = q.queryIsSingleRow
 
     override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader
-    override def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
-      Renderable.renderToSql(q)(ctx)
+    def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = q.toSqlQuery(ctx)
   }
 
   trait Multiple[R] extends Query[Seq[R]]
@@ -39,7 +41,7 @@ object Query {
 
     protected def queryIsSingleRow: Boolean = true
 
-    protected def renderToSql(implicit ctx: Context) = Renderable.renderToSql(query)
+    def toSqlQuery(ctx: Context) = query.toSqlQuery(ctx)
 
     protected def queryValueReader =
       Query.getValueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r

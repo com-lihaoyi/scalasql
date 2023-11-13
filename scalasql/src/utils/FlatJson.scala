@@ -33,7 +33,7 @@ object FlatJson {
     x.map { case (k, v) =>
       (
         (context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter),
-        Renderable.renderToSql(v)(context)._1
+        Renderable.renderToSql(v)(context)
       )
     }
   }
