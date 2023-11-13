@@ -1,21 +1,17 @@
 package scalasql.operations
 
-import scalasql.TypeMapper
-import scalasql.query.{Expr, JoinNullable}
-import scalasql.renderer.SqlStr
+import scalasql.query.Expr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 import scala.reflect.ClassTag
 
 class ExprTypedOps[T: ClassTag](v: Expr[T]) {
 
-  private def isNullable[T: ClassTag](value: Expr[T]) =
-    implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]] ||
-      implicitly[ClassTag[T]].runtimeClass == classOf[JoinNullable[_]]
+  private def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]]
 
   /** Equals to */
   def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
-    (isNullable(v), isNullable(x)) match {
+    (isNullable[T], isNullable[V]) match {
       case (true, true) => sql"($v IS NULL AND $x IS NULL) OR $v = $x"
       case _ => sql"$v = $x"
     }
@@ -23,9 +19,9 @@ class ExprTypedOps[T: ClassTag](v: Expr[T]) {
 
   /** Not equal to */
   def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
-    (isNullable(v), isNullable(x)) match {
+    (isNullable[T], isNullable[V]) match {
       case (true, true) => sql"($v IS NULL AND $x IS NULL) OR $v = $x"
-      case (false, false) => sql"$v <> $x"
+      case _ => sql"$v <> $x"
     }
   }
 
