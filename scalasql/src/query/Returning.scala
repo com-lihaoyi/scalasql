@@ -11,7 +11,7 @@ import scalasql.utils.OptionPickler
  */
 trait Returnable[Q] extends Renderable with WithExpr[Q] {
   def table: TableRef
-  def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]])
+  def toSqlStr(ctx: Context): SqlStr
 }
 
 trait InsertReturnable[Q] extends Returnable[Q]
@@ -42,19 +42,21 @@ object Returning {
 
     override def queryIsSingleRow = false
 
-    override def toSqlQuery(ctx0: Context): (SqlStr, Seq[TypeMapper[_]]) =
-      toSqlQuery0(ctx0)
-
-    def toSqlQuery0(ctx0: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+    override def toSqlStr(ctx0: Context) = {
       val computed = Context.compute(ctx0, Nil, Some(returnable.table))
       import computed.implicitCtx
 
-      val (prefix, mts) = returnable.toSqlQuery(implicitCtx)
+      val prefix = returnable.toSqlStr(implicitCtx)
       val flattenedExpr = qr.walk(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"
 
-      (prefix + suffix, qr.toSqlQuery(returning, implicitCtx)._2)
+      prefix + suffix
+    }
+    def toTypeMappers(ctx0: Context): Seq[TypeMapper[_]] = {
+      val computed = Context.compute(ctx0, Nil, Some(returnable.table))
+      import computed.implicitCtx
+      qr.toTypeMappers(returning, implicitCtx)
     }
   }
   class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable.Row[Q, R])

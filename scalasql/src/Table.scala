@@ -46,13 +46,14 @@ object Table {
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
 
 
-      def toSqlQuery(q: Q, ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+      def toSqlStr(q: Q, ctx: Context): SqlStr = {
         val walked = this.walk(q)
         val res = ExprsToSql(walked, sql"", ctx)
-        (
-          if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix),
-          toSqlQueries(q, ctx).flatMap(_._2)
-        )
+        if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
+      }
+
+      def toTypeMappers(q: Q, ctx: Context): Seq[TypeMapper[_]] = {
+        toSqlQueries(q, ctx).flatMap(_._2)
       }
     }
 

@@ -95,15 +95,8 @@ object MySqlDialect extends MySqlDialect {
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
 
-    override def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
-      toSqlQuery0(this, ctx)
-    }
-
-    def toSqlQuery0[Q, R](
-        q: Update.Impl[Q, R],
-        prevContext: Context
-    ): (SqlStr, Seq[TypeMapper[_]]) = {
-      new UpdateRenderer(q.joins, q.table, q.set0, q.where, prevContext).render()
+    override def toSqlStr(ctx: Context) = {
+      new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
     }
 
   }
@@ -128,7 +121,7 @@ object MySqlDialect extends MySqlDialect {
     override lazy val joins = optSeq(joins0)(
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
     )
-    override def render() = (sql"UPDATE $tableName" + joins + sql" SET " + sets + where, Nil)
+    override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + where
   }
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
@@ -151,15 +144,18 @@ object MySqlDialect extends MySqlDialect {
     protected def queryValueReader = Query.getValueReader(insert.query)
 
 
-    def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = {
+    def toSqlStr(ctx: Context) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val (str, mapped) = insert.query.toSqlQuery(ctx)
+      val str = insert.query.toSqlStr(ctx)
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
         sql", "
       )
-      (str + sql" ON DUPLICATE KEY UPDATE $updatesStr", mapped)
+      str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
+    }
+    def toTypeMappers(ctx: Context) = {
+      insert.query.toTypeMappers(ctx)
     }
   }
 

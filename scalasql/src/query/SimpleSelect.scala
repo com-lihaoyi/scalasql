@@ -138,7 +138,8 @@ class SimpleSelect[Q, R](
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     new Aggregate[E, V](
-      implicit ctx => this.copy(expr = selectProxyExpr).toSqlQuery(ctx),
+      implicit ctx => this.copy(expr = selectProxyExpr).toSqlStr(ctx),
+      implicit ctx => this.copy(expr = selectProxyExpr).toTypeMappers(ctx),
       selectProxyExpr
     )(qr)
   }
@@ -188,13 +189,15 @@ class SimpleSelect[Q, R](
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
-    new SimpleSelect.Renderer(this, prevContext, qr.toSqlQuery(expr, prevContext)._2)
+    new SimpleSelect.Renderer(this, prevContext)
+
+  override def toTypeMappers(ctx: Context) = qr.toTypeMappers(expr, ctx)
 }
 
 object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.getRenderer(prevContext)
-  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context, mts: Seq[TypeMapper[_]]) extends Select.Renderer {
+  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     val computed = Context.compute(
       prevContext,
@@ -256,6 +259,5 @@ object SimpleSelect {
 
     lazy val context = implicitCtx
 
-    lazy val mappedTypes = mts
   }
 }

@@ -15,8 +15,8 @@ object Delete {
     def queryWalkExprs() = Nil
     def queryIsSingleRow = true
 
-    def toSqlQuery(ctx: Context) =
-      (new Renderer(table, filter, ctx).render(), Seq(TypeMapper.IntType))
+    def toSqlStr(ctx: Context) = new Renderer(table, filter, ctx).render()
+    def toTypeMappers(ctx: Context) = Seq(TypeMapper.IntType)
 
     protected def queryValueReader = implicitly
   }

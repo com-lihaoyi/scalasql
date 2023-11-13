@@ -14,12 +14,15 @@ trait Aggregatable[Q] extends WithExpr[Q] {
   ): Expr[V]
 }
 
-class Aggregate[Q, R](toSqlQuery0: Context => (SqlStr, Seq[TypeMapper[_]]), expr: Q)(
+class Aggregate[Q, R](toSqlStr0: Context => SqlStr,
+                      toTypeMappers0: Context => Seq[TypeMapper[_]],
+                      expr: Q)(
     qr: Queryable[Q, R]
 ) extends Query[R] {
 
   protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
   protected def queryIsSingleRow: Boolean = true
-  def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) = toSqlQuery0(ctx)
+  def toSqlStr(ctx: Context) = toSqlStr0(ctx)
+  def toTypeMappers(ctx: Context) = toTypeMappers0(ctx)
   protected def queryValueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
 }

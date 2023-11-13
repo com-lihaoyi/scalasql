@@ -66,8 +66,10 @@ object Update {
       this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
     }
 
-    override def toSqlQuery(ctx: Context): (SqlStr, Seq[TypeMapper[_]]) =
+    override def toSqlStr(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
+
+    override def toTypeMappers(ctx: Context) = Seq(TypeMapper.IntType)
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 
@@ -112,8 +114,7 @@ object Update {
       JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
     )
 
-    def render() =
-      (sql"UPDATE $tableName SET " + sets + from + joins + where, Seq(TypeMapper.IntType))
+    def render() = sql"UPDATE $tableName SET " + sets + from + joins + where
 
   }
 }
