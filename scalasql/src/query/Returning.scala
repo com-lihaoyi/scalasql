@@ -53,10 +53,8 @@ object Returning {
 
       prefix + suffix
     }
-    def toTypeMappers(ctx0: Context): Seq[TypeMapper[_]] = {
-      val computed = Context.compute(ctx0, Nil, Some(returnable.table))
-      import computed.implicitCtx
-      qr.toTypeMappers(returning, implicitCtx)
+    def toTypeMappers(): Seq[TypeMapper[_]] = {
+      qr.toTypeMappers(returning)
     }
   }
   class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable.Row[Q, R])

@@ -154,8 +154,8 @@ object MySqlDialect extends MySqlDialect {
       )
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
-    def toTypeMappers(ctx: Context) = {
-      insert.query.toTypeMappers(ctx)
+    def toTypeMappers() = {
+      insert.query.toTypeMappers()
     }
   }
 

@@ -15,7 +15,7 @@ trait Aggregatable[Q] extends WithExpr[Q] {
 }
 
 class Aggregate[Q, R](toSqlStr0: Context => SqlStr,
-                      toTypeMappers0: Context => Seq[TypeMapper[_]],
+                      toTypeMappers0: Seq[TypeMapper[_]],
                       expr: Q)(
     qr: Queryable[Q, R]
 ) extends Query[R] {
@@ -23,6 +23,6 @@ class Aggregate[Q, R](toSqlStr0: Context => SqlStr,
   protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
   protected def queryIsSingleRow: Boolean = true
   def toSqlStr(ctx: Context) = toSqlStr0(ctx)
-  def toTypeMappers(ctx: Context) = toTypeMappers0(ctx)
+  def toTypeMappers() = toTypeMappers0
   protected def queryValueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
 }

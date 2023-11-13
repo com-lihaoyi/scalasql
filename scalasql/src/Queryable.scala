@@ -19,7 +19,7 @@ trait Queryable[-Q, R] {
   def singleRow(q: Q): Boolean
 
   def toSqlStr(q: Q, ctx: Context): SqlStr
-  def toTypeMappers(q: Q, ctx: Context): Seq[TypeMapper[_]]
+  def toTypeMappers(q: Q): Seq[TypeMapper[_]]
 }
 
 object Queryable {
@@ -43,7 +43,7 @@ object Queryable {
 
     private class TupleNQueryable[Q, R](
         val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
-        val toTypeMappers0: (Q, Context) => Seq[Seq[TypeMapper[_]]],
+        val toTypeMappers0: Q => Seq[Seq[TypeMapper[_]]],
         val valueReader0: Q => Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q) = {
@@ -58,9 +58,7 @@ object Queryable {
         if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
       }
 
-      def toTypeMappers(q: Q, ctx: Context): Seq[TypeMapper[_]] = {
-        toTypeMappers0(q, ctx).flatten
-      }
+      def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0(q).flatten
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
     }
@@ -71,7 +69,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2), (R1, R2)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2)),
-        (q, ctx) => Seq(q1.toTypeMappers(q._1, ctx), q2.toTypeMappers(q._2, ctx)),
+        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2)),
         t => utils.OptionPickler.Tuple2Reader(q1.valueReader(t._1), q2.valueReader(t._2))
       )
     }
@@ -83,7 +81,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3), (R1, R2, R3)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
-        (q, ctx) => Seq(q1.toTypeMappers(q._1, ctx), q2.toTypeMappers(q._2, ctx), q3.toTypeMappers(q._3, ctx)),
+        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3)),
         t =>
           utils.OptionPickler
             .Tuple3Reader(q1.valueReader(t._1), q2.valueReader(t._2), q3.valueReader(t._3))
@@ -98,7 +96,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-        (q, ctx) => Seq(q1.toTypeMappers(q._1, ctx), q2.toTypeMappers(q._2, ctx), q3.toTypeMappers(q._3, ctx), q4.toTypeMappers(q._4, ctx)),
+        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4)),
         t =>
           utils.OptionPickler.Tuple4Reader(
             q1.valueReader(t._1),
@@ -118,7 +116,7 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-        (q, ctx) => Seq(q1.toTypeMappers(q._1, ctx), q2.toTypeMappers(q._2, ctx), q3.toTypeMappers(q._3, ctx), q4.toTypeMappers(q._4, ctx), q5.toTypeMappers(q._5, ctx)),
+        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4), q5.toTypeMappers(q._5)),
         t =>
           utils.OptionPickler.Tuple5Reader(
             q1.valueReader(t._1),
@@ -148,7 +146,7 @@ object Queryable {
             q5.walk(t._5),
             q6.walk(t._6)
           ),
-        (q, ctx) => Seq(q1.toTypeMappers(q._1, ctx), q2.toTypeMappers(q._2, ctx), q3.toTypeMappers(q._3, ctx), q4.toTypeMappers(q._4, ctx), q5.toTypeMappers(q._5, ctx), q6.toTypeMappers(q._6, ctx)),
+        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4), q5.toTypeMappers(q._5), q6.toTypeMappers(q._6)),
         t =>
           utils.OptionPickler.Tuple6Reader(
             q1.valueReader(t._1),
@@ -171,7 +169,7 @@ object Queryable {
       }
 
       def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
-      def toTypeMappers(q: JoinNullable[Q], ctx: Context) = qr.toTypeMappers(q.get, ctx)
+      def toTypeMappers(q: JoinNullable[Q]) = qr.toTypeMappers(q.get)
     }
   }
 

@@ -193,7 +193,7 @@ object DbApi {
     ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
       val ctx = Context.Impl(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
       val sqlStr = qr.toSqlStr(query, ctx)
-      val mappedTypes = qr.toTypeMappers(query, ctx)
+      val mappedTypes = qr.toTypeMappers(query)
       val flattened = SqlStr.flatten(sqlStr)
       val queryStr = flattened.queryParts
         .zipAll(flattened.params, "", null)

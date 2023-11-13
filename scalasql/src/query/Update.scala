@@ -69,7 +69,7 @@ object Update {
     override def toSqlStr(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    override def toTypeMappers(ctx: Context) = Seq(TypeMapper.IntType)
+    override def toTypeMappers() = Seq(TypeMapper.IntType)
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 

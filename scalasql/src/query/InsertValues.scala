@@ -25,7 +25,7 @@ object InsertValues {
     override def toSqlStr(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render()
 
-    override def toTypeMappers(ctx: Context) =Seq (TypeMapper.IntType)
+    override def toTypeMappers() =Seq (TypeMapper.IntType)
 
     def queryWalkExprs() = Nil
     protected override def queryIsSingleRow = true

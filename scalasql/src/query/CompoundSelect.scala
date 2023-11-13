@@ -121,7 +121,7 @@ class CompoundSelect[Q, R](
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
-  override def toTypeMappers(ctx: Context) = qr.toTypeMappers(expr, ctx)
+  override def toTypeMappers() = qr.toTypeMappers(expr)
 }
 
 object CompoundSelect {

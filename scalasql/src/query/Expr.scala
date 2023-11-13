@@ -58,9 +58,7 @@ object Expr {
       val res = ExprsToSql(walked, sql"", ctx)
       if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
     }
-    def toTypeMappers(q: E[T], ctx: Context) = {
-      Seq(mt)
-    }
+    def toTypeMappers(q: E[T]) = Seq(mt)
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)

@@ -20,7 +20,7 @@ object InsertSelect {
     override def toSqlStr(ctx: Context) =
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render()
 
-    override def toTypeMappers(ctx: Context) = Seq(TypeMapper.IntType)
+    override def toTypeMappers() = Seq(TypeMapper.IntType)
 
     protected override def queryIsExecuteUpdate = true
 

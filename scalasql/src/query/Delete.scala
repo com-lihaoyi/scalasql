@@ -16,7 +16,7 @@ object Delete {
     def queryIsSingleRow = true
 
     def toSqlStr(ctx: Context) = new Renderer(table, filter, ctx).render()
-    def toTypeMappers(ctx: Context) = Seq(TypeMapper.IntType)
+    def toTypeMappers() = Seq(TypeMapper.IntType)
 
     protected def queryValueReader = implicitly
   }

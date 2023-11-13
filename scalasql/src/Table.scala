@@ -37,7 +37,7 @@ object Table {
   object Internal {
     class TableQueryable[Q, R](
         flatten0: Q => Seq[(List[String], Expr[_])],
-        val toSqlQueries: (Q, Context) => Seq[(SqlStr, Seq[TypeMapper[_]])],
+        val toTypeMappers0: Q => Seq[TypeMapper[_]],
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
@@ -45,16 +45,13 @@ object Table {
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
 
-
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         val walked = this.walk(q)
         val res = ExprsToSql(walked, sql"", ctx)
         if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
       }
 
-      def toTypeMappers(q: Q, ctx: Context): Seq[TypeMapper[_]] = {
-        toSqlQueries(q, ctx).flatMap(_._2)
-      }
+      def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0(q)
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(

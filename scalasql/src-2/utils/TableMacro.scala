@@ -16,7 +16,7 @@ object TableMacros {
       q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
     }
     val allToSqlQueryExprs = for (applyParam <- applyParameters) yield {
-      q"""(sql"", Seq(implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]))"""
+      q"""implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]"""
     }
 
     val flattenExprs = for (applyParam <- applyParameters) yield {
@@ -31,7 +31,7 @@ object TableMacros {
     new _root_.scalasql.Table.Metadata[$wtt](
       new _root_.scalasql.Table.Internal.TableQueryable(
         table => $allFlattenedExprs,
-        (table, ctx) => Seq(..$allToSqlQueryExprs),
+        table => $allToSqlQueryExprs,
         _root_.scalasql.utils.OptionPickler.macroR
       ),
       ($tableRef: _root_.scalasql.query.TableRef) => new $wtt(..$queryParams)

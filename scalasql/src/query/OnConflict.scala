@@ -29,7 +29,7 @@ object OnConflict {
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING"
     }
 
-    def toTypeMappers(ctx: Context) = query.toTypeMappers(ctx)
+    def toTypeMappers() = query.toTypeMappers()
 
     override def queryIsExecuteUpdate = true
 
@@ -59,7 +59,7 @@ object OnConflict {
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
     }
 
-    def toTypeMappers(ctx: Context) = query.toTypeMappers(ctx)
+    def toTypeMappers() = query.toTypeMappers()
     override def queryIsExecuteUpdate = true
     protected def queryValueReader = Query.getValueReader(query)
   }

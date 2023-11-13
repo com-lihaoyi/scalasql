@@ -137,9 +137,10 @@ class SimpleSelect[Q, R](
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
     val selectProxyExpr = f(new SelectProxy[Q](expr))
+    val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
-      implicit ctx => this.copy(expr = selectProxyExpr).toSqlStr(ctx),
-      implicit ctx => this.copy(expr = selectProxyExpr).toTypeMappers(ctx),
+      implicit ctx => copied.toSqlStr(ctx),
+      this.copy(expr = selectProxyExpr).toTypeMappers(),
       selectProxyExpr
     )(qr)
   }
@@ -191,7 +192,7 @@ class SimpleSelect[Q, R](
   protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  override def toTypeMappers(ctx: Context) = qr.toTypeMappers(expr, ctx)
+  override def toTypeMappers() = qr.toTypeMappers(expr)
 }
 
 object SimpleSelect {
