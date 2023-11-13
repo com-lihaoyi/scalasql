@@ -2,7 +2,9 @@ package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps}
 import scalasql.query.{Aggregatable, Expr, JoinNullable, Select}
-import scalasql.{TypeMapper, Queryable, Table, operations}
+import scalasql.{Queryable, Table, TypeMapper, operations}
+
+import scala.reflect.ClassTag
 
 /**
  * Base type for all SQL dialects. A Dialect proides extension methods, extension operators,
@@ -16,6 +18,8 @@ trait Dialect extends DialectConfig {
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
 
   implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
+
+  implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] = new operations.ExprTypedOps(v)
 
   implicit def ExprOptionOpsConv[T: TypeMapper](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)

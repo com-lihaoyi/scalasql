@@ -54,7 +54,6 @@ object Returning {
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"
 
-      pprint.log(mts)
       (prefix + suffix, qr.toSqlQuery(returning, implicitCtx)._2)
     }
   }
