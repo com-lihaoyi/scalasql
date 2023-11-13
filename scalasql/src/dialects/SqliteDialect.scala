@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{Id, Queryable, Table, dialects, operations}
+import scalasql.{Id, Queryable, Table, TypeMapper, dialects, operations}
 import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, Join, Nulls, OrderBy, Select}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
@@ -8,6 +8,9 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   def defaultQueryableSuffix = ""
   def castParams = false
+
+  override implicit def ExprOpsConv(v: Expr[_]): SqliteDialect.ExprOps =
+    new SqliteDialect.ExprOps(v)
 
   override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
@@ -17,7 +20,16 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
 }
 
 object SqliteDialect extends SqliteDialect {
+  class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
+    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
+      val s = implicitly[TypeMapper[V]] match {
+        case TypeMapper.LocalDateType | TypeMapper.LocalDateTimeType | TypeMapper.InstantType => "VARCHAR"
+        case s => s.typeString
+      }
 
+      sql"CAST($v AS ${SqlStr.raw(s)})"
+    }
+  }
   class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with TrimOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
     def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"GLOB($v, $x)" }

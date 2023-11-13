@@ -98,6 +98,36 @@ trait ExprOpsTests extends ScalaSqlSuite {
         ),
         value = "1234.5678"
       )
+
+      test("localdate") - checker(
+        query = Expr("2001-02-03").cast[java.time.LocalDate],
+        sqls = Seq(
+          "SELECT CAST(? AS DATE) as res",
+          "SELECT CAST(? AS VARCHAR) as res"
+        ),
+        value = java.time.LocalDate.parse("2001-02-03")
+      )
+
+      test("localdatetime") - checker(
+        query = Expr("2023-11-12 03:22:41").cast[java.time.LocalDateTime],
+        sqls = Seq(
+          "SELECT CAST(? AS DATETIME) as res",
+          "SELECT CAST(? AS TIMESTAMP) as res",
+          "SELECT CAST(? AS VARCHAR) as res"
+        ),
+        value = java.time.LocalDateTime.parse("2023-11-12T03:22:41")
+      )
+
+      test("instant") - checker(
+        query = Expr("2007-12-03 10:15:30.00").cast[java.time.Instant],
+        sqls = Seq(
+          "SELECT CAST(? AS DATETIME) as res",
+          "SELECT CAST(? AS TIMESTAMP) as res",
+          "SELECT CAST(? AS VARCHAR) as res"
+        ),
+        value = java.time.Instant.parse("2007-12-03T02:15:30.00Z")
+      )
+
     }
   }
 }

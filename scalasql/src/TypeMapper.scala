@@ -114,7 +114,20 @@ object TypeMapper {
 
   implicit object InstantType extends TypeMapper[Instant] {
     def jdbcType = JDBCType.TIMESTAMP
-    def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant
+    def get(r: ResultSet, idx: Int) = {
+      r.getObject(idx) match{
+        // Sqlite sometimes returns this
+        case l: java.lang.Long => Instant.ofEpochMilli(l)
+        // Sqlite sometimes also returns this
+        case s: java.lang.String => java.sql.Timestamp.valueOf(s).toInstant
+        // H2 and HsqlDb return this
+        case o: java.time.OffsetDateTime => o.toInstant
+        // MySql returns this
+        case l: java.time.LocalDateTime => l.toInstant(ZoneId.systemDefault().getRules().getOffset(Instant.now()))
+        // Everyone seems to return this sometimes
+        case l: java.sql.Timestamp => l.toInstant()
+      }
+    }
     def put(r: PreparedStatement, idx: Int, v: Instant) = r
       .setTimestamp(idx, java.sql.Timestamp.from(v))
   }

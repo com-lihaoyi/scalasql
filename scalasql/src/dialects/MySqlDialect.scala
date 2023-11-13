@@ -49,6 +49,7 @@ object MySqlDialect extends MySqlDialect {
             TypeMapper.LongType =>
           "SIGNED"
         case TypeMapper.StringType => "CHAR"
+        case TypeMapper.LocalDateTimeType | TypeMapper.InstantType => "DATETIME"
         case s => s.typeString
       }
 
