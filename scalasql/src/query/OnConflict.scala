@@ -24,14 +24,14 @@ object OnConflict {
     protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
-    def toSqlStr(ctx: Context) = {
-      val str = query.toSqlStr(ctx)
+    protected def renderToSql(ctx: Context) = {
+      val str = Renderable.renderToSql(query)(ctx)
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING"
     }
 
-    def toTypeMappers() = query.toTypeMappers()
+    protected def queryTypeMappers() = Query.getTypeMappers(query)
 
-    override def queryIsExecuteUpdate = true
+    protected override def queryIsExecuteUpdate = true
 
     protected def queryValueReader = Query.getValueReader(query)
 
@@ -47,10 +47,10 @@ object OnConflict {
     protected def expr = WithExpr.get(query)
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
-    def toSqlStr(ctx: Context) = {
+    protected def renderToSql(ctx: Context) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val str = query.toSqlStr(implicitCtx)
+      val str = Renderable.renderToSql(query)
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
@@ -59,8 +59,8 @@ object OnConflict {
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
     }
 
-    def toTypeMappers() = query.toTypeMappers()
-    override def queryIsExecuteUpdate = true
+    protected def queryTypeMappers() = Query.getTypeMappers(query)
+    protected override def queryIsExecuteUpdate = true
     protected def queryValueReader = Query.getValueReader(query)
   }
 }

@@ -10,8 +10,8 @@ import scalasql.utils.OptionPickler
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  protected final def renderToSql(implicit ctx: Context): SqlStr = {
-    ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0)
+  protected final def renderToSql(ctx: Context): SqlStr = {
+    ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0(ctx))
   }
 
   protected def toSqlExpr0(implicit ctx: Context): SqlStr
@@ -41,11 +41,14 @@ object Expr {
   class Identity()
 
   implicit def toExprable[E[_] <: Expr[_], T](
-      implicit valueReader0: OptionPickler.Reader[T], mt: TypeMapper[T]
+      implicit valueReader0: OptionPickler.Reader[T],
+      mt: TypeMapper[T]
   ): Queryable.Row[E[T], T] = new toExprable[E, T]()
 
-  class toExprable[E[_] <: Expr[_], T](implicit valueReader0: OptionPickler.Reader[T], mt: TypeMapper[T])
-      extends Queryable.Row[E[T], T] {
+  class toExprable[E[_] <: Expr[_], T](
+      implicit valueReader0: OptionPickler.Reader[T],
+      mt: TypeMapper[T]
+  ) extends Queryable.Row[E[T], T] {
     def walk(q: E[T]) = Seq(Nil -> q)
 
     def valueReader = valueReader0

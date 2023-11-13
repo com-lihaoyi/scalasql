@@ -51,7 +51,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         checker(query = Expr(true) <= Expr(true), sql = "SELECT ? <= ? as res", value = true)
     }
 
-    test("cast"){
+    test("cast") {
       test("byte") - checker(
         query = Expr(45.12).cast[Byte],
         sqls = Seq(
@@ -86,7 +86,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
           "SELECT CAST(? AS BIGINT) as res",
           "SELECT CAST(? AS SIGNED) as res"
         ),
-        value = 1234l
+        value = 1234L
       )
 
       test("string") - checker(

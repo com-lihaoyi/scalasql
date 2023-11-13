@@ -66,10 +66,10 @@ object Update {
       this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
     }
 
-    override def toSqlStr(ctx: Context): SqlStr =
+    protected override def renderToSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    override def toTypeMappers() = Seq(TypeMapper.IntType)
+    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 

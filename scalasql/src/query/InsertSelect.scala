@@ -17,10 +17,10 @@ object InsertSelect {
 
     def table = insert.table
 
-    override def toSqlStr(ctx: Context) =
+    protected override def renderToSql(ctx: Context) =
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render()
 
-    override def toTypeMappers() = Seq(TypeMapper.IntType)
+    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
 
     protected override def queryIsExecuteUpdate = true
 

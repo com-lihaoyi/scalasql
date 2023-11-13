@@ -44,8 +44,10 @@ trait MySqlDialect extends Dialect {
 object MySqlDialect extends MySqlDialect {
   class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[TypeMapper[V]] match{
-        case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType | TypeMapper.LongType => "SIGNED"
+      val s = implicitly[TypeMapper[V]] match {
+        case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType |
+            TypeMapper.LongType =>
+          "SIGNED"
         case TypeMapper.StringType => "CHAR"
         case s => s.typeString
       }
@@ -95,7 +97,7 @@ object MySqlDialect extends MySqlDialect {
         where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
 
-    override def toSqlStr(ctx: Context) = {
+    protected override def renderToSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
     }
 
@@ -143,19 +145,19 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryValueReader = Query.getValueReader(insert.query)
 
-
-    def toSqlStr(ctx: Context) = {
+    protected def renderToSql(ctx: Context) = {
       val computed = Context.compute(ctx, Nil, Some(table))
       import computed.implicitCtx
-      val str = insert.query.toSqlStr(ctx)
+      val str = Renderable.renderToSql(insert.query)
+
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
         sql", "
       )
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
-    def toTypeMappers() = {
-      insert.query.toTypeMappers()
+    protected def queryTypeMappers() = {
+      Query.getTypeMappers(insert.query)
     }
   }
 

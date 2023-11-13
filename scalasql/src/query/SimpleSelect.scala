@@ -43,7 +43,7 @@ class SimpleSelect[Q, R](
 
           f(expr)(newCtx)
         })
-        .renderToSql
+        .renderToSql(outerCtx)
         .withCompleteQuery(true)
     }
   }
@@ -139,8 +139,8 @@ class SimpleSelect[Q, R](
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
-      implicit ctx => copied.toSqlStr(ctx),
-      this.copy(expr = selectProxyExpr).toTypeMappers(),
+      implicit ctx => copied.renderToSql(ctx),
+      Query.getTypeMappers(copied),
       selectProxyExpr
     )(qr)
   }
@@ -192,7 +192,7 @@ class SimpleSelect[Q, R](
   protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  override def toTypeMappers() = qr.toTypeMappers(expr)
+  protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 }
 
 object SimpleSelect {

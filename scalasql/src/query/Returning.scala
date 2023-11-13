@@ -11,7 +11,6 @@ import scalasql.utils.OptionPickler
  */
 trait Returnable[Q] extends Renderable with WithExpr[Q] {
   def table: TableRef
-  def toSqlStr(ctx: Context): SqlStr
 }
 
 trait InsertReturnable[Q] extends Returnable[Q]
@@ -42,18 +41,18 @@ object Returning {
 
     override def queryIsSingleRow = false
 
-    override def toSqlStr(ctx0: Context) = {
+    protected override def renderToSql(ctx0: Context) = {
       val computed = Context.compute(ctx0, Nil, Some(returnable.table))
       import computed.implicitCtx
 
-      val prefix = returnable.toSqlStr(implicitCtx)
+      val prefix = Renderable.renderToSql(returnable)
       val flattenedExpr = qr.walk(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
       val suffix = sql" RETURNING $exprStr"
 
       prefix + suffix
     }
-    def toTypeMappers(): Seq[TypeMapper[_]] = {
+    protected def queryTypeMappers(): Seq[TypeMapper[_]] = {
       qr.toTypeMappers(returning)
     }
   }

@@ -19,7 +19,8 @@ trait Dialect extends DialectConfig {
 
   implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
 
-  implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] = new operations.ExprTypedOps(v)
+  implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
+    new operations.ExprTypedOps(v)
 
   implicit def ExprOptionOpsConv[T: TypeMapper](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)

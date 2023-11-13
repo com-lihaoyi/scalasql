@@ -11,7 +11,7 @@ class ExprTypedOps[T: ClassTag](v: Expr[T]) {
 
   private def isNullable[T: ClassTag](value: Expr[T]) =
     implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]] ||
-    implicitly[ClassTag[T]].runtimeClass == classOf[JoinNullable[_]]
+      implicitly[ClassTag[T]].runtimeClass == classOf[JoinNullable[_]]
 
   /** Equals to */
   def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>

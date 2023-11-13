@@ -13,8 +13,6 @@ class ExprOps(v: Expr[_]) {
   /** Not equal to */
   def <>[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"$v <> $x" }
 
-
-
   /** Greater than */
   def >[V](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => sql"$v > $x" }
 

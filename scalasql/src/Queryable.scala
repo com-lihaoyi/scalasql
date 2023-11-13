@@ -96,7 +96,13 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4)),
+        (q) =>
+          Seq(
+            q1.toTypeMappers(q._1),
+            q2.toTypeMappers(q._2),
+            q3.toTypeMappers(q._3),
+            q4.toTypeMappers(q._4)
+          ),
         t =>
           utils.OptionPickler.Tuple4Reader(
             q1.valueReader(t._1),
@@ -116,7 +122,14 @@ object Queryable {
     ): Queryable.Row[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
       new Queryable.Row.TupleNQueryable(
         t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4), q5.toTypeMappers(q._5)),
+        (q) =>
+          Seq(
+            q1.toTypeMappers(q._1),
+            q2.toTypeMappers(q._2),
+            q3.toTypeMappers(q._3),
+            q4.toTypeMappers(q._4),
+            q5.toTypeMappers(q._5)
+          ),
         t =>
           utils.OptionPickler.Tuple5Reader(
             q1.valueReader(t._1),
@@ -146,7 +159,15 @@ object Queryable {
             q5.walk(t._5),
             q6.walk(t._6)
           ),
-        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3), q4.toTypeMappers(q._4), q5.toTypeMappers(q._5), q6.toTypeMappers(q._6)),
+        (q) =>
+          Seq(
+            q1.toTypeMappers(q._1),
+            q2.toTypeMappers(q._2),
+            q3.toTypeMappers(q._3),
+            q4.toTypeMappers(q._4),
+            q5.toTypeMappers(q._5),
+            q6.toTypeMappers(q._6)
+          ),
         t =>
           utils.OptionPickler.Tuple6Reader(
             q1.valueReader(t._1),

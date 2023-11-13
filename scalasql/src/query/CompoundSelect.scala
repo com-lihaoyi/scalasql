@@ -121,7 +121,7 @@ class CompoundSelect[Q, R](
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
-  override def toTypeMappers() = qr.toTypeMappers(expr)
+  protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 }
 
 object CompoundSelect {
@@ -177,7 +177,6 @@ object CompoundSelect {
     }
 
     lazy val lhsMap = lhsToSqlQuery.lhsMap
-
 
     def orderToSqlStr(newCtx: Context) = {
 

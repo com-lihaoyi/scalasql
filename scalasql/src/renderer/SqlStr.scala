@@ -105,11 +105,11 @@ object SqlStr {
     new SqlStr(Seq(s), Nil, false, referencedExprs)
 
   trait Renderable {
-    protected def renderToSql(implicit ctx: Context): SqlStr
+    protected def renderToSql(ctx: Context): SqlStr
   }
 
   object Renderable {
-    def renderToSql(x: Renderable)(implicit ctx: Context) = x.renderToSql
+    def renderToSql(x: Renderable)(implicit ctx: Context) = x.renderToSql(ctx)
   }
 
   /**

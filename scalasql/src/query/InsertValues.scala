@@ -22,10 +22,10 @@ object InsertValues {
     def table = insert.table
     protected def expr: Q = WithExpr.get(insert)
 
-    override def toSqlStr(ctx: Context) =
+    protected override def renderToSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, table.value.tableName).render()
 
-    override def toTypeMappers() =Seq (TypeMapper.IntType)
+    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
 
     def queryWalkExprs() = Nil
     protected override def queryIsSingleRow = true

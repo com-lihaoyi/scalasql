@@ -42,7 +42,6 @@ object Table {
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
 
-
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {

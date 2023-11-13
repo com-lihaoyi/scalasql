@@ -66,9 +66,8 @@ trait DbApi extends AutoCloseable {
 
 }
 
-
-
 object DbApi {
+
   /**
    * An interface to a SQL database *transaction*, allowing you to run queries,
    * create savepoints, or roll back the transaction.
@@ -77,6 +76,7 @@ object DbApi {
     def savepoint[T](block: DbApi.Savepoint => T): T
     def rollback(): Unit
   }
+
   /**
    * A SQL `SAVEPOINT`, with an ID, name, and the ability to roll back to when it was created
    */
