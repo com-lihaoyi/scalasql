@@ -23,7 +23,8 @@ object SqliteDialect extends SqliteDialect {
   class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
-        case TypeMapper.LocalDateType | TypeMapper.LocalDateTimeType | TypeMapper.InstantType => "VARCHAR"
+        case TypeMapper.LocalDateType | TypeMapper.LocalDateTimeType | TypeMapper.InstantType =>
+          "VARCHAR"
         case s => s.typeString
       }
 

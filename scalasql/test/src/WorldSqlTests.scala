@@ -649,7 +649,7 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query2) ==> """
         SELECT COUNT(1) as res
         FROM country country0
-        WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
+        WHERE country0.capital IS NOT DISTINCT FROM ?
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query2) ==> 7
@@ -1198,7 +1198,7 @@ object WorldSqlTests extends TestSuite {
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
       // using that in a query to return a string.
       import scalasql.renderer.SqlStr.SqlStringSyntax
-      def rawToHex(v: Expr[String]): Expr[String] = Expr{implicit ctx => sql"RAWTOHEX($v)"}
+      def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
       db.toSqlQuery(query) ==>
         "SELECT RAWTOHEX(city0.name) as res FROM city city0 WHERE city0.countrycode = ?"

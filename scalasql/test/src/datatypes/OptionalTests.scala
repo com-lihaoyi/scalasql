@@ -119,27 +119,103 @@ trait OptionalTests extends ScalaSqlSuite {
     test("scalaEquals") {
       test("someHit") - checker(
         query = Text { OptCols.select.filter(_.myInt === Option(1)) },
-        sql = """
-          SELECT
-            opt_cols0.my_int as res__my_int,
-            opt_cols0.my_int2 as res__my_int2
-          FROM opt_cols opt_cols0
-          WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
-        """,
+        sqls = Seq(
+          """
+            SELECT
+              opt_cols0.my_int as res__my_int,
+              opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            WHERE opt_cols0.my_int IS NOT DISTINCT FROM ?
+          """,
+          // MySQL syntax
+          """
+            SELECT
+              opt_cols0.my_int as res__my_int,
+              opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            WHERE opt_cols0.my_int <=> ?
+          """
+        ),
         value = Seq(OptCols[Id](Some(1), Some(2)))
       )
 
       test("noneHit") - checker(
         query = Text { OptCols.select.filter(_.myInt === Option.empty[Int]) },
-        sql = """
+        sqls = Seq(
+          """
+            SELECT
+              opt_cols0.my_int as res__my_int,
+              opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            WHERE opt_cols0.my_int IS NOT DISTINCT FROM ?
+          """,
+          // MySQL syntax
+          """
+            SELECT
+              opt_cols0.my_int as res__my_int,
+              opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            WHERE opt_cols0.my_int <=> ?
+          """
+        ),
+        value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+      )
+
+      test("notEqualsSome") - checker(
+        query = Text {
+          OptCols.select.filter(_.myInt !== Option(1))
+        },
+        sqls = Seq(
+          """
           SELECT
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
-        """,
-        value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+          WHERE opt_cols0.my_int IS DISTINCT FROM ?
+          """,
+          // MySQL syntax
+          """
+          SELECT
+            opt_cols0.my_int as res__my_int,
+            opt_cols0.my_int2 as res__my_int2
+          FROM opt_cols opt_cols0
+          WHERE (NOT opt_cols0.my_int <=> ?)
+          """
+        ),
+        value = Seq(
+          OptCols[Id](None, None),
+          OptCols[Id](Some(3), None),
+          OptCols[Id](None, Some(value = 4))
+        )
       )
+
+      test("notEqualsNone") - checker(
+        query = Text {
+          OptCols.select.filter(_.myInt !== Option.empty[Int])
+        },
+        sqls = Seq(
+          """
+          SELECT
+            opt_cols0.my_int as res__my_int,
+            opt_cols0.my_int2 as res__my_int2
+          FROM opt_cols opt_cols0
+          WHERE opt_cols0.my_int IS DISTINCT FROM ?
+          """,
+          // MySQL syntax
+          """
+            SELECT
+              opt_cols0.my_int as res__my_int,
+              opt_cols0.my_int2 as res__my_int2
+            FROM opt_cols opt_cols0
+            WHERE (NOT opt_cols0.my_int <=> ?)
+          """
+        ),
+        value = Seq(
+          OptCols[Id](Some(1), Some(2)),
+          OptCols[Id](Some(3), None)
+        )
+      )
+
     }
 
     test("map") - checker(

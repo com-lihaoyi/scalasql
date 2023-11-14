@@ -7,12 +7,12 @@ import scala.reflect.ClassTag
 
 class ExprTypedOps[T: ClassTag](v: Expr[T]) {
 
-  private def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]]
+  protected def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]]
 
   /** Equals to */
   def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
     (isNullable[T], isNullable[V]) match {
-      case (true, true) => sql"($v IS NULL AND $x IS NULL) OR $v = $x"
+      case (true, true) => sql"$v IS NOT DISTINCT FROM $x"
       case _ => sql"$v = $x"
     }
   }
@@ -20,7 +20,7 @@ class ExprTypedOps[T: ClassTag](v: Expr[T]) {
   /** Not equal to */
   def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
     (isNullable[T], isNullable[V]) match {
-      case (true, true) => sql"($v IS NULL AND $x IS NULL) OR $v = $x"
+      case (true, true) => sql"$v IS DISTINCT FROM $x"
       case _ => sql"$v <> $x"
     }
   }

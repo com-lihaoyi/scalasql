@@ -9,8 +9,8 @@ import scalasql.query.{
   GroupBy,
   InsertValues,
   Join,
-  Joinable,
   JoinNullable,
+  Joinable,
   Nulls,
   OrderBy,
   Query,
@@ -22,12 +22,17 @@ import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
+import scala.reflect.ClassTag
+
 trait MySqlDialect extends Dialect {
   def defaultQueryableSuffix = ""
   def castParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): MySqlDialect.ExprOps =
     new MySqlDialect.ExprOps(v)
+
+  override implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
+    new MySqlDialect.ExprTypedOps(v)
 
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
@@ -56,6 +61,27 @@ object MySqlDialect extends MySqlDialect {
       sql"CAST($v AS ${SqlStr.raw(s)})"
     }
   }
+
+  class ExprTypedOps[T: ClassTag](v: Expr[T]) extends operations.ExprTypedOps(v) {
+
+    /** Equals to */
+    override def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
+      (isNullable[T], isNullable[V]) match {
+        case (true, true) => sql"$v <=> $x"
+        case _ => sql"$v = $x"
+      }
+    }
+
+    /** Not equal to */
+    override def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
+      (isNullable[T], isNullable[V]) match {
+        case (true, true) => sql"(NOT $v <=> $x)"
+        case _ => sql"$v <> $x"
+      }
+    }
+
+  }
+
   class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 
