@@ -40,7 +40,6 @@ object Context {
       copy(exprNaming = exprNaming)
   }
   case class Computed(
-      namedFromsMap: Map[From, String],
       fromSelectables: Map[
         From,
         (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)
@@ -104,7 +103,7 @@ object Context {
       prevContext.defaultQueryableSuffix
     )
 
-    Computed(namedFromsMap, fromSelectables, ctx)
+    Computed(fromSelectables, ctx)
   }
 
 }
