@@ -5,7 +5,7 @@ import scalasql.Queryable
 object FlatJoin {
   trait Rhs[Q2, R2]
   class MapResult[Q, Q2, R, R2](
-      val prefix: Option[String],
+      val prefix: String,
       val from: From,
       val on: Option[Expr[Boolean]],
       val qr: Queryable.Row[Q2, R2],
@@ -14,7 +14,7 @@ object FlatJoin {
   ) extends Rhs[Q2, R2]
 
   class FlatMapResult[Q, Q2, R, R2](
-      val prefix: Option[String],
+      val prefix: String,
       val from: From,
       val on: Option[Expr[Boolean]],
       val qr: Queryable.Row[Q2, R2],
@@ -23,7 +23,7 @@ object FlatJoin {
   ) extends Rhs[Q2, R2]
 
   class Mapper[Q, Q2, R, R2](
-      prefix: Option[String],
+      prefix: String,
       from: From,
       expr: Q,
       on: Option[Expr[Boolean]],
@@ -52,13 +52,13 @@ object FlatJoin {
     def map(
         f: JoinNullable[Q] => Q2
     )(implicit qr: Queryable.Row[Q2, R2]): MapResult[Q, Q2, R, R2] = {
-      new MapResult[Q, Q2, R, R2](Some("LEFT"), from, on, qr, f(expr), where)
+      new MapResult[Q, Q2, R, R2]("LEFT JOIN", from, on, qr, f(expr), where)
     }
 
     def flatMap(
         f: JoinNullable[Q] => Rhs[Q2, R2]
     )(implicit qr: Queryable.Row[Q2, R2]): FlatMapResult[Q, Q2, R, R2] = {
-      new FlatMapResult[Q, Q2, R, R2](Some("LEFT"), from, on, qr, f(expr), where)
+      new FlatMapResult[Q, Q2, R, R2]("LEFT JOIN", from, on, qr, f(expr), where)
     }
 
     def filter(x: JoinNullable[Q] => Expr[Boolean]): NullableMapper[Q, Q2, R, R2] = withFilter(x)

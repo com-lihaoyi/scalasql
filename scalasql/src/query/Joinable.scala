@@ -10,12 +10,12 @@ trait Joinable[Q, R] {
   protected def joinableToFromExpr: (From, Q)
   def crossJoin[Q2, R2](): FlatJoin.Mapper[Q, Q2, R, R2] = {
     val (from, expr) = joinableToFromExpr
-    new FlatJoin.Mapper[Q, Q2, R, R2](Some("CROSS"), from, expr, None, Nil)
+    new FlatJoin.Mapper[Q, Q2, R, R2]("CROSS JOIN", from, expr, None, Nil)
   }
 
   def join[Q2, R2](on: Q => Expr[Boolean]): FlatJoin.Mapper[Q, Q2, R, R2] = {
     val (from, expr) = joinableToFromExpr
-    new FlatJoin.Mapper[Q, Q2, R, R2](None, from, expr, Some(on(expr)), Nil)
+    new FlatJoin.Mapper[Q, Q2, R, R2]("JOIN", from, expr, Some(on(expr)), Nil)
   }
   def leftJoin[Q2, R2](on: Q => Expr[Boolean]): FlatJoin.NullableMapper[Q, Q2, R, R2] = {
     val (from, expr) = joinableToFromExpr

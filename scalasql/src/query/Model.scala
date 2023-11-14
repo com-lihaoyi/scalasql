@@ -54,7 +54,7 @@ case class GroupBy(key: Expr[_], select: () => Select[_, _], having: Seq[Expr[_]
 /**
  * Models a SQL `JOIN` clause
  */
-case class Join(prefix: Option[String], from: Seq[Join.From])
+case class Join(prefix: String, from: Seq[Join.From])
 object Join {
   case class From(from: scalasql.query.From, on: Option[Expr[_]])
 }

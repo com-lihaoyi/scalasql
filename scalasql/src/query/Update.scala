@@ -15,7 +15,7 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
 
   def join0[Q2, R2](
-      prefix: Option[String],
+      prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
@@ -56,7 +56,7 @@ object Update {
     def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2](
-        prefix: Option[String],
+        prefix: String,
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Expr[Boolean]]
     )(

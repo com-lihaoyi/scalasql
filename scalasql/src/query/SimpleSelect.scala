@@ -78,7 +78,7 @@ class SimpleSelect[Q, R](
   }
 
   def join0[Q2, R2](
-      prefix: Option[String],
+      prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
@@ -88,7 +88,7 @@ class SimpleSelect[Q, R](
   protected def joinCopy[Q2, R2, Q3, R3](
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]],
-      joinPrefix: Option[String]
+      joinPrefix: String
   )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
 
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
@@ -120,19 +120,19 @@ class SimpleSelect[Q, R](
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = {
-    joinCopy(other, Some(on), Some("LEFT"))((e, o) => (e, JoinNullable(o)))
+    joinCopy(other, Some(on), "LEFT JOIN")((e, o) => (e, JoinNullable(o)))
   }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
       on: (Q, Q2) => Expr[Boolean]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(JoinNullable[Q], Q2), (Option[R], R2)] = {
-    joinCopy(other, Some(on), Some("RIGHT"))((e, o) => (JoinNullable(e), o))
+    joinCopy(other, Some(on), "RIGHT JOIN")((e, o) => (JoinNullable(e), o))
   }
 
   def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
-    joinCopy(other, Some(on), Some("FULL OUTER"))((e, o) => (JoinNullable(e), JoinNullable(o)))
+    joinCopy(other, Some(on), "FULL OUTER JOIN")((e, o) => (JoinNullable(e), JoinNullable(o)))
   }
 
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
@@ -247,8 +247,7 @@ object SimpleSelect {
       val renderedFroms =
         JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, Some(innerLiveExprs))
 
-      val joins =
-        joinsToSqlStr(query.joins, renderedFroms, joinOns)
+      val joins = joinsToSqlStr(query.joins, renderedFroms, joinOns)
 
       val tables = SqlStr
         .join(query.from.map(renderedFroms(_)), sql", ")

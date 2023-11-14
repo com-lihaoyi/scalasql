@@ -58,7 +58,7 @@ class CompoundSelect[Q, R](
   }
 
   def join0[Q2, R2](
-      prefix: Option[String],
+      prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(

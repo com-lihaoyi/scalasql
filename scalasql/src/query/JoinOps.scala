@@ -9,17 +9,23 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
    */
   def join[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
       implicit qr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)] = join0(None, other, Some(on))
+  ): C[(Q, Q2), (R, R2)] = join0("JOIN", other, Some(on))
 
   /**
    * Performs a `CROSS JOIN`, which is an `INNER JOIN` but without the `ON` clause
    */
   def crossJoin[Q2, R2](other: Joinable[Q2, R2])(
       implicit qr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)] = join0(Some("CROSS"), other, None)
+  ): C[(Q, Q2), (R, R2)] = join0("CROSS JOIN", other, None)
+  /**
+   * Performs a `CROSS JOIN`, which is an `INNER JOIN` but without the `ON` clause
+   */
+  def crossJoinLateral[Q2, R2](other: Q => Joinable[Q2, R2])(
+      implicit qr: Queryable.Row[Q2, R2]
+  ): C[(Q, Q2), (R, R2)] = join0("CROSS JOIN LATERAL", other(expr), None)
 
   protected def join0[Q2, R2](
-      prefix: Option[String],
+      prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
@@ -27,7 +33,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   ): C[(Q, Q2), (R, R2)]
 
   protected def joinInfo[Q2, R2](
-      joinPrefix: Option[String],
+      joinPrefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(implicit joinQr: Queryable.Row[Q2, _]) = {
@@ -43,7 +49,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
     (Seq(otherJoin), otherSelect)
   }
   protected def joinInfo0[Q2, R2](
-      joinPrefix: Option[String],
+      joinPrefix: String,
       otherSelect: Select[Q2, R2],
       on: Option[Expr[Boolean]],
       isTrivialJoin: Boolean
