@@ -146,7 +146,7 @@ object MySqlDialect extends MySqlDialect {
     override lazy val joinOns = joins0
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
-    override lazy val joins = optSeq(joins0)(JoinsToSql.joinsToSqlStr(_, fromSelectables, joinOns))
+    override lazy val joins = optSeq(joins0)(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
     override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + whereAll
   }
 

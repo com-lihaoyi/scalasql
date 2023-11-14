@@ -3,8 +3,8 @@ package scalasql.query
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Config, TypeMapper, Queryable}
-import scalasql.renderer.{Context, ExprsToSql, SqlStr}
+import scalasql.{Config, Queryable, TypeMapper}
+import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
 
 /**
@@ -203,7 +203,6 @@ object SimpleSelect {
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, None)
 
-
     lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
@@ -245,13 +244,14 @@ object SimpleSelect {
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
 
-      val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming, Some(innerLiveExprs))
+      val renderedFroms =
+        JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, Some(innerLiveExprs))
 
       val joins =
-        joinsToSqlStr(query.joins, fromSelectables, joinOns)
+        joinsToSqlStr(query.joins, renderedFroms, joinOns)
 
       val tables = SqlStr
-        .join(query.from.map(fromSelectables(_)._2), sql", ")
+        .join(query.from.map(renderedFroms(_)), sql", ")
 
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }

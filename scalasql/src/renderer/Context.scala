@@ -43,17 +43,12 @@ object Context {
   def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
     val namedFromsMap =
       prevContext.fromNaming ++
-        selectables
-          .zipWithIndex
-          .map {
-            case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + i)
-            case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
-            case x => throw new Exception("wtf " + x)
-          }
-          .toMap ++
+        selectables.zipWithIndex.map {
+          case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + i)
+          case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
+          case x => throw new Exception("wtf " + x)
+        }.toMap ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
-
-
 
     val exprNaming =
       prevContext.exprNaming ++
@@ -71,29 +66,5 @@ object Context {
       prevContext.defaultQueryableSuffix
     )
   }
-
-  def fromSelectables(selectables: Seq[From], prevContext: Context, namedFromsMap: Map[From, String],
-                      liveExprs: Option[Set[Expr.Identity]]) = selectables
-    .map(f =>
-      (
-        f,
-        f match {
-          case t: TableRef =>
-            (
-              Map.empty[Expr.Identity, SqlStr],
-                SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
-                  SqlStr.raw(namedFromsMap(t))
-            )
-
-          case t: SubqueryRef[_, _] =>
-            val toSqlQuery = Select.getRenderer(t.value, prevContext)
-            (
-              toSqlQuery.lhsMap,
-                sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
-            )
-        }
-      )
-    )
-    .toMap
 
 }

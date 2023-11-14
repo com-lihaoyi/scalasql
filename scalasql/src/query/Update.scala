@@ -85,7 +85,6 @@ object Update {
     lazy val froms = joins0.flatMap(_.from).map(_.from)
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, Some(table))
 
-
     lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
 
     lazy val updateList = set0.map { case assign =>
@@ -96,10 +95,14 @@ object Update {
 
     lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
-    lazy val liveExprs = sets.referencedExprs.toSet ++ where.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
-    lazy val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming, Some(liveExprs))
+    lazy val liveExprs =
+      sets.referencedExprs.toSet ++ where.referencedExprs ++ joinOns.flatten.flatten.flatMap(
+        _.referencedExprs
+      )
+    lazy val renderedFroms =
+      JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, Some(liveExprs))
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
-      val froms = firstJoin.from.map { jf => fromSelectables(jf.from)._2 }
+      val froms = firstJoin.from.map { jf => renderedFroms(jf.from) }
       sql" FROM " + SqlStr.join(froms, sql", ")
     }
     lazy val fromOns = joins0.headOption match {
@@ -107,13 +110,11 @@ object Update {
       case Some(firstJoin) => firstJoin.from.flatMap(_.on)
     }
 
-
-
     lazy val joinOns = joins0
       .drop(1)
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
-    lazy val joins = optSeq(joins0.drop(1))(JoinsToSql.joinsToSqlStr(_, fromSelectables, joinOns))
+    lazy val joins = optSeq(joins0.drop(1))(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
 
     def render() = sql"UPDATE $tableName SET " + sets + from + joins + where
 
