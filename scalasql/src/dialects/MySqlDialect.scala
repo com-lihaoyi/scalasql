@@ -142,12 +142,12 @@ object MySqlDialect extends MySqlDialect {
       sql"$tableName.$colStr = ${assign.value}"
     }
 
-    override lazy val where = ExprsToSql.booleanExprs(sql" WHERE ", where0)
+    lazy val whereAll = ExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
     override lazy val joins = optSeq(joins0)(JoinsToSql.joinsToSqlStr(_, fromSelectables, joinOns))
-    override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + where
+    override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + whereAll
   }
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {

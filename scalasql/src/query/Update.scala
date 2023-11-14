@@ -94,7 +94,9 @@ object Update {
     }
     lazy val sets = SqlStr.flatten(SqlStr.join(updateList, sql", "))
 
-    lazy val liveExprs = sets.referencedExprs.toSet ++ SqlStr.flatten(where).referencedExprs
+    lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
+
+    lazy val liveExprs = sets.referencedExprs.toSet ++ where.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
     lazy val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming, Some(liveExprs))
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
       val froms = firstJoin.from.map { jf => fromSelectables(jf.from)._2 }
@@ -105,7 +107,7 @@ object Update {
       case Some(firstJoin) => firstJoin.from.flatMap(_.on)
     }
 
-    lazy val where = ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0)
+
 
     lazy val joinOns = joins0
       .drop(1)
