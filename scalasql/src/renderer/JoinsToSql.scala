@@ -25,13 +25,12 @@ object JoinsToSql {
         (Map[Expr.Identity, SqlStr], SqlStr)
       ],
       joinOns: Seq[Seq[Option[SqlStr.Flattened]]]
-  )(implicit ctx: Context) = {
+  ) = {
 
     SqlStr.join(joins.zip(joinOns).map { case (join, joinOns) =>
       val joinPrefix = SqlStr.opt(join.prefix)(s => sql" ${SqlStr.raw(s)}")
       val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
         val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
-        val onReferenced = onSql.referencedExprs
         fromSelectables(jf.from)._2 + onSql
       })
 
