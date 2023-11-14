@@ -52,47 +52,58 @@ object Context {
   }
 
   def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
-    val namedFromsMap0 = selectables.zipWithIndex.map {
-      case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + i)
-      case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
-      case x => throw new Exception("wtf " + x)
-    }.toMap
+    val namedFromsMap =
+      prevContext.fromNaming ++
+        selectables
+          .zipWithIndex
+          .map {
+            case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + i)
+            case (s: SubqueryRef[_, _], i) => (s, "subquery" + i)
+            case x => throw new Exception("wtf " + x)
+          }
+          .toMap ++
+        updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
-    val namedFromsMap = prevContext.fromNaming ++ namedFromsMap0 ++
-      updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
-
-    def computeSelectable0(t: From) = t match {
-      case t: TableRef => Map.empty[Expr.Identity, SqlStr]
-      case t: SubqueryRef[_, _] => Select.getRenderer(t.value, prevContext).lhsMap
-    }
-
-    def computeSelectable(t: From) = t match {
-      case t: TableRef =>
+    val fromSelectables = selectables
+      .map(f =>
         (
-          Map.empty[Expr.Identity, SqlStr],
-          (liveExprs: Option[Set[Expr.Identity]]) =>
-            SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
-              SqlStr.raw(namedFromsMap(t))
+          f,
+          f match {
+            case t: TableRef =>
+              (
+                Map.empty[Expr.Identity, SqlStr],
+                (liveExprs: Option[Set[Expr.Identity]]) =>
+                  SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
+                    SqlStr.raw(namedFromsMap(t))
+              )
+
+            case t: SubqueryRef[_, _] =>
+              val toSqlQuery = Select.getRenderer(t.value, prevContext)
+              (
+                toSqlQuery.lhsMap,
+                (liveExprs: Option[Set[Expr.Identity]]) =>
+                  sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
+              )
+          }
         )
+      )
+      .toMap
 
-      case t: SubqueryRef[_, _] =>
-        val toSqlQuery = Select.getRenderer(t.value, prevContext)
-        (
-          toSqlQuery.lhsMap,
-          (liveExprs: Option[Set[Expr.Identity]]) =>
-            sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
-        )
-    }
+    val exprNaming =
+      prevContext.exprNaming ++
+        selectables.collect { case t: SubqueryRef[_, _] =>
+          Select
+            .getRenderer(t.value, prevContext)
+            .lhsMap
+            .map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(t), Seq(e))}.$s") }
+        }.flatten
 
-    val fromSelectables = selectables.map(f => (f, computeSelectable(f))).toMap
-    val fromSelectables0 = selectables.map(f => (f, computeSelectable0(f))).toMap
-
-    val exprNaming = prevContext.exprNaming ++ fromSelectables0.flatMap { case (k, vs) =>
-      vs.map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(k), Seq(e))}.$s") }
-    }
-
-    val ctx: Context =
-      Impl(namedFromsMap, exprNaming, prevContext.config, prevContext.defaultQueryableSuffix)
+    val ctx = Context.Impl(
+      namedFromsMap,
+      exprNaming,
+      prevContext.config,
+      prevContext.defaultQueryableSuffix
+    )
 
     Computed(namedFromsMap, fromSelectables, exprNaming, ctx)
   }
