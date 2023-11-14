@@ -45,7 +45,6 @@ object Context {
         From,
         (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)
       ],
-      exprNaming: Map[Expr.Identity, SqlStr],
       ctx: Context
   ) {
     implicit def implicitCtx: Context = ctx
@@ -105,7 +104,7 @@ object Context {
       prevContext.defaultQueryableSuffix
     )
 
-    Computed(namedFromsMap, fromSelectables, exprNaming, ctx)
+    Computed(namedFromsMap, fromSelectables, ctx)
   }
 
 }
