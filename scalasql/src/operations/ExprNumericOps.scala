@@ -7,28 +7,28 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 class ExprNumericOps[T: Numeric](v: Expr[T])(implicit val m: TypeMapper[T]) {
 
   /** Addition */
-  def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v + $x" }
+  def +[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v + $x)" }
 
   /** Subtraction */
-  def -[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v - $x" }
+  def -[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v - $x)" }
 
   /** Multiplication */
-  def *[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v * $x" }
+  def *[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v * $x)" }
 
   /** Division */
-  def /[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v / $x" }
+  def /[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v / $x)" }
 
   /** Remainder */
   def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"MOD($v, $x)" }
 
   /** Bitwise AND */
-  def &[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v & $x" }
+  def &[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v & $x)" }
 
   /** Bitwise OR */
-  def |[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v | $x" }
+  def |[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v | $x)" }
 
   /** Bitwise XOR */
-  def ^[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v ^ $x" }
+  def ^[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"($v ^ $x)" }
 
   /** TRUE if the operand is within a range */
   def between(x: Expr[Int], y: Expr[Int]): Expr[Boolean] = Expr { implicit ctx =>

@@ -64,7 +64,7 @@ trait OptionalTests extends ScalaSqlSuite {
           opt_cols0.my_int as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
-        WHERE opt_cols0.my_int IS NOT NULL""",
+        WHERE (opt_cols0.my_int IS NOT NULL)""",
       value = Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
     )
 
@@ -75,7 +75,7 @@ trait OptionalTests extends ScalaSqlSuite {
           opt_cols0.my_int as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
-        WHERE opt_cols0.my_int IS NULL""",
+        WHERE (opt_cols0.my_int IS NULL)""",
       value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
     )
 
@@ -87,7 +87,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE opt_cols0.my_int = ?
+          WHERE (opt_cols0.my_int = ?)
         """,
         value = Seq(OptCols[Id](Some(1), Some(2)))
       )
@@ -99,7 +99,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE opt_cols0.my_int = ?
+          WHERE (opt_cols0.my_int = ?)
         """,
         value = Seq[OptCols[Id]]()
       )
@@ -111,7 +111,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE opt_cols0.my_int = ?
+          WHERE (opt_cols0.my_int = ?)
         """,
         value = Seq[OptCols[Id]]()
       )
@@ -125,7 +125,7 @@ trait OptionalTests extends ScalaSqlSuite {
               opt_cols0.my_int as res__my_int,
               opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
-            WHERE opt_cols0.my_int IS NOT DISTINCT FROM ?
+            WHERE (opt_cols0.my_int IS NOT DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
@@ -133,7 +133,7 @@ trait OptionalTests extends ScalaSqlSuite {
               opt_cols0.my_int as res__my_int,
               opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
-            WHERE opt_cols0.my_int <=> ?
+            WHERE (opt_cols0.my_int <=> ?)
           """
         ),
         value = Seq(OptCols[Id](Some(1), Some(2)))
@@ -147,7 +147,7 @@ trait OptionalTests extends ScalaSqlSuite {
               opt_cols0.my_int as res__my_int,
               opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
-            WHERE opt_cols0.my_int IS NOT DISTINCT FROM ?
+            WHERE (opt_cols0.my_int IS NOT DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
@@ -155,7 +155,7 @@ trait OptionalTests extends ScalaSqlSuite {
               opt_cols0.my_int as res__my_int,
               opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
-            WHERE opt_cols0.my_int <=> ?
+            WHERE (opt_cols0.my_int <=> ?)
           """
         ),
         value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
@@ -171,7 +171,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE opt_cols0.my_int IS DISTINCT FROM ?
+          WHERE (opt_cols0.my_int IS DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
@@ -179,7 +179,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE (NOT opt_cols0.my_int <=> ?)
+          WHERE (NOT (opt_cols0.my_int <=> ?))
           """
         ),
         value = Seq(
@@ -199,7 +199,7 @@ trait OptionalTests extends ScalaSqlSuite {
             opt_cols0.my_int as res__my_int,
             opt_cols0.my_int2 as res__my_int2
           FROM opt_cols opt_cols0
-          WHERE opt_cols0.my_int IS DISTINCT FROM ?
+          WHERE (opt_cols0.my_int IS DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
@@ -207,7 +207,7 @@ trait OptionalTests extends ScalaSqlSuite {
               opt_cols0.my_int as res__my_int,
               opt_cols0.my_int2 as res__my_int2
             FROM opt_cols opt_cols0
-            WHERE (NOT opt_cols0.my_int <=> ?)
+            WHERE (NOT (opt_cols0.my_int <=> ?))
           """
         ),
         value = Seq(
@@ -222,7 +222,7 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10))) },
       sql = """
       SELECT
-        opt_cols0.my_int + ? as res__my_int,
+        (opt_cols0.my_int + ?) as res__my_int,
         opt_cols0.my_int2 as res__my_int2
       FROM opt_cols opt_cols0
       """,
@@ -236,7 +236,7 @@ trait OptionalTests extends ScalaSqlSuite {
 
     test("map2") - checker(
       query = Text { OptCols.select.map(_.myInt.map(_ + 10)) },
-      sql = "SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0",
+      sql = "SELECT (opt_cols0.my_int + ?) as res FROM opt_cols opt_cols0",
       value = Seq(None, Some(11), Some(13), None)
     )
 
@@ -247,7 +247,7 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
       """,
@@ -266,7 +266,7 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
       """,
@@ -285,7 +285,7 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) as res__my_int,
           opt_cols0.my_int2 as res__my_int2
         FROM opt_cols opt_cols0
       """,
@@ -335,7 +335,7 @@ trait OptionalTests extends ScalaSqlSuite {
       sql = """
         SELECT
           CASE
-            WHEN opt_cols0.my_int < ? THEN opt_cols0.my_int
+            WHEN (opt_cols0.my_int < ?) THEN opt_cols0.my_int
             ELSE NULL
           END as res__my_int,
           opt_cols0.my_int2 as res__my_int2

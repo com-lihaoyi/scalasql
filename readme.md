@@ -74,7 +74,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 # TODO
 
 * Scala 3 support
-* Dot-delimited result names
 * `string_agg`, `array_agg`, other agg functions
-* Turn on Acyclic enforcement
 * Support Postgres/MySQL lateral joins
+* Interpolate `Seq[T: TypeMapper]` as expressions for use in `IN` clause

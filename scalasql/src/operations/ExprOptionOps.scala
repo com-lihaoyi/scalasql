@@ -7,9 +7,9 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 class ExprOptionOps[T: TypeMapper](v: Expr[Option[T]]) {
 
-  def isDefined: Expr[Boolean] = Expr { implicit ctx => sql"$v IS NOT NULL" }
+  def isDefined: Expr[Boolean] = Expr { implicit ctx => sql"($v IS NOT NULL)" }
 
-  def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"$v IS NULL" }
+  def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"($v IS NULL)" }
 
   // SQL nulls tend to propagate automatically, so we do not need to explicitly
   // generate CASE/WHEN/THEN/ELSE syntax and can just use the final expression directly

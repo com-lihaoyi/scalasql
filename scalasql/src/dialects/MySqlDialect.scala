@@ -67,16 +67,16 @@ object MySqlDialect extends MySqlDialect {
     /** Equals to */
     override def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
       (isNullable[T], isNullable[V]) match {
-        case (true, true) => sql"$v <=> $x"
-        case _ => sql"$v = $x"
+        case (true, true) => sql"($v <=> $x)"
+        case _ => sql"($v = $x)"
       }
     }
 
     /** Not equal to */
     override def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
       (isNullable[T], isNullable[V]) match {
-        case (true, true) => sql"(NOT $v <=> $x)"
-        case _ => sql"$v <> $x"
+        case (true, true) => sql"(NOT ($v <=> $x))"
+        case _ => sql"($v <> $x)"
       }
     }
 

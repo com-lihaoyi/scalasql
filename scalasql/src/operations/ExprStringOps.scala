@@ -5,10 +5,10 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 abstract class ExprStringOps(v: Expr[String]) {
 
-  def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"$v || $x" }
+  def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"($v || $x)" }
 
   /** TRUE if the operand matches a pattern */
-  def like[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"$v LIKE $x" }
+  def like[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"($v LIKE $x)" }
 
   /** Returns an integer value representing the starting position of a string within the search string. */
   def indexOf(x: Expr[String]): Expr[Int]

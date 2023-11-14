@@ -143,7 +143,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           ORDER BY res__total DESC
           LIMIT 3) subquery0
         CROSS JOIN product product1
-        WHERE product1.id = subquery0.res__product_id
+        WHERE (product1.id = subquery0.res__product_id)
       """,
       value = Seq("Camera", "Face Mask", "Guitar"),
       normalize = (x: Seq[String]) => x.sorted,

@@ -119,7 +119,7 @@ trait ReturningTests extends ScalaSqlSuite {
               buyer0.name as res__0,
               buyer0.date_of_birth as res__1
             FROM buyer buyer0
-            WHERE buyer0.name <> ?
+            WHERE (buyer0.name <> ?)
             RETURNING buyer.id as res
           """,
           value = Seq(4, 5),
@@ -155,8 +155,8 @@ trait ReturningTests extends ScalaSqlSuite {
               .returning(_.id)
           },
           sqls = Seq(
-            "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res",
-            "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res"
+            "UPDATE buyer SET date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id as res",
+            "UPDATE buyer SET buyer.date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id as res"
           ),
           value = Seq(1)
         )
@@ -178,12 +178,12 @@ trait ReturningTests extends ScalaSqlSuite {
           sqls = Seq(
             """
             UPDATE buyer
-            SET date_of_birth = ?, name = ? WHERE buyer.name = ?
+            SET date_of_birth = ?, name = ? WHERE (buyer.name = ?)
             RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
           """,
             """
             UPDATE buyer
-            SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?
+            SET buyer.date_of_birth = ?, buyer.name = ? (WHERE buyer.name = ?)
             RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
           """
           ),
@@ -196,7 +196,7 @@ trait ReturningTests extends ScalaSqlSuite {
       checker(
         query = Text { Purchase.delete(_.shippingInfoId `=` 1).returning(_.total) },
         sqls = Seq(
-          "DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res"
+          "DELETE FROM purchase WHERE (purchase.shipping_info_id = ?) RETURNING purchase.total as res"
         ),
         value = Seq(888.0, 900.0, 15.7)
       )

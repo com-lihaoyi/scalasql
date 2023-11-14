@@ -11,6 +11,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 trait JoinNullable[Q] {
   def get: Q
   def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean]
+  def nonEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean]
   def map[V](f: Q => V): JoinNullable[V]
 
 }
@@ -22,7 +23,11 @@ object JoinNullable {
     def get: Q = t
     def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr {
       implicit ctx =>
-        sql"${f(t)} IS NULL"
+        sql"(${f(t)} IS NULL)"
+    }
+    def nonEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        sql"(${f(t)} IS NOT NULL)"
     }
     def map[V](f: Q => V) = JoinNullable(f(t))
   }

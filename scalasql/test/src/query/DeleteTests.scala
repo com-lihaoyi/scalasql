@@ -13,7 +13,7 @@ trait DeleteTests extends ScalaSqlSuite {
     test("single") {
       checker(
         query = Purchase.delete(_.id `=` 2),
-        sql = "DELETE FROM purchase WHERE purchase.id = ?",
+        sql = "DELETE FROM purchase WHERE (purchase.id = ?)",
         value = 1,
         docs = """
           `Table.delete` takes a mandatory predicate specifying what rows you want to delete.
@@ -37,7 +37,7 @@ trait DeleteTests extends ScalaSqlSuite {
     test("multiple") {
       checker(
         query = Purchase.delete(_.id <> 2),
-        sql = "DELETE FROM purchase WHERE purchase.id <> ?",
+        sql = "DELETE FROM purchase WHERE (purchase.id <> ?)",
         value = 6,
         docs = """
           Although specifying a single ID to delete is the most common case, you can pass

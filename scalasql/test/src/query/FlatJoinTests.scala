@@ -20,7 +20,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
         FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
+        JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
       value = Seq(
         ("James Bond", LocalDate.parse("2012-04-05")),
@@ -48,10 +48,10 @@ trait FlatJoinTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.name as res__0, product3.name as res__1, product3.price as res__2
         FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
-        JOIN purchase purchase2 ON purchase2.shipping_info_id = shipping_info1.id
-        JOIN product product3 ON product3.id = purchase2.product_id
-        WHERE buyer0.name = ? AND product3.price > ?
+        JOIN shipping_info shipping_info1 ON (shipping_info1.id = buyer0.id)
+        JOIN purchase purchase2 ON (purchase2.shipping_info_id = shipping_info1.id)
+        JOIN product product3 ON (product3.id = purchase2.product_id)
+        WHERE (buyer0.name = ?) AND (product3.price > ?)
       """,
       value = Seq(
         ("Li Haoyi", "Face Mask", 8.88)
@@ -75,7 +75,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
+        LEFT JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
       value = Seq(
         ("James Bond", Some(LocalDate.parse("2012-04-05"))),
@@ -101,7 +101,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
-        WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
+        WHERE ((buyer0.id = shipping_info1.buyer_id) AND (buyer0.name = ?))
       """,
       value = Seq(LocalDate.parse("2012-04-05")),
       docs = """
@@ -123,7 +123,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
-        WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
+        WHERE ((buyer0.id = shipping_info1.buyer_id) AND (buyer0.name = ?))
       """,
       value = Seq(LocalDate.parse("2012-04-05")),
       docs = """
@@ -142,7 +142,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
-        WHERE buyer0.name = ? AND buyer0.id = shipping_info1.buyer_id
+        WHERE (buyer0.name = ?) AND (buyer0.id = shipping_info1.buyer_id)
       """,
       value = Seq(LocalDate.parse("2012-04-05"))
     )
@@ -158,13 +158,13 @@ trait FlatJoinTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.name as res__0, subquery2.res__1__name as res__1
         FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         CROSS JOIN (SELECT
             purchase0.shipping_info_id as res__0__shipping_info_id,
             product1.name as res__1__name
           FROM purchase purchase0
-          JOIN product product1 ON purchase0.product_id = product1.id) subquery2
-        WHERE shipping_info1.id = subquery2.res__0__shipping_info_id
+          JOIN product product1 ON (purchase0.product_id = product1.id)) subquery2
+        WHERE (shipping_info1.id = subquery2.res__0__shipping_info_id)
       """,
       value = Seq(
         ("James Bond", "Camera"),

@@ -141,7 +141,7 @@ object WorldSqlTests extends TestSuite {
       // `db.toSqlQuery` to see the generated SQL code, and `db.run` to send the
       // query to the database and return the output `4`
       val query = Expr(1) + Expr(3)
-      db.toSqlQuery(query) ==> "SELECT ? + ? as res"
+      db.toSqlQuery(query) ==> "SELECT (? + ?) as res"
       db.run(query) ==> 4
       // In general, most primitive types that can be mapped to SQL can be converted
       // to `scalasql.Expr`s: `Int`s and other numeric types, `String`s, `Boolean`s,
@@ -215,7 +215,7 @@ object WorldSqlTests extends TestSuite {
           city0.district as res__district,
           city0.population as res__population
         FROM city city0
-        WHERE city0.name = ?
+        WHERE (city0.name = ?)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -254,7 +254,7 @@ object WorldSqlTests extends TestSuite {
           city0.district as res__district,
           city0.population as res__population
         FROM city city0
-        WHERE city0.name = ?
+        WHERE (city0.name = ?)
         LIMIT 1
         """.trim.replaceAll("\\s+", " ")
 
@@ -276,7 +276,7 @@ object WorldSqlTests extends TestSuite {
           city0.district as res__district,
           city0.population as res__population
         FROM city city0
-        WHERE city0.id = ?
+        WHERE (city0.id = ?)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -297,9 +297,7 @@ object WorldSqlTests extends TestSuite {
               city0.district as res__district,
               city0.population as res__population
             FROM city city0
-            WHERE
-              city0.population > ?
-              AND city0.countrycode = ?
+            WHERE ((city0.population > ?) AND (city0.countrycode = ?))
             """.trim.replaceAll("\\s+", " ")
 
           db.run(query).take(2) ==> Seq(
@@ -325,9 +323,7 @@ object WorldSqlTests extends TestSuite {
             city0.district as res__district,
             city0.population as res__population
           FROM city city0
-          WHERE
-            city0.population > ?
-            AND city0.countrycode = ?
+          WHERE (city0.population > ?) AND (city0.countrycode = ?)
           """.trim.replaceAll("\\s+", " ")
 
           db.run(query).take(2) ==> Seq(
@@ -440,11 +436,9 @@ object WorldSqlTests extends TestSuite {
             city0.district as res__0__district,
             city0.population as res__0__population,
             UPPER(city0.name) as res__1,
-            city0.population / ? as res__2
-          FROM
-            city city0
-          WHERE
-            city0.name = ?
+            (city0.population / ?) as res__2
+          FROM city city0
+          WHERE (city0.name = ?)
           """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==>
@@ -466,7 +460,7 @@ object WorldSqlTests extends TestSuite {
         // query all cities in China and sum up their populations
         val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
         db.toSqlQuery(query) ==>
-          "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
+          "SELECT SUM(city0.population) as res FROM city city0 WHERE (city0.countrycode = ?)"
 
         db.run(query) ==> 175953614
         // -DOCS
@@ -488,7 +482,7 @@ object WorldSqlTests extends TestSuite {
         // greater than one million
         val query = Country.select.filter(_.population > 1000000).size
         db.toSqlQuery(query) ==>
-          "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
+          "SELECT COUNT(1) as res FROM country country0 WHERE (country0.population > ?)"
 
         db.run(query) ==> 154
         // -DOCS
@@ -562,7 +556,7 @@ object WorldSqlTests extends TestSuite {
       db.toSqlQuery(query) ==> """
         SELECT CAST(country0.lifeexpectancy AS INTEGER) as res
         FROM country country0
-        WHERE country0.name = ?
+        WHERE (country0.name = ?)
       """.trim.replaceAll("\\s+", " ")
 
       db.run(query) ==> 80
@@ -591,7 +585,7 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
         SELECT COUNT(1) as res
         FROM country country0
-        WHERE country0.capital IS NULL
+        WHERE (country0.capital IS NULL)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> 7
@@ -632,13 +626,13 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
         SELECT COUNT(1) as res
         FROM country country0
-        WHERE country0.capital = ?
+        WHERE (country0.capital = ?)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> 0
 
         // Whereas using Scala equality with `===` translates into a more
-        // verbose `(country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?`
+        // verbose `IS NOT DISTINCT FROM`
         // expression, returning `true` when both left-hand and right-hand values
         // are `None`/`NULL`, thus successfully returning all countries for which
         // the `capital` column is `NULL`
@@ -649,7 +643,7 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query2) ==> """
         SELECT COUNT(1) as res
         FROM country country0
-        WHERE country0.capital IS NOT DISTINCT FROM ?
+        WHERE (country0.capital IS NOT DISTINCT FROM ?)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query2) ==> 7
@@ -672,8 +666,8 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
         SELECT city0.name as res
         FROM city city0
-        JOIN country country1 ON city0.countrycode = country1.code
-        WHERE country1.name = ?
+        JOIN country country1 ON (city0.countrycode = country1.code)
+        WHERE (country1.name = ?)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -690,8 +684,8 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
         SELECT city0.name as res__0, country1.name as res__1
         FROM city city0
-        RIGHT JOIN country country1 ON city0.countrycode = country1.code
-        WHERE city0.id IS NULL
+        RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
+        WHERE (city0.id IS NULL)
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq(
@@ -729,8 +723,8 @@ object WorldSqlTests extends TestSuite {
       db.toSqlQuery(query) ==> """
         SELECT city0.name as res
         FROM city city0
-        JOIN country country1 ON city0.countrycode = country1.code
-        WHERE country1.name = ?
+        JOIN country country1 ON (city0.countrycode = country1.code)
+        WHERE (country1.name = ?)
       """.trim.replaceAll("\\s+", " ")
 
       db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -758,7 +752,7 @@ object WorldSqlTests extends TestSuite {
             FROM country country0
             ORDER BY res__population DESC
             LIMIT 2) subquery1
-          ON countrylanguage0.countrycode = subquery1.res__code
+          ON (countrylanguage0.countrycode = subquery1.res__code)
           ORDER BY res__0
           """.trim.replaceAll("\\s+", " ")
 
@@ -795,7 +789,7 @@ object WorldSqlTests extends TestSuite {
             ORDER BY res__population DESC
             LIMIT 2) subquery0
           JOIN countrylanguage countrylanguage1
-          ON subquery0.res__code = countrylanguage1.countrycode
+          ON (subquery0.res__code = countrylanguage1.countrycode)
           ORDER BY res__0
           """.trim.replaceAll("\\s+", " ")
 
@@ -830,7 +824,7 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
          SELECT countrylanguage1.language as res__0, COUNT(1) as res__1
          FROM city city0
-         JOIN countrylanguage countrylanguage1 ON city0.countrycode = countrylanguage1.countrycode
+         JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
          GROUP BY countrylanguage1.language
          ORDER BY res__1 DESC
          LIMIT 10
@@ -866,7 +860,7 @@ object WorldSqlTests extends TestSuite {
         db.toSqlQuery(query) ==> """
         SELECT
           country0.continent as res__0,
-          SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) as res__1
+          (SUM((country0.lifeexpectancy * country0.population)) / SUM(country0.population)) as res__1
         FROM country country0
         GROUP BY country0.continent
         ORDER BY res__1 DESC
@@ -926,13 +920,13 @@ object WorldSqlTests extends TestSuite {
           FROM country country0
           ORDER BY res__population DESC
           LIMIT 3) subquery0
-        JOIN city city1 ON subquery0.res__code = city1.countrycode
-        WHERE city1.id = (SELECT
+        JOIN city city1 ON (subquery0.res__code = city1.countrycode)
+        WHERE (city1.id = (SELECT
             city0.id as res
             FROM city city0
-            WHERE city0.countrycode = subquery0.res__code
+            WHERE (city0.countrycode = subquery0.res__code)
             ORDER BY city0.population DESC
-            LIMIT 1)
+            LIMIT 1))
         """.trim.replaceAll("\\s+", " ")
 
         db.run(query) ==> Seq(
@@ -1009,8 +1003,9 @@ object WorldSqlTests extends TestSuite {
 
         db.toSqlQuery(query) ==> """
           INSERT INTO city (name, countrycode, district, population)
-          SELECT ? || city0.name as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
-          FROM city city0 WHERE city0.name = ?
+          SELECT (? || city0.name) as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
+          FROM city city0
+          WHERE (city0.name = ?)
           """.trim.replaceAll("\\s+", " ")
 
         db.run(query)
@@ -1038,7 +1033,7 @@ object WorldSqlTests extends TestSuite {
           .set(_.population := 0, _.district := "UNKNOWN")
 
         db.toSqlQuery(query) ==>
-          "UPDATE city SET population = ?, district = ? WHERE city.countrycode = ?"
+          "UPDATE city SET population = ?, district = ? WHERE (city.countrycode = ?)"
 
         db.run(query)
 
@@ -1055,7 +1050,7 @@ object WorldSqlTests extends TestSuite {
           .update(_.countryCode === "SGP")
           .set(c => c.population := (c.population + 1000000))
         db.toSqlQuery(query) ==>
-          "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?"
+          "UPDATE city SET population = (city.population + ?) WHERE (city.countrycode = ?)"
 
         db.run(query)
 
@@ -1087,7 +1082,7 @@ object WorldSqlTests extends TestSuite {
       // Deletes are performed by the `.delete` method, which takes a predicate
       // letting you specify what rows you want to delete.
       val query = City.delete(_.countryCode === "SGP")
-      db.toSqlQuery(query) ==> "DELETE FROM city WHERE city.countrycode = ?"
+      db.toSqlQuery(query) ==> "DELETE FROM city WHERE (city.countrycode = ?)"
       db.run(query)
 
       db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
@@ -1201,7 +1196,7 @@ object WorldSqlTests extends TestSuite {
       def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
       db.toSqlQuery(query) ==>
-        "SELECT RAWTOHEX(city0.name) as res FROM city city0 WHERE city0.countrycode = ?"
+        "SELECT RAWTOHEX(city0.name) as res FROM city city0 WHERE (city0.countrycode = ?)"
 
       db.run(query) ==> "00530069006e006700610070006f00720065"
 

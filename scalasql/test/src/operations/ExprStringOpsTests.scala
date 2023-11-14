@@ -10,11 +10,11 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),
-      sqls = Seq("SELECT ? || ? as res", "SELECT CONCAT(?, ?) as res"),
+      sqls = Seq("SELECT (? || ?) as res", "SELECT CONCAT(?, ?) as res"),
       value = "helloworld"
     )
     test("like") -
-      checker(query = Expr("hello").like("he%"), sql = "SELECT ? LIKE ? as res", value = true)
+      checker(query = Expr("hello").like("he%"), sql = "SELECT (? LIKE ?) as res", value = true)
     test("length") -
       checker(query = Expr("hello").length, sql = "SELECT LENGTH(?) as res", value = 5)
     test("octetLength") - checker(

@@ -19,8 +19,8 @@ trait UpdateTests extends ScalaSqlSuite {
             .set(_.dateOfBirth := LocalDate.parse("2019-04-07"))
         },
         sqls = Seq(
-          "UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ?",
-          "UPDATE buyer SET buyer.date_of_birth = ? WHERE buyer.name = ?"
+          "UPDATE buyer SET date_of_birth = ? WHERE (buyer.name = ?)",
+          "UPDATE buyer SET buyer.date_of_birth = ? WHERE (buyer.name = ?)"
         ),
         value = 1,
         docs = """
@@ -84,8 +84,8 @@ trait UpdateTests extends ScalaSqlSuite {
             .set(_.dateOfBirth := LocalDate.parse("2019-04-07"), _.name := "John Dee")
         },
         sqls = Seq(
-          "UPDATE buyer SET date_of_birth = ?, name = ? WHERE buyer.name = ?",
-          "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE buyer.name = ?"
+          "UPDATE buyer SET date_of_birth = ?, name = ? WHERE (buyer.name = ?)",
+          "UPDATE buyer SET buyer.date_of_birth = ?, buyer.name = ? WHERE (buyer.name = ?)"
         ),
         value = 1,
         docs = """
@@ -110,8 +110,8 @@ trait UpdateTests extends ScalaSqlSuite {
           Buyer.update(_.name `=` "James Bond").set(c => c.name := c.name.toUpperCase)
         },
         sqls = Seq(
-          "UPDATE buyer SET name = UPPER(buyer.name) WHERE buyer.name = ?",
-          "UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE buyer.name = ?"
+          "UPDATE buyer SET name = UPPER(buyer.name) WHERE (buyer.name = ?)",
+          "UPDATE buyer SET buyer.name = UPPER(buyer.name) WHERE (buyer.name = ?)"
         ),
         value = 1,
         docs = """

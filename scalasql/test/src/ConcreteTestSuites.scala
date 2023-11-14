@@ -53,7 +53,7 @@ package postgres {
 
   object ExprOpsTests extends ExprOpsTests with PostgresSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
-  object ExprIntOpsTests extends ExprNumericOpsTests with PostgresSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with PostgresSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with PostgresSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with PostgresSuite
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
@@ -89,7 +89,7 @@ package hikari {
 
   object ExprOpsTests extends ExprOpsTests with HikariSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with HikariSuite
-  object ExprIntOpsTests extends ExprNumericOpsTests with HikariSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with HikariSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HikariSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with HikariSuite
   object ExprStringOpsTests extends ExprStringOpsTests with HikariSuite
@@ -128,7 +128,7 @@ package mysql {
 
   object ExprOpsTests extends ExprOpsTests with MySqlSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
-  object ExprIntOpsTests extends ExprNumericOpsTests with MySqlSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with MySqlSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with MySqlSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with MySqlSuite
   object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
@@ -161,7 +161,7 @@ package sqlite {
 
   object ExprOpsTests extends ExprOpsTests with SqliteSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
-  object ExprIntOpsTests extends ExprNumericOpsTests with SqliteSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with SqliteSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with SqliteSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with SqliteSuite
   object ExprStringOpsTests extends ExprStringOpsTests with SqliteSuite
@@ -197,7 +197,7 @@ package hsqldb {
 
   object ExprOpsTests extends ExprOpsTests with HsqlDbSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with HsqlDbSuite
-  object ExprIntOpsTests extends ExprNumericOpsTests with HsqlDbSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with HsqlDbSuite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HsqlDbSuite
   object ExprSeqOpsTests extends ExprSeqOpsTests with HsqlDbSuite
   object ExprStringOpsTests extends ExprStringOpsTests with HsqlDbSuite
@@ -232,7 +232,7 @@ package h2 {
 
   object ExprOpsTests extends ExprOpsTests with H2Suite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
-  object ExprIntOpsTests extends ExprNumericOpsTests with H2Suite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with H2Suite
   object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with H2Suite
   object ExprSeqOpsTests extends ExprSeqOpsTests with H2Suite
   object ExprStringOpsTests extends ExprStringOpsTests with H2Suite

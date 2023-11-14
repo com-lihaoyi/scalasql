@@ -26,7 +26,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           FROM product product0
           ORDER BY res__price DESC
           LIMIT 1) subquery1
-        ON purchase0.product_id = subquery1.res__id
+        ON (purchase0.product_id = subquery1.res__id)
       """,
       value = Seq(10000.0),
       docs = """
@@ -47,7 +47,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           FROM product product0
           ORDER BY res__price DESC
           LIMIT 1) subquery0
-        JOIN purchase purchase1 ON subquery0.res__id = purchase1.product_id
+        JOIN purchase purchase1 ON (subquery0.res__id = purchase1.product_id)
       """,
       value = Seq(10000.0),
       docs = """
@@ -85,7 +85,7 @@ trait SubQueryTests extends ScalaSqlSuite {
           FROM purchase purchase0
           ORDER BY res__count DESC
           LIMIT 3) subquery1
-        ON subquery0.res__id = subquery1.res__product_id
+        ON (subquery0.res__id = subquery1.res__product_id)
       """,
       value = Seq(("Camera", 10)),
       docs = """
@@ -151,7 +151,7 @@ trait SubQueryTests extends ScalaSqlSuite {
             SUM(purchase0.total) as res__1
           FROM purchase purchase0
           GROUP BY purchase0.product_id) subquery0
-        JOIN product product1 ON subquery0.res__0 = product1.id
+        JOIN product product1 ON (subquery0.res__0 = product1.id)
       """,
       value = Seq(
         ("Camera", 10000.0),
@@ -174,10 +174,10 @@ trait SubQueryTests extends ScalaSqlSuite {
           buyer0.name as res__name,
           buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
-        WHERE (SELECT
+        WHERE ((SELECT
             COUNT(1) as res
             FROM shipping_info shipping_info0
-            WHERE buyer0.id = shipping_info0.buyer_id) = ?
+            WHERE (buyer0.id = shipping_info0.buyer_id)) = ?)
       """,
       value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))),
       docs = """
@@ -197,7 +197,9 @@ trait SubQueryTests extends ScalaSqlSuite {
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
           buyer0.date_of_birth as res__0__date_of_birth,
-          (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
+          (SELECT COUNT(1) as res
+            FROM shipping_info shipping_info0
+            WHERE (buyer0.id = shipping_info0.buyer_id)) as res__1
         FROM buyer buyer0
       """,
       value = Seq(
@@ -219,10 +221,10 @@ trait SubQueryTests extends ScalaSqlSuite {
           buyer0.id as res__0__id,
           buyer0.name as res__0__name,
           buyer0.date_of_birth as res__0__date_of_birth,
-          (SELECT
+          ((SELECT
             COUNT(1) as res
             FROM shipping_info shipping_info0
-            WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
+            WHERE (buyer0.id = shipping_info0.buyer_id)) = ?) as res__1
         FROM buyer buyer0
       """,
       value = Seq(
@@ -356,15 +358,15 @@ trait SubQueryTests extends ScalaSqlSuite {
           (SELECT
             (SELECT product0.price as res
             FROM product product0
-            WHERE product0.id = purchase0.product_id
+            WHERE (product0.id = purchase0.product_id)
             ORDER BY res DESC
             LIMIT 1) as res
           FROM purchase purchase0
-          WHERE purchase0.shipping_info_id = shipping_info0.id
+          WHERE (purchase0.shipping_info_id = shipping_info0.id)
           ORDER BY res DESC
           LIMIT 1) as res
         FROM shipping_info shipping_info0
-        WHERE shipping_info0.buyer_id = buyer0.id
+        WHERE (shipping_info0.buyer_id = buyer0.id)
         ORDER BY res DESC
         LIMIT 1) as res__1
       FROM buyer buyer0

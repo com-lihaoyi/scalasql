@@ -13,7 +13,7 @@ trait SelectTests extends ScalaSqlSuite {
   def tests = Tests {
     test("constant") - checker(
       query = Text { Expr(1) + Expr(2) },
-      sql = "SELECT ? + ? as res",
+      sql = "SELECT (? + ?) as res",
       value = 3,
       docs = """
         The most simple thing you can query in the database is an `Expr`. These do not need
@@ -53,7 +53,7 @@ trait SelectTests extends ScalaSqlSuite {
           shipping_info0.buyer_id as res__buyer_id,
           shipping_info0.shipping_date as res__shipping_date
         FROM shipping_info shipping_info0
-        WHERE shipping_info0.buyer_id = ?
+        WHERE (shipping_info0.buyer_id = ?)
         """,
         value = Seq(
           ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
@@ -77,8 +77,8 @@ trait SelectTests extends ScalaSqlSuite {
           shipping_info0.buyer_id as res__buyer_id,
           shipping_info0.shipping_date as res__shipping_date
         FROM shipping_info shipping_info0
-        WHERE shipping_info0.buyer_id = ?
-        AND shipping_info0.shipping_date = ?
+        WHERE (shipping_info0.buyer_id = ?)
+        AND (shipping_info0.shipping_date = ?)
         """,
         value =
           Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))),
@@ -101,8 +101,8 @@ trait SelectTests extends ScalaSqlSuite {
               shipping_info0.buyer_id as res__buyer_id,
               shipping_info0.shipping_date as res__shipping_date
             FROM shipping_info shipping_info0
-            WHERE shipping_info0.buyer_id = ?
-            AND shipping_info0.shipping_date = ?
+            WHERE (shipping_info0.buyer_id = ?)
+            AND (shipping_info0.shipping_date = ?)
           """,
           value =
             ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")),
@@ -137,8 +137,8 @@ trait SelectTests extends ScalaSqlSuite {
             shipping_info0.buyer_id as res__buyer_id,
             shipping_info0.shipping_date as res__shipping_date
           FROM shipping_info shipping_info0
-          WHERE shipping_info0.buyer_id = ?
-          AND shipping_info0.shipping_date = ?
+          WHERE ((shipping_info0.buyer_id = ?)
+          AND (shipping_info0.shipping_date = ?))
         """,
         value = Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
         docs = """
@@ -163,7 +163,7 @@ trait SelectTests extends ScalaSqlSuite {
         query = Text {
           Product.select.filter(_.price < 100).map(_.name)
         },
-        sql = "SELECT product0.name as res FROM product product0 WHERE product0.price < ?",
+        sql = "SELECT product0.name as res FROM product product0 WHERE (product0.price < ?)",
         value = Seq("Face Mask", "Socks", "Cookie"),
         docs = """
           The common use case of `SELECT FROM WHERE` can be achieved via `.select.filter.map` in ScalaSql
@@ -198,7 +198,7 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("interpolateInMap") - checker(
         query = Text { Product.select.map(_.price * 2) },
-        sql = "SELECT product0.price * ? as res FROM product product0",
+        sql = "SELECT (product0.price * ?) as res FROM product product0",
         value = Seq(17.76, 600, 6.28, 246.9, 2000.0, 0.2),
         docs = """
           You can perform operations inside the `.map` to change what you return
@@ -247,7 +247,7 @@ trait SelectTests extends ScalaSqlSuite {
           product0.name as res__0,
           (SELECT purchase0.total as res
             FROM purchase purchase0
-            WHERE purchase0.product_id = product0.id
+            WHERE (purchase0.product_id = product0.id)
             ORDER BY res DESC
             LIMIT 1) as res__1
         FROM product product0""",
@@ -332,7 +332,7 @@ trait SelectTests extends ScalaSqlSuite {
           SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
           FROM purchase purchase0
           GROUP BY purchase0.product_id
-          HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
+          HAVING (SUM(purchase0.total) > ?) AND (purchase0.product_id > ?)
         """,
         value = Seq((2, 900.0), (4, 493.8), (5, 10000.0)),
         normalize = (x: Seq[(Int, Double)]) => x.sorted,
@@ -351,9 +351,9 @@ trait SelectTests extends ScalaSqlSuite {
         sql = """
           SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
           FROM purchase purchase0
-          WHERE purchase0.count > ?
+          WHERE (purchase0.count > ?)
           GROUP BY purchase0.product_id
-          HAVING SUM(purchase0.total) > ?
+          HAVING (SUM(purchase0.total) > ?)
         """,
         value = Seq((1, 888.0), (5, 10000.0)),
         normalize = (x: Seq[(Int, Double)]) => x.sorted
@@ -385,7 +385,7 @@ trait SelectTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
         FROM buyer buyer0
-        WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
+        WHERE (buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0))
       """,
       value = Seq(
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -408,7 +408,7 @@ trait SelectTests extends ScalaSqlSuite {
           EXISTS (SELECT
             shipping_info0.id as res
             FROM shipping_info shipping_info0
-            WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+            WHERE (shipping_info0.buyer_id = buyer0.id)) as res__1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false)),
@@ -428,7 +428,7 @@ trait SelectTests extends ScalaSqlSuite {
           NOT EXISTS (SELECT
             shipping_info0.id as res
             FROM shipping_info shipping_info0
-            WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+            WHERE (shipping_info0.buyer_id = buyer0.id)) as res__1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
@@ -449,18 +449,18 @@ trait SelectTests extends ScalaSqlSuite {
           """
             SELECT
               CASE
-                WHEN product0.price > ? THEN product0.name || ?
-                WHEN product0.price > ? THEN product0.name || ?
-                WHEN product0.price <= ? THEN product0.name || ?
+                WHEN (product0.price > ?) THEN (product0.name || ?)
+                WHEN (product0.price > ?) THEN (product0.name || ?)
+                WHEN (product0.price <= ?) THEN (product0.name || ?)
               END as res
             FROM product product0
           """,
           """
             SELECT
               CASE
-                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-                WHEN product0.price <= ? THEN CONCAT(product0.name, ?)
+                WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
+                WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
+                WHEN (product0.price <= ?) THEN CONCAT(product0.name, ?)
               END as res
             FROM product product0
           """
@@ -492,17 +492,17 @@ trait SelectTests extends ScalaSqlSuite {
           """
             SELECT
               CASE
-                WHEN product0.price > ? THEN product0.name || ?
-                WHEN product0.price > ? THEN product0.name || ?
-                ELSE product0.name || ?
+                WHEN (product0.price > ?) THEN (product0.name || ?)
+                WHEN (product0.price > ?) THEN (product0.name || ?)
+                ELSE (product0.name || ?)
               END as res
             FROM product product0
           """,
           """
             SELECT
               CASE
-                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
-                WHEN product0.price > ? THEN CONCAT(product0.name, ?)
+                WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
+                WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 ELSE CONCAT(product0.name, ?)
               END as res
             FROM product product0

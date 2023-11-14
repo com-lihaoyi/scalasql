@@ -24,13 +24,13 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             UPDATE buyer
             SET date_of_birth = shipping_info0.shipping_date
             FROM shipping_info shipping_info0
-            WHERE buyer.id = shipping_info0.buyer_id AND buyer.name = ?
+            WHERE (buyer.id = shipping_info0.buyer_id) AND (buyer.name = ?)
           """,
           """
             UPDATE buyer
-            JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
+            JOIN shipping_info shipping_info0 ON (buyer.id = shipping_info0.buyer_id)
             SET buyer.date_of_birth = shipping_info0.shipping_date
-            WHERE buyer.name = ?
+            WHERE (buyer.name = ?)
           """
         ),
         value = 1,
@@ -62,20 +62,20 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             UPDATE buyer
             SET name = product2.name
             FROM shipping_info shipping_info0
-            JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
-            JOIN product product2 ON purchase1.product_id = product2.id
-            WHERE buyer.id = shipping_info0.buyer_id
-            AND buyer.name = ?
-            AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
+            JOIN purchase purchase1 ON (shipping_info0.id = purchase1.shipping_info_id)
+            JOIN product product2 ON (purchase1.product_id = product2.id)
+            WHERE (buyer.id = shipping_info0.buyer_id)
+            AND (buyer.name = ?)
+            AND (LOWER(product2.name) = LOWER(product2.kebab_case_name))
           """,
           """
             UPDATE buyer
-            JOIN shipping_info shipping_info0 ON buyer.id = shipping_info0.buyer_id
-            JOIN purchase purchase1 ON shipping_info0.id = purchase1.shipping_info_id
-            JOIN product product2 ON purchase1.product_id = product2.id
+            JOIN shipping_info shipping_info0 ON (buyer.id = shipping_info0.buyer_id)
+            JOIN purchase purchase1 ON (shipping_info0.id = purchase1.shipping_info_id)
+            JOIN product product2 ON (purchase1.product_id = product2.id)
             SET buyer.name = product2.name
-            WHERE buyer.name = ?
-            AND LOWER(product2.name) = LOWER(product2.kebab_case_name)
+            WHERE (buyer.name = ?)
+            AND (LOWER(product2.name) = LOWER(product2.kebab_case_name))
           """
         ),
         value = 1,
@@ -106,7 +106,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
               LIMIT 2) subquery0
-            WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+            WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
           """,
           """
             UPDATE
@@ -117,9 +117,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                   shipping_info0.shipping_date as res__shipping_date
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
-                LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
+                LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)
             SET buyer.date_of_birth = subquery0.res__shipping_date
-            WHERE buyer.name = ?
+            WHERE (buyer.name = ?)
           """
         ),
         value = 1,
@@ -153,7 +153,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
               LIMIT 2) subquery0
-            WHERE buyer.id = subquery0.res__buyer_id AND buyer.name = ?
+            WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
           """,
           """
             UPDATE
@@ -163,9 +163,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                   shipping_info0.buyer_id as res__buyer_id
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
-                LIMIT 2) subquery0 ON buyer.id = subquery0.res__buyer_id
+                LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)
             SET buyer.date_of_birth = ?
-            WHERE buyer.name = ?
+            WHERE (buyer.name = ?)
           """
         ),
         value = 1

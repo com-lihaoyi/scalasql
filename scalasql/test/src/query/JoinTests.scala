@@ -23,8 +23,8 @@ trait JoinTests extends ScalaSqlSuite {
           shipping_info1.buyer_id as res__1__buyer_id,
           shipping_info1.shipping_date as res__1__shipping_date
         FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
-        WHERE buyer0.name = ?
+        JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        WHERE (buyer0.name = ?)
       """,
       value = Seq(
         (
@@ -54,8 +54,8 @@ trait JoinTests extends ScalaSqlSuite {
       sql = """
         SELECT shipping_info1.shipping_date as res
         FROM buyer buyer0
-        JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
-        WHERE buyer0.name = ?
+        JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        WHERE (buyer0.name = ?)
       """,
       value = Seq(LocalDate.parse("2012-04-05"))
     )
@@ -71,7 +71,7 @@ trait JoinTests extends ScalaSqlSuite {
           buyer1.name as res__1__name,
           buyer1.date_of_birth as res__1__date_of_birth
         FROM buyer buyer0
-        JOIN buyer buyer1 ON buyer0.id = buyer1.id
+        JOIN buyer buyer1 ON (buyer0.id = buyer1.id)
       """,
       value = Seq(
         (
@@ -106,7 +106,7 @@ trait JoinTests extends ScalaSqlSuite {
           buyer1.name as res__1__name,
           buyer1.date_of_birth as res__1__date_of_birth
         FROM buyer buyer0
-        JOIN buyer buyer1 ON buyer0.id <> buyer1.id
+        JOIN buyer buyer1 ON (buyer0.id <> buyer1.id)
       """,
       value = Seq(
         (
@@ -170,7 +170,7 @@ trait JoinTests extends ScalaSqlSuite {
           shipping_info1.buyer_id as res__1__buyer_id,
           shipping_info1.shipping_date as res__1__shipping_date
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
       value = Seq(
         (
@@ -204,7 +204,7 @@ trait JoinTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
       value = Seq(
         ("James Bond", Some(LocalDate.parse("2012-04-05"))),
@@ -233,14 +233,14 @@ trait JoinTests extends ScalaSqlSuite {
         """
           SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
           FROM buyer buyer0
-          LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res__1 NULLS FIRST
         """,
         // MySQL doesn't support NULLS FIRST syntax and needs a workaround
         """
           SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
           FROM buyer buyer0
-          LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res__1 IS NULL DESC, res__1
         """
       ),
@@ -261,14 +261,14 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text {
         Buyer.select
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
-          .map { case (b, si) => (b.name, !si.isEmpty(_.id)) }
+          .map { case (b, si) => (b.name, si.nonEmpty(_.id)) }
           .distinct
           .sortBy(_._1)
       },
       sql = """
-        SELECT DISTINCT buyer0.name as res__0, NOT shipping_info1.id IS NULL as res__1
+        SELECT DISTINCT buyer0.name as res__0, (shipping_info1.id IS NOT NULL) as res__1
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res__0
       """,
       value = Seq(
@@ -291,9 +291,9 @@ trait JoinTests extends ScalaSqlSuite {
       sql = """
         SELECT
           buyer0.name as res__0,
-          shipping_info1.shipping_date > buyer0.date_of_birth as res__1
+          (shipping_info1.shipping_date > buyer0.date_of_birth) as res__1
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
       value = Seq(
         ("James Bond", true),
@@ -314,9 +314,9 @@ trait JoinTests extends ScalaSqlSuite {
       sql = """
         SELECT
           buyer0.name as res__0,
-          shipping_info1.shipping_date > buyer0.date_of_birth as res__1
+          (shipping_info1.shipping_date > buyer0.date_of_birth) as res__1
         FROM buyer buyer0
-        LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
       value = Seq(
         ("James Bond", true),
@@ -342,7 +342,7 @@ trait JoinTests extends ScalaSqlSuite {
           buyer1.name as res__1__name,
           buyer1.date_of_birth as res__1__date_of_birth
         FROM shipping_info shipping_info0
-        RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+        RIGHT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
       """,
       value = Seq(
         (
@@ -375,7 +375,7 @@ trait JoinTests extends ScalaSqlSuite {
             buyer1.name as res__1__name,
             buyer1.date_of_birth as res__1__date_of_birth
           FROM shipping_info shipping_info0
-          FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+          FULL OUTER JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
         """,
         """
           SELECT
@@ -386,7 +386,7 @@ trait JoinTests extends ScalaSqlSuite {
             buyer1.name as res__1__name,
             buyer1.date_of_birth as res__1__date_of_birth
           FROM shipping_info shipping_info0
-          LEFT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
+          LEFT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
           UNION
           SELECT
             shipping_info0.id as res__0__id,
@@ -396,7 +396,7 @@ trait JoinTests extends ScalaSqlSuite {
             buyer1.name as res__1__name,
             buyer1.date_of_birth as res__1__date_of_birth
           FROM shipping_info shipping_info0
-          RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id"""
+          RIGHT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)"""
       ),
       value = Seq(
         (
@@ -428,7 +428,7 @@ trait JoinTests extends ScalaSqlSuite {
         SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
-        WHERE buyer0.id = shipping_info1.buyer_id
+        WHERE (buyer0.id = shipping_info1.buyer_id)
         """,
       value = Seq(
         ("James Bond", LocalDate.parse("2012-04-05")),
