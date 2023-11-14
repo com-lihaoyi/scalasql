@@ -72,7 +72,8 @@ object Context {
     )
   }
 
-  def fromSelectables(selectables: Seq[From], prevContext: Context, namedFromsMap: Map[From, String]) = selectables
+  def fromSelectables(selectables: Seq[From], prevContext: Context, namedFromsMap: Map[From, String],
+                      liveExprs: Option[Set[Expr.Identity]]) = selectables
     .map(f =>
       (
         f,
@@ -80,7 +81,6 @@ object Context {
           case t: TableRef =>
             (
               Map.empty[Expr.Identity, SqlStr],
-              (liveExprs: Option[Set[Expr.Identity]]) =>
                 SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
                   SqlStr.raw(namedFromsMap(t))
             )
@@ -89,7 +89,6 @@ object Context {
             val toSqlQuery = Select.getRenderer(t.value, prevContext)
             (
               toSqlQuery.lhsMap,
-              (liveExprs: Option[Set[Expr.Identity]]) =>
                 sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
             )
         }

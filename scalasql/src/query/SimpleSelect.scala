@@ -202,7 +202,7 @@ object SimpleSelect {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, None)
-    lazy val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming)
+
 
     lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
@@ -245,11 +245,13 @@ object SimpleSelect {
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
 
+      val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming, Some(innerLiveExprs))
+
       val joins =
-        joinsToSqlStr(query.joins, fromSelectables, Some(innerLiveExprs), joinOns)
+        joinsToSqlStr(query.joins, fromSelectables, joinOns)
 
       val tables = SqlStr
-        .join(query.from.map(fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
+        .join(query.from.map(fromSelectables(_)._2), sql", ")
 
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }
