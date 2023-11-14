@@ -1186,5 +1186,29 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
     }
+
+    test("customExpressions") {
+      // +DOCS
+      // ### Custom Expressions
+      //
+      // You can define custom SQL expressions via the `Expr` constructor. This is
+      // useful for extending ScalaSql when you need to use some operator or syntax
+      // that your Database supports but ScalaSql does not have built in. This example
+      // shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
+      // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
+      // using that in a query to return a string.
+      import scalasql.renderer.SqlStr.SqlStringSyntax
+      def rawToHex(v: Expr[String]): Expr[String] = Expr{implicit ctx => sql"RAWTOHEX($v)"}
+      val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
+      db.toSqlQuery(query) ==>
+        "SELECT RAWTOHEX(city0.name) as res FROM city city0 WHERE city0.countrycode = ?"
+
+      db.run(query) ==> "00530069006e006700610070006f00720065"
+
+      // Your custom Scala functions can either be standalone functions or extension
+      // methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
+      // are extension methods, with a different set being made available for each database
+      // -DOCS
+    }
   }
 }
