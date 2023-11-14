@@ -48,8 +48,7 @@ object OnConflict {
     protected def queryWalkExprs() = Query.getWalkExprs(query)
     protected def queryIsSingleRow = Query.getIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {
-      val computed = Context.compute(ctx, Nil, Some(table))
-      import computed.implicitCtx
+      implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderToSql(query)
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
       val updatesStr = SqlStr.join(

@@ -200,13 +200,9 @@ object SimpleSelect {
     s.getRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
-    val computed = Context.compute(
-      prevContext,
-      query.from ++ query.joins.flatMap(_.from.map(_.from)),
-      None
-    )
-
-    import computed.implicitCtx
+    lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
+    implicit lazy val implicitCtx = Context.compute(prevContext, froms, None)
+    lazy val fromSelectables = Context.fromSelectables(froms, prevContext, implicitCtx.fromNaming)
 
     lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
@@ -250,10 +246,10 @@ object SimpleSelect {
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
 
       val joins =
-        joinsToSqlStr(query.joins, computed.fromSelectables, Some(innerLiveExprs), joinOns)
+        joinsToSqlStr(query.joins, fromSelectables, Some(innerLiveExprs), joinOns)
 
       val tables = SqlStr
-        .join(query.from.map(computed.fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
+        .join(query.from.map(fromSelectables(_)._2(Some(innerLiveExprs))), sql", ")
 
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }

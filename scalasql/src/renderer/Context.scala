@@ -39,15 +39,6 @@ object Context {
     def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context =
       copy(exprNaming = exprNaming)
   }
-  case class Computed(
-      fromSelectables: Map[
-        From,
-        (Map[Expr.Identity, SqlStr], Option[Set[Expr.Identity]] => SqlStr)
-      ],
-      ctx: Context
-  ) {
-    implicit def implicitCtx: Context = ctx
-  }
 
   def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
     val namedFromsMap =
@@ -62,30 +53,7 @@ object Context {
           .toMap ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
-    val fromSelectables = selectables
-      .map(f =>
-        (
-          f,
-          f match {
-            case t: TableRef =>
-              (
-                Map.empty[Expr.Identity, SqlStr],
-                (liveExprs: Option[Set[Expr.Identity]]) =>
-                  SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
-                    SqlStr.raw(namedFromsMap(t))
-              )
 
-            case t: SubqueryRef[_, _] =>
-              val toSqlQuery = Select.getRenderer(t.value, prevContext)
-              (
-                toSqlQuery.lhsMap,
-                (liveExprs: Option[Set[Expr.Identity]]) =>
-                  sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
-              )
-          }
-        )
-      )
-      .toMap
 
     val exprNaming =
       prevContext.exprNaming ++
@@ -96,14 +64,37 @@ object Context {
             .map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(t), Seq(e))}.$s") }
         }.flatten
 
-    val ctx = Context.Impl(
+    Context.Impl(
       namedFromsMap,
       exprNaming,
       prevContext.config,
       prevContext.defaultQueryableSuffix
     )
-
-    Computed(fromSelectables, ctx)
   }
+
+  def fromSelectables(selectables: Seq[From], prevContext: Context, namedFromsMap: Map[From, String]) = selectables
+    .map(f =>
+      (
+        f,
+        f match {
+          case t: TableRef =>
+            (
+              Map.empty[Expr.Identity, SqlStr],
+              (liveExprs: Option[Set[Expr.Identity]]) =>
+                SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " +
+                  SqlStr.raw(namedFromsMap(t))
+            )
+
+          case t: SubqueryRef[_, _] =>
+            val toSqlQuery = Select.getRenderer(t.value, prevContext)
+            (
+              toSqlQuery.lhsMap,
+              (liveExprs: Option[Set[Expr.Identity]]) =>
+                sql"(${toSqlQuery.render(liveExprs)}) ${SqlStr.raw(namedFromsMap(t))}"
+            )
+        }
+      )
+    )
+    .toMap
 
 }

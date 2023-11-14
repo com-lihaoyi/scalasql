@@ -42,8 +42,7 @@ object Returning {
     override def queryIsSingleRow = false
 
     protected override def renderToSql(ctx0: Context) = {
-      val computed = Context.compute(ctx0, Nil, Some(returnable.table))
-      import computed.implicitCtx
+      implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
       val prefix = Renderable.renderToSql(returnable)
       val flattenedExpr = qr.walk(returning)

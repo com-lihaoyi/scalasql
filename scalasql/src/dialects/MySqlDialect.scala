@@ -137,7 +137,6 @@ object MySqlDialect extends MySqlDialect {
       where0: Seq[Expr[_]],
       prevContext: Context
   ) extends scalasql.query.Update.Renderer(joins0, table, set0, where0, prevContext) {
-    import computed.implicitCtx
     override lazy val updateList = set0.map { case assign =>
       val colStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
       sql"$tableName.$colStr = ${assign.value}"
@@ -148,7 +147,7 @@ object MySqlDialect extends MySqlDialect {
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
     override lazy val joins = optSeq(joins0)(
-      JoinsToSql.joinsToSqlStr(_, computed.fromSelectables, Some(liveExprs), joinOns)
+      JoinsToSql.joinsToSqlStr(_, fromSelectables, Some(liveExprs), joinOns)
     )
     override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + where
   }
@@ -173,8 +172,7 @@ object MySqlDialect extends MySqlDialect {
     protected def queryValueReader = Query.getValueReader(insert.query)
 
     protected def renderToSql(ctx: Context) = {
-      val computed = Context.compute(ctx, Nil, Some(table))
-      import computed.implicitCtx
+      implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderToSql(insert.query)
 
       val updatesStr = SqlStr.join(
