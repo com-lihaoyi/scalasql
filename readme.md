@@ -75,4 +75,3 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 * Scala 3 support
 * `string_agg`, `array_agg`, other agg functions
 * Support Postgres/MySQL lateral joins
-* Interpolate `Seq[T: TypeMapper]` as expressions for use in `IN` clause

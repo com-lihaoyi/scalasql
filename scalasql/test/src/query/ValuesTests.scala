@@ -43,6 +43,19 @@ trait ValuesTests extends ScalaSqlSuite {
       """
     )
 
+    test("map") - checker(
+      query = Text { values(Seq(1, 2, 3)).map() },
+      sqls = Seq(
+        "SELECT MAX(column1) AS res FROM (VALUES (?), (?), (?)) v",
+        "SELECT MAX(c1) AS res FROM (VALUES (?), (?), (?)) v",
+        "SELECT MAX(column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) v"
+      ),
+      value = 3,
+      docs = """
+        `Values` supports aggregate functions like `.max`
+      """
+    )
+
 
   }
 }
