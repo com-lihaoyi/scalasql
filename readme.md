@@ -1,6 +1,6 @@
 # ScalaSql
 
-ScalaSql is a small SQL library that allows type-safe low-boilerplate querying of
+ScalaSql is a Scala library that allows type-safe low-boilerplate querying of
 SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
