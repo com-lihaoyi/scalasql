@@ -20,7 +20,8 @@ import query.{
   UpdateJoinTests,
   UpdateSubQueryTests,
   ReturningTests,
-  OnConflictTests
+  OnConflictTests,
+  ValuesTests
 }
 import scalasql.dialects.{
   HsqlDbDialectTests,
@@ -48,6 +49,7 @@ package postgres {
   object UpdateSubQueryTests extends UpdateSubQueryTests with PostgresSuite
   object ReturningTests extends ReturningTests with PostgresSuite
   object OnConflictTests extends OnConflictTests with PostgresSuite
+  object ValuesTests extends ValuesTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
 
@@ -84,6 +86,7 @@ package hikari {
   object UpdateSubQueryTests extends UpdateSubQueryTests with HikariSuite
   object ReturningTests extends ReturningTests with HikariSuite
   object OnConflictTests extends OnConflictTests with HikariSuite
+  object ValuesTests extends ValuesTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
 
@@ -123,6 +126,7 @@ package mysql {
   // object ReturningTests extends ReturningTests with MySqlSuite
   // MySql does not support onConflictIgnore and onConflictUpdate does not take columns
   // object OnConflictTests extends OnConflictTests with MySqlSuite
+  object ValuesTests extends ValuesTests with MySqlSuite
 
   object SubQueryTests extends SubQueryTests with MySqlSuite
 
@@ -157,6 +161,8 @@ package sqlite {
   object UpdateSubQueryTests extends UpdateSubQueryTests with SqliteSuite
   object ReturningTests extends ReturningTests with SqliteSuite
   object OnConflictTests extends OnConflictTests with SqliteSuite
+  object ValuesTests extends ValuesTests with SqliteSuite
+
   object SubQueryTests extends SubQueryTests with SqliteSuite
 
   object ExprOpsTests extends ExprOpsTests with SqliteSuite
@@ -193,6 +199,8 @@ package hsqldb {
   // object ReturningTests extends ReturningTests with HsqlSuite
   // HSql does not support ON CONFLICT IGNORE
   // object OnConflictTests extends OnConflictTests with H2Suite
+  object ValuesTests extends ValuesTests with HsqlDbSuite
+
   object SubQueryTests extends SubQueryTests with HsqlDbSuite
 
   object ExprOpsTests extends ExprOpsTests with HsqlDbSuite
@@ -228,6 +236,8 @@ package h2 {
   // object ReturningTests extends ReturningTests with H2Suite
   // H2 does not support ON CONFLICT IGNORE unless in postgres mode
   // object OnConflictTests extends OnConflictTests with H2Suite
+  object ValuesTests extends ValuesTests with H2Suite
+
   object SubQueryTests extends SubQueryTests with H2Suite
 
   object ExprOpsTests extends ExprOpsTests with H2Suite

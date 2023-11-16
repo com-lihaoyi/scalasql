@@ -8,14 +8,13 @@ object Values{
   def apply[T: TypeMapper](ts: Seq[T]) = new Values(ts)
 }
 
-class Values[T: TypeMapper](ts: Seq[T]) extends Renderable{
-//  def queryExpr[V: TypeMapper](f: Expr[T] => Context => SqlStr)
-//                              (implicit qr: Queryable.Row[Expr[V], V]): Expr[V] = Expr{
-//    implicit ctx =>
-//
-//  }
-//
-//  protected def expr: Expr[T] = Expr{implicit ctx => ??? }
+class Values[T: TypeMapper](ts: Seq[T]) extends Renderable with Aggregatable[Expr[T]]{
+  def queryExpr[V: TypeMapper](f: Expr[T] => Context => SqlStr)
+                              (implicit qr: Queryable.Row[Expr[V], V]): Expr[V] = Expr{
+    implicit ctx => sql"SELECT ${f(expr)(ctx)} AS res FROM ${renderToSql(ctx)}".withCompleteQuery(true)
+  }
+
+  protected def expr: Expr[T] = Expr{implicit ctx => sql"column1" }
 
   def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => sql"($other in $this)" }
 
