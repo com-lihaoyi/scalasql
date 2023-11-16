@@ -1221,7 +1221,12 @@ object WorldSqlTests extends TestSuite {
 
       // Your custom Scala functions can either be standalone functions or extension
       // methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
-      // are extension methods, with a different set being made available for each database
+      // are extension methods, with a different set being made available for each database.
+      //
+      // Different databases have a huge range of functions available. ScalaSql comes
+      // with the most commonly-used functions built in, but it is expected that you will
+      // need to build up your own library of custom `Expr[T]` functions to to access
+      // less commonly used functions that are nonetheless still needed in your application
       // -DOCS
     }
   }
