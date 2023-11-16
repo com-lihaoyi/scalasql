@@ -277,11 +277,11 @@ object MySqlDialect extends MySqlDialect {
 
 
   class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
-    override protected def renderToSql(ctx: Context): SqlStr = {
-      val rows = SqlStr.join(ts.map(t => sql"ROW($t)"), sql", ")
-      sql"VALUES $rows"
-    }
+    override protected def getRenderer(prevContext: Context) = new ValuesRenderer[T](this)(implicitly, prevContext)
     override protected def expr: Expr[T] = Expr{implicit ctx => sql"column_0" }
+  }
+  class ValuesRenderer[T: TypeMapper](v: Values[T])(implicit ctx: Context) extends scalasql.query.Values.Renderer[T](v){
+    override def wrapRow(t: T) = sql"ROW($t)"
   }
 
 }

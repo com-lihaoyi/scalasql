@@ -200,11 +200,7 @@ trait Select[Q, R]
    */
   def toExpr(implicit mt: TypeMapper[R]): Expr[R] = Expr { implicit ctx => this.renderToSql(ctx) }
 
-  protected def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
-    case s: SimpleSelect[Q, R] => s
-    case s: CompoundSelect[Q, R] => s.subquery
-    case s: Values[_] => s.subquery
-  }
+  protected def simpleFrom(): SimpleSelect[Q, R]
 
   /**
    * Forces this [[Select]] to be treated as a subquery that any further operations
@@ -239,6 +235,7 @@ trait Select[Q, R]
 }
 
 object Select {
+  def getSimpleFrom[Q, R](s: Select[Q, R]) = s.simpleFrom()
   def getRenderer(s: Select[_, _], prevContext: Context) = s.getRenderer(prevContext)
   trait Renderer {
     def lhsMap: Map[Expr.Identity, SqlStr]

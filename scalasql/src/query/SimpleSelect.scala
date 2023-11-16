@@ -48,6 +48,8 @@ class SimpleSelect[Q, R](
     }
   }
 
+  protected def simpleFrom() = this
+
   def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): SimpleSelect[Q2, R2] =
     copy(expr = f(expr))
 
@@ -180,7 +182,7 @@ class SimpleSelect[Q, R](
   def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q, R]) = {
-    val op2 = CompoundSelect.Op(op, simpleFrom(other))
+    val op2 = CompoundSelect.Op(op, Select.getSimpleFrom(other))
     newCompoundSelect(this, Seq(op2), Nil, None, None)
   }
 
