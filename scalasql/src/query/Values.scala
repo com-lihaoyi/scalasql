@@ -15,7 +15,7 @@ class Values[T: TypeMapper](ts: Seq[T]) extends Renderable with Aggregatable[Exp
 
   protected def expr: Expr[T] = Expr{implicit ctx => sql"column1" }
 
-  def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => sql"($other in ($this))" }
+  def contains(other: Expr[_]): Expr[Boolean] = Expr { implicit ctx => sql"($other IN ($this))" }
 
   protected def renderToSql(ctx: Context): SqlStr = {
     val rows = SqlStr.join(ts.map(t => sql"($t)"), sql", ")

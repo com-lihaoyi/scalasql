@@ -221,7 +221,7 @@ object SimpleSelect {
 
     lazy val exprsStrs = {
       FlatJson.flatten(flattenedExpr, implicitCtx).map { case (k, v) =>
-        sql"$v as ${SqlStr.raw(implicitCtx.config.tableNameMapper(k))}"
+        sql"$v AS ${SqlStr.raw(implicitCtx.config.tableNameMapper(k))}"
       }
     }
 

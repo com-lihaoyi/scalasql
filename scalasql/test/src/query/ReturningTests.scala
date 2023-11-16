@@ -24,7 +24,7 @@ trait ReturningTests extends ScalaSqlSuite {
               .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
               .returning(_.id)
           },
-          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
+          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id AS res",
           value = Seq(4),
           docs = """
             ScalaSql's `.returning` clause translates to SQL's `RETURNING` syntax, letting
@@ -51,7 +51,7 @@ trait ReturningTests extends ScalaSqlSuite {
               .returning(_.id)
               .single
           },
-          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res",
+          sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id AS res",
           value = 4,
           docs = """
             If your `.returning` query is expected to be a single row, the `.single` method is
@@ -84,7 +84,7 @@ trait ReturningTests extends ScalaSqlSuite {
               (?, ?),
               (?, ?),
               (?, ?)
-            RETURNING buyer.id as res
+            RETURNING buyer.id AS res
           """,
           value = Seq(4, 5, 6)
         )
@@ -116,11 +116,11 @@ trait ReturningTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             SELECT
-              buyer0.name as res__0,
-              buyer0.date_of_birth as res__1
+              buyer0.name AS res__0,
+              buyer0.date_of_birth AS res__1
             FROM buyer buyer0
             WHERE (buyer0.name <> ?)
-            RETURNING buyer.id as res
+            RETURNING buyer.id AS res
           """,
           value = Seq(4, 5),
           docs = """
@@ -155,8 +155,8 @@ trait ReturningTests extends ScalaSqlSuite {
               .returning(_.id)
           },
           sqls = Seq(
-            "UPDATE buyer SET date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id as res",
-            "UPDATE buyer SET buyer.date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id as res"
+            "UPDATE buyer SET date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id AS res",
+            "UPDATE buyer SET buyer.date_of_birth = ? WHERE (buyer.name = ?) RETURNING buyer.id AS res"
           ),
           value = Seq(1)
         )
@@ -179,12 +179,12 @@ trait ReturningTests extends ScalaSqlSuite {
             """
             UPDATE buyer
             SET date_of_birth = ?, name = ? WHERE (buyer.name = ?)
-            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+            RETURNING buyer.id AS res__0, buyer.name AS res__1, buyer.date_of_birth AS res__2
           """,
             """
             UPDATE buyer
             SET buyer.date_of_birth = ?, buyer.name = ? (WHERE buyer.name = ?)
-            RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+            RETURNING buyer.id AS res__0, buyer.name AS res__1, buyer.date_of_birth AS res__2
           """
           ),
           value = Seq((1, "John Dee", LocalDate.parse("2019-04-07")))
@@ -196,7 +196,7 @@ trait ReturningTests extends ScalaSqlSuite {
       checker(
         query = Text { Purchase.delete(_.shippingInfoId `=` 1).returning(_.total) },
         sqls = Seq(
-          "DELETE FROM purchase WHERE (purchase.shipping_info_id = ?) RETURNING purchase.total as res"
+          "DELETE FROM purchase WHERE (purchase.shipping_info_id = ?) RETURNING purchase.total AS res"
         ),
         value = Seq(888.0, 900.0, 15.7)
       )

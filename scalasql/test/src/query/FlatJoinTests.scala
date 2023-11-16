@@ -18,7 +18,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, si.shippingDate)
       },
       sql = """
-        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
@@ -46,7 +46,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, pr.name, pr.price)
       },
       sql = """
-        SELECT buyer0.name as res__0, product3.name as res__1, product3.price as res__2
+        SELECT buyer0.name AS res__0, product3.name AS res__1, product3.price AS res__2
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (shipping_info1.id = buyer0.id)
         JOIN purchase purchase2 ON (purchase2.shipping_info_id = shipping_info1.id)
@@ -73,7 +73,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, si.map(_.shippingDate))
       },
       sql = """
-        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
@@ -98,7 +98,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
           .map(_._2.shippingDate)
       },
       sql = """
-        SELECT shipping_info1.shipping_date as res
+        SELECT shipping_info1.shipping_date AS res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
         WHERE ((buyer0.id = shipping_info1.buyer_id) AND (buyer0.name = ?))
@@ -120,7 +120,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield s.shippingDate
       },
       sql = """
-        SELECT shipping_info1.shipping_date as res
+        SELECT shipping_info1.shipping_date AS res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
         WHERE ((buyer0.id = shipping_info1.buyer_id) AND (buyer0.name = ?))
@@ -139,7 +139,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield s.shippingDate
       },
       sql = """
-        SELECT shipping_info1.shipping_date as res
+        SELECT shipping_info1.shipping_date AS res
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
         WHERE (buyer0.name = ?) AND (buyer0.id = shipping_info1.buyer_id)
@@ -156,12 +156,12 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, pr.name)
       },
       sql = """
-        SELECT buyer0.name as res__0, subquery2.res__1__name as res__1
+        SELECT buyer0.name AS res__0, subquery2.res__1__name AS res__1
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         CROSS JOIN (SELECT
-            purchase0.shipping_info_id as res__0__shipping_info_id,
-            product1.name as res__1__name
+            purchase0.shipping_info_id AS res__0__shipping_info_id,
+            product1.name AS res__1__name
           FROM purchase purchase0
           JOIN product product1 ON (purchase0.product_id = product1.id)) subquery2
         WHERE (shipping_info1.id = subquery2.res__0__shipping_info_id)
@@ -191,11 +191,11 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__0 as res__0,
-          subquery0.res__1 as res__1,
-          shipping_info1.id as res__2,
-          shipping_info1.shipping_date as res__3
-        FROM (SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
+          subquery0.res__0 AS res__0,
+          subquery0.res__1 AS res__1,
+          shipping_info1.id AS res__2,
+          shipping_info1.shipping_date AS res__3
+        FROM (SELECT buyer0.name AS res__0, MIN(buyer0.date_of_birth) AS res__1
           FROM buyer buyer0
           GROUP BY buyer0.name) subquery0
         CROSS JOIN shipping_info shipping_info1
@@ -228,18 +228,18 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__0 as res__0,
-          subquery0.res__1 as res__1,
-          subquery1.res__0 as res__2,
-          subquery1.res__1 as res__3
+          subquery0.res__0 AS res__0,
+          subquery0.res__1 AS res__1,
+          subquery1.res__0 AS res__2,
+          subquery1.res__1 AS res__3
         FROM (SELECT
-            buyer0.name as res__0,
-            MIN(buyer0.date_of_birth) as res__1
+            buyer0.name AS res__0,
+            MIN(buyer0.date_of_birth) AS res__1
           FROM buyer buyer0
           GROUP BY buyer0.name) subquery0
         CROSS JOIN (SELECT
-            shipping_info0.id as res__0,
-            MIN(shipping_info0.shipping_date) as res__1
+            shipping_info0.id AS res__0,
+            MIN(shipping_info0.shipping_date) AS res__1
           FROM shipping_info shipping_info0
           GROUP BY shipping_info0.id) subquery1
       """,
@@ -269,16 +269,16 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__name as res__0,
-          subquery1.res__shipping_date as res__1
+          subquery0.res__name AS res__0,
+          subquery1.res__shipping_date AS res__1
         FROM
-          (SELECT buyer0.id as res__id, buyer0.name as res__name
+          (SELECT buyer0.id AS res__id, buyer0.name AS res__name
           FROM buyer buyer0
           ORDER BY res__id ASC
           LIMIT 1) subquery0
         CROSS JOIN (SELECT
-            shipping_info0.id as res__id,
-            shipping_info0.shipping_date as res__shipping_date
+            shipping_info0.id AS res__id,
+            shipping_info0.shipping_date AS res__shipping_date
           FROM shipping_info shipping_info0
           ORDER BY res__id ASC
           LIMIT 1) subquery1

@@ -10,25 +10,25 @@ trait H2DialectTests extends H2Suite {
 
     test("ltrim2") - checker(
       query = Expr("xxHellox").ltrim("x"),
-      sql = "SELECT LTRIM(?, ?) as res",
+      sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
       query = Expr("xxHellox").rtrim("x"),
-      sql = "SELECT RTRIM(?, ?) as res",
+      sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 
     test("lpad") - checker(
       query = Expr("Hello").lpad(10, "xy"),
-      sql = "SELECT LPAD(?, ?, ?) as res",
+      sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xxxxxHello" // H2 only uses first character of fill string
     )
 
     test("rpad") - checker(
       query = Expr("Hello").rpad(10, "xy"),
-      sql = "SELECT RPAD(?, ?, ?) as res",
+      sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxxxxx" // H2 only uses first character of fill string
     )
   }

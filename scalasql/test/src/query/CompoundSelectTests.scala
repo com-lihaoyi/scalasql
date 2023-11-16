@@ -15,7 +15,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     test("sort") {
       test("simple") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name) },
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price",
         value = Seq("Cookie", "Socks", "Face Mask", "Skate Board", "Guitar", "Camera"),
         docs = """
           ScalaSql's `.sortBy` method translates into SQL `ORDER BY`
@@ -26,11 +26,11 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         query = Text { Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc },
         sql = """
           SELECT
-            purchase0.id as res__id,
-            purchase0.shipping_info_id as res__shipping_info_id,
-            purchase0.product_id as res__product_id,
-            purchase0.count as res__count,
-            purchase0.total as res__total
+            purchase0.id AS res__id,
+            purchase0.shipping_info_id AS res__shipping_info_id,
+            purchase0.product_id AS res__product_id,
+            purchase0.count AS res__count,
+            purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__shipping_info_id DESC, res__product_id ASC""",
         value = Seq(
@@ -52,7 +52,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2) },
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Seq("Cookie", "Socks"),
         docs = """
           ScalaSql also supports various combinations of `.take` and `.drop`, translating to SQL
@@ -62,15 +62,15 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       test("sortOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2) },
         sqls = Seq(
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2",
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2"
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET 2",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2"
         ),
         value = Seq("Face Mask", "Skate Board", "Guitar", "Camera")
       )
 
       test("sortLimitTwiceHigher") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2",
         value = Seq("Cookie", "Socks"),
         docs = """
           Note that `.drop` and `.take` follow Scala collections' semantics, so calling e.g. `.take`
@@ -81,35 +81,35 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimitTwiceLower") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(1) },
-        sql = "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1",
         value = Seq("Cookie")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffsetTwice") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1) },
         sql =
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
         value = Seq("Guitar")
       )
 
       test("sortOffsetLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).drop(1) },
         sql =
-          "SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
         value = Seq("Socks")
       )
     }
@@ -117,8 +117,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     test("distinct") - checker(
       query = Text { Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct },
       sql = """
-        SELECT DISTINCT subquery0.res as res
-        FROM (SELECT purchase0.shipping_info_id as res
+        SELECT DISTINCT subquery0.res AS res
+        FROM (SELECT purchase0.shipping_info_id AS res
           FROM purchase purchase0
           ORDER BY purchase0.total DESC
           LIMIT 3) subquery0
@@ -137,8 +137,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         }
       },
       sql = """
-        SELECT product1.name as res
-        FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
+        SELECT product1.name AS res
+        FROM (SELECT purchase0.product_id AS res__product_id, purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0
@@ -158,8 +158,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
     test("sumBy") - checker(
       query = Text { Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total) },
       sql = """
-        SELECT SUM(subquery0.res__total) as res
-        FROM (SELECT purchase0.total as res__total
+        SELECT SUM(subquery0.res__total) AS res
+        FROM (SELECT purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0
@@ -177,8 +177,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
       },
       sql = """
-        SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
-        FROM (SELECT purchase0.total as res__total
+        SELECT SUM(subquery0.res__total) AS res__0, AVG(subquery0.res__total) AS res__1
+        FROM (SELECT purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
           LIMIT 3) subquery0
@@ -194,10 +194,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .union(Product.select.map(_.kebabCaseName.toLowerCase))
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         UNION
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
       """,
       value = Seq(
@@ -224,10 +224,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         UNION ALL
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
       """,
       value = Seq(
@@ -253,10 +253,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .intersect(Product.select.map(_.kebabCaseName.toLowerCase))
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         INTERSECT
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
       """,
       value = Seq("camera", "cookie", "guitar", "socks"),
@@ -270,10 +270,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .except(Product.select.map(_.kebabCaseName.toLowerCase))
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         EXCEPT
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
       """,
       value = Seq("face mask", "skate board")
@@ -288,13 +288,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .sortBy(identity)
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         UNION ALL
-        SELECT LOWER(buyer0.name) as res
+        SELECT LOWER(buyer0.name) AS res
         FROM buyer buyer0
         UNION
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
         ORDER BY res
       """,
@@ -328,13 +328,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .take(4)
       },
       sql = """
-        SELECT LOWER(product0.name) as res
+        SELECT LOWER(product0.name) AS res
         FROM product product0
         UNION ALL
-        SELECT LOWER(buyer0.name) as res
+        SELECT LOWER(buyer0.name) AS res
         FROM buyer buyer0
         UNION
-        SELECT LOWER(product0.kebab_case_name) as res
+        SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
         ORDER BY res
         LIMIT 4

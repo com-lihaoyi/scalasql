@@ -100,9 +100,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
           """
             UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
             FROM (SELECT
-                shipping_info0.id as res__id,
-                shipping_info0.buyer_id as res__buyer_id,
-                shipping_info0.shipping_date as res__shipping_date
+                shipping_info0.id AS res__id,
+                shipping_info0.buyer_id AS res__buyer_id,
+                shipping_info0.shipping_date AS res__shipping_date
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
               LIMIT 2) subquery0
@@ -112,9 +112,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             UPDATE
               buyer
               JOIN (SELECT
-                  shipping_info0.id as res__id,
-                  shipping_info0.buyer_id as res__buyer_id,
-                  shipping_info0.shipping_date as res__shipping_date
+                  shipping_info0.id AS res__id,
+                  shipping_info0.buyer_id AS res__buyer_id,
+                  shipping_info0.shipping_date AS res__shipping_date
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
                 LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)
@@ -139,7 +139,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
         query = Text {
           Buyer
             .update(_.name `=` "James Bond")
-            // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
+            // Make sure the `SELECT shipping_info0.shipping_info_id AS res__shipping_info_id`
             // column gets eliminated since it is not used outside the subquery
             .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
             .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
@@ -148,8 +148,8 @@ trait UpdateJoinTests extends ScalaSqlSuite {
           """
             UPDATE buyer SET date_of_birth = ?
             FROM (SELECT
-                shipping_info0.id as res__id,
-                shipping_info0.buyer_id as res__buyer_id
+                shipping_info0.id AS res__id,
+                shipping_info0.buyer_id AS res__buyer_id
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
               LIMIT 2) subquery0
@@ -159,8 +159,8 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             UPDATE
               buyer
               JOIN (SELECT
-                  shipping_info0.id as res__id,
-                  shipping_info0.buyer_id as res__buyer_id
+                  shipping_info0.id AS res__id,
+                  shipping_info0.buyer_id AS res__buyer_id
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
                 LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)

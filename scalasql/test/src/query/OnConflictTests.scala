@@ -51,7 +51,7 @@ trait OnConflictTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
-            RETURNING buyer.name as res
+            RETURNING buyer.name AS res
           """,
           value = Seq.empty[String]
         )
@@ -72,7 +72,7 @@ trait OnConflictTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
             ON CONFLICT (id) DO NOTHING
-            RETURNING buyer.name as res
+            RETURNING buyer.name AS res
           """,
           value = Seq("test buyer")
         )
@@ -154,7 +154,7 @@ trait OnConflictTests extends ScalaSqlSuite {
           INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
           ON CONFLICT (id) DO UPDATE
           SET name = UPPER(buyer.name)
-          RETURNING buyer.name as res
+          RETURNING buyer.name AS res
         """,
         value = "JAMES BOND"
       )

@@ -409,7 +409,7 @@ Expr(1) + Expr(2)
 
 *
     ```sql
-    SELECT ? + ? as res
+    SELECT ? + ? AS res
     ```
 
 
@@ -436,9 +436,9 @@ Buyer.select
 *
     ```sql
     SELECT
-      buyer0.id as res__id,
-      buyer0.name as res__name,
-      buyer0.date_of_birth as res__date_of_birth
+      buyer0.id AS res__id,
+      buyer0.name AS res__name,
+      buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
     ```
 
@@ -468,9 +468,9 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
 *
     ```sql
     SELECT
-      shipping_info0.id as res__id,
-      shipping_info0.buyer_id as res__buyer_id,
-      shipping_info0.shipping_date as res__shipping_date
+      shipping_info0.id AS res__id,
+      shipping_info0.buyer_id AS res__buyer_id,
+      shipping_info0.shipping_date AS res__shipping_date
     FROM shipping_info shipping_info0
     WHERE shipping_info0.buyer_id = ?
     ```
@@ -501,9 +501,9 @@ ShippingInfo.select
 *
     ```sql
     SELECT
-      shipping_info0.id as res__id,
-      shipping_info0.buyer_id as res__buyer_id,
-      shipping_info0.shipping_date as res__shipping_date
+      shipping_info0.id AS res__id,
+      shipping_info0.buyer_id AS res__buyer_id,
+      shipping_info0.shipping_date AS res__shipping_date
     FROM shipping_info shipping_info0
     WHERE shipping_info0.buyer_id = ?
     AND shipping_info0.shipping_date = ?
@@ -535,9 +535,9 @@ ShippingInfo.select
 *
     ```sql
     SELECT
-      shipping_info0.id as res__id,
-      shipping_info0.buyer_id as res__buyer_id,
-      shipping_info0.shipping_date as res__shipping_date
+      shipping_info0.id AS res__id,
+      shipping_info0.buyer_id AS res__buyer_id,
+      shipping_info0.shipping_date AS res__shipping_date
     FROM shipping_info shipping_info0
     WHERE shipping_info0.buyer_id = ?
     AND shipping_info0.shipping_date = ?
@@ -565,9 +565,9 @@ ShippingInfo.select
 *
     ```sql
     SELECT
-      shipping_info0.id as res__id,
-      shipping_info0.buyer_id as res__buyer_id,
-      shipping_info0.shipping_date as res__shipping_date
+      shipping_info0.id AS res__id,
+      shipping_info0.buyer_id AS res__buyer_id,
+      shipping_info0.shipping_date AS res__shipping_date
     FROM shipping_info shipping_info0
     WHERE shipping_info0.buyer_id = ?
     AND shipping_info0.shipping_date = ?
@@ -595,7 +595,7 @@ Buyer.select.map(_.name)
 
 *
     ```sql
-    SELECT buyer0.name as res FROM buyer buyer0
+    SELECT buyer0.name AS res FROM buyer buyer0
     ```
 
 
@@ -618,7 +618,7 @@ Product.select.filter(_.price < 100).map(_.name)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 WHERE product0.price < ?
+    SELECT product0.name AS res FROM product product0 WHERE product0.price < ?
     ```
 
 
@@ -642,7 +642,7 @@ Buyer.select.map(c => (c.name, c.id))
 
 *
     ```sql
-    SELECT buyer0.name as res__0, buyer0.id as res__1 FROM buyer buyer0
+    SELECT buyer0.name AS res__0, buyer0.id AS res__1 FROM buyer buyer0
     ```
 
 
@@ -666,9 +666,9 @@ Buyer.select.map(c => (c.name, c.id, c.dateOfBirth))
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
-      buyer0.id as res__1,
-      buyer0.date_of_birth as res__2
+      buyer0.name AS res__0,
+      buyer0.id AS res__1,
+      buyer0.date_of_birth AS res__2
     FROM buyer buyer0
     ```
 
@@ -696,7 +696,7 @@ Product.select.map(_.price * 2)
 
 *
     ```sql
-    SELECT product0.price * ? as res FROM product product0
+    SELECT product0.price * ? AS res FROM product product0
     ```
 
 
@@ -721,10 +721,10 @@ Buyer.select.map(c => (c.id, c))
 *
     ```sql
     SELECT
-      buyer0.id as res__0,
-      buyer0.id as res__1__id,
-      buyer0.name as res__1__name,
-      buyer0.date_of_birth as res__1__date_of_birth
+      buyer0.id AS res__0,
+      buyer0.id AS res__1__id,
+      buyer0.name AS res__1__name,
+      buyer0.date_of_birth AS res__1__date_of_birth
     FROM buyer buyer0
     ```
 
@@ -768,12 +768,12 @@ Product.select.map(p =>
 *
     ```sql
     SELECT
-      product0.name as res__0,
-      (SELECT purchase0.total as res
+      product0.name AS res__0,
+      (SELECT purchase0.total AS res
         FROM purchase purchase0
         WHERE purchase0.product_id = product0.id
         ORDER BY res DESC
-        LIMIT 1) as res__1
+        LIMIT 1) AS res__1
     FROM product product0
     ```
 
@@ -807,8 +807,8 @@ Buyer.select.subquery.map(_.name)
 
 *
     ```sql
-    SELECT subquery0.res__name as res
-    FROM (SELECT buyer0.name as res__name FROM buyer buyer0) subquery0
+    SELECT subquery0.res__name AS res
+    FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery0
     ```
 
 
@@ -832,7 +832,7 @@ Purchase.select.sumBy(_.total)
 
 *
     ```sql
-    SELECT SUM(purchase0.total) as res FROM purchase purchase0
+    SELECT SUM(purchase0.total) AS res FROM purchase purchase0
     ```
 
 
@@ -856,7 +856,7 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 
 *
     ```sql
-    SELECT SUM(purchase0.total) as res__0, MAX(purchase0.total) as res__1 FROM purchase purchase0
+    SELECT SUM(purchase0.total) AS res__0, MAX(purchase0.total) AS res__1 FROM purchase purchase0
     ```
 
 
@@ -882,7 +882,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total))
 
 *
     ```sql
-    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
     FROM purchase purchase0
     GROUP BY purchase0.product_id
     ```
@@ -907,7 +907,7 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter
 
 *
     ```sql
-    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
     FROM purchase purchase0
     GROUP BY purchase0.product_id
     HAVING SUM(purchase0.total) > ? AND purchase0.product_id > ?
@@ -936,7 +936,7 @@ Purchase.select
 
 *
     ```sql
-    SELECT purchase0.product_id as res__0, SUM(purchase0.total) as res__1
+    SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
     FROM purchase purchase0
     WHERE purchase0.count > ?
     GROUP BY purchase0.product_id
@@ -965,7 +965,7 @@ Purchase.select.map(_.shippingInfoId)
 
 *
     ```sql
-    SELECT purchase0.shipping_info_id as res FROM purchase purchase0
+    SELECT purchase0.shipping_info_id AS res FROM purchase purchase0
     ```
 
 
@@ -988,7 +988,7 @@ Purchase.select.map(_.shippingInfoId).distinct
 
 *
     ```sql
-    SELECT DISTINCT purchase0.shipping_info_id as res FROM purchase purchase0
+    SELECT DISTINCT purchase0.shipping_info_id AS res FROM purchase purchase0
     ```
 
 
@@ -1012,9 +1012,9 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 
 *
     ```sql
-    SELECT buyer0.id as res__id, buyer0.name as res__name, buyer0.date_of_birth as res__date_of_birth
+    SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
-    WHERE buyer0.id in (SELECT shipping_info0.buyer_id as res FROM shipping_info shipping_info0)
+    WHERE buyer0.id IN (SELECT shipping_info0.buyer_id AS res FROM shipping_info shipping_info0)
     ```
 
 
@@ -1042,11 +1042,11 @@ Buyer.select
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
+      buyer0.name AS res__0,
       EXISTS (SELECT
-        shipping_info0.id as res
+        shipping_info0.id AS res
         FROM shipping_info shipping_info0
-        WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+        WHERE shipping_info0.buyer_id = buyer0.id) AS res__1
     FROM buyer buyer0
     ```
 
@@ -1072,11 +1072,11 @@ Buyer.select
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
+      buyer0.name AS res__0,
       NOT EXISTS (SELECT
-        shipping_info0.id as res
+        shipping_info0.id AS res
         FROM shipping_info shipping_info0
-        WHERE shipping_info0.buyer_id = buyer0.id) as res__1
+        WHERE shipping_info0.buyer_id = buyer0.id) AS res__1
     FROM buyer buyer0
     ```
 
@@ -1112,7 +1112,7 @@ Product.select.map(p =>
         WHEN product0.price > ? THEN product0.name || ?
         WHEN product0.price > ? THEN product0.name || ?
         WHEN product0.price <= ? THEN product0.name || ?
-      END as res
+      END AS res
     FROM product product0
     ```
 
@@ -1153,7 +1153,7 @@ Product.select.map(p =>
         WHEN product0.price > ? THEN product0.name || ?
         WHEN product0.price > ? THEN product0.name || ?
         ELSE product0.name || ?
-      END as res
+      END AS res
     FROM product product0
     ```
 
@@ -1190,12 +1190,12 @@ Buyer.select.join(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
-      shipping_info1.id as res__1__id,
-      shipping_info1.buyer_id as res__1__buyer_id,
-      shipping_info1.shipping_date as res__1__shipping_date
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      shipping_info1.id AS res__1__id,
+      shipping_info1.buyer_id AS res__1__buyer_id,
+      shipping_info1.shipping_date AS res__1__shipping_date
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     WHERE buyer0.name = ?
@@ -1233,7 +1233,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT shipping_info1.shipping_date as res
+    SELECT shipping_info1.shipping_date AS res
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     WHERE buyer0.name = ?
@@ -1263,12 +1263,12 @@ Buyer.select.join(Buyer)(_.id `=` _.id)
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
-      buyer1.id as res__1__id,
-      buyer1.name as res__1__name,
-      buyer1.date_of_birth as res__1__date_of_birth
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      buyer1.id AS res__1__id,
+      buyer1.name AS res__1__name,
+      buyer1.date_of_birth AS res__1__date_of_birth
     FROM buyer buyer0
     JOIN buyer buyer1 ON buyer0.id = buyer1.id
     ```
@@ -1307,12 +1307,12 @@ Buyer.select.join(Buyer)(_.id <> _.id)
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
-      buyer1.id as res__1__id,
-      buyer1.name as res__1__name,
-      buyer1.date_of_birth as res__1__date_of_birth
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      buyer1.id AS res__1__id,
+      buyer1.name AS res__1__name,
+      buyer1.date_of_birth AS res__1__date_of_birth
     FROM buyer buyer0
     JOIN buyer buyer1 ON buyer0.id <> buyer1.id
     ```
@@ -1364,7 +1364,7 @@ for ((name, dateOfBirth) <- Buyer.select.groupBy(_.name)(_.minBy(_.dateOfBirth))
 
 *
     ```sql
-    SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
+    SELECT buyer0.name AS res__0, MIN(buyer0.date_of_birth) AS res__1
     FROM buyer buyer0
     GROUP BY buyer0.name
     ```
@@ -1395,12 +1395,12 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
-      shipping_info1.id as res__1__id,
-      shipping_info1.buyer_id as res__1__buyer_id,
-      shipping_info1.shipping_date as res__1__shipping_date
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      shipping_info1.id AS res__1__id,
+      shipping_info1.buyer_id AS res__1__buyer_id,
+      shipping_info1.shipping_date AS res__1__shipping_date
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ```
@@ -1443,7 +1443,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+    SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ```
@@ -1480,7 +1480,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+    SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ORDER BY res__1 NULLS FIRST
@@ -1516,7 +1516,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT DISTINCT buyer0.name as res__0, NOT shipping_info1.id IS NULL as res__1
+    SELECT DISTINCT buyer0.name AS res__0, NOT shipping_info1.id IS NULL AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ORDER BY res__0
@@ -1549,8 +1549,8 @@ Buyer.select
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
-      shipping_info1.shipping_date > buyer0.date_of_birth as res__1
+      buyer0.name AS res__0,
+      shipping_info1.shipping_date > buyer0.date_of_birth AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ```
@@ -1586,8 +1586,8 @@ Buyer.select
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
-      shipping_info1.shipping_date > buyer0.date_of_birth as res__1
+      buyer0.name AS res__0,
+      shipping_info1.shipping_date > buyer0.date_of_birth AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     ```
@@ -1618,12 +1618,12 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
 *
     ```sql
     SELECT
-      shipping_info0.id as res__0__id,
-      shipping_info0.buyer_id as res__0__buyer_id,
-      shipping_info0.shipping_date as res__0__shipping_date,
-      buyer1.id as res__1__id,
-      buyer1.name as res__1__name,
-      buyer1.date_of_birth as res__1__date_of_birth
+      shipping_info0.id AS res__0__id,
+      shipping_info0.buyer_id AS res__0__buyer_id,
+      shipping_info0.shipping_date AS res__0__shipping_date,
+      buyer1.id AS res__1__id,
+      buyer1.name AS res__1__name,
+      buyer1.date_of_birth AS res__1__date_of_birth
     FROM shipping_info shipping_info0
     RIGHT JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
     ```
@@ -1663,12 +1663,12 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
 *
     ```sql
     SELECT
-      shipping_info0.id as res__0__id,
-      shipping_info0.buyer_id as res__0__buyer_id,
-      shipping_info0.shipping_date as res__0__shipping_date,
-      buyer1.id as res__1__id,
-      buyer1.name as res__1__name,
-      buyer1.date_of_birth as res__1__date_of_birth
+      shipping_info0.id AS res__0__id,
+      shipping_info0.buyer_id AS res__0__buyer_id,
+      shipping_info0.shipping_date AS res__0__shipping_date,
+      buyer1.id AS res__1__id,
+      buyer1.name AS res__1__name,
+      buyer1.date_of_birth AS res__1__date_of_birth
     FROM shipping_info shipping_info0
     FULL OUTER JOIN buyer buyer1 ON shipping_info0.buyer_id = buyer1.id
     ```
@@ -1711,7 +1711,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+    SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
     FROM buyer buyer0
     CROSS JOIN shipping_info shipping_info1
     WHERE buyer0.id = shipping_info1.buyer_id
@@ -1748,7 +1748,7 @@ for {
 
 *
     ```sql
-    SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+    SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
     ```
@@ -1788,7 +1788,7 @@ for {
 
 *
     ```sql
-    SELECT buyer0.name as res__0, product3.name as res__1, product3.price as res__2
+    SELECT buyer0.name AS res__0, product3.name AS res__1, product3.price AS res__2
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON shipping_info1.id = buyer0.id
     JOIN purchase purchase2 ON purchase2.shipping_info_id = shipping_info1.id
@@ -1822,7 +1822,7 @@ for {
 
 *
     ```sql
-    SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+    SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON shipping_info1.buyer_id = buyer0.id
     ```
@@ -1857,7 +1857,7 @@ Buyer.select
 
 *
     ```sql
-    SELECT shipping_info1.shipping_date as res
+    SELECT shipping_info1.shipping_date AS res
     FROM buyer buyer0
     CROSS JOIN shipping_info shipping_info1
     WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
@@ -1887,7 +1887,7 @@ for {
 
 *
     ```sql
-    SELECT shipping_info1.shipping_date as res
+    SELECT shipping_info1.shipping_date AS res
     FROM buyer buyer0
     CROSS JOIN shipping_info shipping_info1
     WHERE buyer0.id = shipping_info1.buyer_id AND buyer0.name = ?
@@ -1916,7 +1916,7 @@ for {
 
 *
     ```sql
-    SELECT shipping_info1.shipping_date as res
+    SELECT shipping_info1.shipping_date AS res
     FROM buyer buyer0
     CROSS JOIN shipping_info shipping_info1
     WHERE buyer0.name = ? AND buyer0.id = shipping_info1.buyer_id
@@ -1947,12 +1947,12 @@ for {
 
 *
     ```sql
-    SELECT buyer0.name as res__0, subquery2.res__1__name as res__1
+    SELECT buyer0.name AS res__0, subquery2.res__1__name AS res__1
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON buyer0.id = shipping_info1.buyer_id
     CROSS JOIN (SELECT
-        purchase0.shipping_info_id as res__0__shipping_info_id,
-        product1.name as res__1__name
+        purchase0.shipping_info_id AS res__0__shipping_info_id,
+        product1.name AS res__1__name
       FROM purchase purchase0
       JOIN product product1 ON purchase0.product_id = product1.id) subquery2
     WHERE shipping_info1.id = subquery2.res__0__shipping_info_id
@@ -1991,11 +1991,11 @@ for {
 *
     ```sql
     SELECT
-      subquery0.res__0 as res__0,
-      subquery0.res__1 as res__1,
-      shipping_info1.id as res__2,
-      shipping_info1.shipping_date as res__3
-    FROM (SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
+      subquery0.res__0 AS res__0,
+      subquery0.res__1 AS res__1,
+      shipping_info1.id AS res__2,
+      shipping_info1.shipping_date AS res__3
+    FROM (SELECT buyer0.name AS res__0, MIN(buyer0.date_of_birth) AS res__1
       FROM buyer buyer0
       GROUP BY buyer0.name) subquery0
     CROSS JOIN shipping_info shipping_info1
@@ -2038,18 +2038,18 @@ for {
 *
     ```sql
     SELECT
-      subquery0.res__0 as res__0,
-      subquery0.res__1 as res__1,
-      subquery1.res__0 as res__2,
-      subquery1.res__1 as res__3
+      subquery0.res__0 AS res__0,
+      subquery0.res__1 AS res__1,
+      subquery1.res__0 AS res__2,
+      subquery1.res__1 AS res__3
     FROM (SELECT
-        buyer0.name as res__0,
-        MIN(buyer0.date_of_birth) as res__1
+        buyer0.name AS res__0,
+        MIN(buyer0.date_of_birth) AS res__1
       FROM buyer buyer0
       GROUP BY buyer0.name) subquery0
     CROSS JOIN (SELECT
-        shipping_info0.id as res__0,
-        MIN(shipping_info0.shipping_date) as res__1
+        shipping_info0.id AS res__0,
+        MIN(shipping_info0.shipping_date) AS res__1
       FROM shipping_info shipping_info0
       GROUP BY shipping_info0.id) subquery1
     ```
@@ -2089,16 +2089,16 @@ for {
 *
     ```sql
     SELECT
-      subquery0.res__name as res__0,
-      subquery1.res__shipping_date as res__1
+      subquery0.res__name AS res__0,
+      subquery1.res__shipping_date AS res__1
     FROM
-      (SELECT buyer0.id as res__id, buyer0.name as res__name
+      (SELECT buyer0.id AS res__id, buyer0.name AS res__name
       FROM buyer buyer0
       ORDER BY res__id ASC
       LIMIT 1) subquery0
     CROSS JOIN (SELECT
-        shipping_info0.id as res__id,
-        shipping_info0.shipping_date as res__shipping_date
+        shipping_info0.id AS res__id,
+        shipping_info0.shipping_date AS res__shipping_date
       FROM shipping_info shipping_info0
       ORDER BY res__id ASC
       LIMIT 1) subquery1
@@ -2337,9 +2337,9 @@ Buyer.insert.select(
     ```sql
     INSERT INTO buyer (id, name, date_of_birth)
     SELECT
-      buyer0.id + (SELECT MAX(buyer0.id) as res FROM buyer buyer0) as res__id,
-      buyer0.name as res__name,
-      buyer0.date_of_birth as res__date_of_birth
+      buyer0.id + (SELECT MAX(buyer0.id) AS res FROM buyer buyer0) AS res__id,
+      buyer0.name AS res__name,
+      buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
     WHERE buyer0.name <> ?
     ```
@@ -2392,7 +2392,7 @@ Buyer.insert.select(
 *
     ```sql
     INSERT INTO buyer (name, date_of_birth)
-    SELECT buyer0.name as res__0, buyer0.date_of_birth as res__1
+    SELECT buyer0.name AS res__0, buyer0.date_of_birth AS res__1
     FROM buyer buyer0
     WHERE buyer0.name <> ?
     ```
@@ -2831,7 +2831,7 @@ Product.select.sortBy(_.price).map(_.name)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price
     ```
 
 
@@ -2858,11 +2858,11 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 *
     ```sql
     SELECT
-      purchase0.id as res__id,
-      purchase0.shipping_info_id as res__shipping_info_id,
-      purchase0.product_id as res__product_id,
-      purchase0.count as res__count,
-      purchase0.total as res__total
+      purchase0.id AS res__id,
+      purchase0.shipping_info_id AS res__shipping_info_id,
+      purchase0.product_id AS res__product_id,
+      purchase0.count AS res__count,
+      purchase0.total AS res__total
     FROM purchase purchase0
     ORDER BY res__shipping_info_id DESC, res__product_id ASC
     ```
@@ -2896,7 +2896,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2
     ```
 
 
@@ -2919,7 +2919,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET 2
     ```
 
 
@@ -2944,7 +2944,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2
     ```
 
 
@@ -2967,7 +2967,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1
     ```
 
 
@@ -2990,7 +2990,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
     ```
 
 
@@ -3013,7 +3013,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4
     ```
 
 
@@ -3036,7 +3036,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    SELECT product0.name as res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
     ```
 
 
@@ -3059,8 +3059,8 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
 
 *
     ```sql
-    SELECT DISTINCT subquery0.res as res
-    FROM (SELECT purchase0.shipping_info_id as res
+    SELECT DISTINCT subquery0.res AS res
+    FROM (SELECT purchase0.shipping_info_id AS res
       FROM purchase purchase0
       ORDER BY purchase0.total DESC
       LIMIT 3) subquery0
@@ -3091,8 +3091,8 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
 
 *
     ```sql
-    SELECT product1.name as res
-    FROM (SELECT purchase0.product_id as res__product_id, purchase0.total as res__total
+    SELECT product1.name AS res
+    FROM (SELECT purchase0.product_id AS res__product_id, purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
       LIMIT 3) subquery0
@@ -3120,8 +3120,8 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
 
 *
     ```sql
-    SELECT SUM(subquery0.res__total) as res
-    FROM (SELECT purchase0.total as res__total
+    SELECT SUM(subquery0.res__total) AS res
+    FROM (SELECT purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
       LIMIT 3) subquery0
@@ -3151,8 +3151,8 @@ Purchase.select
 
 *
     ```sql
-    SELECT SUM(subquery0.res__total) as res__0, AVG(subquery0.res__total) as res__1
-    FROM (SELECT purchase0.total as res__total
+    SELECT SUM(subquery0.res__total) AS res__0, AVG(subquery0.res__total) AS res__1
+    FROM (SELECT purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
       LIMIT 3) subquery0
@@ -3181,10 +3181,10 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     UNION
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ```
 
@@ -3219,10 +3219,10 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     UNION ALL
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ```
 
@@ -3261,10 +3261,10 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     INTERSECT
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ```
 
@@ -3290,10 +3290,10 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     EXCEPT
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ```
 
@@ -3322,13 +3322,13 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     UNION ALL
-    SELECT LOWER(buyer0.name) as res
+    SELECT LOWER(buyer0.name) AS res
     FROM buyer buyer0
     UNION
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ORDER BY res
     ```
@@ -3371,13 +3371,13 @@ Product.select
 
 *
     ```sql
-    SELECT LOWER(product0.name) as res
+    SELECT LOWER(product0.name) AS res
     FROM product product0
     UNION ALL
-    SELECT LOWER(buyer0.name) as res
+    SELECT LOWER(buyer0.name) AS res
     FROM buyer buyer0
     UNION
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ORDER BY res
     LIMIT 4
@@ -3515,9 +3515,9 @@ Buyer
     ```sql
     UPDATE buyer SET date_of_birth = subquery0.res__shipping_date
     FROM (SELECT
-        shipping_info0.id as res__id,
-        shipping_info0.buyer_id as res__buyer_id,
-        shipping_info0.shipping_date as res__shipping_date
+        shipping_info0.id AS res__id,
+        shipping_info0.buyer_id AS res__buyer_id,
+        shipping_info0.shipping_date AS res__shipping_date
       FROM shipping_info shipping_info0
       ORDER BY res__id ASC
       LIMIT 2) subquery0
@@ -3558,7 +3558,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ```scala
 Buyer
   .update(_.name `=` "James Bond")
-  // Make sure the `SELECT shipping_info0.shipping_info_id as res__shipping_info_id`
+  // Make sure the `SELECT shipping_info0.shipping_info_id AS res__shipping_info_id`
   // column gets eliminated since it is not used outside the subquery
   .join(ShippingInfo.select.sortBy(_.id).asc.take(2))(_.id `=` _.buyerId)
   .set(c => c._1.dateOfBirth := LocalDate.parse("2000-01-01"))
@@ -3569,8 +3569,8 @@ Buyer
     ```sql
     UPDATE buyer SET date_of_birth = ?
     FROM (SELECT
-        shipping_info0.id as res__id,
-        shipping_info0.buyer_id as res__buyer_id
+        shipping_info0.id AS res__id,
+        shipping_info0.buyer_id AS res__buyer_id
       FROM shipping_info shipping_info0
       ORDER BY res__id ASC
       LIMIT 2) subquery0
@@ -3619,7 +3619,7 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 *
     ```sql
     UPDATE product
-    SET price = (SELECT MAX(product0.price) as res FROM product product0)
+    SET price = (SELECT MAX(product0.price) AS res FROM product product0)
     ```
 
 
@@ -3670,7 +3670,7 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
     ```sql
     UPDATE product
     SET price = ?
-    WHERE product.price = (SELECT MAX(product0.price) as res FROM product product0)
+    WHERE product.price = (SELECT MAX(product0.price) AS res FROM product product0)
     ```
 
 
@@ -3727,7 +3727,7 @@ Buyer.insert
 
 *
     ```sql
-    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id AS res
     ```
 
 
@@ -3773,7 +3773,7 @@ Buyer.insert
 
 *
     ```sql
-    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id as res
+    INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id AS res
     ```
 
 
@@ -3825,7 +3825,7 @@ Buyer.insert
       (?, ?),
       (?, ?),
       (?, ?)
-    RETURNING buyer.id as res
+    RETURNING buyer.id AS res
     ```
 
 
@@ -3883,11 +3883,11 @@ Buyer.insert
     ```sql
     INSERT INTO buyer (name, date_of_birth)
     SELECT
-      buyer0.name as res__0,
-      buyer0.date_of_birth as res__1
+      buyer0.name AS res__0,
+      buyer0.date_of_birth AS res__1
     FROM buyer buyer0
     WHERE buyer0.name <> ?
-    RETURNING buyer.id as res
+    RETURNING buyer.id AS res
     ```
 
 
@@ -3938,7 +3938,7 @@ Buyer
 
 *
     ```sql
-    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id as res
+    UPDATE buyer SET date_of_birth = ? WHERE buyer.name = ? RETURNING buyer.id AS res
     ```
 
 
@@ -3984,7 +3984,7 @@ Buyer
     ```sql
     UPDATE buyer
     SET date_of_birth = ?, name = ? WHERE buyer.name = ?
-    RETURNING buyer.id as res__0, buyer.name as res__1, buyer.date_of_birth as res__2
+    RETURNING buyer.id AS res__0, buyer.name AS res__1, buyer.date_of_birth AS res__2
     ```
 
 
@@ -4007,7 +4007,7 @@ Purchase.delete(_.shippingInfoId `=` 1).returning(_.total)
 
 *
     ```sql
-    DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total as res
+    DELETE FROM purchase WHERE purchase.shipping_info_id = ? RETURNING purchase.total AS res
     ```
 
 
@@ -4097,7 +4097,7 @@ Buyer.insert
     ```sql
     INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
     ON CONFLICT (id) DO NOTHING
-    RETURNING buyer.name as res
+    RETURNING buyer.name AS res
     ```
 
 
@@ -4129,7 +4129,7 @@ Buyer.insert
     ```sql
     INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
     ON CONFLICT (id) DO NOTHING
-    RETURNING buyer.name as res
+    RETURNING buyer.name AS res
     ```
 
 
@@ -4265,7 +4265,7 @@ Buyer.insert
     INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
     ON CONFLICT (id) DO UPDATE
     SET name = UPPER(buyer.name)
-    RETURNING buyer.name as res
+    RETURNING buyer.name AS res
     ```
 
 
@@ -4293,9 +4293,9 @@ Purchase.select
 
 *
     ```sql
-    SELECT purchase0.total as res
+    SELECT purchase0.total AS res
     FROM purchase purchase0
-    JOIN (SELECT product0.id as res__id, product0.price as res__price
+    JOIN (SELECT product0.id AS res__id, product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
       LIMIT 1) subquery1
@@ -4328,8 +4328,8 @@ Product.select.sortBy(_.price).desc.take(1).join(Purchase)(_.id `=` _.productId)
 
 *
     ```sql
-    SELECT purchase1.total as res
-    FROM (SELECT product0.id as res__id, product0.price as res__price
+    SELECT purchase1.total AS res
+    FROM (SELECT product0.id AS res__id, product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
       LIMIT 1) subquery0
@@ -4363,18 +4363,18 @@ Product.select
 *
     ```sql
     SELECT
-      subquery0.res__name as res__0,
-      subquery1.res__count as res__1
+      subquery0.res__name AS res__0,
+      subquery1.res__count AS res__1
     FROM (SELECT
-        product0.id as res__id,
-        product0.name as res__name,
-        product0.price as res__price
+        product0.id AS res__id,
+        product0.name AS res__name,
+        product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
       LIMIT 3) subquery0
     JOIN (SELECT
-        purchase0.product_id as res__product_id,
-        purchase0.count as res__count
+        purchase0.product_id AS res__product_id,
+        purchase0.count AS res__count
       FROM purchase purchase0
       ORDER BY res__count DESC
       LIMIT 3) subquery1
@@ -4403,10 +4403,10 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
 
 *
     ```sql
-    SELECT subquery0.res__name as res
+    SELECT subquery0.res__name AS res
     FROM (SELECT
-        product0.name as res__name,
-        product0.price as res__price
+        product0.name AS res__name,
+        product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
       LIMIT 4) subquery0
@@ -4434,11 +4434,11 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 *
     ```sql
-    SELECT subquery0.res__product_id as res__0, SUM(subquery0.res__total) as res__1
+    SELECT subquery0.res__product_id AS res__0, SUM(subquery0.res__total) AS res__1
     FROM (SELECT
-        purchase0.product_id as res__product_id,
-        purchase0.count as res__count,
-        purchase0.total as res__total
+        purchase0.product_id AS res__product_id,
+        purchase0.count AS res__count,
+        purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__count
       LIMIT 5) subquery0
@@ -4468,11 +4468,11 @@ Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).join(Product)(_._1 `=` _.
 *
     ```sql
     SELECT
-      product1.name as res__0,
-      subquery0.res__1 as res__1
+      product1.name AS res__0,
+      subquery0.res__1 AS res__1
     FROM (SELECT
-        purchase0.product_id as res__0,
-        SUM(purchase0.total) as res__1
+        purchase0.product_id AS res__0,
+        SUM(purchase0.total) AS res__1
       FROM purchase purchase0
       GROUP BY purchase0.product_id) subquery0
     JOIN product product1 ON subquery0.res__0 = product1.id
@@ -4510,12 +4510,12 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 *
     ```sql
     SELECT
-      buyer0.id as res__id,
-      buyer0.name as res__name,
-      buyer0.date_of_birth as res__date_of_birth
+      buyer0.id AS res__id,
+      buyer0.name AS res__name,
+      buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
     WHERE (SELECT
-        COUNT(1) as res
+        COUNT(1) AS res
         FROM shipping_info shipping_info0
         WHERE buyer0.id = shipping_info0.buyer_id) = ?
     ```
@@ -4542,10 +4542,10 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
-      (SELECT COUNT(1) as res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) as res__1
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      (SELECT COUNT(1) AS res FROM shipping_info shipping_info0 WHERE buyer0.id = shipping_info0.buyer_id) AS res__1
     FROM buyer buyer0
     ```
 
@@ -4574,13 +4574,13 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 *
     ```sql
     SELECT
-      buyer0.id as res__0__id,
-      buyer0.name as res__0__name,
-      buyer0.date_of_birth as res__0__date_of_birth,
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
       (SELECT
-        COUNT(1) as res
+        COUNT(1) AS res
         FROM shipping_info shipping_info0
-        WHERE buyer0.id = shipping_info0.buyer_id) = ? as res__1
+        WHERE buyer0.id = shipping_info0.buyer_id) = ? AS res__1
     FROM buyer buyer0
     ```
 
@@ -4611,13 +4611,13 @@ Buyer.select
 
 *
     ```sql
-    SELECT subquery0.res as res
+    SELECT subquery0.res AS res
     FROM (SELECT
-        LOWER(buyer0.name) as res
+        LOWER(buyer0.name) AS res
       FROM buyer buyer0
       LIMIT 2) subquery0
     UNION ALL
-    SELECT LOWER(product0.kebab_case_name) as res
+    SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ```
 
@@ -4643,12 +4643,12 @@ Buyer.select
 
 *
     ```sql
-    SELECT LOWER(buyer0.name) as res
+    SELECT LOWER(buyer0.name) AS res
     FROM buyer buyer0
     UNION ALL
-    SELECT subquery0.res as res
+    SELECT subquery0.res AS res
     FROM (SELECT
-        LOWER(product0.kebab_case_name) as res
+        LOWER(product0.kebab_case_name) AS res
       FROM product product0
       LIMIT 2) subquery0
     ```
@@ -4679,16 +4679,16 @@ Product.select
 *
     ```sql
     SELECT
-      MAX(subquery0.res__1) as res__0,
-      MIN(subquery0.res__1) as res__1
+      MAX(subquery0.res__1) AS res__0,
+      MIN(subquery0.res__1) AS res__1
     FROM (SELECT
-        LOWER(product0.name) as res__0,
-        product0.price as res__1
+        LOWER(product0.name) AS res__0,
+        product0.price AS res__1
       FROM product product0
       EXCEPT
       SELECT
-        LOWER(product0.kebab_case_name) as res__0,
-        product0.price as res__1
+        LOWER(product0.kebab_case_name) AS res__0,
+        product0.price AS res__1
       FROM product product0) subquery0
     ```
 
@@ -4718,12 +4718,12 @@ Product.select
 *
     ```sql
     SELECT
-      MAX(subquery0.res__1) as res__0,
-      MIN(subquery0.res__1) as res__1
-    FROM (SELECT product0.price as res__1
+      MAX(subquery0.res__1) AS res__0,
+      MIN(subquery0.res__1) AS res__1
+    FROM (SELECT product0.price AS res__1
       FROM product product0
       UNION ALL
-      SELECT product0.price as res__1
+      SELECT product0.price AS res__1
       FROM product product0) subquery0
     ```
 
@@ -4785,22 +4785,22 @@ Buyer.select.map { buyer =>
 *
     ```sql
     SELECT
-      buyer0.name as res__0,
+      buyer0.name AS res__0,
       (SELECT
         (SELECT
-          (SELECT product0.price as res
+          (SELECT product0.price AS res
           FROM product product0
           WHERE product0.id = purchase0.product_id
           ORDER BY res DESC
-          LIMIT 1) as res
+          LIMIT 1) AS res
         FROM purchase purchase0
         WHERE purchase0.shipping_info_id = shipping_info0.id
         ORDER BY res DESC
-        LIMIT 1) as res
+        LIMIT 1) AS res
       FROM shipping_info shipping_info0
       WHERE shipping_info0.buyer_id = buyer0.id
       ORDER BY res DESC
-      LIMIT 1) as res__1
+      LIMIT 1) AS res__1
     FROM buyer buyer0
     ```
 
@@ -4830,7 +4830,7 @@ Expr(6) > Expr(2)
 
 *
     ```sql
-    SELECT ? > ? as res
+    SELECT ? > ? AS res
     ```
 
 
@@ -4853,7 +4853,7 @@ Expr(6) < Expr(2)
 
 *
     ```sql
-    SELECT ? < ? as res
+    SELECT ? < ? AS res
     ```
 
 
@@ -4876,7 +4876,7 @@ Expr(6) >= Expr(2)
 
 *
     ```sql
-    SELECT ? >= ? as res
+    SELECT ? >= ? AS res
     ```
 
 
@@ -4899,7 +4899,7 @@ Expr(6) <= Expr(2)
 
 *
     ```sql
-    SELECT ? <= ? as res
+    SELECT ? <= ? AS res
     ```
 
 
@@ -4922,7 +4922,7 @@ Expr("A") > Expr("B")
 
 *
     ```sql
-    SELECT ? > ? as res
+    SELECT ? > ? AS res
     ```
 
 
@@ -4945,7 +4945,7 @@ Expr("A") < Expr("B")
 
 *
     ```sql
-    SELECT ? < ? as res
+    SELECT ? < ? AS res
     ```
 
 
@@ -4968,7 +4968,7 @@ Expr("A") >= Expr("B")
 
 *
     ```sql
-    SELECT ? >= ? as res
+    SELECT ? >= ? AS res
     ```
 
 
@@ -4991,7 +4991,7 @@ Expr("A") <= Expr("B")
 
 *
     ```sql
-    SELECT ? <= ? as res
+    SELECT ? <= ? AS res
     ```
 
 
@@ -5014,7 +5014,7 @@ Expr(true) > Expr(false)
 
 *
     ```sql
-    SELECT ? > ? as res
+    SELECT ? > ? AS res
     ```
 
 
@@ -5037,7 +5037,7 @@ Expr(true) < Expr(true)
 
 *
     ```sql
-    SELECT ? < ? as res
+    SELECT ? < ? AS res
     ```
 
 
@@ -5060,7 +5060,7 @@ Expr(true) >= Expr(true)
 
 *
     ```sql
-    SELECT ? >= ? as res
+    SELECT ? >= ? AS res
     ```
 
 
@@ -5083,7 +5083,7 @@ Expr(true) <= Expr(true)
 
 *
     ```sql
-    SELECT ? <= ? as res
+    SELECT ? <= ? AS res
     ```
 
 
@@ -5106,7 +5106,7 @@ Expr(45.12).cast[Byte]
 
 *
     ```sql
-    SELECT CAST(? AS INTEGER) as res
+    SELECT CAST(? AS INTEGER) AS res
     ```
 
 
@@ -5129,7 +5129,7 @@ Expr(1234.1234).cast[Short]
 
 *
     ```sql
-    SELECT CAST(? AS SMALLINT) as res
+    SELECT CAST(? AS SMALLINT) AS res
     ```
 
 
@@ -5152,7 +5152,7 @@ Expr(1234.1234).cast[Int]
 
 *
     ```sql
-    SELECT CAST(? AS INTEGER) as res
+    SELECT CAST(? AS INTEGER) AS res
     ```
 
 
@@ -5175,7 +5175,7 @@ Expr(1234.1234).cast[Long]
 
 *
     ```sql
-    SELECT CAST(? AS BIGINT) as res
+    SELECT CAST(? AS BIGINT) AS res
     ```
 
 
@@ -5198,7 +5198,7 @@ Expr(1234.5678).cast[String]
 
 *
     ```sql
-    SELECT CAST(? AS VARCHAR) as res
+    SELECT CAST(? AS VARCHAR) AS res
     ```
 
 
@@ -5223,7 +5223,7 @@ Expr(true) && Expr(true)
 
 *
     ```sql
-    SELECT ? AND ? as res
+    SELECT ? AND ? AS res
     ```
 
 
@@ -5246,7 +5246,7 @@ Expr(false) && Expr(true)
 
 *
     ```sql
-    SELECT ? AND ? as res
+    SELECT ? AND ? AS res
     ```
 
 
@@ -5269,7 +5269,7 @@ Expr(false) || Expr(false)
 
 *
     ```sql
-    SELECT ? OR ? as res
+    SELECT ? OR ? AS res
     ```
 
 
@@ -5292,7 +5292,7 @@ Expr(false) || Expr(false)
 
 *
     ```sql
-    SELECT NOT ? as res
+    SELECT NOT ? AS res
     ```
 
 
@@ -5317,7 +5317,7 @@ Expr(6) + Expr(2)
 
 *
     ```sql
-    SELECT ? + ? as res
+    SELECT ? + ? AS res
     ```
 
 
@@ -5340,7 +5340,7 @@ Expr(6) - Expr(2)
 
 *
     ```sql
-    SELECT ? - ? as res
+    SELECT ? - ? AS res
     ```
 
 
@@ -5363,7 +5363,7 @@ Expr(6) * Expr(2)
 
 *
     ```sql
-    SELECT ? * ? as res
+    SELECT ? * ? AS res
     ```
 
 
@@ -5386,7 +5386,7 @@ Expr(6) / Expr(2)
 
 *
     ```sql
-    SELECT ? / ? as res
+    SELECT ? / ? AS res
     ```
 
 
@@ -5409,7 +5409,7 @@ Expr(6) % Expr(2)
 
 *
     ```sql
-    SELECT MOD(?, ?) as res
+    SELECT MOD(?, ?) AS res
     ```
 
 
@@ -5432,7 +5432,7 @@ Expr(6) & Expr(2)
 
 *
     ```sql
-    SELECT ? & ? as res
+    SELECT ? & ? AS res
     ```
 
 
@@ -5455,7 +5455,7 @@ Expr(6) | Expr(3)
 
 *
     ```sql
-    SELECT ? | ? as res
+    SELECT ? | ? AS res
     ```
 
 
@@ -5478,7 +5478,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    SELECT ? BETWEEN ? AND ? as res
+    SELECT ? BETWEEN ? AND ? AS res
     ```
 
 
@@ -5501,7 +5501,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    SELECT +? as res
+    SELECT +? AS res
     ```
 
 
@@ -5524,7 +5524,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    SELECT -? as res
+    SELECT -? AS res
     ```
 
 
@@ -5547,7 +5547,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 *
     ```sql
-    SELECT ~? as res
+    SELECT ~? AS res
     ```
 
 
@@ -5570,7 +5570,7 @@ Expr(-4).abs
 
 *
     ```sql
-    SELECT ABS(?) as res
+    SELECT ABS(?) AS res
     ```
 
 
@@ -5593,7 +5593,7 @@ Expr(8).mod(Expr(3))
 
 *
     ```sql
-    SELECT MOD(?, ?) as res
+    SELECT MOD(?, ?) AS res
     ```
 
 
@@ -5616,7 +5616,7 @@ Expr(4.3).ceil
 
 *
     ```sql
-    SELECT CEIL(?) as res
+    SELECT CEIL(?) AS res
     ```
 
 
@@ -5639,7 +5639,7 @@ Expr(4.7).floor
 
 *
     ```sql
-    SELECT FLOOR(?) as res
+    SELECT FLOOR(?) AS res
     ```
 
 
@@ -5662,7 +5662,7 @@ Expr(4.7).floor
 
 *
     ```sql
-    SELECT FLOOR(?) as res
+    SELECT FLOOR(?) AS res
     ```
 
 
@@ -5687,7 +5687,7 @@ Purchase.select.map(_.count).sum
 
 *
     ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    SELECT SUM(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5710,7 +5710,7 @@ Purchase.select.map(_.count).min
 
 *
     ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    SELECT MIN(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5733,7 +5733,7 @@ Purchase.select.map(_.count).max
 
 *
     ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    SELECT MAX(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5756,7 +5756,7 @@ Purchase.select.map(_.count).avg
 
 *
     ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    SELECT AVG(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5781,7 +5781,7 @@ Purchase.select.size
 
 *
     ```sql
-    SELECT COUNT(1) as res FROM purchase purchase0
+    SELECT COUNT(1) AS res FROM purchase purchase0
     ```
 
 
@@ -5804,7 +5804,7 @@ Purchase.select.sumBy(_.count)
 
 *
     ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    SELECT SUM(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5827,7 +5827,7 @@ Purchase.select.sumByOpt(_.count)
 
 *
     ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0
+    SELECT SUM(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5850,7 +5850,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
 
 *
     ```sql
-    SELECT SUM(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    SELECT SUM(purchase0.count) AS res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -5873,7 +5873,7 @@ Purchase.select.minBy(_.count)
 
 *
     ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    SELECT MIN(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5896,7 +5896,7 @@ Purchase.select.minByOpt(_.count)
 
 *
     ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0
+    SELECT MIN(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5919,7 +5919,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
 
 *
     ```sql
-    SELECT MIN(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    SELECT MIN(purchase0.count) AS res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -5942,7 +5942,7 @@ Purchase.select.maxBy(_.count)
 
 *
     ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    SELECT MAX(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5965,7 +5965,7 @@ Purchase.select.maxByOpt(_.count)
 
 *
     ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0
+    SELECT MAX(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -5988,7 +5988,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
 
 *
     ```sql
-    SELECT MAX(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    SELECT MAX(purchase0.count) AS res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -6011,7 +6011,7 @@ Purchase.select.avgBy(_.count)
 
 *
     ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    SELECT AVG(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -6034,7 +6034,7 @@ Purchase.select.avgByOpt(_.count)
 
 *
     ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0
+    SELECT AVG(purchase0.count) AS res FROM purchase purchase0
     ```
 
 
@@ -6057,7 +6057,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 
 *
     ```sql
-    SELECT AVG(purchase0.count) as res FROM purchase purchase0 WHERE ?
+    SELECT AVG(purchase0.count) AS res FROM purchase purchase0 WHERE ?
     ```
 
 
@@ -6082,7 +6082,7 @@ Expr("hello") + Expr("world")
 
 *
     ```sql
-    SELECT ? || ? as res
+    SELECT ? || ? AS res
     ```
 
 
@@ -6105,7 +6105,7 @@ Expr("hello").like("he%")
 
 *
     ```sql
-    SELECT ? LIKE ? as res
+    SELECT ? LIKE ? AS res
     ```
 
 
@@ -6128,7 +6128,7 @@ Expr("hello").length
 
 *
     ```sql
-    SELECT LENGTH(?) as res
+    SELECT LENGTH(?) AS res
     ```
 
 
@@ -6151,7 +6151,7 @@ Expr("叉烧包").octetLength
 
 *
     ```sql
-    SELECT OCTET_LENGTH(?) as res
+    SELECT OCTET_LENGTH(?) AS res
     ```
 
 
@@ -6174,7 +6174,7 @@ Expr("hello").indexOf("ll")
 
 *
     ```sql
-    SELECT POSITION(? IN ?) as res
+    SELECT POSITION(? IN ?) AS res
     ```
 
 
@@ -6197,7 +6197,7 @@ Expr("Hello").toLowerCase
 
 *
     ```sql
-    SELECT LOWER(?) as res
+    SELECT LOWER(?) AS res
     ```
 
 
@@ -6220,7 +6220,7 @@ Expr("  Hello ").trim
 
 *
     ```sql
-    SELECT TRIM(?) as res
+    SELECT TRIM(?) AS res
     ```
 
 
@@ -6243,7 +6243,7 @@ Expr("  Hello ").ltrim
 
 *
     ```sql
-    SELECT LTRIM(?) as res
+    SELECT LTRIM(?) AS res
     ```
 
 
@@ -6266,7 +6266,7 @@ Expr("  Hello ").rtrim
 
 *
     ```sql
-    SELECT RTRIM(?) as res
+    SELECT RTRIM(?) AS res
     ```
 
 
@@ -6289,7 +6289,7 @@ Expr("Hello").substring(2, 2)
 
 *
     ```sql
-    SELECT SUBSTRING(?, ?, ?) as res
+    SELECT SUBSTRING(?, ?, ?) AS res
     ```
 
 
@@ -6427,8 +6427,8 @@ OptCols.select
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6457,7 +6457,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__0, MAX(opt_cols0.my_int2) as res__1
+    SELECT opt_cols0.my_int AS res__0, MAX(opt_cols0.my_int2) AS res__1
     FROM opt_cols opt_cols0
     GROUP BY opt_cols0.my_int
     ```
@@ -6483,8 +6483,8 @@ OptCols.select.filter(_.myInt.isDefined)
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE opt_cols0.my_int IS NOT NULL
     ```
@@ -6510,8 +6510,8 @@ OptCols.select.filter(_.myInt.isEmpty)
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE opt_cols0.my_int IS NULL
     ```
@@ -6537,8 +6537,8 @@ OptCols.select.filter(_.myInt `=` 1)
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE opt_cols0.my_int = ?
     ```
@@ -6564,8 +6564,8 @@ OptCols.select.filter(_.myInt `=` 2)
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE opt_cols0.my_int = ?
     ```
@@ -6591,8 +6591,8 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE opt_cols0.my_int = ?
     ```
@@ -6618,8 +6618,8 @@ OptCols.select.filter(_.myInt === Option(1))
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
     ```
@@ -6645,8 +6645,8 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
 *
     ```sql
     SELECT
-      opt_cols0.my_int as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     WHERE (opt_cols0.my_int IS NULL AND ? IS NULL) OR opt_cols0.my_int = ?
     ```
@@ -6672,8 +6672,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
 *
     ```sql
     SELECT
-      opt_cols0.my_int + ? as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int + ? AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6702,7 +6702,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 *
     ```sql
-    SELECT opt_cols0.my_int + ? as res FROM opt_cols opt_cols0
+    SELECT opt_cols0.my_int + ? AS res FROM opt_cols opt_cols0
     ```
 
 
@@ -6727,8 +6727,8 @@ OptCols.select
 *
     ```sql
     SELECT
-      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int + opt_cols0.my_int2 + ? AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6759,8 +6759,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 *
     ```sql
     SELECT
-      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int + opt_cols0.my_int2 + ? AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6791,8 +6791,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 *
     ```sql
     SELECT
-      opt_cols0.my_int + opt_cols0.my_int2 + ? as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      opt_cols0.my_int + opt_cols0.my_int2 + ? AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6823,8 +6823,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 *
     ```sql
     SELECT
-      COALESCE(opt_cols0.my_int, ?) as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      COALESCE(opt_cols0.my_int, ?) AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6854,8 +6854,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 *
     ```sql
     SELECT
-      COALESCE(opt_cols0.my_int, opt_cols0.my_int2) as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      COALESCE(opt_cols0.my_int, opt_cols0.my_int2) AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6888,8 +6888,8 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
       CASE
         WHEN opt_cols0.my_int < ? THEN opt_cols0.my_int
         ELSE NULL
-      END as res__my_int,
-      opt_cols0.my_int2 as res__my_int2
+      END AS res__my_int,
+      opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ```
 
@@ -6918,7 +6918,7 @@ OptCols.select.sortBy(_.myInt).nullsLast
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int NULLS LAST
     ```
@@ -6948,7 +6948,7 @@ OptCols.select.sortBy(_.myInt).nullsFirst
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int NULLS FIRST
     ```
@@ -6978,7 +6978,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int ASC NULLS LAST
     ```
@@ -7008,7 +7008,7 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int ASC NULLS FIRST
     ```
@@ -7038,7 +7038,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int DESC NULLS LAST
     ```
@@ -7068,7 +7068,7 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 *
     ```sql
-    SELECT opt_cols0.my_int as res__my_int, opt_cols0.my_int2 as res__my_int2
+    SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
     FROM opt_cols opt_cols0
     ORDER BY res__my_int DESC NULLS FIRST
     ```
@@ -7100,7 +7100,7 @@ Expr("xxHellox").ltrim("x")
 
 *
     ```sql
-    SELECT LTRIM(?, ?) as res
+    SELECT LTRIM(?, ?) AS res
     ```
 
 
@@ -7123,7 +7123,7 @@ Expr("xxHellox").rtrim("x")
 
 *
     ```sql
-    SELECT RTRIM(?, ?) as res
+    SELECT RTRIM(?, ?) AS res
     ```
 
 
@@ -7146,7 +7146,7 @@ Expr("Hello").reverse
 
 *
     ```sql
-    SELECT REVERSE(?) as res
+    SELECT REVERSE(?) AS res
     ```
 
 
@@ -7169,7 +7169,7 @@ Expr("Hello").lpad(10, "xy")
 
 *
     ```sql
-    SELECT LPAD(?, ?, ?) as res
+    SELECT LPAD(?, ?, ?) AS res
     ```
 
 
@@ -7192,7 +7192,7 @@ Expr("Hello").rpad(10, "xy")
 
 *
     ```sql
-    SELECT RPAD(?, ?, ?) as res
+    SELECT RPAD(?, ?, ?) AS res
     ```
 
 
@@ -7217,7 +7217,7 @@ Expr("Hello").reverse
 
 *
     ```sql
-    SELECT REVERSE(?) as res
+    SELECT REVERSE(?) AS res
     ```
 
 
@@ -7240,7 +7240,7 @@ Expr("Hello").lpad(10, "xy")
 
 *
     ```sql
-    SELECT LPAD(?, ?, ?) as res
+    SELECT LPAD(?, ?, ?) AS res
     ```
 
 
@@ -7263,7 +7263,7 @@ Expr("Hello").rpad(10, "xy")
 
 *
     ```sql
-    SELECT RPAD(?, ?, ?) as res
+    SELECT RPAD(?, ?, ?) AS res
     ```
 
 
@@ -7419,7 +7419,7 @@ Expr("xxHellox").ltrim("x")
 
 *
     ```sql
-    SELECT LTRIM(?, ?) as res
+    SELECT LTRIM(?, ?) AS res
     ```
 
 
@@ -7442,7 +7442,7 @@ Expr("xxHellox").rtrim("x")
 
 *
     ```sql
-    SELECT RTRIM(?, ?) as res
+    SELECT RTRIM(?, ?) AS res
     ```
 
 
@@ -7467,7 +7467,7 @@ Expr("xxHellox").ltrim("x")
 
 *
     ```sql
-    SELECT LTRIM(?, ?) as res
+    SELECT LTRIM(?, ?) AS res
     ```
 
 
@@ -7490,7 +7490,7 @@ Expr("xxHellox").rtrim("x")
 
 *
     ```sql
-    SELECT RTRIM(?, ?) as res
+    SELECT RTRIM(?, ?) AS res
     ```
 
 
@@ -7513,7 +7513,7 @@ Expr("Hello").reverse
 
 *
     ```sql
-    SELECT REVERSE(?) as res
+    SELECT REVERSE(?) AS res
     ```
 
 
@@ -7536,7 +7536,7 @@ Expr("Hello").lpad(10, "xy")
 
 *
     ```sql
-    SELECT LPAD(?, ?, ?) as res
+    SELECT LPAD(?, ?, ?) AS res
     ```
 
 
@@ -7559,7 +7559,7 @@ Expr("Hello").rpad(10, "xy")
 
 *
     ```sql
-    SELECT RPAD(?, ?, ?) as res
+    SELECT RPAD(?, ?, ?) AS res
     ```
 
 
@@ -7584,7 +7584,7 @@ Expr("xxHellox").ltrim("x")
 
 *
     ```sql
-    SELECT LTRIM(?, ?) as res
+    SELECT LTRIM(?, ?) AS res
     ```
 
 
@@ -7607,7 +7607,7 @@ Expr("xxHellox").rtrim("x")
 
 *
     ```sql
-    SELECT RTRIM(?, ?) as res
+    SELECT RTRIM(?, ?) AS res
     ```
 
 
@@ -7630,7 +7630,7 @@ Expr("Hello").lpad(10, "xy")
 
 *
     ```sql
-    SELECT LPAD(?, ?, ?) as res
+    SELECT LPAD(?, ?, ?) AS res
     ```
 
 
@@ -7653,7 +7653,7 @@ Expr("Hello").rpad(10, "xy")
 
 *
     ```sql
-    SELECT RPAD(?, ?, ?) as res
+    SELECT RPAD(?, ?, ?) AS res
     ```
 
 

@@ -171,7 +171,7 @@ Here, we construct `Expr`s to represent the SQL query `1 + 3`. We can use
 query to the database and return the output `4`
 ```scala
 val query = Expr(1) + Expr(3)
-db.toSqlQuery(query) ==> "SELECT ? + ? as res"
+db.toSqlQuery(query) ==> "SELECT ? + ? AS res"
 db.run(query) ==> 4
 
 ```
@@ -196,11 +196,11 @@ on its own in order to retrieve all the data in the table:
 val query = City.select
 db.toSqlQuery(query) ==> """
 SELECT
-  city0.id as res__id,
-  city0.name as res__name,
-  city0.countrycode as res__countrycode,
-  city0.district as res__district,
-  city0.population as res__population
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
 FROM city city0
 """.trim.replaceAll("\\s+", " ")
 
@@ -234,11 +234,11 @@ val query = City.select.filter(_.name === "Singapore").single
 
 db.toSqlQuery(query) ==> """
 SELECT
-  city0.id as res__id,
-  city0.name as res__name,
-  city0.countrycode as res__countrycode,
-  city0.district as res__district,
-  city0.population as res__population
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
 FROM city city0
 WHERE city0.name = ?
 """.trim.replaceAll("\\s+", " ")
@@ -272,11 +272,11 @@ val query = City.select.filter(_.name === "Singapore").head
 
 db.toSqlQuery(query) ==> """
 SELECT
-  city0.id as res__id,
-  city0.name as res__name,
-  city0.countrycode as res__countrycode,
-  city0.district as res__district,
-  city0.population as res__population
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
 FROM city city0
 WHERE city0.name = ?
 LIMIT 1
@@ -291,11 +291,11 @@ as shown below:
 val query = City.select.filter(_.id === 3208).single
 db.toSqlQuery(query) ==> """
 SELECT
-  city0.id as res__id,
-  city0.name as res__name,
-  city0.countrycode as res__countrycode,
-  city0.district as res__district,
-  city0.population as res__population
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
 FROM city city0
 WHERE city0.id = ?
 """.trim.replaceAll("\\s+", " ")
@@ -309,11 +309,11 @@ with population more than 5 million:
 val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
 db.toSqlQuery(query) ==> """
   SELECT
-    city0.id as res__id,
-    city0.name as res__name,
-    city0.countrycode as res__countrycode,
-    city0.district as res__district,
-    city0.population as res__population
+    city0.id AS res__id,
+    city0.name AS res__name,
+    city0.countrycode AS res__countrycode,
+    city0.district AS res__district,
+    city0.population AS res__population
   FROM city city0
   WHERE
     city0.population > ?
@@ -336,11 +336,11 @@ You can also stack multiple separate filters together, as shown below:
 val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
 db.toSqlQuery(query) ==> """
 SELECT
-  city0.id as res__id,
-  city0.name as res__name,
-  city0.countrycode as res__countrycode,
-  city0.district as res__district,
-  city0.population as res__population
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
 FROM city city0
 WHERE
   city0.population > ?
@@ -413,8 +413,8 @@ each country, without all the other metadata:
 val query = Country.select.map(c => (c.name, c.continent))
 db.toSqlQuery(query) ==> """
   SELECT
-    country0.name as res__0,
-    country0.continent as res__1
+    country0.name AS res__0,
+    country0.continent AS res__1
   FROM country country0
   """.trim.replaceAll("\\s+", " ")
 
@@ -439,13 +439,13 @@ val query = City.select
 
 db.toSqlQuery(query) ==> """
   SELECT
-    city0.id as res__0__id,
-    city0.name as res__0__name,
-    city0.countrycode as res__0__countrycode,
-    city0.district as res__0__district,
-    city0.population as res__0__population,
-    UPPER(city0.name) as res__1,
-    city0.population / ? as res__2
+    city0.id AS res__0__id,
+    city0.name AS res__0__name,
+    city0.countrycode AS res__0__countrycode,
+    city0.district AS res__0__district,
+    city0.population AS res__0__population,
+    UPPER(city0.name) AS res__1,
+    city0.population / ? AS res__2
   FROM
     city city0
   WHERE
@@ -467,7 +467,7 @@ query all cities in China and sum up their populations
 ```scala
 val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
 db.toSqlQuery(query) ==>
-  "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
+  "SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?"
 
 db.run(query) ==> 175953614
 ```
@@ -476,7 +476,7 @@ Many aggregates have a `By` version, e.g. `.sumBy`, which allows you to
 customize exactly what you are aggregating:
 ```scala
 val query = City.select.sumBy(_.population)
-db.toSqlQuery(query) ==> "SELECT SUM(city0.population) as res FROM city city0"
+db.toSqlQuery(query) ==> "SELECT SUM(city0.population) AS res FROM city city0"
 
 db.run(query) ==> 1429559884
 ```
@@ -487,7 +487,7 @@ greater than one million
 ```scala
 val query = Country.select.filter(_.population > 1000000).size
 db.toSqlQuery(query) ==>
-  "SELECT COUNT(1) as res FROM country country0 WHERE country0.population > ?"
+  "SELECT COUNT(1) AS res FROM country country0 WHERE country0.population > ?"
 
 db.run(query) ==> 154
 ```
@@ -500,9 +500,9 @@ val query = Country.select
   .aggregate(cs => (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population)))
 db.toSqlQuery(query) ==> """
 SELECT
-  MIN(country0.population) as res__0,
-  AVG(country0.population) as res__1,
-  MAX(country0.population) as res__2
+  MIN(country0.population) AS res__0,
+  AVG(country0.population) AS res__1,
+  MAX(country0.population) AS res__2
 FROM country country0
 """.trim.replaceAll("\\s+", " ")
 
@@ -522,7 +522,7 @@ val query = City.select
   .map(c => (c.name, c.population))
 
 db.toSqlQuery(query) ==> """
-  SELECT city0.name as res__0, city0.population as res__1
+  SELECT city0.name AS res__0, city0.population AS res__1
   FROM city city0
   ORDER BY res__1 DESC
   LIMIT 5 OFFSET 5
@@ -555,7 +555,7 @@ val query = Country.select
   .single
 
 db.toSqlQuery(query) ==> """
-  SELECT CAST(country0.lifeexpectancy AS INTEGER) as res
+  SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
   FROM country country0
   WHERE country0.name = ?
 """.trim.replaceAll("\\s+", " ")
@@ -582,7 +582,7 @@ val query = Country.select
   .size
 
 db.toSqlQuery(query) ==> """
-SELECT COUNT(1) as res
+SELECT COUNT(1) AS res
 FROM country country0
 WHERE country0.capital IS NULL
 """.trim.replaceAll("\\s+", " ")
@@ -622,7 +622,7 @@ val query = Country.select
   .size
 
 db.toSqlQuery(query) ==> """
-SELECT COUNT(1) as res
+SELECT COUNT(1) AS res
 FROM country country0
 WHERE country0.capital = ?
 """.trim.replaceAll("\\s+", " ")
@@ -642,7 +642,7 @@ val query2 = Country.select
   .size
 
 db.toSqlQuery(query2) ==> """
-SELECT COUNT(1) as res
+SELECT COUNT(1) AS res
 FROM country country0
 WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
 """.trim.replaceAll("\\s+", " ")
@@ -662,7 +662,7 @@ val query = City.select
   .map { case (city, country) => city.name }
 
 db.toSqlQuery(query) ==> """
-SELECT city0.name as res
+SELECT city0.name AS res
 FROM city city0
 JOIN country country1 ON city0.countrycode = country1.code
 WHERE country1.name = ?
@@ -679,7 +679,7 @@ val query = City.select
   .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
 db.toSqlQuery(query) ==> """
-SELECT city0.name as res__0, country1.name as res__1
+SELECT city0.name AS res__0, country1.name AS res__1
 FROM city city0
 RIGHT JOIN country country1 ON city0.countrycode = country1.code
 WHERE city0.id IS NULL
@@ -716,7 +716,7 @@ val query = for {
 } yield city.name
 
 db.toSqlQuery(query) ==> """
-  SELECT city0.name as res
+  SELECT city0.name AS res
   FROM city city0
   JOIN country country1 ON city0.countrycode = country1.code
   WHERE country1.name = ?
@@ -735,12 +735,12 @@ val query = CountryLanguage.select
   .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
-  SELECT countrylanguage0.language as res__0, subquery1.res__name as res__1
+  SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
   FROM countrylanguage countrylanguage0
   JOIN (SELECT
-      country0.code as res__code,
-      country0.name as res__name,
-      country0.population as res__population
+      country0.code AS res__code,
+      country0.name AS res__name,
+      country0.population AS res__population
     FROM country country0
     ORDER BY res__population DESC
     LIMIT 2) subquery1
@@ -771,11 +771,11 @@ val query = Country.select
   .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
-  SELECT countrylanguage1.language as res__0, subquery0.res__name as res__1
+  SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
   FROM (SELECT
-      country0.code as res__code,
-      country0.name as res__name,
-      country0.population as res__population
+      country0.code AS res__code,
+      country0.name AS res__name,
+      country0.population AS res__population
     FROM country country0
     ORDER BY res__population DESC
     LIMIT 2) subquery0
@@ -809,7 +809,7 @@ val query = City.select
   .take(10)
 
 db.toSqlQuery(query) ==> """
- SELECT countrylanguage1.language as res__0, COUNT(1) as res__1
+ SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
  FROM city city0
  JOIN countrylanguage countrylanguage1 ON city0.countrycode = countrylanguage1.countrycode
  GROUP BY countrylanguage1.language
@@ -844,8 +844,8 @@ val query = Country.select
 
 db.toSqlQuery(query) ==> """
 SELECT
-  country0.continent as res__0,
-  SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) as res__1
+  country0.continent AS res__0,
+  SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) AS res__1
 FROM country country0
 GROUP BY country0.continent
 ORDER BY res__1 DESC
@@ -892,20 +892,20 @@ val query = Country.select
 
 db.toSqlQuery(query) ==> """
 SELECT
-  subquery0.res__name as res__0,
-  subquery0.res__population as res__1,
-  city1.name as res__2,
-  city1.population as res__3
+  subquery0.res__name AS res__0,
+  subquery0.res__population AS res__1,
+  city1.name AS res__2,
+  city1.population AS res__3
 FROM (SELECT
-    country0.code as res__code,
-    country0.name as res__name,
-    country0.population as res__population
+    country0.code AS res__code,
+    country0.name AS res__name,
+    country0.population AS res__population
   FROM country country0
   ORDER BY res__population DESC
   LIMIT 3) subquery0
 JOIN city city1 ON subquery0.res__code = city1.countrycode
 WHERE city1.id = (SELECT
-    city0.id as res
+    city0.id AS res
     FROM city city0
     WHERE city0.countrycode = subquery0.res__code
     ORDER BY city0.population DESC
@@ -978,7 +978,7 @@ val query = City.insert.select(
 
 db.toSqlQuery(query) ==> """
   INSERT INTO city (name, countrycode, district, population)
-  SELECT ? || city0.name as res__0, city0.countrycode as res__1, city0.district as res__2, ? as res__3
+  SELECT ? || city0.name AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
   FROM city city0 WHERE city0.name = ?
   """.trim.replaceAll("\\s+", " ")
 

@@ -14,28 +14,28 @@ trait PostgresDialectTests extends PostgresSuite {
 
     test("ltrim2") - checker(
       query = Expr("xxHellox").ltrim("x"),
-      sql = "SELECT LTRIM(?, ?) as res",
+      sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
       query = Expr("xxHellox").rtrim("x"),
-      sql = "SELECT RTRIM(?, ?) as res",
+      sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 
     test("reverse") -
-      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) as res", value = "olleH")
+      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
 
     test("lpad") - checker(
       query = Expr("Hello").lpad(10, "xy"),
-      sql = "SELECT LPAD(?, ?, ?) as res",
+      sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xyxyxHello"
     )
 
     test("rpad") - checker(
       query = Expr("Hello").rpad(10, "xy"),
-      sql = "SELECT RPAD(?, ?, ?) as res",
+      sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxyxyx"
     )
 
@@ -46,9 +46,9 @@ trait PostgresDialectTests extends PostgresSuite {
 //          .map { case (b, s) => (b.name, s.shippingDate) }
 //      },
 //      sql = """
-//        SELECT buyer0.name as res__0, subquery1.res__shipping_date as res__1
+//        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
 //        FROM buyer buyer0
-//        CROSS JOIN LATERAL (SELECT shipping_info0.shipping_date as res__shipping_date
+//        CROSS JOIN LATERAL (SELECT shipping_info0.shipping_date AS res__shipping_date
 //          FROM shipping_info shipping_info0
 //          WHERE (SCALASQL_MISSING_TABLE_Buyer.id = shipping_info0.buyer_id)) subquery1
 //        """,

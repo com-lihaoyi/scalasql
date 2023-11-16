@@ -21,8 +21,8 @@ trait ValuesTests extends ScalaSqlSuite {
     test("contains") - checker(
       query = Text { values(Seq(1, 2, 3)).contains(1) },
       sqls = Seq(
-        "SELECT (? in (VALUES (?), (?), (?))) as res",
-        "SELECT (? in (VALUES ROW(?), ROW(?), ROW(?))) as res"
+        "SELECT (? IN (VALUES (?), (?), (?))) AS res",
+        "SELECT (? IN (VALUES ROW(?), ROW(?), ROW(?))) AS res"
       ),
       value = true,
       docs = """

@@ -103,7 +103,7 @@ user-facing complexity and internal maintainability:
 ### SLICK
 
 SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
-transactions, and query optimization. These areas result in a lot of user-facing and
+transactions, and query optimization. These areAS result in a lot of user-facing and
 internal complexity for the library. While it is possible to paper over some of this
 complexity with libraries such as [Blocking Slick](https://github.com/gitbucket/blocking-slick),
 the essential complexity remains to cause confusion for users and burden for maintainers.

@@ -11,13 +11,13 @@ trait SqliteDialectTests extends SqliteSuite {
 
     test("ltrim2") - checker(
       query = Expr("xxHellox").ltrim("x"),
-      sql = "SELECT LTRIM(?, ?) as res",
+      sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
       query = Expr("xxHellox").rtrim("x"),
-      sql = "SELECT RTRIM(?, ?) as res",
+      sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 

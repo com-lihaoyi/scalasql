@@ -16,12 +16,12 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.id as res__0__id,
-          buyer0.name as res__0__name,
-          buyer0.date_of_birth as res__0__date_of_birth,
-          shipping_info1.id as res__1__id,
-          shipping_info1.buyer_id as res__1__buyer_id,
-          shipping_info1.shipping_date as res__1__shipping_date
+          buyer0.id AS res__0__id,
+          buyer0.name AS res__0__name,
+          buyer0.date_of_birth AS res__0__date_of_birth,
+          shipping_info1.id AS res__1__id,
+          shipping_info1.buyer_id AS res__1__buyer_id,
+          shipping_info1.shipping_date AS res__1__shipping_date
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         WHERE (buyer0.name = ?)
@@ -52,7 +52,7 @@ trait JoinTests extends ScalaSqlSuite {
           .map(_._2.shippingDate)
       },
       sql = """
-        SELECT shipping_info1.shipping_date as res
+        SELECT shipping_info1.shipping_date AS res
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         WHERE (buyer0.name = ?)
@@ -64,12 +64,12 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text { Buyer.select.join(Buyer)(_.id `=` _.id) },
       sql = """
         SELECT
-          buyer0.id as res__0__id,
-          buyer0.name as res__0__name,
-          buyer0.date_of_birth as res__0__date_of_birth,
-          buyer1.id as res__1__id,
-          buyer1.name as res__1__name,
-          buyer1.date_of_birth as res__1__date_of_birth
+          buyer0.id AS res__0__id,
+          buyer0.name AS res__0__name,
+          buyer0.date_of_birth AS res__0__date_of_birth,
+          buyer1.id AS res__1__id,
+          buyer1.name AS res__1__name,
+          buyer1.date_of_birth AS res__1__date_of_birth
         FROM buyer buyer0
         JOIN buyer buyer1 ON (buyer0.id = buyer1.id)
       """,
@@ -99,12 +99,12 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text { Buyer.select.join(Buyer)(_.id <> _.id) },
       sql = """
         SELECT
-          buyer0.id as res__0__id,
-          buyer0.name as res__0__name,
-          buyer0.date_of_birth as res__0__date_of_birth,
-          buyer1.id as res__1__id,
-          buyer1.name as res__1__name,
-          buyer1.date_of_birth as res__1__date_of_birth
+          buyer0.id AS res__0__id,
+          buyer0.name AS res__0__name,
+          buyer0.date_of_birth AS res__0__date_of_birth,
+          buyer1.id AS res__1__id,
+          buyer1.name AS res__1__name,
+          buyer1.date_of_birth AS res__1__date_of_birth
         FROM buyer buyer0
         JOIN buyer buyer1 ON (buyer0.id <> buyer1.id)
       """,
@@ -143,7 +143,7 @@ trait JoinTests extends ScalaSqlSuite {
           yield (name, dateOfBirth)
       },
       sql = """
-        SELECT buyer0.name as res__0, MIN(buyer0.date_of_birth) as res__1
+        SELECT buyer0.name AS res__0, MIN(buyer0.date_of_birth) AS res__1
         FROM buyer buyer0
         GROUP BY buyer0.name
       """,
@@ -163,12 +163,12 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text { Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId) },
       sql = """
         SELECT
-          buyer0.id as res__0__id,
-          buyer0.name as res__0__name,
-          buyer0.date_of_birth as res__0__date_of_birth,
-          shipping_info1.id as res__1__id,
-          shipping_info1.buyer_id as res__1__buyer_id,
-          shipping_info1.shipping_date as res__1__shipping_date
+          buyer0.id AS res__0__id,
+          buyer0.name AS res__0__name,
+          buyer0.date_of_birth AS res__0__date_of_birth,
+          shipping_info1.id AS res__1__id,
+          shipping_info1.buyer_id AS res__1__buyer_id,
+          shipping_info1.shipping_date AS res__1__shipping_date
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
@@ -202,7 +202,7 @@ trait JoinTests extends ScalaSqlSuite {
           .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
       },
       sql = """
-        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
@@ -231,14 +231,14 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sqls = Seq(
         """
-          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res__1 NULLS FIRST
         """,
         // MySQL doesn't support NULLS FIRST syntax and needs a workaround
         """
-          SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+          SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res__1 IS NULL DESC, res__1
@@ -266,7 +266,7 @@ trait JoinTests extends ScalaSqlSuite {
           .sortBy(_._1)
       },
       sql = """
-        SELECT DISTINCT buyer0.name as res__0, (shipping_info1.id IS NOT NULL) as res__1
+        SELECT DISTINCT buyer0.name AS res__0, (shipping_info1.id IS NOT NULL) AS res__1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res__0
@@ -290,8 +290,8 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.name as res__0,
-          (shipping_info1.shipping_date > buyer0.date_of_birth) as res__1
+          buyer0.name AS res__0,
+          (shipping_info1.shipping_date > buyer0.date_of_birth) AS res__1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
@@ -313,8 +313,8 @@ trait JoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.name as res__0,
-          (shipping_info1.shipping_date > buyer0.date_of_birth) as res__1
+          buyer0.name AS res__0,
+          (shipping_info1.shipping_date > buyer0.date_of_birth) AS res__1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
@@ -335,12 +335,12 @@ trait JoinTests extends ScalaSqlSuite {
       query = Text { ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id) },
       sql = """
         SELECT
-          shipping_info0.id as res__0__id,
-          shipping_info0.buyer_id as res__0__buyer_id,
-          shipping_info0.shipping_date as res__0__shipping_date,
-          buyer1.id as res__1__id,
-          buyer1.name as res__1__name,
-          buyer1.date_of_birth as res__1__date_of_birth
+          shipping_info0.id AS res__0__id,
+          shipping_info0.buyer_id AS res__0__buyer_id,
+          shipping_info0.shipping_date AS res__0__shipping_date,
+          buyer1.id AS res__1__id,
+          buyer1.name AS res__1__name,
+          buyer1.date_of_birth AS res__1__date_of_birth
         FROM shipping_info shipping_info0
         RIGHT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
       """,
@@ -368,33 +368,33 @@ trait JoinTests extends ScalaSqlSuite {
       sqls = Seq(
         """
           SELECT
-            shipping_info0.id as res__0__id,
-            shipping_info0.buyer_id as res__0__buyer_id,
-            shipping_info0.shipping_date as res__0__shipping_date,
-            buyer1.id as res__1__id,
-            buyer1.name as res__1__name,
-            buyer1.date_of_birth as res__1__date_of_birth
+            shipping_info0.id AS res__0__id,
+            shipping_info0.buyer_id AS res__0__buyer_id,
+            shipping_info0.shipping_date AS res__0__shipping_date,
+            buyer1.id AS res__1__id,
+            buyer1.name AS res__1__name,
+            buyer1.date_of_birth AS res__1__date_of_birth
           FROM shipping_info shipping_info0
           FULL OUTER JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
         """,
         """
           SELECT
-            shipping_info0.id as res__0__id,
-            shipping_info0.buyer_id as res__0__buyer_id,
-            shipping_info0.shipping_date as res__0__shipping_date,
-            buyer1.id as res__1__id,
-            buyer1.name as res__1__name,
-            buyer1.date_of_birth as res__1__date_of_birth
+            shipping_info0.id AS res__0__id,
+            shipping_info0.buyer_id AS res__0__buyer_id,
+            shipping_info0.shipping_date AS res__0__shipping_date,
+            buyer1.id AS res__1__id,
+            buyer1.name AS res__1__name,
+            buyer1.date_of_birth AS res__1__date_of_birth
           FROM shipping_info shipping_info0
           LEFT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)
           UNION
           SELECT
-            shipping_info0.id as res__0__id,
-            shipping_info0.buyer_id as res__0__buyer_id,
-            shipping_info0.shipping_date as res__0__shipping_date,
-            buyer1.id as res__1__id,
-            buyer1.name as res__1__name,
-            buyer1.date_of_birth as res__1__date_of_birth
+            shipping_info0.id AS res__0__id,
+            shipping_info0.buyer_id AS res__0__buyer_id,
+            shipping_info0.shipping_date AS res__0__shipping_date,
+            buyer1.id AS res__1__id,
+            buyer1.name AS res__1__name,
+            buyer1.date_of_birth AS res__1__date_of_birth
           FROM shipping_info shipping_info0
           RIGHT JOIN buyer buyer1 ON (shipping_info0.buyer_id = buyer1.id)"""
       ),
@@ -425,7 +425,7 @@ trait JoinTests extends ScalaSqlSuite {
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
-        SELECT buyer0.name as res__0, shipping_info1.shipping_date as res__1
+        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
         FROM buyer buyer0
         CROSS JOIN shipping_info shipping_info1
         WHERE (buyer0.id = shipping_info1.buyer_id)

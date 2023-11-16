@@ -21,7 +21,7 @@ val db: DbApi = ???
 
 val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
 db.toSqlQuery(query) ==>
-  "SELECT SUM(city0.population) as res FROM city city0 WHERE city0.countrycode = ?"
+  "SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?"
 
 db.run(query) ==> 175953614
 ```

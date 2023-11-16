@@ -18,7 +18,7 @@ object ExprsToSql {
       case flatQuery =>
         val exprsStr = SqlStr.join(
           flatQuery.map { case (k, v) =>
-            sql"$v as ${SqlStr.raw(context.config.tableNameMapper(k))}"
+            sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
           },
           sql", "
         )
