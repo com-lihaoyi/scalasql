@@ -20,6 +20,7 @@ class SqlStr(
   }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
+  override def toString = SqlStr.flatten(this).queryParts.mkString("?")
 }
 
 object SqlStr {

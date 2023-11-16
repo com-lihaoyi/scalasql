@@ -46,11 +46,11 @@ trait PostgresDialectTests extends PostgresSuite {
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery0.res__shipping_date AS res__1
+        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
         FROM buyer buyer0
-        CROSS JOIN LATERAL (SELECT shipping_info0.shipping_date AS res__shipping_date
-          FROM shipping_info shipping_info0
-          WHERE (buyer0.id = shipping_info0.buyer_id)) subquery0
+        CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+          FROM shipping_info shipping_info1
+          WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
         """,
       value = Seq(
         ("James Bond", LocalDate.parse("2012-04-05")),

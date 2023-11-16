@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, join}
 import scalasql.{Config, Queryable, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
@@ -201,7 +201,6 @@ object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.getRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
-    println("new Renderer")
     lazy val flattenedExpr = query.qr.walk(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)
@@ -216,18 +215,14 @@ object SimpleSelect {
     lazy val lhsMap = jsonQueryMap
 
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
-      println("BEGIN render")
-      pprint.log(prevContext.fromNaming)
       val joinOns =
         query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
-
 
       lazy val exprsStrs = {
         FlatJson.flatten(flattenedExpr, context).map { case (k, v) =>
           sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
         }
       }
-
 
       val exprStr = SqlStr.flatten(
         SqlStr.join(
@@ -248,21 +243,16 @@ object SimpleSelect {
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
 
-      pprint.log(prevContext.fromNaming)
       var joinContext = Context.compute(prevContext, query.from, None)
-      pprint.log(joinContext.fromNaming)
-      pprint.log(query.joins)
 
       val renderedFroms = JoinsToSql.renderFroms(query.from, prevContext, joinContext.fromNaming, liveExprs)
         .to(collection.mutable.Map)
 
-      pprint.log(renderedFroms)
 
       val joins = SqlStr.join(query.joins.zip(joinOns).map { case (join, joinOns) =>
         val joinPrefix = SqlStr.raw(join.prefix)
         val prevJoinContext = joinContext
         joinContext = Context.compute(joinContext, join.from.map(_.from), None)
-        implicit val context = joinContext
         val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
           val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
 
@@ -285,18 +275,11 @@ object SimpleSelect {
         sql" $joinPrefix $joinSelectables"
       })
 
-      pprint.log(renderedFroms)
-
-
       lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
-
-
-
 
       val tables = SqlStr
         .join(query.from.map(renderedFroms(_)), sql", ")
 
-      println("END render")
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }
 

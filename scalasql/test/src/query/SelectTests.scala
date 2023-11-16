@@ -245,9 +245,9 @@ trait SelectTests extends ScalaSqlSuite {
       sql = """
         SELECT
           product0.name AS res__0,
-          (SELECT purchase0.total AS res
-            FROM purchase purchase0
-            WHERE (purchase0.product_id = product0.id)
+          (SELECT purchase1.total AS res
+            FROM purchase purchase1
+            WHERE (purchase1.product_id = product0.id)
             ORDER BY res DESC
             LIMIT 1) AS res__1
         FROM product product0""",
@@ -271,8 +271,8 @@ trait SelectTests extends ScalaSqlSuite {
     test("subquery") - checker(
       query = Text { Buyer.select.subquery.map(_.name) },
       sql = """
-        SELECT subquery0.res__name AS res
-        FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery0
+        SELECT subquery1.res__name AS res
+        FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery1
       """,
       value = Seq("James Bond", "叉烧包", "Li Haoyi"),
       docs = """
@@ -385,7 +385,7 @@ trait SelectTests extends ScalaSqlSuite {
       sql = """
         SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
         FROM buyer buyer0
-        WHERE (buyer0.id IN (SELECT shipping_info0.buyer_id AS res FROM shipping_info shipping_info0))
+        WHERE (buyer0.id IN (SELECT shipping_info1.buyer_id AS res FROM shipping_info shipping_info1))
       """,
       value = Seq(
         Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
