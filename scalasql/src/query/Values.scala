@@ -7,6 +7,7 @@ import scalasql.utils.OptionPickler
 
 
 class Values[T: TypeMapper](ts: Seq[T]) extends Renderable with Aggregatable[Expr[T]] with Query[Seq[T]]{
+  assert(ts.nonEmpty, "`Values` clause does not support empty sequence")
   def queryExpr[V: TypeMapper](f: Expr[T] => Context => SqlStr)
                               (implicit qr: Queryable.Row[Expr[V], V]): Expr[V] = Expr{
     implicit ctx => sql"SELECT ${f(expr)(ctx)} AS res FROM (${renderToSql(ctx)}) v".withCompleteQuery(true)
