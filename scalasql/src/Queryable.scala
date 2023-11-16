@@ -54,8 +54,7 @@ object Queryable {
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         val walked = this.walk(q)
-        val res = ExprsToSql(walked, sql"", ctx)
-        if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
+        ExprsToSql(walked, sql"", ctx)
       }
 
       def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0(q).flatten

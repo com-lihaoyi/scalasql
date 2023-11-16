@@ -6,7 +6,6 @@ import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
-  def defaultQueryableSuffix = ""
 
   def castParams = false
 

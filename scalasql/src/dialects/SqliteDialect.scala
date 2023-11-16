@@ -6,7 +6,6 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
-  def defaultQueryableSuffix = ""
   def castParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): SqliteDialect.ExprOps =

@@ -25,7 +25,6 @@ import scalasql.utils.OptionPickler
 import scala.reflect.ClassTag
 
 trait MySqlDialect extends Dialect {
-  def defaultQueryableSuffix = ""
   def castParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): MySqlDialect.ExprOps =

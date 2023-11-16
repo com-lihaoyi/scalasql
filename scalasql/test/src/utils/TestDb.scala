@@ -61,7 +61,6 @@ class TestDb(
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
     val sqlResult = autoCommitConnection
       .toSqlQuery(query.value)
-      .stripSuffix(dialectConfig.defaultQueryableSuffix)
 
     val allCheckedSqls = Option(sql) ++ sqls
     val matchedSql = allCheckedSqls.find { sql =>

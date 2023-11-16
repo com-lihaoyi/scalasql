@@ -27,7 +27,6 @@ trait ScalaSql extends CrossScalaModule{
       ivy"com.lihaoyi::upickle:3.1.3",
       ivy"com.lihaoyi::utest:0.8.2",
       ivy"com.h2database:h2:2.2.224",
-      ivy"org.hsqldb:hsqldb:2.5.1",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
       ivy"org.testcontainers:postgresql:1.19.1",
       ivy"org.postgresql:postgresql:42.6.0",

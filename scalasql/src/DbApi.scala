@@ -191,7 +191,7 @@ object DbApi {
     def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
-      val ctx = Context.Impl(Map(), Map(), config, dialectConfig.defaultQueryableSuffix)
+      val ctx = Context.Impl(Map(), Map(), config)
       val sqlStr = qr.toSqlStr(query, ctx)
       val mappedTypes = qr.toTypeMappers(query)
       val flattened = SqlStr.flatten(sqlStr)

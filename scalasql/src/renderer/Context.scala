@@ -13,15 +13,11 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
  * @param exprNaming any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and
  *                   what those expressions are named in SQL
  * @param config The ScalaSql configuration
- * @param defaultQueryableSuffix the suffix necessary for turning an expression into a valid
- *                               SQL query, e.g. some databases allow `SELECT foo` while others
- *                               require `SELECT foo FROM (VALUES (0))`
  */
 trait Context {
   def fromNaming: Map[From, String]
   def exprNaming: Map[Expr.Identity, SqlStr]
   def config: Config
-  def defaultQueryableSuffix: String
 
   def withFromNaming(fromNaming: Map[From, String]): Context
   def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
@@ -32,7 +28,6 @@ object Context {
       fromNaming: Map[From, String],
       exprNaming: Map[Expr.Identity, SqlStr],
       config: Config,
-      defaultQueryableSuffix: String
   ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
@@ -63,7 +58,6 @@ object Context {
       namedFromsMap,
       exprNaming,
       prevContext.config,
-      prevContext.defaultQueryableSuffix
     )
   }
 

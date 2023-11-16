@@ -19,7 +19,6 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait H2Dialect extends Dialect {
-  def defaultQueryableSuffix = ""
 
   def castParams = true
 

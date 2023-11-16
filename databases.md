@@ -3,7 +3,7 @@
 ## Connecting to Your Database
 
 This section contains examples of how to connect to the different databases
-that ScalaSql supports: Sqlite, HsqlDb, H2, MySql, Postgres, as well as an
+that ScalaSql supports: Sqlite, H2, MySql, Postgres, as well as an
 example of using a connection pool like HikariCP. These are all connections
 to databases running in-memory or in local docker containers suitable for
 testing, but you can replace the url/username/password to connect to production
@@ -26,17 +26,7 @@ lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
 
 
 ```
-### HsqlDB
-The example HsqlDB database comes from the library `org.hsqldb:hsqldb:2.5.1`
-```scala
-lazy val hsqlDbClient = new scalasql.DatabaseClient.Connection(
-  DriverManager.getConnection("jdbc:hsqldb:mem:mydb"),
-  dialectConfig = scalasql.dialects.HsqlDbDialect,
-  config = new scalasql.Config {}
-)
 
-
-```
 ### H2
 The example H2 database comes from the library `com.h2database:h2:2.2.224`
 ```scala

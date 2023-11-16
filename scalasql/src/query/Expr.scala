@@ -55,11 +55,7 @@ object Expr {
 
     def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
 
-    def toSqlStr(q: E[T], ctx: Context) = {
-      val walked = this.walk(q)
-      val res = ExprsToSql(walked, sql"", ctx)
-      if (res.isCompleteQuery) res else res + SqlStr.raw(ctx.defaultQueryableSuffix)
-    }
+    def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
     def toTypeMappers(q: E[T]) = Seq(mt)
   }
 

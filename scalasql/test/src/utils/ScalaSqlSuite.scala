@@ -29,20 +29,6 @@ trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
   checker.reset()
 }
 
-trait HsqlDbSuite extends ScalaSqlSuite with HsqlDbDialect {
-  val checker = new TestDb(
-    scalasql.example.HsqlDbExample.hsqlDbClient,
-    "hsqldb-customer-schema.sql",
-    "customer-data.sql",
-    dialects.HsqlDbDialect,
-    getClass.getName,
-    suiteLine.value,
-    description
-  )
-
-  checker.reset()
-}
-
 trait H2Suite extends ScalaSqlSuite with H2Dialect {
   val checker = new TestDb(
     scalasql.example.H2Example.h2Client,

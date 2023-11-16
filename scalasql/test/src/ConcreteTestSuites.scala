@@ -24,7 +24,6 @@ import query.{
   ValuesTests
 }
 import scalasql.dialects.{
-  HsqlDbDialectTests,
   MySqlDialectTests,
   PostgresDialectTests,
   SqliteDialectTests,
@@ -178,43 +177,6 @@ package sqlite {
   object SqliteDialectTests extends SqliteDialectTests
 }
 
-package hsqldb {
-
-  import utils.HsqlDbSuite
-
-  object DbApiTests extends DbApiTests with HsqlDbSuite
-  object TransactionTests extends TransactionTests with HsqlDbSuite
-
-  object SelectTests extends SelectTests with HsqlDbSuite
-  object JoinTests extends JoinTests with HsqlDbSuite
-  object FlatJoinTests extends FlatJoinTests with HsqlDbSuite
-  object InsertTests extends InsertTests with HsqlDbSuite
-  object UpdateTests extends UpdateTests with HsqlDbSuite
-  object DeleteTests extends DeleteTests with HsqlDbSuite
-  object CompoundSelectTests extends CompoundSelectTests with HsqlDbSuite
-  // HSql does not support UPDATE/JOIN keywords
-  // object UpdateJoinTests extends UpdateTests with HsqlDbSuite
-  object UpdateSubQueryTests extends UpdateSubQueryTests with HsqlDbSuite
-  // HSql does not support RETURNING keyword
-  // object ReturningTests extends ReturningTests with HsqlSuite
-  // HSql does not support ON CONFLICT IGNORE
-  // object OnConflictTests extends OnConflictTests with H2Suite
-  object ValuesTests extends ValuesTests with HsqlDbSuite
-
-  object SubQueryTests extends SubQueryTests with HsqlDbSuite
-
-  object ExprOpsTests extends ExprOpsTests with HsqlDbSuite
-  object ExprBooleanOpsTests extends ExprBooleanOpsTests with HsqlDbSuite
-  object ExprNumericOpsTests extends ExprNumericOpsTests with HsqlDbSuite
-  object ExprSeqNumericOpsTests extends ExprSeqNumericOpsTests with HsqlDbSuite
-  object ExprSeqOpsTests extends ExprSeqOpsTests with HsqlDbSuite
-  object ExprStringOpsTests extends ExprStringOpsTests with HsqlDbSuite
-
-  object DataTypesTests extends datatypes.DataTypesTests with HsqlDbSuite
-  object OptionalTests extends datatypes.OptionalTests with HsqlDbSuite
-
-  object HsqlDbDialectTests extends HsqlDbDialectTests
-}
 
 package h2 {
 

@@ -15,7 +15,7 @@ import scalasql.dialects.H2Dialect._
 
 ```
 This readme will use the H2 database for simplicity, but you can change the `Dialect`
-above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
+above to other databases as necessary. ScalaSql supports H2, Sqlite,
 Postgres, and MySql out of the box. The `Dialect` import provides the
 various operators and functions that may be unique to each specific database
 
@@ -65,7 +65,6 @@ supported databases, to see what kind of set up is necessary for each one
 * [MySql](scalasql/test/src/example/MySqlExample.scala)
 * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
 * [H2](scalasql/test/src/example/H2Example.scala)
-* [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
 * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 ### Modeling Your Schema
