@@ -29,6 +29,10 @@ object FlatJoin {
       on: Option[Expr[Boolean]],
       where: Seq[Expr[Boolean]]
   ) {
+    def lateral = {
+      assert(!prefix.contains("LATERAL"), "Cannot call `.lateral` multiple times on join")
+      new Mapper[Q, Q2, R, R2](prefix + " LATERAL", from, expr, on, where)
+    }
     def map(f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): MapResult[Q, Q2, R, R2] = {
       new MapResult[Q, Q2, R, R2](prefix, from, on, qr, f(expr), where)
     }
@@ -44,25 +48,27 @@ object FlatJoin {
       new Mapper(prefix, from, expr, on, where ++ Seq(x(expr)))
   }
   class NullableMapper[Q, Q2, R, R2](
+      prefix: String,
       from: From,
       expr: JoinNullable[Q],
       on: Option[Expr[Boolean]],
       where: Seq[Expr[Boolean]]
   ) {
+    def lateral = new NullableMapper[Q, Q2, R, R2](prefix + " LATERAL", from, expr, on, where)
     def map(
         f: JoinNullable[Q] => Q2
     )(implicit qr: Queryable.Row[Q2, R2]): MapResult[Q, Q2, R, R2] = {
-      new MapResult[Q, Q2, R, R2]("LEFT JOIN", from, on, qr, f(expr), where)
+      new MapResult[Q, Q2, R, R2](prefix, from, on, qr, f(expr), where)
     }
 
     def flatMap(
         f: JoinNullable[Q] => Rhs[Q2, R2]
     )(implicit qr: Queryable.Row[Q2, R2]): FlatMapResult[Q, Q2, R, R2] = {
-      new FlatMapResult[Q, Q2, R, R2]("LEFT JOIN", from, on, qr, f(expr), where)
+      new FlatMapResult[Q, Q2, R, R2](prefix, from, on, qr, f(expr), where)
     }
 
     def filter(x: JoinNullable[Q] => Expr[Boolean]): NullableMapper[Q, Q2, R, R2] = withFilter(x)
     def withFilter(x: JoinNullable[Q] => Expr[Boolean]): NullableMapper[Q, Q2, R, R2] =
-      new NullableMapper(from, expr, on, where ++ Seq(x(expr)))
+      new NullableMapper("LEFT JOIN", from, expr, on, where ++ Seq(x(expr)))
   }
 }
