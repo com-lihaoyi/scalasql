@@ -283,6 +283,25 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
 
+      test("values") {
+
+        // +DOCS
+        // You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
+        // query using `Values(...)`, which translates into a SQL `VALUES` clause
+        val query = City.select
+          .filter(c => Values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+          .map(_.countryCode)
+
+        db.toSqlQuery(query) ==> """
+        SELECT city0.countrycode as res
+        FROM city city0
+        WHERE (city0.name in (VALUES (?), (?), (?)))
+        """.trim.replaceAll("\\s+", " ")
+
+        db.run(query) ==> Seq("IDN", "MYS", "SGP")
+        // -DOCS
+      }
+
       test("multiple") {
         test("combined") {
           // +DOCS
