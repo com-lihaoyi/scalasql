@@ -15,7 +15,7 @@ import scalasql.dialects.H2Dialect._
 
 ```
 This readme will use the H2 database for simplicity, but you can change the `Dialect`
-above to other databases as necessary. ScalaSql supports H2, Sqlite,
+above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
 Postgres, and MySql out of the box. The `Dialect` import provides the
 various operators and functions that may be unique to each specific database
 
@@ -65,6 +65,7 @@ supported databases, to see what kind of set up is necessary for each one
 * [MySql](scalasql/test/src/example/MySqlExample.scala)
 * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
 * [H2](scalasql/test/src/example/H2Example.scala)
+* [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
 * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 ### Modeling Your Schema
@@ -171,7 +172,7 @@ Here, we construct `Expr`s to represent the SQL query `1 + 3`. We can use
 query to the database and return the output `4`
 ```scala
 val query = Expr(1) + Expr(3)
-db.toSqlQuery(query) ==> "SELECT ? + ? AS res"
+db.toSqlQuery(query) ==> "SELECT (? + ?) AS res"
 db.run(query) ==> 4
 
 ```
@@ -240,7 +241,7 @@ SELECT
   city0.district AS res__district,
   city0.population AS res__population
 FROM city city0
-WHERE city0.name = ?
+WHERE (city0.name = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -278,7 +279,7 @@ SELECT
   city0.district AS res__district,
   city0.population AS res__population
 FROM city city0
-WHERE city0.name = ?
+WHERE (city0.name = ?)
 LIMIT 1
 """.trim.replaceAll("\\s+", " ")
 
@@ -297,10 +298,26 @@ SELECT
   city0.district AS res__district,
   city0.population AS res__population
 FROM city city0
-WHERE city0.id = ?
+WHERE (city0.id = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+```
+
+You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
+query using `Values(...)`, which translates into a SQL `VALUES` clause
+```scala
+val query = City.select
+  .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+  .map(_.countryCode)
+
+db.toSqlQuery(query) ==> """
+SELECT city0.countrycode AS res
+FROM city city0
+WHERE (city0.name IN (VALUES (?), (?), (?)))
+""".trim.replaceAll("\\s+", " ")
+
+db.run(query) ==> Seq("IDN", "MYS", "SGP")
 ```
 
 You can filter on multiple things, e.g. here we look for cities in China
@@ -315,9 +332,7 @@ db.toSqlQuery(query) ==> """
     city0.district AS res__district,
     city0.population AS res__population
   FROM city city0
-  WHERE
-    city0.population > ?
-    AND city0.countrycode = ?
+  WHERE ((city0.population > ?) AND (city0.countrycode = ?))
   """.trim.replaceAll("\\s+", " ")
 
 db.run(query).take(2) ==> Seq(
@@ -342,9 +357,7 @@ SELECT
   city0.district AS res__district,
   city0.population AS res__population
 FROM city city0
-WHERE
-  city0.population > ?
-  AND city0.countrycode = ?
+WHERE (city0.population > ?) AND (city0.countrycode = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query).take(2) ==> Seq(
@@ -445,11 +458,9 @@ db.toSqlQuery(query) ==> """
     city0.district AS res__0__district,
     city0.population AS res__0__population,
     UPPER(city0.name) AS res__1,
-    city0.population / ? AS res__2
-  FROM
-    city city0
-  WHERE
-    city0.name = ?
+    (city0.population / ?) AS res__2
+  FROM city city0
+  WHERE (city0.name = ?)
   """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==>
@@ -467,7 +478,7 @@ query all cities in China and sum up their populations
 ```scala
 val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
 db.toSqlQuery(query) ==>
-  "SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?"
+  "SELECT SUM(city0.population) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
 db.run(query) ==> 175953614
 ```
@@ -487,7 +498,7 @@ greater than one million
 ```scala
 val query = Country.select.filter(_.population > 1000000).size
 db.toSqlQuery(query) ==>
-  "SELECT COUNT(1) AS res FROM country country0 WHERE country0.population > ?"
+  "SELECT COUNT(1) AS res FROM country country0 WHERE (country0.population > ?)"
 
 db.run(query) ==> 154
 ```
@@ -557,7 +568,7 @@ val query = Country.select
 db.toSqlQuery(query) ==> """
   SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
   FROM country country0
-  WHERE country0.name = ?
+  WHERE (country0.name = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> 80
@@ -584,7 +595,7 @@ val query = Country.select
 db.toSqlQuery(query) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
-WHERE country0.capital IS NULL
+WHERE (country0.capital IS NULL)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> 7
@@ -624,7 +635,7 @@ val query = Country.select
 db.toSqlQuery(query) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
-WHERE country0.capital = ?
+WHERE (country0.capital = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> 0
@@ -632,7 +643,7 @@ db.run(query) ==> 0
 
 ```
 Whereas using Scala equality with `===` translates into a more
-verbose `(country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?`
+verbose `IS NOT DISTINCT FROM`
 expression, returning `true` when both left-hand and right-hand values
 are `None`/`NULL`, thus successfully returning all countries for which
 the `capital` column is `NULL`
@@ -644,7 +655,7 @@ val query2 = Country.select
 db.toSqlQuery(query2) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
-WHERE (country0.capital IS NULL AND ? IS NULL) OR country0.capital = ?
+WHERE (country0.capital IS NOT DISTINCT FROM ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query2) ==> 7
@@ -664,8 +675,8 @@ val query = City.select
 db.toSqlQuery(query) ==> """
 SELECT city0.name AS res
 FROM city city0
-JOIN country country1 ON city0.countrycode = country1.code
-WHERE country1.name = ?
+JOIN country country1 ON (city0.countrycode = country1.code)
+WHERE (country1.name = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -681,8 +692,8 @@ val query = City.select
 db.toSqlQuery(query) ==> """
 SELECT city0.name AS res__0, country1.name AS res__1
 FROM city city0
-RIGHT JOIN country country1 ON city0.countrycode = country1.code
-WHERE city0.id IS NULL
+RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
+WHERE (city0.id IS NULL)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> Seq(
@@ -718,8 +729,8 @@ val query = for {
 db.toSqlQuery(query) ==> """
   SELECT city0.name AS res
   FROM city city0
-  JOIN country country1 ON city0.countrycode = country1.code
-  WHERE country1.name = ?
+  JOIN country country1 ON (city0.countrycode = country1.code)
+  WHERE (country1.name = ?)
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -744,7 +755,7 @@ db.toSqlQuery(query) ==> """
     FROM country country0
     ORDER BY res__population DESC
     LIMIT 2) subquery1
-  ON countrylanguage0.countrycode = subquery1.res__code
+  ON (countrylanguage0.countrycode = subquery1.res__code)
   ORDER BY res__0
   """.trim.replaceAll("\\s+", " ")
 
@@ -780,7 +791,7 @@ db.toSqlQuery(query) ==> """
     ORDER BY res__population DESC
     LIMIT 2) subquery0
   JOIN countrylanguage countrylanguage1
-  ON subquery0.res__code = countrylanguage1.countrycode
+  ON (subquery0.res__code = countrylanguage1.countrycode)
   ORDER BY res__0
   """.trim.replaceAll("\\s+", " ")
 
@@ -811,7 +822,7 @@ val query = City.select
 db.toSqlQuery(query) ==> """
  SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
  FROM city city0
- JOIN countrylanguage countrylanguage1 ON city0.countrycode = countrylanguage1.countrycode
+ JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
  GROUP BY countrylanguage1.language
  ORDER BY res__1 DESC
  LIMIT 10
@@ -845,7 +856,7 @@ val query = Country.select
 db.toSqlQuery(query) ==> """
 SELECT
   country0.continent AS res__0,
-  SUM(country0.lifeexpectancy * country0.population) / SUM(country0.population) AS res__1
+  (SUM((country0.lifeexpectancy * country0.population)) / SUM(country0.population)) AS res__1
 FROM country country0
 GROUP BY country0.continent
 ORDER BY res__1 DESC
@@ -903,13 +914,13 @@ FROM (SELECT
   FROM country country0
   ORDER BY res__population DESC
   LIMIT 3) subquery0
-JOIN city city1 ON subquery0.res__code = city1.countrycode
-WHERE city1.id = (SELECT
+JOIN city city1 ON (subquery0.res__code = city1.countrycode)
+WHERE (city1.id = (SELECT
     city0.id AS res
     FROM city city0
-    WHERE city0.countrycode = subquery0.res__code
+    WHERE (city0.countrycode = subquery0.res__code)
     ORDER BY city0.population DESC
-    LIMIT 1)
+    LIMIT 1))
 """.trim.replaceAll("\\s+", " ")
 
 db.run(query) ==> Seq(
@@ -978,8 +989,9 @@ val query = City.insert.select(
 
 db.toSqlQuery(query) ==> """
   INSERT INTO city (name, countrycode, district, population)
-  SELECT ? || city0.name AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
-  FROM city city0 WHERE city0.name = ?
+  SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
+  FROM city city0
+  WHERE (city0.name = ?)
   """.trim.replaceAll("\\s+", " ")
 
 db.run(query)
@@ -1004,7 +1016,7 @@ val query = City
   .set(_.population := 0, _.district := "UNKNOWN")
 
 db.toSqlQuery(query) ==>
-  "UPDATE city SET population = ?, district = ? WHERE city.countrycode = ?"
+  "UPDATE city SET population = ?, district = ? WHERE (city.countrycode = ?)"
 
 db.run(query)
 
@@ -1019,7 +1031,7 @@ val query = City
   .update(_.countryCode === "SGP")
   .set(c => c.population := (c.population + 1000000))
 db.toSqlQuery(query) ==>
-  "UPDATE city SET population = city.population + ? WHERE city.countrycode = ?"
+  "UPDATE city SET population = (city.population + ?) WHERE (city.countrycode = ?)"
 
 db.run(query)
 
@@ -1047,7 +1059,7 @@ Deletes are performed by the `.delete` method, which takes a predicate
 letting you specify what rows you want to delete.
 ```scala
 val query = City.delete(_.countryCode === "SGP")
-db.toSqlQuery(query) ==> "DELETE FROM city WHERE city.countrycode = ?"
+db.toSqlQuery(query) ==> "DELETE FROM city WHERE (city.countrycode = ?)"
 db.run(query)
 
 db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
@@ -1136,3 +1148,31 @@ dbClient.transaction { implicit db =>
     City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 }
 ```
+
+### Custom Expressions
+
+You can define custom SQL expressions via the `Expr` constructor. This is
+useful for extending ScalaSql when you need to use some operator or syntax
+that your Database supports but ScalaSql does not have built in. This example
+shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
+that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
+using that in a query to return a string.
+```scala
+import scalasql.renderer.SqlStr.SqlStringSyntax
+def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
+val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
+db.toSqlQuery(query) ==>
+  "SELECT RAWTOHEX(city0.name) AS res FROM city city0 WHERE (city0.countrycode = ?)"
+
+db.run(query) ==> "00530069006e006700610070006f00720065"
+
+
+```
+Your custom Scala functions can either be standalone functions or extension
+methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
+are extension methods, with a different set being made available for each database.
+
+Different databases have a huge range of functions available. ScalaSql comes
+with the most commonly-used functions built in, but it is expected that you will
+need to build up your own library of custom `Expr[T]` functions to to access
+less commonly used functions that are nonetheless still needed in your application
