@@ -69,15 +69,42 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
         )
       )
   }
+
+  def joinCopy2[Q2, R2, Q3, R3](
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]],
+      joinPrefix: String
+  )(
+      f: (Q, Q2) => Q3
+  )(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]): SimpleSelect[Q3, R3] = {
+    joinCopy[Q2, R2, Q3, R3](other, on, joinPrefix)(f)(joinQr, jqr)
+  }
+
+  protected def joinCopy[Q2, R2, Q3, R3](
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]],
+      joinPrefix: String
+  )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
+
+    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
+
+    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)
+  }
+
+  protected def joinCopy0[Q3, R3](newExpr: Q3, newJoins: Seq[Join], newWheres: Seq[Expr[Boolean]])(
+      implicit jqr: Queryable.Row[Q3, R3]
+  ): SimpleSelect[Q3, R3] = ???
 }
 
-object JoinOps{
-  def join0[C[_, _], Q, R, Q2, R2](v: JoinOps[C, Q, R],
-                                   prefix: String,
-                                   other: Joinable[Q2, R2],
-                                   on: Option[(Q, Q2) => Expr[Boolean]])(
-                                     implicit joinQr: Queryable.Row[Q2, R2]
-                                   ) = {
+object JoinOps {
+  def join0[C[_, _], Q, R, Q2, R2](
+      v: JoinOps[C, Q, R],
+      prefix: String,
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]]
+  )(
+      implicit joinQr: Queryable.Row[Q2, R2]
+  ) = {
     v.join0(prefix, other, on)
   }
 }

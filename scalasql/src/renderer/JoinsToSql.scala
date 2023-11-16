@@ -41,21 +41,19 @@ object JoinsToSql {
       prevContext: Context,
       namedFromsMap: Map[From, String],
       liveExprs: Option[Set[Expr.Identity]]
-  ) = selectables
-    .map { f =>
-      val name = SqlStr.raw(namedFromsMap(f))
-      (
-        f,
-        f match {
-          case t: TableRef =>
-            SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + name
+  ) = selectables.map { f =>
+    val name = SqlStr.raw(namedFromsMap(f))
+    (
+      f,
+      f match {
+        case t: TableRef =>
+          SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + name
 
-          case t: SubqueryRef[_, _] =>
-            val toSqlQuery = Select.getRenderer(t.value, prevContext)
-            sql"(${toSqlQuery.render(liveExprs)}) $name"
-        }
-      )
-    }
-    .toMap
+        case t: SubqueryRef[_, _] =>
+          val toSqlQuery = Select.getRenderer(t.value, prevContext)
+          sql"(${toSqlQuery.render(liveExprs)}) $name"
+      }
+    )
+  }.toMap
 
 }

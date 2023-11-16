@@ -87,18 +87,11 @@ class SimpleSelect[Q, R](
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, prefix)((_, _)) }
 
-  protected def joinCopy[Q2, R2, Q3, R3](
-      other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Expr[Boolean]],
-      joinPrefix: String
-  )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
-
-    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
-
-    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)
-  }
-
-  private def joinCopy0[Q3, R3](newExpr: Q3, newJoins: Seq[Join], newWheres: Seq[Expr[Boolean]])(
+  override protected def joinCopy0[Q3, R3](
+      newExpr: Q3,
+      newJoins: Seq[Join],
+      newWheres: Seq[Expr[Boolean]]
+  )(
       implicit jqr: Queryable.Row[Q3, R3]
   ): SimpleSelect[Q3, R3] = {
     // If this doesn't have a `groupBy` yet, then we can simply append another join. Otherwise
@@ -249,7 +242,6 @@ object SimpleSelect {
         .renderFroms(query.from, prevContext, joinContext.fromNaming, Some(innerLiveExprs))
         .to(collection.mutable.Map)
 
-
       val joins = SqlStr.join(query.joins.zip(joinOns).map { case (join, joinOns) =>
         val joinPrefix = SqlStr.raw(join.prefix)
         val prevJoinContext = joinContext
@@ -261,17 +253,17 @@ object SimpleSelect {
             jf.from,
             jf.from match {
               case t: TableRef =>
-                SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + SqlStr.raw(joinContext.fromNaming(jf.from))
+                SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + SqlStr
+                  .raw(joinContext.fromNaming(jf.from))
 
               case t: SubqueryRef[_, _] =>
                 val toSqlQuery = Select.getRenderer(t.value, prevJoinContext)
-                sql"(${toSqlQuery.render(Some(innerLiveExprs))}) " + SqlStr.raw(joinContext.fromNaming(jf.from))
+                sql"(${toSqlQuery.render(Some(innerLiveExprs))}) " + SqlStr
+                  .raw(joinContext.fromNaming(jf.from))
             }
           ) +
             onSql
         })
-
-
 
         sql" $joinPrefix $joinSelectables"
       })
@@ -283,7 +275,6 @@ object SimpleSelect {
 
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }
-
 
   }
 }

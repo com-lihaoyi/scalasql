@@ -19,7 +19,13 @@ trait Joinable[Q, R] {
   }
   def leftJoin[Q2, R2](on: Q => Expr[Boolean]): FlatJoin.NullableMapper[Q, Q2, R, R2] = {
     val (from, expr) = joinableToFromExpr
-    new FlatJoin.NullableMapper[Q, Q2, R, R2]("LEFT JOIN", from, JoinNullable(expr), Some(on(expr)), Nil)
+    new FlatJoin.NullableMapper[Q, Q2, R, R2](
+      "LEFT JOIN",
+      from,
+      JoinNullable(expr),
+      Some(on(expr)),
+      Nil
+    )
   }
 
 }

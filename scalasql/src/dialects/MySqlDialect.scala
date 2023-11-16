@@ -1,7 +1,25 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, JoinNullable, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, TableRef, Update, WithExpr}
+import scalasql.query.{
+  AscDesc,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertValues,
+  Join,
+  JoinNullable,
+  JoinOps,
+  Joinable,
+  LateralJoinOps,
+  Nulls,
+  OrderBy,
+  Query,
+  TableRef,
+  Update,
+  WithExpr
+}
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -30,7 +48,9 @@ trait MySqlDialect extends Dialect {
 
   override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
 
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R]) = new LateralJoinOps(wrapped)
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+      implicit qr: Queryable.Row[Q, R]
+  ) = new LateralJoinOps(wrapped)
 }
 
 object MySqlDialect extends MySqlDialect {
@@ -261,12 +281,13 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-
   class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
-    override protected def getRenderer(prevContext: Context) = new ValuesRenderer[T](this)(implicitly, prevContext)
+    override protected def getRenderer(prevContext: Context) =
+      new ValuesRenderer[T](this)(implicitly, prevContext)
     override protected def columnName = "column_0"
   }
-  class ValuesRenderer[T: TypeMapper](v: Values[T])(implicit ctx: Context) extends scalasql.query.Values.Renderer[T](v){
+  class ValuesRenderer[T: TypeMapper](v: Values[T])(implicit ctx: Context)
+      extends scalasql.query.Values.Renderer[T](v) {
     override def wrapRow(t: T) = sql"ROW($t)"
   }
 

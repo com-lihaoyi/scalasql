@@ -110,7 +110,6 @@ object H2Dialect extends H2Dialect {
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R]
 
-
   class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
     override protected def columnName = "c1"
   }

@@ -101,10 +101,16 @@ object WorldSqlTests extends TestSuite {
         // Hack to make Arrays compare sanely; at some point we may want some
         // custom, extensible, typesafe equality check but for now this will do
         case (lhs: Array[_], rhs: Array[_]) =>
-          Predef.assert(lhs.toSeq == rhs.toSeq, s"==> assertion failed: ${lhs.toSeq} != ${rhs.toSeq}")
+          Predef.assert(
+            lhs.toSeq == rhs.toSeq,
+            s"==> assertion failed: ${lhs.toSeq} != ${rhs.toSeq}"
+          )
         // Ignore trivial formatting differences when comparing SQL strings
         case (lhs: String, rhs: String) =>
-          Predef.assert(lhs == rhs.trim.replaceAll("\\s+", " "), s"==> assertion failed: $lhs != $rhs")
+          Predef.assert(
+            lhs == rhs.trim.replaceAll("\\s+", " "),
+            s"==> assertion failed: $lhs != $rhs"
+          )
         case (lhs, rhs) =>
           Predef.assert(lhs == rhs, s"==> assertion failed: $lhs != $rhs")
       }

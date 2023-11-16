@@ -22,7 +22,7 @@ import query.{
   ReturningTests,
   OnConflictTests,
   ValuesTests,
-  LateralJoinTests,
+  LateralJoinTests
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -182,7 +182,6 @@ package sqlite {
 
   object SqliteDialectTests extends SqliteDialectTests
 }
-
 
 package h2 {
 

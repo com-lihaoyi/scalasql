@@ -27,7 +27,7 @@ object Context {
   case class Impl(
       fromNaming: Map[From, String],
       exprNaming: Map[Expr.Identity, SqlStr],
-      config: Config,
+      config: Config
   ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
@@ -41,7 +41,8 @@ object Context {
     val namedFromsMap =
       prevContext.fromNaming ++
         selectables.zipWithIndex.map {
-          case (t: TableRef, i) => (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
+          case (t: TableRef, i) =>
+            (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
           case x => throw new Exception("wtf " + x)
         }.toMap ++
@@ -59,7 +60,7 @@ object Context {
     Context.Impl(
       namedFromsMap,
       exprNaming,
-      prevContext.config,
+      prevContext.config
     )
   }
 

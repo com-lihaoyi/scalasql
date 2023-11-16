@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{TypeMapper, operations}
+import scalasql.{Queryable, TypeMapper, operations}
 import scalasql.query.{Expr, JoinOps, Joinable, LateralJoinOps}
 import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
@@ -15,7 +15,9 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def ExprStringOpsConv(v: Expr[String]): PostgresDialect.ExprStringOps =
     new PostgresDialect.ExprStringOps(v)
 
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R]) = new LateralJoinOps(wrapped)
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+      implicit qr: Queryable.Row[Q, R]
+  ) = new LateralJoinOps(wrapped)
 }
 
 object PostgresDialect extends PostgresDialect {

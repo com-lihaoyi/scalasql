@@ -313,18 +313,18 @@ object DbApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = metadata.getColumnLabel(i + 1).toLowerCase match{
+      val k = metadata.getColumnLabel(i + 1).toLowerCase match {
         // Hack to support top-level `VALUES` clause; most databases do not
         // let you
-        case /*h2*/"c1" | /*postgres/sqlite*/"column1" | /*mysql*/"column_0" => IndexedSeq()
+        case /*h2*/ "c1" | /*postgres/sqlite*/ "column1" | /*mysql*/ "column_0" => IndexedSeq()
         case label =>
-          FlatJson.fastSplitNonRegex(
+          FlatJson
+            .fastSplitNonRegex(
               columnNameUnMapper(label),
               config.columnLabelDelimiter
             )
             .drop(1)
       }
-
 
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
       val isNull = resultSet.getObject(i + 1) == null

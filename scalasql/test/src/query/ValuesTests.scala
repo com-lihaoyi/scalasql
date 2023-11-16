@@ -61,16 +61,15 @@ trait ValuesTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT subquery0.column1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.column1 > ?)",
         "SELECT subquery0.c1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.c1 > ?)",
-        "SELECT subquery0.column_0 AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0 WHERE (subquery0.column_0 > ?)",
+        "SELECT subquery0.column_0 AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0 WHERE (subquery0.column_0 > ?)"
       ),
       value = Seq(3),
       docs = ""
     )
 
-
     test("crossJoin") - checker(
       query = Text {
-        values(Seq(1, 2, 3)).crossJoin(values(Seq(4, 5, 6))).map{case (a, b) => (a * 10 + b)}
+        values(Seq(1, 2, 3)).crossJoin(values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
       },
       sqls = Seq(
         """
@@ -87,7 +86,7 @@ trait ValuesTests extends ScalaSqlSuite {
         SELECT ((subquery0.column_0 * ?) + subquery1.column_0) AS res
         FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0
         CROSS JOIN (VALUES ROW(?), ROW(?), ROW(?)) subquery1
-        """,
+        """
       ),
       value = Seq(14, 15, 16, 24, 25, 26, 34, 35, 36),
       docs = "",
@@ -96,7 +95,7 @@ trait ValuesTests extends ScalaSqlSuite {
 
     test("joinValuesAndTable") - checker(
       query = Text {
-        for{
+        for {
           name <- values(Seq("Socks", "Face Mask", "Camera"))
           product <- Product.join(_.name === name)
         } yield (name, product.price)
@@ -116,13 +115,13 @@ trait ValuesTests extends ScalaSqlSuite {
         SELECT subquery0.column_0 AS res__0, product1.price AS res__1
         FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0
         JOIN product product1 ON (product1.name = subquery0.column_0)
-        """,
+        """
       ),
       value = Seq(("Socks", 3.14), ("Face Mask", 8.88), ("Camera", 1000.0)),
-      docs = "You can also mix `values` calls and normal `selects` in the same query, e.g. with joins",
+      docs =
+        "You can also mix `values` calls and normal `selects` in the same query, e.g. with joins",
       normalize = (x: Seq[(String, Double)]) => x.sortBy(_._2)
     )
-
 
   }
 }
