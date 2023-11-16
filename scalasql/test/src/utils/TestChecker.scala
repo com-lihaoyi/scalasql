@@ -9,11 +9,10 @@ import scalasql.{Config, DatabaseClient, Queryable, UtestFramework}
 
 import java.sql.Connection
 
-class TestDb(
+class TestChecker(
     val dbClient: DatabaseClient,
     testSchemaFileName: String,
     testDataFileName: String,
-    dialectConfig: DialectConfig,
     suiteName: String,
     suiteLine: Int,
     description: String
@@ -65,6 +64,8 @@ class TestDb(
     val allCheckedSqls = Option(sql) ++ sqls
     val matchedSql = allCheckedSqls.find { sql =>
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
+//       pprint.log(sqlResult)
+//       pprint.log(expectedSql)
       sqlResult == expectedSql
     }
 
@@ -94,7 +95,7 @@ class TestDb(
   }
 }
 
-object TestDb {
+object TestChecker {
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(additionalHandlers = {
     case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)

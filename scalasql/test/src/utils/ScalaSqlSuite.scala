@@ -9,18 +9,17 @@ import java.sql.DriverManager
 abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
     extends TestSuite
     with Dialect {
-  def checker: TestDb
+  def checker: TestChecker
 
   lazy val dbClient = checker.dbClient
   def description: String
 }
 
 trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
-  val checker = new TestDb(
+  val checker = new TestChecker(
     scalasql.example.SqliteExample.sqliteClient,
     "sqlite-customer-schema.sql",
     "customer-data.sql",
-    dialects.SqliteDialect,
     getClass.getName,
     suiteLine.value,
     description
@@ -30,11 +29,10 @@ trait SqliteSuite extends ScalaSqlSuite with SqliteDialect {
 }
 
 trait H2Suite extends ScalaSqlSuite with H2Dialect {
-  val checker = new TestDb(
+  val checker = new TestChecker(
     scalasql.example.H2Example.h2Client,
     "h2-customer-schema.sql",
     "customer-data.sql",
-    dialects.H2Dialect,
     getClass.getName,
     suiteLine.value,
     description
@@ -44,11 +42,10 @@ trait H2Suite extends ScalaSqlSuite with H2Dialect {
 }
 
 trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
-  val checker = new TestDb(
+  val checker = new TestChecker(
     scalasql.example.PostgresExample.postgresClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
-    dialects.PostgresDialect,
     getClass.getName,
     suiteLine.value,
     description
@@ -58,11 +55,10 @@ trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
 }
 
 trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
-  val checker = new TestDb(
+  val checker = new TestChecker(
     scalasql.example.HikariCpExample.hikariClient,
     "postgres-customer-schema.sql",
     "customer-data.sql",
-    dialects.PostgresDialect,
     getClass.getName,
     suiteLine.value,
     description
@@ -77,11 +73,10 @@ trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
 }
 
 trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {
-  val checker = new TestDb(
+  val checker = new TestChecker(
     scalasql.example.MySqlExample.mysqlClient,
     "mysql-customer-schema.sql",
     "customer-data.sql",
-    dialects.MySqlDialect,
     getClass.getName,
     suiteLine.value,
     description

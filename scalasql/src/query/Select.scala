@@ -203,6 +203,7 @@ trait Select[Q, R]
   protected def simpleFrom[Q, R](s: Select[Q, R]): SimpleSelect[Q, R] = s match {
     case s: SimpleSelect[Q, R] => s
     case s: CompoundSelect[Q, R] => s.subquery
+    case s: Values[_] => s.subquery
   }
 
   /**

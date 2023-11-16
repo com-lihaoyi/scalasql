@@ -33,9 +33,9 @@ trait ValuesTests extends ScalaSqlSuite {
     test("max") - checker(
       query = Text { values(Seq(1, 2, 3)).max },
       sqls = Seq(
-        "SELECT MAX(column1) AS res FROM (VALUES (?), (?), (?)) v",
-        "SELECT MAX(c1) AS res FROM (VALUES (?), (?), (?)) v",
-        "SELECT MAX(column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) v"
+        "SELECT MAX(column1) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT MAX(c1) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT MAX(column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
       ),
       value = 3,
       docs = """
@@ -44,15 +44,28 @@ trait ValuesTests extends ScalaSqlSuite {
     )
 
     test("map") - checker(
-      query = Text { values(Seq(1, 2, 3)).map() },
+      query = Text { values(Seq(1, 2, 3)).map(_ + 1) },
       sqls = Seq(
-        "SELECT MAX(column1) AS res FROM (VALUES (?), (?), (?)) v",
-        "SELECT MAX(c1) AS res FROM (VALUES (?), (?), (?)) v",
-        "SELECT MAX(column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) v"
+        "SELECT (column1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT (c1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT (column_0 + ?) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
       ),
-      value = 3,
+      value = Seq(2, 3, 4),
       docs = """
-        `Values` supports aggregate functions like `.max`
+        `Values` supports most `.select` operators like `.map`, `filter`, and so on
+      """
+    )
+
+    test("filter") - checker(
+      query = Text { values(Seq(1, 2, 3)).filter(_ > 2) },
+      sqls = Seq(
+        "SELECT column1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (column1 > ?)",
+        "SELECT c1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (c1 > ?)",
+        "SELECT column_0 AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0 WHERE (column_0 > ?)",
+      ),
+      value = Seq(3),
+      docs = """
+        `Values` supports most `.select` operators
       """
     )
 
