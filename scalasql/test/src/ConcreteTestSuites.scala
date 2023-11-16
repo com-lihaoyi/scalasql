@@ -21,7 +21,8 @@ import query.{
   UpdateSubQueryTests,
   ReturningTests,
   OnConflictTests,
-  ValuesTests
+  ValuesTests,
+  LateralJoinTests,
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -49,6 +50,7 @@ package postgres {
   object ReturningTests extends ReturningTests with PostgresSuite
   object OnConflictTests extends OnConflictTests with PostgresSuite
   object ValuesTests extends ValuesTests with PostgresSuite
+  object LateralJoinTests extends LateralJoinTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
 
@@ -86,6 +88,7 @@ package hikari {
   object ReturningTests extends ReturningTests with HikariSuite
   object OnConflictTests extends OnConflictTests with HikariSuite
   object ValuesTests extends ValuesTests with HikariSuite
+  object LateralJoinTests extends LateralJoinTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
 
@@ -126,6 +129,7 @@ package mysql {
   // MySql does not support onConflictIgnore and onConflictUpdate does not take columns
   // object OnConflictTests extends OnConflictTests with MySqlSuite
   object ValuesTests extends ValuesTests with MySqlSuite
+  object LateralJoinTests extends LateralJoinTests with MySqlSuite
 
   object SubQueryTests extends SubQueryTests with MySqlSuite
 
@@ -161,6 +165,8 @@ package sqlite {
   object ReturningTests extends ReturningTests with SqliteSuite
   object OnConflictTests extends OnConflictTests with SqliteSuite
   object ValuesTests extends ValuesTests with SqliteSuite
+  // Sqlite does not support lateral joins
+  // object LateralJoinTests extends LateralJoinTests with SqliteSuite
 
   object SubQueryTests extends SubQueryTests with SqliteSuite
 
@@ -199,6 +205,8 @@ package h2 {
   // H2 does not support ON CONFLICT IGNORE unless in postgres mode
   // object OnConflictTests extends OnConflictTests with H2Suite
   object ValuesTests extends ValuesTests with H2Suite
+  // H2 does not support lateral joins
+  // object LateralJoinTests extends LateralJoinTests with H2Suite
 
   object SubQueryTests extends SubQueryTests with H2Suite
 
