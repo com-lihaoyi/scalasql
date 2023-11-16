@@ -29,10 +29,6 @@ object FlatJoin {
       on: Option[Expr[Boolean]],
       where: Seq[Expr[Boolean]]
   ) {
-    def lateral = {
-      assert(!prefix.contains("LATERAL"), "Cannot call `.lateral` multiple times on join")
-      new Mapper[Q, Q2, R, R2](prefix + " LATERAL", from, expr, on, where)
-    }
     def map(f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): MapResult[Q, Q2, R, R2] = {
       new MapResult[Q, Q2, R, R2](prefix, from, on, qr, f(expr), where)
     }

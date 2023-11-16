@@ -30,7 +30,7 @@ trait MySqlDialect extends Dialect {
 
   override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
 
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R]) = new LateralJoinOps(wrapped)
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R]) = new LateralJoinOps(wrapped)
 }
 
 object MySqlDialect extends MySqlDialect {
