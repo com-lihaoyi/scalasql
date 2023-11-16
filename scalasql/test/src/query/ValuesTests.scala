@@ -94,6 +94,35 @@ trait ValuesTests extends ScalaSqlSuite {
       normalize = (x: Seq[Int]) => x.sorted
     )
 
+    test("joinValuesAndTable") - checker(
+      query = Text {
+        for{
+          name <- values(Seq("Socks", "Face Mask", "Camera"))
+          product <- Product.join(_.name === name)
+        } yield (name, product.price)
+      },
+      sqls = Seq(
+        """
+        SELECT subquery0.column1 AS res__0, product1.price AS res__1
+        FROM (VALUES (?), (?), (?)) subquery0
+        JOIN product product1 ON (product1.name = subquery0.column1)
+        """,
+        """
+        SELECT subquery0.c1 AS res__0, product1.price AS res__1
+        FROM (VALUES (?), (?), (?)) subquery0
+        JOIN product product1 ON (product1.name = subquery0.c1)
+        """,
+        """
+        SELECT subquery0.column_0 AS res__0, product1.price AS res__1
+        FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0
+        JOIN product product1 ON (product1.name = subquery0.column_0)
+        """,
+      ),
+      value = Seq(("Socks", 3.14), ("Face Mask", 8.88), ("Camera", 1000.0)),
+      docs = "You can also mix `values` calls and normal `selects` in the same query, e.g. with joins",
+      normalize = (x: Seq[(String, Double)]) => x.sortBy(_._2)
+    )
+
 
   }
 }
