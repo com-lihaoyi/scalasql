@@ -1,4 +1,4 @@
-import $file.generateDocs
+import $file.buildutil.generateDocs
 import mill._, scalalib._
 
 val scalaVersions = Seq("2.13.8"/*, "3.3.1"*/)
@@ -43,13 +43,15 @@ val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial() = T.command {
   generateDocs.generateTutorial(
     os.pwd / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
-    os.pwd / "tutorial.md"
+    os.pwd / "docs" / "tutorial.md"
   )
 }
 def generateReference() = T.command {
-  generateDocs.generateReference((sources, config) =>
-    mill.scalalib.scalafmt.ScalafmtWorkerModule
-      .worker()
-      .reformat(sources.map(PathRef(_)), PathRef(config))
+  generateDocs.generateReference(
+    os.pwd / "docs" / "reference.md",
+    (sources, config) =>
+      mill.scalalib.scalafmt.ScalafmtWorkerModule
+        .worker()
+        .reformat(sources.map(PathRef(_)), PathRef(config))
   )
 }
