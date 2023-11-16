@@ -1,23 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{
-  AscDesc,
-  CompoundSelect,
-  Expr,
-  From,
-  GroupBy,
-  InsertValues,
-  Join,
-  JoinNullable,
-  Joinable,
-  Nulls,
-  OrderBy,
-  Query,
-  TableRef,
-  Update,
-  WithExpr
-}
+import scalasql.query.{AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, JoinNullable, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, TableRef, Update, WithExpr}
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -45,6 +29,8 @@ trait MySqlDialect extends Dialect {
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 
   override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
+
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R]) = new LateralJoinOps(wrapped)
 }
 
 object MySqlDialect extends MySqlDialect {

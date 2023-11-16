@@ -17,12 +17,6 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   def crossJoin[Q2, R2](other: Joinable[Q2, R2])(
       implicit qr: Queryable.Row[Q2, R2]
   ): C[(Q, Q2), (R, R2)] = join0("CROSS JOIN", other, None)
-  /**
-   * Performs a `CROSS JOIN`, which is an `INNER JOIN` but without the `ON` clause
-   */
-  def crossJoinLateral[Q2, R2](other: Q => Joinable[Q2, R2])(
-      implicit qr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)] = join0("CROSS JOIN LATERAL", other(expr), None)
 
   protected def join0[Q2, R2](
       prefix: String,
@@ -74,5 +68,16 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
           )
         )
       )
+  }
+}
+
+object JoinOps{
+  def join0[C[_, _], Q, R, Q2, R2](v: JoinOps[C, Q, R],
+                                   prefix: String,
+                                   other: Joinable[Q2, R2],
+                                   on: Option[(Q, Q2) => Expr[Boolean]])(
+                                     implicit joinQr: Queryable.Row[Q2, R2]
+                                   ) = {
+    v.join0(prefix, other, on)
   }
 }
