@@ -94,6 +94,22 @@ object WorldSqlTests extends TestSuite {
   }
   // -DOCS
 
+  // Shadow uTest's `ArrowAssert` to add lenient SQL string comparisons
+  implicit class ArrowAssert(lhs: Any) {
+    def ==>[V](rhs: V) = {
+      (lhs, rhs) match {
+        // Hack to make Arrays compare sanely; at some point we may want some
+        // custom, extensible, typesafe equality check but for now this will do
+        case (lhs: Array[_], rhs: Array[_]) =>
+          Predef.assert(lhs.toSeq == rhs.toSeq, s"==> assertion failed: ${lhs.toSeq} != ${rhs.toSeq}")
+        // Ignore trivial formatting differences when comparing SQL strings
+        case (lhs: String, rhs: String) =>
+          Predef.assert(lhs == rhs.trim.replaceAll("\\s+", " "), s"==> assertion failed: $lhs != $rhs")
+        case (lhs, rhs) =>
+          Predef.assert(lhs == rhs, s"==> assertion failed: $lhs != $rhs")
+      }
+    }
+  }
   def tests = Tests {
     // +DOCS
     // ### Creating Your Database Client
@@ -173,7 +189,7 @@ object WorldSqlTests extends TestSuite {
         city0.district AS res__district,
         city0.population AS res__population
       FROM city city0
-      """.trim.replaceAll("\\s+", " ")
+      """
 
       db.run(query).take(3) ==> Seq(
         City[Id](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
@@ -216,7 +232,7 @@ object WorldSqlTests extends TestSuite {
           city0.population AS res__population
         FROM city city0
         WHERE (city0.name = ?)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 
@@ -256,7 +272,7 @@ object WorldSqlTests extends TestSuite {
         FROM city city0
         WHERE (city0.name = ?)
         LIMIT 1
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
@@ -277,7 +293,7 @@ object WorldSqlTests extends TestSuite {
           city0.population AS res__population
         FROM city city0
         WHERE (city0.id = ?)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
@@ -296,7 +312,7 @@ object WorldSqlTests extends TestSuite {
         SELECT city0.countrycode AS res
         FROM city city0
         WHERE (city0.name IN (VALUES (?), (?), (?)))
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq("IDN", "MYS", "SGP")
         // -DOCS
@@ -317,7 +333,7 @@ object WorldSqlTests extends TestSuite {
               city0.population AS res__population
             FROM city city0
             WHERE ((city0.population > ?) AND (city0.countrycode = ?))
-            """.trim.replaceAll("\\s+", " ")
+            """
 
           db.run(query).take(2) ==> Seq(
             City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -343,7 +359,7 @@ object WorldSqlTests extends TestSuite {
             city0.population AS res__population
           FROM city city0
           WHERE (city0.population > ?) AND (city0.countrycode = ?)
-          """.trim.replaceAll("\\s+", " ")
+          """
 
           db.run(query).take(2) ==> Seq(
             City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -424,7 +440,7 @@ object WorldSqlTests extends TestSuite {
             country0.name AS res__0,
             country0.continent AS res__1
           FROM country country0
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query).take(5) ==> Seq(
           ("Afghanistan", "Asia"),
@@ -458,7 +474,7 @@ object WorldSqlTests extends TestSuite {
             (city0.population / ?) AS res__2
           FROM city city0
           WHERE (city0.name = ?)
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query) ==>
           (
@@ -519,7 +535,7 @@ object WorldSqlTests extends TestSuite {
           AVG(country0.population) AS res__1,
           MAX(country0.population) AS res__2
         FROM country country0
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> (0, 25434098, 1277558000)
         // -DOCS
@@ -544,7 +560,7 @@ object WorldSqlTests extends TestSuite {
         FROM city city0
         ORDER BY res__1 DESC
         LIMIT 5 OFFSET 5
-        """.trim.replaceAll("\\s+", " ")
+        """
 
       db.run(query) ==> Seq(
         ("Karachi", 9269265),
@@ -576,7 +592,7 @@ object WorldSqlTests extends TestSuite {
         SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
         FROM country country0
         WHERE (country0.name = ?)
-      """.trim.replaceAll("\\s+", " ")
+      """
 
       db.run(query) ==> 80
 
@@ -605,7 +621,7 @@ object WorldSqlTests extends TestSuite {
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital IS NULL)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> 7
         // -DOCS
@@ -646,7 +662,7 @@ object WorldSqlTests extends TestSuite {
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital = ?)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> 0
 
@@ -663,7 +679,7 @@ object WorldSqlTests extends TestSuite {
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital IS NOT DISTINCT FROM ?)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query2) ==> 7
         // -DOCS
@@ -687,7 +703,7 @@ object WorldSqlTests extends TestSuite {
         FROM city city0
         JOIN country country1 ON (city0.countrycode = country1.code)
         WHERE (country1.name = ?)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq("Schaan", "Vaduz")
         // -DOCS
@@ -705,7 +721,7 @@ object WorldSqlTests extends TestSuite {
         FROM city city0
         RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
         WHERE (city0.id IS NULL)
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq(
           (None, "Antarctica"),
@@ -744,7 +760,7 @@ object WorldSqlTests extends TestSuite {
         FROM city city0
         JOIN country country1 ON (city0.countrycode = country1.code)
         WHERE (country1.name = ?)
-      """.trim.replaceAll("\\s+", " ")
+      """
 
       db.run(query) ==> Seq("Schaan", "Vaduz")
       // -DOCS
@@ -773,7 +789,7 @@ object WorldSqlTests extends TestSuite {
             LIMIT 2) subquery1
           ON (countrylanguage0.countrycode = subquery1.res__code)
           ORDER BY res__0
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query).take(5) ==> Seq(
           ("Asami", "India"),
@@ -810,7 +826,7 @@ object WorldSqlTests extends TestSuite {
           JOIN countrylanguage countrylanguage1
           ON (subquery0.res__code = countrylanguage1.countrycode)
           ORDER BY res__0
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query).take(5) ==> List(
           ("Asami", "India"),
@@ -847,7 +863,7 @@ object WorldSqlTests extends TestSuite {
          GROUP BY countrylanguage1.language
          ORDER BY res__1 DESC
          LIMIT 10
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq(
           ("Chinese", 1083),
@@ -883,7 +899,7 @@ object WorldSqlTests extends TestSuite {
         FROM country country0
         GROUP BY country0.continent
         ORDER BY res__1 DESC
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq(
           ("Oceania", 75.90188415576932),
@@ -946,7 +962,7 @@ object WorldSqlTests extends TestSuite {
             WHERE (city0.countrycode = subquery0.res__code)
             ORDER BY city0.population DESC
             LIMIT 1))
-        """.trim.replaceAll("\\s+", " ")
+        """
 
         db.run(query) ==> Seq(
           ("China", 1277558000, "Shanghai", 9696300),
@@ -996,7 +1012,7 @@ object WorldSqlTests extends TestSuite {
           (?, ?, ?, ?),
           (?, ?, ?, ?),
           (?, ?, ?, ?)
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query)
 
@@ -1025,7 +1041,7 @@ object WorldSqlTests extends TestSuite {
           SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
           FROM city city0
           WHERE (city0.name = ?)
-          """.trim.replaceAll("\\s+", " ")
+          """
 
         db.run(query)
 

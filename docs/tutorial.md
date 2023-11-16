@@ -203,7 +203,7 @@ SELECT
   city0.district AS res__district,
   city0.population AS res__population
 FROM city city0
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query).take(3) ==> Seq(
   City[Id](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
@@ -242,7 +242,7 @@ SELECT
   city0.population AS res__population
 FROM city city0
 WHERE (city0.name = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 
@@ -281,7 +281,7 @@ SELECT
 FROM city city0
 WHERE (city0.name = ?)
 LIMIT 1
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 ```
@@ -299,7 +299,7 @@ SELECT
   city0.population AS res__population
 FROM city city0
 WHERE (city0.id = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 ```
@@ -315,7 +315,7 @@ db.toSqlQuery(query) ==> """
 SELECT city0.countrycode AS res
 FROM city city0
 WHERE (city0.name IN (VALUES (?), (?), (?)))
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq("IDN", "MYS", "SGP")
 ```
@@ -333,7 +333,7 @@ db.toSqlQuery(query) ==> """
     city0.population AS res__population
   FROM city city0
   WHERE ((city0.population > ?) AND (city0.countrycode = ?))
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query).take(2) ==> Seq(
   City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -358,7 +358,7 @@ SELECT
   city0.population AS res__population
 FROM city city0
 WHERE (city0.population > ?) AND (city0.countrycode = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query).take(2) ==> Seq(
   City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -429,7 +429,7 @@ db.toSqlQuery(query) ==> """
     country0.name AS res__0,
     country0.continent AS res__1
   FROM country country0
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query).take(5) ==> Seq(
   ("Afghanistan", "Asia"),
@@ -461,7 +461,7 @@ db.toSqlQuery(query) ==> """
     (city0.population / ?) AS res__2
   FROM city city0
   WHERE (city0.name = ?)
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query) ==>
   (
@@ -515,7 +515,7 @@ SELECT
   AVG(country0.population) AS res__1,
   MAX(country0.population) AS res__2
 FROM country country0
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> (0, 25434098, 1277558000)
 ```
@@ -537,7 +537,7 @@ db.toSqlQuery(query) ==> """
   FROM city city0
   ORDER BY res__1 DESC
   LIMIT 5 OFFSET 5
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query) ==> Seq(
   ("Karachi", 9269265),
@@ -569,7 +569,7 @@ db.toSqlQuery(query) ==> """
   SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
   FROM country country0
   WHERE (country0.name = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> 80
 
@@ -596,7 +596,7 @@ db.toSqlQuery(query) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
 WHERE (country0.capital IS NULL)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> 7
 ```
@@ -636,7 +636,7 @@ db.toSqlQuery(query) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
 WHERE (country0.capital = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> 0
 
@@ -656,7 +656,7 @@ db.toSqlQuery(query2) ==> """
 SELECT COUNT(1) AS res
 FROM country country0
 WHERE (country0.capital IS NOT DISTINCT FROM ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query2) ==> 7
 ```
@@ -677,7 +677,7 @@ SELECT city0.name AS res
 FROM city city0
 JOIN country country1 ON (city0.countrycode = country1.code)
 WHERE (country1.name = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
 ```
@@ -694,7 +694,7 @@ SELECT city0.name AS res__0, country1.name AS res__1
 FROM city city0
 RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
 WHERE (city0.id IS NULL)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq(
   (None, "Antarctica"),
@@ -731,7 +731,7 @@ db.toSqlQuery(query) ==> """
   FROM city city0
   JOIN country country1 ON (city0.countrycode = country1.code)
   WHERE (country1.name = ?)
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
 ```
@@ -757,7 +757,7 @@ db.toSqlQuery(query) ==> """
     LIMIT 2) subquery1
   ON (countrylanguage0.countrycode = subquery1.res__code)
   ORDER BY res__0
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query).take(5) ==> Seq(
   ("Asami", "India"),
@@ -793,7 +793,7 @@ db.toSqlQuery(query) ==> """
   JOIN countrylanguage countrylanguage1
   ON (subquery0.res__code = countrylanguage1.countrycode)
   ORDER BY res__0
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query).take(5) ==> List(
   ("Asami", "India"),
@@ -826,7 +826,7 @@ db.toSqlQuery(query) ==> """
  GROUP BY countrylanguage1.language
  ORDER BY res__1 DESC
  LIMIT 10
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq(
   ("Chinese", 1083),
@@ -860,7 +860,7 @@ SELECT
 FROM country country0
 GROUP BY country0.continent
 ORDER BY res__1 DESC
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq(
   ("Oceania", 75.90188415576932),
@@ -921,7 +921,7 @@ WHERE (city1.id = (SELECT
     WHERE (city0.countrycode = subquery0.res__code)
     ORDER BY city0.population DESC
     LIMIT 1))
-""".trim.replaceAll("\\s+", " ")
+"""
 
 db.run(query) ==> Seq(
   ("China", 1277558000, "Shanghai", 9696300),
@@ -965,7 +965,7 @@ db.toSqlQuery(query) ==> """
   (?, ?, ?, ?),
   (?, ?, ?, ?),
   (?, ?, ?, ?)
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query)
 
@@ -992,7 +992,7 @@ db.toSqlQuery(query) ==> """
   SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
   FROM city city0
   WHERE (city0.name = ?)
-  """.trim.replaceAll("\\s+", " ")
+  """
 
 db.run(query)
 

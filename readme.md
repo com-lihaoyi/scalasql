@@ -68,7 +68,9 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Running all unit tests: `./mill -i -w "scalasql[2.13.8].test"`
 * Running all unit tests on one database: `./mill -i -w "scalasql[2.13.8].test scalasql.sqlite"`
-* Re-geneating docs: `./mill -i "scalasql[2.13.8].test" + generateTutorial + generateReference`
+* Re-generating docs: `./mill -i "scalasql[2.13.8].test" + generateTutorial + generateReference`
+  * Note that ScalaSql's reference docs are extracted from the test suite, and thus we need
+    to make sure to run the test suite before re-generating them.
 
 ## Changelog
 
