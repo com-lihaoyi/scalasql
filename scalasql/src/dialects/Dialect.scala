@@ -49,4 +49,6 @@ trait Dialect extends DialectConfig {
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
 
   def caseWhen[T: TypeMapper](values: (Expr[Boolean], Expr[T])*) = new CaseWhen(values)
+
+  def values[T: TypeMapper](ts: Seq[T]) = new scalasql.query.Values(ts)
 }

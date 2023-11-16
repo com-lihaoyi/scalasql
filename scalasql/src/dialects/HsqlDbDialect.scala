@@ -13,6 +13,8 @@ trait HsqlDbDialect extends Dialect {
   override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
       v: Expr[T]
   ): HsqlDbDialect.ExprNumericOps[T] = new HsqlDbDialect.ExprNumericOps(v)
+
+  override def values[T: TypeMapper](ts: Seq[T]) = new HsqlDbDialect.Values(ts)
 }
 
 object HsqlDbDialect extends HsqlDbDialect {
@@ -27,4 +29,9 @@ object HsqlDbDialect extends HsqlDbDialect {
   class ExprNumericOps[T: Numeric: TypeMapper](val v: Expr[T])
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
+
+  class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
+
+    override protected def expr: Expr[T] = Expr { implicit ctx => sql"c1" }
+  }
 }

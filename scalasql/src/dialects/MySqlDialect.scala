@@ -44,6 +44,8 @@ trait MySqlDialect extends Dialect {
       query: InsertValues[Q, R]
   ): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
+
+  override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
 }
 
 object MySqlDialect extends MySqlDialect {
@@ -272,6 +274,15 @@ object MySqlDialect extends MySqlDialect {
         sql" ORDER BY $orderStr"
       }
     }
+  }
+
+
+  class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
+    override protected def renderToSql(ctx: Context): SqlStr = {
+      val rows = SqlStr.join(ts.map(t => sql"ROW($t)"), sql", ")
+      sql"VALUES $rows"
+    }
+    override protected def expr: Expr[T] = Expr{implicit ctx => sql"column_0" }
   }
 
 }

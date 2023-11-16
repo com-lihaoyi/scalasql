@@ -289,7 +289,7 @@ object WorldSqlTests extends TestSuite {
         // You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
         // query using `Values(...)`, which translates into a SQL `VALUES` clause
         val query = City.select
-          .filter(c => Values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+          .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
           .map(_.countryCode)
 
         db.toSqlQuery(query) ==> """
