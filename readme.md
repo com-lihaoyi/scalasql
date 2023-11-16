@@ -47,18 +47,18 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     * [H2](scalasql/test/src/example/H2Example.scala)
     * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
-* [ScalaSql Tutorial](tutorial.md): a structured walkthrough of how to use ScalaSql,
+* [ScalaSql Tutorial](docs/tutorial.md): a structured walkthrough of how to use ScalaSql,
   connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
   against it to perform useful work. Ideal for newcomers to work through from top
   to bottom when getting started with the library.
 
-* [ScalaSql Reference](reference.md): a detailed listing of ScalaSql functionality,
+* [ScalaSql Reference](docs/reference.md): a detailed listing of ScalaSql functionality,
   comprehensively covering everything that ScalaSql supports, in a single easily searchable
   place. Ideal for looking up exactly methods/operators ScalaSql supports, looking up
   how ScalaSql code translates to SQL, or looking up SQL syntax to find out how to
   express it using ScalaSql
 
-* [ScalaSql Design](design.md): discusses the design of the ScalaSql library, why it
+* [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
   is built the way it is, what tradeoffs it makes, and how it compares to other 
   common Scala database query libraries. Ideal for contributors who want to understand
   the structure of the ScalaSql codebase, or for advanced users who may need to
