@@ -21,10 +21,7 @@ object JoinsToSql {
 
   def joinsToSqlStr(
       joins: Seq[Join],
-      renderedFroms: Map[
-        From,
-        SqlStr
-      ],
+      renderedFroms: Map[From, SqlStr],
       joinOns: Seq[Seq[Option[SqlStr.Flattened]]]
   ) = {
 
