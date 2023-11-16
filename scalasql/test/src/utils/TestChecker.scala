@@ -64,8 +64,8 @@ class TestChecker(
     val allCheckedSqls = Option(sql) ++ sqls
     val matchedSql = allCheckedSqls.find { sql =>
       val expectedSql = sql.trim.replaceAll("\\s+", " ")
-//       pprint.log(sqlResult)
-//       pprint.log(expectedSql)
+      // pprint.log(sqlResult)
+      // pprint.log(expectedSql)
       sqlResult == expectedSql
     }
 

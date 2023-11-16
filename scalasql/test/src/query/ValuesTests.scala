@@ -33,9 +33,9 @@ trait ValuesTests extends ScalaSqlSuite {
     test("max") - checker(
       query = Text { values(Seq(1, 2, 3)).max },
       sqls = Seq(
-        "SELECT MAX(column1) AS res FROM (VALUES (?), (?), (?)) subquery0",
-        "SELECT MAX(c1) AS res FROM (VALUES (?), (?), (?)) subquery0",
-        "SELECT MAX(column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
+        "SELECT MAX(subquery0.column1) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT MAX(subquery0.c1) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT MAX(subquery0.column_0) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
       ),
       value = 3,
       docs = """
@@ -46,27 +46,52 @@ trait ValuesTests extends ScalaSqlSuite {
     test("map") - checker(
       query = Text { values(Seq(1, 2, 3)).map(_ + 1) },
       sqls = Seq(
-        "SELECT (column1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
-        "SELECT (c1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
-        "SELECT (column_0 + ?) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
+        "SELECT (subquery0.column1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT (subquery0.c1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
+        "SELECT (subquery0.column_0 + ?) AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0"
       ),
       value = Seq(2, 3, 4),
       docs = """
-        `Values` supports most `.select` operators like `.map`, `filter`, and so on
+        `Values` supports most `.select` operators like `.map`, `.filter`, `.crossJoin`, and so on
       """
     )
 
     test("filter") - checker(
       query = Text { values(Seq(1, 2, 3)).filter(_ > 2) },
       sqls = Seq(
-        "SELECT column1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (column1 > ?)",
-        "SELECT c1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (c1 > ?)",
-        "SELECT column_0 AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0 WHERE (column_0 > ?)",
+        "SELECT subquery0.column1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.column1 > ?)",
+        "SELECT subquery0.c1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.c1 > ?)",
+        "SELECT subquery0.column_0 AS res FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0 WHERE (subquery0.column_0 > ?)",
       ),
       value = Seq(3),
-      docs = """
-        `Values` supports most `.select` operators
-      """
+      docs = ""
+    )
+
+
+    test("crossJoin") - checker(
+      query = Text {
+        values(Seq(1, 2, 3)).crossJoin(values(Seq(4, 5, 6))).map{case (a, b) => (a * 10 + b)}
+      },
+      sqls = Seq(
+        """
+        SELECT ((subquery0.column1 * ?) + subquery1.column1) AS res
+        FROM (VALUES (?), (?), (?)) subquery0
+        CROSS JOIN (VALUES (?), (?), (?)) subquery1
+        """,
+        """
+        SELECT ((subquery0.c1 * ?) + subquery1.c1) AS res
+        FROM (VALUES (?), (?), (?)) subquery0
+        CROSS JOIN (VALUES (?), (?), (?)) subquery1
+        """,
+        """
+        SELECT ((subquery0.column_0 * ?) + subquery1.column_0) AS res
+        FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0
+        CROSS JOIN (VALUES ROW(?), ROW(?), ROW(?)) subquery1
+        """,
+      ),
+      value = Seq(14, 15, 16, 24, 25, 26, 34, 35, 36),
+      docs = "",
+      normalize = (x: Seq[Int]) => x.sorted
     )
 
 

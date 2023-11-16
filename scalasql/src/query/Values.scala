@@ -16,7 +16,16 @@ class Values[T: TypeMapper](val ts: Seq[T])(implicit val qr: Queryable.Row[Expr[
                               (implicit qr: Queryable.Row[Expr[V], V]): Expr[V] = simpleFrom().queryExpr(f)
 
   protected def simpleFrom() = this.subquery
-  protected def expr: Expr[T] = Expr{implicit ctx => sql"column1" }
+  val tableRef = new SubqueryRef(this, qr)
+  protected def columnName = "column1"
+  protected val expr: Expr[T] = Expr{implicit ctx =>
+    val prefix = ctx.fromNaming.get(tableRef) match {
+      case Some("") => sql""
+      case Some(s) => SqlStr.raw(s) + sql"."
+      case None => sql"SCALASQL_MISSING_VALUES."
+    }
+    prefix + SqlStr.raw(ctx.config.columnNameMapper(columnName))
+  }
 
   override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = Seq(Nil -> expr)
 
@@ -74,7 +83,7 @@ class Values[T: TypeMapper](val ts: Seq[T])(implicit val qr: Queryable.Row[Expr[
 
 object Values{
   class Renderer[T: TypeMapper](v: Values[T])(implicit ctx: Context) extends Select.Renderer{
-    def lhsMap: Map[Expr.Identity, SqlStr] = Map()
+    def lhsMap  = Map(Expr.getIdentity(v.expr) -> SqlStr.raw(v.columnName))
 
     def wrapRow(t: T) = sql"($t)"
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {

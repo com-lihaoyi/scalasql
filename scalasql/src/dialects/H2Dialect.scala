@@ -112,7 +112,6 @@ object H2Dialect extends H2Dialect {
 
 
   class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
-
-    override protected def expr: Expr[T] = Expr { implicit ctx => sql"c1" }
+    override protected def columnName = "c1"
   }
 }
