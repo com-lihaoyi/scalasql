@@ -781,10 +781,10 @@ object WorldSqlTests extends TestSuite {
           SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
           FROM countrylanguage countrylanguage0
           JOIN (SELECT
-              country0.code AS res__code,
-              country0.name AS res__name,
-              country0.population AS res__population
-            FROM country country0
+              country1.code AS res__code,
+              country1.name AS res__name,
+              country1.population AS res__population
+            FROM country country1
             ORDER BY res__population DESC
             LIMIT 2) subquery1
           ON (countrylanguage0.countrycode = subquery1.res__code)
@@ -957,10 +957,10 @@ object WorldSqlTests extends TestSuite {
           LIMIT 3) subquery0
         JOIN city city1 ON (subquery0.res__code = city1.countrycode)
         WHERE (city1.id = (SELECT
-            city0.id AS res
-            FROM city city0
-            WHERE (city0.countrycode = subquery0.res__code)
-            ORDER BY city0.population DESC
+            city2.id AS res
+            FROM city city2
+            WHERE (city2.countrycode = subquery0.res__code)
+            ORDER BY city2.population DESC
             LIMIT 1))
         """
 

@@ -160,10 +160,10 @@ trait FlatJoinTests extends ScalaSqlSuite {
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         CROSS JOIN (SELECT
-            purchase0.shipping_info_id AS res__0__shipping_info_id,
-            product1.name AS res__1__name
-          FROM purchase purchase0
-          JOIN product product1 ON (purchase0.product_id = product1.id)) subquery2
+            purchase2.shipping_info_id AS res__0__shipping_info_id,
+            product3.name AS res__1__name
+          FROM purchase purchase2
+          JOIN product product3 ON (purchase2.product_id = product3.id)) subquery2
         WHERE (shipping_info1.id = subquery2.res__0__shipping_info_id)
       """,
       value = Seq(
@@ -238,10 +238,10 @@ trait FlatJoinTests extends ScalaSqlSuite {
           FROM buyer buyer0
           GROUP BY buyer0.name) subquery0
         CROSS JOIN (SELECT
-            shipping_info0.id AS res__0,
-            MIN(shipping_info0.shipping_date) AS res__1
-          FROM shipping_info shipping_info0
-          GROUP BY shipping_info0.id) subquery1
+            shipping_info1.id AS res__0,
+            MIN(shipping_info1.shipping_date) AS res__1
+          FROM shipping_info shipping_info1
+          GROUP BY shipping_info1.id) subquery1
       """,
       value = Seq(
         ("James Bond", LocalDate.parse("2001-02-03"), 1, LocalDate.parse("2010-02-03")),
@@ -277,9 +277,9 @@ trait FlatJoinTests extends ScalaSqlSuite {
           ORDER BY res__id ASC
           LIMIT 1) subquery0
         CROSS JOIN (SELECT
-            shipping_info0.id AS res__id,
-            shipping_info0.shipping_date AS res__shipping_date
-          FROM shipping_info shipping_info0
+            shipping_info1.id AS res__id,
+            shipping_info1.shipping_date AS res__shipping_date
+          FROM shipping_info shipping_info1
           ORDER BY res__id ASC
           LIMIT 1) subquery1
       """,

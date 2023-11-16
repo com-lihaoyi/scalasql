@@ -245,7 +245,8 @@ object SimpleSelect {
 
       var joinContext = Context.compute(prevContext, query.from, None)
 
-      val renderedFroms = JoinsToSql.renderFroms(query.from, prevContext, joinContext.fromNaming, liveExprs)
+      val renderedFroms = JoinsToSql
+        .renderFroms(query.from, prevContext, joinContext.fromNaming, Some(innerLiveExprs))
         .to(collection.mutable.Map)
 
 

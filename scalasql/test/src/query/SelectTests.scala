@@ -271,8 +271,8 @@ trait SelectTests extends ScalaSqlSuite {
     test("subquery") - checker(
       query = Text { Buyer.select.subquery.map(_.name) },
       sql = """
-        SELECT subquery1.res__name AS res
-        FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery1
+        SELECT subquery0.res__name AS res
+        FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery0
       """,
       value = Seq("James Bond", "叉烧包", "Li Haoyi"),
       docs = """
@@ -406,9 +406,9 @@ trait SelectTests extends ScalaSqlSuite {
         SELECT
           buyer0.name AS res__0,
           (EXISTS (SELECT
-            shipping_info0.id AS res
-            FROM shipping_info shipping_info0
-            WHERE (shipping_info0.buyer_id = buyer0.id))) AS res__1
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false)),
@@ -426,9 +426,9 @@ trait SelectTests extends ScalaSqlSuite {
         SELECT
           buyer0.name AS res__0,
           (NOT EXISTS (SELECT
-            shipping_info0.id AS res
-            FROM shipping_info shipping_info0
-            WHERE (shipping_info0.buyer_id = buyer0.id))) AS res__1
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
