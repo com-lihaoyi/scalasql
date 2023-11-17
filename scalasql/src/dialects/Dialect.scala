@@ -43,6 +43,9 @@ trait Dialect extends DialectConfig {
       implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
+
+  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T]
+
   implicit def SelectOpsConv[T](v: Select[T, _]): operations.SelectOps[T] =
     new operations.SelectOps(v)
 

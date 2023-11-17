@@ -1,20 +1,8 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.{Column, Id, TypeMapper, Queryable, Table, dialects, operations}
-import scalasql.query.{
-  CompoundSelect,
-  Expr,
-  From,
-  GroupBy,
-  InsertSelect,
-  InsertValues,
-  Join,
-  Joinable,
-  JoinNullable,
-  OrderBy,
-  Query
-}
+import scalasql.{Column, Id, Queryable, Table, TypeMapper, dialects, operations}
+import scalasql.query.{Aggregatable, CompoundSelect, Expr, From, GroupBy, InsertSelect, InsertValues, Join, JoinNullable, Joinable, OrderBy, Query}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -32,9 +20,23 @@ trait H2Dialect extends Dialect {
     new H2Dialect.TableOps(t)
 
   override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
+
+  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] = new H2Dialect.AggExprOps(v)
 }
 
 object H2Dialect extends H2Dialect {
+  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v) {
+    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
+      assert(
+        sep == null,
+        "H2 database dialect does not support mkString separator due to a bug (?) where " +
+        "the separator is being treated as empty when a prepared statement placeholder is given"
+      )
+      val sepRender = Option(sep).getOrElse(sql"''")
+
+      v.queryExpr(expr => implicit ctx => sql"LISTAGG($expr || '', $sepRender)")
+    }
+  }
 
   class ExprStringOps(val v: Expr[String])
       extends operations.ExprStringOps(v)

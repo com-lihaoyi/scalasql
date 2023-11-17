@@ -14,13 +14,15 @@ class SqlStr(
     private val params: Seq[SqlStr.Interp],
     val isCompleteQuery: Boolean,
     private val referencedExprs: Seq[Expr.Identity]
-) {
+) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
     new SqlStr(SqlStr.plusParts, Seq(this, other), false, Nil)
   }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
   override def toString = SqlStr.flatten(this).queryParts.mkString("?")
+
+  override protected def renderToSql(ctx: Context): SqlStr = this
 }
 
 object SqlStr {
