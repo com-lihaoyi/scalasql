@@ -1,5 +1,111 @@
-
 # Design
+
+The rough dataflow of how ScalaSql works is given by the following diagram:
+
+```
+   {Table.select,update,map,
+    filter,join,aggregate}                         +-------->
+           |                                       |
+           |                                       |
+{Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
+   CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
+           |                                       |
+           |                                       |
+           +-------------+           +-------------+
+                         |           |
+                         v           |
+           +------ DatabaseApi#run(q: Q): R <------+
+           |                                       |
+         Q |                                       | R
+           |                                       |
+           v                                       |
+ Queryable#{walk,toSqlQuery}           Queryable#valueReader
+           |    |                            ^     ^
+           |    |                            |     |
+    SqlStr |    +------Seq[TypeMapper]-------+     | ResultSet
+           |                                       |
+           |                                       |
+           +---------> java.sql.execute -----------+
+```
+
+1. We start off constructing a query of type `Q`: an expression, query, or
+   case-class/tuple containing expressions.
+
+2. These get converted into a `SqlStr` and `Seq[TypeMapper]` using the
+   `Queryable[Q, R]` typeclass
+
+3. We execute the `SqlStr` using JDBC/`java.sql` APIs and get back a `ResultSet`
+
+4. We use `Queryable[Q, R]#valueReader` and `Seq[TypeMapper]` to convert the
+   `ResultSet` back into a Scala type `R`: typically primitive types, collections,
+   or case-classes/tuples containing primitive types
+
+5. That Scala value of type `R` is returned to the application for use
+
+## Queryable Hierarchy
+
+The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
+
+- `Q` -> `R` given `Queryable[Q, R]`
+   - `Query[Q_r]` -> `R_r`
+   - `Q_r` -> `R_r` given `Queryable.Row[Q_r, R_r]`
+      - `TupleN[Q_r1, Q_r2, ... Q_rn]` -> `TupleN[R_r1, R_r2, ... R_rn]`
+      - `CaseClass[Expr]` -> `CaseClass[Id]`
+      - `Expr[T]` -> `T`
+
+We need to use a `Queryable` typeclass here for two reasons:
+
+1. We do not control some of the types that can be queryable: `TupleN` and `CaseClass`
+   are "vanilla" types which happen to have members which a queryable, and cannot be
+   made to inherit from any ScalaSql base class the way `Query` and `Expr` can.
+
+2. We need to control the return type: the mapping from `Q` to `R` is somewhat
+   arbitrary, with `Query[Q_r] -> R_r` and `Expr[T] -> T` being straightforward unwrapping
+   of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
+   following that pattern. Thus we need to use the typeclass to encode this logic
+
+Unlike `Queryable[Q, R]`,`Query[Q_r]` and `Expr[T]` are open class hierarchies. This is
+done intentionally to allow users to easily `override` portions of this logic at runtime:
+e.g. MySql has a different syntax for `UPDATE`/`JOIN` commands than most other databases,
+and it can easily subclass `scalasql.query.Update` and override `toSqlQuery`. In general,
+this allows the various SQL dialects to modify or extend ScalaSql's core classes
+independently of each other, and lets users further customize ScalaSql in their own
+downstream code.
+
+## Operations
+
+`Expr[T]` is a type with no built-in members, as its operations depend on entirely what
+`T` is: `Expr[Int]` allows arithmetic, `Expr[String]` allows string operations, and so on.
+All of these `Expr[T]` operations are thus provided as extension methods that are
+imported with the SQL dialect and apply depending on the type `T`.
+
+These extension methods are provided via implicit conversions to classes implementing
+these methods, and can also be overriden or extended by the various SQL dialects: e.g.
+MySQL uses `CONCAT` rather than `||` for string concatenation, Postgres provides
+`.reverse`/`REVERSE` while MySQL doesn't. Again, this allows each dialect to customize
+the APIs they expose independently of each other, and makes it easy for users to define
+their own operations not provided by the base library.
+
+In general, we try to use extension methods on `Expr[T]` as much as possible, rather
+than static methods that receive `Expr[T]` as parameters. This has two goals:
+
+1. To emulate normal Scala primitive APIs: strings have `.substring`, `.toUpperCase`,
+   `.trim` operations, rather than static methods e.g. `String.toUpperCase(s: String)`.
+   ScalaSql aims to make user code "look like" normal Scala, and thus it follows
+   that style
+
+2. To avoid namespace collisions: extension methods via `implicit class`es tend 
+   to cause fewer namespace collisions than imported static methods, as only the
+   name of the `implicit class` must be imported for all extension methods to 
+   be available
+
+Similarly, operations on `Select`, `Update`, etc. are mostly methods that aim to follow
+the Scala collections style.
+
+However, there are some operations that do not map nicely to extension methods:
+`caseWhen`, `values`, etc. These are left as static methods that are brought into
+scope when you call `import scalasql.dialects.MyDialect._`.
+
 
 ## Goals
 
@@ -188,92 +294,3 @@ interpolation and parsing SQL result sets into Scala data structures, but withou
 any kind of strongly-typed data model for the queries you write. ScalaSql also lets
 you write raw `sql"..."` strings, but the primary interface is meant to be the
 strongly-typed collection-like API.
-
-# Design
-
-The rough dataflow of how ScalaSql works is given by the following diagram:
-
-```
-   {Table.select,update,map,
-    filter,join,aggregate}                         +-------->
-           |                                       |
-           |                                       |
-{Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
-   CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
-           |                                       |
-           |                                       |
-           +-------------+           +-------------+
-                         |           |
-                         v           |
-           +------ DatabaseApi#run(q: Q): R <------+
-           |                                       |
-         Q |                                       | R
-           |                                       |
-           v                                       |
- Queryable#{walk,toSqlQuery}           Queryable#valueReader
-           |    |                            ^     ^
-           |    |                            |     |
-    SqlStr |    +------Seq[TypeMapper]-------+     | ResultSet
-           |                                       |
-           |                                       |
-           +---------> java.sql.execute -----------+
-```
-
-1. We start off constructing a query of type `Q`: an expression, query, or
-   case-class/tuple containing expressions.
-
-2. These get converted into a `SqlStr` and `Seq[TypeMapper]` using the 
-   `Queryable[Q, R]` typeclass
-
-3. We execute the `SqlStr` using JDBC/`java.sql` APIs and get back a `ResultSet`
-
-4. We use `Queryable[Q, R]#valueReader` and `Seq[TypeMapper]` to convert the 
-  `ResultSet` back into a Scala type `R`: typically primitive types, collections, 
-  or case-classes/tuples containing primitive types
-
-5. That Scala value of type `R` is returned to the application for use
-
-## Queryable Hierarchy
-
-The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
-
-- `Q` -> `R` given `Queryable[Q, R]`
-   - `Query[Q_r]` -> `R_r`
-   - `Q_r` -> `R_r` given `Queryable.Row[Q_r, R_r]`
-     - `TupleN[Q_r1, Q_r2, ... Q_rn]` -> `TupleN[R_r1, R_r2, ... R_rn]`
-     - `CaseClass[Expr]` -> `CaseClass[Id]`
-     - `Expr[T]` -> `T`
-
-We need to use a `Queryable` typeclass here for two reasons:
-
-1. We do not control some of the types that can be queryable: `TupleN` and `CaseClass`
-   are "vanilla" types which happen to have members which a queryable, and cannot be
-   made to inherit from any ScalaSql base class the way `Query` and `Expr` can.
-
-2. We need to control the return type: the mapping from `Q` to `R` is somewhat
-   arbitrary, with `Query[Q_r] -> R_r` and `Expr[T] -> T` being straightforward unwrapping
-   of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
-   following that pattern. Thus we need to use the typeclass to encode this logic
-
-Unlike `Queryable[Q, R]`,`Query[Q_r]` and `Expr[T]` are open class hierarchies. This is
-done intentionally to allow users to easily `override` portions of this logic at runtime:
-e.g. MySql has a different syntax for `UPDATE`/`JOIN` commands than most other databases,
-and it can easily subclass `scalasql.query.Update` and override `toSqlQuery`. In general,
-this allows the various SQL dialects to modify or extend ScalaSql's core classes
-independently of each other, and lets users further customize ScalaSql in their own
-downstream code.
-
-## Operations
-
-`Expr[T]` is a type with no built-in members, as its operations depend on entirely what
-`T` is: `Expr[Int]` allows arithmetic, `Expr[String]` allows string operations, and so on.
-All of these `Expr[T]` operations are thus provided as extension methods that are
-imported with the SQL dialect and apply depending on the type `T`.
-
-These extension methods are provided via implicit conversions to classes implementing
-these methods, and can also be overriden or extended by the various SQL dialects: e.g.
-MySQL uses `CONCAT` rather than `||` for string concatenation, Postgres provides
-`.reverse`/`REVERSE` while MySQL doesn't. Again, this allows each dialect to customize
-the APIs they expose independently of each other, and makes it easy for users to define
-their own operations not provided by the base library.
-
