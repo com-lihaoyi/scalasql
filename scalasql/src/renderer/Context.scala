@@ -40,19 +40,22 @@ object Context {
     val prevSize = prevContext.fromNaming.size
     val newFromNaming =
       prevContext.fromNaming ++
-        selectables.zipWithIndex.map {
+        selectables.zipWithIndex.toMap.map {
           case (t: TableRef, i) =>
             (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
-        }.toMap ++
+        } ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
     val newExprNaming =
       prevContext.exprNaming ++
-        selectables.collect { case t: SubqueryRef[_, _] =>
-          Select.getLhsMap(t.value, prevContext)
-            .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Seq(e))}.$s") }
-        }.flatten
+        selectables
+          .collect { case t: SubqueryRef[_, _] => t }
+          .flatMap { t =>
+            Select
+              .getLhsMap(t.value, prevContext)
+              .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Seq(e))}.$s") }
+          }
 
     Context.Impl(newFromNaming, newExprNaming, prevContext.config)
   }

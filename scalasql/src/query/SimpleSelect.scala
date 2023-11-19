@@ -242,9 +242,9 @@ object SimpleSelect {
 
       val innerLiveExprs =
         exprStr.referencedExprs.toSet ++
-        filtersOpt.referencedExprs ++
-        groupByOpt.referencedExprs ++
-        joinOns.flatMap(_.flatMap(_.toSeq.flatMap(_.referencedExprs)))
+          filtersOpt.referencedExprs ++
+          groupByOpt.referencedExprs ++
+          joinOns.flatMap(_.flatMap(_.toSeq.flatMap(_.referencedExprs)))
 
       val (renderedFroms, joins) = JoinsToSql.renderLateralJoins(
         prevContext,

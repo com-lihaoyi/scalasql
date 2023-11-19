@@ -181,7 +181,6 @@ object CompoundSelect {
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
 
-
     def orderToSqlStr(newCtx: Context) = {
 
       SqlStr.optSeq(query.orderBy) { orderBys =>

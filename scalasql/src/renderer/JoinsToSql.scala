@@ -62,11 +62,13 @@ object JoinsToSql {
     }
   }
 
-  def renderLateralJoins(prevContext: Context,
-                         from: Seq[From],
-                         innerLiveExprs: Set[Expr.Identity],
-                         joins0: Seq[Join],
-                         renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]) = {
+  def renderLateralJoins(
+      prevContext: Context,
+      from: Seq[From],
+      innerLiveExprs: Set[Expr.Identity],
+      joins0: Seq[Join],
+      renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]
+  ) = {
     var joinContext = Context.compute(prevContext, from, None)
 
     val renderedFroms = JoinsToSql
