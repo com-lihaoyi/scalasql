@@ -7,6 +7,8 @@ import scalasql.{Config, Queryable, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
 
+import scala.collection.mutable
+
 /**
  * A `SELECT` query, with `FROM`/`JOIN`/`WHERE`/`GROUP BY`
  * clauses, but without `ORDER BY`/`LIMIT`/`TAKE`/`UNION` clauses
@@ -233,36 +235,19 @@ object SimpleSelect {
         )
       )
 
-      val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
-        groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
+      val innerLiveExprs =
+        exprStr.referencedExprs.toSet ++
+        filtersOpt.referencedExprs ++
+        groupByOpt.referencedExprs ++
+        joinOns.flatMap(_.flatMap(_.toSeq.flatMap(_.referencedExprs)))
 
-      var joinContext = Context.compute(prevContext, query.from, None)
-
-      val renderedFroms = JoinsToSql
-        .renderFroms(query.from, prevContext, joinContext.fromNaming, Some(innerLiveExprs))
-        .to(collection.mutable.Map)
-
-      val joins = SqlStr.join(query.joins.zip(joinOns).map { case (join, joinOns) =>
-        val joinPrefix = SqlStr.raw(join.prefix)
-        val prevJoinContext = joinContext
-        joinContext = Context.compute(joinContext, join.from.map(_.from), None)
-        val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
-          val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
-
-          renderedFroms.getOrElseUpdate(
-            jf.from,
-            JoinsToSql.renderSingleFrom(
-              prevJoinContext,
-              Some(innerLiveExprs),
-              jf.from,
-              joinContext.fromNaming
-            )
-          ) +
-            onSql
-        })
-
-        sql" $joinPrefix $joinSelectables"
-      })
+      val (renderedFroms, joins) = JoinsToSql.renderLateralJoins(
+        prevContext,
+        query.from,
+        innerLiveExprs,
+        query.joins,
+        joinOns
+      )
 
       lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
 

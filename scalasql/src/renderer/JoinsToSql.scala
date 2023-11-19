@@ -61,4 +61,39 @@ object JoinsToSql {
         sql"(${toSqlQuery.render(liveExprs)}) $name"
     }
   }
+
+  def renderLateralJoins(prevContext: Context,
+                         from: Seq[From],
+                         innerLiveExprs: Set[Expr.Identity],
+                         joins0: Seq[Join],
+                         renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]) = {
+    var joinContext = Context.compute(prevContext, from, None)
+
+    val renderedFroms = JoinsToSql
+      .renderFroms(from, prevContext, joinContext.fromNaming, Some(innerLiveExprs))
+      .to(collection.mutable.Map)
+
+    val joins = SqlStr.join(joins0.zip(renderedJoinOns).map { case (join, joinOns) =>
+      val joinPrefix = SqlStr.raw(join.prefix)
+      val prevJoinContext = joinContext
+      joinContext = Context.compute(joinContext, join.from.map(_.from), None)
+      val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
+        val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
+
+        renderedFroms.getOrElseUpdate(
+          jf.from,
+          JoinsToSql.renderSingleFrom(
+            prevJoinContext,
+            Some(innerLiveExprs),
+            jf.from,
+            joinContext.fromNaming
+          )
+        ) +
+          onSql
+      })
+
+      sql" $joinPrefix $joinSelectables"
+    })
+    (renderedFroms, joins)
+  }
 }
