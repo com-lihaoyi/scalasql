@@ -7,10 +7,14 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 class ExprOps(v: Expr[_]) {
 
-  /** Equals to */
+  /**
+   * SQL-style Equals to, translates to SQL `=`. Returns `false` if both values are `NULL`
+   */
   def `=`[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"($v = $x)" }
 
-  /** Not equal to */
+  /**
+   * SQL-style Not equals to, translates to SQL `<>`. Returns `false` if both values are `NULL`
+   */
   def <>[T](x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"($v <> $x)" }
 
   /** Greater than */
