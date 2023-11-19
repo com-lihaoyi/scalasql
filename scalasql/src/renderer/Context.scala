@@ -38,7 +38,7 @@ object Context {
   def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
 
     val prevSize = prevContext.fromNaming.size
-    val namedFromsMap =
+    val newFromNaming =
       prevContext.fromNaming ++
         selectables.zipWithIndex.map {
           case (t: TableRef, i) =>
@@ -47,18 +47,14 @@ object Context {
         }.toMap ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
-    val exprNaming =
+    val newExprNaming =
       prevContext.exprNaming ++
         selectables.collect { case t: SubqueryRef[_, _] =>
           Select.getLhsMap(t.value, prevContext)
-            .map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(t), Seq(e))}.$s") }
+            .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Seq(e))}.$s") }
         }.flatten
 
-    Context.Impl(
-      namedFromsMap,
-      exprNaming,
-      prevContext.config
-    )
+    Context.Impl(newFromNaming, newExprNaming, prevContext.config)
   }
 
 }
