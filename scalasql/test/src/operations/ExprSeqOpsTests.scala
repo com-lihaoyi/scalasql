@@ -100,21 +100,22 @@ trait ExprSeqOpsTests extends ScalaSqlSuite {
           "SELECT STRING_AGG(buyer0.name || '', '') AS res FROM buyer buyer0",
           "SELECT GROUP_CONCAT(buyer0.name || '', '') AS res FROM buyer buyer0",
           "SELECT LISTAGG(buyer0.name || '', '') AS res FROM buyer buyer0",
-          "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR '') AS res FROM buyer buyer0",
+          "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR '') AS res FROM buyer buyer0"
         ),
         value = "James Bond叉烧包Li Haoyi"
       )
 
       test("sep") - {
-        if (!this.isInstanceOf[H2Dialect]) checker(
-          query = Buyer.select.map(_.name).mkString(", "),
-          sqls = Seq(
-            "SELECT STRING_AGG(buyer0.name || '', ?) AS res FROM buyer buyer0",
-            "SELECT GROUP_CONCAT(buyer0.name || '', ?) AS res FROM buyer buyer0",
-            "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR ?) AS res FROM buyer buyer0"
-          ),
-          value = "James Bond, 叉烧包, Li Haoyi"
-        )
+        if (!this.isInstanceOf[H2Dialect])
+          checker(
+            query = Buyer.select.map(_.name).mkString(", "),
+            sqls = Seq(
+              "SELECT STRING_AGG(buyer0.name || '', ?) AS res FROM buyer buyer0",
+              "SELECT GROUP_CONCAT(buyer0.name || '', ?) AS res FROM buyer buyer0",
+              "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR ?) AS res FROM buyer buyer0"
+            ),
+            value = "James Bond, 叉烧包, Li Haoyi"
+          )
       }
     }
   }

@@ -2,7 +2,20 @@ package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
 import scalasql.{Column, Id, Queryable, Table, TypeMapper, dialects, operations}
-import scalasql.query.{Aggregatable, CompoundSelect, Expr, From, GroupBy, InsertSelect, InsertValues, Join, JoinNullable, Joinable, OrderBy, Query}
+import scalasql.query.{
+  Aggregatable,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertSelect,
+  InsertValues,
+  Join,
+  JoinNullable,
+  Joinable,
+  OrderBy,
+  Query
+}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -21,7 +34,8 @@ trait H2Dialect extends Dialect {
 
   override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] = new H2Dialect.AggExprOps(v)
+  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
+    new H2Dialect.AggExprOps(v)
 }
 
 object H2Dialect extends H2Dialect {
@@ -30,7 +44,7 @@ object H2Dialect extends H2Dialect {
       assert(
         sep == null,
         "H2 database dialect does not support mkString separator due to a bug (?) where " +
-        "the separator is being treated as empty when a prepared statement placeholder is given"
+          "the separator is being treated as empty when a prepared statement placeholder is given"
       )
       val sepRender = Option(sep).getOrElse(sql"''")
 

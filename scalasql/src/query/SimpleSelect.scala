@@ -251,16 +251,12 @@ object SimpleSelect {
 
           renderedFroms.getOrElseUpdate(
             jf.from,
-            jf.from match {
-              case t: TableRef =>
-                SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + SqlStr
-                  .raw(joinContext.fromNaming(jf.from))
-
-              case t: SubqueryRef[_, _] =>
-                val toSqlQuery = Select.getRenderer(t.value, prevJoinContext)
-                sql"(${toSqlQuery.render(Some(innerLiveExprs))}) " + SqlStr
-                  .raw(joinContext.fromNaming(jf.from))
-            }
+            JoinsToSql.renderSingleFrom(
+              prevJoinContext,
+              Some(innerLiveExprs),
+              jf.from,
+              joinContext.fromNaming
+            )
           ) +
             onSql
         })

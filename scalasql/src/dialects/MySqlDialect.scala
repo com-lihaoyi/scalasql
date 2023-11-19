@@ -1,7 +1,26 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, JoinNullable, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, TableRef, Update, WithExpr}
+import scalasql.query.{
+  Aggregatable,
+  AscDesc,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertValues,
+  Join,
+  JoinNullable,
+  JoinOps,
+  Joinable,
+  LateralJoinOps,
+  Nulls,
+  OrderBy,
+  Query,
+  TableRef,
+  Update,
+  WithExpr
+}
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -34,14 +53,17 @@ trait MySqlDialect extends Dialect {
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] = new MySqlDialect.AggExprOps(v)
+  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
+    new MySqlDialect.AggExprOps(v)
 }
 
 object MySqlDialect extends MySqlDialect {
   class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v) {
     def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
-      v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT(CONCAT($expr, '') SEPARATOR ${sepRender})")
+      v.queryExpr(expr =>
+        implicit ctx => sql"GROUP_CONCAT(CONCAT($expr, '') SEPARATOR ${sepRender})"
+      )
     }
   }
   class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {

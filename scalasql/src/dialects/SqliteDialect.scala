@@ -1,7 +1,18 @@
 package scalasql.dialects
 
 import scalasql.{Id, Queryable, Table, TypeMapper, dialects, operations}
-import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, Expr, From, GroupBy, Join, Nulls, OrderBy, Select}
+import scalasql.query.{
+  Aggregatable,
+  AscDesc,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  Join,
+  Nulls,
+  OrderBy,
+  Select
+}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -17,11 +28,14 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new SqliteDialect.TableOps(t)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] = new SqliteDialect.AggExprOps(v)
+  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
+    new SqliteDialect.AggExprOps(v)
 }
 
 object SqliteDialect extends SqliteDialect {
-  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v){/** TRUE if all values in a set are TRUE */
+  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v) {
+
+    /** TRUE if all values in a set are TRUE */
     def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
