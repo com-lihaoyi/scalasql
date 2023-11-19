@@ -27,7 +27,6 @@ import scalasql.{TypeMapper, Queryable}
 trait Select[Q, R]
     extends SqlStr.Renderable
     with Aggregatable[Q]
-    with From
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
     with Query.Multiple[R] {

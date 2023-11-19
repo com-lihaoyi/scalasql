@@ -44,7 +44,6 @@ object Context {
           case (t: TableRef, i) =>
             (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
-          case x => throw new Exception("wtf " + x)
         }.toMap ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 

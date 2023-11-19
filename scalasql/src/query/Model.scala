@@ -40,7 +40,7 @@ object Nulls {
 /**
  * Models a SQL `FROM` clause
  */
-trait From
+sealed trait From
 class TableRef(val value: Table.Base) extends From {
   override def toString = s"TableRef(${value.tableName})"
 }
