@@ -50,9 +50,7 @@ object Context {
     val exprNaming =
       prevContext.exprNaming ++
         selectables.collect { case t: SubqueryRef[_, _] =>
-          Select
-            .getRenderer(t.value, prevContext)
-            .lhsMap
+          Select.getLhsMap(t.value, prevContext)
             .map { case (e, s) => (e, sql"${SqlStr.raw(namedFromsMap(t), Seq(e))}.$s") }
         }.flatten
 

@@ -190,6 +190,20 @@ class SimpleSelect[Q, R](
     new SimpleSelect.Renderer(this, prevContext)
 
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
+
+  protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+
+    lazy val flattenedExpr = qr.walk(expr)
+
+    lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
+      val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
+      val exprId = Expr.getIdentity(v)
+
+      (exprId, SqlStr.raw(str, Seq(exprId)))
+    }.toMap
+
+    jsonQueryMap
+  }
 }
 
 object SimpleSelect {
@@ -199,15 +213,6 @@ object SimpleSelect {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)
-
-    lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
-      val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
-      val exprId = Expr.getIdentity(v)
-
-      (exprId, SqlStr.raw(str, Seq(exprId)))
-    }.toMap
-
-    lazy val lhsMap = jsonQueryMap
 
     lazy val joinOns =
       query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))

@@ -98,12 +98,14 @@ class Values[T: TypeMapper](val ts: Seq[T])(implicit val qr: Queryable.Row[Expr[
       on: Option[(Expr[T], Q2) => Expr[Boolean]]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Expr[T], Q2), (T, R2)] =
     simpleFrom().join0(prefix, other, on)
+
+  override protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+    Map(Expr.getIdentity(expr) -> SqlStr.raw(columnName))
+  }
 }
 
 object Values {
   class Renderer[T: TypeMapper](v: Values[T])(implicit ctx: Context) extends Select.Renderer {
-    def lhsMap = Map(Expr.getIdentity(v.expr) -> SqlStr.raw(v.columnName))
-
     def wrapRow(t: T) = sql"($t)"
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {
       val rows = SqlStr.join(v.ts.map(wrapRow), sql", ")

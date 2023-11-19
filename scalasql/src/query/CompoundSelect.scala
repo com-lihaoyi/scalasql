@@ -122,6 +122,10 @@ class CompoundSelect[Q, R](
 
   protected def getRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
+
+  protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+    Select.getLhsMap(lhs, prevContext)
+  }
 }
 
 object CompoundSelect {
@@ -131,8 +135,9 @@ object CompoundSelect {
 
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
+    lazy val lhsLhsMap = Select.getLhsMap(query.lhs, prevContext)
     lazy val newCtx = lhsToSqlQuery.context
-      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsMap)
+      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
     lazy val sortOpt = SqlStr.flatten(orderToSqlStr(newCtx))
 
@@ -155,15 +160,15 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-
+          lazy val rhsLhsMap = Select.getLhsMap(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
           // belongong to the RHS SimpleSelect `liveExprs` analysis to work
           val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-            val strs = l.map(e => SqlStr.flatten(lhsToSqlQuery.lhsMap(e)).queryParts.mkString("?"))
+            val strs = l.map(e => SqlStr.flatten(lhsLhsMap(e)).queryParts.mkString("?"))
 
-            rhsToSqlQuery.lhsMap.collect {
+            rhsLhsMap.collect {
               case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
             }.toSet
           }
@@ -176,7 +181,6 @@ object CompoundSelect {
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
 
-    lazy val lhsMap = lhsToSqlQuery.lhsMap
 
     def orderToSqlStr(newCtx: Context) = {
 

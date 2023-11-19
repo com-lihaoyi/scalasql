@@ -173,6 +173,7 @@ trait Select[Q, R]
   protected override def queryIsSingleRow = false
 
   protected def getRenderer(prevContext: Context): Select.Renderer
+  protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr]
 
   /**
    * Asserts that this query returns exactly one row, and returns a single
@@ -236,8 +237,9 @@ trait Select[Q, R]
 object Select {
   def getSimpleFrom[Q, R](s: Select[Q, R]) = s.simpleFrom()
   def getRenderer(s: Select[_, _], prevContext: Context) = s.getRenderer(prevContext)
+  def getLhsMap(s: Select[_, _], prevContext: Context) = s.getLhsMap(prevContext)
   trait Renderer {
-    def lhsMap: Map[Expr.Identity, SqlStr]
+//    def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
   }
 }
