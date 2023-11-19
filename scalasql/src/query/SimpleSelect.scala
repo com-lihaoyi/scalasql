@@ -207,16 +207,23 @@ object SimpleSelect {
 
     lazy val lhsMap = jsonQueryMap
 
-    def render(liveExprs: Option[Set[Expr.Identity]]) = {
-      val joinOns =
-        query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
+    lazy val joinOns =
+      query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
 
-      lazy val exprsStrs = {
-        FlatJson.flatten(flattenedExpr, context).map { case (k, v) =>
-          sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
-        }
+    lazy val exprsStrs = {
+      FlatJson.flatten(flattenedExpr, context).map { case (k, v) =>
+        sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
       }
+    }
 
+    lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
+
+    lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
+      val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
+      sql" GROUP BY ${groupBy.key}${havingOpt}"
+    })
+
+    def render(liveExprs: Option[Set[Expr.Identity]]) = {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.zip(exprsStrs).collect {
@@ -225,13 +232,6 @@ object SimpleSelect {
           sql", "
         )
       )
-
-      lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
-
-      lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
-        val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
-        sql" GROUP BY ${groupBy.key}${havingOpt}"
-      })
 
       val innerLiveExprs = exprStr.referencedExprs.toSet ++ filtersOpt.referencedExprs ++
         groupByOpt.referencedExprs ++ joinOns.flatten.flatten.flatMap(_.referencedExprs)
