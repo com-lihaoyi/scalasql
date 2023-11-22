@@ -43,7 +43,12 @@ trait OptionalTests extends ScalaSqlSuite {
         OptCols[Id](Some(1), Some(2)),
         OptCols[Id](Some(3), None),
         OptCols[Id](None, Some(4))
-      )
+      ),
+      docs = """
+        Nullable columns are modelled as `T[Option[V]]` fields on your `case class`,
+        and are returned to you as `Option[V]` values when you run a query. These
+        can be `Some` or `None`
+      """
     )
 
     test("groupByMaxGet") - checker(
@@ -54,7 +59,10 @@ trait OptionalTests extends ScalaSqlSuite {
         GROUP BY opt_cols0.my_int
       """,
       value = Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None),
-      normalize = (x: Seq[(Option[Int], Option[Int])]) => x.sorted
+      normalize = (x: Seq[(Option[Int], Option[Int])]) => x.sorted,
+      docs = """
+        Some aggregates return `Expr[Option[V]]`s, et.c. `.maxByOpt`
+      """
     )
 
     test("isDefined") - checker(
@@ -65,7 +73,11 @@ trait OptionalTests extends ScalaSqlSuite {
           opt_cols0.my_int2 AS res__my_int2
         FROM opt_cols opt_cols0
         WHERE (opt_cols0.my_int IS NOT NULL)""",
-      value = Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
+      value = Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None)),
+      docs = """
+        `.isDefined` on `Expr[Option[V]]` translates to a SQL
+        `IS NOT NULL` check
+      """
     )
 
     test("isEmpty") - checker(
@@ -76,7 +88,11 @@ trait OptionalTests extends ScalaSqlSuite {
           opt_cols0.my_int2 AS res__my_int2
         FROM opt_cols opt_cols0
         WHERE (opt_cols0.my_int IS NULL)""",
-      value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+      value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4))),
+      docs ="""
+        `.isEmpty` on `Expr[Option[V]]` translates to a SQL
+        `IS NULL` check
+      """
     )
 
     test("sqlEquals") {
@@ -89,7 +105,12 @@ trait OptionalTests extends ScalaSqlSuite {
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int = ?)
         """,
-        value = Seq(OptCols[Id](Some(1), Some(2)))
+        value = Seq(OptCols[Id](Some(1), Some(2))),
+        docs = """
+          Backticked `=` equality in ScalaSQL translates to a raw `=`
+          in SQL. This follows SQL `NULL` semantics, meaning that
+          `None = None` returns `false` rather than `true`
+        """
       )
 
       test("nonOptionMiss") - checker(
@@ -136,7 +157,12 @@ trait OptionalTests extends ScalaSqlSuite {
             WHERE (opt_cols0.my_int <=> ?)
           """
         ),
-        value = Seq(OptCols[Id](Some(1), Some(2)))
+        value = Seq(OptCols[Id](Some(1), Some(2))),
+        docs = """
+          `===` equality in ScalaSQL translates to a `IS NOT DISTINCT` in SQL.
+          This roughly follows Scala `==` semantics, meaning `None === None`
+          returns `true`
+        """
       )
 
       test("noneHit") - checker(
@@ -231,7 +257,12 @@ trait OptionalTests extends ScalaSqlSuite {
         OptCols[Id](Some(11), Some(2)),
         OptCols[Id](Some(13), None),
         OptCols[Id](None, Some(4))
-      )
+      ),
+      docs = """
+        You can use operators like `.map` and `.flatMap` to work with
+        your `Expr[Option[V]]` values. These roughly follow the semantics
+        that you would be familiar with from Scala.
+      """
     )
 
     test("map2") - checker(
@@ -276,7 +307,13 @@ trait OptionalTests extends ScalaSqlSuite {
         // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
         OptCols[Id](None, None),
         OptCols[Id](None, Some(4))
-      )
+      ),
+      docs = """
+        You can use `.get` to turn an `Expr[Option[V]]` into an `Expr[V]`. This follows
+        SQL semantics, such that `NULL`s anywhere in that selected column automatically
+        will turn the whole column `None` (if it's an `Expr[Option[V]]` column) or `null`
+        (if it's not an optional column)
+      """
     )
 
     test("rawGet") - checker(
@@ -346,7 +383,10 @@ trait OptionalTests extends ScalaSqlSuite {
         OptCols[Id](Some(1), Some(2)),
         OptCols[Id](None, None),
         OptCols[Id](None, Some(4))
-      )
+      ),
+      docs = """
+        `.filter` follows normal Scala semantics, and translates to a `CASE`/`WHEN (foo)`/`ELSE NULL`
+      """
     )
     test("sorting") {
       test("nullsLast") - checker(
@@ -368,7 +408,10 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Id](Some(3), None),
           OptCols[Id](None, None),
           OptCols[Id](None, Some(4))
-        )
+        ),
+        docs = """
+          `.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
+        """
       )
       test("nullsFirst") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).nullsFirst },

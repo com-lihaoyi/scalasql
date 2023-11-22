@@ -7034,7 +7034,9 @@ OptCols.insert.batched(_.myInt, _.myInt2)(
 
 ### Optional.selectAll
 
-
+Nullable columns are modelled as `T[Option[V]]` fields on your `case class`,
+and are returned to you as `Option[V]` values when you run a query. These
+can be `Some` or `None`
 
 ```scala
 OptCols.select
@@ -7065,7 +7067,7 @@ OptCols.select
 
 ### Optional.groupByMaxGet
 
-
+Some aggregates return `Expr[Option[V]]`s, et.c. `.maxByOpt`
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -7090,7 +7092,8 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 ### Optional.isDefined
 
-
+`.isDefined` on `Expr[Option[V]]` translates to a SQL
+`IS NOT NULL` check
 
 ```scala
 OptCols.select.filter(_.myInt.isDefined)
@@ -7117,7 +7120,8 @@ OptCols.select.filter(_.myInt.isDefined)
 
 ### Optional.isEmpty
 
-
+`.isEmpty` on `Expr[Option[V]]` translates to a SQL
+`IS NULL` check
 
 ```scala
 OptCols.select.filter(_.myInt.isEmpty)
@@ -7144,7 +7148,9 @@ OptCols.select.filter(_.myInt.isEmpty)
 
 ### Optional.sqlEquals.nonOptionHit
 
-
+Backticked `=` equality in ScalaSQL translates to a raw `=`
+in SQL. This follows SQL `NULL` semantics, meaning that
+`None = None` returns `false` rather than `true`
 
 ```scala
 OptCols.select.filter(_.myInt `=` 1)
@@ -7225,7 +7231,9 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 
 ### Optional.scalaEquals.someHit
 
-
+`===` equality in ScalaSQL translates to a `IS NOT DISTINCT` in SQL.
+This roughly follows Scala `==` semantics, meaning `None === None`
+returns `true`
 
 ```scala
 OptCols.select.filter(_.myInt === Option(1))
@@ -7340,7 +7348,9 @@ OptCols.select.filter(_.myInt !== Option.empty[Int])
 
 ### Optional.map
 
-
+You can use operators like `.map` and `.flatMap` to work with
+your `Expr[Option[V]]` values. These roughly follow the semantics
+that you would be familiar with from Scala.
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
@@ -7427,7 +7437,10 @@ OptCols.select
 
 ### Optional.mapGet
 
-
+You can use `.get` to turn an `Expr[Option[V]]` into an `Expr[V]`. This follows
+SQL semantics, such that `NULL`s anywhere in that selected column automatically
+will turn the whole column `None` (if it's an `Expr[Option[V]]` column) or `null`
+(if it's not an optional column)
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
@@ -7553,7 +7566,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 
 ### Optional.filter
 
-
+`.filter` follows normal Scala semantics, and translates to a `CASE`/`WHEN (foo)`/`ELSE NULL`
 
 ```scala
 OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
@@ -7587,7 +7600,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
 
 ### Optional.sorting.nullsLast
 
-
+`.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
 
 ```scala
 OptCols.select.sortBy(_.myInt).nullsLast
