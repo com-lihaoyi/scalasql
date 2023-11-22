@@ -130,7 +130,6 @@ object CountryLanguage extends Table[CountryLanguage]() {
 Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
 passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
 you are targeting (in this case `H2Dialect`).
-
 ```scala
 val dbClient = new DatabaseClient.Connection(
   java.sql.DriverManager
@@ -145,7 +144,6 @@ val dbClient = new DatabaseClient.Connection(
 val db = dbClient.getAutoCommitClientConnection
 db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
 db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
-
 
 ```
 We use `dbClient.getAutoCommitClientConnection` in order to create a client that
@@ -192,7 +190,6 @@ The next type of query to look at are simple `SELECT`s. Each table
 that we modelled earlier has `.insert`, `.select`, `.update`, and `.delete`
 methods to help construct the respective queries. You can run a `Table.select`
 on its own in order to retrieve all the data in the table:
-
 ```scala
 val query = City.select
 db.toSqlQuery(query) ==> """
@@ -211,7 +208,6 @@ db.run(query).take(3) ==> Seq(
   City[Id](3, "Herat", "AFG", district = "Herat", population = 186800)
 )
 
-
 ```
 Notice that `db.run` returns instances of type `City[Id]`. `Id` is `scalasql.Id`,
 short for the "Identity" type, representing a `City` object containing normal Scala
@@ -229,7 +225,6 @@ datasets, and for that you
 To avoid loading the entire database table into your Scala program, you can
 add filters to the query before running it. Below, we add a filter to only
 query the city whose name is "Singapore"
-
 ```scala
 val query = City.select.filter(_.name === "Singapore").single
 
@@ -245,7 +240,6 @@ WHERE (city0.name = ?)
 """
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
-
 
 ```
 Note that we use `===` rather than `==` for the equality comparison. The
@@ -267,7 +261,6 @@ an exception if zero or multiple rows are returned by the query.
 You can also use `.head` rather than `.single`, for cases where you
 want a single result row and want additional result rows to be ignored
 rather than causing an exception. `.head` is short for `.take(1).single`
-
 ```scala
 val query = City.select.filter(_.name === "Singapore").head
 
@@ -355,13 +348,11 @@ Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
 `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
 already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
 a `Expr[Int]` automatically
-
 ```scala
 def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
 assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
 assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
-
 
 ```
 Lifting of Scala values into your ScalaSql queries is dependent on there being
@@ -556,7 +547,6 @@ and implementations
 You can use `.cast` to generate SQL `CAST` calls between data types. Below,
 we use it to query Singapore's life expectancy and convert it from a `Double`
 precision floating point number to an `Int`:
-
 ```scala
 val query = Country.select
   .filter(_.name === "Singapore")
@@ -570,7 +560,6 @@ WHERE (country0.name = ?)
 """
 
 db.run(query) ==> 80
-
 
 ```
 You can `.cast` to any type with a `TypeMapper[T]` defined, which is the
@@ -637,7 +626,6 @@ WHERE (country0.capital = ?)
 """
 
 db.run(query) ==> 0
-
 
 ```
 Whereas using Scala equality with `===` translates into a more
@@ -1157,13 +1145,15 @@ that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
 using that in a query to return a string.
 ```scala
 import scalasql.renderer.SqlStr.SqlStringSyntax
+
 def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
+
 val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
+
 db.toSqlQuery(query) ==>
   "SELECT RAWTOHEX(city0.name) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
 db.run(query) ==> "00530069006e006700610070006f00720065"
-
 
 ```
 Your custom Scala functions can either be standalone functions or extension
