@@ -21,19 +21,19 @@ trait ScalaSql extends CrossScalaModule{
   def generatedSources: T[Seq[PathRef]] = T{
     def defs(isImpl: Boolean) = {
       for(i <- Range(2, 22)) yield {
-        def csep(f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
-        
+        def commaSep(f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
+
         val impl =
           if (!isImpl) ""
           else s"""= newInsertValues(
                  |        this,
-                 |        columns = Seq(${csep(j => s"f$j(expr)")}),
-                 |        valuesLists = items.map(t => Seq(${csep(j => s"t._$j")}))
+                 |        columns = Seq(${commaSep(j => s"f$j(expr)")}),
+                 |        valuesLists = items.map(t => Seq(${commaSep(j => s"t._$j")}))
                  |      )
                  |
                  |""".stripMargin
-        s"""def batched[${csep(j => s"T$j")}](${csep(j => s"f$j: Q => Column.ColumnExpr[T$j]")})(
-          |    items: (${csep(j => s"Expr[T$j]")})*
+        s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: Q => Column.ColumnExpr[T$j]")})(
+          |    items: (${commaSep(j => s"Expr[T$j]")})*
           |)(implicit qr: Queryable[Q, R]): scalasql.query.InsertValues[Q, R] $impl""".stripMargin
       }
     }
