@@ -1179,7 +1179,7 @@ object WorldSqlTests extends TestSuite {
     test("savepoint") {
       test("exception") {
         // +DOCS
-        // ## Savepoints
+        // ### Savepoints
         // Most database support Savepoints, which are sort of "nested transactions"
         // allowing you to roll back portions of a transaction without rolling back
         // everything.
@@ -1225,7 +1225,7 @@ object WorldSqlTests extends TestSuite {
 
     test("customExpressions") {
       // +DOCS
-      // ### Custom Expressions
+      // ## Custom Expressions
       //
       // You can define custom SQL expressions via the `Expr` constructor. This is
       // useful for extending ScalaSql when you need to use some operator or syntax
