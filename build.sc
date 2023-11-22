@@ -117,6 +117,8 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
     )
 
     def testFramework = "scalasql.UtestFramework"
+
+    def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
   }
 }
 
