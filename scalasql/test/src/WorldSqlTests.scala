@@ -122,7 +122,6 @@ object WorldSqlTests extends TestSuite {
     // Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
     // passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
     // you are targeting (in this case `H2Dialect`).
-
     val dbClient = new DatabaseClient.Connection(
       java.sql.DriverManager
         .getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
@@ -136,7 +135,6 @@ object WorldSqlTests extends TestSuite {
     val db = dbClient.getAutoCommitClientConnection
     db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
     db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
-
     // We use `dbClient.getAutoCommitClientConnection` in order to create a client that
     // will automatically run every SQL command in a new transaction and commit it. For
     // the majority of examples in this page, the exact transaction configuration doesn't
@@ -185,7 +183,6 @@ object WorldSqlTests extends TestSuite {
       // that we modelled earlier has `.insert`, `.select`, `.update`, and `.delete`
       // methods to help construct the respective queries. You can run a `Table.select`
       // on its own in order to retrieve all the data in the table:
-
       val query = City.select
       db.toSqlQuery(query) ==> """
       SELECT
@@ -202,7 +199,6 @@ object WorldSqlTests extends TestSuite {
         City[Id](2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
         City[Id](3, "Herat", "AFG", district = "Herat", population = 186800)
       )
-
       // Notice that `db.run` returns instances of type `City[Id]`. `Id` is `scalasql.Id`,
       // short for the "Identity" type, representing a `City` object containing normal Scala
       // values. The `[Id]` type parameter must be provided explicitly whenever creating,
@@ -226,7 +222,6 @@ object WorldSqlTests extends TestSuite {
         // To avoid loading the entire database table into your Scala program, you can
         // add filters to the query before running it. Below, we add a filter to only
         // query the city whose name is "Singapore"
-
         val query = City.select.filter(_.name === "Singapore").single
 
         db.toSqlQuery(query) ==> """
@@ -241,7 +236,6 @@ object WorldSqlTests extends TestSuite {
         """
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
-
         // Note that we use `===` rather than `==` for the equality comparison. The
         // function literal passed to `.filter` is given a `City[Expr]` as its parameter,
         // representing a `City` that is part of the database query, in contrast to the
@@ -265,7 +259,6 @@ object WorldSqlTests extends TestSuite {
         // You can also use `.head` rather than `.single`, for cases where you
         // want a single result row and want additional result rows to be ignored
         // rather than causing an exception. `.head` is short for `.take(1).single`
-
         val query = City.select.filter(_.name === "Singapore").head
 
         db.toSqlQuery(query) ==> """
@@ -365,7 +358,6 @@ object WorldSqlTests extends TestSuite {
         // `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
         // already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
         // a `Expr[Int]` automatically
-
         def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
@@ -584,7 +576,6 @@ object WorldSqlTests extends TestSuite {
       // You can use `.cast` to generate SQL `CAST` calls between data types. Below,
       // we use it to query Singapore's life expectancy and convert it from a `Double`
       // precision floating point number to an `Int`:
-
       val query = Country.select
         .filter(_.name === "Singapore")
         .map(_.lifeExpectancy.cast[Int])
@@ -597,7 +588,6 @@ object WorldSqlTests extends TestSuite {
       """
 
       db.run(query) ==> 80
-
       // You can `.cast` to any type with a `TypeMapper[T]` defined, which is the
       // same set of types you can lift into queries.
       //
@@ -667,7 +657,6 @@ object WorldSqlTests extends TestSuite {
         """
 
         db.run(query) ==> 0
-
         // Whereas using Scala equality with `===` translates into a more
         // verbose `IS NOT DISTINCT FROM`
         // expression, returning `true` when both left-hand and right-hand values
