@@ -69,6 +69,9 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
   * [Expressions Ops](docs/reference.md#exprops), covering the different
     types of expresisons and the different operations you can do on each one
+  * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
+    [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:
+    operations that are specific to each database that may not be generally applicable
 
 * [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
   is built the way it is, what tradeoffs it makes, and how it compares to other 
