@@ -370,7 +370,6 @@ object WorldSqlTests extends TestSuite {
 
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
-
         // Lifting of Scala values into your ScalaSql queries is dependent on there being
         // an implicit `scalasql.TypeMapper[T]` in scope. By default, the following mappings
         // are provided:
