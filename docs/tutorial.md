@@ -180,7 +180,7 @@ etc., each returning an `Expr[T]` for the respective type `T`. Each type of
 `Expr[T]` has a set of operations representing what operations the database
 supports on that type of expression.
 
-You can check out the [ScalaSql Reference](reference.md) if you want a
+You can check out the [ScalaSql Reference](reference.md#exprops) if you want a
 comprehensive list of built-in operations on various `Expr[T]` types.
 
 
