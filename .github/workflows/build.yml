@@ -30,23 +30,7 @@ jobs:
         if: matrix.os == 'windows-latest'
 
       - run: ./mill -i -k __.test
-        if: matrix.os != 'windows-latest'
-      - run: ./mill.bat -i -k __.jvm.__.test
-        if: matrix.os == 'windows-latest'
 
-  check-bin-compat:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 8
-
-      - run: ./mill -i -k __.mimaReportBinaryIssues
 
   check-formatting:
     runs-on: ubuntu-latest

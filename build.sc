@@ -1,11 +1,32 @@
 import $file.buildutil.generateDocs
-import mill._, scalalib._
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
+import $ivy.`com.github.lolgab::mill-mima::0.1.0`
+import de.tobiasroeser.mill.vcs.version.VcsVersion
+
+import mill._, scalalib._, publish._
 
 val scalaVersions = Seq("2.13.12"/*, "3.3.1"*/)
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends CrossScalaModule{
+trait ScalaSql extends CrossScalaModule with PublishModule{
   def scalaVersion = crossScalaVersion
+
+  def publishVersion = VcsVersion.vcsState().format()
+
+  def pomSettings = PomSettings(
+    description = artifactName(),
+    organization = "com.lihaoyi",
+    url = "https://github.com/com-lihaoyi/os-lib",
+    licenses = Seq(License.MIT),
+    versionControl = VersionControl.github(
+      owner = "com-lihaoyi",
+      repo = "os-lib"
+    ),
+    developers = Seq(
+      Developer("lihaoyi", "Li Haoyi", "https://github.com/lihaoyi")
+    )
+  )
+
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode:0.3.1",
     ivy"com.lihaoyi::upickle-implicits:3.1.3",
