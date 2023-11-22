@@ -75,9 +75,9 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   * [Join](docs/reference.md#join), covering different kinds of joins
   * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
     covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
-  * [Expressions Ops](docs/reference.md#exprops), covering the different
+  * [Expression Ops](docs/reference.md#exprops), covering the different
     types of `Expr[T]` values and the different operations you can do on each one
-  * [Options Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
+  * [Option Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
   * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
     [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:
     operations that are specific to each database that may not be generally applicable
