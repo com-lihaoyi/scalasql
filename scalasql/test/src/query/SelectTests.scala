@@ -434,10 +434,10 @@ trait SelectTests extends ScalaSqlSuite {
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     )
 
-
     test("nestedTuples") - checker(
       query = Text {
-        Buyer.select.join(ShippingInfo)(_.id === _.buyerId)
+        Buyer.select
+          .join(ShippingInfo)(_.id === _.buyerId)
           .sortBy(_._1.id)
           .map { case (b, s) => (b.id, (b, (s.id, s))) }
       },
@@ -477,7 +477,6 @@ trait SelectTests extends ScalaSqlSuite {
             (3, ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
           )
         )
-
       ),
       docs = """
         Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
