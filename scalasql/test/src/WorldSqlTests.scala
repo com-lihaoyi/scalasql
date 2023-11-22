@@ -305,25 +305,6 @@ object WorldSqlTests extends TestSuite {
         // -DOCS
       }
 
-      test("values") {
-
-        // +DOCS
-        // You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
-        // query using `Values(...)`, which translates into a SQL `VALUES` clause
-        val query = City.select
-          .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
-          .map(_.countryCode)
-
-        db.toSqlQuery(query) ==> """
-        SELECT city0.countrycode AS res
-        FROM city city0
-        WHERE (city0.name IN (VALUES (?), (?), (?)))
-        """
-
-        db.run(query) ==> Seq("IDN", "MYS", "SGP")
-        // -DOCS
-      }
-
       test("multiple") {
         test("combined") {
           // +DOCS
@@ -428,6 +409,24 @@ object WorldSqlTests extends TestSuite {
 
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        // -DOCS
+      }
+
+      test("values") {
+        // +DOCS
+        // You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
+        // query using `Values(...)`, which translates into a SQL `VALUES` clause
+        val query = City.select
+          .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+          .map(_.countryCode)
+
+        db.toSqlQuery(query) ==> """
+        SELECT city0.countrycode AS res
+        FROM city city0
+        WHERE (city0.name IN (VALUES (?), (?), (?)))
+        """
+
+        db.run(query) ==> Seq("IDN", "MYS", "SGP")
         // -DOCS
       }
     }
