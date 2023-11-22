@@ -120,7 +120,8 @@ class CompoundSelect[Q, R](
 
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
-  protected def selectRenderer(prevContext: Context) = new CompoundSelect.Renderer(this, prevContext)
+  protected def selectRenderer(prevContext: Context) =
+    new CompoundSelect.Renderer(this, prevContext)
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {

@@ -304,36 +304,20 @@ WHERE (city0.id = ?)
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
 ```
 
-You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
-query using `Values(...)`, which translates into a SQL `VALUES` clause
-```scala
-val query = City.select
-  .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
-  .map(_.countryCode)
-
-db.toSqlQuery(query) ==> """
-SELECT city0.countrycode AS res
-FROM city city0
-WHERE (city0.name IN (VALUES (?), (?), (?)))
-"""
-
-db.run(query) ==> Seq("IDN", "MYS", "SGP")
-```
-
 You can filter on multiple things, e.g. here we look for cities in China
 with population more than 5 million:
 ```scala
 val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
 db.toSqlQuery(query) ==> """
-  SELECT
-    city0.id AS res__id,
-    city0.name AS res__name,
-    city0.countrycode AS res__countrycode,
-    city0.district AS res__district,
-    city0.population AS res__population
-  FROM city city0
-  WHERE ((city0.population > ?) AND (city0.countrycode = ?))
-  """
+SELECT
+  city0.id AS res__id,
+  city0.name AS res__name,
+  city0.countrycode AS res__countrycode,
+  city0.district AS res__district,
+  city0.population AS res__population
+FROM city city0
+WHERE ((city0.population > ?) AND (city0.countrycode = ?))
+"""
 
 db.run(query).take(2) ==> Seq(
   City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -417,6 +401,22 @@ assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
 assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
 ```
 
+You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
+query using `Values(...)`, which translates into a SQL `VALUES` clause
+```scala
+val query = City.select
+  .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+  .map(_.countryCode)
+
+db.toSqlQuery(query) ==> """
+SELECT city0.countrycode AS res
+FROM city city0
+WHERE (city0.name IN (VALUES (?), (?), (?)))
+"""
+
+db.run(query) ==> Seq("IDN", "MYS", "SGP")
+```
+
 ### Mapping
 
 You can use `.map` to select exactly what values you want to return from a query.
@@ -425,11 +425,9 @@ each country, without all the other metadata:
 ```scala
 val query = Country.select.map(c => (c.name, c.continent))
 db.toSqlQuery(query) ==> """
-  SELECT
-    country0.name AS res__0,
-    country0.continent AS res__1
-  FROM country country0
-  """
+SELECT country0.name AS res__0, country0.continent AS res__1
+FROM country country0
+"""
 
 db.run(query).take(5) ==> Seq(
   ("Afghanistan", "Asia"),
@@ -451,17 +449,17 @@ val query = City.select
   .single
 
 db.toSqlQuery(query) ==> """
-  SELECT
-    city0.id AS res__0__id,
-    city0.name AS res__0__name,
-    city0.countrycode AS res__0__countrycode,
-    city0.district AS res__0__district,
-    city0.population AS res__0__population,
-    UPPER(city0.name) AS res__1,
-    (city0.population / ?) AS res__2
-  FROM city city0
-  WHERE (city0.name = ?)
-  """
+SELECT
+  city0.id AS res__0__id,
+  city0.name AS res__0__name,
+  city0.countrycode AS res__0__countrycode,
+  city0.district AS res__0__district,
+  city0.population AS res__0__population,
+  UPPER(city0.name) AS res__1,
+  (city0.population / ?) AS res__2
+FROM city city0
+WHERE (city0.name = ?)
+"""
 
 db.run(query) ==>
   (
@@ -533,11 +531,11 @@ val query = City.select
   .map(c => (c.name, c.population))
 
 db.toSqlQuery(query) ==> """
-  SELECT city0.name AS res__0, city0.population AS res__1
-  FROM city city0
-  ORDER BY res__1 DESC
-  LIMIT 5 OFFSET 5
-  """
+SELECT city0.name AS res__0, city0.population AS res__1
+FROM city city0
+ORDER BY res__1 DESC
+LIMIT 5 OFFSET 5
+"""
 
 db.run(query) ==> Seq(
   ("Karachi", 9269265),
@@ -566,9 +564,9 @@ val query = Country.select
   .single
 
 db.toSqlQuery(query) ==> """
-  SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
-  FROM country country0
-  WHERE (country0.name = ?)
+SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
+FROM country country0
+WHERE (country0.name = ?)
 """
 
 db.run(query) ==> 80
@@ -727,10 +725,10 @@ val query = for {
 } yield city.name
 
 db.toSqlQuery(query) ==> """
-  SELECT city0.name AS res
-  FROM city city0
-  JOIN country country1 ON (city0.countrycode = country1.code)
-  WHERE (country1.name = ?)
+SELECT city0.name AS res
+FROM city city0
+JOIN country country1 ON (city0.countrycode = country1.code)
+WHERE (country1.name = ?)
 """
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -746,18 +744,18 @@ val query = CountryLanguage.select
   .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
-  SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
-  FROM countrylanguage countrylanguage0
-  JOIN (SELECT
-      country0.code AS res__code,
-      country0.name AS res__name,
-      country0.population AS res__population
-    FROM country country0
-    ORDER BY res__population DESC
-    LIMIT 2) subquery1
-  ON (countrylanguage0.countrycode = subquery1.res__code)
-  ORDER BY res__0
-  """
+SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
+FROM countrylanguage countrylanguage0
+JOIN (SELECT
+    country1.code AS res__code,
+    country1.name AS res__name,
+    country1.population AS res__population
+  FROM country country1
+  ORDER BY res__population DESC
+  LIMIT 2) subquery1
+ON (countrylanguage0.countrycode = subquery1.res__code)
+ORDER BY res__0
+"""
 
 db.run(query).take(5) ==> Seq(
   ("Asami", "India"),
@@ -782,18 +780,18 @@ val query = Country.select
   .sortBy(_._1)
 
 db.toSqlQuery(query) ==> """
-  SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
-  FROM (SELECT
-      country0.code AS res__code,
-      country0.name AS res__name,
-      country0.population AS res__population
-    FROM country country0
-    ORDER BY res__population DESC
-    LIMIT 2) subquery0
-  JOIN countrylanguage countrylanguage1
-  ON (subquery0.res__code = countrylanguage1.countrycode)
-  ORDER BY res__0
-  """
+SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
+FROM (SELECT
+    country0.code AS res__code,
+    country0.name AS res__name,
+    country0.population AS res__population
+  FROM country country0
+  ORDER BY res__population DESC
+  LIMIT 2) subquery0
+JOIN countrylanguage countrylanguage1
+ON (subquery0.res__code = countrylanguage1.countrycode)
+ORDER BY res__0
+"""
 
 db.run(query).take(5) ==> List(
   ("Asami", "India"),
@@ -820,12 +818,12 @@ val query = City.select
   .take(10)
 
 db.toSqlQuery(query) ==> """
- SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
- FROM city city0
- JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
- GROUP BY countrylanguage1.language
- ORDER BY res__1 DESC
- LIMIT 10
+SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
+FROM city city0
+JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
+GROUP BY countrylanguage1.language
+ORDER BY res__1 DESC
+LIMIT 10
 """
 
 db.run(query) ==> Seq(
@@ -916,10 +914,10 @@ FROM (SELECT
   LIMIT 3) subquery0
 JOIN city city1 ON (subquery0.res__code = city1.countrycode)
 WHERE (city1.id = (SELECT
-    city0.id AS res
-    FROM city city0
-    WHERE (city0.countrycode = subquery0.res__code)
-    ORDER BY city0.population DESC
+    city2.id AS res
+    FROM city city2
+    WHERE (city2.countrycode = subquery0.res__code)
+    ORDER BY city2.population DESC
     LIMIT 1))
 """
 
@@ -961,11 +959,11 @@ val query = City.insert.batched(_.name, _.countryCode, _.district, _.population)
   ("Jurong", "SGP", "West", 313373)
 )
 db.toSqlQuery(query) ==> """
-  INSERT INTO city (name, countrycode, district, population) VALUES
-  (?, ?, ?, ?),
-  (?, ?, ?, ?),
-  (?, ?, ?, ?)
-  """
+INSERT INTO city (name, countrycode, district, population) VALUES
+(?, ?, ?, ?),
+(?, ?, ?, ?),
+(?, ?, ?, ?)
+"""
 
 db.run(query)
 
@@ -988,11 +986,11 @@ val query = City.insert.select(
 )
 
 db.toSqlQuery(query) ==> """
-  INSERT INTO city (name, countrycode, district, population)
-  SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
-  FROM city city0
-  WHERE (city0.name = ?)
-  """
+INSERT INTO city (name, countrycode, district, population)
+SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
+FROM city city0
+WHERE (city0.name = ?)
+"""
 
 db.run(query)
 
@@ -1107,7 +1105,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-## Savepoints
+### Savepoints
 Most database support Savepoints, which are sort of "nested transactions"
 allowing you to roll back portions of a transaction without rolling back
 everything.
@@ -1149,7 +1147,7 @@ dbClient.transaction { implicit db =>
 }
 ```
 
-### Custom Expressions
+## Custom Expressions
 
 You can define custom SQL expressions via the `Expr` constructor. This is
 useful for extending ScalaSql when you need to use some operator or syntax

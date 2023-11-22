@@ -39,7 +39,6 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
     )
   }
 
-
   /**
    * Version of `crossJoinLateral` meant for use in `for`-comprehensions
    */

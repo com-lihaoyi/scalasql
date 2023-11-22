@@ -5,7 +5,7 @@ import scalasql.{Column, Queryable, query}
 /**
  * A SQL `INSERT` query
  */
-trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R]{
+trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R] {
   def table: TableRef
   def qr: Queryable[Q, R]
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2]
@@ -17,7 +17,8 @@ trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R]{
 
 object Insert {
   class Impl[Q, R](val expr: Q, val table: TableRef)(implicit val qr: Queryable[Q, R])
-      extends Insert[Q, R] with scalasql.generated.InsertImpl[Q, R]{
+      extends Insert[Q, R]
+      with scalasql.generated.InsertImpl[Q, R] {
 
     def newInsertSelect[Q, C, R, R2](
         insert: Insert[Q, R],

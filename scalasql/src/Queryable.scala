@@ -39,7 +39,7 @@ object Queryable {
     def singleRow(q: Q): Boolean = true
 
   }
-  object Row extends scalasql.generated.QueryableRow{
+  object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R](
         val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
         val toTypeMappers0: Q => Seq[Seq[TypeMapper[_]]],

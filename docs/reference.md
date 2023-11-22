@@ -769,9 +769,9 @@ Product.select.map(p =>
     ```sql
     SELECT
       product0.name AS res__0,
-      (SELECT purchase0.total AS res
-        FROM purchase purchase0
-        WHERE (purchase0.product_id = product0.id)
+      (SELECT purchase1.total AS res
+        FROM purchase purchase1
+        WHERE (purchase1.product_id = product0.id)
         ORDER BY res DESC
         LIMIT 1) AS res__1
     FROM product product0
@@ -1014,7 +1014,7 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
     ```sql
     SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
-    WHERE (buyer0.id IN (SELECT shipping_info0.buyer_id AS res FROM shipping_info shipping_info0))
+    WHERE (buyer0.id IN (SELECT shipping_info1.buyer_id AS res FROM shipping_info shipping_info1))
     ```
 
 
@@ -1044,9 +1044,9 @@ Buyer.select
     SELECT
       buyer0.name AS res__0,
       (EXISTS (SELECT
-        shipping_info0.id AS res
-        FROM shipping_info shipping_info0
-        WHERE (shipping_info0.buyer_id = buyer0.id))) AS res__1
+        shipping_info1.id AS res
+        FROM shipping_info shipping_info1
+        WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
     FROM buyer buyer0
     ```
 
@@ -1074,9 +1074,9 @@ Buyer.select
     SELECT
       buyer0.name AS res__0,
       (NOT EXISTS (SELECT
-        shipping_info0.id AS res
-        FROM shipping_info shipping_info0
-        WHERE (shipping_info0.buyer_id = buyer0.id))) AS res__1
+        shipping_info1.id AS res
+        FROM shipping_info shipping_info1
+        WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
     FROM buyer buyer0
     ```
 
@@ -1951,10 +1951,10 @@ for {
     FROM buyer buyer0
     JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
     CROSS JOIN (SELECT
-        purchase0.shipping_info_id AS res__0__shipping_info_id,
-        product1.name AS res__1__name
-      FROM purchase purchase0
-      JOIN product product1 ON (purchase0.product_id = product1.id)) subquery2
+        purchase2.shipping_info_id AS res__0__shipping_info_id,
+        product3.name AS res__1__name
+      FROM purchase purchase2
+      JOIN product product3 ON (purchase2.product_id = product3.id)) subquery2
     WHERE (shipping_info1.id = subquery2.res__0__shipping_info_id)
     ```
 
@@ -2048,10 +2048,10 @@ for {
       FROM buyer buyer0
       GROUP BY buyer0.name) subquery0
     CROSS JOIN (SELECT
-        shipping_info0.id AS res__0,
-        MIN(shipping_info0.shipping_date) AS res__1
-      FROM shipping_info shipping_info0
-      GROUP BY shipping_info0.id) subquery1
+        shipping_info1.id AS res__0,
+        MIN(shipping_info1.shipping_date) AS res__1
+      FROM shipping_info shipping_info1
+      GROUP BY shipping_info1.id) subquery1
     ```
 
 
@@ -2097,9 +2097,9 @@ for {
       ORDER BY res__id ASC
       LIMIT 1) subquery0
     CROSS JOIN (SELECT
-        shipping_info0.id AS res__id,
-        shipping_info0.shipping_date AS res__shipping_date
-      FROM shipping_info shipping_info0
+        shipping_info1.id AS res__id,
+        shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
       ORDER BY res__id ASC
       LIMIT 1) subquery1
     ```
@@ -2337,7 +2337,7 @@ Buyer.insert.select(
     ```sql
     INSERT INTO buyer (id, name, date_of_birth)
     SELECT
-      (buyer0.id + (SELECT MAX(buyer0.id) AS res FROM buyer buyer0)) AS res__id,
+      (buyer0.id + (SELECT MAX(buyer1.id) AS res FROM buyer buyer1)) AS res__id,
       buyer0.name AS res__name,
       buyer0.date_of_birth AS res__date_of_birth
     FROM buyer buyer0
@@ -3619,7 +3619,7 @@ Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
 *
     ```sql
     UPDATE product
-    SET price = (SELECT MAX(product0.price) AS res FROM product product0)
+    SET price = (SELECT MAX(product1.price) AS res FROM product product1)
     ```
 
 
@@ -3670,7 +3670,7 @@ Product.update(_.price `=` Product.select.maxBy(_.price)).set(_.price := 0)
     ```sql
     UPDATE product
     SET price = ?
-    WHERE (product.price = (SELECT MAX(product0.price) AS res FROM product product0))
+    WHERE (product.price = (SELECT MAX(product1.price) AS res FROM product product1))
     ```
 
 
@@ -4447,6 +4447,251 @@ for {
 
 
 
+## LateralJoin
+`JOIN LATERAL`, for the databases that support it
+### LateralJoin.crossJoinLateral
+
+
+
+```scala
+Buyer.select
+  .crossJoinLateral(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })
+  .map { case (b, s) => (b.name, s.shippingDate) }
+```
+
+
+*
+    ```sql
+    SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+    FROM buyer buyer0
+    CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", LocalDate.parse("2012-04-05")),
+      ("叉烧包", LocalDate.parse("2010-02-03")),
+      ("叉烧包", LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### LateralJoin.crossJoinLateralFor
+
+
+
+```scala
+for {
+  b <- Buyer.select
+  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.crossJoinLateral()
+} yield (b.name, s.shippingDate)
+```
+
+
+*
+    ```sql
+    SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+    FROM buyer buyer0
+    CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", LocalDate.parse("2012-04-05")),
+      ("叉烧包", LocalDate.parse("2010-02-03")),
+      ("叉烧包", LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### LateralJoin.joinLateral
+
+
+
+```scala
+Buyer.select
+  .joinLateral(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })((_, _) => true)
+  .map { case (b, s) => (b.name, s.shippingDate) }
+```
+
+
+*
+    ```sql
+    SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+    FROM buyer buyer0
+    JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
+      ON ?
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", LocalDate.parse("2012-04-05")),
+      ("叉烧包", LocalDate.parse("2010-02-03")),
+      ("叉烧包", LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### LateralJoin.joinLateralFor
+
+
+
+```scala
+for {
+  b <- Buyer.select
+  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Expr(true))
+} yield (b.name, s.shippingDate)
+```
+
+
+*
+    ```sql
+    SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+    FROM buyer buyer0
+    JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
+    ON ?
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", LocalDate.parse("2012-04-05")),
+      ("叉烧包", LocalDate.parse("2010-02-03")),
+      ("叉烧包", LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### LateralJoin.leftJoin
+
+ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
+`.leftJoin`/`.rightJoin`/`.outerJoin` methods
+
+```scala
+Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
+  Expr(true)
+)
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      subquery1.res__id AS res__1__id,
+      subquery1.res__buyer_id AS res__1__buyer_id,
+      subquery1.res__shipping_date AS res__1__shipping_date
+    FROM buyer buyer0
+    LEFT JOIN LATERAL (SELECT
+        shipping_info1.id AS res__id,
+        shipping_info1.buyer_id AS res__buyer_id,
+        shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1 ON ?
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      (
+        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+      ),
+      (
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+      ),
+      (
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+      ),
+      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+    )
+    ```
+
+
+
+### LateralJoin.leftJoinFor
+
+ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
+`.leftJoin`/`.rightJoin`/`.outerJoin` methods
+
+```scala
+for {
+  b <- Buyer.select
+  s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Expr(true))
+} yield (b, s)
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.id AS res__0__id,
+      buyer0.name AS res__0__name,
+      buyer0.date_of_birth AS res__0__date_of_birth,
+      subquery1.res__id AS res__1__id,
+      subquery1.res__buyer_id AS res__1__buyer_id,
+      subquery1.res__shipping_date AS res__1__shipping_date
+    FROM buyer buyer0
+    LEFT JOIN LATERAL (SELECT
+        shipping_info1.id AS res__id,
+        shipping_info1.buyer_id AS res__buyer_id,
+        shipping_info1.shipping_date AS res__shipping_date
+      FROM shipping_info shipping_info1
+      WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1 ON ?
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      (
+        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+      ),
+      (
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+      ),
+      (
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+      ),
+      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+    )
+    ```
+
+
+
 ## SubQuery
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
@@ -4465,8 +4710,8 @@ Purchase.select
     ```sql
     SELECT purchase0.total AS res
     FROM purchase purchase0
-    JOIN (SELECT product0.id AS res__id, product0.price AS res__price
-      FROM product product0
+    JOIN (SELECT product1.id AS res__id, product1.price AS res__price
+      FROM product product1
       ORDER BY res__price DESC
       LIMIT 1) subquery1
     ON (purchase0.product_id = subquery1.res__id)
@@ -4543,9 +4788,9 @@ Product.select
       ORDER BY res__price DESC
       LIMIT 3) subquery0
     JOIN (SELECT
-        purchase0.product_id AS res__product_id,
-        purchase0.count AS res__count
-      FROM purchase purchase0
+        purchase1.product_id AS res__product_id,
+        purchase1.count AS res__count
+      FROM purchase purchase1
       ORDER BY res__count DESC
       LIMIT 3) subquery1
     ON (subquery0.res__id = subquery1.res__product_id)
@@ -4686,8 +4931,8 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
     FROM buyer buyer0
     WHERE ((SELECT
         COUNT(1) AS res
-        FROM shipping_info shipping_info0
-        WHERE (buyer0.id = shipping_info0.buyer_id)) = ?)
+        FROM shipping_info shipping_info1
+        WHERE (buyer0.id = shipping_info1.buyer_id)) = ?)
     ```
 
 
@@ -4716,8 +4961,8 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
       buyer0.name AS res__0__name,
       buyer0.date_of_birth AS res__0__date_of_birth,
       (SELECT COUNT(1) AS res
-        FROM shipping_info shipping_info0
-        WHERE (buyer0.id = shipping_info0.buyer_id)) AS res__1
+        FROM shipping_info shipping_info1
+        WHERE (buyer0.id = shipping_info1.buyer_id)) AS res__1
     FROM buyer buyer0
     ```
 
@@ -4751,8 +4996,8 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
       buyer0.date_of_birth AS res__0__date_of_birth,
       ((SELECT
         COUNT(1) AS res
-        FROM shipping_info shipping_info0
-        WHERE (buyer0.id = shipping_info0.buyer_id)) = ?) AS res__1
+        FROM shipping_info shipping_info1
+        WHERE (buyer0.id = shipping_info1.buyer_id)) = ?) AS res__1
     FROM buyer buyer0
     ```
 
@@ -4960,17 +5205,17 @@ Buyer.select.map { buyer =>
       buyer0.name AS res__0,
       (SELECT
         (SELECT
-          (SELECT product0.price AS res
-          FROM product product0
-          WHERE (product0.id = purchase0.product_id)
+          (SELECT product3.price AS res
+          FROM product product3
+          WHERE (product3.id = purchase2.product_id)
           ORDER BY res DESC
           LIMIT 1) AS res
-        FROM purchase purchase0
-        WHERE (purchase0.shipping_info_id = shipping_info0.id)
+        FROM purchase purchase2
+        WHERE (purchase2.shipping_info_id = shipping_info1.id)
         ORDER BY res DESC
         LIMIT 1) AS res
-      FROM shipping_info shipping_info0
-      WHERE (shipping_info0.buyer_id = buyer0.id)
+      FROM shipping_info shipping_info1
+      WHERE (shipping_info1.buyer_id = buyer0.id)
       ORDER BY res DESC
       LIMIT 1) AS res__1
     FROM buyer buyer0
@@ -6329,6 +6574,52 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 *
     ```scala
     Option.empty[Int]
+    ```
+
+
+
+### ExprSeqOps.mkString.simple
+
+
+
+```scala
+Buyer.select.map(_.name).mkString()
+```
+
+
+*
+    ```sql
+    SELECT STRING_AGG(buyer0.name || '', '') AS res FROM buyer buyer0
+    ```
+
+
+
+*
+    ```scala
+    "James Bond叉烧包Li Haoyi"
+    ```
+
+
+
+### ExprSeqOps.mkString.sep
+
+
+
+```scala
+Buyer.select.map(_.name).mkString(", ")
+```
+
+
+*
+    ```sql
+    SELECT STRING_AGG(buyer0.name || '', ?) AS res FROM buyer buyer0
+    ```
+
+
+
+*
+    ```scala
+    "James Bond, 叉烧包, Li Haoyi"
     ```
 
 
