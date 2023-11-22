@@ -7008,7 +7008,7 @@ NonRoundTripTypes.select
 
 
 ## Optional
-Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T] in Scala
+Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala
 ### Optional
 
 
