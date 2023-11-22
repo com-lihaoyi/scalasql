@@ -21,19 +21,19 @@ trait ScalaSql extends CrossScalaModule{
   def generatedSources: T[Seq[PathRef]] = T{
     def defs(isImpl: Boolean) = {
       for(i <- Range(2, 22)) yield {
-        val args = for(j <- Range.inclusive(1, i)) yield s"f$j: Q => Column.ColumnExpr[T$j]"
-        val items = for(j <- Range.inclusive(1, i)) yield s"Expr[T$j]"
+        def csep(f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
+        
         val impl =
           if (!isImpl) ""
           else s"""= newInsertValues(
                  |        this,
-                 |        columns = Seq(${Range.inclusive(1, i).map(j => s"f$j(expr)").mkString(", ")}),
-                 |        valuesLists = items.map(t => Seq(${Range.inclusive(1, i).map(j => s"t._$j").mkString(", ")}))
+                 |        columns = Seq(${csep(j => s"f$j(expr)")}),
+                 |        valuesLists = items.map(t => Seq(${csep(j => s"t._$j")}))
                  |      )
                  |
                  |""".stripMargin
-        s"""def batched[${Range.inclusive(1, i).map(j => s"T$j").mkString(", ")}](${args.mkString(", ")})(
-          |    items: (${items.mkString(", ")})*
+        s"""def batched[${csep(j => s"T$j")}](${csep(j => s"f$j: Q => Column.ColumnExpr[T$j]")})(
+          |    items: (${csep(j => s"Expr[T$j]")})*
           |)(implicit qr: Queryable[Q, R]): scalasql.query.InsertValues[Q, R] $impl""".stripMargin
       }
     }
