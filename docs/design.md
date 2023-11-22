@@ -19,7 +19,7 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
          Q |                                       | R
            |                                       |
            v                                       |
- Queryable#{walk,toSqlQuery}           Queryable#valueReader
+ Queryable#{walk,toSqlStr}           Queryable#valueReader
            |    |                            ^     ^
            |    |                            |     |
     SqlStr |    +------Seq[TypeMapper]-------+     | ResultSet
