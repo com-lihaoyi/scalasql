@@ -395,7 +395,7 @@ dbClient.transaction(_.run(Purchase.select.size)) ==> 1
 
 
 ## Select
-Basic `SELECT`` operations: map, filter, join, etc.
+Basic `SELECT` operations: map, filter, join, etc.
 ### Select.constant
 
 The most simple thing you can query in the database is an `Expr`. These do not need
@@ -4278,7 +4278,7 @@ Buyer.insert
 
 
 ## Values
-Basic `SELECT`` operations: map, filter, join, etc.
+Basic `VALUES` operations
 ### Values.basic
 
 You can use `Values` to generate a SQL `VALUES` clause

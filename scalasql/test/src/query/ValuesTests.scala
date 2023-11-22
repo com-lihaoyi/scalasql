@@ -6,7 +6,7 @@ import utest._
 import utils.ScalaSqlSuite
 
 trait ValuesTests extends ScalaSqlSuite {
-  def description = "Basic `SELECT`` operations: map, filter, join, etc."
+  def description = "Basic `VALUES` operations"
 
   def tests = Tests {
     test("basic") - checker(
