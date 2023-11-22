@@ -832,7 +832,6 @@ object WorldSqlTests extends TestSuite {
       }
     }
 
-
     test("union") {
       // +DOCS
       // ## Union/Except/Intersect
@@ -840,9 +839,13 @@ object WorldSqlTests extends TestSuite {
       // ScalaSql supports `.union`/`.unionAll`/`.except`/`.intersect` operations,
       // generating SQL `UNION`/`UNION ALL`/`EXCEPT`/`INTERSECT` clauses. These
       // also generate subqueries as necessary
-      val query =
+      val largestCountries =
+        Country.select.sortBy(_.name).sortBy(_.population).desc.take(2).map(_.name)
+
+      val smallestCountries =
         Country.select.sortBy(_.name).sortBy(_.population).asc.take(2).map(_.name)
-          .union(Country.select.sortBy(_.name).sortBy(_.population).desc.map(_.name).take(2))
+
+      val query = smallestCountries.union(largestCountries)
 
       db.toSqlQuery(query) ==> """
       SELECT subquery0.res AS res

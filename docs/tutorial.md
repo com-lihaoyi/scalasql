@@ -713,14 +713,16 @@ val query = for {
 } yield city.name
 
 db.toSqlQuery(query) ==> """
-SELECT city0.name AS res
-FROM city city0
-JOIN country country1 ON (city0.countrycode = country1.code)
-WHERE (country1.name = ?)
-"""
+LECT city0.name AS res
+OM city city0
+IN country country1 ON (city0.countrycode = country1.code)
+ERE (country1.name = ?)
+"
 
 db.run(query) ==> Seq("Schaan", "Vaduz")
 ```
+
+## Subqueries
 
 ScalaSql in general allows you to use SQL Subqueries anywhere you would use
 a table. e.g. you can pass a Subquery to `.join`, as we do in the below
@@ -788,6 +790,37 @@ db.run(query).take(5) ==> List(
   ("Dong", "China"),
   ("Gujarati", "India")
 )
+```
+
+## Union/Except/Intersect
+
+ScalaSql supports `.union`/`.unionAll`/`.except`/`.intersect` operations,
+generating SQL `UNION`/`UNION ALL`/`EXCEPT`/`INTERSECT` clauses. These
+also generate subqueries as necessary
+```scala
+val largestCountries =
+  Country.select.sortBy(_.name).sortBy(_.population).desc.take(2).map(_.name)
+
+val smallestCountries =
+  Country.select.sortBy(_.name).sortBy(_.population).asc.take(2).map(_.name)
+
+val query = smallestCountries.union(largestCountries)
+
+db.toSqlQuery(query) ==> """
+SELECT subquery0.res AS res
+FROM (SELECT country0.name AS res
+  FROM country country0
+  ORDER BY country0.population ASC, res
+  LIMIT 2) subquery0
+UNION
+SELECT subquery0.res AS res
+FROM (SELECT country0.name AS res
+  FROM country country0
+  ORDER BY country0.population DESC, res
+  LIMIT 2) subquery0
+"""
+
+db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
 ```
 
 
