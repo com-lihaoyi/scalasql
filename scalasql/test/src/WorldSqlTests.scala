@@ -1230,8 +1230,11 @@ object WorldSqlTests extends TestSuite {
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
       // using that in a query to return a string.
       import scalasql.renderer.SqlStr.SqlStringSyntax
+
       def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
+
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
+
       db.toSqlQuery(query) ==>
         "SELECT RAWTOHEX(city0.name) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
