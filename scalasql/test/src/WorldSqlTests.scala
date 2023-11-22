@@ -212,7 +212,7 @@ object WorldSqlTests extends TestSuite {
       // -DOCS
     }
 
-    test("queryFilter") {
+    test("filter") {
 
       test("singleName") {
 
@@ -536,7 +536,7 @@ object WorldSqlTests extends TestSuite {
       }
     }
 
-    test("sortLimitOffset") {
+    test("sortDropTake") {
       // +DOCS
       // ### Sort/Drop/Take
       //
@@ -732,34 +732,36 @@ object WorldSqlTests extends TestSuite {
         //
         // -DOCS
       }
-    }
 
-    test("flatMap") {
-      // +DOCS
-      // ScalaSql also supports performing `JOIN`s via Scala's `for`-comprehension syntax and `.join`.
-      // `for`-comprehensions also support `.crossJoin()`  for joins without an `ON` clause, and
-      // `.leftJoin()` returning `JoinNullable[T]` for joins where joined table may not have corresponding
-      // rows.
-      val query = for {
-        city <- City.select
-        country <- Country.join(city.countryCode === _.code)
-        if country.name === "Liechtenstein"
-      } yield city.name
+      test("flatMap") {
+        // +DOCS
+        // ScalaSql also supports performing `JOIN`s via Scala's `for`-comprehension syntax and `.join`.
+        // `for`-comprehensions also support `.crossJoin()`  for joins without an `ON` clause, and
+        // `.leftJoin()` returning `JoinNullable[T]` for joins where joined table may not have corresponding
+        // rows.
+        val query = for {
+          city <- City.select
+          country <- Country.join(city.countryCode === _.code)
+          if country.name === "Liechtenstein"
+        } yield city.name
 
-      db.toSqlQuery(query) ==> """
+        db.toSqlQuery(query) ==> """
       SELECT city0.name AS res
       FROM city city0
       JOIN country country1 ON (city0.countrycode = country1.code)
       WHERE (country1.name = ?)
       """
 
-      db.run(query) ==> Seq("Schaan", "Vaduz")
-      // -DOCS
+        db.run(query) ==> Seq("Schaan", "Vaduz")
+        // -DOCS
+      }
     }
 
     test("subquery") {
       test("join") {
         // +DOCS
+        // ## Subqueries
+        //
         // ScalaSql in general allows you to use SQL Subqueries anywhere you would use
         // a table. e.g. you can pass a Subquery to `.join`, as we do in the below
         // query to find language and the name of the top 2 most populous countries:
@@ -828,6 +830,35 @@ object WorldSqlTests extends TestSuite {
         )
         // -DOCS
       }
+    }
+
+
+    test("union") {
+      // +DOCS
+      // ## Union/Except/Intersect
+      //
+      // ScalaSql supports `.union`/`.unionAll`/`.except`/`.intersect` operations,
+      // generating SQL `UNION`/`UNION ALL`/`EXCEPT`/`INTERSECT` clauses
+      val query =
+        Country.select.sortBy(_.name).sortBy(_.population).asc.take(2).map(_.name)
+          .union(Country.select.sortBy(_.name).sortBy(_.population).desc.map(_.name).take(2))
+
+      db.toSqlQuery(query) ==> """
+      SELECT subquery0.res AS res
+      FROM (SELECT country0.name AS res
+        FROM country country0
+        ORDER BY country0.population ASC, res
+        LIMIT 2) subquery0
+      UNION
+      SELECT subquery0.res AS res
+      FROM (SELECT country0.name AS res
+        FROM country country0
+        ORDER BY country0.population DESC, res
+        LIMIT 2) subquery0
+      """
+
+      db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
+      // -DOCS
     }
 
     test("realistic") {
