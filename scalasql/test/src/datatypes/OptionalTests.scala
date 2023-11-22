@@ -89,7 +89,7 @@ trait OptionalTests extends ScalaSqlSuite {
         FROM opt_cols opt_cols0
         WHERE (opt_cols0.my_int IS NULL)""",
       value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4))),
-      docs ="""
+      docs = """
         `.isEmpty` on `Expr[Option[V]]` translates to a SQL
         `IS NULL` check
       """
