@@ -56,7 +56,19 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   comprehensively covering everything that ScalaSql supports, in a single easily searchable
   place. Ideal for looking up exactly methods/operators ScalaSql supports, looking up
   how ScalaSql code translates to SQL, or looking up SQL syntax to find out how to
-  express it using ScalaSql
+  express it using ScalaSql. Useful subsections include:
+  * [DbApi](docs/reference.md#dbapi), covering the main methods you can all
+    to execute queries
+  * [Transaction](docs/reference.md#transaction), covering usage of transactions
+    and savepoints
+  * [Select](docs/reference.md#select), [Insert](docs/reference.md#insert), 
+    [Update](docs/reference.md#update), [Delete](docs/reference.md#delete):
+    covering operations on the primary queries you are likely to use
+  * [Join](docs/reference.md#join), covering different kinds of joins
+  * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
+    covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
+  * [Expressions Ops](docs/reference.md#exprops), covering the different
+    types of expresisons and the different operations you can do on each one
 
 * [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
   is built the way it is, what tradeoffs it makes, and how it compares to other 
