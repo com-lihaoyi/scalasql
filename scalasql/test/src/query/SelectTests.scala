@@ -434,6 +434,59 @@ trait SelectTests extends ScalaSqlSuite {
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     )
 
+
+    test("nestedTuples") - checker(
+      query = Text {
+        Buyer.select.join(ShippingInfo)(_.id === _.buyerId)
+          .sortBy(_._1.id)
+          .map { case (b, s) => (b.id, (b, (s.id, s))) }
+      },
+      sql = """
+        SELECT
+          buyer0.id AS res__0,
+          buyer0.id AS res__1__0__id,
+          buyer0.name AS res__1__0__name,
+          buyer0.date_of_birth AS res__1__0__date_of_birth,
+          shipping_info1.id AS res__1__1__0,
+          shipping_info1.id AS res__1__1__1__id,
+          shipping_info1.buyer_id AS res__1__1__1__buyer_id,
+          shipping_info1.shipping_date AS res__1__1__1__shipping_date
+        FROM buyer buyer0
+        JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        ORDER BY res__1__0__id
+      """,
+      value = Seq[(Int, (Buyer[Id], (Int, ShippingInfo[Id])))](
+        (
+          1,
+          (
+            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
+            (2, ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+          )
+        ),
+        (
+          2,
+          (
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            (1, ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+          )
+        ),
+        (
+          2,
+          (
+            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            (3, ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+          )
+        )
+
+      ),
+      docs = """
+        Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
+        instances of `Foo[Expr]`, which will be de-serialized into nested tuples
+        of `T` and `Foo[Id]`s. The `AS` aliases assigned to each column will contain
+        the path of indices and field names used to populate the final returned values
+      """
+    )
+
     test("case") {
       test("when") - checker(
         query = Text {
