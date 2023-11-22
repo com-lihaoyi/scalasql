@@ -249,7 +249,7 @@ trait SelectTests extends ScalaSqlSuite {
             FROM purchase purchase1
             WHERE (purchase1.product_id = product0.id)
             ORDER BY res DESC
-            LIMIT 1) AS res__1
+            LIMIT ?) AS res__1
         FROM product product0""",
       value = Seq(
         ("Face Mask", 888.0),

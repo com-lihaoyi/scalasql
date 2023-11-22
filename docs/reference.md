@@ -773,7 +773,7 @@ Product.select.map(p =>
         FROM purchase purchase1
         WHERE (purchase1.product_id = product0.id)
         ORDER BY res DESC
-        LIMIT 1) AS res__1
+        LIMIT ?) AS res__1
     FROM product product0
     ```
 
@@ -2095,13 +2095,13 @@ for {
       (SELECT buyer0.id AS res__id, buyer0.name AS res__name
       FROM buyer buyer0
       ORDER BY res__id ASC
-      LIMIT 1) subquery0
+      LIMIT ?) subquery0
     CROSS JOIN (SELECT
         shipping_info1.id AS res__id,
         shipping_info1.shipping_date AS res__shipping_date
       FROM shipping_info shipping_info1
       ORDER BY res__id ASC
-      LIMIT 1) subquery1
+      LIMIT ?) subquery1
     ```
 
 
@@ -2896,7 +2896,7 @@ Product.select.sortBy(_.price).map(_.name).take(2)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?
     ```
 
 
@@ -2919,7 +2919,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ?
     ```
 
 
@@ -2944,7 +2944,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(3)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?
     ```
 
 
@@ -2967,7 +2967,7 @@ Product.select.sortBy(_.price).map(_.name).take(2).take(1)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?
     ```
 
 
@@ -2990,7 +2990,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?
     ```
 
 
@@ -3013,7 +3013,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?
     ```
 
 
@@ -3036,7 +3036,7 @@ Product.select.sortBy(_.price).map(_.name).drop(2).take(2)
 
 *
     ```sql
-    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2
+    SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?
     ```
 
 
@@ -3063,7 +3063,7 @@ Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct
     FROM (SELECT purchase0.shipping_info_id AS res
       FROM purchase purchase0
       ORDER BY purchase0.total DESC
-      LIMIT 3) subquery0
+      LIMIT ?) subquery0
     ```
 
 
@@ -3095,7 +3095,7 @@ Purchase.select.sortBy(_.total).desc.take(3).flatMap { p =>
     FROM (SELECT purchase0.product_id AS res__product_id, purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
-      LIMIT 3) subquery0
+      LIMIT ?) subquery0
     CROSS JOIN product product1
     WHERE (product1.id = subquery0.res__product_id)
     ```
@@ -3124,7 +3124,7 @@ Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total)
     FROM (SELECT purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
-      LIMIT 3) subquery0
+      LIMIT ?) subquery0
     ```
 
 
@@ -3155,7 +3155,7 @@ Purchase.select
     FROM (SELECT purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__total DESC
-      LIMIT 3) subquery0
+      LIMIT ?) subquery0
     ```
 
 
@@ -3380,8 +3380,8 @@ Product.select
     SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
     ORDER BY res
-    LIMIT 4
-    OFFSET 4
+    LIMIT ?
+    OFFSET ?
     ```
 
 
@@ -3520,7 +3520,7 @@ Buyer
         shipping_info0.shipping_date AS res__shipping_date
       FROM shipping_info shipping_info0
       ORDER BY res__id ASC
-      LIMIT 2) subquery0
+      LIMIT ?) subquery0
     WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
     ```
 
@@ -3573,7 +3573,7 @@ Buyer
         shipping_info0.buyer_id AS res__buyer_id
       FROM shipping_info shipping_info0
       ORDER BY res__id ASC
-      LIMIT 2) subquery0
+      LIMIT ?) subquery0
     WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
     ```
 
@@ -4713,7 +4713,7 @@ Purchase.select
     JOIN (SELECT product1.id AS res__id, product1.price AS res__price
       FROM product product1
       ORDER BY res__price DESC
-      LIMIT 1) subquery1
+      LIMIT ?) subquery1
     ON (purchase0.product_id = subquery1.res__id)
     ```
 
@@ -4747,7 +4747,7 @@ Product.select.sortBy(_.price).desc.take(1).join(Purchase)(_.id `=` _.productId)
     FROM (SELECT product0.id AS res__id, product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
-      LIMIT 1) subquery0
+      LIMIT ?) subquery0
     JOIN purchase purchase1 ON (subquery0.res__id = purchase1.product_id)
     ```
 
@@ -4786,13 +4786,13 @@ Product.select
         product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
-      LIMIT 3) subquery0
+      LIMIT ?) subquery0
     JOIN (SELECT
         purchase1.product_id AS res__product_id,
         purchase1.count AS res__count
       FROM purchase purchase1
       ORDER BY res__count DESC
-      LIMIT 3) subquery1
+      LIMIT ?) subquery1
     ON (subquery0.res__id = subquery1.res__product_id)
     ```
 
@@ -4824,9 +4824,9 @@ Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.na
         product0.price AS res__price
       FROM product product0
       ORDER BY res__price DESC
-      LIMIT 4) subquery0
+      LIMIT ?) subquery0
     ORDER BY subquery0.res__price ASC
-    LIMIT 2
+    LIMIT ?
     ```
 
 
@@ -4856,7 +4856,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
         purchase0.total AS res__total
       FROM purchase purchase0
       ORDER BY res__count
-      LIMIT 5) subquery0
+      LIMIT ?) subquery0
     GROUP BY subquery0.res__product_id
     ```
 
@@ -5032,7 +5032,7 @@ Buyer.select
     FROM (SELECT
         LOWER(buyer0.name) AS res
       FROM buyer buyer0
-      LIMIT 2) subquery0
+      LIMIT ?) subquery0
     UNION ALL
     SELECT LOWER(product0.kebab_case_name) AS res
     FROM product product0
@@ -5067,7 +5067,7 @@ Buyer.select
     FROM (SELECT
         LOWER(product0.kebab_case_name) AS res
       FROM product product0
-      LIMIT 2) subquery0
+      LIMIT ?) subquery0
     ```
 
 
@@ -5209,15 +5209,15 @@ Buyer.select.map { buyer =>
           FROM product product3
           WHERE (product3.id = purchase2.product_id)
           ORDER BY res DESC
-          LIMIT 1) AS res
+          LIMIT ?) AS res
         FROM purchase purchase2
         WHERE (purchase2.shipping_info_id = shipping_info1.id)
         ORDER BY res DESC
-        LIMIT 1) AS res
+        LIMIT ?) AS res
       FROM shipping_info shipping_info1
       WHERE (shipping_info1.buyer_id = buyer0.id)
       ORDER BY res DESC
-      LIMIT 1) AS res__1
+      LIMIT ?) AS res__1
     FROM buyer buyer0
     ```
 

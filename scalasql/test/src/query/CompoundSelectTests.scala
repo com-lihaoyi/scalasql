@@ -52,7 +52,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
         value = Seq("Cookie", "Socks"),
         docs = """
           ScalaSql also supports various combinations of `.take` and `.drop`, translating to SQL
@@ -62,15 +62,15 @@ trait CompoundSelectTests extends ScalaSqlSuite {
       test("sortOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2) },
         sqls = Seq(
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET 2",
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2147483647 OFFSET 2"
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?"
         ),
         value = Seq("Face Mask", "Skate Board", "Guitar", "Camera")
       )
 
       test("sortLimitTwiceHigher") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
         value = Seq("Cookie", "Socks"),
         docs = """
           Note that `.drop` and `.take` follow Scala collections' semantics, so calling e.g. `.take`
@@ -81,35 +81,35 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimitTwiceLower") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(1) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1",
+        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
         value = Seq("Cookie")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffsetTwice") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1) },
         sql =
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 4",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
         value = Seq("Guitar")
       )
 
       test("sortOffsetLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
         sql =
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 2 OFFSET 2",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).drop(1) },
         sql =
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT 1 OFFSET 1",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
         value = Seq("Socks")
       )
     }
@@ -121,7 +121,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         FROM (SELECT purchase0.shipping_info_id AS res
           FROM purchase purchase0
           ORDER BY purchase0.total DESC
-          LIMIT 3) subquery0
+          LIMIT ?) subquery0
       """,
       value = Seq(1, 2),
       normalize = (x: Seq[Int]) => x.sorted,
@@ -141,7 +141,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         FROM (SELECT purchase0.product_id AS res__product_id, purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
-          LIMIT 3) subquery0
+          LIMIT ?) subquery0
         CROSS JOIN product product1
         WHERE (product1.id = subquery0.res__product_id)
       """,
@@ -162,7 +162,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         FROM (SELECT purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
-          LIMIT 3) subquery0
+          LIMIT ?) subquery0
       """,
       value = 11788.0,
       normalize = (x: Double) => x.round.toDouble
@@ -181,7 +181,7 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         FROM (SELECT purchase0.total AS res__total
           FROM purchase purchase0
           ORDER BY res__total DESC
-          LIMIT 3) subquery0
+          LIMIT ?) subquery0
       """,
       value = (11788.0, 3929.0),
       normalize = (x: (Double, Double)) => (x._1.round.toDouble, x._2.round.toDouble)
@@ -337,8 +337,8 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         SELECT LOWER(product0.kebab_case_name) AS res
         FROM product product0
         ORDER BY res
-        LIMIT 4
-        OFFSET 4
+        LIMIT ?
+        OFFSET ?
       """,
       value = Seq("guitar", "james bond", "li haoyi", "skate board")
     )

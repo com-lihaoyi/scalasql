@@ -273,7 +273,7 @@ SELECT
   city0.population AS res__population
 FROM city city0
 WHERE (city0.name = ?)
-LIMIT 1
+LIMIT ?
 """
 
 db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -525,7 +525,7 @@ db.toSqlQuery(query) ==> """
 SELECT city0.name AS res__0, city0.population AS res__1
 FROM city city0
 ORDER BY res__1 DESC
-LIMIT 5 OFFSET 5
+LIMIT ? OFFSET ?
 """
 
 db.run(query) ==> Seq(
@@ -742,7 +742,7 @@ JOIN (SELECT
     country1.population AS res__population
   FROM country country1
   ORDER BY res__population DESC
-  LIMIT 2) subquery1
+  LIMIT ?) subquery1
 ON (countrylanguage0.countrycode = subquery1.res__code)
 ORDER BY res__0
 """
@@ -777,7 +777,7 @@ FROM (SELECT
     country0.population AS res__population
   FROM country country0
   ORDER BY res__population DESC
-  LIMIT 2) subquery0
+  LIMIT ?) subquery0
 JOIN countrylanguage countrylanguage1
 ON (subquery0.res__code = countrylanguage1.countrycode)
 ORDER BY res__0
@@ -790,6 +790,23 @@ db.run(query).take(5) ==> List(
   ("Dong", "China"),
   ("Gujarati", "India")
 )
+```
+
+You can force a subquery using `.subquery`, in cases where it would normally
+be combined into a single query. This can be useful in cases where the
+database query plan changes based on whether a subquery is present or not
+```scala
+val query = Country.select.sortBy(_.population).desc.subquery.take(2).map(_.name)
+
+db.toSqlQuery(query) ==> """
+SELECT subquery0.res__name AS res
+FROM (SELECT country0.name AS res__name, country0.population AS res__population
+  FROM country country0
+  ORDER BY res__population DESC) subquery0
+LIMIT ?
+"""
+
+db.run(query) ==> List("China", "India")
 ```
 
 ## Union/Except/Intersect
@@ -811,13 +828,13 @@ SELECT subquery0.res AS res
 FROM (SELECT country0.name AS res
   FROM country country0
   ORDER BY country0.population ASC, res
-  LIMIT 2) subquery0
+  LIMIT ?) subquery0
 UNION
 SELECT subquery0.res AS res
 FROM (SELECT country0.name AS res
   FROM country country0
   ORDER BY country0.population DESC, res
-  LIMIT 2) subquery0
+  LIMIT ?) subquery0
 """
 
 db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
@@ -844,7 +861,7 @@ FROM city city0
 JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
 GROUP BY countrylanguage1.language
 ORDER BY res__1 DESC
-LIMIT 10
+LIMIT ?
 """
 
 db.run(query) ==> Seq(
@@ -932,14 +949,14 @@ FROM (SELECT
     country0.population AS res__population
   FROM country country0
   ORDER BY res__population DESC
-  LIMIT 3) subquery0
+  LIMIT ?) subquery0
 JOIN city city1 ON (subquery0.res__code = city1.countrycode)
 WHERE (city1.id = (SELECT
     city2.id AS res
     FROM city city2
     WHERE (city2.countrycode = subquery0.res__code)
     ORDER BY city2.population DESC
-    LIMIT 1))
+    LIMIT ?))
 """
 
 db.run(query) ==> Seq(

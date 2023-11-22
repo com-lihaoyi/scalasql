@@ -6,7 +6,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 object CompoundSelectRendererForceLimit {
   def limitToSqlStr(limit: Option[Int], offset: Option[Int]) = {
     SqlStr.opt(limit.orElse(Option.when(offset.nonEmpty)(Int.MaxValue))) { limit =>
-      sql" LIMIT " + SqlStr.raw(limit.toString)
+      sql" LIMIT $limit"
     }
   }
 }

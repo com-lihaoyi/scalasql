@@ -105,7 +105,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                 shipping_info0.shipping_date AS res__shipping_date
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
-              LIMIT 2) subquery0
+              LIMIT ?) subquery0
             WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
           """,
           """
@@ -117,7 +117,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                   shipping_info0.shipping_date AS res__shipping_date
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
-                LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)
+                LIMIT ?) subquery0 ON (buyer.id = subquery0.res__buyer_id)
             SET buyer.date_of_birth = subquery0.res__shipping_date
             WHERE (buyer.name = ?)
           """
@@ -152,7 +152,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                 shipping_info0.buyer_id AS res__buyer_id
               FROM shipping_info shipping_info0
               ORDER BY res__id ASC
-              LIMIT 2) subquery0
+              LIMIT ?) subquery0
             WHERE (buyer.id = subquery0.res__buyer_id) AND (buyer.name = ?)
           """,
           """
@@ -163,7 +163,7 @@ trait UpdateJoinTests extends ScalaSqlSuite {
                   shipping_info0.buyer_id AS res__buyer_id
                 FROM shipping_info shipping_info0
                 ORDER BY res__id ASC
-                LIMIT 2) subquery0 ON (buyer.id = subquery0.res__buyer_id)
+                LIMIT ?) subquery0 ON (buyer.id = subquery0.res__buyer_id)
             SET buyer.date_of_birth = ?
             WHERE (buyer.name = ?)
           """

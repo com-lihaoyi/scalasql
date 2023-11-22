@@ -270,7 +270,7 @@ object WorldSqlTests extends TestSuite {
           city0.population AS res__population
         FROM city city0
         WHERE (city0.name = ?)
-        LIMIT 1
+        LIMIT ?
         """
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -553,7 +553,7 @@ object WorldSqlTests extends TestSuite {
       SELECT city0.name AS res__0, city0.population AS res__1
       FROM city city0
       ORDER BY res__1 DESC
-      LIMIT 5 OFFSET 5
+      LIMIT ? OFFSET ?
       """
 
       db.run(query) ==> Seq(
@@ -779,7 +779,7 @@ object WorldSqlTests extends TestSuite {
             country1.population AS res__population
           FROM country country1
           ORDER BY res__population DESC
-          LIMIT 2) subquery1
+          LIMIT ?) subquery1
         ON (countrylanguage0.countrycode = subquery1.res__code)
         ORDER BY res__0
         """
@@ -815,7 +815,7 @@ object WorldSqlTests extends TestSuite {
             country0.population AS res__population
           FROM country country0
           ORDER BY res__population DESC
-          LIMIT 2) subquery0
+          LIMIT ?) subquery0
         JOIN countrylanguage countrylanguage1
         ON (subquery0.res__code = countrylanguage1.countrycode)
         ORDER BY res__0
@@ -842,7 +842,7 @@ object WorldSqlTests extends TestSuite {
         FROM (SELECT country0.name AS res__name, country0.population AS res__population
           FROM country country0
           ORDER BY res__population DESC) subquery0
-        LIMIT 2
+        LIMIT ?
         """
 
         db.run(query) ==> List("China", "India")
@@ -870,13 +870,13 @@ object WorldSqlTests extends TestSuite {
       FROM (SELECT country0.name AS res
         FROM country country0
         ORDER BY country0.population ASC, res
-        LIMIT 2) subquery0
+        LIMIT ?) subquery0
       UNION
       SELECT subquery0.res AS res
       FROM (SELECT country0.name AS res
         FROM country country0
         ORDER BY country0.population DESC, res
-        LIMIT 2) subquery0
+        LIMIT ?) subquery0
       """
 
       db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
@@ -906,7 +906,7 @@ object WorldSqlTests extends TestSuite {
         JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
         GROUP BY countrylanguage1.language
         ORDER BY res__1 DESC
-        LIMIT 10
+        LIMIT ?
         """
 
         db.run(query) ==> Seq(
@@ -998,14 +998,14 @@ object WorldSqlTests extends TestSuite {
             country0.population AS res__population
           FROM country country0
           ORDER BY res__population DESC
-          LIMIT 3) subquery0
+          LIMIT ?) subquery0
         JOIN city city1 ON (subquery0.res__code = city1.countrycode)
         WHERE (city1.id = (SELECT
             city2.id AS res
             FROM city city2
             WHERE (city2.countrycode = subquery0.res__code)
             ORDER BY city2.population DESC
-            LIMIT 1))
+            LIMIT ?))
         """
 
         db.run(query) ==> Seq(

@@ -143,10 +143,10 @@ object CompoundSelect {
     lazy val sortOpt = SqlStr.flatten(orderToSqlStr(newCtx))
 
     lazy val limitOpt = SqlStr.flatten(SqlStr.opt(query.limit) { limit =>
-      sql" LIMIT " + SqlStr.raw(limit.toString)
+      sql" LIMIT $limit"
     })
     lazy val offsetOpt = SqlStr.flatten(SqlStr.opt(query.offset) { offset =>
-      sql" OFFSET " + SqlStr.raw(offset.toString)
+      sql" OFFSET $offset"
     })
 
     lazy val newReferencedExpressions = Seq(limitOpt, offsetOpt, sortOpt).flatMap(_.referencedExprs)

@@ -275,13 +275,13 @@ trait FlatJoinTests extends ScalaSqlSuite {
           (SELECT buyer0.id AS res__id, buyer0.name AS res__name
           FROM buyer buyer0
           ORDER BY res__id ASC
-          LIMIT 1) subquery0
+          LIMIT ?) subquery0
         CROSS JOIN (SELECT
             shipping_info1.id AS res__id,
             shipping_info1.shipping_date AS res__shipping_date
           FROM shipping_info shipping_info1
           ORDER BY res__id ASC
-          LIMIT 1) subquery1
+          LIMIT ?) subquery1
       """,
       value = Seq(
         ("James Bond", LocalDate.parse("2010-02-03"))
