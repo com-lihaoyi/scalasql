@@ -1239,7 +1239,6 @@ object WorldSqlTests extends TestSuite {
         "SELECT RAWTOHEX(city0.name) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
       db.run(query) ==> "00530069006e006700610070006f00720065"
-
       // Your custom Scala functions can either be standalone functions or extension
       // methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
       // are extension methods, with a different set being made available for each database.
