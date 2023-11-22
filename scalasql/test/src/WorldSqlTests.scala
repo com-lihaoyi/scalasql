@@ -830,6 +830,24 @@ object WorldSqlTests extends TestSuite {
         )
         // -DOCS
       }
+      test("force") {
+        // +DOCS
+        // You can force a subquery using `.subquery`, in cases where it would normally
+        // be combined into a single query. This can be useful in cases where the
+        // database query plan changes based on whether a subquery is present or not
+        val query = Country.select.sortBy(_.population).desc.subquery.take(2).map(_.name)
+
+        db.toSqlQuery(query) ==> """
+        SELECT subquery0.res__name AS res
+        FROM (SELECT country0.name AS res__name, country0.population AS res__population
+          FROM country country0
+          ORDER BY res__population DESC) subquery0
+        LIMIT 2
+        """
+
+        db.run(query) ==> List("China", "India")
+        // -DOCS
+      }
     }
 
     test("union") {
