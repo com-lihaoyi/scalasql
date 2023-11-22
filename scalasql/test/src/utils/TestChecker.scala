@@ -100,6 +100,6 @@ object TestChecker {
   lazy val pprinter: PPrinter = PPrinter.Color.copy(additionalHandlers = {
     case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)
     case v: Expr[_] if !v.isInstanceOf[scala.Product] =>
-      pprinter.treeify(Expr.getToString(v), false, true)
+      pprinter.treeify(Expr.exprToString(v), false, true)
   })
 }

@@ -110,7 +110,7 @@ object SqliteDialect extends SqliteDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    protected override def getRenderer(prevContext: Context) = {
+    protected override def selectRenderer(prevContext: Context) = {
       new CompoundSelectRenderer(this, prevContext)
     }
   }

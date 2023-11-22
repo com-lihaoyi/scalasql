@@ -182,11 +182,11 @@ object MySqlDialect extends MySqlDialect {
   ) extends Query[R] {
 
     override def queryIsExecuteUpdate = true
-    protected def queryWalkExprs() = Query.getWalkExprs(insert.query)
+    protected def queryWalkExprs() = Query.queryWalkExprs(insert.query)
 
-    protected def queryIsSingleRow = Query.getIsSingleRow(insert.query)
+    protected def queryIsSingleRow = Query.queryIsSingleRow(insert.query)
 
-    protected def queryValueReader = Query.getValueReader(insert.query)
+    protected def queryValueReader = Query.queryValueReader(insert.query)
 
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
@@ -199,7 +199,7 @@ object MySqlDialect extends MySqlDialect {
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
     protected def queryTypeMappers() = {
-      Query.getTypeMappers(insert.query)
+      Query.queryTypeMappers(insert.query)
     }
   }
 
@@ -256,7 +256,7 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    protected override def getRenderer(prevContext: Context) =
+    protected override def selectRenderer(prevContext: Context) =
       new CompoundSelectRenderer(this, prevContext)
   }
 
@@ -294,7 +294,7 @@ object MySqlDialect extends MySqlDialect {
   }
 
   class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
-    override protected def getRenderer(prevContext: Context) =
+    override protected def selectRenderer(prevContext: Context) =
       new ValuesRenderer[T](this)(implicitly, prevContext)
     override protected def columnName = "column_0"
   }

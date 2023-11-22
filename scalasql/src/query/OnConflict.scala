@@ -22,18 +22,18 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     protected def expr = WithExpr.get(query)
-    protected def queryWalkExprs() = Query.getWalkExprs(query)
-    protected def queryIsSingleRow = Query.getIsSingleRow(query)
+    protected def queryWalkExprs() = Query.queryWalkExprs(query)
+    protected def queryIsSingleRow = Query.queryIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {
       val str = Renderable.renderToSql(query)(ctx)
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING"
     }
 
-    protected def queryTypeMappers() = Query.getTypeMappers(query)
+    protected def queryTypeMappers() = Query.queryTypeMappers(query)
 
     protected override def queryIsExecuteUpdate = true
 
-    protected def queryValueReader = Query.getValueReader(query)
+    protected def queryValueReader = Query.queryValueReader(query)
 
   }
 
@@ -45,8 +45,8 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     protected def expr = WithExpr.get(query)
-    protected def queryWalkExprs() = Query.getWalkExprs(query)
-    protected def queryIsSingleRow = Query.getIsSingleRow(query)
+    protected def queryWalkExprs() = Query.queryWalkExprs(query)
+    protected def queryIsSingleRow = Query.queryIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderToSql(query)
@@ -58,8 +58,8 @@ object OnConflict {
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
     }
 
-    protected def queryTypeMappers() = Query.getTypeMappers(query)
+    protected def queryTypeMappers() = Query.queryTypeMappers(query)
     protected override def queryIsExecuteUpdate = true
-    protected def queryValueReader = Query.getValueReader(query)
+    protected def queryValueReader = Query.queryValueReader(query)
   }
 }

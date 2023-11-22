@@ -53,7 +53,7 @@ object Context {
           .collect { case t: SubqueryRef[_, _] => t }
           .flatMap { t =>
             Select
-              .getLhsMap(t.value, prevContext)
+              .selectLhsMap(t.value, prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Seq(e))}.$s") }
           }
 

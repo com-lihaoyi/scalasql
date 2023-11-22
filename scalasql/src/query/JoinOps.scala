@@ -31,13 +31,13 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(implicit joinQr: Queryable.Row[Q2, _]) = {
-    val otherSelect = Joinable.getSelect(other)
+    val otherSelect = Joinable.joinableSelect(other)
 
     val otherJoin = joinInfo0(
       joinPrefix,
       otherSelect,
       on.map(_(expr, otherSelect.expr)),
-      Joinable.getIsTrivial(other)
+      Joinable.joinableIsTrivial(other)
     )
 
     (Seq(otherJoin), otherSelect)

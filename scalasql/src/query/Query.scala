@@ -19,10 +19,10 @@ trait Query[R] extends Renderable {
 }
 
 object Query {
-  def getTypeMappers[R](q: Query[R]) = q.queryTypeMappers()
-  def getWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
-  def getIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
-  def getValueReader[R](q: Query[R]) = q.queryValueReader
+  def queryTypeMappers[R](q: Query[R]) = q.queryTypeMappers()
+  def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
+  def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
+  def queryValueReader[R](q: Query[R]) = q.queryValueReader
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walk(q: Q) = q.queryWalkExprs()
@@ -46,6 +46,6 @@ object Query {
     protected def queryTypeMappers(): Seq[TypeMapper[_]] = query.queryTypeMappers()
 
     protected def queryValueReader =
-      Query.getValueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
+      Query.queryValueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
   }
 }

@@ -50,7 +50,7 @@ class SimpleSelect[Q, R](
     }
   }
 
-  protected def simpleFrom() = this
+  protected def selectSimpleFrom() = this
 
   def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): SimpleSelect[Q2, R2] =
     copy(expr = f(expr))
@@ -137,7 +137,7 @@ class SimpleSelect[Q, R](
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
       implicit ctx => copied.renderToSql(ctx),
-      Query.getTypeMappers(copied),
+      Query.queryTypeMappers(copied),
       selectProxyExpr
     )(qr)
   }
@@ -177,7 +177,7 @@ class SimpleSelect[Q, R](
   def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q, R]) = {
-    val op2 = CompoundSelect.Op(op, Select.getSimpleFrom(other))
+    val op2 = CompoundSelect.Op(op, Select.selectSimpleFrom(other))
     newCompoundSelect(this, Seq(op2), Nil, None, None)
   }
 
@@ -186,18 +186,18 @@ class SimpleSelect[Q, R](
 
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
-  protected def getRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
+  protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
-  protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
     lazy val flattenedExpr = qr.walk(expr)
 
     lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
       val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
-      val exprId = Expr.getIdentity(v)
+      val exprId = Expr.exprIdentity(v)
 
       (exprId, SqlStr.raw(str, Seq(exprId)))
     }.toMap
@@ -208,7 +208,7 @@ class SimpleSelect[Q, R](
 
 object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
-    s.getRenderer(prevContext)
+    s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
     lazy val flattenedExpr = query.qr.walk(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
@@ -234,7 +234,7 @@ object SimpleSelect {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.zip(exprsStrs).collect {
-            case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.getIdentity(e))) => s
+            case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.exprIdentity(e))) => s
           },
           sql", "
         )

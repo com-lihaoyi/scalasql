@@ -31,6 +31,6 @@ trait Joinable[Q, R] {
 }
 object Joinable {
   def joinableToFromExpr[Q, R](x: Joinable[Q, R]) = x.joinableToFromExpr
-  def getSelect[Q, R](x: Joinable[Q, R]) = x.joinableSelect
-  def getIsTrivial[Q, R](x: Joinable[Q, R]) = x.joinableIsTrivial
+  def joinableSelect[Q, R](x: Joinable[Q, R]) = x.joinableSelect
+  def joinableIsTrivial[Q, R](x: Joinable[Q, R]) = x.joinableIsTrivial
 }

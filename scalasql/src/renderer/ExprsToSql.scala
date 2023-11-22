@@ -28,7 +28,7 @@ object ExprsToSql {
   }
 
   def booleanExprs(prefix: SqlStr, exprs: Seq[Expr[_]])(implicit ctx: Context) = {
-    SqlStr.optSeq(exprs.filter(!Expr.getIsLiteralTrue(_))) { having =>
+    SqlStr.optSeq(exprs.filter(!Expr.exprIsLiteralTrue(_))) { having =>
       prefix + SqlStr.join(having.map(Renderable.renderToSql(_)), sql" AND ")
     }
   }

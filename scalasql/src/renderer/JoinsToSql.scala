@@ -57,7 +57,7 @@ object JoinsToSql {
         SqlStr.raw(prevContext.config.tableNameMapper(t.value.tableName)) + sql" " + name
 
       case t: SubqueryRef[_, _] =>
-        val toSqlQuery = Select.getRenderer(t.value, prevContext)
+        val toSqlQuery = Select.selectRenderer(t.value, prevContext)
         sql"(${toSqlQuery.render(liveExprs)}) $name"
     }
   }

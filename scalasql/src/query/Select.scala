@@ -165,15 +165,15 @@ trait Select[Q, R]
   def take(n: Int): Select[Q, R]
 
   protected def renderToSql(ctx: Context): SqlStr = {
-    val renderer = getRenderer(ctx)
+    val renderer = selectRenderer(ctx)
 
     renderer.render(None).withCompleteQuery(true)
   }
   protected def queryWalkExprs() = qr.walk(expr)
   protected override def queryIsSingleRow = false
 
-  protected def getRenderer(prevContext: Context): Select.Renderer
-  protected def getLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr]
+  protected def selectRenderer(prevContext: Context): Select.Renderer
+  protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr]
 
   /**
    * Asserts that this query returns exactly one row, and returns a single
@@ -200,7 +200,7 @@ trait Select[Q, R]
    */
   def toExpr(implicit mt: TypeMapper[R]): Expr[R] = Expr { implicit ctx => this.renderToSql(ctx) }
 
-  protected def simpleFrom(): SimpleSelect[Q, R]
+  protected def selectSimpleFrom(): SimpleSelect[Q, R]
 
   /**
    * Forces this [[Select]] to be treated as a subquery that any further operations
@@ -235,11 +235,10 @@ trait Select[Q, R]
 }
 
 object Select {
-  def getSimpleFrom[Q, R](s: Select[Q, R]) = s.simpleFrom()
-  def getRenderer(s: Select[_, _], prevContext: Context) = s.getRenderer(prevContext)
-  def getLhsMap(s: Select[_, _], prevContext: Context) = s.getLhsMap(prevContext)
+  def selectSimpleFrom[Q, R](s: Select[Q, R]) = s.selectSimpleFrom()
+  def selectRenderer(s: Select[_, _], prevContext: Context) = s.selectRenderer(prevContext)
+  def selectLhsMap(s: Select[_, _], prevContext: Context) = s.selectLhsMap(prevContext)
   trait Renderer {
-//    def lhsMap: Map[Expr.Identity, SqlStr]
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
   }
 }
