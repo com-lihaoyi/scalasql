@@ -11,7 +11,13 @@ trait LateralJoinTests extends ScalaSqlSuite {
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
   ): LateralJoinOps[C, Q, R]
-  def description = "`JOIN LATERAL`, for the databases that support it"
+  def description = """
+    `JOIN LATERAL`, for the databases that support it. This allows you to use the
+    expressions defined in tables on the left-hand-side of the join in a
+    subquery on the right-hand-side of the join, v.s. normal `JOIN`s which only
+    allow you to use left-hand-side expressions in the `ON` expression but not
+    in the `FROM` subquery.
+  """
   def tests = Tests {
 
     test("crossJoinLateral") - checker(

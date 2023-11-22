@@ -4510,7 +4510,13 @@ for {
 
 
 ## LateralJoin
-`JOIN LATERAL`, for the databases that support it
+
+    `JOIN LATERAL`, for the databases that support it. This allows you to use the
+    expressions defined in tables on the left-hand-side of the join in a
+    subquery on the right-hand-side of the join, v.s. normal `JOIN`s which only
+    allow you to use left-hand-side expressions in the `ON` expression but not
+    in the `FROM` subquery.
+  
 ### LateralJoin.crossJoinLateral
 
 
