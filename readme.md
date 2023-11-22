@@ -26,7 +26,15 @@ db.toSqlQuery(query) ==>
 db.run(query) ==> 175953614
 ```
 
-ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases.
+ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 
+databases can be easily added.
+
+ScalaSql is a relatively new library, so please try it out, but be aware you may hit bugs
+or missing features! Please open [Discussions](https://github.com/com-lihaoyi/scalasql/discussions)
+for any questions, file [Issues](https://github.com/com-lihaoyi/scalasql/issues) for any 
+bugs you hit, or send [Pull Requests](https://github.com/com-lihaoyi/scalasql/pulls) if
+you are able to investigate and fix them!
+
 
 ## Getting Started
 
