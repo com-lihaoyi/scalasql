@@ -16,8 +16,8 @@ trait LateralJoinTests extends ScalaSqlSuite {
 
     test("crossJoinLateral") - checker(
       query = Text {
-        Buyer.select.lateral
-          .crossJoin(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })
+        Buyer.select
+          .crossJoinLateral(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
@@ -41,7 +41,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.lateral.crossJoin()
+          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.crossJoinLateral()
         } yield (b.name, s.shippingDate)
       },
       sql = """
@@ -63,8 +63,8 @@ trait LateralJoinTests extends ScalaSqlSuite {
 
     test("joinLateral") - checker(
       query = Text {
-        Buyer.select.lateral
-          .join(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })((_, _) => true)
+        Buyer.select
+          .joinLateral(b => ShippingInfo.select.filter { s => b.id `=` s.buyerId })((_, _) => true)
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
@@ -89,7 +89,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.lateral.join(_ => Expr(true))
+          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Expr(true))
         } yield (b.name, s.shippingDate)
       },
       sql = """
@@ -112,7 +112,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
 
     test("leftJoin") - checker(
       query = Text {
-        Buyer.select.lateral.leftJoin(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
+        Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
           Expr(true)
         )
       },
@@ -159,7 +159,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).lateral.leftJoin(_ => Expr(true))
+          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Expr(true))
         } yield (b, s)
       },
       sql = """
