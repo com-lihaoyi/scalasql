@@ -312,15 +312,15 @@ object WorldSqlTests extends TestSuite {
           // with population more than 5 million:
           val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
           db.toSqlQuery(query) ==> """
-            SELECT
-              city0.id AS res__id,
-              city0.name AS res__name,
-              city0.countrycode AS res__countrycode,
-              city0.district AS res__district,
-              city0.population AS res__population
-            FROM city city0
-            WHERE ((city0.population > ?) AND (city0.countrycode = ?))
-            """
+          SELECT
+            city0.id AS res__id,
+            city0.name AS res__name,
+            city0.countrycode AS res__countrycode,
+            city0.district AS res__district,
+            city0.population AS res__population
+          FROM city city0
+          WHERE ((city0.population > ?) AND (city0.countrycode = ?))
+          """
 
           db.run(query).take(2) ==> Seq(
             City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
@@ -441,11 +441,9 @@ object WorldSqlTests extends TestSuite {
         // each country, without all the other metadata:
         val query = Country.select.map(c => (c.name, c.continent))
         db.toSqlQuery(query) ==> """
-          SELECT
-            country0.name AS res__0,
-            country0.continent AS res__1
-          FROM country country0
-          """
+        SELECT country0.name AS res__0, country0.continent AS res__1
+        FROM country country0
+        """
 
         db.run(query).take(5) ==> Seq(
           ("Afghanistan", "Asia"),
@@ -469,17 +467,17 @@ object WorldSqlTests extends TestSuite {
           .single
 
         db.toSqlQuery(query) ==> """
-          SELECT
-            city0.id AS res__0__id,
-            city0.name AS res__0__name,
-            city0.countrycode AS res__0__countrycode,
-            city0.district AS res__0__district,
-            city0.population AS res__0__population,
-            UPPER(city0.name) AS res__1,
-            (city0.population / ?) AS res__2
-          FROM city city0
-          WHERE (city0.name = ?)
-          """
+        SELECT
+          city0.id AS res__0__id,
+          city0.name AS res__0__name,
+          city0.countrycode AS res__0__countrycode,
+          city0.district AS res__0__district,
+          city0.population AS res__0__population,
+          UPPER(city0.name) AS res__1,
+          (city0.population / ?) AS res__2
+        FROM city city0
+        WHERE (city0.name = ?)
+        """
 
         db.run(query) ==>
           (
@@ -561,11 +559,11 @@ object WorldSqlTests extends TestSuite {
         .map(c => (c.name, c.population))
 
       db.toSqlQuery(query) ==> """
-        SELECT city0.name AS res__0, city0.population AS res__1
-        FROM city city0
-        ORDER BY res__1 DESC
-        LIMIT 5 OFFSET 5
-        """
+      SELECT city0.name AS res__0, city0.population AS res__1
+      FROM city city0
+      ORDER BY res__1 DESC
+      LIMIT 5 OFFSET 5
+      """
 
       db.run(query) ==> Seq(
         ("Karachi", 9269265),
@@ -594,9 +592,9 @@ object WorldSqlTests extends TestSuite {
         .single
 
       db.toSqlQuery(query) ==> """
-        SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
-        FROM country country0
-        WHERE (country0.name = ?)
+      SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
+      FROM country country0
+      WHERE (country0.name = ?)
       """
 
       db.run(query) ==> 80
@@ -761,10 +759,10 @@ object WorldSqlTests extends TestSuite {
       } yield city.name
 
       db.toSqlQuery(query) ==> """
-        SELECT city0.name AS res
-        FROM city city0
-        JOIN country country1 ON (city0.countrycode = country1.code)
-        WHERE (country1.name = ?)
+      SELECT city0.name AS res
+      FROM city city0
+      JOIN country country1 ON (city0.countrycode = country1.code)
+      WHERE (country1.name = ?)
       """
 
       db.run(query) ==> Seq("Schaan", "Vaduz")
@@ -783,18 +781,18 @@ object WorldSqlTests extends TestSuite {
           .sortBy(_._1)
 
         db.toSqlQuery(query) ==> """
-          SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
-          FROM countrylanguage countrylanguage0
-          JOIN (SELECT
-              country1.code AS res__code,
-              country1.name AS res__name,
-              country1.population AS res__population
-            FROM country country1
-            ORDER BY res__population DESC
-            LIMIT 2) subquery1
-          ON (countrylanguage0.countrycode = subquery1.res__code)
-          ORDER BY res__0
-          """
+        SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
+        FROM countrylanguage countrylanguage0
+        JOIN (SELECT
+            country1.code AS res__code,
+            country1.name AS res__name,
+            country1.population AS res__population
+          FROM country country1
+          ORDER BY res__population DESC
+          LIMIT 2) subquery1
+        ON (countrylanguage0.countrycode = subquery1.res__code)
+        ORDER BY res__0
+        """
 
         db.run(query).take(5) ==> Seq(
           ("Asami", "India"),
@@ -820,18 +818,18 @@ object WorldSqlTests extends TestSuite {
           .sortBy(_._1)
 
         db.toSqlQuery(query) ==> """
-          SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
-          FROM (SELECT
-              country0.code AS res__code,
-              country0.name AS res__name,
-              country0.population AS res__population
-            FROM country country0
-            ORDER BY res__population DESC
-            LIMIT 2) subquery0
-          JOIN countrylanguage countrylanguage1
-          ON (subquery0.res__code = countrylanguage1.countrycode)
-          ORDER BY res__0
-          """
+        SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
+        FROM (SELECT
+            country0.code AS res__code,
+            country0.name AS res__name,
+            country0.population AS res__population
+          FROM country country0
+          ORDER BY res__population DESC
+          LIMIT 2) subquery0
+        JOIN countrylanguage countrylanguage1
+        ON (subquery0.res__code = countrylanguage1.countrycode)
+        ORDER BY res__0
+        """
 
         db.run(query).take(5) ==> List(
           ("Asami", "India"),
@@ -862,12 +860,12 @@ object WorldSqlTests extends TestSuite {
           .take(10)
 
         db.toSqlQuery(query) ==> """
-         SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
-         FROM city city0
-         JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
-         GROUP BY countrylanguage1.language
-         ORDER BY res__1 DESC
-         LIMIT 10
+        SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
+        FROM city city0
+        JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
+        GROUP BY countrylanguage1.language
+        ORDER BY res__1 DESC
+        LIMIT 10
         """
 
         db.run(query) ==> Seq(
@@ -1013,11 +1011,11 @@ object WorldSqlTests extends TestSuite {
           ("Jurong", "SGP", "West", 313373)
         )
         db.toSqlQuery(query) ==> """
-          INSERT INTO city (name, countrycode, district, population) VALUES
-          (?, ?, ?, ?),
-          (?, ?, ?, ?),
-          (?, ?, ?, ?)
-          """
+        INSERT INTO city (name, countrycode, district, population) VALUES
+        (?, ?, ?, ?),
+        (?, ?, ?, ?),
+        (?, ?, ?, ?)
+        """
 
         db.run(query)
 
@@ -1042,11 +1040,11 @@ object WorldSqlTests extends TestSuite {
         )
 
         db.toSqlQuery(query) ==> """
-          INSERT INTO city (name, countrycode, district, population)
-          SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
-          FROM city city0
-          WHERE (city0.name = ?)
-          """
+        INSERT INTO city (name, countrycode, district, population)
+        SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
+        FROM city city0
+        WHERE (city0.name = ?)
+        """
 
         db.run(query)
 
