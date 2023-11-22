@@ -19,9 +19,10 @@ trait ScalaSql extends CrossScalaModule{
   )
 
   def generatedSources: T[Seq[PathRef]] = T{
+    def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
     def defs(isImpl: Boolean) = {
-      for(i <- Range(2, 22)) yield {
-        def commaSep(f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
+      for(i <- Range.inclusive(2, 22)) yield {
+        def commaSep(f: Int => String) = commaSep0(i, f)
 
         val impl =
           if (!isImpl) ""
@@ -38,9 +39,23 @@ trait ScalaSql extends CrossScalaModule{
       }
     }
 
+    val queryableRowDefs = for(i <- Range.inclusive(2, 22)) yield {
+      def commaSep(f: Int => String) = commaSep0(i, f)
+      s"""implicit def Tuple${i}Queryable[${commaSep(j => s"Q$j")}, ${commaSep(j => s"R$j")}](
+        |    implicit
+        |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
+        |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
+        |  new Queryable.Row.TupleNQueryable(
+        |    t => Seq(${commaSep(j => s"q$j.walk(t._$j)")}),
+        |    (q) => Seq(${commaSep(j => s"q$j.toTypeMappers(q._$j)")}),
+        |    t => scalasql.utils.OptionPickler.Tuple${i}Reader(${commaSep(j => s"q$j.valueReader(t._$j)")})
+        |  )
+        |}""".stripMargin
+    }
+
     os.write(
       T.dest / "Generated.scala",
-      s"""package scalasql.query.generated
+      s"""package scalasql.generated
         |import scalasql.Column
         |import scalasql.Queryable
         |import scalasql.query.Expr
@@ -54,6 +69,10 @@ trait ScalaSql extends CrossScalaModule{
         |        valuesLists: Seq[Seq[Expr[_]]]
         |    )(implicit qr: Queryable[Q, R]): scalasql.query.InsertValues[Q, R]
         |  ${defs(true).mkString("\n")}
+        |}
+        |
+        |trait QueryableRow{
+        |  ${queryableRowDefs.mkString("\n")}
         |}
         |""".stripMargin
     )

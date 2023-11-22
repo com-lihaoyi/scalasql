@@ -39,9 +39,8 @@ object Queryable {
     def singleRow(q: Q): Boolean = true
 
   }
-  object Row {
-
-    private class TupleNQueryable[Q, R](
+  object Row extends scalasql.generated.QueryableRow{
+    private[scalasql] class TupleNQueryable[Q, R](
         val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
         val toTypeMappers0: Q => Seq[Seq[TypeMapper[_]]],
         val valueReader0: Q => Reader[R]
@@ -62,122 +61,6 @@ object Queryable {
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
     }
 
-    implicit def Tuple2Queryable[Q1, Q2, R1, R2](
-        implicit q1: Queryable.Row[Q1, R1],
-        q2: Queryable.Row[Q2, R2]
-    ): Queryable.Row[(Q1, Q2), (R1, R2)] = {
-      new Queryable.Row.TupleNQueryable(
-        t => Seq(q1.walk(t._1), q2.walk(t._2)),
-        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2)),
-        t => utils.OptionPickler.Tuple2Reader(q1.valueReader(t._1), q2.valueReader(t._2))
-      )
-    }
-
-    implicit def Tuple3Queryable[Q1, Q2, Q3, R1, R2, R3](
-        implicit q1: Queryable.Row[Q1, R1],
-        q2: Queryable.Row[Q2, R2],
-        q3: Queryable.Row[Q3, R3]
-    ): Queryable.Row[(Q1, Q2, Q3), (R1, R2, R3)] = {
-      new Queryable.Row.TupleNQueryable(
-        t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3)),
-        (q) => Seq(q1.toTypeMappers(q._1), q2.toTypeMappers(q._2), q3.toTypeMappers(q._3)),
-        t =>
-          utils.OptionPickler
-            .Tuple3Reader(q1.valueReader(t._1), q2.valueReader(t._2), q3.valueReader(t._3))
-      )
-    }
-
-    implicit def Tuple4Queryable[Q1, Q2, Q3, Q4, R1, R2, R3, R4](
-        implicit q1: Queryable.Row[Q1, R1],
-        q2: Queryable.Row[Q2, R2],
-        q3: Queryable.Row[Q3, R3],
-        q4: Queryable.Row[Q4, R4]
-    ): Queryable.Row[(Q1, Q2, Q3, Q4), (R1, R2, R3, R4)] = {
-      new Queryable.Row.TupleNQueryable(
-        t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4)),
-        (q) =>
-          Seq(
-            q1.toTypeMappers(q._1),
-            q2.toTypeMappers(q._2),
-            q3.toTypeMappers(q._3),
-            q4.toTypeMappers(q._4)
-          ),
-        t =>
-          utils.OptionPickler.Tuple4Reader(
-            q1.valueReader(t._1),
-            q2.valueReader(t._2),
-            q3.valueReader(t._3),
-            q4.valueReader(t._4)
-          )
-      )
-    }
-
-    implicit def Tuple5Queryable[Q1, Q2, Q3, Q4, Q5, R1, R2, R3, R4, R5](
-        implicit q1: Queryable.Row[Q1, R1],
-        q2: Queryable.Row[Q2, R2],
-        q3: Queryable.Row[Q3, R3],
-        q4: Queryable.Row[Q4, R4],
-        q5: Queryable.Row[Q5, R5]
-    ): Queryable.Row[(Q1, Q2, Q3, Q4, Q5), (R1, R2, R3, R4, R5)] = {
-      new Queryable.Row.TupleNQueryable(
-        t => Seq(q1.walk(t._1), q2.walk(t._2), q3.walk(t._3), q4.walk(t._4), q5.walk(t._5)),
-        (q) =>
-          Seq(
-            q1.toTypeMappers(q._1),
-            q2.toTypeMappers(q._2),
-            q3.toTypeMappers(q._3),
-            q4.toTypeMappers(q._4),
-            q5.toTypeMappers(q._5)
-          ),
-        t =>
-          utils.OptionPickler.Tuple5Reader(
-            q1.valueReader(t._1),
-            q2.valueReader(t._2),
-            q3.valueReader(t._3),
-            q4.valueReader(t._4),
-            q5.valueReader(t._5)
-          )
-      )
-    }
-
-    implicit def Tuple6Queryable[Q1, Q2, Q3, Q4, Q5, Q6, R1, R2, R3, R4, R5, R6](
-        implicit q1: Queryable.Row[Q1, R1],
-        q2: Queryable.Row[Q2, R2],
-        q3: Queryable.Row[Q3, R3],
-        q4: Queryable.Row[Q4, R4],
-        q5: Queryable.Row[Q5, R5],
-        q6: Queryable.Row[Q6, R6]
-    ): Queryable.Row[(Q1, Q2, Q3, Q4, Q5, Q6), (R1, R2, R3, R4, R5, R6)] = {
-      new Queryable.Row.TupleNQueryable(
-        t =>
-          Seq(
-            q1.walk(t._1),
-            q2.walk(t._2),
-            q3.walk(t._3),
-            q4.walk(t._4),
-            q5.walk(t._5),
-            q6.walk(t._6)
-          ),
-        (q) =>
-          Seq(
-            q1.toTypeMappers(q._1),
-            q2.toTypeMappers(q._2),
-            q3.toTypeMappers(q._3),
-            q4.toTypeMappers(q._4),
-            q5.toTypeMappers(q._5),
-            q6.toTypeMappers(q._6)
-          ),
-        t =>
-          utils.OptionPickler.Tuple6Reader(
-            q1.valueReader(t._1),
-            q2.valueReader(t._2),
-            q3.valueReader(t._3),
-            q4.valueReader(t._4),
-            q5.valueReader(t._5),
-            q6.valueReader(t._6)
-          )
-      )
-    }
     implicit def NullableQueryable[Q, R](
         implicit qr: Queryable.Row[Q, R]
     ): Queryable.Row[JoinNullable[Q], Option[R]] = new Queryable.Row[JoinNullable[Q], Option[R]] {
