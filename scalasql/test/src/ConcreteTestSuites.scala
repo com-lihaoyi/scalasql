@@ -23,7 +23,8 @@ import query.{
   OnConflictTests,
   ValuesTests,
   LateralJoinTests,
-  WindowFunctionTests
+  WindowFunctionTests,
+  WithCteTests
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -55,6 +56,7 @@ package postgres {
   object WindowFunctionTests extends WindowFunctionTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
+  object WithCteTests extends WithCteTests with PostgresSuite
 
   object ExprOpsTests extends ExprOpsTests with PostgresSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
@@ -94,6 +96,7 @@ package hikari {
   object WindowFunctionTests extends WindowFunctionTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
+  object WithCteTests extends WithCteTests with HikariSuite
 
   object ExprOpsTests extends ExprOpsTests with HikariSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with HikariSuite
@@ -136,6 +139,7 @@ package mysql {
   object WindowFunctionTests extends WindowFunctionTests with MySqlSuite
 
   object SubQueryTests extends SubQueryTests with MySqlSuite
+  object WithCteTests extends WithCteTests with MySqlSuite
 
   object ExprOpsTests extends ExprOpsTests with MySqlSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
@@ -174,6 +178,7 @@ package sqlite {
   object WindowFunctionTests extends WindowFunctionTests with SqliteSuite
 
   object SubQueryTests extends SubQueryTests with SqliteSuite
+  object WithCteTests extends WithCteTests with SqliteSuite
 
   object ExprOpsTests extends ExprOpsTests with SqliteSuite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
@@ -214,6 +219,7 @@ package h2 {
   object WindowFunctionTests extends WindowFunctionTests with H2Suite
 
   object SubQueryTests extends SubQueryTests with H2Suite
+  object WithCteTests extends WithCteTests with H2Suite
 
   object ExprOpsTests extends ExprOpsTests with H2Suite
   object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite

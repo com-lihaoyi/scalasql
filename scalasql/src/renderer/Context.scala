@@ -1,7 +1,7 @@
 package scalasql.renderer
 
 import scalasql.Config
-import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef}
+import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef, WithCteRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 /**
@@ -44,6 +44,7 @@ object Context {
           case (t: TableRef, i) =>
             (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
+          case (s: WithCteRef[_, _], i) => (s, s.name)
         } ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 

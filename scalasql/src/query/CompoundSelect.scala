@@ -141,10 +141,10 @@ object CompoundSelect {
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
     lazy val lhsLhsMap = Select.selectLhsMap(query.lhs, prevContext)
-    lazy val newCtx = lhsToSqlQuery.context
+    lazy val context = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
-    lazy val sortOpt = SqlStr.flatten(orderToSqlStr(newCtx))
+    lazy val sortOpt = SqlStr.flatten(orderToSqlStr(context))
 
     lazy val limitOpt = SqlStr.flatten(SqlStr.opt(query.limit) { limit =>
       sql" LIMIT $limit"

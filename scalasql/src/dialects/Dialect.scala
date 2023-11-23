@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps, WindowExpr}
-import scalasql.query.{Aggregatable, Expr, JoinNullable, Select}
+import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, SimpleSelect, SubqueryRef, WithCte, WithCteRef, WithExpr}
 import scalasql.renderer.SqlStr
 import scalasql.{Queryable, Table, TypeMapper, operations}
 
@@ -91,5 +91,28 @@ trait Dialect extends DialectConfig {
 
   implicit class WindowExtensions[T](e: Expr[T]) {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
+  }
+
+  //with cte(x) as (SELECT name as x from buyer)
+  //  select x || 'xxx' from cte
+  //
+  //SELECT * from (
+  //  with cte(x) as (SELECT name as x from buyer)
+  //    select x || 'xxx' from cte
+  //  ) v
+  def withCte[Q, Q2, R, R2](lhs: Select[Q, R])
+                           (block: Select[Q, R] => Select[Q2, R2])
+                           (implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+    val lhsSubQueryRef = new WithCteRef("cte")
+    val rhsSelect = new SimpleSelect[Q, R](
+      expr = WithExpr.get(lhs),
+      exprPrefix = None,
+      from = Seq(lhsSubQueryRef),
+      joins = Nil,
+      where = Nil,
+      groupBy0 = None
+    )(lhs.qr)
+
+    new WithCte(lhs, lhsSubQueryRef, block(rhsSelect))
   }
 }

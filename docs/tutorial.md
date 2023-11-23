@@ -840,6 +840,80 @@ FROM (SELECT country0.name AS res
 db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
 ```
 
+## Window Functions
+ScalaSql supports window functions via the `.over` operator, which
+enables the `.partitionBy` and `.sortBy` operators on `Expr[T]`. These
+translate into SQL's `OVER`/`PARTITION BY`/`ORDER BY` clauses
+```scala
+val query = City.select
+  .map(c =>
+    (
+      c.name,
+      c.countryCode,
+      c.population,
+      rank().over.partitionBy(c.countryCode).sortBy(c.population).desc
+    )
+  )
+  .filter{case (name, countryCode, population, rank) =>
+    values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
+  }
+
+db.toSqlQuery(query) ==> """
+SELECT
+  city0.name AS res__0,
+  city0.countrycode AS res__1,
+  city0.population AS res__2,
+  RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__3
+FROM city city0
+WHERE (city0.name IN (VALUES (?), (?), (?), (?), (?)))
+"""
+
+db.run(query) ==> Seq(
+  ("Kuala Lumpur", "MYS", 1297526L, 1),
+  ("Johor Baharu", "MYS", 328436L, 2),
+  ("Pinang", "MYS", 219603L, 3),
+  ("New York", "USA", 8008278L, 1),
+  ("San Francisco", "USA", 776733L, 2)
+)
+```
+
+You can also perform aggregates as part of your window function by using
+the `.mapAggregate` function; this provides a `SelectProxy[Q]` rather than
+a `Q`, letting you perform aggregates like `.sumBy` that you can then use
+as window functions via `.over`. You can reference normal columns by referencing
+the `.expr` member on each `SelectProxy`.
+```scala
+val query = City.select
+  .mapAggregate((c, cs) =>
+    (
+      c.name,
+      c.countryCode,
+      c.population,
+      cs.sumBy(_.population).over.partitionBy(c.countryCode).sortBy(c.population).desc
+    )
+  )
+  .filter{case (name, countryCode, population, rank) =>
+    values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
+  }
+
+db.toSqlQuery(query) ==> """
+SELECT
+  city0.name AS res__0,
+  city0.countrycode AS res__1,
+  city0.population AS res__2,
+  SUM(city0.population) OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__3
+FROM city city0
+WHERE (city0.name IN (VALUES (?), (?), (?), (?)))
+"""
+
+db.run(query).sortBy(t => (t._2, t._4)) ==> Seq(
+  ("Kuala Lumpur", "MYS", 1297526L, 1297526L),
+  ("Johor Baharu", "MYS", 328436L, 1625962L),
+  ("Pinang", "MYS", 219603L, 1845565L),
+  ("Singapore", "SGP", 4017733L, 4017733L)
+)
+```
+
 
 ## Realistic Queries
 

@@ -115,5 +115,7 @@ object Values {
       val rows = SqlStr.join(v.ts.map(wrapRow), sql", ")
       sql"VALUES $rows"
     }
+
+    def context = ctx
   }
 }
