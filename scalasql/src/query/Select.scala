@@ -91,6 +91,12 @@ trait Select[Q, R]
   def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V]
 
   /**
+   * Performs a `.map` which additionally provides a [[SelectProxy]] that allows you to perform aggregate
+   * functions.
+   */
+  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2]
+
+  /**
    * Translates into a SQL `GROUP BY`, takes a function specifying the group-key and
    * a function specifying the group-aggregate.
    */

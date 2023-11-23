@@ -83,6 +83,10 @@ class CompoundSelect[Q, R](
     selectSimpleFrom().aggregate(f)
   }
 
+  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+    selectSimpleFrom().mapAggregate(f)
+  }
+
   def groupBy[K, V, R1, R2](groupKey: Q => K)(
       groupAggregate: SelectProxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
