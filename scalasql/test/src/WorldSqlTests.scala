@@ -1108,11 +1108,12 @@ object WorldSqlTests extends TestSuite {
         val query = City.select
           .map(c => (c, rank().over.partitionBy(c.countryCode).sortBy(c.population).desc))
           .subquery
-          .filter{case (city, r) => r <= 3}
-          .map{case (city, r) => (city.name, city.population, city.countryCode, r)}
+          .filter { case (city, r) => r <= 3 }
+          .map { case (city, r) => (city.name, city.population, city.countryCode, r) }
           .join(Country)(_._3 === _.code)
-          .sortBy(_._2.population).desc
-          .map{case (city, country) => city}
+          .sortBy(_._2.population)
+          .desc
+          .map { case (city, country) => city }
 
         db.toSqlQuery(query) ==> """
         SELECT
@@ -1141,7 +1142,7 @@ object WorldSqlTests extends TestSuite {
           ("New York", 8008278L, "USA", 1),
           ("Los Angeles", 3694820L, "USA", 2),
           ("Chicago", 2896016L, "USA", 3),
-          ("Jakarta", 9604900L, "IDN", 1),
+          ("Jakarta", 9604900L, "IDN", 1)
         )
         // -DOCS
       }
