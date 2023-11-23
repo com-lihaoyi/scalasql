@@ -37,13 +37,12 @@ trait WithCteTests extends ScalaSqlSuite {
       """
     )
 
-
     test("multiple") - checker(
       query = Text {
         withCte(Buyer.select) { bs =>
           withCte(ShippingInfo.select) { sis =>
             bs.join(sis)(_.id === _.buyerId)
-              .map{case (b, s) => (b.name, s.shippingDate)}
+              .map { case (b, s) => (b.name, s.shippingDate) }
           }
         }
       },
@@ -69,7 +68,7 @@ trait WithCteTests extends ScalaSqlSuite {
         in the generated SQL
       """
     )
-    
+
     test("eliminated") - checker(
       query = Text {
         withCte(Buyer.select) { bs =>

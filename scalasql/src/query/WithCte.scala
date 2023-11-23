@@ -45,7 +45,8 @@ class WithCte[Q, R](
 }
 
 object WithCte {
-  class Proxy[Q, R](lhs: WithExpr[Q], lhsSubQueryRef: WithCteRef[Q, R], val qr: Queryable.Row[Q, R]) extends Select.Proxy[Q, R] {
+  class Proxy[Q, R](lhs: WithExpr[Q], lhsSubQueryRef: WithCteRef[Q, R], val qr: Queryable.Row[Q, R])
+      extends Select.Proxy[Q, R] {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true
     protected override def joinableSelect = selectSimpleFrom()
@@ -70,7 +71,8 @@ object WithCte {
     }
   }
 
-  class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context) extends Select.Renderer {
+  class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
+      extends Select.Renderer {
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
       val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walk(WithExpr.get(query.lhs))
       val newExprNaming = walked.map { case (tokens, expr) =>
@@ -87,18 +89,18 @@ object WithCte {
           case w: WithCte[Q, R] => sql""
           case r => sql" "
         }) +
-        Select
-          .selectRenderer(
-            query.rhs match{
-              case w: WithCte[Q, R] => w.unprefixed
-              case r => r
-            },
-            newContext.withExprNaming(
-              newContext.exprNaming ++
-                newExprNaming.map { case (k, v) => (k, sql"$cteName.$v") }
+          Select
+            .selectRenderer(
+              query.rhs match {
+                case w: WithCte[Q, R] => w.unprefixed
+                case r => r
+              },
+              newContext.withExprNaming(
+                newContext.exprNaming ++
+                  newExprNaming.map { case (k, v) => (k, sql"$cteName.$v") }
+              )
             )
-          )
-          .render(liveExprs)
+            .render(liveExprs)
       )
       val rhsReferenced = rhsSql.referencedExprs.toSet
       val lhsSql = Select.selectRenderer(query.lhs, prevContext).render(Some(rhsReferenced))

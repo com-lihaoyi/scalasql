@@ -5995,8 +5995,8 @@ ScalaSql supports `WITH`-clauses, also known as "Common Table Expressions"
 (CTEs), via the `.withCte` syntax.
 
 ```scala
-withCte(Buyer.select.map(_.name)) { x =>
-  x.map(_ + "xxx")
+withCte(Buyer.select.map(_.name)) { bs =>
+  bs.map(_ + "-suffix")
 }
 ```
 
@@ -6012,7 +6012,49 @@ withCte(Buyer.select.map(_.name)) { x =>
 
 *
     ```scala
-    Seq("James Bondxxx", "叉烧包xxx", "Li Haoyixxx")
+    Seq("James Bond-suffix", "叉烧包-suffix", "Li Haoyi-suffix")
+    ```
+
+
+
+### WithCte.multiple
+
+Multiple `withCte` blocks can be stacked, turning into chained `WITH` clauses
+in the generated SQL
+
+```scala
+withCte(Buyer.select) { bs =>
+  withCte(ShippingInfo.select) { sis =>
+    bs.join(sis)(_.id === _.buyerId)
+      .map { case (b, s) => (b.name, s.shippingDate) }
+  }
+}
+```
+
+
+*
+    ```sql
+    WITH
+      cte0 (res__id, res__name) AS (SELECT
+        buyer0.id AS res__id, buyer0.name AS res__name FROM buyer buyer0),
+      cte1 (res__buyerId, res__shippingDate) AS (SELECT
+          shipping_info1.buyer_id AS res__buyer_id,
+          shipping_info1.shipping_date AS res__shipping_date
+        FROM shipping_info shipping_info1)
+    SELECT cte0.res__name AS res__0, cte1.res__shippingDate AS res__1
+    FROM cte0
+    JOIN cte1 ON (cte0.res__id = cte1.res__buyerId)
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("叉烧包", LocalDate.parse("2010-02-03")),
+      ("James Bond", LocalDate.parse("2012-04-05")),
+      ("叉烧包", LocalDate.parse("2012-05-06"))
+    )
     ```
 
 
@@ -6023,8 +6065,8 @@ Only the necessary columns are exported from the `WITH` clause; columns that
 are un-used in the downstream `SELECT` clause are eliminated
 
 ```scala
-withCte(Buyer.select) { x =>
-  x.map(_.name + "xxx")
+withCte(Buyer.select) { bs =>
+  bs.map(_.name + "-suffix")
 }
 ```
 
@@ -6040,7 +6082,7 @@ withCte(Buyer.select) { x =>
 
 *
     ```scala
-    Seq("James Bondxxx", "叉烧包xxx", "Li Haoyixxx")
+    Seq("James Bond-suffix", "叉烧包-suffix", "Li Haoyi-suffix")
     ```
 
 

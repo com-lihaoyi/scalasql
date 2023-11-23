@@ -78,7 +78,8 @@ class CompoundSelect[Q, R](
   override def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   override def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  override protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
+  override protected def queryValueReader =
+    OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
