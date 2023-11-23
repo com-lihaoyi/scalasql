@@ -21,12 +21,12 @@ trait WithCteTests extends ScalaSqlSuite {
       sqls = Seq(
         """
           WITH cte(res) AS (SELECT buyer0.name AS res FROM buyer buyer0)
-          SELECT (res || ?) AS res
+          SELECT (cte.res || ?) AS res
           FROM cte
         """,
         """
           WITH cte(res) AS (SELECT buyer0.name AS res FROM buyer buyer0)
-          SELECT CONCAT(res, ?) AS res
+          SELECT CONCAT(cte.res, ?) AS res
           FROM cte
         """
       ),

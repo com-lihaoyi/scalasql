@@ -29,13 +29,12 @@ object FlatJson {
     l.result()
   }
 
+  def flatten(tokens: List[String], context: Context) = {
+    (context.config.columnLabelPrefix +: tokens).mkString(context.config.columnLabelDelimiter)
+  }
+
   def flatten(x: Seq[(List[String], Expr[_])], context: Context): Seq[(String, SqlStr)] = {
-    x.map { case (k, v) =>
-      (
-        (context.config.columnLabelPrefix +: k).mkString(context.config.columnLabelDelimiter),
-        Renderable.renderToSql(v)(context)
-      )
-    }
+    x.map { case (k, v) => (flatten(k, context), Renderable.renderToSql(v)(context)) }
   }
 
   /**

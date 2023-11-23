@@ -106,19 +106,20 @@ object WithCte {
       val lhsSql = lhsRenderer.render(liveExprs)
 
       val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walk(WithExpr.get(query.lhs))
+
+      val newExprNaming = walked.map { case (tokens, expr) =>
+        (Expr.exprIdentity(expr), SqlStr.raw(FlatJson.flatten(tokens, prevContext)))
+      }
+
       val rhsSql = Select.selectRenderer(
         query.rhs,
         prevContext.withExprNaming(
           prevContext.exprNaming ++
-            walked.map{case (tokens, expr) =>
-              (Expr.exprIdentity(expr), SqlStr.raw((prevContext.config.columnLabelPrefix +: tokens.map(prevContext.config.columnNameMapper)).mkString(prevContext.config.columnLabelDelimiter)))
-            }
+            newExprNaming.map{case (k, v) => (k, sql"${SqlStr.raw(query.lhsSubQuery.name)}.$v")}
         )
       ).render(liveExprs)
-      val cteColumns = SqlStr.join(
-        FlatJson.flatten(walked, prevContext).map(t => SqlStr.raw(t._1)),
-        sql", "
-      )
+
+      val cteColumns = SqlStr.join(newExprNaming.map(_._2), sql", ")
 
       sql"WITH ${SqlStr.raw(query.lhsSubQuery.name)}($cteColumns) AS ($lhsSql) $rhsSql"
     }

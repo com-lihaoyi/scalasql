@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.renderer.SqlStr
 import scalasql.{Queryable, Table}
 
 /**
