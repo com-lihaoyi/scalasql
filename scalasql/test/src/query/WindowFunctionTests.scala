@@ -432,5 +432,41 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2))
       )
     }
+    test("frames"){
+      test("sumBy") - checker(
+        query = Text {
+          Purchase.select.mapAggregate((p, ps) =>
+            (
+              p.shippingInfoId,
+              p.total,
+              ps.sumBy(_.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc.frameStart.preceding().frameEnd.following().frameExclusion.currentRow
+            )
+          )
+        },
+        sql = """
+          SELECT
+            purchase0.shipping_info_id AS res__0,
+            purchase0.total AS res__1,
+            SUM(purchase0.total)
+            OVER (PARTITION BY purchase0.shipping_info_id
+              ORDER BY purchase0.total ASC
+              ROWS BETWEEN UNBOUNDED PRECEDING
+              AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW) AS res__2
+          FROM purchase purchase0
+        """,
+        value = Seq[(Int, Double, Double)](
+          (1, 15.7, 1788.0),
+          (1, 888.0, 915.7),
+          (1, 900.0, 903.7),
+          (2, 493.8, 10000.0),
+          (2, 10000.0, 493.8),
+          (3, 1.3, 44.4),
+          (3, 44.4, 1.3)
+        ),
+        normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2))
+      )
+
+    }
   }
+
 }

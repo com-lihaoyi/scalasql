@@ -90,6 +90,6 @@ trait Dialect extends DialectConfig {
 
 
   implicit class WindowExtensions[T](e: Expr[T]) {
-    def over = new WindowExpr[T](e, None, Nil)
+    def over = new WindowExpr[T](e, None, Nil, None, None, None)
   }
 }
