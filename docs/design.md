@@ -268,7 +268,7 @@ val programmers = db.run(
      .join(Company)(_.companyId == _.id)
      .filter{case (p, c) => !p.isDeleted}
      .sortBy{case (p, c) => p.createdAt}
-     .drop(take(10))
+     .take(10)
 )
 ```
 
