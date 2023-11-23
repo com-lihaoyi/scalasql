@@ -165,6 +165,9 @@ scope when you call `import scalasql.dialects.MyDialect._`.
    aiming instead for common use cases and leaving more esoteric things to the user
    to either extend the library to support or drop down to raw SQL.
 
+5. **ORM/ActiveRecord-esque Features**: Most Scala code is immutable by default, and works
+   by transforming immutable Scala collections of immutable values through pure functions. 
+   ScalaSql aims to follow that style, rather than trying to emulate mutable objects.
 
 ## Comparisons
 
