@@ -181,30 +181,31 @@ object CompoundSelect {
 
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
+    def orderToSqlStr(newCtx: Context) = CompoundSelect.orderToSqlStr(query.orderBy, newCtx)
+  }
 
-    def orderToSqlStr(newCtx: Context) = {
+  def orderToSqlStr(orderBys: Seq[OrderBy], newCtx: Context) = {
 
-      SqlStr.optSeq(query.orderBy) { orderBys =>
-        val orderStr = SqlStr.join(
-          orderBys.map { orderBy =>
-            val ascDesc = orderBy.ascDesc match {
-              case None => sql""
-              case Some(AscDesc.Asc) => sql" ASC"
-              case Some(AscDesc.Desc) => sql" DESC"
-            }
+    SqlStr.optSeq(orderBys) { orderBys =>
+      val orderStr = SqlStr.join(
+        orderBys.map { orderBy =>
+          val ascDesc = orderBy.ascDesc match {
+            case None => sql""
+            case Some(AscDesc.Asc) => sql" ASC"
+            case Some(AscDesc.Desc) => sql" DESC"
+          }
 
-            val nulls = SqlStr.opt(orderBy.nulls) {
-              case Nulls.First => sql" NULLS FIRST"
-              case Nulls.Last => sql" NULLS LAST"
-            }
-            Renderable.renderToSql(orderBy.expr)(newCtx) + ascDesc + nulls
-          },
-          sql", "
-        )
+          val nulls = SqlStr.opt(orderBy.nulls) {
+            case Nulls.First => sql" NULLS FIRST"
+            case Nulls.Last => sql" NULLS LAST"
+          }
+          Renderable.renderToSql(orderBy.expr)(newCtx) + ascDesc + nulls
+        },
+        sql", "
+      )
 
-        sql" ORDER BY " + orderStr
-      }
-
+      sql"ORDER BY " + orderStr
     }
+
   }
 }

@@ -1,7 +1,8 @@
 package scalasql.dialects
 
-import scalasql.operations.{CaseWhen, TableOps}
+import scalasql.operations.{CaseWhen, TableOps, WindowExpr}
 import scalasql.query.{Aggregatable, Expr, JoinNullable, Select}
+import scalasql.renderer.SqlStr
 import scalasql.{Queryable, Table, TypeMapper, operations}
 
 import scala.reflect.ClassTag
@@ -53,4 +54,37 @@ trait Dialect extends DialectConfig {
   def caseWhen[T: TypeMapper](values: (Expr[Boolean], Expr[T])*) = new CaseWhen(values)
 
   def values[T: TypeMapper](ts: Seq[T]) = new scalasql.query.Values(ts)
+
+  import scalasql.renderer.SqlStr.SqlStringSyntax
+
+  def rank(): Expr[Int] = Expr{implicit ctx => sql"RANK()"}
+  def rowNumber(): Expr[Int] = Expr{implicit ctx => sql"ROW_NUMBER()"}
+  def denseRank(): Expr[Int] = Expr{implicit ctx => sql"DENSE_RANK()"}
+  def percentRank(): Expr[Int] = Expr{implicit ctx => sql"PERCENT_RANK()"}
+  def cumeDist(n: Int): Expr[Int] = Expr{implicit ctx => sql"CUME_DIST($n)"}
+  def nTile(): Expr[Int] = Expr{implicit ctx => sql"N_TILE()"}
+
+  private def lagLead[T](prefix: SqlStr,
+                         e: Expr[T],
+                         offset: Int, default: Expr[T]): Expr[T] = Expr { implicit ctx =>
+    val args = SqlStr.join(
+      Seq(Some(sql"$e"), Some(offset).filter(_ != 1).map(o => sql"$o"), Option(default).map(d => sql"$d")).flatten,
+      sql", "
+    )
+    sql"$prefix($args)"
+  }
+
+  def lag[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
+    lagLead(sql"LAG", e, offset, default)
+  def lead[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
+    lagLead(sql"LEAD", e, offset, default)
+
+  def firstValue[T](e: Expr[T]): Expr[T] = Expr{implicit ctx => sql"FIRST_VALUE($e)"}
+  def lastValue[T](e: Expr[T]): Expr[T] = Expr{implicit ctx => sql"LAST_VALUE($e)"}
+  def nthValue[T](e: Expr[T], n: Int): Expr[T] = Expr{implicit ctx => sql"NTH_VALUE($e, $n)"}
+
+
+  implicit class WindowExtensions[T](e: Expr[T]) {
+    def over = new WindowExpr[T](e, None, Nil)
+  }
 }
