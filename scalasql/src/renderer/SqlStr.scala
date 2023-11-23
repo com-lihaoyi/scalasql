@@ -10,10 +10,10 @@ import scalasql.query.Expr
  * until [[SqlStr.flatten]] is called to convert it into a [[SqlStr.Flattened]]
  */
 class SqlStr(
-    private val queryParts: Seq[String],
-    private val params: Seq[SqlStr.Interp],
+    private val queryParts: collection.Seq[String],
+    private val params: collection.Seq[SqlStr.Interp],
     val isCompleteQuery: Boolean,
-    private val referencedExprs: Seq[Expr.Identity]
+    private val referencedExprs: collection.Seq[Expr.Identity]
 ) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
     new SqlStr(SqlStr.plusParts, Seq(this, other), false, Nil)
@@ -28,10 +28,10 @@ class SqlStr(
 object SqlStr {
   private val plusParts = Array("", "", "")
   class Flattened(
-      val queryParts: Seq[String],
-      val params: Seq[Interp.TypeInterp[_]],
+      val queryParts: collection.Seq[String],
+      val params: collection.Seq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
-      val referencedExprs: Seq[Expr.Identity]
+      val referencedExprs: collection.Seq[Expr.Identity]
   ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
 
   /**
@@ -66,7 +66,9 @@ object SqlStr {
         else finalParts.append(s)
       }
 
-      for ((p, a) <- self.queryParts.zip(self.params)) {
+      for (i <- self.params.indices) {
+        val p = self.queryParts(i)
+        val a = self.params(i)
         addFinalPart(p)
         boundary = false
         a match {
@@ -83,7 +85,7 @@ object SqlStr {
     }
 
     rec(self, true)
-    new Flattened(finalParts.toSeq, finalArgs.toSeq, self.isCompleteQuery, finalExprs.toSeq)
+    new Flattened(finalParts, finalArgs, self.isCompleteQuery, finalExprs)
   }
 
   /**
@@ -96,8 +98,8 @@ object SqlStr {
   /**
    * Joins a `Seq` of [[SqlStr]]s into a single [[SqlStr]] using the given [[sep]] separator
    */
-  def join(strs: Seq[SqlStr], sep: SqlStr = sql""): SqlStr = {
-    if (strs.isEmpty) sql"" else strs.reduce(_ + sep + _)
+  def join(strs: IterableOnce[SqlStr], sep: SqlStr = sql""): SqlStr = {
+    strs.iterator.reduceOption(_ + sep + _).getOrElse(sql"")
   }
 
   /**

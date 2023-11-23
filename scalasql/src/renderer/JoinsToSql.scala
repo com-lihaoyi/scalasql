@@ -26,9 +26,9 @@ object JoinsToSql {
       joinOns: Seq[Seq[Option[SqlStr.Flattened]]]
   ) = {
 
-    SqlStr.join(joins.zip(joinOns).map { case (join, joinOns) =>
+    SqlStr.join(joins.iterator.zip(joinOns).map { case (join, joinOns) =>
       val joinPrefix = SqlStr.raw(join.prefix)
-      val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
+      val joinSelectables = SqlStr.join(join.from.iterator.zip(joinOns).map { case (jf, fromOns) =>
         val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
         renderedFroms(jf.from) + onSql
       })
@@ -43,7 +43,9 @@ object JoinsToSql {
       namedFromsMap: Map[From, String],
       liveExprs: Option[Set[Expr.Identity]]
   ) = {
-    selectables.map { f => (f, renderSingleFrom(prevContext, liveExprs, f, namedFromsMap)) }.toMap
+    selectables.iterator.map { f =>
+      (f, renderSingleFrom(prevContext, liveExprs, f, namedFromsMap))
+    }.toMap
   }
 
   def renderSingleFrom(
@@ -77,11 +79,11 @@ object JoinsToSql {
       .renderFroms(from, prevContext, joinContext.fromNaming, Some(innerLiveExprs))
       .to(collection.mutable.Map)
 
-    val joins = SqlStr.join(joins0.zip(renderedJoinOns).map { case (join, joinOns) =>
+    val joins = SqlStr.join(joins0.iterator.zip(renderedJoinOns).map { case (join, joinOns) =>
       val joinPrefix = SqlStr.raw(join.prefix)
       val prevJoinContext = joinContext
       joinContext = Context.compute(joinContext, join.from.map(_.from), None)
-      val joinSelectables = SqlStr.join(join.from.zip(joinOns).map { case (jf, fromOns) =>
+      val joinSelectables = SqlStr.join(join.from.iterator.zip(joinOns).map { case (jf, fromOns) =>
         val onSql = SqlStr.flatten(SqlStr.opt(fromOns)(on => sql" ON $on"))
 
         renderedFroms.getOrElseUpdate(

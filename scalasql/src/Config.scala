@@ -18,6 +18,19 @@ object Config {
   }
 
   def camelToSnake(s: String) = {
-    s.replaceAll("([A-Z])", "#$1").split('#').map(_.toLowerCase).mkString("_").stripPrefix("_")
+    val chars = new collection.mutable.StringBuilder
+    var lowercase = false
+    for (c <- s) {
+      if (c.isUpper) {
+        if (lowercase == true) chars.append('_')
+        chars.append(c.toLower)
+        lowercase = false
+      } else {
+        chars.append(c)
+        lowercase = true
+      }
+
+    }
+    chars.toString()
   }
 }

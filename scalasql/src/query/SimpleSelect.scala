@@ -240,7 +240,7 @@ object SimpleSelect {
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
-          flattenedExpr.zip(exprsStrs).collect {
+          flattenedExpr.iterator.zip(exprsStrs).collect {
             case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.exprIdentity(e))) => s
           },
           sql", "

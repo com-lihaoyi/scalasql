@@ -46,9 +46,10 @@ object Queryable {
         val valueReader0: Q => Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q) = {
-        walk0(q).zipWithIndex.map { case (v, i) => (i.toString, v) }.flatMap { case (prefix, vs0) =>
-          vs0.map { case (k, v) => (prefix +: k, v) }
-        }
+        walk0(q).iterator.zipWithIndex
+          .map { case (v, i) => (i.toString, v) }
+          .flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
+          .toIndexedSeq
       }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {

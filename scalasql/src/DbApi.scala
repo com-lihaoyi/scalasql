@@ -134,7 +134,7 @@ object DbApi {
     def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val statement = connection.prepareStatement(sql)
-      for ((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
+      for ((variable, i) <- variables.iterator.zipWithIndex) statement.setObject(i + 1, variable)
 
       try block(statement.executeQuery())
       finally statement.close()
@@ -143,7 +143,9 @@ object DbApi {
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
-      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value): _*)(block)
+      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value).toSeq: _*)(
+        block
+      )
     }
 
     def runRawUpdate(sql: String, variables: Any*): Int = {
@@ -158,7 +160,7 @@ object DbApi {
         finally statement.close()
       } else {
         val statement = connection.prepareStatement(sql)
-        for ((variable, i) <- variables.zipWithIndex) statement.setObject(i + 1, variable)
+        for ((variable, i) <- variables.iterator.zipWithIndex) statement.setObject(i + 1, variable)
         try statement.executeUpdate()
         finally statement.close()
       }
@@ -167,7 +169,7 @@ object DbApi {
     def runUpdate(sql: SqlStr): Int = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
-      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value): _*)
+      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value).toSeq: _*)
     }
 
     def runRawUpdateBatch(sqls: Seq[String]) = {
@@ -190,12 +192,12 @@ object DbApi {
 
     def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
-    ): (String, Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
+    ): (String, collection.Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
       val ctx = Context.Impl(Map(), Map(), config)
       val sqlStr = qr.toSqlStr(query, ctx)
       val mappedTypes = qr.toTypeMappers(query)
       val flattened = SqlStr.flatten(sqlStr)
-      val queryStr = flattened.queryParts
+      val queryStr = flattened.queryParts.iterator
         .zipAll(flattened.params, "", null)
         .map {
           case (part, null) => part
@@ -253,7 +255,7 @@ object DbApi {
         .find(_ != -1)
         .foreach(statement.setQueryTimeout)
 
-      for ((p, n) <- params.zipWithIndex) {
+      for ((p, n) <- params.iterator.zipWithIndex) {
         p.mappedType.asInstanceOf[TypeMapper[Any]].put(statement, n + 1, p.value)
       }
 
