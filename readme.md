@@ -77,6 +77,7 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
   * [Expression Ops](docs/reference.md#exprops), covering the different
     types of `Expr[T]` values and the different operations you can do on each one
+  * [Window Functions](docs/reference.md#windowfunctions)
   * [Option Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
   * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
     [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:

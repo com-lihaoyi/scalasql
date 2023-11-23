@@ -7,6 +7,7 @@ import scalasql.renderer.{Context, SqlStr}
 
 case class WindowExpr[T](e: Expr[T],
                          partitionBy0: Option[Expr[_]],
+                         filter0: Option[Expr[Boolean]],
                          orderBy: Seq[scalasql.query.OrderBy],
                          frameStart0: Option[SqlStr],
                          frameEnd0: Option[SqlStr],
@@ -24,12 +25,16 @@ case class WindowExpr[T](e: Expr[T],
       case (Some(start), None, ex) => sql" ROWS $start" + SqlStr.opt(ex)(sql" " + _)
       case (Some(start), Some(end), ex) => sql" ROWS BETWEEN $start AND $end" + SqlStr.opt(ex)(sql" " + _)
     }
-    sql"$e OVER ($overClause$frameStr)"
+    val filterStr = SqlStr.opt(filter0){f =>
+      sql" FILTER (WHERE $f)"
+    }
+    sql"$e$filterStr OVER ($overClause$frameStr)"
 
   }
 
   def partitionBy(e: Expr[_]) = this.copy(partitionBy0 = Some(e))
 
+  def filter(expr: Expr[Boolean]) = copy(filter0 = Some(expr))
   def sortBy(expr: Expr[_]) = {
     val newOrder = Seq(OrderBy(expr, None, None))
 
@@ -74,7 +79,7 @@ case class WindowExpr[T](e: Expr[T],
     }
   }
 
-  object frameExclusion{
+  object exclude{
     def currentRow = copy(exclusions = Some(sql"EXCLUDE CURRENT ROW"))
     def group = copy(exclusions = Some(sql"EXCLUDE GROUP"))
     def ties = copy(exclusions = Some(sql"EXCLUDE TIES"))
