@@ -111,15 +111,8 @@ trait Dialect extends DialectConfig {
   def withCte[Q, Q2, R, R2](
       lhs: Select[Q, R]
   )(block: Select[Q, R] => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    val lhsSubQueryRef = new WithCteRef()
-    val rhsSelect = new SimpleSelect[Q, R](
-      expr = WithExpr.get(lhs),
-      exprPrefix = None,
-      from = Seq(lhsSubQueryRef),
-      joins = Nil,
-      where = Nil,
-      groupBy0 = None
-    )(lhs.qr)
+    val lhsSubQueryRef = new WithCteRef[Q, R]()
+    val rhsSelect = new WithCte.Proxy[Q, R](lhs, lhsSubQueryRef, lhs.qr)
 
     new WithCte(lhs, lhsSubQueryRef, block(rhsSelect))
   }

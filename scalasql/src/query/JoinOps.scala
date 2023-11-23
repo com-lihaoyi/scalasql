@@ -48,7 +48,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
       on: Option[Expr[Boolean]],
       isTrivialJoin: Boolean
   )(implicit joinQr: Queryable.Row[Q2, _]) = {
-    if (isTrivialJoin)
+    if (isTrivialJoin) {
       Join(
         joinPrefix,
         Seq(
@@ -58,7 +58,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
           )
         )
       )
-    else
+    } else {
       Join(
         joinPrefix,
         Seq(
@@ -68,6 +68,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
           )
         )
       )
+    }
   }
 
   def joinCopy2[Q2, R2, Q3, R3](

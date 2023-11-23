@@ -62,6 +62,7 @@ object JoinsToSql {
       case t: SubqueryRef[_, _] =>
         val toSqlQuery = Select.selectRenderer(t.value, prevContext)
         sql"(${toSqlQuery.render(liveExprs)}) $name"
+
       case t: WithCteRef[_, _] => name
     }
   }

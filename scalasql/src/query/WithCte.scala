@@ -11,13 +11,14 @@ import scalasql.{Queryable, TypeMapper}
 class WithCte[Q, R](
     val lhs: Select[_, _],
     val lhsSubQuery: WithCteRef[_, _],
-    val rhs: Select[Q, R]
+    val rhs: Select[Q, R],
+    val withPrefix: SqlStr = sql"WITH "
 )(implicit val qr: Queryable.Row[Q, R])
     extends Select[Q, R] {
 
   protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
+  private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, sql", ")
 
-  protected override def joinableSelect = this
 
   def distinct: Select[Q, R] = selectSimpleFrom().distinct
   protected def selectSimpleFrom() = this.subquery
@@ -90,7 +91,8 @@ class WithCte[Q, R](
   protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def selectRenderer(prevContext: Context) =
-    new WithCte.Renderer(this, prevContext)
+    new WithCte.Renderer(withPrefix, this, prevContext)
+
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
@@ -99,8 +101,32 @@ class WithCte[Q, R](
 }
 
 object WithCte {
+  class Proxy[Q, R](lhs: WithExpr[Q], lhsSubQueryRef: WithCteRef[Q, R], val qr: Queryable.Row[Q, R]) extends Select.Proxy[Q, R] {
+//    override def joinableSelect = this
+    override def joinableIsTrivial = true
+    protected override def joinableSelect = selectSimpleFrom()
+    override protected def selectSimpleFrom(): SimpleSelect[Q, R] =
+      new SimpleSelect[Q, R](
+        expr = WithExpr.get(lhs),
+        exprPrefix = None,
+        from = Seq(lhsSubQueryRef),
+        joins = Nil,
+        where = Nil,
+        groupBy0 = None
+      )(qr)
 
-  class Renderer[Q, R](query: WithCte[Q, R], prevContext: Context) extends Select.Renderer {
+    override def selectRenderer(prevContext: Context): Select.Renderer = new Select.Renderer {
+      def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {
+        SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
+      }
+    }
+
+    override protected def renderToSql(ctx: Context): SqlStr = {
+      SqlStr.raw(ctx.fromNaming(lhsSubQueryRef))
+    }
+  }
+
+  class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context) extends Select.Renderer {
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
       val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walk(WithExpr.get(query.lhs))
       val newExprNaming = walked.map { case (tokens, expr) =>
@@ -113,9 +139,16 @@ object WithCte {
       val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))
       val rhsSql = SqlStr.flatten(
+        (query.rhs match {
+          case w: WithCte[Q, R] => sql""
+          case r => sql" "
+        }) +
         Select
           .selectRenderer(
-            query.rhs,
+            query.rhs match{
+              case w: WithCte[Q, R] => w.unprefixed
+              case r => r
+            },
             newContext.withExprNaming(
               newContext.exprNaming ++
                 newExprNaming.map { case (k, v) => (k, sql"$cteName.$v") }
@@ -131,7 +164,7 @@ object WithCte {
         sql", "
       )
 
-      sql"WITH $cteName ($cteColumns) AS ($lhsSql) $rhsSql"
+      sql"$withPrefix$cteName ($cteColumns) AS ($lhsSql)$rhsSql"
     }
 
   }
