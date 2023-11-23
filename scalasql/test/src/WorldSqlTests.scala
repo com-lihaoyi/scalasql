@@ -1096,6 +1096,55 @@ object WorldSqlTests extends TestSuite {
         )
         // -DOCS
       }
+
+      test("largestThreeCitiesByCountry") {
+        // +DOCS
+        // ### Most Populous Three Cities In Each Country
+        // This example queries the top 3 cities with the largest population in
+        // each country, using ScalaSql's `rank()` function that translates into
+        // SQL's `RANK()`. Note that `RANK()` does not work inside the SQL `WHERE`
+        // clause, and so we need to use `.subquery` to ensure that the `RANK()` is
+        // run in an isolated subquery and does not get executed in the WHERE clause
+        val query = City.select
+          .map(c => (c, rank().over.partitionBy(c.countryCode).sortBy(c.population).desc))
+          .subquery
+          .filter{case (city, r) => r <= 3}
+          .map{case (city, r) => (city.name, city.population, city.countryCode, r)}
+          .join(Country)(_._3 === _.code)
+          .sortBy(_._2.population).desc
+          .map{case (city, country) => city}
+
+        db.toSqlQuery(query) ==> """
+        SELECT
+          subquery0.res__0__name AS res__0,
+          subquery0.res__0__population AS res__1,
+          subquery0.res__0__countrycode AS res__2,
+          subquery0.res__1 AS res__3
+        FROM (SELECT
+            city0.name AS res__0__name,
+            city0.countrycode AS res__0__countrycode,
+            city0.population AS res__0__population,
+            RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__1
+          FROM city city0) subquery0
+        JOIN country country1 ON (subquery0.res__0__countrycode = country1.code)
+        WHERE (subquery0.res__1 <= ?)
+        ORDER BY country1.population DESC
+        """
+
+        db.run(query).take(10) ==> Seq(
+          ("Shanghai", 9696300L, "CHN", 1),
+          ("Peking", 7472000L, "CHN", 2),
+          ("Chongqing", 6351600L, "CHN", 3),
+          ("Mumbai (Bombay)", 10500000L, "IND", 1),
+          ("Delhi", 7206704L, "IND", 2),
+          ("Calcutta [Kolkata]", 4399819L, "IND", 3),
+          ("New York", 8008278L, "USA", 1),
+          ("Los Angeles", 3694820L, "USA", 2),
+          ("Chicago", 2896016L, "USA", 3),
+          ("Jakarta", 9604900L, "IDN", 1),
+        )
+        // -DOCS
+      }
     }
 
     test("insert") {
