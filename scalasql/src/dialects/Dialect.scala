@@ -60,17 +60,22 @@ trait Dialect extends DialectConfig {
   def rank(): Expr[Int] = Expr{implicit ctx => sql"RANK()"}
   def rowNumber(): Expr[Int] = Expr{implicit ctx => sql"ROW_NUMBER()"}
   def denseRank(): Expr[Int] = Expr{implicit ctx => sql"DENSE_RANK()"}
-  def percentRank(): Expr[Int] = Expr{implicit ctx => sql"PERCENT_RANK()"}
-  def cumeDist(n: Int): Expr[Int] = Expr{implicit ctx => sql"CUME_DIST($n)"}
-  def nTile(): Expr[Int] = Expr{implicit ctx => sql"N_TILE()"}
+  def percentRank(): Expr[Double] = Expr{implicit ctx => sql"PERCENT_RANK()"}
+  def cumeDist(): Expr[Double] = Expr{implicit ctx => sql"CUME_DIST()"}
+  def ntile(n: Int): Expr[Int] = Expr{implicit ctx => sql"NTILE($n)"}
 
   private def lagLead[T](prefix: SqlStr,
                          e: Expr[T],
                          offset: Int, default: Expr[T]): Expr[T] = Expr { implicit ctx =>
     val args = SqlStr.join(
-      Seq(Some(sql"$e"), Some(offset).filter(_ != 1).map(o => sql"$o"), Option(default).map(d => sql"$d")).flatten,
+      Seq(
+        Some(sql"$e"),
+        Some(offset).filter(_ != -1).map(o => sql"$o"),
+        Option(default).map(d => sql"$d")
+      ).flatten,
       sql", "
     )
+
     sql"$prefix($args)"
   }
 
