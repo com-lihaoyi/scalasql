@@ -260,7 +260,11 @@ val studentsWithAnAddress = from(students)(s =>
 ScalaSql aims to mimic both the syntax and semantics of Scala collections, which should
 hopefully result in a library much more familiar to Scala programmers. Squeryl's DSL on
 the other hand is unlike Scala collections, but as an embedded DSL is unlike raw SQL as
-well, making it unfamiliar to people with either Scala or raw SQL expertise
+well, making it unfamiliar to people with either Scala or raw SQL expertise.
+
+While ScalaSql still has some syntax edge cases - e.g. using triple `===` instead of double
+`==` - overall it should give us a much more familiar experience to Scala programmers than
+libraries like Squeryl (above) or ScalikeJDBC (below).
 
 ### ScalikeJDBC
 
