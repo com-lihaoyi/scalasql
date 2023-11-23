@@ -11,10 +11,9 @@ import scalasql.{Queryable, TypeMapper}
 class WithCte[Q, R](
     val lhs: Select[_, _],
     val lhsSubQuery: WithCteRef[_, _],
-    val rhs: Select[Q, R],
+    val rhs: Select[Q, R]
 )(implicit val qr: Queryable.Row[Q, R])
     extends Select[Q, R] {
-
 
   protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
 
@@ -64,7 +63,9 @@ class WithCte[Q, R](
     selectSimpleFrom().aggregate(f)
   }
 
-  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+  def mapAggregate[Q2, R2](
+      f: (Q, SelectProxy[Q]) => Q2
+  )(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     selectSimpleFrom().mapAggregate(f)
   }
 
@@ -100,28 +101,37 @@ class WithCte[Q, R](
 object WithCte {
 
   class Renderer[Q, R](query: WithCte[Q, R], prevContext: Context) extends Select.Renderer {
-
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
-      val lhsRenderer = Select.selectRenderer(query.lhs, prevContext)
-      val lhsSql = lhsRenderer.render(liveExprs)
-
       val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walk(WithExpr.get(query.lhs))
-
       val newExprNaming = walked.map { case (tokens, expr) =>
-        (Expr.exprIdentity(expr), SqlStr.raw(FlatJson.flatten(tokens, prevContext)))
+        (
+          Expr.exprIdentity(expr),
+          SqlStr.raw(FlatJson.flatten(tokens, prevContext), Seq(Expr.exprIdentity(expr)))
+        )
       }
 
-      val rhsSql = Select.selectRenderer(
-        query.rhs,
-        prevContext.withExprNaming(
-          prevContext.exprNaming ++
-            newExprNaming.map{case (k, v) => (k, sql"${SqlStr.raw(query.lhsSubQuery.name)}.$v")}
-        )
-      ).render(liveExprs)
+      val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
+      val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))
+      val rhsSql = SqlStr.flatten(
+        Select
+          .selectRenderer(
+            query.rhs,
+            newContext.withExprNaming(
+              newContext.exprNaming ++
+                newExprNaming.map { case (k, v) => (k, sql"$cteName.$v") }
+            )
+          )
+          .render(liveExprs)
+      )
+      val rhsReferenced = rhsSql.referencedExprs.toSet
+      val lhsSql = Select.selectRenderer(query.lhs, prevContext).render(Some(rhsReferenced))
 
-      val cteColumns = SqlStr.join(newExprNaming.map(_._2), sql", ")
+      val cteColumns = SqlStr.join(
+        newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },
+        sql", "
+      )
 
-      sql"WITH ${SqlStr.raw(query.lhsSubQuery.name)}($cteColumns) AS ($lhsSql) $rhsSql"
+      sql"WITH $cteName ($cteColumns) AS ($lhsSql) $rhsSql"
     }
 
   }

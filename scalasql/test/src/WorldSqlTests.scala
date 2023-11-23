@@ -885,7 +885,7 @@ object WorldSqlTests extends TestSuite {
       // -DOCS
     }
     test("window") {
-      test("simple"){
+      test("simple") {
         // +DOCS
         // ## Window Functions
         // ScalaSql supports window functions via the `.over` operator, which
@@ -900,8 +900,9 @@ object WorldSqlTests extends TestSuite {
               rank().over.partitionBy(c.countryCode).sortBy(c.population).desc
             )
           )
-          .filter{case (name, countryCode, population, rank) =>
-            values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
+          .filter { case (name, countryCode, population, rank) =>
+            values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu"))
+              .contains(name)
           }
 
         db.toSqlQuery(query) ==> """
@@ -923,7 +924,7 @@ object WorldSqlTests extends TestSuite {
         )
         // -DOCS
       }
-      test("aggregate"){
+      test("aggregate") {
         // +DOCS
         // You can also perform aggregates as part of your window function by using
         // the `.mapAggregate` function; this provides a `SelectProxy[Q]` rather than
@@ -939,7 +940,7 @@ object WorldSqlTests extends TestSuite {
               cs.sumBy(_.population).over.partitionBy(c.countryCode).sortBy(c.population).desc
             )
           )
-          .filter{case (name, countryCode, population, rank) =>
+          .filter { case (name, countryCode, population, rank) =>
             values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
           }
 

@@ -142,7 +142,9 @@ class SimpleSelect[Q, R](
     )(qr)
   }
 
-  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+  def mapAggregate[Q2, R2](
+      f: (Q, SelectProxy[Q]) => Q2
+  )(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     val selectProxyExpr = f(expr, new SelectProxy[Q](expr))
     this.copy(expr = selectProxyExpr)
   }

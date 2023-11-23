@@ -854,8 +854,9 @@ val query = City.select
       rank().over.partitionBy(c.countryCode).sortBy(c.population).desc
     )
   )
-  .filter{case (name, countryCode, population, rank) =>
-    values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
+  .filter { case (name, countryCode, population, rank) =>
+    values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu"))
+      .contains(name)
   }
 
 db.toSqlQuery(query) ==> """
@@ -892,7 +893,7 @@ val query = City.select
       cs.sumBy(_.population).over.partitionBy(c.countryCode).sortBy(c.population).desc
     )
   )
-  .filter{case (name, countryCode, population, rank) =>
+  .filter { case (name, countryCode, population, rank) =>
     values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
   }
 

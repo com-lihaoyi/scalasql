@@ -46,7 +46,7 @@ class TableRef(val value: Table.Base) extends From {
   override def toString = s"TableRef(${value.tableName})"
 }
 class SubqueryRef[Q, R](val value: Select[Q, R], val qr: Queryable[Q, R]) extends From
-class WithCteRef[Q, R](val name: String) extends From
+class WithCteRef[Q, R]() extends From
 
 /**
  * Models a SQL `GROUP BY` clause

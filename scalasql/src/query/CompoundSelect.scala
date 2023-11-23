@@ -83,7 +83,9 @@ class CompoundSelect[Q, R](
     selectSimpleFrom().aggregate(f)
   }
 
-  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+  def mapAggregate[Q2, R2](
+      f: (Q, SelectProxy[Q]) => Q2
+  )(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     selectSimpleFrom().mapAggregate(f)
   }
 
@@ -185,7 +187,8 @@ object CompoundSelect {
 
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
-    def orderToSqlStr(newCtx: Context) = CompoundSelect.orderToSqlStr(query.orderBy, newCtx, gap = true)
+    def orderToSqlStr(newCtx: Context) =
+      CompoundSelect.orderToSqlStr(query.orderBy, newCtx, gap = true)
   }
 
   def orderToSqlStr(orderBys: Seq[OrderBy], newCtx: Context, gap: Boolean = false) = {

@@ -1,7 +1,17 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps, WindowExpr}
-import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, SimpleSelect, SubqueryRef, WithCte, WithCteRef, WithExpr}
+import scalasql.query.{
+  Aggregatable,
+  Expr,
+  JoinNullable,
+  Select,
+  SimpleSelect,
+  SubqueryRef,
+  WithCte,
+  WithCteRef,
+  WithExpr
+}
 import scalasql.renderer.SqlStr
 import scalasql.{Queryable, Table, TypeMapper, operations}
 
@@ -57,53 +67,51 @@ trait Dialect extends DialectConfig {
 
   import scalasql.renderer.SqlStr.SqlStringSyntax
 
-  def rank(): Expr[Int] = Expr{implicit ctx => sql"RANK()"}
-  def rowNumber(): Expr[Int] = Expr{implicit ctx => sql"ROW_NUMBER()"}
-  def denseRank(): Expr[Int] = Expr{implicit ctx => sql"DENSE_RANK()"}
-  def percentRank(): Expr[Double] = Expr{implicit ctx => sql"PERCENT_RANK()"}
-  def cumeDist(): Expr[Double] = Expr{implicit ctx => sql"CUME_DIST()"}
-  def ntile(n: Int): Expr[Int] = Expr{implicit ctx => sql"NTILE($n)"}
+  def rank(): Expr[Int] = Expr { implicit ctx => sql"RANK()" }
+  def rowNumber(): Expr[Int] = Expr { implicit ctx => sql"ROW_NUMBER()" }
+  def denseRank(): Expr[Int] = Expr { implicit ctx => sql"DENSE_RANK()" }
+  def percentRank(): Expr[Double] = Expr { implicit ctx => sql"PERCENT_RANK()" }
+  def cumeDist(): Expr[Double] = Expr { implicit ctx => sql"CUME_DIST()" }
+  def ntile(n: Int): Expr[Int] = Expr { implicit ctx => sql"NTILE($n)" }
 
-  private def lagLead[T](prefix: SqlStr,
-                         e: Expr[T],
-                         offset: Int, default: Expr[T]): Expr[T] = Expr { implicit ctx =>
-    val args = SqlStr.join(
-      Seq(
-        Some(sql"$e"),
-        Some(offset).filter(_ != -1).map(o => sql"$o"),
-        Option(default).map(d => sql"$d")
-      ).flatten,
-      sql", "
-    )
+  private def lagLead[T](prefix: SqlStr, e: Expr[T], offset: Int, default: Expr[T]): Expr[T] =
+    Expr { implicit ctx =>
+      val args = SqlStr.join(
+        Seq(
+          Some(sql"$e"),
+          Some(offset).filter(_ != -1).map(o => sql"$o"),
+          Option(default).map(d => sql"$d")
+        ).flatten,
+        sql", "
+      )
 
-    sql"$prefix($args)"
-  }
+      sql"$prefix($args)"
+    }
 
   def lag[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
     lagLead(sql"LAG", e, offset, default)
   def lead[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
     lagLead(sql"LEAD", e, offset, default)
 
-  def firstValue[T](e: Expr[T]): Expr[T] = Expr{implicit ctx => sql"FIRST_VALUE($e)"}
-  def lastValue[T](e: Expr[T]): Expr[T] = Expr{implicit ctx => sql"LAST_VALUE($e)"}
-  def nthValue[T](e: Expr[T], n: Int): Expr[T] = Expr{implicit ctx => sql"NTH_VALUE($e, $n)"}
-
+  def firstValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"FIRST_VALUE($e)" }
+  def lastValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"LAST_VALUE($e)" }
+  def nthValue[T](e: Expr[T], n: Int): Expr[T] = Expr { implicit ctx => sql"NTH_VALUE($e, $n)" }
 
   implicit class WindowExtensions[T](e: Expr[T]) {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
   }
 
-  //with cte(x) as (SELECT name as x from buyer)
+  // with cte(x) as (SELECT name as x from buyer)
   //  select x || 'xxx' from cte
   //
-  //SELECT * from (
+  // SELECT * from (
   //  with cte(x) as (SELECT name as x from buyer)
   //    select x || 'xxx' from cte
   //  ) v
-  def withCte[Q, Q2, R, R2](lhs: Select[Q, R])
-                           (block: Select[Q, R] => Select[Q2, R2])
-                           (implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    val lhsSubQueryRef = new WithCteRef("cte")
+  def withCte[Q, Q2, R, R2](
+      lhs: Select[Q, R]
+  )(block: Select[Q, R] => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+    val lhsSubQueryRef = new WithCteRef()
     val rhsSelect = new SimpleSelect[Q, R](
       expr = WithExpr.get(lhs),
       exprPrefix = None,

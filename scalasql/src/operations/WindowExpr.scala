@@ -5,13 +5,15 @@ import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
 
-case class WindowExpr[T](e: Expr[T],
-                         partitionBy0: Option[Expr[_]],
-                         filter0: Option[Expr[Boolean]],
-                         orderBy: Seq[scalasql.query.OrderBy],
-                         frameStart0: Option[SqlStr],
-                         frameEnd0: Option[SqlStr],
-                         exclusions: Option[SqlStr]) extends Expr[T] {
+case class WindowExpr[T](
+    e: Expr[T],
+    partitionBy0: Option[Expr[_]],
+    filter0: Option[Expr[Boolean]],
+    orderBy: Seq[scalasql.query.OrderBy],
+    frameStart0: Option[SqlStr],
+    frameEnd0: Option[SqlStr],
+    exclusions: Option[SqlStr]
+) extends Expr[T] {
   protected def toSqlExpr0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }
     val sortBySql = CompoundSelect.orderToSqlStr(orderBy, ctx)
@@ -20,12 +22,13 @@ case class WindowExpr[T](e: Expr[T],
       sql" "
     )
 
-    val frameStr = (frameStart0, frameEnd0, exclusions) match{
+    val frameStr = (frameStart0, frameEnd0, exclusions) match {
       case (None, None, None) => sql""
       case (Some(start), None, ex) => sql" ROWS $start" + SqlStr.opt(ex)(sql" " + _)
-      case (Some(start), Some(end), ex) => sql" ROWS BETWEEN $start AND $end" + SqlStr.opt(ex)(sql" " + _)
+      case (Some(start), Some(end), ex) =>
+        sql" ROWS BETWEEN $start AND $end" + SqlStr.opt(ex)(sql" " + _)
     }
-    val filterStr = SqlStr.opt(filter0){f =>
+    val filterStr = SqlStr.opt(filter0) { f =>
       sql" FILTER (WHERE $f)"
     }
     sql"$e$filterStr OVER ($overClause$frameStr)"
@@ -79,7 +82,7 @@ case class WindowExpr[T](e: Expr[T],
     }
   }
 
-  object exclude{
+  object exclude {
     def currentRow = copy(exclusions = Some(sql"EXCLUDE CURRENT ROW"))
     def group = copy(exclusions = Some(sql"EXCLUDE GROUP"))
     def ties = copy(exclusions = Some(sql"EXCLUDE TIES"))

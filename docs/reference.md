@@ -4810,7 +4810,11 @@ Purchase.select.map(p =>
 
 ```scala
 Purchase.select.map(p =>
-  (p.shippingInfoId, p.total, rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc)
+  (
+    p.shippingInfoId,
+    p.total,
+    rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+  )
 )
 ```
 
@@ -5979,6 +5983,64 @@ Buyer.select.map { buyer =>
       ("叉烧包", 300.0),
       ("Li Haoyi", 0.0)
     )
+    ```
+
+
+
+## WithCte
+Basic `WITH`/Common-Table-Expression operations
+### WithCte.simple
+
+ScalaSql supports `WITH`-clauses, also known as "Common Table Expressions"
+(CTEs), via the `.withCte` syntax.
+
+```scala
+withCte(Buyer.select.map(_.name)) { x =>
+  x.map(_ + "xxx")
+}
+```
+
+
+*
+    ```sql
+    WITH cte0 (res) AS (SELECT buyer0.name AS res FROM buyer buyer0)
+    SELECT (cte0.res || ?) AS res
+    FROM cte0
+    ```
+
+
+
+*
+    ```scala
+    Seq("James Bondxxx", "叉烧包xxx", "Li Haoyixxx")
+    ```
+
+
+
+### WithCte.eliminated
+
+Only the necessary columns are exported from the `WITH` clause; columns that
+are un-used in the downstream `SELECT` clause are eliminated
+
+```scala
+withCte(Buyer.select) { x =>
+  x.map(_.name + "xxx")
+}
+```
+
+
+*
+    ```sql
+    WITH cte0 (res__name) AS (SELECT buyer0.name AS res__name FROM buyer buyer0)
+    SELECT (cte0.res__name || ?) AS res
+    FROM cte0
+    ```
+
+
+
+*
+    ```scala
+    Seq("James Bondxxx", "叉烧包xxx", "Li Haoyixxx")
     ```
 
 

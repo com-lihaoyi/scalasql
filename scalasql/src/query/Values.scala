@@ -50,7 +50,9 @@ class Values[T: TypeMapper](val ts: Seq[T])(implicit val qr: Queryable.Row[Expr[
   def aggregate[E, V](f: SelectProxy[Expr[T]] => E)(implicit qr: Queryable.Row[E, V]) =
     selectSimpleFrom().aggregate(f)
 
-  def mapAggregate[Q2, R2](f: (Expr[T], SelectProxy[Expr[T]]) => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
+  def mapAggregate[Q2, R2](
+      f: (Expr[T], SelectProxy[Expr[T]]) => Q2
+  )(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     selectSimpleFrom().mapAggregate(f)
   }
 

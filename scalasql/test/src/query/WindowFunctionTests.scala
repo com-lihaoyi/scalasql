@@ -12,7 +12,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
   def description = "Window functions using `OVER`"
 
   def tests = Tests {
-    test("simple"){
+    test("simple") {
       test("rank") - checker(
         query = Text {
           Purchase.select.map(p =>
@@ -52,7 +52,8 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc)
+              rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+            )
           )
         },
         sql = """
@@ -248,7 +249,6 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
       )
 
-
       test("lead") - checker(
         query = Text {
           Purchase.select.map(p =>
@@ -277,7 +277,6 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         ),
         normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
       )
-
 
       test("firstValue") - checker(
         query = Text {
@@ -366,7 +365,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
       )
     }
-    test("aggregate"){
+    test("aggregate") {
 
       test("sumBy") - checker(
         query = Text {
@@ -475,22 +474,28 @@ trait WindowFunctionTests extends ScalaSqlSuite {
     }
     test("frames") - {
       // MySql doesn't support `.exclude`
-      if (!this.isInstanceOf[MySqlDialect]) checker(
-        query = Text {
-          Purchase.select.mapAggregate((p, ps) =>
-            (
-              p.shippingInfoId,
-              p.total,
-              ps.sumBy(_.total).over
-                .partitionBy(p.shippingInfoId)
-                .sortBy(p.total).asc
-                .frameStart.preceding()
-                .frameEnd.following()
-                .exclude.currentRow
+      if (!this.isInstanceOf[MySqlDialect])
+        checker(
+          query = Text {
+            Purchase.select.mapAggregate((p, ps) =>
+              (
+                p.shippingInfoId,
+                p.total,
+                ps.sumBy(_.total)
+                  .over
+                  .partitionBy(p.shippingInfoId)
+                  .sortBy(p.total)
+                  .asc
+                  .frameStart
+                  .preceding()
+                  .frameEnd
+                  .following()
+                  .exclude
+                  .currentRow
+              )
             )
-          )
-        },
-        sql = """
+          },
+          sql = """
         SELECT
           purchase0.shipping_info_id AS res__0,
           purchase0.total AS res__1,
@@ -501,40 +506,42 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW) AS res__2
         FROM purchase purchase0
       """,
-        value = Seq[(Int, Double, Double)](
-          (1, 15.7, 1788.0),
-          (1, 888.0, 915.7),
-          (1, 900.0, 903.7),
-          (2, 493.8, 10000.0),
-          (2, 10000.0, 493.8),
-          (3, 1.3, 44.4),
-          (3, 44.4, 1.3)
-        ),
-
-        normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2)),
-        docs = """
+          value = Seq[(Int, Double, Double)](
+            (1, 15.7, 1788.0),
+            (1, 888.0, 915.7),
+            (1, 900.0, 903.7),
+            (2, 493.8, 10000.0),
+            (2, 10000.0, 493.8),
+            (3, 1.3, 44.4),
+            (3, 44.4, 1.3)
+          ),
+          normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2)),
+          docs = """
         You can have further control over the window function call via `.frameStart`,
         `.frameEnd`, `.exclude`
       """
-      )
+        )
     }
 
     test("filter") - {
       // MySql doesn't support FILTER
-      if (!this.isInstanceOf[MySqlDialect]) checker(
-        query = Text {
-          Purchase.select.mapAggregate((p, ps) =>
-            (
-              p.shippingInfoId,
-              p.total,
-              ps.sumBy(_.total).over
-                .filter(p.total > 100)
-                .partitionBy(p.shippingInfoId)
-                .sortBy(p.total).asc
+      if (!this.isInstanceOf[MySqlDialect])
+        checker(
+          query = Text {
+            Purchase.select.mapAggregate((p, ps) =>
+              (
+                p.shippingInfoId,
+                p.total,
+                ps.sumBy(_.total)
+                  .over
+                  .filter(p.total > 100)
+                  .partitionBy(p.shippingInfoId)
+                  .sortBy(p.total)
+                  .asc
+              )
             )
-          )
-        },
-        sql = """
+          },
+          sql = """
         SELECT
           purchase0.shipping_info_id AS res__0,
           purchase0.total AS res__1,
@@ -544,22 +551,22 @@ trait WindowFunctionTests extends ScalaSqlSuite {
               ORDER BY purchase0.total ASC) AS res__2
         FROM purchase purchase0
       """,
-        value = Seq[(Int, Double, Double)](
-          (1, 15.7, 0.0),
-          (1, 888.0, 888.0),
-          (1, 900.0, 1788.0),
-          (2, 493.8, 493.8),
-          (2, 10000.0, 10493.8),
-          (3, 1.3, 0.0),
-          (3, 44.4, 0.0)
-        ),
-        normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2)),
-        docs = """
+          value = Seq[(Int, Double, Double)](
+            (1, 15.7, 0.0),
+            (1, 888.0, 888.0),
+            (1, 900.0, 1788.0),
+            (2, 493.8, 493.8),
+            (2, 10000.0, 10493.8),
+            (3, 1.3, 0.0),
+            (3, 44.4, 0.0)
+          ),
+          normalize = (x: Seq[(Int, Double, Double)]) => x.sortBy(t => (t._1, t._2)),
+          docs = """
         ScalaSql allows `.filter` to be used after `over` to add a SQL `FILTER` clause
         to your window function call, allowing you to exclude certain rows from the
         window.
       """
-      )
+        )
     }
 
   }

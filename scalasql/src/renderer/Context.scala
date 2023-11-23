@@ -40,11 +40,11 @@ object Context {
     val prevSize = prevContext.fromNaming.size
     val newFromNaming =
       prevContext.fromNaming ++
-        selectables.zipWithIndex.toMap.map {
+        selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
           case (t: TableRef, i) =>
             (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
-          case (s: WithCteRef[_, _], i) => (s, s.name)
+          case (s: WithCteRef[_, _], i) => (s, "cte" + (i + prevSize))
         } ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
 
