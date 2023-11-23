@@ -22,7 +22,8 @@ import query.{
   ReturningTests,
   OnConflictTests,
   ValuesTests,
-  LateralJoinTests
+  LateralJoinTests,
+  WindowFunctionTests
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -51,6 +52,7 @@ package postgres {
   object OnConflictTests extends OnConflictTests with PostgresSuite
   object ValuesTests extends ValuesTests with PostgresSuite
   object LateralJoinTests extends LateralJoinTests with PostgresSuite
+  object WindowFunctionTests extends WindowFunctionTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
 
@@ -89,6 +91,7 @@ package hikari {
   object OnConflictTests extends OnConflictTests with HikariSuite
   object ValuesTests extends ValuesTests with HikariSuite
   object LateralJoinTests extends LateralJoinTests with HikariSuite
+  object WindowFunctionTests extends WindowFunctionTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
 
@@ -130,6 +133,7 @@ package mysql {
   // object OnConflictTests extends OnConflictTests with MySqlSuite
   object ValuesTests extends ValuesTests with MySqlSuite
   object LateralJoinTests extends LateralJoinTests with MySqlSuite
+  object WindowFunctionTests extends WindowFunctionTests with MySqlSuite
 
   object SubQueryTests extends SubQueryTests with MySqlSuite
 
@@ -167,6 +171,7 @@ package sqlite {
   object ValuesTests extends ValuesTests with SqliteSuite
   // Sqlite does not support lateral joins
   // object LateralJoinTests extends LateralJoinTests with SqliteSuite
+  object WindowFunctionTests extends WindowFunctionTests with SqliteSuite
 
   object SubQueryTests extends SubQueryTests with SqliteSuite
 
@@ -206,6 +211,7 @@ package h2 {
   object ValuesTests extends ValuesTests with H2Suite
   // H2 does not support lateral joins
   // object LateralJoinTests extends LateralJoinTests with H2Suite
+  object WindowFunctionTests extends WindowFunctionTests with H2Suite
 
   object SubQueryTests extends SubQueryTests with H2Suite
 
