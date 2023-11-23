@@ -181,10 +181,10 @@ object CompoundSelect {
 
       lhsStr + compound + sortOpt + limitOpt + offsetOpt
     }
-    def orderToSqlStr(newCtx: Context) = CompoundSelect.orderToSqlStr(query.orderBy, newCtx)
+    def orderToSqlStr(newCtx: Context) = CompoundSelect.orderToSqlStr(query.orderBy, newCtx, gap = true)
   }
 
-  def orderToSqlStr(orderBys: Seq[OrderBy], newCtx: Context) = {
+  def orderToSqlStr(orderBys: Seq[OrderBy], newCtx: Context, gap: Boolean = false) = {
 
     SqlStr.optSeq(orderBys) { orderBys =>
       val orderStr = SqlStr.join(
@@ -204,7 +204,8 @@ object CompoundSelect {
         sql", "
       )
 
-      sql"ORDER BY " + orderStr
+      val prefix = if (gap) sql" ORDER BY " else sql"ORDER BY "
+      prefix + orderStr
     }
 
   }
