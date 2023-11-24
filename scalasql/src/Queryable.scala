@@ -37,12 +37,13 @@ object Queryable {
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
-
+    def toTypeMappers0: Seq[TypeMapper[_]]
+    def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R](
         val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
-        val toTypeMappers0: Q => Seq[Seq[TypeMapper[_]]],
+        val toTypeMappers0List: Seq[Seq[TypeMapper[_]]],
         val valueReader0: Q => Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q) = {
@@ -57,7 +58,7 @@ object Queryable {
         ExprsToSql(walked, sql"", ctx)
       }
 
-      def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0(q).flatten
+      def toTypeMappers0: Seq[TypeMapper[_]] = toTypeMappers0List.flatten
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
     }
@@ -73,7 +74,7 @@ object Queryable {
       }
 
       def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
-      def toTypeMappers(q: JoinNullable[Q]) = qr.toTypeMappers(q.get)
+      def toTypeMappers0 = qr.toTypeMappers0
     }
   }
 

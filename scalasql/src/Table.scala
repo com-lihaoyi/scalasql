@@ -58,7 +58,7 @@ object Table {
   object Internal {
     class TableQueryable[Q, R](
         flatten0: Q => Seq[(List[String], Expr[_])],
-        val toTypeMappers0: Q => Seq[TypeMapper[_]],
+        val toTypeMappers0: Seq[TypeMapper[_]],
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
@@ -71,7 +71,6 @@ object Table {
         res
       }
 
-      def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0(q)
     }
 
     def flattenPrefixed[T](t: T, prefix: String)(

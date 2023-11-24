@@ -21,7 +21,7 @@ object TableMacros {
         ).expr($tableRef)
       """
     }
-    val allToSqlQueryExprs = for (applyParam <- applyParameters) yield {
+    val allTypeMappers = for (applyParam <- applyParameters) yield {
       q"""implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]"""
     }
 
@@ -39,7 +39,7 @@ object TableMacros {
       new _root_.scalasql.Table.Metadata[$wtt](
         new _root_.scalasql.Table.Internal.TableQueryable(
           table => $allFlattenedExprs,
-          table => $allToSqlQueryExprs,
+          $allTypeMappers,
           _root_.scalasql.utils.OptionPickler.macroR
         ),
         ($tableRef: _root_.scalasql.query.TableRef) => new $wtt(..$queryParams)

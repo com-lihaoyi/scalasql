@@ -40,6 +40,10 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
+  def runQuery0[T](sql: SqlStr)
+                  (implicit qr: Queryable.Row[_, T],
+                   vr: OptionPickler.Reader[T]): T
+
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
    * [[block]] allowing you to process the resultant [[ResultSet]]
@@ -140,6 +144,34 @@ object DbApi {
       finally statement.close()
     }
 
+    def runQuery0[T](sql: SqlStr)
+                    (implicit qr: Queryable.Row[_, T],
+                     vr: OptionPickler.Reader[T]): T = {
+      if (autoCommit) connection.setAutoCommit(true)
+      val flattened = SqlStr.flatten(sql)
+      runRawQuery(
+        flattened.queryParts.mkString("?"),
+        flattened.params.map(_.value).toSeq: _*
+      ){ resultSet =>
+
+        val valueReader: OptionPickler.Reader[T] = vr
+        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers0
+        val columnNameUnMapper: Map[String, String] = ???
+        val arrVisitor = valueReader.visitArray(-1, -1)
+        while (resultSet.next()) {
+          val rowRes = handleResultRow(
+            resultSet,
+            arrVisitor.subVisitor,
+            typeMappers,
+            config,
+            columnNameUnMapper
+          )
+          arrVisitor.visitValue(rowRes, -1)
+        }
+        arrVisitor.visitEnd(-1)
+      }
+    }
+
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
@@ -213,7 +245,7 @@ object DbApi {
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
-      val (exprs, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+      val (typeMappers, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
       else {
@@ -223,14 +255,15 @@ object DbApi {
           if (qr.singleRow(query)) {
             assert(resultSet.next())
             val res =
-              handleResultRow(resultSet, qr.valueReader(query), exprs, config, columnUnMapper)
+              handleResultRow(resultSet, qr.valueReader(query), typeMappers, config, columnUnMapper)
             assert(!resultSet.next())
             res
           } else {
             val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
             while (resultSet.next()) {
-              val rowRes =
-                handleResultRow(resultSet, arrVisitor.subVisitor, exprs, config, columnUnMapper)
+              val rowRes = handleResultRow(
+                resultSet, arrVisitor.subVisitor, typeMappers, config, columnUnMapper
+              )
               arrVisitor.visitValue(rowRes, -1)
             }
             arrVisitor.visitEnd(-1)
@@ -247,7 +280,7 @@ object DbApi {
     ) = {
 
       if (autoCommit) connection.setAutoCommit(true)
-      val (str, params, exprs) = toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
+      val (str, params, typeMappers) = toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
       val statement = connection.prepareStatement(str)
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
@@ -266,21 +299,21 @@ object DbApi {
           Config.joinName(namesChunks, config)
       }.toMap
 
-      (exprs, statement, columnUnMapper)
+      (typeMappers, statement, columnUnMapper)
     }
 
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val (exprs, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+        val (typeMappers, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
 
         val resultSet: ResultSet = statement.executeQuery()
         try {
           val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = handleResultRow(resultSet, visitor, exprs, config, columnUnMapper)
+            val rowRes = handleResultRow(resultSet, visitor, typeMappers, config, columnUnMapper)
             action = handleItem(rowRes)
           }
 

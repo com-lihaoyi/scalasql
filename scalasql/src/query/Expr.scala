@@ -56,7 +56,7 @@ object Expr {
     def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
 
     def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
-    def toTypeMappers(q: E[T]) = Seq(mt)
+    def toTypeMappers0 = Seq(mt)
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
