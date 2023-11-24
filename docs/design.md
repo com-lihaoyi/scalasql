@@ -139,6 +139,11 @@ scope when you call `import scalasql.dialects.MyDialect._`.
    them. That ensures the library is both easy to get started with and can scale beyond
    toy examples.
 
+7. Simple translation to SQL: ScalaSql translates Scala expressions to SQL queries
+   in a straightforward manner, without complex query optimizations or transformations.
+   This makes it easy to predict what query your ScalaSql code will generate, or match
+   up queries in your database logs with callsites on your Scala code.
+
 ## Non-Goals
 
 1. **Novel Programming Paradigms**: [SLICK](https://github.com/slick/slick) went all-in

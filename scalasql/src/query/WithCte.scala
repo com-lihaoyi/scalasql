@@ -40,7 +40,7 @@ class WithCte[Q, R](
   protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
-    Select.selectLhsMap(lhs, prevContext)
+    Select.selectLhsMap(rhs, prevContext)
   }
 }
 
