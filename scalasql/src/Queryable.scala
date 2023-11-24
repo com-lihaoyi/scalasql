@@ -40,8 +40,10 @@ object Queryable {
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
-    def toTypeMappers0: Seq[TypeMapper[_]]
-    def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0
+    def valueReader(q: Q): Reader[R] = valueReader()
+    def valueReader(): Reader[R]
+    def toTypeMappers(): Seq[TypeMapper[_]]
+    def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers()
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
   }
@@ -49,8 +51,8 @@ object Queryable {
     private[scalasql] class TupleNQueryable[Q, R](
         val walkLabels0: Seq[Seq[List[String]]],
         val walkExprs0: Q => Seq[Seq[Expr[_]]],
-        val toTypeMappers0List: Seq[Seq[TypeMapper[_]]],
-        val valueReader0: Q => Reader[R]
+        val toTypeMappersList: Seq[Seq[TypeMapper[_]]],
+        val valueReader0: Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walkExprs(q: Q) = {
         walkExprs0(q).iterator.zipWithIndex
@@ -71,9 +73,9 @@ object Queryable {
         ExprsToSql(walked, sql"", ctx)
       }
 
-      def toTypeMappers0: Seq[TypeMapper[_]] = toTypeMappers0List.flatten
+      def toTypeMappers(): Seq[TypeMapper[_]] = toTypeMappersList.flatten
 
-      override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0(q)
+      override def valueReader(): OptionPickler.Reader[R] = valueReader0
     }
 
     implicit def NullableQueryable[Q, R](
@@ -82,13 +84,13 @@ object Queryable {
       def walkLabels() = qr.walkLabels()
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
-      def valueReader(q: JoinNullable[Q]): OptionPickler.Reader[Option[R]] = {
-        new OptionPickler.NullableReader(qr.valueReader(q.get))
+      def valueReader(): OptionPickler.Reader[Option[R]] = {
+        new OptionPickler.NullableReader(qr.valueReader())
           .asInstanceOf[OptionPickler.Reader[Option[R]]]
       }
 
       def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
-      def toTypeMappers0 = qr.toTypeMappers0
+      def toTypeMappers() = qr.toTypeMappers()
     }
   }
 

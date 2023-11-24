@@ -40,7 +40,7 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
-  def runQuery0[T](sql: SqlStr)(implicit qr: Queryable.Row[_, T], vr: OptionPickler.Reader[T]): T
+  def runQuery0[Q, R](sql: SqlStr)(implicit qr: Queryable.Row[Q, R]): Seq[R]
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
@@ -142,31 +142,31 @@ object DbApi {
       finally statement.close()
     }
 
-    def runQuery0[T](
+    def runQuery0[Q, R](
         sql: SqlStr
-    )(implicit qr: Queryable.Row[_, T], vr: OptionPickler.Reader[T]): T = {
+    )(implicit qr: Queryable.Row[Q, R]): Seq[R] = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
       runRawQuery(
         flattened.queryParts.mkString("?"),
         flattened.params.map(_.value).toSeq: _*
       ) { resultSet =>
-        val valueReader: OptionPickler.Reader[T] = vr
-        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers0
+        val valueReader: OptionPickler.Reader[R] = qr.valueReader()
+        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
         qr.walkLabels()
-        val columnNameUnMapper: Map[String, String] = ???
-        val arrVisitor = valueReader.visitArray(-1, -1)
+        val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
+        val results = collection.mutable.ArrayBuffer.empty[R]
         while (resultSet.next()) {
           val rowRes = handleResultRow(
             resultSet,
-            arrVisitor.subVisitor,
+            valueReader,
             typeMappers,
             config,
             columnNameUnMapper
           )
-          arrVisitor.visitValue(rowRes, -1)
+          results.append(rowRes)
         }
-        arrVisitor.visitEnd(-1)
+        results.toSeq
       }
     }
 
@@ -254,7 +254,7 @@ object DbApi {
           if (qr.singleRow(query)) {
             assert(resultSet.next())
             val res =
-              handleResultRow(resultSet, qr.valueReader(query), typeMappers, config, columnUnMapper)
+              handleResultRow(resultSet, qr.valueReader(query), typeMappers, config, Left(columnUnMapper))
             assert(!resultSet.next())
             res
           } else {
@@ -265,7 +265,7 @@ object DbApi {
                 arrVisitor.subVisitor,
                 typeMappers,
                 config,
-                columnUnMapper
+                Left(columnUnMapper)
               )
               arrVisitor.visitValue(rowRes, -1)
             }
@@ -318,7 +318,7 @@ object DbApi {
           val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = handleResultRow(resultSet, visitor, typeMappers, config, columnUnMapper)
+            val rowRes = handleResultRow(resultSet, visitor, typeMappers, config, Left(columnUnMapper))
             action = handleItem(rowRes)
           }
 
@@ -344,7 +344,7 @@ object DbApi {
       rowVisitor: Visitor[_, V],
       exprs: Seq[TypeMapper[_]],
       config: Config,
-      columnNameUnMapper: Map[String, String]
+      columnNameUnMapper0: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]]
   ): V = {
 
     val keys = Array.newBuilder[IndexedSeq[String]]
@@ -353,19 +353,23 @@ object DbApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = metadata.getColumnLabel(i + 1).toLowerCase match {
-        // Hack to support top-level `VALUES` clause; most databases do not
-        // let you rename their columns
-        case /*h2*/ "c1" | /*postgres/sqlite*/ "column1" | /*mysql*/ "column_0" => IndexedSeq()
-        case label =>
-          FlatJson
-            .fastSplitNonRegex(
-              columnNameUnMapper(label),
-              config.columnLabelDelimiter
-            )
-            .drop(1)
+      val k = columnNameUnMapper0 match{
+        case Left(columnNameUnMapper) =>
+          metadata.getColumnLabel(i + 1).toLowerCase match {
+            // Hack to support top-level `VALUES` clause; most databases do not
+            // let you rename their columns
+            case /*h2*/ "c1" | /*postgres/sqlite*/ "column1" | /*mysql*/ "column_0" => IndexedSeq()
+            case label =>
+              FlatJson
+                .fastSplitNonRegex(
+                  columnNameUnMapper(label),
+                  config.columnLabelDelimiter
+                )
+                .drop(1)
+          }
+        case Right(columnNameUnMapper) =>
+          columnNameUnMapper(i)
       }
-
       val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
       val isNull = resultSet.getObject(i + 1) == null
 

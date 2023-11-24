@@ -40,7 +40,7 @@ object Expr {
   def exprIdentity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
-  implicit def toExprable[E[_] <: Expr[_], T](
+  implicit def ExprQueryable[E[_] <: Expr[_], T](
       implicit valueReader0: OptionPickler.Reader[T],
       mt: TypeMapper[T]
   ): Queryable.Row[E[T], T] = new toExprable[E, T]()
@@ -52,12 +52,11 @@ object Expr {
     def walkLabels() = Seq(Nil)
     def walkExprs(q: E[T]) = Seq(q)
 
-    def valueReader = valueReader0
+    def valueReader() = valueReader0
 
-    def valueReader(q: E[T]): OptionPickler.Reader[T] = valueReader0
 
     def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
-    def toTypeMappers0 = Seq(mt)
+    def toTypeMappers() = Seq(mt)
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)

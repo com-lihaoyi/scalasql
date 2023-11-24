@@ -43,7 +43,9 @@ trait DbApiTests extends ScalaSqlSuite {
 
         dbClient.transaction { db =>
           val filterId = 2
-          val output = db.runQuery0[Seq[String]](sql"SELECT name FROM buyer WHERE id = $filterId")
+          val output = db.runQuery0[scalasql.Expr[String], String](
+            sql"SELECT name FROM buyer WHERE id = $filterId"
+          )
           assert(output == Seq("叉烧包"))
         }
       }

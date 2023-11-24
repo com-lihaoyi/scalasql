@@ -59,13 +59,13 @@ object Table {
     class TableQueryable[Q, R](
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
-        val toTypeMappers0: Seq[TypeMapper[_]],
+        val toTypeMappers: Seq[TypeMapper[_]],
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
-      override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
+      override def valueReader(): OptionPickler.Reader[R] = valueReader0
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         ExprsToSql(this.walk(q), sql"", ctx)
