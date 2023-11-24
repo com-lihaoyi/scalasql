@@ -87,7 +87,7 @@ object SqliteDialect extends SqliteDialect {
 
     override def newSimpleSelect[Q, R](
         expr: Q,
-        exprPrefix: Option[String],
+        exprPrefix: Option[Context => SqlStr],
         from: Seq[From],
         joins: Seq[Join],
         where: Seq[Expr[_]],
@@ -99,7 +99,7 @@ object SqliteDialect extends SqliteDialect {
 
   class SimpleSelect[Q, R](
       expr: Q,
-      exprPrefix: Option[String],
+      exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
       where: Seq[Expr[_]],

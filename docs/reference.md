@@ -8631,6 +8631,41 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 ## PostgresDialect
 Operations specific to working with Postgres Databases
+### PostgresDialect.distinctOn
+
+ScalaSql's Postgres dialect provides teh `.distinctOn` operator, which translates
+into a SQL `DISTINCT ON` clause
+
+```scala
+Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
+```
+
+
+*
+    ```sql
+    SELECT
+      DISTINCT ON (purchase0.shipping_info_id) purchase0.id AS res__id,
+      purchase0.shipping_info_id AS res__shipping_info_id,
+      purchase0.product_id AS res__product_id,
+      purchase0.count AS res__count,
+      purchase0.total AS res__total
+    FROM purchase purchase0
+    ORDER BY res__shipping_info_id DESC
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Purchase[Id](6, 3, 1, 5, 44.4),
+      Purchase[Id](4, 2, 4, 4, 493.8),
+      Purchase[Id](2, 1, 2, 3, 900.0)
+    )
+    ```
+
+
+
 ### PostgresDialect.ltrim2
 
 

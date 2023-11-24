@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
 import scalasql.{Queryable, TypeMapper}
@@ -44,7 +45,7 @@ trait Select[Q, R]
 
   protected def newSimpleSelect[Q, R](
       expr: Q,
-      exprPrefix: Option[String],
+      exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
       where: Seq[Expr[_]],
@@ -59,7 +60,8 @@ trait Select[Q, R]
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
    */
-  def distinct: Select[Q, R]
+  def distinct: Select[Q, R] = selectWithExprPrefix(ctx => sql"DISTINCT")
+  protected def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R]
 
   protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef[Q, R](this, qr)
 
@@ -247,13 +249,16 @@ object Select {
   def selectSimpleFrom[Q, R](s: Select[Q, R]) = s.selectSimpleFrom()
   def selectRenderer(s: Select[_, _], prevContext: Context) = s.selectRenderer(prevContext)
   def selectLhsMap(s: Select[_, _], prevContext: Context) = s.selectLhsMap(prevContext)
+  def selectWithExprPrefix[Q, R](s: Select[Q, R], str: Context => SqlStr) =
+    s.selectWithExprPrefix(str)
   trait Renderer {
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
   }
 
   trait Proxy[Q, R] extends Select[Q, R] {
     override def qr: Queryable.Row[Q, R]
-    override def distinct: Select[Q, R] = selectSimpleFrom().distinct
+    override protected def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R] =
+      selectSimpleFrom().selectWithExprPrefix(s)
     override def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] =
       selectSimpleFrom().map(f)
     override def flatMap[Q2, R2](f: Q => FlatJoin.Rhs[Q2, R2])(

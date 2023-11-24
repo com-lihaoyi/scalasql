@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.{Queryable, TypeMapper, operations}
-import scalasql.query.{Aggregatable, Expr, JoinOps, Joinable, LateralJoinOps}
+import scalasql.query.{Aggregatable, Expr, JoinOps, Joinable, LateralJoinOps, Select, WithExpr}
 import scalasql.renderer.SqlStr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -22,6 +22,11 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
     new PostgresDialect.AggExprOps(v)
 
+  implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
+    def distinctOn(f: Q => Expr[_]): Select[Q, R] = {
+      Select.selectWithExprPrefix(r, implicit ctx => sql"DISTINCT ON (${f(WithExpr.get(r))})")
+    }
+  }
 }
 
 object PostgresDialect extends PostgresDialect {

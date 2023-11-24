@@ -224,7 +224,7 @@ object MySqlDialect extends MySqlDialect {
 
     override def newSimpleSelect[Q, R](
         expr: Q,
-        exprPrefix: Option[String],
+        exprPrefix: Option[Context => SqlStr],
         from: Seq[From],
         joins: Seq[Join],
         where: Seq[Expr[_]],
@@ -236,7 +236,7 @@ object MySqlDialect extends MySqlDialect {
 
   class SimpleSelect[Q, R](
       expr: Q,
-      exprPrefix: Option[String],
+      exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
       where: Seq[Expr[_]],

@@ -15,7 +15,7 @@ import scala.collection.mutable
  */
 class SimpleSelect[Q, R](
     val expr: Q,
-    val exprPrefix: Option[String],
+    val exprPrefix: Option[Context => SqlStr],
     val from: Seq[From],
     val joins: Seq[Join],
     val where: Seq[Expr[_]],
@@ -26,14 +26,15 @@ class SimpleSelect[Q, R](
 
   protected def copy[Q, R](
       expr: Q = this.expr,
-      exprPrefix: Option[String] = this.exprPrefix,
+      exprPrefix: Option[Context => SqlStr] = this.exprPrefix,
       from: Seq[From] = this.from,
       joins: Seq[Join] = this.joins,
       where: Seq[Expr[_]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
     newSimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
-  def distinct: Select[Q, R] = this.copy(exprPrefix = Some("DISTINCT"))
+
+  def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R] = this.copy(exprPrefix = Some(s))
 
   def queryExpr[V: TypeMapper](
       f: Q => Context => SqlStr
@@ -261,7 +262,7 @@ object SimpleSelect {
         joinOns
       )
 
-      lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => SqlStr.raw(p) + sql" " }
+      lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => p(context) + sql" " }
 
       val tables = SqlStr
         .join(query.from.map(renderedFroms(_)), sql", ")

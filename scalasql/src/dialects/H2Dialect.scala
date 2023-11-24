@@ -92,7 +92,7 @@ object H2Dialect extends H2Dialect {
 
     override def newSimpleSelect[Q, R](
         expr: Q,
-        exprPrefix: Option[String],
+        exprPrefix: Option[Context => SqlStr],
         from: Seq[From],
         joins: Seq[Join],
         where: Seq[Expr[_]],
@@ -104,7 +104,7 @@ object H2Dialect extends H2Dialect {
 
   class SimpleSelect[Q, R](
       expr: Q,
-      exprPrefix: Option[String],
+      exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
       where: Seq[Expr[_]],
