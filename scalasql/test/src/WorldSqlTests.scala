@@ -1475,6 +1475,18 @@ object WorldSqlTests extends TestSuite {
       )
       // -DOCS
     }
+    test("dbApiCommands") {
+      // +DOCS
+      // ## Different Ways of Running Queries
+      //
+      // | Execution Style \ Input |       Query |     `sql"..."` |  "..." + variables |
+      // |------------------------:|------------:|---------------:|-------------------:|
+      // |                Blocking |    `db.run` | `db.runQuery0` |        `db.runRaw` |
+      // |                  Update |    `db.run` |            ??? |                ??? |
+      // |               Streaming | `db.stream` |            ??? |                ??? |
+      // |               ResultSet |         ??? |            ??? |                ??? |
+      // -DOCS
+    }
   }
 
   case class CityCustom[+T[_]](
