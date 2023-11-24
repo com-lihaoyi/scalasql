@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.{Column, TypeMapper, Queryable}
+import scalasql.{Column, Queryable, Table, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
@@ -85,7 +85,7 @@ object Update {
     lazy val froms = joins0.flatMap(_.from).map(_.from)
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, Some(table))
 
-    lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(table.value.tableName))
+    lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(Table.tableName(table.value)))
 
     lazy val updateList = set0.map { case assign =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))

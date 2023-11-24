@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{Column, TypeMapper, Queryable}
+import scalasql.{Column, Queryable, Table, TypeMapper}
 
 /**
  * A SQL `INSERT VALUES` query
@@ -23,7 +23,7 @@ object InsertValues {
     protected def expr: Q = WithExpr.get(insert)
 
     protected override def renderToSql(ctx: Context) =
-      new Renderer(columns, ctx, valuesLists, table.value.tableName).render()
+      new Renderer(columns, ctx, valuesLists, Table.tableName(table.value)).render()
 
     protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
 

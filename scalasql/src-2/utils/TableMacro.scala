@@ -13,7 +13,13 @@ object TableMacros {
 
     val queryParams = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
-      q"_root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(implicitly, ${name.toString}, ${c.prefix}).expr($tableRef)"
+      q"""
+        _root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(
+          implicitly,
+          sourcecode.Name(_root_.scalasql.Table.tableColumnNameOverrides(tableSelf).getOrElse(${name.toString}, ${name.toString})),
+          ${c.prefix}
+        ).expr($tableRef)
+      """
     }
     val allToSqlQueryExprs = for (applyParam <- applyParameters) yield {
       q"""implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]"""

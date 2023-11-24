@@ -43,7 +43,7 @@ object Nulls {
  */
 sealed trait From
 class TableRef(val value: Table.Base) extends From {
-  override def toString = s"TableRef(${value.tableName})"
+  override def toString = s"TableRef(${Table.tableName(value)})"
 }
 class SubqueryRef[Q, R](val value: Select[Q, R], val qr: Queryable[Q, R]) extends From
 class WithCteRef[Q, R]() extends From

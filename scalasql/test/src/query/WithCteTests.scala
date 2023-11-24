@@ -50,13 +50,13 @@ trait WithCteTests extends ScalaSqlSuite {
         WITH
           cte0 (res__id, res__name) AS (SELECT
             buyer0.id AS res__id, buyer0.name AS res__name FROM buyer buyer0),
-          cte1 (res__buyerId, res__shippingDate) AS (SELECT
+          cte1 (res__buyer_id, res__shipping_date) AS (SELECT
               shipping_info1.buyer_id AS res__buyer_id,
               shipping_info1.shipping_date AS res__shipping_date
             FROM shipping_info shipping_info1)
-        SELECT cte0.res__name AS res__0, cte1.res__shippingDate AS res__1
+        SELECT cte0.res__name AS res__0, cte1.res__shipping_date AS res__1
         FROM cte0
-        JOIN cte1 ON (cte0.res__id = cte1.res__buyerId)
+        JOIN cte1 ON (cte0.res__id = cte1.res__buyer_id)
       """,
       value = Seq(
         ("叉烧包", LocalDate.parse("2010-02-03")),
@@ -112,12 +112,12 @@ trait WithCteTests extends ScalaSqlSuite {
         FROM (WITH
             cte0 (res__id, res__name)
             AS (SELECT buyer0.id AS res__id, buyer0.name AS res__name FROM buyer buyer0),
-            cte1 (res__id, res__buyerId)
+            cte1 (res__id, res__buyer_id)
             AS (SELECT shipping_info1.id AS res__id, shipping_info1.buyer_id AS res__buyer_id
               FROM shipping_info shipping_info1)
           SELECT cte0.res__name AS res__0__name, cte1.res__id AS res__1__id
           FROM cte0
-          JOIN cte1 ON (cte0.res__id = cte1.res__buyerId)) subquery0
+          JOIN cte1 ON (cte0.res__id = cte1.res__buyer_id)) subquery0
         JOIN (WITH
             cte1 (res__id, res__name)
             AS (SELECT product1.id AS res__id, product1.name AS res__name FROM product product1)
@@ -129,19 +129,20 @@ trait WithCteTests extends ScalaSqlSuite {
         ON (subquery0.res__1__id = subquery1.res__0__shipping_info_id)
       """,
       value = Seq[(String, String)](
+        ("James Bond", "Camera"),
+        ("James Bond", "Skate Board"),
+        ("叉烧包", "Cookie"),
+        ("叉烧包", "Face Mask"),
         ("叉烧包", "Face Mask"),
         ("叉烧包", "Guitar"),
         ("叉烧包", "Socks"),
-        ("James Bond", "Skate Board"),
-        ("James Bond", "Camera"),
-        ("叉烧包", "Face Mask"),
-        ("叉烧包", "Cookie")
       ),
       docs = """
         ScalaSql's `withCte` can be used anywhere a `.select` operator can be used. The
         generated `WITH` clauses may be wrapped in sub-queries in scenarios where they
         cannot be easily combined into a single query
-      """
+      """,
+      normalize = (x: Seq[(String, String)]) => x.sorted
     )
   }
 }

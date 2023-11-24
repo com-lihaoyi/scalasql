@@ -1,6 +1,6 @@
 package scalasql.renderer
 
-import scalasql.Config
+import scalasql.{Config, Table}
 import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef, WithCteRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -42,11 +42,11 @@ object Context {
       prevContext.fromNaming ++
         selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
           case (t: TableRef, i) =>
-            (t, prevContext.config.tableNameMapper(t.value.tableName) + (i + prevSize))
+            (t, prevContext.config.tableNameMapper(Table.tableName(t.value)) + (i + prevSize))
           case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
           case (s: WithCteRef[_, _], i) => (s, "cte" + (i + prevSize))
         } ++
-        updateTable.map(t => t -> prevContext.config.tableNameMapper(t.value.tableName))
+        updateTable.map(t => t -> prevContext.config.tableNameMapper(Table.tableName(t.value)))
 
     val newExprNaming =
       prevContext.exprNaming ++

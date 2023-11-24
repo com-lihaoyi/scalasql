@@ -12,7 +12,18 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     extends Table.Base
     with scalasql.utils.TableMacros {
 
-  val tableName = name.value
+  /**
+   * The name of this table, before processing by [[Config.tableNameMapper]].
+   * Can be overriden to configure the table names
+   */
+  protected[scalasql] def tableName = name.value
+
+  /**
+   * Customizations to the column names of this table before processing,
+   * by [[Config.columnNameMapper]]. Can be overriden to configure the column
+   * names on a per-column basis.
+   */
+  protected def tableColumnNameOverrides: Map[String, String] = Map()
   protected implicit def tableSelf: Table[V] = this
 
   protected def tableMetadata: Table.Metadata[V]
@@ -21,14 +32,19 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
+
+
 }
 
 object Table {
   def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
   def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
+  def tableName[V[_[_]]](t: Table.Base) = t.tableName
+  def tableColumnNameOverrides[V[_[_]]](t: Table[V]) = t.tableColumnNameOverrides
   trait Base {
-    def tableName: String
+    protected[scalasql] def tableName: String
   }
+
 
   class Metadata[V[_[_]]](
       val queryable: Queryable[V[Expr], V[Id]],
@@ -75,7 +91,7 @@ object Column {
       ctx.fromNaming.get(tableRef) match {
         case Some("") => suffix
         case Some(s) => SqlStr.raw(s) + sql".$suffix"
-        case None => sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(tableRef.value.tableName)}.$suffix"
+        case None => sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.tableName(tableRef.value))}.$suffix"
       }
     }
   }

@@ -78,7 +78,7 @@ object WithCte {
       val newExprNaming = walked.map { case (tokens, expr) =>
         (
           Expr.exprIdentity(expr),
-          SqlStr.raw(FlatJson.flatten(tokens, prevContext), Array(Expr.exprIdentity(expr)))
+          SqlStr.raw(prevContext.config.tableNameMapper(FlatJson.flatten(tokens, prevContext)), Array(Expr.exprIdentity(expr)))
         )
       }
 

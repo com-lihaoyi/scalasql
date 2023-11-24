@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Column, TypeMapper, Queryable}
+import scalasql.{Column, Queryable, Table, TypeMapper}
 import scalasql.utils.OptionPickler
 
 /**
@@ -18,7 +18,7 @@ object InsertSelect {
     def table = insert.table
 
     protected override def renderToSql(ctx: Context) =
-      new Renderer(select, select.qr.walk(columns).map(_._2), ctx, table.value.tableName).render()
+      new Renderer(select, select.qr.walk(columns).map(_._2), ctx, Table.tableName(table.value)).render()
 
     protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
 
