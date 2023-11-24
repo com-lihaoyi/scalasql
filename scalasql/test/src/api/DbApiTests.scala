@@ -31,6 +31,24 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
 
+    test("runQuery0") - checker.recorded(
+      """
+      `db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
+      allowing you to construct SQL strings and interpolate variables within them.
+      Interpolated variables automatically become prepared statement variables to
+      avoid SQL injection vulnerabilities. Takes a callback providing a `java.sql.ResultSet`
+      for you to use directly.
+      """,
+      Text {
+
+        dbClient.transaction { db =>
+          val filterId = 2
+          val output = db.runQuery0[Seq[String]](sql"SELECT name FROM buyer WHERE id = $filterId")
+          assert(output == Seq("叉烧包"))
+        }
+      }
+    )
+
     test("runQuery") - checker.recorded(
       """
       `db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
