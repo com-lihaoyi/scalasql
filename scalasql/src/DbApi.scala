@@ -247,7 +247,7 @@ object DbApi {
     ) = {
 
       if (autoCommit) connection.setAutoCommit(true)
-      val (str, params, exprs) = toSqlQuery0(query, dialectConfig.castParams)
+      val (str, params, exprs) = toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
       val statement = connection.prepareStatement(str)
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)

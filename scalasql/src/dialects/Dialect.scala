@@ -1,17 +1,7 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, TableOps, WindowExpr}
-import scalasql.query.{
-  Aggregatable,
-  Expr,
-  JoinNullable,
-  Select,
-  SimpleSelect,
-  SubqueryRef,
-  WithCte,
-  WithCteRef,
-  WithExpr
-}
+import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
 import scalasql.{Queryable, Table, TypeMapper, operations}
 

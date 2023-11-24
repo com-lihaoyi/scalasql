@@ -1,5 +1,8 @@
 package scalasql.dialects
 
 trait DialectConfig {
-  def castParams: Boolean
+  protected def dialectCastParams: Boolean
+}
+object DialectConfig {
+  def dialectCastParams(d: DialectConfig) = d.dialectCastParams
 }

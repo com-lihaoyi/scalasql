@@ -17,7 +17,7 @@ import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
-  def castParams = false
+  protected def dialectCastParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): SqliteDialect.ExprOps =
     new SqliteDialect.ExprOps(v)
@@ -41,7 +41,7 @@ object SqliteDialect extends SqliteDialect {
       v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
     }
   }
-  class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
+  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
         case TypeMapper.LocalDateType | TypeMapper.LocalDateTimeType | TypeMapper.InstantType =>
@@ -52,7 +52,9 @@ object SqliteDialect extends SqliteDialect {
       sql"CAST($v AS ${SqlStr.raw(s)})"
     }
   }
-  class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with TrimOps {
+  class ExprStringOps(protected val v: Expr[String])
+      extends operations.ExprStringOps(v)
+      with TrimOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
     def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"GLOB($v, $x)" }
   }

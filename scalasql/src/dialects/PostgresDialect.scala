@@ -7,7 +7,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
-  def castParams = false
+  protected def dialectCastParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): PostgresDialect.ExprOps =
     new PostgresDialect.ExprOps(v)
@@ -23,6 +23,7 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     new PostgresDialect.AggExprOps(v)
 
   implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
+
     /**
      * SELECT DISTINCT ON ( expression [, ...] ) keeps only the first row of each set of rows
      * where the given expressions evaluate to equal. The DISTINCT ON expressions are
@@ -43,7 +44,7 @@ object PostgresDialect extends PostgresDialect {
       v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
-  class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
+  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
         case TypeMapper.ByteType => "INTEGER"
@@ -54,7 +55,7 @@ object PostgresDialect extends PostgresDialect {
       sql"CAST($v AS ${SqlStr.raw(s)})"
     }
   }
-  class ExprStringOps(val v: Expr[String])
+  class ExprStringOps(protected val v: Expr[String])
       extends operations.ExprStringOps(v)
       with TrimOps
       with PadOps {

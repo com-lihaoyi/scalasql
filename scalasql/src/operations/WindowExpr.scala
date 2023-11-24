@@ -56,31 +56,21 @@ case class WindowExpr[T](
   def nullsLast =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
-  object frameStart {
+  class FrameConfig(f: Some[SqlStr] => WindowExpr[T]) {
     def preceding(offset: Int = -1) = offset match {
-      case -1 => copy(frameStart0 = Some(sql"UNBOUNDED PRECEDING"))
-      case offset => copy(frameStart0 = Some(sql"$offset PRECEDING"))
+      case -1 => f(Some(sql"UNBOUNDED PRECEDING"))
+      case offset => f(Some(sql"$offset PRECEDING"))
     }
-    def currentRow = copy(frameStart0 = Some(sql"CURRENT ROW"))
+
+    def currentRow = f(Some(sql"CURRENT ROW"))
 
     def following(offset: Int = -1) = offset match {
-      case -1 => copy(frameStart0 = Some(sql"UNBOUNDED FOLLOWING"))
-      case offset => copy(frameStart0 = Some(sql"$offset FOLLOWING"))
+      case -1 => f(Some(sql"UNBOUNDED FOLLOWING"))
+      case offset => f(Some(sql"$offset FOLLOWING"))
     }
   }
-
-  object frameEnd {
-    def preceding(offset: Int = -1) = offset match {
-      case -1 => copy(frameEnd0 = Some(sql"UNBOUNDED PRECEDING"))
-      case offset => copy(frameEnd0 = Some(sql"$offset PRECEDING"))
-    }
-    def currentRow = copy(frameEnd0 = Some(sql"CURRENT ROW"))
-
-    def following(offset: Int = -1) = offset match {
-      case -1 => copy(frameEnd0 = Some(sql"UNBOUNDED FOLLOWING"))
-      case offset => copy(frameEnd0 = Some(sql"$offset FOLLOWING"))
-    }
-  }
+  def frameStart = new FrameConfig(s => copy(frameStart0 = s))
+  def frameEnd = new FrameConfig(s => copy(frameEnd0 = s))
 
   object exclude {
     def currentRow = copy(exclusions = Some(sql"EXCLUDE CURRENT ROW"))

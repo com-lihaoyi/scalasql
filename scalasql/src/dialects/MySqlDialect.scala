@@ -28,7 +28,7 @@ import scalasql.utils.OptionPickler
 import scala.reflect.ClassTag
 
 trait MySqlDialect extends Dialect {
-  def castParams = false
+  protected def dialectCastParams = false
 
   override implicit def ExprOpsConv(v: Expr[_]): MySqlDialect.ExprOps =
     new MySqlDialect.ExprOps(v)
@@ -66,7 +66,7 @@ object MySqlDialect extends MySqlDialect {
       )
     }
   }
-  class ExprOps(val v: Expr[_]) extends operations.ExprOps(v) {
+  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
         case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType |
@@ -101,7 +101,9 @@ object MySqlDialect extends MySqlDialect {
 
   }
 
-  class ExprStringOps(val v: Expr[String]) extends operations.ExprStringOps(v) with PadOps {
+  class ExprStringOps(protected val v: Expr[String])
+      extends operations.ExprStringOps(v)
+      with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }

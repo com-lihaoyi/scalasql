@@ -21,7 +21,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait H2Dialect extends Dialect {
 
-  def castParams = true
+  protected def dialectCastParams = true
 
   override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps =
     new H2Dialect.ExprStringOps(v)
@@ -52,14 +52,14 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class ExprStringOps(val v: Expr[String])
+  class ExprStringOps(protected val v: Expr[String])
       extends operations.ExprStringOps(v)
       with TrimOps
       with PadOps {
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class ExprNumericOps[T: Numeric: TypeMapper](val v: Expr[T])
+  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Expr[T])
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
 

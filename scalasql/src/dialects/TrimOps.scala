@@ -4,7 +4,7 @@ import scalasql.query.Expr
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait TrimOps {
-  def v: Expr[String]
+  protected def v: Expr[String]
 
   /**
    * Trim [[x]]s from the left hand side of the string [[v]]
