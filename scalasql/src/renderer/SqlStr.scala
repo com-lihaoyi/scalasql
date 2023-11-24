@@ -16,7 +16,12 @@ class SqlStr(
     private val referencedExprs: collection.IndexedSeq[Expr.Identity]
 ) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
-    new SqlStr(SqlStr.plusParts, Array[SqlStr.Interp](this, other), false, Array.empty[Expr.Identity])
+    new SqlStr(
+      SqlStr.plusParts,
+      Array[SqlStr.Interp](this, other),
+      false,
+      Array.empty[Expr.Identity]
+    )
   }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
@@ -51,24 +56,37 @@ object SqlStr {
    * at which point you can use its `queryParts`, `params`, `referencedExprs`, etc.
    */
   def flatten(self: SqlStr): Flattened = {
-    val finalParts = collection.mutable.ArrayBuffer[String]()
-    val finalArgs = collection.mutable.ArrayBuffer[Interp.TypeInterp[_]]()
-    val finalExprs = collection.mutable.ArrayBuffer[Expr.Identity]()
+    // Implement this in a mutable style because`it's pretty performance sensitive
+    val finalParts = collection.mutable.ArrayBuffer.empty[String]
+    val finalArgs = collection.mutable.ArrayBuffer.empty[Interp.TypeInterp[_]]
+    val finalExprs = collection.mutable.ArrayBuffer.empty[Expr.Identity]
+    // Equivalent to `finalParts.last`, cached locally for performance
+    var lastFinalPart: String = null
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
+      val queryParts = self.queryParts
+      val params = self.params
       finalExprs.appendAll(self.referencedExprs)
       var boundary = true
-      if (!topLevel && self.isCompleteQuery) addFinalPart("(")
+      val parenthesize = !topLevel && self.isCompleteQuery
+      if (parenthesize) addFinalPart("(")
       boundary = true
 
       def addFinalPart(s: String) = {
-        if (boundary && finalParts.nonEmpty) finalParts(finalParts.length - 1) = finalParts.last + s
-        else finalParts.append(s)
+        if (boundary && finalParts.nonEmpty) {
+          lastFinalPart = lastFinalPart + s
+          finalParts(finalParts.length - 1) = lastFinalPart
+        } else {
+          finalParts.append(s)
+          lastFinalPart = s
+        }
       }
 
-      for (i <- self.params.indices) {
-        val p = self.queryParts(i)
-        val a = self.params(i)
+      var i = 0
+      val length = params.length
+      while (i < length) {
+        val p = queryParts(i)
+        val a = params(i)
         addFinalPart(p)
         boundary = false
         a match {
@@ -78,10 +96,11 @@ object SqlStr {
 
           case s: Interp.TypeInterp[_] => finalArgs.append(s)
         }
+        i += 1
       }
 
-      addFinalPart(self.queryParts.last)
-      if (!topLevel && self.isCompleteQuery) addFinalPart(")")
+      addFinalPart(queryParts(queryParts.length - 1))
+      if (parenthesize) addFinalPart(")")
     }
 
     rec(self, true)
@@ -92,7 +111,8 @@ object SqlStr {
    * Provides the sql"..." syntax for constructing [[SqlStr]]s
    */
   implicit class SqlStringSyntax(sc: StringContext) {
-    def sql(args: Interp*) = new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Expr.Identity])
+    def sql(args: Interp*) =
+      new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Expr.Identity])
   }
 
   /**

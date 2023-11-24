@@ -1088,13 +1088,12 @@ object WorldSqlTests extends TestSuite {
             ORDER BY city2.population DESC
             LIMIT ?))
         """
-        while(true) {
-          db.run(query) ==> Seq(
-            ("China", 1277558000, "Shanghai", 9696300),
-            ("India", 1013662000, "Mumbai (Bombay)", 10500000),
-            ("United States", 278357000, "New York", 8008278)
-          )
-        }
+
+        db.run(query) ==> Seq(
+          ("China", 1277558000, "Shanghai", 9696300),
+          ("India", 1013662000, "Mumbai (Bombay)", 10500000),
+          ("United States", 278357000, "New York", 8008278)
+        )
         // -DOCS
       }
 
