@@ -23,6 +23,13 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     new PostgresDialect.AggExprOps(v)
 
   implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
+    /**
+     * SELECT DISTINCT ON ( expression [, ...] ) keeps only the first row of each set of rows
+     * where the given expressions evaluate to equal. The DISTINCT ON expressions are
+     * interpreted using the same rules as for ORDER BY (see above). Note that the “first
+     * row” of each set is unpredictable unless ORDER BY is used to ensure that the desired
+     * row appears first. For example:
+     */
     def distinctOn(f: Q => Expr[_]): Select[Q, R] = {
       Select.selectWithExprPrefix(r, implicit ctx => sql"DISTINCT ON (${f(WithExpr.get(r))})")
     }
