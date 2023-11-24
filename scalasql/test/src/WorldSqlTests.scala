@@ -69,7 +69,7 @@ object WorldSqlTests extends TestSuite {
   )
 
   object Country extends Table[Country]() {
-    val metadata = initMetadata()
+    val tableMetadata = initMetadata()
   }
 
   case class City[+T[_]](
@@ -81,7 +81,7 @@ object WorldSqlTests extends TestSuite {
   )
 
   object City extends Table[City]() {
-    val metadata = initMetadata()
+    val tableMetadata = initMetadata()
   }
 
   case class CountryLanguage[+T[_]](
@@ -92,7 +92,7 @@ object WorldSqlTests extends TestSuite {
   )
 
   object CountryLanguage extends Table[CountryLanguage]() {
-    val metadata = initMetadata()
+    val tableMetadata = initMetadata()
   }
   // -DOCS
 

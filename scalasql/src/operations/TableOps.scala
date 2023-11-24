@@ -6,8 +6,8 @@ import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Upd
 class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
 
   protected def toFromExpr0 = {
-    val ref = t.tableRef
-    (ref, t.metadata.vExpr(ref))
+    val ref = Table.tableRef(t)
+    (ref, Table.tableMetadata(t).vExpr(ref))
   }
 
   protected def joinableToFromExpr = {
@@ -33,7 +33,7 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    */
   def update(filter: V[Column.ColumnExpr] => Expr[Boolean]): Update[V[Column.ColumnExpr], V[Id]] = {
     val (ref, expr) = toFromExpr0
-    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(
+    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.tableMetadata(t).vExpr(ref))))(
       t.containerQr
     )
   }
@@ -52,7 +52,7 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    */
   def delete(filter: V[Column.ColumnExpr] => Expr[Boolean]): Delete[V[Column.ColumnExpr]] = {
     val (ref, expr) = toFromExpr0
-    new Delete.Impl(expr, filter(t.metadata.vExpr(ref)), ref)
+    new Delete.Impl(expr, filter(Table.tableMetadata(t).vExpr(ref)), ref)
   }
 
   protected def joinableIsTrivial = true

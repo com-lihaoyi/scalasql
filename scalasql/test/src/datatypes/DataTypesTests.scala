@@ -31,7 +31,7 @@ case class DataTypes[+T[_]](
 )
 
 object DataTypes extends Table[DataTypes] {
-  val metadata = initMetadata()
+  val tableMetadata = initMetadata()
 }
 
 case class NonRoundTripTypes[+T[_]](
@@ -40,7 +40,7 @@ case class NonRoundTripTypes[+T[_]](
 )
 
 object NonRoundTripTypes extends Table[NonRoundTripTypes] {
-  val metadata = initMetadata()
+  val tableMetadata = initMetadata()
 }
 
 trait DataTypesTests extends ScalaSqlSuite {

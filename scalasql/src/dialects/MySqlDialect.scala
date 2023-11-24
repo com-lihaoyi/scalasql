@@ -112,15 +112,23 @@ object MySqlDialect extends MySqlDialect {
     override def update(
         filter: V[Column.ColumnExpr] => Expr[Boolean]
     ): Update[V[Column.ColumnExpr], V[Id]] = {
-      val ref = t.tableRef
-      new Update(t.metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(t.metadata.vExpr(ref))))(
+      val ref = Table.tableRef(t)
+      val metadata = Table.tableMetadata(t)
+      new Update(metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(metadata.vExpr(ref))))(
         t.containerQr
       )
     }
 
     protected override def joinableSelect: Select[V[Expr], V[Id]] = {
-      val ref = t.tableRef
-      new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
+      val ref = Table.tableRef(t)
+      new SimpleSelect(
+        Table.tableMetadata(t).vExpr(ref).asInstanceOf[V[Expr]],
+        None,
+        Seq(ref),
+        Nil,
+        Nil,
+        None
+      )(
         t.containerQr
       )
     }

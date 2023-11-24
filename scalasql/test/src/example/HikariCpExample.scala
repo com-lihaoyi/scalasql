@@ -13,7 +13,7 @@ object HikariCpExample {
   )
 
   object ExampleProduct extends Table[ExampleProduct] {
-    val metadata = initMetadata()
+    val tableMetadata = initMetadata()
   }
 
   lazy val postgres = {

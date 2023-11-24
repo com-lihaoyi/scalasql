@@ -65,8 +65,15 @@ object H2Dialect extends H2Dialect {
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
     protected override def joinableSelect: Select[V[Expr], V[Id]] = {
-      val ref = t.tableRef
-      new SimpleSelect(t.metadata.vExpr(ref).asInstanceOf[V[Expr]], None, Seq(ref), Nil, Nil, None)(
+      val ref = Table.tableRef(t)
+      new SimpleSelect(
+        Table.tableMetadata(t).vExpr(ref).asInstanceOf[V[Expr]],
+        None,
+        Seq(ref),
+        Nil,
+        Nil,
+        None
+      )(
         t.containerQr
       )
     }

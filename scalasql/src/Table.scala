@@ -13,18 +13,19 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     with scalasql.utils.TableMacros {
 
   val tableName = name.value
-  implicit def self: Table[V] = this
+  protected implicit def tableSelf: Table[V] = this
 
-  def metadata: Table.Metadata[V]
+  protected def tableMetadata: Table.Metadata[V]
 
-  implicit def containerQr[E[_] <: Expr[_]]: Queryable.Row[V[E], V[Id]] = metadata.queryable
+  implicit def containerQr[E[_] <: Expr[_]]: Queryable.Row[V[E], V[Id]] = tableMetadata.queryable
     .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
-  def tableRef = new scalasql.query.TableRef(this)
+  protected def tableRef = new scalasql.query.TableRef(this)
 }
 
 object Table {
-
+  def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
+  def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
   trait Base {
     def tableName: String
   }
