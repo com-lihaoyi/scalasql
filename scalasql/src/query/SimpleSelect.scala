@@ -206,7 +206,7 @@ class SimpleSelect[Q, R](
       val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
       val exprId = Expr.exprIdentity(v)
 
-      (exprId, SqlStr.raw(str, Seq(exprId)))
+      (exprId, SqlStr.raw(str, Array(exprId)))
     }.toMap
 
     jsonQueryMap

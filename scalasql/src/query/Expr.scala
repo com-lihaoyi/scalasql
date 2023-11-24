@@ -84,7 +84,7 @@ object Expr {
   )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = new Expr[T] {
     def mappedType = mappedType0
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
-      new SqlStr(Seq("", ""), Seq(conv(x)), false, Nil)
+      new SqlStr(Array("", ""), Array(conv(x)), false, Array.empty[Expr.Identity])
     protected override def exprIsLiteralTrue = exprIsLiteralTrue0
   }
 

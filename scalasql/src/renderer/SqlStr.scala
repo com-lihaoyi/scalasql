@@ -10,13 +10,13 @@ import scalasql.query.Expr
  * until [[SqlStr.flatten]] is called to convert it into a [[SqlStr.Flattened]]
  */
 class SqlStr(
-    private val queryParts: collection.Seq[String],
-    private val params: collection.Seq[SqlStr.Interp],
+    private val queryParts: collection.IndexedSeq[String],
+    private val params: collection.IndexedSeq[SqlStr.Interp],
     val isCompleteQuery: Boolean,
-    private val referencedExprs: collection.Seq[Expr.Identity]
+    private val referencedExprs: collection.IndexedSeq[Expr.Identity]
 ) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
-    new SqlStr(SqlStr.plusParts, Seq(this, other), false, Nil)
+    new SqlStr(SqlStr.plusParts, Array[SqlStr.Interp](this, other), false, Array.empty[Expr.Identity])
   }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
@@ -26,12 +26,12 @@ class SqlStr(
 }
 
 object SqlStr {
-  private val plusParts = Array("", "", "")
+  private val plusParts: IndexedSeq[String] = Array("", "", "")
   class Flattened(
-      val queryParts: collection.Seq[String],
-      val params: collection.Seq[Interp.TypeInterp[_]],
+      val queryParts: collection.IndexedSeq[String],
+      val params: collection.IndexedSeq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
-      val referencedExprs: collection.Seq[Expr.Identity]
+      val referencedExprs: collection.IndexedSeq[Expr.Identity]
   ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
 
   /**
@@ -51,9 +51,9 @@ object SqlStr {
    * at which point you can use its `queryParts`, `params`, `referencedExprs`, etc.
    */
   def flatten(self: SqlStr): Flattened = {
-    val finalParts = collection.mutable.Buffer[String]()
-    val finalArgs = collection.mutable.Buffer[Interp.TypeInterp[_]]()
-    val finalExprs = collection.mutable.Buffer[Expr.Identity]()
+    val finalParts = collection.mutable.ArrayBuffer[String]()
+    val finalArgs = collection.mutable.ArrayBuffer[Interp.TypeInterp[_]]()
+    val finalExprs = collection.mutable.ArrayBuffer[Expr.Identity]()
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       finalExprs.appendAll(self.referencedExprs)
@@ -92,7 +92,7 @@ object SqlStr {
    * Provides the sql"..." syntax for constructing [[SqlStr]]s
    */
   implicit class SqlStringSyntax(sc: StringContext) {
-    def sql(args: Interp*) = new SqlStr(sc.parts, args, false, Nil)
+    def sql(args: Interp*) = new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Expr.Identity])
   }
 
   /**
@@ -106,8 +106,8 @@ object SqlStr {
    * Converts a raw `String` into a [[SqlStr]]. Note that this must be used
    * carefully to avoid SQL injection attacks.
    */
-  def raw(s: String, referencedExprs: Seq[Expr.Identity] = Nil) =
-    new SqlStr(Seq(s), Nil, false, referencedExprs)
+  def raw(s: String, referencedExprs: Array[Expr.Identity] = Array.empty) =
+    new SqlStr(Array(s), Array.empty[SqlStr.Interp], false, referencedExprs)
 
   trait Renderable {
     protected def renderToSql(ctx: Context): SqlStr

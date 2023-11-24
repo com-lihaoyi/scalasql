@@ -55,7 +55,7 @@ object Context {
           .flatMap { t =>
             Select
               .selectLhsMap(t.value, prevContext)
-              .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Seq(e))}.$s") }
+              .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 
     Context.Impl(newFromNaming, newExprNaming, prevContext.config)
