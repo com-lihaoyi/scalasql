@@ -133,4 +133,4 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 # TODO
 
 * Scala 3 support
-
+* Better support for plain SQL queries
