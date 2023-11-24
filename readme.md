@@ -19,11 +19,33 @@ object City extends Table[City]() {
 
 val db: DbApi = ???
 
+// Adding up population of all cities in China
 val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
 db.toSqlQuery(query) ==>
   "SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?"
 
 db.run(query) ==> 175953614
+
+// Finding the 5-10th largest cities by population
+val query = City.select
+  .sortBy(_.population).desc
+  .drop(5).take(5)
+  .map(c => (c.name, c.population))
+
+db.toSqlQuery(query) ==> """
+SELECT city0.name AS res__0, city0.population AS res__1
+FROM city city0
+ORDER BY res__1 DESC
+LIMIT ? OFFSET ?
+"""
+
+db.run(query) ==> Seq(
+  ("Karachi", 9269265),
+  ("Istanbul", 8787958),
+  ("Ciudad de México", 8591309),
+  ("Moscow", 8389200),
+  ("New York", 8008278)
+)
 ```
 
 ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 
