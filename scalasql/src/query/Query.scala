@@ -25,7 +25,8 @@ object Query {
   def queryValueReader[R](q: Query[R]) = q.queryValueReader
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
-    override def walk(q: Q) = q.queryWalkExprs()
+    override def walkLabels(q: Q) = q.queryWalkExprs().map(_._1)
+    override def walkExprs(q: Q) = q.queryWalkExprs().map(_._2)
     override def singleRow(q: Q) = q.queryIsSingleRow
 
     override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader

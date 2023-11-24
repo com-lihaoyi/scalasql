@@ -40,9 +40,7 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
-  def runQuery0[T](sql: SqlStr)
-                  (implicit qr: Queryable.Row[_, T],
-                   vr: OptionPickler.Reader[T]): T
+  def runQuery0[T](sql: SqlStr)(implicit qr: Queryable.Row[_, T], vr: OptionPickler.Reader[T]): T
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
@@ -144,18 +142,18 @@ object DbApi {
       finally statement.close()
     }
 
-    def runQuery0[T](sql: SqlStr)
-                    (implicit qr: Queryable.Row[_, T],
-                     vr: OptionPickler.Reader[T]): T = {
+    def runQuery0[T](
+        sql: SqlStr
+    )(implicit qr: Queryable.Row[_, T], vr: OptionPickler.Reader[T]): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
       runRawQuery(
         flattened.queryParts.mkString("?"),
         flattened.params.map(_.value).toSeq: _*
-      ){ resultSet =>
-
+      ) { resultSet =>
         val valueReader: OptionPickler.Reader[T] = vr
         val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers0
+        qr.walkLabels()
         val columnNameUnMapper: Map[String, String] = ???
         val arrVisitor = valueReader.visitArray(-1, -1)
         while (resultSet.next()) {
@@ -245,7 +243,8 @@ object DbApi {
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
-      val (typeMappers, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+      val (typeMappers, statement, columnUnMapper) =
+        prepareRun(query, fetchSize, queryTimeoutSeconds)
 
       if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
       else {
@@ -262,7 +261,11 @@ object DbApi {
             val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
             while (resultSet.next()) {
               val rowRes = handleResultRow(
-                resultSet, arrVisitor.subVisitor, typeMappers, config, columnUnMapper
+                resultSet,
+                arrVisitor.subVisitor,
+                typeMappers,
+                config,
+                columnUnMapper
               )
               arrVisitor.visitValue(rowRes, -1)
             }
@@ -280,7 +283,8 @@ object DbApi {
     ) = {
 
       if (autoCommit) connection.setAutoCommit(true)
-      val (str, params, typeMappers) = toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
+      val (str, params, typeMappers) =
+        toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
       val statement = connection.prepareStatement(str)
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
@@ -292,9 +296,9 @@ object DbApi {
         p.mappedType.asInstanceOf[TypeMapper[Any]].put(statement, n + 1, p.value)
       }
 
-      val walked = qr.walk(query)
+      val walked = qr.walkLabels(query)
 
-      val columnUnMapper = walked.map { case (namesChunks, exprs) =>
+      val columnUnMapper = walked.map { namesChunks =>
         Config.joinName(namesChunks.map(config.columnNameMapper), config) ->
           Config.joinName(namesChunks, config)
       }.toMap
@@ -306,7 +310,8 @@ object DbApi {
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val (typeMappers, statement, columnUnMapper) = prepareRun(query, fetchSize, queryTimeoutSeconds)
+        val (typeMappers, statement, columnUnMapper) =
+          prepareRun(query, fetchSize, queryTimeoutSeconds)
 
         val resultSet: ResultSet = statement.executeQuery()
         try {

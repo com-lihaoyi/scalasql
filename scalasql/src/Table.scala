@@ -57,25 +57,31 @@ object Table {
 
   object Internal {
     class TableQueryable[Q, R](
-        flatten0: Q => Seq[(List[String], Expr[_])],
+        walkLabels0: () => Seq[List[String]],
+        walkExprs0: Q => Seq[Expr[_]],
         val toTypeMappers0: Seq[TypeMapper[_]],
         valueReader0: OptionPickler.Reader[R]
     ) extends Queryable.Row[Q, R] {
-      def walk(q: Q): Seq[(List[String], Expr[_])] = flatten0(q)
+      def walkLabels(): Seq[List[String]] = walkLabels0()
+      def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
       override def valueReader(q: Q): OptionPickler.Reader[R] = valueReader0
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
-        val walked = this.walk(q)
-        val res = ExprsToSql(walked, sql"", ctx)
-        res
+        ExprsToSql(this.walk(q), sql"", ctx)
       }
 
     }
 
-    def flattenPrefixed[T](t: T, prefix: String)(
-        implicit q: Queryable.Row[T, _]
-    ): Seq[(List[String], Expr[_])] = { q.walk(t).map { case (k, v) => (prefix +: k, v) } }
+    def flattenPrefixedLists[T](
+        prefix: String
+    )(implicit q: Queryable.Row[T, _]): Seq[List[String]] = {
+      q.walkLabels().map(prefix +: _)
+    }
+
+    def flattenPrefixedExprs[T](t: T)(implicit q: Queryable.Row[T, _]): Seq[Expr[_]] = {
+      q.walkExprs(t)
+    }
   }
 }
 

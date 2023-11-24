@@ -49,7 +49,8 @@ object Expr {
       implicit valueReader0: OptionPickler.Reader[T],
       mt: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
-    def walk(q: E[T]) = Seq(Nil -> q)
+    def walkLabels() = Seq(Nil)
+    def walkExprs(q: E[T]) = Seq(q)
 
     def valueReader = valueReader0
 

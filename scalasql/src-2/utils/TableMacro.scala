@@ -25,12 +25,15 @@ object TableMacros {
       q"""implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]"""
     }
 
-    val flattenExprs = for (applyParam <- applyParameters) yield {
+    val flattenLists = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
-      q"_root_.scalasql.Table.Internal.flattenPrefixed(table.${TermName(name.toString)}, ${name.toString})"
+      q"_root_.scalasql.Table.Internal.flattenPrefixedLists[_root_.scalasql.Expr[${applyParam.info.typeArgs.head}]](${name.toString})"
     }
 
-    val allFlattenedExprs = flattenExprs.reduceLeft((l, r) => q"$l ++ $r")
+    val flattenExprs = for (applyParam <- applyParameters) yield {
+      val name = applyParam.name
+      q"_root_.scalasql.Table.Internal.flattenPrefixedExprs(table.${TermName(name.toString)})"
+    }
 
     c.Expr[Unit](q"""
     import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
@@ -38,7 +41,8 @@ object TableMacros {
       $self,
       new _root_.scalasql.Table.Metadata[$wtt](
         new _root_.scalasql.Table.Internal.TableQueryable(
-          table => $allFlattenedExprs,
+          () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
+          table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           $allTypeMappers,
           _root_.scalasql.utils.OptionPickler.macroR
         ),

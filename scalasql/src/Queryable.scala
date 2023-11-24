@@ -14,7 +14,10 @@ import scalasql.utils.OptionPickler
  */
 trait Queryable[-Q, R] {
   def isExecuteUpdate(q: Q): Boolean
-  def walk(q: Q): Seq[(List[String], Expr[_])]
+
+  def walkLabels(q: Q): Seq[List[String]]
+  def walkExprs(q: Q): Seq[Expr[_]]
+  def walk(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
   def valueReader(q: Q): Reader[R]
   def singleRow(q: Q): Boolean
 
@@ -39,17 +42,27 @@ object Queryable {
     def singleRow(q: Q): Boolean = true
     def toTypeMappers0: Seq[TypeMapper[_]]
     def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers0
+    def walkLabels(): Seq[List[String]]
+    def walkLabels(q: Q): Seq[List[String]] = walkLabels()
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R](
-        val walk0: Q => Seq[Seq[(List[String], Expr[_])]],
+        val walkLabels0: Seq[Seq[List[String]]],
+        val walkExprs0: Q => Seq[Seq[Expr[_]]],
         val toTypeMappers0List: Seq[Seq[TypeMapper[_]]],
         val valueReader0: Q => Reader[R]
     ) extends Queryable.Row[Q, R] {
-      def walk(q: Q) = {
-        walk0(q).iterator.zipWithIndex
+      def walkExprs(q: Q) = {
+        walkExprs0(q).iterator.zipWithIndex
           .map { case (v, i) => (i.toString, v) }
-          .flatMap { case (prefix, vs0) => vs0.map { case (k, v) => (prefix +: k, v) } }
+          .flatMap { case (prefix, vs0) => vs0 }
+          .toIndexedSeq
+      }
+
+      def walkLabels() = {
+        walkLabels0.iterator.zipWithIndex
+          .map { case (v, i) => (i.toString, v) }
+          .flatMap { case (prefix, vs0) => vs0.map { k => prefix +: k } }
           .toIndexedSeq
       }
 
@@ -66,7 +79,8 @@ object Queryable {
     implicit def NullableQueryable[Q, R](
         implicit qr: Queryable.Row[Q, R]
     ): Queryable.Row[JoinNullable[Q], Option[R]] = new Queryable.Row[JoinNullable[Q], Option[R]] {
-      def walk(q: JoinNullable[Q]): Seq[(List[String], Expr[_])] = qr.walk(q.get)
+      def walkLabels() = qr.walkLabels()
+      def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
       def valueReader(q: JoinNullable[Q]): OptionPickler.Reader[Option[R]] = {
         new OptionPickler.NullableReader(qr.valueReader(q.get))
