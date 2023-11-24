@@ -54,7 +54,6 @@ object Expr {
 
     def valueReader() = valueReader0
 
-
     def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
     def toTypeMappers() = Seq(mt)
   }

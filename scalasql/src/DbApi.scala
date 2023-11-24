@@ -40,7 +40,7 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
-  def runQuery0[Q, R](sql: SqlStr)(implicit qr: Queryable.Row[Q, R]): Seq[R]
+  def runQuery0[R](sql: SqlStr)(implicit qr: Queryable.Row[_, R]): Seq[R]
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
@@ -142,9 +142,9 @@ object DbApi {
       finally statement.close()
     }
 
-    def runQuery0[Q, R](
+    def runQuery0[R](
         sql: SqlStr
-    )(implicit qr: Queryable.Row[Q, R]): Seq[R] = {
+    )(implicit qr: Queryable.Row[_, R]): Seq[R] = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
       runRawQuery(
@@ -254,7 +254,13 @@ object DbApi {
           if (qr.singleRow(query)) {
             assert(resultSet.next())
             val res =
-              handleResultRow(resultSet, qr.valueReader(query), typeMappers, config, Left(columnUnMapper))
+              handleResultRow(
+                resultSet,
+                qr.valueReader(query),
+                typeMappers,
+                config,
+                Left(columnUnMapper)
+              )
             assert(!resultSet.next())
             res
           } else {
@@ -318,7 +324,8 @@ object DbApi {
           val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = handleResultRow(resultSet, visitor, typeMappers, config, Left(columnUnMapper))
+            val rowRes =
+              handleResultRow(resultSet, visitor, typeMappers, config, Left(columnUnMapper))
             action = handleItem(rowRes)
           }
 
@@ -353,7 +360,7 @@ object DbApi {
     val metadata = resultSet.getMetaData
 
     for (i <- Range(0, metadata.getColumnCount)) {
-      val k = columnNameUnMapper0 match{
+      val k = columnNameUnMapper0 match {
         case Left(columnNameUnMapper) =>
           metadata.getColumnLabel(i + 1).toLowerCase match {
             // Hack to support top-level `VALUES` clause; most databases do not

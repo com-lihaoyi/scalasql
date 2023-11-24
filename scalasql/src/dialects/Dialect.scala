@@ -3,6 +3,7 @@ package scalasql.dialects
 import scalasql.operations.{CaseWhen, TableOps, WindowExpr}
 import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
+import scalasql.utils.OptionPickler
 import scalasql.{Queryable, Table, TypeMapper, operations}
 
 import scala.reflect.ClassTag
@@ -192,5 +193,13 @@ trait Dialect extends DialectConfig {
     val rhsSelect = new WithCte.Proxy[Q, R](lhs, lhsSubQueryRef, lhs.qr)
 
     new WithCte(lhs, lhsSubQueryRef, block(rhsSelect))
+  }
+
+  // This is necessary for `runQuery0` to work.
+  implicit def ExprQueryable[T](
+      implicit valueReader0: OptionPickler.Reader[T],
+      mt: TypeMapper[T]
+  ): Queryable.Row[_, T] = {
+    new Expr.toExprable[Expr, T]()
   }
 }

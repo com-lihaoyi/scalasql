@@ -3,7 +3,7 @@ package scalasql.api
 import geny.Generator
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.{Buyer, Id}
-import scalasql.utils.ScalaSqlSuite
+import scalasql.utils.{MySqlSuite, ScalaSqlSuite}
 import sourcecode.Text
 import utest._
 
@@ -31,25 +31,60 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
 
-    test("runQuery0") - checker.recorded(
-      """
-      `db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
-      allowing you to construct SQL strings and interpolate variables within them.
-      Interpolated variables automatically become prepared statement variables to
-      avoid SQL injection vulnerabilities. Takes a callback providing a `java.sql.ResultSet`
-      for you to use directly.
-      """,
-      Text {
+    test("runQuery0") - {
+      if (!this.isInstanceOf[MySqlSuite])
+        checker.recorded(
+          """
+      `db.runQuery0` can be used to run `sql"..."` strings, while providing a
+      specified type that the query results will be deserialized as the specified
+      type. `db.runQuery0` supports the all the same data types as `db.run`:
+      primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
+      any combination of these.
 
-        dbClient.transaction { db =>
-          val filterId = 2
-          val output = db.runQuery0[scalasql.Expr[String], String](
-            sql"SELECT name FROM buyer WHERE id = $filterId"
-          )
-          assert(output == Seq("叉烧包"))
-        }
-      }
-    )
+      The `sql"..."` string interpolator automatically converts interpolated values
+      into prepared statement variables, avoidin SQL injection vulnerabilities. You
+      can also interpolate other `sql"..."` strings, or finally use `SqlStr.raw` for
+      the rare cases where you want to interpolate a trusted `java.lang.String` into
+      the `sql"..."` query without escaping.
+      """,
+          Text {
+
+            dbClient.transaction { db =>
+              val filterId = 2
+              val output = db.runQuery0[String](
+                sql"SELECT name FROM buyer WHERE id = $filterId"
+              )(ExprQueryable)
+              assert(output == Seq("叉烧包"))
+
+              val output2 = db.runQuery0[(String, LocalDate)](
+                sql"SELECT name, date_of_birth FROM buyer WHERE id = $filterId"
+              )
+              assert(
+                output2 ==
+                  Seq(("叉烧包", LocalDate.parse("1923-11-12")))
+              )
+
+              val output3 = db.runQuery0[(String, LocalDate, Buyer[Id])](
+                sql"SELECT name, date_of_birth, * FROM buyer WHERE id = $filterId"
+              )
+              assert(
+                output3 ==
+                  Seq(
+                    (
+                      "叉烧包",
+                      LocalDate.parse("1923-11-12"),
+                      Buyer[Id](
+                        id = 2,
+                        name = "叉烧包",
+                        dateOfBirth = LocalDate.parse("1923-11-12")
+                      )
+                    )
+                  )
+              )
+            }
+          }
+        )
+    }
 
     test("runQuery") - checker.recorded(
       """
