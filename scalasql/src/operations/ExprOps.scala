@@ -29,6 +29,7 @@ class ExprOps(v: Expr[_]) {
   /** Less than or equal to */
   def <=[V](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx => sql"($v <= $x)" }
 
+  /** Translates to a SQL `CAST` from one type to another */
   def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
     sql"CAST($v AS ${SqlStr.raw(implicitly[TypeMapper[V]].typeString)})"
   }

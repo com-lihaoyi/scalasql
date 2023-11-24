@@ -61,17 +61,34 @@ trait Dialect extends DialectConfig {
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
 
+  /**
+   * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
+   */
   def caseWhen[T: TypeMapper](values: (Expr[Boolean], Expr[T])*) = new CaseWhen(values)
 
+  /**
+   * Creates a SQL `VALUES` clause
+   */
   def values[T: TypeMapper](ts: Seq[T]) = new scalasql.query.Values(ts)
 
   import scalasql.renderer.SqlStr.SqlStringSyntax
 
+  /** SQL `RANK()` */
   def rank(): Expr[Int] = Expr { implicit ctx => sql"RANK()" }
+
+  /** SQL `ROW_NUMBER()` */
   def rowNumber(): Expr[Int] = Expr { implicit ctx => sql"ROW_NUMBER()" }
+
+  /** SQL `DENSERANK()` */
   def denseRank(): Expr[Int] = Expr { implicit ctx => sql"DENSE_RANK()" }
+
+  /** SQL `PERCENTRANK()` */
   def percentRank(): Expr[Double] = Expr { implicit ctx => sql"PERCENT_RANK()" }
+
+  /** SQL `CUMEDIST()` */
   def cumeDist(): Expr[Double] = Expr { implicit ctx => sql"CUME_DIST()" }
+
+  /** SQL `NTILE()` */
   def ntile(n: Int): Expr[Int] = Expr { implicit ctx => sql"NTILE($n)" }
 
   private def lagLead[T](prefix: SqlStr, e: Expr[T], offset: Int, default: Expr[T]): Expr[T] =
@@ -88,26 +105,28 @@ trait Dialect extends DialectConfig {
       sql"$prefix($args)"
     }
 
+  /** SQL `LAG()` function */
   def lag[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
     lagLead(sql"LAG", e, offset, default)
+
+  /** SQL `LEAD()` function */
   def lead[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
     lagLead(sql"LEAD", e, offset, default)
 
+  /** SQL `FIRST_VALUE()` function */
   def firstValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"FIRST_VALUE($e)" }
+
+  /** SQL `LAST_VALUE()` function */
   def lastValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"LAST_VALUE($e)" }
+
+  /** SQL `NTH_VALUE()` function */
   def nthValue[T](e: Expr[T], n: Int): Expr[T] = Expr { implicit ctx => sql"NTH_VALUE($e, $n)" }
 
   implicit class WindowExtensions[T](e: Expr[T]) {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
   }
 
-  // with cte(x) as (SELECT name as x from buyer)
-  //  select x || 'xxx' from cte
-  //
-  // SELECT * from (
-  //  with cte(x) as (SELECT name as x from buyer)
-  //    select x || 'xxx' from cte
-  //  ) v
+  /** Generates a SQL `WITH` common table expression clause */
   def withCte[Q, Q2, R, R2](
       lhs: Select[Q, R]
   )(block: Select[Q, R] => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
