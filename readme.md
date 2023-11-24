@@ -134,4 +134,3 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * `SELECT DISTINCT ON` support
-* Per-table table name and column name customization
