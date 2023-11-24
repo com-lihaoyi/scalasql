@@ -14,17 +14,17 @@ import java.time.{
 
 case class Product[+T[_]](id: T[Int], kebabCaseName: T[String], name: T[String], price: T[Double])
 object Product extends Table[Product] {
-  val tableMetadata = initMetadata()
+  initTableMetadata()
 }
 
 case class Buyer[+T[_]](id: T[Int], name: T[String], dateOfBirth: T[LocalDate])
 object Buyer extends Table[Buyer] {
-  val tableMetadata = initMetadata()
+  initTableMetadata()
 }
 
 case class ShippingInfo[+T[_]](id: T[Int], buyerId: T[Int], shippingDate: T[LocalDate])
 object ShippingInfo extends Table[ShippingInfo] {
-  val tableMetadata = initMetadata()
+  initTableMetadata()
 }
 
 case class Purchase[+T[_]](
@@ -35,5 +35,5 @@ case class Purchase[+T[_]](
     total: T[Double]
 )
 object Purchase extends Table[Purchase] {
-  val tableMetadata = initMetadata()
+  initTableMetadata()
 }

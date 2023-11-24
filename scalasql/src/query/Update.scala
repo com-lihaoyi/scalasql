@@ -85,7 +85,8 @@ object Update {
     lazy val froms = joins0.flatMap(_.from).map(_.from)
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, Some(table))
 
-    lazy val tableName = SqlStr.raw(implicitCtx.config.tableNameMapper(Table.tableName(table.value)))
+    lazy val tableName =
+      SqlStr.raw(implicitCtx.config.tableNameMapper(Table.tableName(table.value)))
 
     lazy val updateList = set0.map { case assign =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))

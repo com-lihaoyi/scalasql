@@ -99,7 +99,7 @@ case class Country[+T[_]](
 )
 
 object Country extends Table[Country]() {
-  val metadata = initMetadata()
+  initTableMetadata()
 }
 
 case class City[+T[_]](
@@ -111,7 +111,7 @@ case class City[+T[_]](
 )
 
 object City extends Table[City]() {
-  val metadata = initMetadata()
+  initTableMetadata()
 }
 
 case class CountryLanguage[+T[_]](
@@ -122,7 +122,7 @@ case class CountryLanguage[+T[_]](
 )
 
 object CountryLanguage extends Table[CountryLanguage]() {
-  val metadata = initMetadata()
+  initTableMetadata()
 }
 ```
 
@@ -218,7 +218,6 @@ In this example, we do `.take(3)` after running the query to show only the first
 3 table entries for brevity, but by that point the `City.select` query had already
 fetched the entire database table into memory. This can be a problem with non-trivial
 datasets, and for that you
-
 
 ### Filtering
 
@@ -1337,3 +1336,56 @@ Different databases have a huge range of functions available. ScalaSql comes
 with the most commonly-used functions built in, but it is expected that you will
 need to build up your own library of custom `Expr[T]` functions to to access
 less commonly used functions that are nonetheless still needed in your application
+
+## Customizing Table and Column Names
+
+ScalaSql allows you to customize the table and column names via overriding
+`def table` and `def tableColumnNameOverride` om your `Table` object.
+```scala
+case class CityCustom[+T[_]](
+  idCustom: T[Int],
+  nameCustom: T[String],
+  countryCodeCustom: T[String],
+  districtCustom: T[String],
+  populationCustom: T[Long]
+)
+
+object CityCustom extends Table[CityCustom]() {
+  initTableMetadata()
+
+  override def tableName: String = "city"
+
+  override def tableColumnNameOverride(s: String): String = s match{
+    case "idCustom" => "id"
+    case "nameCustom" => "name"
+    case "countryCodeCustom" => "countrycode"
+    case "districtCustom" => "district"
+    case "populationCustom" => "population"
+  }
+}
+```
+
+```scala
+val query = CityCustom.select
+db.toSqlQuery(query) ==> """
+SELECT
+  city0.id AS res__idcustom,
+  city0.name AS res__namecustom,
+  city0.countrycode AS res__countrycodecustom,
+  city0.district AS res__districtcustom,
+  city0.population AS res__populationcustom
+FROM city city0
+"""
+
+db.run(query).take(3) ==> Seq(
+  CityCustom[Id](1, "Kabul", "AFG", districtCustom = "Kabol", populationCustom = 1780000),
+  CityCustom[Id](
+    2,
+    "Qandahar",
+    "AFG",
+    districtCustom = "Qandahar",
+    populationCustom = 237500
+  ),
+  CityCustom[Id](3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
+)
+```

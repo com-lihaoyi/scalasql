@@ -14,7 +14,7 @@ object SqliteExample {
   )
 
   object ExampleProduct extends Table[ExampleProduct] {
-    val tableMetadata = initMetadata()
+    initTableMetadata()
   }
 
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`

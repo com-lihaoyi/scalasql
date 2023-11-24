@@ -15,7 +15,7 @@ object PostgresExample {
   )
 
   object ExampleProduct extends Table[ExampleProduct] {
-    val tableMetadata = initMetadata()
+    initTableMetadata()
   }
 
   // The example PostgreSQLContainer comes from the library `org.testcontainers:postgresql:1.19.1`

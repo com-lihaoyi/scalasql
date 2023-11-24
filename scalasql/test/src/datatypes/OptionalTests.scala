@@ -9,7 +9,7 @@ import sourcecode.Text
 case class OptCols[+T[_]](myInt: T[Option[Int]], myInt2: T[Option[Int]])
 
 object OptCols extends Table[OptCols] {
-  val tableMetadata = initMetadata()
+  initTableMetadata()
 }
 
 trait OptionalTests extends ScalaSqlSuite {

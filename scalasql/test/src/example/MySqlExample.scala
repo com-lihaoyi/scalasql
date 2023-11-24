@@ -14,7 +14,7 @@ object MySqlExample {
   )
 
   object ExampleProduct extends Table[ExampleProduct] {
-    val tableMetadata = initMetadata()
+    initTableMetadata()
   }
 
   // The example MySQLContainer comes from the library `org.testcontainers:mysql:1.19.1`

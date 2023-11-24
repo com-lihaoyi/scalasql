@@ -14,7 +14,7 @@ object H2Example {
   )
 
   object ExampleProduct extends Table[ExampleProduct] {
-    val tableMetadata = initMetadata()
+    initTableMetadata()
   }
 
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`

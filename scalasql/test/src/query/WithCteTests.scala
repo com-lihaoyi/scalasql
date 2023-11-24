@@ -135,7 +135,7 @@ trait WithCteTests extends ScalaSqlSuite {
         ("叉烧包", "Face Mask"),
         ("叉烧包", "Face Mask"),
         ("叉烧包", "Guitar"),
-        ("叉烧包", "Socks"),
+        ("叉烧包", "Socks")
       ),
       docs = """
         ScalaSql's `withCte` can be used anywhere a `.select` operator can be used. The

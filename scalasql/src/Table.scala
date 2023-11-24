@@ -23,16 +23,20 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
    * by [[Config.columnNameMapper]]. Can be overriden to configure the column
    * names on a per-column basis.
    */
-  protected def tableColumnNameOverrides: Map[String, String] = Map()
+  protected def tableColumnNameOverride(s: String): String = identity(s)
   protected implicit def tableSelf: Table[V] = this
 
-  protected def tableMetadata: Table.Metadata[V]
+  protected var tableMetadata0: Table.Metadata[V] = null
+  protected def tableMetadata: Table.Metadata[V] = Option(tableMetadata0).getOrElse(
+    throw new Exception(
+      s"Table Metadata not initialized for ${tableName}, please ensure you run `initTableMetadata()"
+    )
+  )
 
   implicit def containerQr[E[_] <: Expr[_]]: Queryable.Row[V[E], V[Id]] = tableMetadata.queryable
     .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
-
 
 }
 
@@ -40,11 +44,11 @@ object Table {
   def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
   def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
   def tableName[V[_[_]]](t: Table.Base) = t.tableName
-  def tableColumnNameOverrides[V[_[_]]](t: Table[V]) = t.tableColumnNameOverrides
+  def tableColumnNameOverride[V[_[_]]](t: Table[V])(s: String) = t.tableColumnNameOverride(s)
+  def setTableMetadata0[V[_[_]]](t: Table[V], m: Metadata[V]) = t.tableMetadata0 = m
   trait Base {
     protected[scalasql] def tableName: String
   }
-
 
   class Metadata[V[_[_]]](
       val queryable: Queryable[V[Expr], V[Id]],
@@ -91,7 +95,8 @@ object Column {
       ctx.fromNaming.get(tableRef) match {
         case Some("") => suffix
         case Some(s) => SqlStr.raw(s) + sql".$suffix"
-        case None => sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.tableName(tableRef.value))}.$suffix"
+        case None =>
+          sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.tableName(tableRef.value))}.$suffix"
       }
     }
   }
