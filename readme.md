@@ -270,7 +270,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 |        `a + b` |           `a + b` |        `a - b` |           `a - b` |
 |        `a * b` |           `a * b` |        `a / b` |           `a / b` |
 |        `a % b` |       `MOD(a, b)` |        `a & b` |           `a & b` |
-|        `a ^ b` |           `a ^ b` |        `a | b` |           `a | b` |
+|        `a ^ b` |           `a ^ b` |       `a \| b` |          `a \| b` |
 |       `a.ceil` |         `CEIL(a)` |      `a.floor` |        `FLOOR(a)` |
 |    `a.expr(b)` |       `EXP(a, b)` |         `a.ln` |           `LN(a)` |
 |     `a.pow(b)` |       `POW(a, b)` |       `a.sqrt` |         `SQRT(a)` |
@@ -280,14 +280,14 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 | Scala Function | Database Function | Scala Function | Database Function |
 |---------------:|------------------:|---------------:|------------------:|
-|       `a && b` |         `a AND b` |       `a || b` |          `a OR b` |
+|       `a && b` |         `a AND b` |     `a \|\| b` |          `a OR b` |
 |           `!a` |           `NOT a` |
 
 **String Functions**
 
 |      Scala Function |    Database Function |  Scala Function | Database Function |
 |--------------------:|---------------------:|----------------:|------------------:|
-|             `a + b` |             `a || b` |     `a.like(b)` |        `a LIKE b` |
+|             `a + b` |           `a \|\| b` |     `a.like(b)` |        `a LIKE b` |
 |  `a.toLowerCase(b)` |           `LOWER(a)` | `a.toUpperCase` |        `UPPER(a)` |
 |      `a.indexOf(b)` |     `POSITION(a, b)` |        `a.trim` |         `TRIM(a)` |
 |          `a.length` |          `LENGTH(a)` | `a.octetLength` | `OCTET_LENGTH(a)` |
