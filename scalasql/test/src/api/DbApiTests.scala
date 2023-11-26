@@ -121,26 +121,13 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.transaction { db =>
-          val output = db.runRaw("SELECT name FROM buyer WHERE id = ?", Seq(2)) { rs =>
-            val output = mutable.Buffer.empty[String]
-
-            while (
-              rs.next() match {
-                case false => false
-                case true =>
-                  output.append(rs.getString(1))
-                  true
-              }
-            ) ()
-            output
-          }
-
+          val output = db.runRaw[Seq[String]]("SELECT name FROM buyer WHERE id = ?", Seq(2))
           assert(output == Seq("叉烧包"))
         }
       }
     )
 
-    test("runRawUpdate") - checker.recorded(
+    test("updateRaw") - checker.recorded(
       """
       `runRawUpdate` is similar to `runRawQuery`, but for update queries that
       return a single number
@@ -177,6 +164,29 @@ trait DbApiTests extends ScalaSqlSuite {
           val output = collection.mutable.Buffer.empty[String]
 
           db.stream(Buyer.select).generate { buyer =>
+            output.append(buyer.name)
+            if (buyer.id >= 2) Generator.End else Generator.Continue
+          }
+
+          output ==> List("James Bond", "叉烧包")
+        }
+      }
+    )
+
+    test("streamSql") - checker.recorded(
+      """
+      `db.stream` can be run on queries that return `Seq[T]`s, and makes them
+      return `geny.Generator[T]`s instead. This allows you to deserialize and
+      process the returned database rows incrementally without buffering the
+      entire `Seq[T]` in memory. Not that the underlying JDBC driver and the
+      underlying database may each perform their own buffering depending on
+      their implementation
+      """,
+      Text {
+        dbClient.transaction { db =>
+          val output = collection.mutable.Buffer.empty[String]
+
+          db.streamSql[Buyer[Id]](sql"SELECT * FROM buyer").generate { buyer =>
             output.append(buyer.name)
             if (buyer.id >= 2) Generator.End else Generator.Continue
           }

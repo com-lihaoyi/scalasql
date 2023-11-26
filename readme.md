@@ -155,6 +155,9 @@ db.stream(Foo.select.filter(_.myStr === str)): Generator[Foo[Id]]
 
 // Streaming SQL Select Query
 db.streamSql[Foo[Id]](sql"SELECT * FROM foo WHERE foo.my_str = $str"): Generator[Foo[Id]]
+
+// Streaming SQL Select Query
+db.streamRaw[Foo[Id]]("SELECT * FROM foo WHERE foo.my_str = ?", Seq(str)): Generator[Foo[Id]]
 ```
 
 ### Selects
@@ -178,7 +181,7 @@ Foo.select.sumByOpt(_.myInt)                                        // Option[In
 Foo.select.size                                                     // Int
 // SELECT COUNT(1) FROM foo
 
-Foo.select.aggregate(_.sumBy(_.myInt), _.maxBy(_.barInd))           // (Int, Int)
+Foo.select.aggregate(fs => (fs.sumBy(_.myInt), fs.maxBy(_.myInt)))  // (Int, Int)
 // SELECT SUM(my_int), MAX(my_int) FROM foo
 
 Foo.select.filter(_.myStr === "hello")                              // Seq[Foo[Id]]
@@ -202,7 +205,7 @@ Foo.select.map(_.myInt.cast[String])                                // Seq[Strin
 Foo.select.join(Bar)(_.id === _.fooId)                              // Seq[(Foo[Id], Bar[Id])] 
 // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 
-for(f <- Foo.select; b <- Bar.join(_.id === _.fooId)) yield (f, b)  // Seq[(Foo[Id], Bar[Id])] 
+for(f <- Foo.select; b <- Bar.join(f.id === _.fooId)) yield (f, b)  // Seq[(Foo[Id], Bar[Id])] 
 // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 ```
 
@@ -228,19 +231,86 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 ### Type Mapping
 
-|    Scala Primitive Type |             Database Type |        Scala DateTime Type |             Database Type |
-|------------------------:|--------------------------:|---------------------------:|--------------------------:|
-|          `scala.String` |             `LONGVARCHAR` |      `java.time.LocalDate` |                    `DATE` |
-|            `scala.Byte` |                 `TINYINT` |      `java.time.LocalTime` |                    `TIME` |
-|           `scala.Short` |                `SMALLINT` |  `java.time.LocalDateTime` |               `TIMESTAMP` |
-|             `scala.Int` |                 `INTEGER` |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
-|            `scala.Long` |                  `BIGINT` |        `java.time.Instant` |               `TIMESTAMP` |
-|           `scala.Float` |                  `DOUBLE` | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
-|          `scala.Double` |                  `DOUBLE` |
-| `scala.math.BigDecimal` |                  `DOUBLE` |
-|         `scala.Boolean` |                 `BOOLEAN` |
+|    Scala Primitive Type |  Database Type |        Scala DateTime Type |             Database Type |
+|------------------------:|---------------:|---------------------------:|--------------------------:|
+|          `scala.String` |  `LONGVARCHAR` |      `java.time.LocalDate` |                    `DATE` |
+|            `scala.Byte` |      `TINYINT` |      `java.time.LocalTime` |                    `TIME` |
+|           `scala.Short` |     `SMALLINT` |  `java.time.LocalDateTime` |               `TIMESTAMP` |
+|             `scala.Int` |      `INTEGER` |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
+|            `scala.Long` |       `BIGINT` |        `java.time.Instant` |               `TIMESTAMP` |
+|           `scala.Float` |       `DOUBLE` | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
+|          `scala.Double` |       `DOUBLE` |
+| `scala.math.BigDecimal` |       `DOUBLE` |
+|         `scala.Boolean` |      `BOOLEAN` |
 
 
+### Common ScalaSql Functions
+
+**Expression Functions**
+
+|   Scala Function |                     Database Function | Scala Function |                  Database Function |
+|-----------------:|--------------------------------------:|---------------:|-----------------------------------:|
+|        `a === b` | `a = b` or `a IS NOT DISTINCT FROM b` |      `a !== b` | `a <> b` or `a IS DISTINCT FROM b` |
+|          `a < b` |                               `a < b` |       `a <= b` |                           `a <= b` |
+|          `a > b` |                               `a > b` |       `a >= b` |                           `a >= b` |
+|        `a `=` b` |                               `a = b` |       `a <> b` |                           `a <> b` |
+| `a.cast[String]` |                 `CAST(a AS VARCHAR)`  |
+
+**Numeric Functions**
+
+| Scala Function | Database Function | Scala Function | Database Function |
+|---------------:|------------------:|---------------:|------------------:|
+|           `+a` |              `+a` |           `-a` |              `-a` |
+|        `a + b` |           `a + b` |        `a - b` |           `a - b` |
+|        `a * b` |           `a * b` |        `a / b` |           `a / b` |
+|        `a % b` |       `MOD(a, b)` |        `a & b` |           `a & b` |
+|        `a ^ b` |           `a ^ b` |        `a | b` |           `a | b` |
+|       `a.ceil` |         `CEIL(a)` |      `a.floor` |        `FLOOR(a)` |
+|    `a.expr(b)` |       `EXP(a, b)` |         `a.ln` |           `LN(a)` |
+|     `a.pow(b)` |       `POW(a, b)` |       `a.sqrt` |         `SQRT(a)` |
+| `a.abs` | `ABS(a)` |
+
+**Boolean Functions**
+
+| Scala Function | Database Function | Scala Function | Database Function |
+|---------------:|------------------:|---------------:|------------------:|
+|       `a && b` |         `a AND b` |       `a || b` |          `a OR b` |
+|           `!a` |           `NOT a` |
+
+**String Functions**
+
+|      Scala Function |    Database Function |  Scala Function | Database Function |
+|--------------------:|---------------------:|----------------:|------------------:|
+|             `a + b` |             `a || b` |     `a.like(b)` |        `a LIKE b` |
+|  `a.toLowerCase(b)` |           `LOWER(a)` | `a.toUpperCase` |        `UPPER(a)` |
+|      `a.indexOf(b)` |     `POSITION(a, b)` |        `a.trim` |         `TRIM(a)` |
+|          `a.length` |          `LENGTH(a)` | `a.octetLength` | `OCTET_LENGTH(a)` |
+|           `a.ltrim` |           `LTRIM(a)` |       `a.rtrim` |        `RTRIM(a)` |
+| `a.substring(b, c)` | `SUBSTRING(a, b, c)` |
+
+**Aggregate Functions**
+
+|                                     Scala Function |    Database Function |                                     Scala Function |         Database Function |
+|---------------------------------------------------:|---------------------:|---------------------------------------------------:|--------------------------:|
+|                                           `a.size` |           `COUNT(1)` |                                  `a.mkString(sep)` | `GROUP_COUNCAT(a, sep)`   |
+| `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |        `SUM(my_int)` | `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |             `MIN(my_int)` |
+| `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |        `MAX(my_int)` | `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |             `AVG(my_int)` |
+| `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |        `MAX(my_int)` | `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |             `AVG(my_int)` |
+
+**Select Functions**
+
+|  Scala Function | Database Function | Scala Function | Database Function |
+|----------------:|------------------:|---------------:|------------------:|
+| `s.contains(a)` |          `a IN s` |
+|    `s.nonEmpty` |        `EXISTS s` |    `s.isEmpty` |    `NOT EXISTS s` |
+
+**Option/Nullable Functions**
+
+|   Scala Function | Database Function |   Scala Function | Database Function |
+|-----------------:|------------------:|-----------------:|------------------:|
+|    `a.isDefined` |   `a IS NOT NULL` |      `a.isEmpty` |       `a IS NULL` |
+|     `a.map(...)` |               `a` | `a.flatMap(...)` |               `a` |
+| `a.getOrElse(b)` |  `COALESCE(a, b)` |    `a.orElse(b)` |  `COALESCE(a, b)` |
 
 ## Developer Docs
 
@@ -264,3 +334,4 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 * Scala 3 support
 * Better support for plain SQL queries
+* Flatten Nested Tuples 

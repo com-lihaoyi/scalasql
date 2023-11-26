@@ -55,7 +55,7 @@ trait DbApi extends AutoCloseable {
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
    * [[block]] allowing you to process the resultant [[ResultSet]]
    */
-  def runRaw[T](sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T
+  def runRaw[T](sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): T
 
   /**
    * Runs an [[SqlStr]] of the form `sql"..."` containing an `UPDATE` or `INSERT` query and returns the
@@ -147,8 +147,8 @@ object DbApi {
     def runRaw[T](sql: String,
                   variables: Seq[Any] = Nil,
                   fetchSize: Int = -1,
-                  queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T = {
-      runRawQuery0[T](sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)(block)
+                  queryTimeoutSeconds: Int = -1): T = {
+      runRawQuery0[T](sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)
     }
 
     private def flattenParamPuts[T](flattened: SqlStr.Flattened) = {
@@ -326,7 +326,8 @@ object DbApi {
         fetchSize: Int,
         queryTimeoutSeconds: Int
     ) = {
-      runRawQueryFlattened(flattened,
+      runRawQueryFlattened(
+        flattened,
         fetchSize: Int,
         queryTimeoutSeconds: Int) { resultSet =>
         var action: Generator.Action = Generator.Continue
