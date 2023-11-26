@@ -66,6 +66,68 @@ To get started with ScalaSql, add it to your `build.sc` file as follows:
 ivy"com.lihaoyi::scalasql:0.1.0"
 ```
 
+## Cheat Shet
+
+### Selects
+
+| ScalaSql                                                            | SQL                                                             | Return Type                 |
+|---------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------|
+| `Foo.select`                                                        | `SELECT * FROM foo`                                             | `Seq[Foo[Id]]`              |
+| `Foo.select.map(_.myStr)`                                           | `SELECT my_str FROM foo`                                        | `Seq[String]`               |
+| `Foo.select.map(t => (t.myStr, t.myInt))`                           | `SELECT my_str, my_int FROM foo`                                | `Seq[(String, Int)]`        |
+| `Foo.select.sumBy(_.myInt)`                                         | `SELECT SUM(my_int) FROM foo`                                   | `Int`                       |
+| `Foo.select.sumByOpt(_.myInt)`                                      | `SELECT SUM(my_int) FROM foo`                                   | `Option[Int]`               |
+| `Foo.select.aggregate(_.sumBy(_.myInt), _.maxBy(_.barInd)`          | `SELECT SUM(my_int), MAX(my_int) FROM foo`                      | `(Int, Int)`                |
+| `Foo.select.filter(_.myStr === "hello")`                            | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Seq[Foo[[Id]]`             |
+| `Foo.select.filter(_.myStr === Expr("hello"))`                      | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Seq[Foo[[Id]]`             |
+| `Foo.select.filter(_.myStr === "hello").single`                     | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Foo[Id]`                   |
+| `Foo.select.sortBy(_.myInt).asc`                                    | `SELECT * FROM foo ORDER BY my_int ASC`                         | `Seq[Foo[Id]]`              |
+| `Foo.select.sortBy(_.myInt).asc.take(20).drop(5)`                   | `SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5`       | `Seq[Foo[Id]]`              |
+| `Foo.select.sortBy(_.myInt).asc.take(20).drop(5)`                   | `SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5`       | `Seq[Foo[Id]]`              |
+| `Foo.select.map(_.myInt.cast[String])`                              | `SELECT CAST(my_int AS VARCHAR) FROM foo`                       | `Seq[String]`               |
+| `Foo.select.join(Bar)(_.id === _.fooId)`                            | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
+| `for(f <- Foo.select; b <- Bar.join(_.id === _.fooId) yield (f, b)` | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
+
+### Insert/Update/Delete
+| `Foo.insert.values(_.myStr := "hello", _.myInt := 123)`             | `INSERT INTO foo (my_str, my_int) VALUES ("hello", 123)`        | `1`                         |
+| `Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2))`          | `INSERT INTO foo (my_str, my_int) VALUES ("a", 1), ("b", 2)`    | `2`                         |
+| `Foo.update(_.myStr === "hello").set(_.myInt := 123)`               | `UPDATE foo SET my_int = 123 WHERE foo.my_str = "hello"`        | `Int`                       |
+| `Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt+ 1)`       | `UPDATE foo SET my_int = foo.my_int + 1 WHERE foo.my_str = "a"` | `Int`                       |
+| `Foo.delete(_.myStr === "hello")`                                   | `DELETE FROM foo WHERE foo.my_str = "hello"`                    | `Int`                       |
+
+
+### Type Mapping
+
+|    Scala Primitive Type |             Database Type |
+|------------------------:|--------------------------:|
+|          `scala.String` |             `LONGVARCHAR` |
+|            `scala.Byte` |                 `TINYINT` |
+|           `scala.Short` |                `SMALLINT` |
+|             `scala.Int` |                 `INTEGER` |
+|            `scala.Long` |                  `BIGINT` |
+|           `scala.Float` |                  `DOUBLE` |
+|          `scala.Double` |                  `DOUBLE` |
+| `scala.math.BigDecimal` |                  `DOUBLE` |
+|         `scala.Boolean` |                 `BOOLEAN` |
+
+|        Scala DateTime Type |             Database Type |
+|---------------------------:|--------------------------:|
+|      `java.time.LocalDate` |                    `DATE` |
+|      `java.time.LocalTime` |                    `TIME` |
+|  `java.time.LocalDateTime` |               `TIMESTAMP` |
+|  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
+|        `java.time.Instant` |               `TIMESTAMP` |
+| `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
+
+### Call Styles
+
+| Execution Style \ Input   | Query         |     `sql"..."` |  "..." + variables |
+| ------------------------: | ------------: |---------------:|-------------------:|
+| Blocking                  | `db.run`      | `db.runQuery0` |        `db.runRaw` |
+| Update                    | `db.run`      |            ??? |                ??? |
+| Streaming                 | `db.stream`   |            ??? |                ??? |
+| ResultSet                 | ???           |            ??? |                ??? |
+
 ## Documentation
 
 * ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with

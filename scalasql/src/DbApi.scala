@@ -26,6 +26,13 @@ trait DbApi extends AutoCloseable {
   ): R
 
   /**
+   * Runs the given query [[Q]] and returns a value of type [[R]]
+   */
+  def run[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+      implicit qr: Queryable.Row[_, R]
+  ): R
+
+  /**
    * Runs the given query [[Q]] and returns a [[Generator]] of values of type [[R]].
    * allow you to process the results in a streaming fashion without materializing
    * the entire list of results in memory
@@ -40,7 +47,7 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
-  def runQuery0[R](sql: SqlStr)(implicit qr: Queryable.Row[_, R]): Seq[R]
+  def runSql[R](sql: SqlStr)(implicit qr: Queryable.Row[_, R]): Seq[R]
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
@@ -142,7 +149,7 @@ object DbApi {
       finally statement.close()
     }
 
-    def runQuery0[R](
+    def runSql[R](
         sql: SqlStr
     )(implicit qr: Queryable.Row[_, R]): Seq[R] = {
       if (autoCommit) connection.setAutoCommit(true)

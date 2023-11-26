@@ -51,12 +51,12 @@ trait DbApiTests extends ScalaSqlSuite {
 
             dbClient.transaction { db =>
               val filterId = 2
-              val output = db.runQuery0[String](
+              val output = db.runSql[String](
                 sql"SELECT name FROM buyer WHERE id = $filterId"
               )(ExprQueryable)
               assert(output == Seq("叉烧包"))
 
-              val output2 = db.runQuery0[(String, LocalDate)](
+              val output2 = db.runSql[(String, LocalDate)](
                 sql"SELECT name, date_of_birth FROM buyer WHERE id = $filterId"
               )
               assert(
@@ -64,7 +64,7 @@ trait DbApiTests extends ScalaSqlSuite {
                   Seq(("叉烧包", LocalDate.parse("1923-11-12")))
               )
 
-              val output3 = db.runQuery0[(String, LocalDate, Buyer[Id])](
+              val output3 = db.runSql[(String, LocalDate, Buyer[Id])](
                 sql"SELECT name, date_of_birth, * FROM buyer WHERE id = $filterId"
               )
               assert(

@@ -364,29 +364,7 @@ object WorldSqlTests extends TestSuite {
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
         // Lifting of Scala values into your ScalaSql queries is dependent on there being
-        // an implicit `scalasql.TypeMapper[T]` in scope. By default, the following mappings
-        // are provided:
-        //
-        // |    Scala Primitive Type |             Database Type |
-        // |------------------------:|--------------------------:|
-        // |          `scala.String` |             `LONGVARCHAR` |
-        // |            `scala.Byte` |                 `TINYINT` |
-        // |           `scala.Short` |                `SMALLINT` |
-        // |             `scala.Int` |                 `INTEGER` |
-        // |            `scala.Long` |                  `BIGINT` |
-        // |           `scala.Float` |                  `DOUBLE` |
-        // |          `scala.Double` |                  `DOUBLE` |
-        // | `scala.math.BigDecimal` |                  `DOUBLE` |
-        // |         `scala.Boolean` |                 `BOOLEAN` |
-        //
-        // |        Scala DateTime Type |             Database Type |
-        // |---------------------------:|--------------------------:|
-        // |      `java.time.LocalDate` |                    `DATE` |
-        // |      `java.time.LocalTime` |                    `TIME` |
-        // |  `java.time.LocalDateTime` |               `TIMESTAMP` |
-        // |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
-        // |        `java.time.Instant` |               `TIMESTAMP` |
-        // | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
+        // an implicit `scalasql.TypeMapper[T]` in scope.
         //
         // but you can define `TypeMapper`s
         // for your own types if you want to be able to use them to represent types in the database
@@ -1485,6 +1463,8 @@ object WorldSqlTests extends TestSuite {
       // |                  Update |    `db.run` |            ??? |                ??? |
       // |               Streaming | `db.stream` |            ??? |                ??? |
       // |               ResultSet |         ??? |            ??? |                ??? |
+      //
+      //
       // -DOCS
     }
   }
