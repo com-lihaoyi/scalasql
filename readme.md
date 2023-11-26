@@ -116,13 +116,25 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 ## Cheat Sheet
 
 ### Call Styles
+           
+```scala
+val str = "hello"
 
-| Execution Style \ Input   |                              Query |                                       `sql"..."` |
-| ------------------------: |-----------------------------------:|-------------------------------------------------:|
-| Blocking                  |               `db.run(Foo.select)` | `db.runSql[Seq[Foo[Id]](sql"SELECT * FROM foo")` |
-| Update                    | `db.run(Foo.update(...).set(...))` |                                              ??? |
-| Streaming                 |            `db.stream(Foo.select)` |                                              ??? |
+// Simple Select Query
+db.run(Foo.select.filter(_.myStr === str)): Seq[Foo[Id]]
 
+// Simple Update Query
+db.run(Foo.update(_.myStr === str).set(_.myInt := 123)): Int
+
+// Simple SQL Query
+db.runSql[Seq[Foo[Id]]](sql"SELECT * FROM foo WHERE foo.my_str = $str"): Seq[Foo[Id]]
+
+// Streaming Select Query
+db.run(Foo.select.filter(_.myStr === str)): Generator[Foo[Id]]
+
+// Streaming SQL Query
+db.streamSql[Foo[Id]](sql"SELECT * FROM foo WHERE foo.my_str = $str"): Generator[Foo[Id]]
+```
 ### Selects
 
 ```scala
