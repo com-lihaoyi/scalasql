@@ -221,10 +221,13 @@ Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2))      // 2
 Foo.update(_.myStr === "hello").set(_.myInt := 123)           // Int
 // UPDATE foo SET my_int = 123 WHERE foo.my_str = "hello"
 
-Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt+ 1)   // Int
+Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt + 1)   // Int
 // UPDATE foo SET my_int = foo.my_int + 1 WHERE foo.my_str = "a"
 
-Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt+ 1).returning(f => (f.id, f.myInt))   // Seq[(Int, Int)]
+Foo
+  .update(_.myStr === "a")
+  .set(t => t.myInt := t.myInt + 1)
+  .returning(f => (f.id, f.myInt))   // Seq[(Int, Int)]
 // UPDATE foo SET my_int = foo.my_int + 1 WHERE foo.my_str = "a" RETURNING foo.id, foo.my_int
 
 Foo.delete(_.myStr === "hello")                               // Int
