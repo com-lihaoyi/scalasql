@@ -32,21 +32,21 @@ trait DbApiTests extends ScalaSqlSuite {
     )
 
     test("runSql") - {
-      if (!this.isInstanceOf[MySqlSuite])
+      if (!this.isInstanceOf[MySqlSuite]) {
         checker.recorded(
           """
-      `db.runSql` can be used to run `sql"..."` strings, while providing a
-      specified type that the query results will be deserialized as the specified
-      type. `db.runSql` supports the all the same data types as `db.run`:
-      primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
-      any combination of these.
+          `db.runSql` can be used to run `sql"..."` strings, while providing a
+          specified type that the query results will be deserialized as the specified
+          type. `db.runSql` supports the all the same data types as `db.run`:
+          primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
+          any combination of these.
 
-      The `sql"..."` string interpolator automatically converts interpolated values
-      into prepared statement variables, avoidin SQL injection vulnerabilities. You
-      can also interpolate other `sql"..."` strings, or finally use `SqlStr.raw` for
-      the rare cases where you want to interpolate a trusted `java.lang.String` into
-      the `sql"..."` query without escaping.
-      """,
+          The `sql"..."` string interpolator automatically converts interpolated values
+          into prepared statement variables, avoidin SQL injection vulnerabilities. You
+          can also interpolate other `sql"..."` strings, or finally use `SqlStr.raw` for
+          the rare cases where you want to interpolate a trusted `java.lang.String` into
+          the `sql"..."` query without escaping.
+          """,
           Text {
 
             dbClient.transaction { db =>
@@ -84,8 +84,8 @@ trait DbApiTests extends ScalaSqlSuite {
             }
           }
         )
+      }
     }
-
 
     test("updateSql") - checker.recorded(
       """
@@ -114,7 +114,7 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
 
-    test("runRawQuery") - checker.recorded(
+    test("runRaw") - checker.recorded(
       """
       `runRawQuery` is similar to `runQuery` but allows you to pass in the SQL strings
       "raw", along with `?` placeholders and interpolated variables passed separately.
@@ -175,23 +175,40 @@ trait DbApiTests extends ScalaSqlSuite {
 
     test("streamSql") - checker.recorded(
       """
-      `db.stream` can be run on queries that return `Seq[T]`s, and makes them
-      return `geny.Generator[T]`s instead. This allows you to deserialize and
-      process the returned database rows incrementally without buffering the
-      entire `Seq[T]` in memory. Not that the underlying JDBC driver and the
-      underlying database may each perform their own buffering depending on
-      their implementation
+      `.streamSql` provides a lower level interface to `.stream`, allowing you to pass
+      in a `SqlStr` of the form `sql"..."`, while allowing you to process the returned rows
+      in a streaming fashion without.
       """,
       Text {
         dbClient.transaction { db =>
-          val output = collection.mutable.Buffer.empty[String]
+          val excluded = "James Bond"
+          val output = db
+            .streamSql[Buyer[Id]](sql"SELECT * FROM buyer where name != $excluded")
+            .takeWhile(_.id <= 2)
+            .map(_.name)
+            .toList
 
-          db.streamSql[Buyer[Id]](sql"SELECT * FROM buyer").generate { buyer =>
-            output.append(buyer.name)
-            if (buyer.id >= 2) Generator.End else Generator.Continue
-          }
+          output ==> List("叉烧包")
+        }
+      }
+    )
 
-          output ==> List("James Bond", "叉烧包")
+    test("streamRaw") - checker.recorded(
+      """
+      `.streamRaw` provides a lowest level interface to `.stream`, allowing you to pass
+      in a `java.lang.String` and a `Seq[Any]` representing the interpolated prepared
+      statement variables
+      """,
+      Text {
+        dbClient.transaction { db =>
+          val excluded = "James Bond"
+          val output = db
+            .streamRaw[Buyer[Id]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
+            .takeWhile(_.id <= 2)
+            .map(_.name)
+            .toList
+
+          output ==> List("叉烧包")
         }
       }
     )

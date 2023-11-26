@@ -93,41 +93,7 @@ dbClient.transaction { db =>
 
 
 
-### DbApi.runQuery
-
-`db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
-allowing you to construct SQL strings and interpolate variables within them.
-Interpolated variables automatically become prepared statement variables to
-avoid SQL injection vulnerabilities. Takes a callback providing a `java.sql.ResultSet`
-for you to use directly.
-
-```scala
-dbClient.transaction { db =>
-  val filterId = 2
-  val output = db.runQuery(sql"SELECT name FROM buyer WHERE id = $filterId") { rs =>
-    val output = mutable.Buffer.empty[String]
-
-    while (
-      rs.next() match {
-        case false => false
-        case true =>
-          output.append(rs.getString(1))
-          true
-      }
-    ) ()
-    output
-  }
-
-  assert(output == Seq("叉烧包"))
-}
-```
-
-
-
-
-
-
-### DbApi.runUpdate
+### DbApi.updateSql
 
 Similar to `db.runQuery`, `db.runUpdate` allows you to pass in a `SqlStr`, but runs
 an update rather than a query and expects to receive a single number back from the
@@ -138,7 +104,7 @@ dbClient.transaction { db =>
   val newName = "Moo Moo Cow"
   val newDateOfBirth = LocalDate.parse("2000-01-01")
   val count = db
-    .runUpdate(
+    .updateSql(
       sql"INSERT INTO buyer (name, date_of_birth) VALUES($newName, $newDateOfBirth)"
     )
   assert(count == 1)
@@ -157,27 +123,14 @@ dbClient.transaction { db =>
 
 
 
-### DbApi.runRawQuery
+### DbApi.runRaw
 
 `runRawQuery` is similar to `runQuery` but allows you to pass in the SQL strings
 "raw", along with `?` placeholders and interpolated variables passed separately.
 
 ```scala
 dbClient.transaction { db =>
-  val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", 2) { rs =>
-    val output = mutable.Buffer.empty[String]
-
-    while (
-      rs.next() match {
-        case false => false
-        case true =>
-          output.append(rs.getString(1))
-          true
-      }
-    ) ()
-    output
-  }
-
+  val output = db.runRaw[String]("SELECT name FROM buyer WHERE id = ?", Seq(2))
   assert(output == Seq("叉烧包"))
 }
 ```
@@ -187,17 +140,16 @@ dbClient.transaction { db =>
 
 
 
-### DbApi.runRawUpdate
+### DbApi.updateRaw
 
 `runRawUpdate` is similar to `runRawQuery`, but for update queries that
 return a single number
 
 ```scala
 dbClient.transaction { db =>
-  val count = db.runRawUpdate(
+  val count = db.updateRaw(
     "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
-    "Moo Moo Cow",
-    LocalDate.parse("2000-01-01")
+    Seq("Moo Moo Cow", LocalDate.parse("2000-01-01"))
   )
   assert(count == 1)
 
@@ -234,6 +186,54 @@ dbClient.transaction { db =>
   }
 
   output ==> List("James Bond", "叉烧包")
+}
+```
+
+
+
+
+
+
+### DbApi.streamSql
+
+`.streamSql` provides a lower level interface to `.stream`, allowing you to pass
+in a `SqlStr` of the form `sql"..."`, while allowing you to process the returned rows
+in a streaming fashion without.
+
+```scala
+dbClient.transaction { db =>
+  val excluded = "James Bond"
+  val output = db
+    .streamSql[Buyer[Id]](sql"SELECT * FROM buyer where name != $excluded")
+    .takeWhile(_.id <= 2)
+    .map(_.name)
+    .toList
+
+  output ==> List("叉烧包")
+}
+```
+
+
+
+
+
+
+### DbApi.streamRaw
+
+`.streamRaw` provides a lowest level interface to `.stream`, allowing you to pass
+in a `java.lang.String` and a `Seq[Any]` representing the interpolated prepared
+statement variables
+
+```scala
+dbClient.transaction { db =>
+  val excluded = "James Bond"
+  val output = db
+    .streamRaw[Buyer[Id]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
+    .takeWhile(_.id <= 2)
+    .map(_.name)
+    .toList
+
+  output ==> List("叉烧包")
 }
 ```
 
