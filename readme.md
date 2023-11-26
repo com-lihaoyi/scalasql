@@ -117,11 +117,11 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ### Call Styles
 
-| Execution Style \ Input   |                                                         Query |                                       `sql"..."` |
-| ------------------------: |--------------------------------------------------------------:|-------------------------------------------------:|
-| Blocking                  |                                          `db.run(Foo.select)` | `db.runSql[Seq[Foo[Id]](sql"SELECT * FROM foo")` |
-| Update                    | `db.run(Foo.update(_.myStr === "hello").set(_.myInt := 123))` |                                              ??? |
-| Streaming                 |                                       `db.stream(Foo.select)` |                                              ??? |
+| Execution Style \ Input   |                              Query |                                       `sql"..."` |
+| ------------------------: |-----------------------------------:|-------------------------------------------------:|
+| Blocking                  |               `db.run(Foo.select)` | `db.runSql[Seq[Foo[Id]](sql"SELECT * FROM foo")` |
+| Update                    | `db.run(Foo.update(...).set(...))` |                                              ??? |
+| Streaming                 |            `db.stream(Foo.select)` |                                              ??? |
 
 ### Selects
 
