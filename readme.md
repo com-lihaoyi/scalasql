@@ -66,6 +66,53 @@ To get started with ScalaSql, add it to your `build.sc` file as follows:
 ivy"com.lihaoyi::scalasql:0.1.0"
 ```
 
+## Documentation
+
+* ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with
+  a variety of supported databases and perform simple DDL and 
+  `SELECT`/`INSERT`/`UPDATE`/`DELETE` operations:
+    * [Postgres](scalasql/test/src/example/PostgresExample.scala)
+    * [MySql](scalasql/test/src/example/MySqlExample.scala)
+    * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
+    * [H2](scalasql/test/src/example/H2Example.scala)
+    * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
+
+* [ScalaSql Tutorial](docs/tutorial.md): a structured walkthrough of how to use ScalaSql,
+  connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
+  against it to perform useful work. Ideal for newcomers to work through from top
+  to bottom when getting started with the library.
+
+* [ScalaSql Reference](docs/reference.md): a detailed listing of ScalaSql functionality,
+  comprehensively covering everything that ScalaSql supports, in a single easily searchable
+  place. Ideal for looking up exactly methods/operators ScalaSql supports, looking up
+  how ScalaSql code translates to SQL, or looking up SQL syntax to find out how to
+  express it using ScalaSql. Useful subsections include:
+  * [DbApi](docs/reference.md#dbapi), covering the main methods you can all
+    to execute queries
+  * [Transaction](docs/reference.md#transaction), covering usage of transactions
+    and savepoints
+  * [Select](docs/reference.md#select), [Insert](docs/reference.md#insert), 
+    [Update](docs/reference.md#update), [Delete](docs/reference.md#delete):
+    covering operations on the primary queries you are likely to use
+  * [Join](docs/reference.md#join), covering different kinds of joins
+  * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
+    covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
+  * [Expression Ops](docs/reference.md#exprops), covering the different
+    types of `Expr[T]` values and the different operations you can do on each one
+  * [Option Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
+  * [Window Functions](docs/reference.md#windowfunctions), 
+    [With-Clauses/Common-Table-Expressions](docs/reference.md#withcte)
+  * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
+    [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:
+    operations that are specific to each database that may not be generally applicable
+
+* [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
+  is built the way it is, what tradeoffs it makes, and how it compares to other 
+  common Scala database query libraries. Ideal for contributors who want to understand
+  the structure of the ScalaSql codebase, or for advanced users who may need to
+  understand enough to extend ScalaSql with custom functionality.
+
+
 ## Cheat Sheet
 
 ### Selects
@@ -115,13 +162,23 @@ for(f <- Foo.select; b <- Bar.join(_.id === _.fooId)) yield (f, b)  // Seq[(Foo[
 ```
 
 ### Insert/Update/Delete
-| ScalaSql                                                            | SQL                                                             | Return Type                 |
-|---------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------|
-| `Foo.insert.values(_.myStr := "hello", _.myInt := 123)`             | `INSERT INTO foo (my_str, my_int) VALUES ("hello", 123)`        | `1`                         |
-| `Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2))`          | `INSERT INTO foo (my_str, my_int) VALUES ("a", 1), ("b", 2)`    | `2`                         |
-| `Foo.update(_.myStr === "hello").set(_.myInt := 123)`               | `UPDATE foo SET my_int = 123 WHERE foo.my_str = "hello"`        | `Int`                       |
-| `Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt+ 1)`       | `UPDATE foo SET my_int = foo.my_int + 1 WHERE foo.my_str = "a"` | `Int`                       |
-| `Foo.delete(_.myStr === "hello")`                                   | `DELETE FROM foo WHERE foo.my_str = "hello"`                    | `Int`                       |
+
+```scala
+Foo.insert.values(_.myStr := "hello", _.myInt := 123)         // 1
+// INSERT INTO foo (my_str, my_int) VALUES ("hello", 123)
+
+Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2))      // 2
+// INSERT INTO foo (my_str, my_int) VALUES ("a", 1), ("b", 2)
+
+Foo.update(_.myStr === "hello").set(_.myInt := 123)           // Int
+// UPDATE foo SET my_int = 123 WHERE foo.my_str = "hello"
+
+Foo.update(_.myStr === "a").set(t => t.myInt := t.myInt+ 1)   // Int
+// UPDATE foo SET my_int = foo.my_int + 1 WHERE foo.my_str = "a"
+
+Foo.delete(_.myStr === "hello")                               // Int
+// DELETE FROM foo WHERE foo.my_str = "hello"
+```
 
 
 ### Type Mapping
@@ -156,51 +213,6 @@ for(f <- Foo.select; b <- Bar.join(_.id === _.fooId)) yield (f, b)  // Seq[(Foo[
 | Streaming                 | `db.stream`   |            ??? |                ??? |
 | ResultSet                 | ???           |            ??? |                ??? |
 
-## Documentation
-
-* ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with
-  a variety of supported databases and perform simple DDL and 
-  `SELECT`/`INSERT`/`UPDATE`/`DELETE` operations:
-    * [Postgres](scalasql/test/src/example/PostgresExample.scala)
-    * [MySql](scalasql/test/src/example/MySqlExample.scala)
-    * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
-    * [H2](scalasql/test/src/example/H2Example.scala)
-    * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
-
-* [ScalaSql Tutorial](docs/tutorial.md): a structured walkthrough of how to use ScalaSql,
-  connecting to a database and writing queries to `SELECT`/`INSERT`/`UPDATE`/`DELETE`
-  against it to perform useful work. Ideal for newcomers to work through from top
-  to bottom when getting started with the library.
-
-* [ScalaSql Reference](docs/reference.md): a detailed listing of ScalaSql functionality,
-  comprehensively covering everything that ScalaSql supports, in a single easily searchable
-  place. Ideal for looking up exactly methods/operators ScalaSql supports, looking up
-  how ScalaSql code translates to SQL, or looking up SQL syntax to find out how to
-  express it using ScalaSql. Useful subsections include:
-  * [DbApi](docs/reference.md#dbapi), covering the main methods you can all
-    to execute queries
-  * [Transaction](docs/reference.md#transaction), covering usage of transactions
-    and savepoints
-  * [Select](docs/reference.md#select), [Insert](docs/reference.md#insert), 
-    [Update](docs/reference.md#update), [Delete](docs/reference.md#delete):
-    covering operations on the primary queries you are likely to use
-  * [Join](docs/reference.md#join), covering different kinds of joins
-  * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
-    covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
-  * [Expression Ops](docs/reference.md#exprops), covering the different
-    types of `Expr[T]` values and the different operations you can do on each one
-  * [Option Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
-  * [Window Functions](docs/reference.md#windowfunctions), 
-    [With-Clauses/Common-Table-Expressions](docs/reference.md#withcte)
-  * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
-    [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:
-    operations that are specific to each database that may not be generally applicable
-
-* [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
-  is built the way it is, what tradeoffs it makes, and how it compares to other 
-  common Scala database query libraries. Ideal for contributors who want to understand
-  the structure of the ScalaSql codebase, or for advanced users who may need to
-  understand enough to extend ScalaSql with custom functionality.
 
 ## Developer Docs
 
