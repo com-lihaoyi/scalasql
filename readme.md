@@ -253,7 +253,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 |        `a === b` | `a = b` or `a IS NOT DISTINCT FROM b` |      `a !== b` | `a <> b` or `a IS DISTINCT FROM b` |
 |          `a < b` |                               `a < b` |       `a <= b` |                           `a <= b` |
 |          `a > b` |                               `a > b` |       `a >= b` |                           `a >= b` |
-|      `a \`=\` b` |                               `a = b` |       `a <> b` |                           `a <> b` |
+|          `a = b` |                               `a = b` |       `a <> b` |                           `a <> b` |
 | `a.cast[String]` |                 `CAST(a AS VARCHAR)`  |
 
 **Numeric Functions**
