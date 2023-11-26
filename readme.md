@@ -117,12 +117,11 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ### Call Styles
 
-| Execution Style \ Input   | Query         |     `sql"..."` |  "..." + variables |
-| ------------------------: | ------------: |---------------:|-------------------:|
-| Blocking                  | `db.run`      | `db.runQuery0` |        `db.runRaw` |
-| Update                    | `db.run`      |            ??? |                ??? |
-| Streaming                 | `db.stream`   |            ??? |                ??? |
-| ResultSet                 | ???           |            ??? |                ??? |
+| Execution Style \ Input   | Query         |  `sql"..."` |
+| ------------------------: | ------------: |------------:|
+| Blocking                  | `db.run`      | `db.runSql` |
+| Update                    | `db.run`      |         ??? |
+| Streaming                 | `db.stream`   |         ??? |
 
 ### Selects
 
@@ -141,6 +140,9 @@ Foo.select.sumBy(_.myInt)                                           // Int
 
 Foo.select.sumByOpt(_.myInt)                                        // Option[Int]
 // SELECT SUM(my_int) FROM foo
+
+Foo.select.size                                                     // Int
+// SELECT COUNT(1) FROM foo
 
 Foo.select.aggregate(_.sumBy(_.myInt), _.maxBy(_.barInd))           // (Int, Int)
 // SELECT SUM(my_int), MAX(my_int) FROM foo

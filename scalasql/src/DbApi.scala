@@ -28,9 +28,9 @@ trait DbApi extends AutoCloseable {
   /**
    * Runs the given query [[Q]] and returns a value of type [[R]]
    */
-  def run[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+  def runSql[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
       implicit qr: Queryable.Row[_, R]
-  ): R
+  ): Seq[R]
 
   /**
    * Runs the given query [[Q]] and returns a [[Generator]] of values of type [[R]].
@@ -47,7 +47,7 @@ trait DbApi extends AutoCloseable {
    */
   def runQuery[T](sql: SqlStr)(block: ResultSet => T): T
 
-  def runSql[R](sql: SqlStr)(implicit qr: Queryable.Row[_, R]): Seq[R]
+  def streamSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(implicit qr: Queryable.Row[_, R]): Generator[R]
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
@@ -150,31 +150,37 @@ object DbApi {
     }
 
     def runSql[R](
-        sql: SqlStr
-    )(implicit qr: Queryable.Row[_, R]): Seq[R] = {
-      if (autoCommit) connection.setAutoCommit(true)
-      val flattened = SqlStr.flatten(sql)
-      runRawQuery(
-        flattened.queryParts.mkString("?"),
-        flattened.params.map(_.value).toSeq: _*
-      ) { resultSet =>
-        val valueReader: OptionPickler.Reader[R] = qr.valueReader()
-        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
-        qr.walkLabels()
-        val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
-        val results = collection.mutable.ArrayBuffer.empty[R]
-        while (resultSet.next()) {
-          val rowRes = handleResultRow(
-            resultSet,
-            valueReader,
-            typeMappers,
-            config,
-            columnNameUnMapper
-          )
-          results.append(rowRes)
+        sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1
+    )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R] = streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
+
+    def streamSql[R](
+        sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1
+    )(implicit qr: Queryable.Row[_, R]): Generator[R] = new Generator[R] {
+      def generate(handleItem: R => Generator.Action): Generator.Action = {
+        if (autoCommit) connection.setAutoCommit(true)
+        val flattened = SqlStr.flatten(sql)
+        runRawQuery(
+          flattened.queryParts.mkString("?"),
+          flattened.params.map(_.value).toSeq: _*
+        ) { resultSet =>
+          val valueReader: OptionPickler.Reader[R] = qr.valueReader()
+          val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
+          val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
+          var action: Generator.Action = Generator.Continue
+          while (resultSet.next() && action == Generator.Continue) {
+            val rowRes = handleResultRow(
+              resultSet,
+              valueReader,
+              typeMappers,
+              config,
+              columnNameUnMapper
+            )
+            action = handleItem(rowRes)
+          }
+          action
         }
-        results.toSeq
       }
+
     }
 
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {

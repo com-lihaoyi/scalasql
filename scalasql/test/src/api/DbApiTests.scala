@@ -31,13 +31,13 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
 
-    test("runQuery0") - {
+    test("runSql") - {
       if (!this.isInstanceOf[MySqlSuite])
         checker.recorded(
           """
-      `db.runQuery0` can be used to run `sql"..."` strings, while providing a
+      `db.runSql` can be used to run `sql"..."` strings, while providing a
       specified type that the query results will be deserialized as the specified
-      type. `db.runQuery0` supports the all the same data types as `db.run`:
+      type. `db.runSql` supports the all the same data types as `db.run`:
       primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
       any combination of these.
 

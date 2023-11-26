@@ -1459,7 +1459,7 @@ object WorldSqlTests extends TestSuite {
       //
       // | Execution Style \ Input |       Query |     `sql"..."` |  "..." + variables |
       // |------------------------:|------------:|---------------:|-------------------:|
-      // |                Blocking |    `db.run` | `db.runQuery0` |        `db.runRaw` |
+      // |                Blocking |    `db.run` | `db.runSql` |        `db.runRaw` |
       // |                  Update |    `db.run` |            ??? |                ??? |
       // |               Streaming | `db.stream` |            ??? |                ??? |
       // |               ResultSet |         ??? |            ??? |                ??? |

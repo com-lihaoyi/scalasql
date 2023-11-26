@@ -195,7 +195,7 @@ trait Dialect extends DialectConfig {
     new WithCte(lhs, lhsSubQueryRef, block(rhsSelect))
   }
 
-  // This is necessary for `runQuery0` to work.
+  // This is necessary for `runSql` to work.
   implicit def ExprQueryable[T](
       implicit valueReader0: OptionPickler.Reader[T],
       mt: TypeMapper[T]

@@ -38,11 +38,11 @@ dbClient.transaction { db =>
 
 
 
-### DbApi.runQuery0
+### DbApi.runSql
 
-`db.runQuery0` can be used to run `sql"..."` strings, while providing a
+`db.runSql` can be used to run `sql"..."` strings, while providing a
 specified type that the query results will be deserialized as the specified
-type. `db.runQuery0` supports the all the same data types as `db.run`:
+type. `db.runSql` supports the all the same data types as `db.run`:
 primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
 any combination of these.
 
@@ -55,12 +55,12 @@ the `sql"..."` query without escaping.
 ```scala
 dbClient.transaction { db =>
   val filterId = 2
-  val output = db.runQuery0[String](
+  val output = db.runSql[String](
     sql"SELECT name FROM buyer WHERE id = $filterId"
   )(ExprQueryable)
   assert(output == Seq("叉烧包"))
 
-  val output2 = db.runQuery0[(String, LocalDate)](
+  val output2 = db.runSql[(String, LocalDate)](
     sql"SELECT name, date_of_birth FROM buyer WHERE id = $filterId"
   )
   assert(
@@ -68,7 +68,7 @@ dbClient.transaction { db =>
       Seq(("叉烧包", LocalDate.parse("1923-11-12")))
   )
 
-  val output3 = db.runQuery0[(String, LocalDate, Buyer[Id])](
+  val output3 = db.runSql[(String, LocalDate, Buyer[Id])](
     sql"SELECT name, date_of_birth, * FROM buyer WHERE id = $filterId"
   )
   assert(
