@@ -4,6 +4,8 @@ import geny.Generator
 import renderer.{Context, SqlStr}
 import upickle.core.Visitor
 import scalasql.dialects.DialectConfig
+import scalasql.dialects.DialectConfig.dialectCastParams
+import scalasql.renderer.SqlStr.Interp
 import scalasql.utils.{FlatJson, OptionPickler}
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
@@ -67,11 +69,6 @@ trait DbApi extends AutoCloseable {
    */
   def runRawUpdate(sql: String, variables: Any*): Int
 
-  /**
-   * Runs a batch of update queries, as `java.lang.String`s, and returns
-   * the number of rows affected by each one
-   */
-  def runRawUpdateBatch(sql: Seq[String]): Seq[Int]
 
 }
 
@@ -140,10 +137,29 @@ object DbApi {
       rollBack0()
     }
 
+    private def cast[T](t: Any): T = t.asInstanceOf[T]
+
+    def runRawQueryFlattened[T](flattened: SqlStr.Flattened)(block: ResultSet => T): T = {
+      runRawQuery0[T](combineQueryString(flattened), flattenParamPuts(flattened))(block)
+    }
+
+
     def runRawQuery[T](sql: String, variables: Any*)(block: ResultSet => T): T = {
+      runRawQuery0[T](sql, anySeqPuts(variables))(block)
+    }
+
+    private def flattenParamPuts[T](flattened: SqlStr.Flattened) = {
+      flattened.params.map(v => (s, n) => v.mappedType.put(s, n, cast(v.value))).toSeq
+    }
+
+    private def anySeqPuts(variables: Seq[Any]) = {
+      variables.map(v => (s: PreparedStatement, n: Int) => s.setObject(n, v))
+    }
+
+    def runRawQuery0[T](sql: String, variables: Seq[(PreparedStatement, Int) => Unit])(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val statement = connection.prepareStatement(sql)
-      for ((variable, i) <- variables.iterator.zipWithIndex) statement.setObject(i + 1, variable)
+      for ((variable, i) <- variables.iterator.zipWithIndex) variable(statement, i + 1)
 
       try block(statement.executeQuery())
       finally statement.close()
@@ -153,47 +169,17 @@ object DbApi {
         sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1
     )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R] = streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
 
-    def streamSql[R](
-        sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1
-    )(implicit qr: Queryable.Row[_, R]): Generator[R] = new Generator[R] {
-      def generate(handleItem: R => Generator.Action): Generator.Action = {
-        if (autoCommit) connection.setAutoCommit(true)
-        val valueReader: OptionPickler.Reader[R] = qr.valueReader()
-        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
-        val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
-        val flattened = SqlStr.flatten(sql)
-
-        runRawQuery(
-          flattened.queryParts.mkString("?"),
-          flattened.params.map(_.value).toSeq: _*
-        ) { resultSet =>
-
-          var action: Generator.Action = Generator.Continue
-          while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = handleResultRow(
-              resultSet,
-              valueReader,
-              typeMappers,
-              config,
-              columnNameUnMapper
-            )
-            action = handleItem(rowRes)
-          }
-          action
-        }
-      }
-
-    }
-
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       val flattened = SqlStr.flatten(sql)
-      runRawQuery(flattened.queryParts.mkString("?"), flattened.params.map(_.value).toSeq: _*)(
-        block
-      )
+      runRawQueryFlattened(flattened)(block)
     }
 
-    def runRawUpdate(sql: String, variables: Any*): Int = {
+    def runRawUpdateFlattened(flattened: SqlStr.Flattened): Int = {
+      runRawUpdate0(combineQueryString(flattened), flattenParamPuts(flattened))
+    }
+
+    def runRawUpdate0(sql: String, variables: Seq[(PreparedStatement, Int) => Unit]): Int = {
       if (autoCommit) connection.setAutoCommit(true)
 
       // Sqlite and HsqlDb for some reason blow up if you try to do DDL
@@ -205,43 +191,31 @@ object DbApi {
         finally statement.close()
       } else {
         val statement = connection.prepareStatement(sql)
-        for ((variable, i) <- variables.iterator.zipWithIndex) statement.setObject(i + 1, variable)
+        for ((v, i) <- variables.iterator.zipWithIndex) v(statement, i + 1)
         try statement.executeUpdate()
         finally statement.close()
       }
     }
 
-    def runUpdate(sql: SqlStr): Int = {
-      if (autoCommit) connection.setAutoCommit(true)
-      val flattened = SqlStr.flatten(sql)
-      runRawUpdate(flattened.queryParts.mkString("?"), flattened.params.map(_.value).toSeq: _*)
-    }
+    def runRawUpdate(sql: String, variables: Any*): Int = runRawUpdate0(sql, anySeqPuts(variables))
 
-    def runRawUpdateBatch(sqls: Seq[String]) = {
-
-      if (autoCommit) connection.setAutoCommit(true)
-      val statement: Statement = connection.createStatement()
-
-      try {
-        sqls.foreach(statement.addBatch)
-        statement.executeBatch()
-      } finally statement.close()
-    }
+    def runUpdate(sql: SqlStr): Int = runRawUpdateFlattened(SqlStr.flatten(sql))
 
     def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      val (str, params, mappedTypes) = toSqlQuery0(query)
+      val (str, params, mappedTypes) = toSqlQuery0(query, castParams)
       str
     }
 
-    def toSqlQuery0[Q, R](query: Q, castParams: Boolean = false)(
+    def toSqlQuery0[Q, R](query: Q, castParams: Boolean)(
         implicit qr: Queryable[Q, R]
     ): (String, collection.Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
-      val ctx = Context.Impl(Map(), Map(), config)
-      val sqlStr = qr.toSqlStr(query, ctx)
-      val mappedTypes = qr.toTypeMappers(query)
-      val flattened = SqlStr.flatten(sqlStr)
+      val (mappedTypes, flattened) = unpackQueryable(query, qr)
+      (combineQueryString(flattened, castParams), flattened.params, mappedTypes)
+    }
+
+    private def combineQueryString(flattened: SqlStr.Flattened, castParams: Boolean = dialectCastParams(dialectConfig)) = {
       val queryStr = flattened.queryParts.iterator
         .zipAll(flattened.params, "", null)
         .map {
@@ -252,7 +226,15 @@ object DbApi {
         }
         .mkString
 
-      (queryStr, flattened.params, mappedTypes)
+      queryStr
+    }
+
+    private def unpackQueryable[R, Q](query: Q, qr: Queryable[Q, R]) = {
+      val ctx = Context.Impl(Map(), Map(), config)
+      val sqlStr = qr.toSqlStr(query, ctx)
+      val mappedTypes = qr.toTypeMappers(query)
+      val flattened = SqlStr.flatten(sqlStr)
+      (mappedTypes, flattened)
     }
 
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
@@ -260,15 +242,14 @@ object DbApi {
     ): R = {
 
       if (qr.isExecuteUpdate(query)) {
-        val (typeMappers, statement, columnUnMapper) =
-          prepareRun(query, fetchSize, queryTimeoutSeconds)
+        val (typeMappers, statement, columnUnMapper) = prepareStatement(query, fetchSize, queryTimeoutSeconds)
 
         statement.executeUpdate().asInstanceOf[R]
       }else {
         try {
           if (qr.singleRow(query)) {
             val (typeMappers, statement, columnUnMapper) =
-              prepareRun(query, fetchSize, queryTimeoutSeconds)
+              prepareStatement(query, fetchSize, queryTimeoutSeconds)
 
             val resultSet: ResultSet = statement.executeQuery()
             try {
@@ -294,24 +275,29 @@ object DbApi {
       }
     }
 
-    private def prepareRun[Q, R](query: Q, fetchSize: Int, queryTimeoutSeconds: Int)(
+    private def prepareStatement[Q, R](query: Q, fetchSize: Int, queryTimeoutSeconds: Int)(
         implicit qr: Queryable[Q, R]
     ) = {
 
+      val (columnUnMapper, flattened, typeMappers) = prepareMetadata(query, qr)
+
       if (autoCommit) connection.setAutoCommit(true)
-      val (str, params, typeMappers) =
-        toSqlQuery0(query, DialectConfig.dialectCastParams(dialectConfig))
-      val statement = connection.prepareStatement(str)
+
+      val statement = connection.prepareStatement(combineQueryString(flattened))
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
       Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds)
         .find(_ != -1)
         .foreach(statement.setQueryTimeout)
 
-      for ((p, n) <- params.iterator.zipWithIndex) {
+      for ((p, n) <- flattened.params.iterator.zipWithIndex) {
         p.mappedType.asInstanceOf[TypeMapper[Any]].put(statement, n + 1, p.value)
       }
 
+      (typeMappers, statement, columnUnMapper)
+    }
+
+    private def prepareMetadata[R, Q](query: Q, qr: Queryable[Q, R]) = {
       val walked = qr.walkLabels(query)
 
       val columnUnMapper = walked.map { namesChunks =>
@@ -319,31 +305,59 @@ object DbApi {
           Config.joinName(namesChunks, config)
       }.toMap
 
-      (typeMappers, statement, columnUnMapper)
+      val (typeMappers, flattened) = unpackQueryable(query, qr)
+      (columnUnMapper, flattened, typeMappers)
+    }
+
+    def streamSql[R](
+        sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1
+    )(implicit qr: Queryable.Row[_, R]): Generator[R] = new Generator[R] {
+      def generate(handleItem: R => Generator.Action): Generator.Action = {
+        if (autoCommit) connection.setAutoCommit(true)
+        val valueReader: OptionPickler.Reader[R] = qr.valueReader()
+        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
+        val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
+        val flattened = SqlStr.flatten(sql)
+
+        stream0(handleItem, valueReader, typeMappers, columnNameUnMapper, flattened)
+      }
+    }
+
+    def stream0[R](handleItem: R => Generator.Action,
+                   valueReader: OptionPickler.Reader[R],
+                   typeMappers: Seq[TypeMapper[_]],
+                   columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
+                   flattened: SqlStr.Flattened) = {
+      runRawQueryFlattened(flattened) { resultSet =>
+
+        var action: Generator.Action = Generator.Continue
+        while (resultSet.next() && action == Generator.Continue) {
+          val rowRes = handleResultRow(
+            resultSet,
+            valueReader,
+            typeMappers,
+            config,
+            columnNameUnMapper
+          )
+          action = handleItem(rowRes)
+        }
+        action
+      }
     }
 
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val (typeMappers, statement, columnUnMapper) =
-          prepareRun(query, fetchSize, queryTimeoutSeconds)
 
-        val resultSet: ResultSet = statement.executeQuery()
-        try {
-          val visitor = qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
-          var action: Generator.Action = Generator.Continue
-          while (resultSet.next() && action == Generator.Continue) {
-            val rowRes =
-              handleResultRow(resultSet, visitor, typeMappers, config, Left(columnUnMapper))
-            action = handleItem(rowRes)
-          }
-
-          action
-        } finally {
-          resultSet.close()
-          statement.close()
-        }
+        val (columnUnMapper, flattened, typeMappers) = prepareMetadata(query, qr)
+        stream0(
+          handleItem,
+          qr.valueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r,
+          typeMappers,
+          Left(columnUnMapper),
+          flattened
+        )
       }
     }
 
