@@ -115,6 +115,15 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ## Cheat Sheet
 
+### Call Styles
+
+| Execution Style \ Input   | Query         |     `sql"..."` |  "..." + variables |
+| ------------------------: | ------------: |---------------:|-------------------:|
+| Blocking                  | `db.run`      | `db.runQuery0` |        `db.runRaw` |
+| Update                    | `db.run`      |            ??? |                ??? |
+| Streaming                 | `db.stream`   |            ??? |                ??? |
+| ResultSet                 | ???           |            ??? |                ??? |
+
 ### Selects
 
 ```scala
@@ -203,15 +212,6 @@ Foo.delete(_.myStr === "hello")                               // Int
 |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
 |        `java.time.Instant` |               `TIMESTAMP` |
 | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
-
-### Call Styles
-
-| Execution Style \ Input   | Query         |     `sql"..."` |  "..." + variables |
-| ------------------------: | ------------: |---------------:|-------------------:|
-| Blocking                  | `db.run`      | `db.runQuery0` |        `db.runRaw` |
-| Update                    | `db.run`      |            ??? |                ??? |
-| Streaming                 | `db.stream`   |            ??? |                ??? |
-| ResultSet                 | ???           |            ??? |                ??? |
 
 
 ## Developer Docs
