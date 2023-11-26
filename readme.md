@@ -194,26 +194,18 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 ### Type Mapping
 
-|    Scala Primitive Type |             Database Type |
-|------------------------:|--------------------------:|
-|          `scala.String` |             `LONGVARCHAR` |
-|            `scala.Byte` |                 `TINYINT` |
-|           `scala.Short` |                `SMALLINT` |
-|             `scala.Int` |                 `INTEGER` |
-|            `scala.Long` |                  `BIGINT` |
-|           `scala.Float` |                  `DOUBLE` |
+|    Scala Primitive Type |             Database Type |        Scala DateTime Type |             Database Type |
+|------------------------:|--------------------------:|---------------------------:|--------------------------:|
+|          `scala.String` |             `LONGVARCHAR` |      `java.time.LocalDate` |                    `DATE` |
+|            `scala.Byte` |                 `TINYINT` |      `java.time.LocalTime` |                    `TIME` |
+|           `scala.Short` |                `SMALLINT` |  `java.time.LocalDateTime` |               `TIMESTAMP` |
+|             `scala.Int` |                 `INTEGER` |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
+|            `scala.Long` |                  `BIGINT` |        `java.time.Instant` |               `TIMESTAMP` |
+|           `scala.Float` |                  `DOUBLE` | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
 |          `scala.Double` |                  `DOUBLE` |
 | `scala.math.BigDecimal` |                  `DOUBLE` |
 |         `scala.Boolean` |                 `BOOLEAN` |
 
-|        Scala DateTime Type |             Database Type |
-|---------------------------:|--------------------------:|
-|      `java.time.LocalDate` |                    `DATE` |
-|      `java.time.LocalTime` |                    `TIME` |
-|  `java.time.LocalDateTime` |               `TIMESTAMP` |
-|  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
-|        `java.time.Instant` |               `TIMESTAMP` |
-| `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
 
 
 ## Developer Docs
