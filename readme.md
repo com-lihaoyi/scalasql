@@ -248,13 +248,13 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Expression Functions**
 
-|   Scala Function |                     Database Function | Scala Function |                  Database Function |
-|-----------------:|--------------------------------------:|---------------:|-----------------------------------:|
-|        `a === b` | `a = b` or `a IS NOT DISTINCT FROM b` |      `a !== b` | `a <> b` or `a IS DISTINCT FROM b` |
-|          `a < b` |                               `a < b` |       `a <= b` |                           `a <= b` |
-|          `a > b` |                               `a > b` |       `a >= b` |                           `a >= b` |
-|          `a = b` |                               `a = b` |       `a <> b` |                           `a <> b` |
-| `a.cast[String]` |                 `CAST(a AS VARCHAR)`  |
+|   Scala Function |                        Database Function | Scala Function |                   Database Function |
+|-----------------:|-----------------------------------------:|---------------:|------------------------------------:|
+|        `a === b` |    `a IS NOT DISTINCT FROM b` or `a = b` |      `a !== b` | `a IS DISTINCT FROM b`  or `a <> b` |
+|          `a < b` |                                  `a < b` |       `a <= b` |                            `a <= b` |
+|          `a > b` |                                  `a > b` |       `a >= b` |                            `a >= b` |
+|          `a = b` |                                  `a = b` |       `a <> b` |                            `a <> b` |
+| `a.cast[String]` |                     `CAST(a AS VARCHAR)` |
 
 **Numeric Functions**
 
