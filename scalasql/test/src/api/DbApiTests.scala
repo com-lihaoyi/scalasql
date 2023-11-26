@@ -151,7 +151,7 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.transaction { db =>
-          val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", 2) { rs =>
+          val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", Seq(2)) { rs =>
             val output = mutable.Buffer.empty[String]
 
             while (
@@ -179,8 +179,7 @@ trait DbApiTests extends ScalaSqlSuite {
         dbClient.transaction { db =>
           val count = db.runRawUpdate(
             "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
-            "Moo Moo Cow",
-            LocalDate.parse("2000-01-01")
+            Seq("Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
           assert(count == 1)
 
