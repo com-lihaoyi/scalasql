@@ -117,7 +117,7 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ### Call Styles
 
-**Simple Queries**           
+**Scala Queries**           
 ```scala
 val str = "hello"
 
