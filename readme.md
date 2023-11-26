@@ -308,7 +308,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 |                                      Scala Function |       Database Function |
 |----------------------------------------------------:|------------------------:|
 |                                            `a.size` |              `COUNT(1)` |
-|                                   `a.mkString(sep)` | `GROUP_COUNCAT(a, sep)` |
+|                                   `a.mkString(sep)` |  `GROUP_CONCAT(a, sep)` |
 |  `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |           `SUM(my_int)` |
 |  `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |           `MIN(my_int)` |
 |  `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |           `MAX(my_int)` |
