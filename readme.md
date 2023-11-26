@@ -141,7 +141,7 @@ db.updateSql(sql"UPDATE foo SET my_int = 123 WHERE foo.my_str = $str"): Int
 
 ```scala
 // Raw Select Query
-db.runRaw[Seq[Foo[Id]]]("SELECT * FROM foo WHERE foo.my_str = ?", Seq(str)): Seq[Foo[Id]]
+db.runRaw[Foo[Id]]("SELECT * FROM foo WHERE foo.my_str = ?", Seq(str)): Seq[Foo[Id]]
 
 // Raw Update Query
 db.updateRaw("UPDATE foo SET my_int = 123 WHERE foo.my_str = ?", Seq(str)): Int

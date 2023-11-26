@@ -121,7 +121,7 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.transaction { db =>
-          val output = db.runRaw[Seq[String]]("SELECT name FROM buyer WHERE id = ?", Seq(2))
+          val output = db.runRaw[String]("SELECT name FROM buyer WHERE id = ?", Seq(2))
           assert(output == Seq("叉烧包"))
         }
       }

@@ -44,7 +44,7 @@ object CheatSheetExample {
 
     /// **SQL Queries**
     // SQL Select Query
-    db.runSql[Seq[Foo[Id]]](sql"-- SELECT * FROM foo WHERE foo.my_str = $str"): Seq[Foo[Id]]
+    db.runSql[Foo[Id]](sql"-- SELECT * FROM foo WHERE foo.my_str = $str"): Seq[Foo[Id]]
 
     // SQL Update Query
     db.updateSql(sql"UPDATE foo SET my_int = 123 WHERE foo.my_str = $str"): Int
@@ -52,7 +52,7 @@ object CheatSheetExample {
     /// **Raw Queries**
 
     // Raw Select Query
-    db.runRaw[Seq[Foo[Id]]]("SELECT * FROM foo WHERE foo.my_str = ?", Seq(str)): Seq[Foo[Id]]
+    db.runRaw[Foo[Id]]("SELECT * FROM foo WHERE foo.my_str = ?", Seq(str)): Seq[Foo[Id]]
 
     // Raw Update Query
     db.updateRaw("UPDATE foo SET my_int = 123 WHERE foo.my_str = ?", Seq(str)): Int
