@@ -175,9 +175,7 @@ object DbApi {
       streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
 
     def runQuery[T](sql: SqlStr)(block: ResultSet => T): T = {
-      if (autoCommit) connection.setAutoCommit(true)
-      val flattened = SqlStr.flatten(sql)
-      runRawQueryFlattened(flattened)(block)
+      runRawQueryFlattened(SqlStr.flatten(sql))(block)
     }
 
     def runRawUpdateFlattened(flattened: SqlStr.Flattened): Int = {
@@ -292,8 +290,6 @@ object DbApi {
 
       val (flattened, typeMappers) = prepareMetadata(query, qr)
 
-      if (autoCommit) connection.setAutoCommit(true)
-
       val statement = connection.prepareStatement(combineQueryString(flattened))
 
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
@@ -331,7 +327,6 @@ object DbApi {
         queryTimeoutSeconds: Int = -1
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
-        if (autoCommit) connection.setAutoCommit(true)
         val valueReader: OptionPickler.Reader[R] = qr.valueReader()
         val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
         val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
