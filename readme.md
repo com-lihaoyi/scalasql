@@ -83,7 +83,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 | `Foo.select.filter(_.myStr === "hello").single`                     | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Foo[Id]`                   |
 | `Foo.select.sortBy(_.myInt).asc`                                    | `SELECT * FROM foo ORDER BY my_int ASC`                         | `Seq[Foo[Id]]`              |
 | `Foo.select.sortBy(_.myInt).asc.take(20).drop(5)`                   | `SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5`       | `Seq[Foo[Id]]`              |
-| `Foo.select.sortBy(_.myInt).asc.take(20).drop(5)`                   | `SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5`       | `Seq[Foo[Id]]`              |
 | `Foo.select.map(_.myInt.cast[String])`                              | `SELECT CAST(my_int AS VARCHAR) FROM foo`                       | `Seq[String]`               |
 | `Foo.select.join(Bar)(_.id === _.fooId)`                            | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
 | `for(f <- Foo.select; b <- Bar.join(_.id === _.fooId) yield (f, b)` | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
