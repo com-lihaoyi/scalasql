@@ -290,12 +290,14 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Aggregate Functions**
 
-|                                     Scala Function |    Database Function |                                     Scala Function |         Database Function |
-|---------------------------------------------------:|---------------------:|---------------------------------------------------:|--------------------------:|
-|                                           `a.size` |           `COUNT(1)` |                                  `a.mkString(sep)` | `GROUP_COUNCAT(a, sep)`   |
-| `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |        `SUM(my_int)` | `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |             `MIN(my_int)` |
-| `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |        `MAX(my_int)` | `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |             `AVG(my_int)` |
-| `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |        `MAX(my_int)` | `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |             `AVG(my_int)` |
+|                                      Scala Function |       Database Function |
+|----------------------------------------------------:|------------------------:|
+|                                            `a.size` |              `COUNT(1)` |
+|                                   `a.mkString(sep)` | `GROUP_COUNCAT(a, sep)` |
+|  `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |           `SUM(my_int)` |
+|  `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |           `MIN(my_int)` |
+|  `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |           `MAX(my_int)` |
+|  `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |           `AVG(my_int)` |
 
 **Select Functions**
 
