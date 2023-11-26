@@ -135,8 +135,8 @@ object WorldSqlTests extends TestSuite {
     )
 
     val db = dbClient.getAutoCommitClientConnection
-    db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
-    db.runRawUpdate(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
+    db.updateRaw(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
+    db.updateRaw(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
     // We use `dbClient.getAutoCommitClientConnection` in order to create a client that
     // will automatically run every SQL command in a new transaction and commit it. For
     // the majority of examples in this page, the exact transaction configuration doesn't

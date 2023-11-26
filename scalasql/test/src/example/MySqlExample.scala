@@ -38,7 +38,7 @@ object MySqlExample {
 
   def main(args: Array[String]): Unit = {
     mysqlClient.transaction { db =>
-      db.runRawUpdate("""
+      db.updateRaw("""
       CREATE TABLE example_product (
           id INTEGER PRIMARY KEY AUTO_INCREMENT,
           kebab_case_name VARCHAR(256),

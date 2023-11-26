@@ -34,7 +34,7 @@ object PostgresExample {
 
   def main(args: Array[String]): Unit = {
     postgresClient.transaction { db =>
-      db.runRawUpdate("""
+      db.updateRaw("""
       CREATE TABLE example_product (
           id SERIAL PRIMARY KEY,
           kebab_case_name VARCHAR(256),

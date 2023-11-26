@@ -28,7 +28,7 @@ trait DbApi extends AutoCloseable {
   ): R
 
   /**
-   * Runs the given query [[Q]] and returns a value of type [[R]]
+   * Runs the given [[SqlStr]] of the form `sql"..."` and returns a value of type [[R]]
    */
   def runSql[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
       implicit qr: Queryable.Row[_, R]
@@ -44,11 +44,9 @@ trait DbApi extends AutoCloseable {
   ): Generator[R]
 
   /**
-   * Runs a [[SqlStr]] and takes a callback [[block]] allowing you to process the
-   * resultant [[ResultSet]]
+   * A combination of [[stream]] and [[runSql]], [[streamSql]] allows you to pass in an
+   * arbitrary [[SqlStr]] of the form `sql"..."` and  streams the results back to you
    */
-  def runQuery[T](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T
-
   def streamSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
       implicit qr: Queryable.Row[_, R]
   ): Generator[R]
@@ -57,19 +55,19 @@ trait DbApi extends AutoCloseable {
    * Runs a `java.lang.String` (and any interpolated variables) and takes a callback
    * [[block]] allowing you to process the resultant [[ResultSet]]
    */
-  def runRawQuery[T](sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T
+  def runRaw[T](sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T
 
   /**
-   * Runs an [[SqlStr]] containing an `UPDATE` or `INSERT` query and returns the
+   * Runs an [[SqlStr]] of the form `sql"..."` containing an `UPDATE` or `INSERT` query and returns the
    * number of rows affected
    */
-  def runUpdate(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int
+  def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int
 
   /**
    * Runs an `java.lang.String` (and any interpolated variables) containing an
    * `UPDATE` or `INSERT` query and returns the number of rows affected
    */
-  def runRawUpdate(sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int
+  def updateRaw(sql: String, variables: Seq[Any] = Nil, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int
 
 }
 
@@ -146,10 +144,10 @@ object DbApi {
       runRawQuery0[T](combineQueryString(flattened), flattenParamPuts(flattened), fetchSize, queryTimeoutSeconds)(block)
     }
 
-    def runRawQuery[T](sql: String,
-                       variables: Seq[Any] = Nil,
-                       fetchSize: Int = -1,
-                       queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T = {
+    def runRaw[T](sql: String,
+                  variables: Seq[Any] = Nil,
+                  fetchSize: Int = -1,
+                  queryTimeoutSeconds: Int = -1)(block: ResultSet => T): T = {
       runRawQuery0[T](sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)(block)
     }
 
@@ -167,13 +165,9 @@ object DbApi {
                         queryTimeoutSeconds: Int)(
         block: ResultSet => T
     ): T = {
-      if (autoCommit) connection.setAutoCommit(true)
       val statement = connection.prepareStatement(sql)
-      configureStatement(statement, fetchSize, queryTimeoutSeconds)
       for ((variable, i) <- variables.iterator.zipWithIndex) variable(statement, i + 1)
-
-      try block(statement.executeQuery())
-      finally statement.close()
+      configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(s => block(s.executeQuery()))
     }
 
     def runSql[R](
@@ -183,58 +177,47 @@ object DbApi {
     )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R] =
       streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
 
-    def runQuery[T](sql: SqlStr,
-                    fetchSize: Int,
-                    queryTimeoutSeconds: Int)(block: ResultSet => T): T = {
-      runRawQueryFlattened(SqlStr.flatten(sql), fetchSize, queryTimeoutSeconds)(block)
-    }
-
-    def runRawUpdateFlattened(flattened: SqlStr.Flattened,
-                              fetchSize: Int,
-                              queryTimeoutSeconds: Int): Int = {
-      runRawUpdate0(combineQueryString(flattened), flattenParamPuts(flattened), fetchSize, queryTimeoutSeconds)
-    }
-
     def runRawUpdate0(sql: String,
                       variables: Seq[(PreparedStatement, Int) => Unit],
                       fetchSize: Int,
                       queryTimeoutSeconds: Int): Int = {
-      if (autoCommit) connection.setAutoCommit(true)
-
       // Sqlite and HsqlDb for some reason blow up if you try to do DDL
       // like DROP TABLE or CREATE TABLE inside a prepared statement, so
       // fall back to vanilla `createStatement`
       if (variables.isEmpty) {
         val statement = connection.createStatement()
-        configureStatement(statement, fetchSize, queryTimeoutSeconds)
-        try statement.executeUpdate(sql)
-        finally statement.close()
+        configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(_.executeUpdate(sql))
       } else {
         val statement = connection.prepareStatement(sql)
         for ((v, i) <- variables.iterator.zipWithIndex) v(statement, i + 1)
-        configureStatement(statement, fetchSize, queryTimeoutSeconds)
-        try statement.executeUpdate()
-        finally statement.close()
+        configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(_.executeUpdate())
       }
     }
 
-    def configureStatement(statement: Statement,
+    def configureRunCloseStatement[P <: Statement, T](statement: P,
                            fetchSize: Int,
-                           queryTimeoutSeconds: Int) = {
+                           queryTimeoutSeconds: Int)(
+                              f: P => T): T = {
+      if (autoCommit) connection.setAutoCommit(true)
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
       Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds)
         .find(_ != -1)
         .foreach(statement.setQueryTimeout)
 
+      try f(statement)
+      finally statement.close()
     }
 
-    def runRawUpdate(sql: String, variables: Seq[Any] = Nil,
-                     fetchSize: Int,
-                     queryTimeoutSeconds: Int): Int = runRawUpdate0(sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)
+    def updateRaw(sql: String, variables: Seq[Any] = Nil,
+                  fetchSize: Int = -1,
+                  queryTimeoutSeconds: Int = -1): Int = runRawUpdate0(sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)
 
-    def runUpdate(sql: SqlStr,
-                  fetchSize: Int,
-                  queryTimeoutSeconds: Int): Int = runRawUpdateFlattened(SqlStr.flatten(sql), fetchSize, queryTimeoutSeconds)
+    def updateSql(sql: SqlStr,
+                  fetchSize: Int = -1,
+                  queryTimeoutSeconds: Int = -1): Int = {
+      val flattened = SqlStr.flatten(sql)
+      runRawUpdate0(combineQueryString(flattened), flattenParamPuts(flattened), fetchSize, queryTimeoutSeconds)
+    }
 
     def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -279,9 +262,9 @@ object DbApi {
         implicit qr: Queryable[Q, R]
     ): R = {
 
-      val (flattened, typeMappers) = prepareMetadata(query, qr)
+      val (typeMappers, flattened) = unpackQueryable(query, qr)
       if (qr.isExecuteUpdate(query)) {
-        runUpdate(flattened).asInstanceOf[R]
+        updateSql(flattened).asInstanceOf[R]
       } else {
         try {
           if (qr.singleRow(query)) {
@@ -306,12 +289,6 @@ object DbApi {
           }
         }
       }
-    }
-
-    private def prepareMetadata[Q, R](query: Q, qr: Queryable[Q, R]) = {
-
-      val (typeMappers, flattened) = unpackQueryable(query, qr)
-      (flattened, typeMappers)
     }
 
     private def prepareColumnUnmapper[Q, R](query: Q, qr: Queryable[Q, R]) = {
@@ -372,7 +349,7 @@ object DbApi {
     ): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
 
-        val (flattened, typeMappers) = prepareMetadata(query, qr)
+        val (typeMappers, flattened) = unpackQueryable(query, qr)
         val columnUnMapper = prepareColumnUnmapper(query, qr)
 
         stream0(

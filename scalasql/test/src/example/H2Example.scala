@@ -26,7 +26,7 @@ object H2Example {
 
   def main(args: Array[String]): Unit = {
     h2Client.transaction { db =>
-      db.runRawUpdate("""
+      db.updateRaw("""
       CREATE TABLE example_product (
           id INTEGER AUTO_INCREMENT PRIMARY KEY,
           kebab_case_name VARCHAR(256),

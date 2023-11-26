@@ -22,10 +22,10 @@ class TestChecker(
 
   val autoCommitConnection = dbClient.getAutoCommitClientConnection
   def reset() = {
-    autoCommitConnection.runRawUpdate(
+    autoCommitConnection.updateRaw(
       os.read(os.pwd / "scalasql" / "test" / "resources" / testSchemaFileName)
     )
-    autoCommitConnection.runRawUpdate(
+    autoCommitConnection.updateRaw(
       os.read(os.pwd / "scalasql" / "test" / "resources" / testDataFileName)
     )
   }

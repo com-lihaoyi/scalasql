@@ -26,7 +26,7 @@ object SqliteExample {
 
   def main(args: Array[String]): Unit = {
     sqliteClient.transaction { db =>
-      db.runRawUpdate("""
+      db.updateRaw("""
       CREATE TABLE example_product (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           kebab_case_name VARCHAR(256),

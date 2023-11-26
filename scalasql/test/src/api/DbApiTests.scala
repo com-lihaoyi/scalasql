@@ -86,38 +86,8 @@ trait DbApiTests extends ScalaSqlSuite {
         )
     }
 
-    test("runQuery") - checker.recorded(
-      """
-      `db.runQuery` allows you to pass in a `SqlStr` using the `sql"..."` syntax,
-      allowing you to construct SQL strings and interpolate variables within them.
-      Interpolated variables automatically become prepared statement variables to
-      avoid SQL injection vulnerabilities. Takes a callback providing a `java.sql.ResultSet`
-      for you to use directly.
-      """,
-      Text {
 
-        dbClient.transaction { db =>
-          val filterId = 2
-          val output = db.runQuery(sql"SELECT name FROM buyer WHERE id = $filterId") { rs =>
-            val output = mutable.Buffer.empty[String]
-
-            while (
-              rs.next() match {
-                case false => false
-                case true =>
-                  output.append(rs.getString(1))
-                  true
-              }
-            ) ()
-            output
-          }
-
-          assert(output == Seq("叉烧包"))
-        }
-      }
-    )
-
-    test("runUpdate") - checker.recorded(
+    test("updateSql") - checker.recorded(
       """
       Similar to `db.runQuery`, `db.runUpdate` allows you to pass in a `SqlStr`, but runs
       an update rather than a query and expects to receive a single number back from the
@@ -129,7 +99,7 @@ trait DbApiTests extends ScalaSqlSuite {
           val newName = "Moo Moo Cow"
           val newDateOfBirth = LocalDate.parse("2000-01-01")
           val count = db
-            .runUpdate(
+            .updateSql(
               sql"INSERT INTO buyer (name, date_of_birth) VALUES($newName, $newDateOfBirth)"
             )
           assert(count == 1)
@@ -151,7 +121,7 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.transaction { db =>
-          val output = db.runRawQuery("SELECT name FROM buyer WHERE id = ?", Seq(2)) { rs =>
+          val output = db.runRaw("SELECT name FROM buyer WHERE id = ?", Seq(2)) { rs =>
             val output = mutable.Buffer.empty[String]
 
             while (
@@ -177,7 +147,7 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.transaction { db =>
-          val count = db.runRawUpdate(
+          val count = db.updateRaw(
             "INSERT INTO buyer (name, date_of_birth) VALUES(?, ?)",
             Seq("Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
