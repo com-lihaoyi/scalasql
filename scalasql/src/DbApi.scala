@@ -256,43 +256,38 @@ object DbApi {
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
-      val (typeMappers, statement, columnUnMapper) =
-        prepareRun(query, fetchSize, queryTimeoutSeconds)
 
-      if (qr.isExecuteUpdate(query)) statement.executeUpdate().asInstanceOf[R]
-      else {
-        val resultSet: ResultSet = statement.executeQuery()
+      if (qr.isExecuteUpdate(query)) {
+        val (typeMappers, statement, columnUnMapper) =
+          prepareRun(query, fetchSize, queryTimeoutSeconds)
 
+        statement.executeUpdate().asInstanceOf[R]
+      }else {
         try {
           if (qr.singleRow(query)) {
-            assert(resultSet.next())
-            val res =
-              handleResultRow(
-                resultSet,
-                qr.valueReader(query),
-                typeMappers,
-                config,
-                Left(columnUnMapper)
-              )
-            assert(!resultSet.next())
-            res
-          } else {
-            val arrVisitor = qr.valueReader(query).visitArray(-1, -1)
-            while (resultSet.next()) {
-              val rowRes = handleResultRow(
-                resultSet,
-                arrVisitor.subVisitor,
-                typeMappers,
-                config,
-                Left(columnUnMapper)
-              )
-              arrVisitor.visitValue(rowRes, -1)
+            val (typeMappers, statement, columnUnMapper) =
+              prepareRun(query, fetchSize, queryTimeoutSeconds)
+
+            val resultSet: ResultSet = statement.executeQuery()
+            try {
+              assert(resultSet.next())
+              val res =
+                handleResultRow(
+                  resultSet,
+                  qr.valueReader(query),
+                  typeMappers,
+                  config,
+                  Left(columnUnMapper)
+                )
+              assert(!resultSet.next())
+              res
+            } finally {
+              resultSet.close()
+              statement.close()
             }
-            arrVisitor.visitEnd(-1)
+          } else {
+            stream(query, fetchSize, queryTimeoutSeconds)(qr.asInstanceOf[Queryable[Q, Seq[_]]]).toVector.asInstanceOf[R]
           }
-        } finally {
-          resultSet.close()
-          statement.close()
         }
       }
     }
