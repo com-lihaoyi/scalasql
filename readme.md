@@ -88,6 +88,8 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 | `for(f <- Foo.select; b <- Bar.join(_.id === _.fooId) yield (f, b)` | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
 
 ### Insert/Update/Delete
+| ScalaSql                                                            | SQL                                                             | Return Type                 |
+|---------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------|
 | `Foo.insert.values(_.myStr := "hello", _.myInt := 123)`             | `INSERT INTO foo (my_str, my_int) VALUES ("hello", 123)`        | `1`                         |
 | `Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2))`          | `INSERT INTO foo (my_str, my_int) VALUES ("a", 1), ("b", 2)`    | `2`                         |
 | `Foo.update(_.myStr === "hello").set(_.myInt := 123)`               | `UPDATE foo SET my_int = 123 WHERE foo.my_str = "hello"`        | `Int`                       |
