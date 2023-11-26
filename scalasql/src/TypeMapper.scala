@@ -37,12 +37,13 @@ trait TypeMapper[T] {
   def put(r: PreparedStatement, idx: Int, v: T): Unit
 }
 object TypeMapper {
+
   /**
    * Type mapper for getting and setting objects to JDBC directly, without mapping.
    * Usually not what you want, so it's not implicitly available, but can be used
    * manually when necessary
    */
-  object AnyType extends TypeMapper[Any]{
+  object AnyType extends TypeMapper[Any] {
     def jdbcType = ???
     def get(r: ResultSet, idx: Int) = r.getObject(idx)
     def put(r: PreparedStatement, idx: Int, v: Any) = r.setObject(idx, v)
