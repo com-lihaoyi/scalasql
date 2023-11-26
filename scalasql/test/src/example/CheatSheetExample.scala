@@ -109,6 +109,15 @@ object CheatSheetExample {
     Foo.select.join(Bar)(_.id === _.fooId) // Seq[(Foo[Id], Bar[Id])]
     // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 
+    Foo.select.leftJoin(Bar)(_.id === _.fooId) // Seq[(Foo[Id], Option[Bar[Id]])]
+    // SELECT * FROM foo LEFT JOIN bar ON foo.id = foo2.foo_id
+
+    Foo.select.rightJoin(Bar)(_.id === _.fooId) // Seq[(Option[Foo[Id]], Bar[Id])]
+    // SELECT * FROM foo RIGHT JOIN bar ON foo.id = foo2.foo_id
+
+    Foo.select.outerJoin(Bar)(_.id === _.fooId) // Seq[(Option[Foo[Id]], Option[Bar[Id]])]
+    // SELECT * FROM foo FULL OUTER JOIN bar ON foo.id = foo2.foo_id
+
     for (f <- Foo.select; b <- Bar.join(f.id === _.fooId)) yield (f, b) // Seq[(Foo[Id], Bar[Id])]
     // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 

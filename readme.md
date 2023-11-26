@@ -205,6 +205,15 @@ Foo.select.map(_.myInt.cast[String])                                // Seq[Strin
 Foo.select.join(Bar)(_.id === _.fooId)                              // Seq[(Foo[Id], Bar[Id])] 
 // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 
+Foo.select.leftJoin(Bar)(_.id === _.fooId) // Seq[(Foo[Id], Option[Bar[Id]])]
+// SELECT * FROM foo LEFT JOIN bar ON foo.id = foo2.foo_id
+
+Foo.select.rightJoin(Bar)(_.id === _.fooId) // Seq[(Option[Foo[Id]], Bar[Id])]
+// SELECT * FROM foo RIGHT JOIN bar ON foo.id = foo2.foo_id
+
+Foo.select.outerJoin(Bar)(_.id === _.fooId) // Seq[(Option[Foo[Id]], Option[Bar[Id]])]
+// SELECT * FROM foo FULL OUTER JOIN bar ON foo.id = foo2.foo_id
+
 for(f <- Foo.select; b <- Bar.join(f.id === _.fooId)) yield (f, b)  // Seq[(Foo[Id], Bar[Id])] 
 // SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
 ```
@@ -341,5 +350,6 @@ Foo.delete(_.myStr === "hello")                               // Int
 # TODO
 
 * Scala 3 support
-* Better support for plain SQL queries
 * Flatten Nested Tuples 
+* Move static functions into `db.foo` extensions 
+* Audit list of static functions for Postgres/MySql/Sqlite/H2 

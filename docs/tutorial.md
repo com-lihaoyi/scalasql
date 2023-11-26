@@ -1367,13 +1367,3 @@ db.run(query).take(3) ==> Seq(
   CityCustom[Id](3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
 )
 ```
-
-## Different Ways of Running Queries
-
-| Execution Style \ Input |       Query |     `sql"..."` |  "..." + variables |
-|------------------------:|------------:|---------------:|-------------------:|
-|                Blocking |    `db.run` | `db.runSql` |        `db.runRaw` |
-|                  Update |    `db.run` |            ??? |                ??? |
-|               Streaming | `db.stream` |            ??? |                ??? |
-|               ResultSet |         ??? |            ??? |                ??? |
-
