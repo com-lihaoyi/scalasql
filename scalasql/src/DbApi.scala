@@ -158,14 +158,16 @@ object DbApi {
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
         if (autoCommit) connection.setAutoCommit(true)
+        val valueReader: OptionPickler.Reader[R] = qr.valueReader()
+        val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
+        val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
         val flattened = SqlStr.flatten(sql)
+
         runRawQuery(
           flattened.queryParts.mkString("?"),
           flattened.params.map(_.value).toSeq: _*
         ) { resultSet =>
-          val valueReader: OptionPickler.Reader[R] = qr.valueReader()
-          val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
-          val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
+
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
             val rowRes = handleResultRow(
