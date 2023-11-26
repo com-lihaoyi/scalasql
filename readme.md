@@ -308,11 +308,11 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Option/Nullable Functions**
 
-|   Scala Function | Database Function |   Scala Function | Database Function |
-|-----------------:|------------------:|-----------------:|------------------:|
-|    `a.isDefined` |   `a IS NOT NULL` |      `a.isEmpty` |       `a IS NULL` |
-|     `a.map(...)` |               `a` | `a.flatMap(...)` |               `a` |
-| `a.getOrElse(b)` |  `COALESCE(a, b)` |    `a.orElse(b)` |  `COALESCE(a, b)` |
+|   Scala Function | Database Function | Scala Function | Database Function |
+|-----------------:|------------------:|---------------:|------------------:|
+|    `a.isDefined` |   `a IS NOT NULL` |    `a.isEmpty` |       `a IS NULL` |
+|       `a.map(b)` |               `b` | `a.flatMap(b)` |               `b` |
+| `a.getOrElse(b)` |  `COALESCE(a, b)` |  `a.orElse(b)` |  `COALESCE(a, b)` |
 
 ## Developer Docs
 
