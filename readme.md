@@ -66,26 +66,40 @@ To get started with ScalaSql, add it to your `build.sc` file as follows:
 ivy"com.lihaoyi::scalasql:0.1.0"
 ```
 
-## Cheat Shet
+## Cheat Sheet
 
 ### Selects
 
-| ScalaSql                                                            | SQL                                                             | Return Type                 |
-|---------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------|
-| `Foo.select`                                                        | `SELECT * FROM foo`                                             | `Seq[Foo[Id]]`              |
-| `Foo.select.map(_.myStr)`                                           | `SELECT my_str FROM foo`                                        | `Seq[String]`               |
-| `Foo.select.map(t => (t.myStr, t.myInt))`                           | `SELECT my_str, my_int FROM foo`                                | `Seq[(String, Int)]`        |
-| `Foo.select.sumBy(_.myInt)`                                         | `SELECT SUM(my_int) FROM foo`                                   | `Int`                       |
-| `Foo.select.sumByOpt(_.myInt)`                                      | `SELECT SUM(my_int) FROM foo`                                   | `Option[Int]`               |
-| `Foo.select.aggregate(_.sumBy(_.myInt), _.maxBy(_.barInd)`          | `SELECT SUM(my_int), MAX(my_int) FROM foo`                      | `(Int, Int)`                |
-| `Foo.select.filter(_.myStr === "hello")`                            | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Seq[Foo[[Id]]`             |
-| `Foo.select.filter(_.myStr === Expr("hello"))`                      | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Seq[Foo[[Id]]`             |
-| `Foo.select.filter(_.myStr === "hello").single`                     | `SELECT * FROM foo WHERE my_str = "hello"`                      | `Foo[Id]`                   |
-| `Foo.select.sortBy(_.myInt).asc`                                    | `SELECT * FROM foo ORDER BY my_int ASC`                         | `Seq[Foo[Id]]`              |
-| `Foo.select.sortBy(_.myInt).asc.take(20).drop(5)`                   | `SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5`       | `Seq[Foo[Id]]`              |
-| `Foo.select.map(_.myInt.cast[String])`                              | `SELECT CAST(my_int AS VARCHAR) FROM foo`                       | `Seq[String]`               |
-| `Foo.select.join(Bar)(_.id === _.fooId)`                            | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
-| `for(f <- Foo.select; b <- Bar.join(_.id === _.fooId) yield (f, b)` | `SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id`            | `Seq[(Foo[Id], Bar[Id])]`   |
+```scala
+db.run(Foo.select): Seq[Foo[Id]]           
+// SELECT * FROM foo
+db.run(Foo.select.map(_.myStr)): Seq[String]
+// SELECT my_str FROM foo
+db.run(Foo.select.map(t => (t.myStr, t.myInt))): Seq[(String, Int)]
+// SELECT my_str, my_int FROM foo
+db.run(Foo.select.sumBy(_.myInt)): Int
+// SELECT SUM(my_int) FROM foo
+db.run(Foo.select.sumByOpt(_.myInt)): Option[Int]
+// SELECT SUM(my_int) FROM foo
+db.run(Foo.select.aggregate(_.sumBy(_.myInt), _.maxBy(_.barInd)): (Int, Int)
+// SELECT SUM(my_int), MAX(my_int) FROM foo
+db.run(Foo.select.filter(_.myStr === "hello")): Seq[Foo[Id]]
+// SELECT * FROM foo WHERE my_str = "hello"
+db.run(Foo.select.filter(_.myStr === Expr("hello"))): Seq[Foo[Id]]
+// SELECT * FROM foo WHERE my_str = "hello"
+db.run(Foo.select.filter(_.myStr === "hello").single): Foo[Id]
+// SELECT * FROM foo WHERE my_str = "hello"
+db.run(Foo.select.sortBy(_.myInt).asc): Seq[Foo[Id]]
+// SELECT * FROM foo ORDER BY my_int ASC
+db.run(Foo.select.sortBy(_.myInt).asc.take(20).drop(5)): Seq[Foo[Id]] 
+// SELECT * FROM foo ORDER BY my_int ASC LIMIT 15 OFFSET 5
+db.run(Foo.select.map(_.myInt.cast[String])): Seq[String]
+// SELECT CAST(my_int AS VARCHAR) FROM foo
+db.run(Foo.select.join(Bar)(_.id === _.fooId)): Seq[(Foo[Id], Bar[Id])] 
+// SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
+db.run(for(f <- Foo.select; b <- Bar.join(_.id === _.fooId)) yield (f, b)): Seq[(Foo[Id], Bar[Id])] 
+// SELECT * FROM foo JOIN bar ON foo.id = foo2.foo_id
+```
 
 ### Insert/Update/Delete
 | ScalaSql                                                            | SQL                                                             | Return Type                 |
