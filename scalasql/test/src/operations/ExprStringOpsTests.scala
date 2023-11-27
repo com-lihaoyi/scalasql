@@ -49,17 +49,26 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
     )
     test("startsWith") - checker(
       query = Expr("Hello").startsWith("Hel"),
-      sql = "SELECT (? LIKE ? || '%') AS res",
+      sqls = Seq(
+        "SELECT (? LIKE ? || '%') AS res",
+        "SELECT (? LIKE CONCAT(?, '%')) AS res"
+      ),
       value = true
     )
     test("endsWith") - checker(
       query = Expr("Hello").endsWith("llo"),
-      sql = "SELECT (? LIKE '%' || ?) AS res",
+      sqls = Seq(
+        "SELECT (? LIKE '%' || ?) AS res",
+        "SELECT (? LIKE CONCAT('%', ?)) AS res"
+      ),
       value = true
     )
     test("contains") - checker(
       query = Expr("Hello").contains("ll"),
-      sql = "SELECT (? LIKE '%' || ? || '%') AS res",
+      sqls = Seq(
+        "SELECT (? LIKE '%' || ? || '%') AS res",
+        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res"
+      ),
       value = true
     )
 

@@ -3570,9 +3570,9 @@ Buyer
   .update(_.name `=` "James Bond")
   .join(ShippingInfo)(_.id `=` _.buyerId)
   .join(Purchase)(_._2.id `=` _.shippingInfoId)
-  .join(Product)(_._2.productId `=` _.id)
-  .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
-  .set(c => c._1._1._1.name := c._2.name)
+  .join(Product)(_._3.productId `=` _.id)
+  .filter(t => t._4.name.toLowerCase `=` t._4.kebabCaseName.toLowerCase)
+  .set(c => c._1.name := c._4.name)
 ```
 
 
@@ -5683,7 +5683,7 @@ Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
 
 ```scala
 Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).join(Product)(_._1 `=` _.id).map {
-  case ((productId, total), product) => (product.name, total)
+  case (productId, total, product) => (product.name, total)
 }
 ```
 
@@ -5989,17 +5989,17 @@ Buyer.select.map { buyer =>
             Product.select
               .filter(_.id === purchase.productId)
               .map(_.price)
-              .sortBy(identity)
+              .sorted
               .desc
               .take(1)
               .toExpr
           }
-          .sortBy(identity)
+          .sorted
           .desc
           .take(1)
           .toExpr
       }
-      .sortBy(identity)
+      .sorted
       .desc
       .take(1)
       .toExpr
@@ -6158,7 +6158,7 @@ withCte(Buyer.select) { bs =>
     Purchase.select.join(prs)(_.productId === _.id)
   }
 )(_._2.id === _._1.shippingInfoId)
-  .map { case ((b, s), (pu, pr)) => (b.name, pr.name) }
+  .map { case (b, s, (pu, pr)) => (b.name, pr.name) }
 ```
 
 
@@ -7820,6 +7820,75 @@ Expr("Hello").substring(2, 2)
 *
     ```scala
     "el"
+    ```
+
+
+
+### ExprStringOps.startsWith
+
+
+
+```scala
+Expr("Hello").startsWith("Hel")
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE ? || '%') AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprStringOps.endsWith
+
+
+
+```scala
+Expr("Hello").endsWith("llo")
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE '%' || ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### ExprStringOps.contains
+
+
+
+```scala
+Expr("Hello").contains("ll")
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE '%' || ? || '%') AS res
+    ```
+
+
+
+*
+    ```scala
+    true
     ```
 
 

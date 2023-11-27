@@ -17,7 +17,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
    * Only supported by Postgres and MySql
    */
   def crossJoinLateral[Q2, R2, QF, RF](other: Q => Joinable[Q2, R2])(
-    implicit ja: JoinAppend[Q, Q2, QF, RF],
+      implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF] =
     JoinOps.join0(wrapped, "CROSS JOIN LATERAL", other(WithExpr.get(wrapped)), None)
 
@@ -27,7 +27,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
    * Only supported by Postgres and MySql
    */
   def joinLateral[Q2, R2, QF, RF](other: Q => Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-    implicit ja: JoinAppend[Q, Q2, QF, RF],
+      implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF] =
     JoinOps.join0(wrapped, "JOIN LATERAL", other(WithExpr.get(wrapped)), Some(on))
 
@@ -38,9 +38,9 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
       wrapped.asInstanceOf[SimpleSelect[Q, R]],
       other(WithExpr.get(wrapped)),
       Some(on),
-      "LEFT JOIN LATERAL")((e, o) => (e, JoinNullable(o)))
+      "LEFT JOIN LATERAL"
+    )((e, o) => (e, JoinNullable(o)))
   }
-
 
   /**
    * Version of `crossJoinLateral` meant for use in `for`-comprehensions

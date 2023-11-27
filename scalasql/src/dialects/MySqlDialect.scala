@@ -106,6 +106,18 @@ object MySqlDialect extends MySqlDialect {
       with PadOps {
     override def +(x: Expr[String]): Expr[String] = Expr { implicit ctx => sql"CONCAT($v, $x)" }
 
+    override def startsWith(other: Expr[String]): Expr[Boolean] = Expr { implicit ctx =>
+      sql"($v LIKE CONCAT($other, '%'))"
+    }
+
+    override def endsWith(other: Expr[String]): Expr[Boolean] = Expr { implicit ctx =>
+      sql"($v LIKE CONCAT('%', $other))"
+    }
+
+    override def contains(other: Expr[String]): Expr[Boolean] = Expr { implicit ctx =>
+      sql"($v LIKE CONCAT('%', $other, '%'))"
+    }
+
     def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
     def reverse: Expr[String] = Expr { implicit ctx => sql"REVERSE($v)" }
   }

@@ -252,12 +252,11 @@ object Select {
   def selectWithExprPrefix[Q, R](s: Select[Q, R], str: Context => SqlStr) =
     s.selectWithExprPrefix(str)
 
-
   trait Renderer {
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr
   }
 
-  implicit class ExprSelectOps[T](s: Select[Expr[T], T]){
+  implicit class ExprSelectOps[T](s: Select[Expr[T], T]) {
     def sorted(implicit tm: TypeMapper[T]): Select[Expr[T], T] = s.sortBy(identity)
   }
 

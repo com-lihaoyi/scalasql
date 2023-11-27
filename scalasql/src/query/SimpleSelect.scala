@@ -87,7 +87,7 @@ class SimpleSelect[Q, R](
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-    implicit ja: JoinAppend[Q, Q2, QF, RF],
+      implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): Select[QF, RF] = { joinCopy(other, on, prefix)(ja.appendTuple(_, _))(ja.qr) }
 
   protected def joinCopy0[Q3, R3](
@@ -95,8 +95,7 @@ class SimpleSelect[Q, R](
       newJoins: Seq[Join],
       newWheres: Seq[Expr[Boolean]]
   )(
-      implicit jqr: Queryable.Row[Q3, R3],
-
+      implicit jqr: Queryable.Row[Q3, R3]
   ): SimpleSelect[Q3, R3] = {
     // If this doesn't have a `groupBy` yet, then we can simply append another join. Otherwise
     // we have to wrap `this` in a subquery
@@ -215,10 +214,10 @@ class SimpleSelect[Q, R](
   }
 
   protected def joinCopy[Q2, R2, Q3, R3](
-                                          other: Joinable[Q2, R2],
-                                          on: Option[(Q, Q2) => Expr[Boolean]],
-                                          joinPrefix: String
-                                        )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]],
+      joinPrefix: String
+  )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
 
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
@@ -229,11 +228,11 @@ class SimpleSelect[Q, R](
 object SimpleSelect {
 
   def joinCopy[Q, R, Q2, R2, Q3, R3](
-                                               self: SimpleSelect[Q, R],
-                                               other: Joinable[Q2, R2],
-                                               on: Option[(Q, Q2) => Expr[Boolean]],
-                                               joinPrefix: String
-                                             )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
+      self: SimpleSelect[Q, R],
+      other: Joinable[Q2, R2],
+      on: Option[(Q, Q2) => Expr[Boolean]],
+      joinPrefix: String
+  )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
     self.joinCopy(other, on, joinPrefix)(f)
   }
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
