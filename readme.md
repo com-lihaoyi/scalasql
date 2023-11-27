@@ -294,14 +294,15 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **String Functions**
 
-|      Scala |    SQL |  Scala | SQL |
-|--------------------:|---------------------:|----------------:|------------------:|
-|             `a + b` |           `a \|\| b` |     `a.like(b)` |        `a LIKE b` |
-|  `a.toLowerCase(b)` |           `LOWER(a)` | `a.toUpperCase` |        `UPPER(a)` |
-|      `a.indexOf(b)` |     `POSITION(a, b)` |        `a.trim` |         `TRIM(a)` |
-|          `a.length` |          `LENGTH(a)` | `a.octetLength` | `OCTET_LENGTH(a)` |
-|           `a.ltrim` |           `LTRIM(a)` |       `a.rtrim` |        `RTRIM(a)` |
-| `a.substring(b, c)` | `SUBSTRING(a, b, c)` |
+|               Scala |                  SQL |           Scala |                          SQL |
+|--------------------:|---------------------:|----------------:|-----------------------------:|
+|             `a + b` |           `a \|\| b` |     `a.like(b)` |                   `a LIKE b` |
+|  `a.toLowerCase(b)` |           `LOWER(a)` | `a.toUpperCase` |                   `UPPER(a)` |
+|      `a.indexOf(b)` |     `POSITION(a, b)` |        `a.trim` |                    `TRIM(a)` |
+|          `a.length` |          `LENGTH(a)` | `a.octetLength` |            `OCTET_LENGTH(a)` |
+|           `a.ltrim` |           `LTRIM(a)` |       `a.rtrim` |                   `RTRIM(a)` |
+| `a.substring(b, c)` | `SUBSTRING(a, b, c)` | `a.contains(b)` | `a LIKE '%' \|\| b \|\| '%'` |
+|   `a.startsWith(b)` |  `a LIKE b \|\| '%'` | `a.endsWith(b)` |          `a LIKE '%' \|\| b` |
 
 **Aggregate Functions**
 
