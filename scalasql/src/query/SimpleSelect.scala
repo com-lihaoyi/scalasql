@@ -87,10 +87,10 @@ class SimpleSelect[Q, R](
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
-  ): Select[QF, RF] = { joinCopy(other, on, prefix)(ja.appendQ(_, _))(ja.qr2, ja.qr) }
+    implicit ja: JoinAppend[Q, Q2, QF, RF],
+  ): Select[QF, RF] = { joinCopy(other, on, prefix)(ja.appendTuple(_, _))(ja.qr) }
 
-  override protected def joinCopy0[Q3, R3](
+  protected def joinCopy0[Q3, R3](
       newExpr: Q3,
       newJoins: Seq[Join],
       newWheres: Seq[Expr[Boolean]]
@@ -213,9 +213,29 @@ class SimpleSelect[Q, R](
 
     jsonQueryMap
   }
+
+  protected def joinCopy[Q2, R2, Q3, R3](
+                                          other: Joinable[Q2, R2],
+                                          on: Option[(Q, Q2) => Expr[Boolean]],
+                                          joinPrefix: String
+                                        )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
+
+    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
+
+    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)(jqr)
+  }
 }
 
 object SimpleSelect {
+
+  def joinCopy[Q, R, Q2, R2, Q3, R3](
+                                               self: SimpleSelect[Q, R],
+                                               other: Joinable[Q2, R2],
+                                               on: Option[(Q, Q2) => Expr[Boolean]],
+                                               joinPrefix: String
+                                             )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
+    self.joinCopy(other, on, joinPrefix)(f)
+  }
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {

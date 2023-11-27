@@ -19,7 +19,7 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+    implicit ja: JoinAppend[Q, Q2, QF, RF],
   ): Update[QF, RF]
 
   def qr: Queryable.Row[Q, R]
@@ -60,10 +60,10 @@ object Update {
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Expr[Boolean]]
     )(
-      implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF]
+      implicit ja: JoinAppend[Q, Q2, QF, RF]
     ) = {
-      val (otherJoin, otherSelect) = joinInfo(prefix, other, on)(ja.qr2)
-      this.copy(expr = ja.appendQ(expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)(ja.qr)
+      val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
+      this.copy(expr = ja.appendTuple(expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)(ja.qr)
     }
 
     protected override def renderToSql(ctx: Context): SqlStr =

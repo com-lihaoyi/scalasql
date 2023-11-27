@@ -313,7 +313,7 @@ object Select {
         prefix: String,
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Expr[Boolean]]
-    )(implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF]): Select[QF, RF] =
+    )(implicit ja: JoinAppend[Q, Q2, QF, RF]): Select[QF, RF] =
       selectSimpleFrom().join0(prefix, other, on)
     override def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
         implicit qr: Queryable.Row[Expr[V], V]
