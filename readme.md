@@ -351,6 +351,5 @@ Foo.delete(_.myStr === "hello")                               // Int
 # TODO
 
 * Scala 3 support
-* Flatten Nested Tuples 
 * Move static functions into `db.foo` extensions 
 * Audit list of static functions for Postgres/MySql/Sqlite/H2 
