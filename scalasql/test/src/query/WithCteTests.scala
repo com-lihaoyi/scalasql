@@ -14,7 +14,7 @@ trait WithCteTests extends ScalaSqlSuite {
 
     test("simple") - checker(
       query = Text {
-        withCte(Buyer.select.map(_.name)) { bs =>
+        db.withCte(Buyer.select.map(_.name)) { bs =>
           bs.map(_ + "-suffix")
         }
       },
@@ -39,8 +39,8 @@ trait WithCteTests extends ScalaSqlSuite {
 
     test("multiple") - checker(
       query = Text {
-        withCte(Buyer.select) { bs =>
-          withCte(ShippingInfo.select) { sis =>
+        db.withCte(Buyer.select) { bs =>
+          db.withCte(ShippingInfo.select) { sis =>
             bs.join(sis)(_.id === _.buyerId)
               .map { case (b, s) => (b.name, s.shippingDate) }
           }
@@ -71,7 +71,7 @@ trait WithCteTests extends ScalaSqlSuite {
 
     test("eliminated") - checker(
       query = Text {
-        withCte(Buyer.select) { bs =>
+        db.withCte(Buyer.select) { bs =>
           bs.map(_.name + "-suffix")
         }
       },
@@ -96,12 +96,12 @@ trait WithCteTests extends ScalaSqlSuite {
 
     test("subquery") - checker(
       query = Text {
-        withCte(Buyer.select) { bs =>
-          withCte(ShippingInfo.select) { sis =>
+        db.withCte(Buyer.select) { bs =>
+            db.withCte(ShippingInfo.select) { sis =>
             bs.join(sis)(_.id === _.buyerId)
           }
         }.join(
-          withCte(Product.select) { prs =>
+          db.withCte(Product.select) { prs =>
             Purchase.select.join(prs)(_.productId === _.id)
           }
         )(_._2.id === _._1.shippingInfoId)

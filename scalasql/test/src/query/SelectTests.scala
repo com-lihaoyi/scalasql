@@ -490,7 +490,7 @@ trait SelectTests extends ScalaSqlSuite {
       test("when") - checker(
         query = Text {
           Product.select.map(p =>
-            caseWhen(
+            db.caseWhen(
               (p.price > 200) -> (p.name + " EXPENSIVE"),
               (p.price > 5) -> (p.name + " NORMAL"),
               (p.price <= 5) -> (p.name + " CHEAP")
@@ -534,7 +534,7 @@ trait SelectTests extends ScalaSqlSuite {
       test("else") - checker(
         query = Text {
           Product.select.map(p =>
-            caseWhen(
+            db.caseWhen(
               (p.price > 200) -> (p.name + " EXPENSIVE"),
               (p.price > 5) -> (p.name + " NORMAL")
             ).`else` { p.name + " UNKNOWN" }

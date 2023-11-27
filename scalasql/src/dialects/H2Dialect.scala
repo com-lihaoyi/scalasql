@@ -1,21 +1,9 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.{Column, Id, Queryable, Table, TypeMapper, dialects, operations}
-import scalasql.query.{
-  Aggregatable,
-  CompoundSelect,
-  Expr,
-  From,
-  GroupBy,
-  InsertSelect,
-  InsertValues,
-  Join,
-  JoinNullable,
-  Joinable,
-  OrderBy,
-  Query
-}
+import scalasql.operations.DbApiOps
+import scalasql.{Column, DbApi, Id, Queryable, Table, TypeMapper, dialects, operations}
+import scalasql.query.{Aggregatable, CompoundSelect, Expr, From, GroupBy, InsertSelect, InsertValues, Join, JoinNullable, Joinable, OrderBy, Query}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
@@ -32,7 +20,9 @@ trait H2Dialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new H2Dialect.TableOps(t)
 
-  override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
+  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps{
+    override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
+  }
 
   implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
     new H2Dialect.AggExprOps(v)

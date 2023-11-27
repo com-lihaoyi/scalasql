@@ -351,7 +351,6 @@ Foo.delete(_.myStr === "hello")                               // Int
 # TODO
 
 * Scala 3 support
-* Move static functions into `db.foo` extensions 
 * Transaction Isolation Configuration
 * JSON columns
 * Audit TypeMapper v.s. jetbrains/exposed

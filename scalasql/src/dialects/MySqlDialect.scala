@@ -1,26 +1,8 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.{
-  Aggregatable,
-  AscDesc,
-  CompoundSelect,
-  Expr,
-  From,
-  GroupBy,
-  InsertValues,
-  Join,
-  JoinNullable,
-  JoinOps,
-  Joinable,
-  LateralJoinOps,
-  Nulls,
-  OrderBy,
-  Query,
-  TableRef,
-  Update,
-  WithExpr
-}
+import scalasql.operations.DbApiOps
+import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, JoinNullable, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, TableRef, Update, WithExpr}
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
@@ -47,7 +29,9 @@ trait MySqlDialect extends Dialect {
   ): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 
-  override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
+  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps {
+    override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
+  }
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]

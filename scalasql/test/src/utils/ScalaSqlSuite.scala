@@ -10,6 +10,7 @@ abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
     extends TestSuite
     with Dialect {
   def checker: TestChecker
+  def db: DbApi = ???
 
   lazy val dbClient = checker.dbClient
   def description: String

@@ -387,7 +387,7 @@ object WorldSqlTests extends TestSuite {
         // You can also interpolate `Seq[T]`s for any `T: TypeMapper` into your
         // query using `Values(...)`, which translates into a SQL `VALUES` clause
         val query = City.select
-          .filter(c => values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
+          .filter(c => db.values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
           .map(_.countryCode)
 
         db.toSqlQuery(query) ==> """
@@ -874,11 +874,11 @@ object WorldSqlTests extends TestSuite {
               c.name,
               c.countryCode,
               c.population,
-              rank().over.partitionBy(c.countryCode).sortBy(c.population).desc
+              db.rank().over.partitionBy(c.countryCode).sortBy(c.population).desc
             )
           )
           .filter { case (name, countryCode, population, rank) =>
-            values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu"))
+            db.values(Seq("San Francisco", "New York", "Kuala Lumpur", "Pinang", "Johor Baharu"))
               .contains(name)
           }
 
@@ -918,7 +918,7 @@ object WorldSqlTests extends TestSuite {
             )
           )
           .filter { case (name, countryCode, population, rank) =>
-            values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
+            db.values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
           }
 
         db.toSqlQuery(query) ==> """
@@ -1083,7 +1083,7 @@ object WorldSqlTests extends TestSuite {
         // clause, and so we need to use `.subquery` to ensure that the `RANK()` is
         // run in an isolated subquery and does not get executed in the WHERE clause
         val query = City.select
-          .map(c => (c, rank().over.partitionBy(c.countryCode).sortBy(c.population).desc))
+          .map(c => (c, db.rank().over.partitionBy(c.countryCode).sortBy(c.population).desc))
           .subquery
           .filter { case (city, r) => r <= 3 }
           .map { case (city, r) => (city.name, city.population, city.countryCode, r) }

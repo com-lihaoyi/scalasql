@@ -19,7 +19,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              rank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.rank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -52,7 +52,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -81,7 +81,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -110,7 +110,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -139,7 +139,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              percentRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.percentRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -168,7 +168,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              cumeDist().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.cumeDist().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -197,7 +197,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              ntile(3).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.ntile(3).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -226,7 +226,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              lag(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.lag(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -255,7 +255,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              lead(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.lead(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -284,7 +284,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              firstValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.firstValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -313,7 +313,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              lastValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.lastValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },
@@ -342,7 +342,7 @@ trait WindowFunctionTests extends ScalaSqlSuite {
             (
               p.shippingInfoId,
               p.total,
-              nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+              db.nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
             )
           )
         },

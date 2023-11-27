@@ -10,7 +10,7 @@ trait ValuesTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("basic") - checker(
-      query = Text { values(Seq(1, 2, 3)) },
+      query = Text { db.values(Seq(1, 2, 3)) },
       sqls = Seq("VALUES (?), (?), (?)", "VALUES ROW(?), ROW(?), ROW(?)"),
       value = Seq(1, 2, 3),
       docs = """
@@ -19,7 +19,7 @@ trait ValuesTests extends ScalaSqlSuite {
     )
 
     test("contains") - checker(
-      query = Text { values(Seq(1, 2, 3)).contains(1) },
+      query = Text { db.values(Seq(1, 2, 3)).contains(1) },
       sqls = Seq(
         "SELECT (? IN (VALUES (?), (?), (?))) AS res",
         "SELECT (? IN (VALUES ROW(?), ROW(?), ROW(?))) AS res"
@@ -31,7 +31,7 @@ trait ValuesTests extends ScalaSqlSuite {
     )
 
     test("max") - checker(
-      query = Text { values(Seq(1, 2, 3)).max },
+      query = Text { db.values(Seq(1, 2, 3)).max },
       sqls = Seq(
         "SELECT MAX(subquery0.column1) AS res FROM (VALUES (?), (?), (?)) subquery0",
         "SELECT MAX(subquery0.c1) AS res FROM (VALUES (?), (?), (?)) subquery0",
@@ -44,7 +44,7 @@ trait ValuesTests extends ScalaSqlSuite {
     )
 
     test("map") - checker(
-      query = Text { values(Seq(1, 2, 3)).map(_ + 1) },
+      query = Text { db.values(Seq(1, 2, 3)).map(_ + 1) },
       sqls = Seq(
         "SELECT (subquery0.column1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
         "SELECT (subquery0.c1 + ?) AS res FROM (VALUES (?), (?), (?)) subquery0",
@@ -57,7 +57,7 @@ trait ValuesTests extends ScalaSqlSuite {
     )
 
     test("filter") - checker(
-      query = Text { values(Seq(1, 2, 3)).filter(_ > 2) },
+      query = Text { db.values(Seq(1, 2, 3)).filter(_ > 2) },
       sqls = Seq(
         "SELECT subquery0.column1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.column1 > ?)",
         "SELECT subquery0.c1 AS res FROM (VALUES (?), (?), (?)) subquery0 WHERE (subquery0.c1 > ?)",
@@ -69,7 +69,7 @@ trait ValuesTests extends ScalaSqlSuite {
 
     test("crossJoin") - checker(
       query = Text {
-        values(Seq(1, 2, 3)).crossJoin(values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
+        db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
       },
       sqls = Seq(
         """
@@ -96,7 +96,7 @@ trait ValuesTests extends ScalaSqlSuite {
     test("joinValuesAndTable") - checker(
       query = Text {
         for {
-          name <- values(Seq("Socks", "Face Mask", "Camera"))
+          name <- db.values(Seq("Socks", "Face Mask", "Camera"))
           product <- Product.join(_.name === name)
         } yield (name, product.price)
       },
