@@ -75,6 +75,16 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |}""".stripMargin
     }
 
+    val joinAppendDefs = for(i <- Range.inclusive(2, 21)) yield {
+      def commaSep(f: Int => String) = commaSep0(i, f)
+      val commaSepT = commaSep(j => s"T$j")
+      s"""implicit def append$i[$commaSepT, V]: scalasql.query.JoinAppend[($commaSepT), V, ($commaSepT, V)] = {
+         |  new scalasql.query.JoinAppend[($commaSepT), V, ($commaSepT, V)] {
+         |    override def append(t: ($commaSepT), v: V): ($commaSepT, V) = (${commaSep(j => s"t._$j")}, v)
+         |  }
+         |}""".stripMargin
+    }
+
     os.write(
       T.dest / "Generated.scala",
       s"""package scalasql.generated
@@ -95,6 +105,10 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |
         |trait QueryableRow{
         |  ${queryableRowDefs.mkString("\n")}
+        |}
+        |
+        |trait JoinAppend{
+        |  ${joinAppendDefs.mkString("\n")}
         |}
         |""".stripMargin
     )
