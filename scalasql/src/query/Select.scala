@@ -309,11 +309,11 @@ object Select {
       Query.queryValueReader(selectSimpleFrom())
     override protected def queryTypeMappers(): Seq[TypeMapper[_]] =
       Query.queryTypeMappers(selectSimpleFrom())
-    override protected def join0[Q2, R2](
+    override protected def join0[Q2, R2, QF, RF](
         prefix: String,
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Expr[Boolean]]
-    )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, Q2), (R, R2)] =
+    )(implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF]): Select[QF, RF] =
       selectSimpleFrom().join0(prefix, other, on)
     override def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
         implicit qr: Queryable.Row[Expr[V], V]

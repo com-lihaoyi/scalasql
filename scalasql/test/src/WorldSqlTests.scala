@@ -1088,9 +1088,11 @@ object WorldSqlTests extends TestSuite {
           .filter { case (city, r) => r <= 3 }
           .map { case (city, r) => (city.name, city.population, city.countryCode, r) }
           .join(Country)(_._3 === _.code)
-          .sortBy(_._2.population)
+          .sortBy(_._5.population)
           .desc
-          .map { case (city, country) => city }
+          .map { case (name, population, countryCode, r, country) =>
+            (name, population, countryCode, r)
+          }
 
         db.toSqlQuery(query) ==> """
         SELECT

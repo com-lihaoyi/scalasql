@@ -14,13 +14,13 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
 
   def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
 
-  def join0[Q2, R2](
+  def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-      implicit joinQr: Queryable.Row[Q2, R2]
-  ): Update[(Q, Q2), (R, R2)]
+    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+  ): Update[QF, RF]
 
   def qr: Queryable.Row[Q, R]
   override def queryIsExecuteUpdate = true
@@ -55,15 +55,15 @@ object Update {
 
     def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
 
-    def join0[Q2, R2](
+    def join0[Q2, R2, QF, RF](
         prefix: String,
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Expr[Boolean]]
     )(
-        implicit joinQr: Queryable.Row[Q2, R2]
+      implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF]
     ) = {
-      val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
-      this.copy(expr = (expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)
+      val (otherJoin, otherSelect) = joinInfo(prefix, other, on)(ja.qr2)
+      this.copy(expr = ja.appendQ(expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)(ja.qr)
     }
 
     protected override def renderToSql(ctx: Context): SqlStr =

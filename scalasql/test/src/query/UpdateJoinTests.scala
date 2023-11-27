@@ -53,9 +53,9 @@ trait UpdateJoinTests extends ScalaSqlSuite {
             .update(_.name `=` "James Bond")
             .join(ShippingInfo)(_.id `=` _.buyerId)
             .join(Purchase)(_._2.id `=` _.shippingInfoId)
-            .join(Product)(_._2.productId `=` _.id)
-            .filter(t => t._2.name.toLowerCase `=` t._2.kebabCaseName.toLowerCase)
-            .set(c => c._1._1._1.name := c._2.name)
+            .join(Product)(_._3.productId `=` _.id)
+            .filter(t => t._4.name.toLowerCase `=` t._4.kebabCaseName.toLowerCase)
+            .set(c => c._1.name := c._4.name)
         },
         sqls = Seq(
           """

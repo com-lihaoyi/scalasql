@@ -105,7 +105,7 @@ trait WithCteTests extends ScalaSqlSuite {
             Purchase.select.join(prs)(_.productId === _.id)
           }
         )(_._2.id === _._1.shippingInfoId)
-          .map { case ((b, s), (pu, pr)) => (b.name, pr.name) }
+          .map { case (b, s, (pu, pr)) => (b.name, pr.name) }
       },
       sql = """
         SELECT subquery0.res__0__name AS res__0, subquery1.res__1__name AS res__1

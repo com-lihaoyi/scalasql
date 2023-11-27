@@ -7,24 +7,24 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   /**
    * Performs a `JOIN`/`INNER JOIN` on the given [[other]], typically a [[Table]] or [[Select]].
    */
-  def join[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
-      implicit qr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)] = join0("JOIN", other, Some(on))
+  def join[Q2, R2, QF, RF](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+  ): C[QF, RF] = join0("JOIN", other, Some(on))
 
   /**
    * Performs a `CROSS JOIN`, which is an `INNER JOIN` but without the `ON` clause
    */
-  def crossJoin[Q2, R2](other: Joinable[Q2, R2])(
-      implicit qr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)] = join0("CROSS JOIN", other, None)
+  def crossJoin[Q2, R2, QF, RF](other: Joinable[Q2, R2])(
+      implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+  ): C[QF, RF] = join0("CROSS JOIN", other, None)
 
-  protected def join0[Q2, R2](
+  protected def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-      implicit joinQr: Queryable.Row[Q2, R2]
-  ): C[(Q, Q2), (R, R2)]
+    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+  ): C[QF, RF]
 
   protected def joinInfo[Q2, R2](
       joinPrefix: String,
@@ -78,7 +78,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   )(
       f: (Q, Q2) => Q3
   )(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]): SimpleSelect[Q3, R3] = {
-    joinCopy[Q2, R2, Q3, R3](other, on, joinPrefix)(f)(joinQr, jqr)
+    joinCopy[Q2, R2, Q3, R3](other, on, joinPrefix)(f)
   }
 
   protected def joinCopy[Q2, R2, Q3, R3](
@@ -87,9 +87,9 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
       joinPrefix: String
   )(f: (Q, Q2) => Q3)(implicit joinQr: Queryable.Row[Q2, _], jqr: Queryable.Row[Q3, R3]) = {
 
-    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
+    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)(joinQr)
 
-    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)
+    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)(jqr)
   }
 
   protected def joinCopy0[Q3, R3](newExpr: Q3, newJoins: Seq[Join], newWheres: Seq[Expr[Boolean]])(
@@ -98,14 +98,14 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
 }
 
 object JoinOps {
-  def join0[C[_, _], Q, R, Q2, R2](
+  def join0[C[_, _], Q, R, Q2, R2, QF, RF](
       v: JoinOps[C, Q, R],
       prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-      implicit joinQr: Queryable.Row[Q2, R2]
+    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF]
   ) = {
-    v.join0(prefix, other, on)
+    v.join0[Q2, R2, QF, RF](prefix, other, on)
   }
 }

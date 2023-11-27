@@ -82,20 +82,21 @@ class SimpleSelect[Q, R](
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
-  def join0[Q2, R2](
+  def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Expr[Boolean]]
   )(
-      implicit joinQr: Queryable.Row[Q2, R2]
-  ): Select[(Q, Q2), (R, R2)] = { joinCopy(other, on, prefix)((_, _)) }
+    implicit ja: JoinAppend[Q, R, Q2, R2, QF, RF],
+  ): Select[QF, RF] = { joinCopy(other, on, prefix)(ja.appendQ(_, _))(ja.qr2, ja.qr) }
 
   override protected def joinCopy0[Q3, R3](
       newExpr: Q3,
       newJoins: Seq[Join],
       newWheres: Seq[Expr[Boolean]]
   )(
-      implicit jqr: Queryable.Row[Q3, R3]
+      implicit jqr: Queryable.Row[Q3, R3],
+
   ): SimpleSelect[Q3, R3] = {
     // If this doesn't have a `groupBy` yet, then we can simply append another join. Otherwise
     // we have to wrap `this` in a subquery

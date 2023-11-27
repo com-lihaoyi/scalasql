@@ -139,7 +139,7 @@ trait SubQueryTests extends ScalaSqlSuite {
     test("groupByJoin") - checker(
       query = Text {
         Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).join(Product)(_._1 `=` _.id).map {
-          case ((productId, total), product) => (product.name, total)
+          case (productId, total, product) => (product.name, total)
         }
       },
       sql = """
