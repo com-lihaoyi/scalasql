@@ -263,7 +263,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Expression Functions**
 
-|   Scala Function |                        Database Function | Scala Function |                   Database Function |
+|   Scala |                        SQL | Scala |                   SQL |
 |-----------------:|-----------------------------------------:|---------------:|------------------------------------:|
 |        `a === b` |    `a IS NOT DISTINCT FROM b` or `a = b` |      `a !== b` | `a IS DISTINCT FROM b`  or `a <> b` |
 |          `a < b` |                                  `a < b` |       `a <= b` |                            `a <= b` |
@@ -273,7 +273,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Numeric Functions**
 
-| Scala Function | Database Function | Scala Function | Database Function |
+| Scala | SQL | Scala | SQL |
 |---------------:|------------------:|---------------:|------------------:|
 |           `+a` |              `+a` |           `-a` |              `-a` |
 |        `a + b` |           `a + b` |        `a - b` |           `a - b` |
@@ -287,14 +287,14 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Boolean Functions**
 
-| Scala Function | Database Function | Scala Function | Database Function |
+| Scala | SQL | Scala | SQL |
 |---------------:|------------------:|---------------:|------------------:|
 |       `a && b` |         `a AND b` |     `a \|\| b` |          `a OR b` |
 |           `!a` |           `NOT a` |
 
 **String Functions**
 
-|      Scala Function |    Database Function |  Scala Function | Database Function |
+|      Scala |    SQL |  Scala | SQL |
 |--------------------:|---------------------:|----------------:|------------------:|
 |             `a + b` |           `a \|\| b` |     `a.like(b)` |        `a LIKE b` |
 |  `a.toLowerCase(b)` |           `LOWER(a)` | `a.toUpperCase` |        `UPPER(a)` |
@@ -305,7 +305,7 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Aggregate Functions**
 
-|                                      Scala Function |       Database Function |
+|                                      Scala |       SQL |
 |----------------------------------------------------:|------------------------:|
 |                                            `a.size` |              `COUNT(1)` |
 |                                   `a.mkString(sep)` |  `GROUP_CONCAT(a, sep)` |
@@ -316,14 +316,14 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 **Select Functions**
 
-|  Scala Function | Database Function | Scala Function | Database Function |
+|  Scala | SQL | Scala | SQL |
 |----------------:|------------------:|---------------:|------------------:|
 | `s.contains(a)` |          `a IN s` |
 |    `s.nonEmpty` |        `EXISTS s` |    `s.isEmpty` |    `NOT EXISTS s` |
 
 **Option/Nullable Functions**
 
-|   Scala Function | Database Function | Scala Function | Database Function |
+|   Scala | SQL | Scala | SQL |
 |-----------------:|------------------:|---------------:|------------------:|
 |    `a.isDefined` |   `a IS NOT NULL` |    `a.isEmpty` |       `a IS NULL` |
 |       `a.map(b)` |               `b` | `a.flatMap(b)` |               `b` |

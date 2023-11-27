@@ -47,6 +47,21 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       sql = "SELECT SUBSTRING(?, ?, ?) AS res",
       value = "el"
     )
+    test("startsWith") - checker(
+      query = Expr("Hello").startsWith("Hel"),
+      sql = "SELECT (? LIKE ? || '%') AS res",
+      value = true
+    )
+    test("endsWith") - checker(
+      query = Expr("Hello").endsWith("llo"),
+      sql = "SELECT (? LIKE '%' || ?) AS res",
+      value = true
+    )
+    test("contains") - checker(
+      query = Expr("Hello").contains("ll"),
+      sql = "SELECT (? LIKE '%' || ? || '%') AS res",
+      value = true
+    )
 
 //    test("overlay") - checker(
 //      query = Expr("Hello").overlay("LL", 2, 2),
