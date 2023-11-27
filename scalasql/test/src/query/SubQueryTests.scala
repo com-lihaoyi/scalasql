@@ -335,17 +335,17 @@ trait SubQueryTests extends ScalaSqlSuite {
                     Product.select
                       .filter(_.id === purchase.productId)
                       .map(_.price)
-                      .sortBy(identity)
+                      .sorted
                       .desc
                       .take(1)
                       .toExpr
                   }
-                  .sortBy(identity)
+                  .sorted
                   .desc
                   .take(1)
                   .toExpr
               }
-              .sortBy(identity)
+              .sorted
               .desc
               .take(1)
               .toExpr

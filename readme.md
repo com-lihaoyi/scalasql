@@ -193,7 +193,7 @@ Foo.select.filter(_.myStr === Expr("hello"))                        // Seq[Foo[I
 Foo.select.filter(_.myStr === "hello").single                       // Foo[Id]
 // SELECT * FROM foo WHERE my_str = "hello"
 
-Foo.select.sortBy(_.myInt).asc                                      // Seq[Foo[Id]]
+Foo.select.map(_.myInt).sorted.asc                                  // Seq[Foo[Id]]
 // SELECT * FROM foo ORDER BY my_int ASC
 
 Foo.select.sortBy(_.myInt).asc.take(20).drop(5)                     // Seq[Foo[Id]] 
