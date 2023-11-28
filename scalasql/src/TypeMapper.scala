@@ -14,14 +14,31 @@ import java.sql.{JDBCType, PreparedStatement, ResultSet, SQLType}
 
 /**
  * A mapping between a Scala type [[T]] and a JDBC type, defined by
- * it's [[jdbcType]], [[typeString]], and [[get]] and [[put]] operations.
+ * it's [[jdbcType]], [[castTypeString]], and [[get]] and [[put]] operations.
  *
  * Defaults are provided for most common Scala primitives, but you can also provide
  * your own by defining an `implicit val foo: TypeMapper[T]`
  */
 trait TypeMapper[T] {
+
+  /**
+   * The JDBC type of this type. Used for `setNull` which needs to know the
+   * `java.sql.Types` integer ID of the type to set it properly
+   */
   def jdbcType: JDBCType
-  def typeString: String = jdbcType.toString
+
+  /**
+   * What SQL string to use when you run `cast[T]` to a specific type
+   */
+  def castTypeString: String = jdbcType.toString
+
+  /**
+   * How to extract a value of type [[T]] from a `ResultSet`
+   */
   def get(r: ResultSet, idx: Int): T
+
+  /**
+   * How to insert a value of type [[T]] into a `PreparedStatement`
+   */
   def put(r: PreparedStatement, idx: Int, v: T): Unit
 }

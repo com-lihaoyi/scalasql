@@ -7,6 +7,7 @@ import scalasql.renderer.SqlStr
 
 class DbApiOps(dialect: Dialect) {
   import dialect._
+
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */

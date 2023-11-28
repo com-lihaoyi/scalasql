@@ -34,8 +34,10 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     )
   )
 
-  implicit def containerQr[E[_] <: Expr[_]](implicit dialect: Dialect): Queryable.Row[V[E], V[Id]] = tableMetadata.queryable(dialect)
-    .asInstanceOf[Queryable.Row[V[E], V[Id]]]
+  implicit def containerQr[E[_] <: Expr[_]](implicit dialect: Dialect): Queryable.Row[V[E], V[Id]] =
+    tableMetadata
+      .queryable(dialect)
+      .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
 

@@ -16,11 +16,21 @@ import scalasql.query.{
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
+import java.time.{Instant, LocalDate, LocalDateTime}
+
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   protected def dialectCastParams = false
 
-  override implicit def ExprOpsConv(v: Expr[_]): SqliteDialect.ExprOps =
-    new SqliteDialect.ExprOps(v)
+  override implicit def LocalDateTimeType: TypeMapper[LocalDateTime] = new SqliteLocalDateTimeType
+  class SqliteLocalDateTimeType extends LocalDateTimeType {
+    override def castTypeString = "VARCHAR"
+  }
+
+  override implicit def LocalDateType: TypeMapper[LocalDate] = new SqliteLocalDateType
+  class SqliteLocalDateType extends LocalDateType { override def castTypeString = "VARCHAR" }
+
+  override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
+  class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
   override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
@@ -41,17 +51,7 @@ object SqliteDialect extends SqliteDialect {
       v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
     }
   }
-  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
-    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[TypeMapper[V]] match {
-        case LocalDateType | LocalDateTimeType | InstantType =>
-          "VARCHAR"
-        case s => s.typeString
-      }
 
-      sql"CAST($v AS ${SqlStr.raw(s)})"
-    }
-  }
   class ExprStringOps(protected val v: Expr[String])
       extends operations.ExprStringOps(v)
       with TrimOps {

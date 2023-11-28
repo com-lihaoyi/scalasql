@@ -66,7 +66,6 @@ object Expr {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
-
   implicit def apply[T](
       x: T
   )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = {

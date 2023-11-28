@@ -52,8 +52,8 @@ object Update {
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R],
-      dialect: Dialect): Update[Q, R] = new Impl(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): Update[Q, R] =
+      new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 

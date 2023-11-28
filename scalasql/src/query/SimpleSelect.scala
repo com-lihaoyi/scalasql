@@ -21,8 +21,7 @@ class SimpleSelect[Q, R](
     val joins: Seq[Join],
     val where: Seq[Expr[_]],
     val groupBy0: Option[GroupBy]
-)(implicit val qr: Queryable.Row[Q, R],
-  protected val dialect: Dialect)
+)(implicit val qr: Queryable.Row[Q, R], protected val dialect: Dialect)
     extends Select[Q, R] {
   protected override def joinableSelect = this
 

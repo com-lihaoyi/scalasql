@@ -246,17 +246,20 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 ### Type Mapping
 
-|    Scala Primitive Type |  Database Type |        Scala DateTime Type |             Database Type |
-|------------------------:|---------------:|---------------------------:|--------------------------:|
-|          `scala.String` |  `LONGVARCHAR` |      `java.time.LocalDate` |                    `DATE` |
-|            `scala.Byte` |      `TINYINT` |      `java.time.LocalTime` |                    `TIME` |
-|           `scala.Short` |     `SMALLINT` |  `java.time.LocalDateTime` |               `TIMESTAMP` |
-|             `scala.Int` |      `INTEGER` |  `java.time.ZonedDateTime` | `TIMESTAMP WITH TIMEZONE` |
-|            `scala.Long` |       `BIGINT` |        `java.time.Instant` |               `TIMESTAMP` |
-|           `scala.Float` |       `DOUBLE` | `java.time.OffsetDateTime` | `TIMESTAMP WITH TIMEZONE` |
-|          `scala.Double` |       `DOUBLE` |
-| `scala.math.BigDecimal` |       `DOUBLE` |
-|         `scala.Boolean` |      `BOOLEAN` |
+|            Scala |                   Postgres |              MySql |             Sqlite |                         H2 |
+|-----------------:|---------------------------:|-------------------:|-------------------:|---------------------------:|
+|          `Byte`  |                 `SMALLINT` |         `SMALLINT` |         `SMALLINT` |                  `TINYINT` |  
+|          `Short` |                 `SMALLINT` |         `SMALLINT` |         `SMALLINT` |                 `SMALLINT` |  
+|            `Int` |                  `INTEGER` |          `INTEGER` |          `INTEGER` |                  `INTEGER` |  
+|           `Long` |                   `BIGINT` |           `BIGINT` |           `BIGINT` |                   `BIGINT` |  
+|         `Double` |         `DOUBLE PRECISION` | `DOUBLE PRECISION` | `DOUBLE PRECISION` |                   `DOUBLE` |  
+|        `Boolean` |                  `BOOLEAN` |          `BOOLEAN` |          `BOOLEAN` |                  `BOOLEAN` |  
+|      `LocalDate` |                     `DATE` |             `DATE` |             `DATE` |                     `DATE` |  
+|      `LocalTime` |                     `TIME` |             `TIME` |             `TIME` |                     `TIME` |  
+|  `LocalDateTime` |                `TIMESTAMP` |        `TIMESTAMP` |        `TIMESTAMP` |                `TIMESTAMP` |  
+|        `Instant` | `TIMESTAMP WITH TIME ZONE` |         `DATETIME` |         `DATETIME` | `TIMESTAMP WITH TIME ZONE` |  
+|     `geny.Bytes` |                    `BYTEA` |   `VARBINARY(256)` |        `VARBINARY` |           `VARBINARY(256)` |  
+| `java.util.UUID` |                     `UUID` |         `CHAR(36)` |       `BINARY(16)` |                     `UUID` |  
 
 
 ### Common ScalaSql Functions

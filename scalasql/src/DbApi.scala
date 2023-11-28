@@ -289,7 +289,7 @@ object DbApi {
         .map {
           case (part, null) => part
           case (part, param) =>
-            val jdbcTypeString = param.mappedType.typeString
+            val jdbcTypeString = param.mappedType.castTypeString
             if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
         }
         .mkString

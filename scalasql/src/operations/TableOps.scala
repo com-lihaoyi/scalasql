@@ -4,7 +4,8 @@ import scalasql.dialects.Dialect
 import scalasql.{Column, Id, Table}
 import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Update}
 
-class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Joinable[V[Expr], V[Id]] {
+class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
+    extends Joinable[V[Expr], V[Id]] {
 
   import dialect.{dialectSelf => _, _}
 
@@ -21,7 +22,8 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Join
   protected def joinableSelect: Select[V[Expr], V[Id]] = {
     val (ref, expr) = joinableToFromExpr
     new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
-      t.containerQr, dialect
+      t.containerQr,
+      dialect
     )
   }
 

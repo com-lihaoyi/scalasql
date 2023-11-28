@@ -14,7 +14,8 @@ case class WindowExpr[T](
     frameStart0: Option[SqlStr],
     frameEnd0: Option[SqlStr],
     exclusions: Option[SqlStr]
-)(implicit dialect: Dialect) extends Expr[T] {
+)(implicit dialect: Dialect)
+    extends Expr[T] {
   import dialect.{dialectSelf => _, _}
   protected def toSqlExpr0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }

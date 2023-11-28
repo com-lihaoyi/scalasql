@@ -9,8 +9,11 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
   protected def dialectCastParams = false
 
-  override implicit def ExprOpsConv(v: Expr[_]): PostgresDialect.ExprOps =
-    new PostgresDialect.ExprOps(v)
+  override implicit def ByteType: TypeMapper[Byte] = new PostgresByteType
+  class PostgresByteType extends ByteType { override def castTypeString = "INTEGER" }
+
+  override implicit def StringType: TypeMapper[String] = new PostgresStringType
+  class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
   override implicit def ExprStringOpsConv(v: Expr[String]): PostgresDialect.ExprStringOps =
     new PostgresDialect.ExprStringOps(v)
@@ -42,17 +45,6 @@ object PostgresDialect extends PostgresDialect {
     def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
-    }
-  }
-  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
-    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[TypeMapper[V]] match {
-        case ByteType => "INTEGER"
-        case StringType => "VARCHAR"
-        case s => s.typeString
-      }
-
-      sql"CAST($v AS ${SqlStr.raw(s)})"
     }
   }
   class ExprStringOps(protected val v: Expr[String])

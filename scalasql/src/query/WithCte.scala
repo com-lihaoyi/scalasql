@@ -46,11 +46,12 @@ class WithCte[Q, R](
 }
 
 object WithCte {
-  class Proxy[Q, R](lhs: WithExpr[Q],
-                    lhsSubQueryRef: WithCteRef[Q, R],
-                    val qr: Queryable.Row[Q, R],
-                    protected val dialect: Dialect)
-      extends Select.Proxy[Q, R] {
+  class Proxy[Q, R](
+      lhs: WithExpr[Q],
+      lhsSubQueryRef: WithCteRef[Q, R],
+      val qr: Queryable.Row[Q, R],
+      protected val dialect: Dialect
+  ) extends Select.Proxy[Q, R] {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true
     protected override def joinableSelect = selectSimpleFrom()

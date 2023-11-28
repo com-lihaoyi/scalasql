@@ -26,13 +26,44 @@ import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
 
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import java.time.{Instant, LocalDateTime}
+import java.util.UUID
 import scala.reflect.ClassTag
 
 trait MySqlDialect extends Dialect {
   protected def dialectCastParams = false
 
-  override implicit def ExprOpsConv(v: Expr[_]): MySqlDialect.ExprOps =
-    new MySqlDialect.ExprOps(v)
+  override implicit def ByteType: TypeMapper[Byte] = new MySqlByteType
+  class MySqlByteType extends ByteType { override def castTypeString = "SIGNED" }
+
+  override implicit def ShortType: TypeMapper[Short] = new MySqlShortType
+  class MySqlShortType extends ShortType { override def castTypeString = "SIGNED" }
+
+  override implicit def IntType: TypeMapper[Int] = new MySqlIntType
+  class MySqlIntType extends IntType { override def castTypeString = "SIGNED" }
+
+  override implicit def LongType: TypeMapper[Long] = new MySqlLongType
+  class MySqlLongType extends LongType { override def castTypeString = "SIGNED" }
+
+  override implicit def StringType: TypeMapper[String] = new MySqlStringType
+  class MySqlStringType extends StringType { override def castTypeString = "CHAR" }
+
+  override implicit def LocalDateTimeType: TypeMapper[LocalDateTime] = new MySqlLocalDateTimeType
+  class MySqlLocalDateTimeType extends LocalDateTimeType {
+    override def castTypeString = "DATETIME"
+  }
+
+  override implicit def InstantType: TypeMapper[Instant] = new MySqlInstantType
+  class MySqlInstantType extends InstantType { override def castTypeString = "DATETIME" }
+
+  override implicit def UuidType: TypeMapper[UUID] = new MySqlUuidType
+
+  class MySqlUuidType extends UuidType {
+    override def put(r: PreparedStatement, idx: Int, v: UUID) = {
+      r.setObject(idx, v.toString)
+    }
+  }
 
   override implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
     new MySqlDialect.ExprTypedOps(v)
@@ -67,20 +98,6 @@ object MySqlDialect extends MySqlDialect {
       v.queryExpr(expr =>
         implicit ctx => sql"GROUP_CONCAT(CONCAT($expr, '') SEPARATOR ${sepRender})"
       )
-    }
-  }
-  class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
-    override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
-      val s = implicitly[TypeMapper[V]] match {
-        case ByteType | ShortType | IntType |
-            LongType =>
-          "SIGNED"
-        case StringType => "CHAR"
-        case LocalDateTimeType | InstantType => "DATETIME"
-        case s => s.typeString
-      }
-
-      sql"CAST($v AS ${SqlStr.raw(s)})"
     }
   }
 
@@ -131,7 +148,13 @@ object MySqlDialect extends MySqlDialect {
     ): Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = Table.tableRef(t)
       val metadata = Table.tableMetadata(t)
-      new Update(metadata.vExpr(ref, dialectSelf), ref, Nil, Nil, Seq(filter(metadata.vExpr(ref, dialectSelf))))(
+      new Update(
+        metadata.vExpr(ref, dialectSelf),
+        ref,
+        Nil,
+        Nil,
+        Seq(filter(metadata.vExpr(ref, dialectSelf)))
+      )(
         t.containerQr
       )
     }
@@ -166,7 +189,8 @@ object MySqlDialect extends MySqlDialect {
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect) = new Update(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect) =
+      new Update(expr, table, set0, joins, where)
 
     protected override def renderToSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()

@@ -7,6 +7,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: Dialect) {
   import dialect._
+
   /** Counts the rows */
   def size: Expr[Int] = v.queryExpr(expr => implicit ctx => sql"COUNT(1)")
 

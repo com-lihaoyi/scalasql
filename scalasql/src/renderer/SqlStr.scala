@@ -150,13 +150,20 @@ object SqlStr {
     case class SqlStrInterp(s: SqlStr) extends Interp
 
     // Not sure why these two additional implicit conversions are needed
-    implicit def strInterp(value: String)(implicit tm: TypeMapper[String]): Interp = typeInterp(value)
+    implicit def strInterp(value: String)(implicit tm: TypeMapper[String]): Interp = typeInterp(
+      value
+    )
     implicit def intInterp(value: Int)(implicit tm: TypeMapper[Int]): Interp = typeInterp(value)
-    implicit def booleanInterp(value: Boolean)(implicit tm: TypeMapper[Boolean]): Interp = typeInterp(value)
-    implicit def doubleInterp(value: Double)(implicit tm: TypeMapper[Double]): Interp = typeInterp(value)
+    implicit def booleanInterp(value: Boolean)(implicit tm: TypeMapper[Boolean]): Interp =
+      typeInterp(value)
+    implicit def doubleInterp(value: Double)(implicit tm: TypeMapper[Double]): Interp = typeInterp(
+      value
+    )
     implicit def longInterp(value: Long)(implicit tm: TypeMapper[Long]): Interp = typeInterp(value)
 
-    implicit def optionInterp[T: TypeMapper](value: Option[T])(implicit tm: TypeMapper[Option[T]]): Interp =
+    implicit def optionInterp[T: TypeMapper](value: Option[T])(
+        implicit tm: TypeMapper[Option[T]]
+    ): Interp =
       typeInterp(value)(tm)
 
     implicit def typeInterp[T: TypeMapper](value: T): Interp = TypeInterp(value)

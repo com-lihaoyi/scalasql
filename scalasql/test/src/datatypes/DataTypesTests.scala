@@ -28,7 +28,7 @@ case class DataTypes[+T[_]](
     myLocalDateTime: T[LocalDateTime],
     myInstant: T[Instant],
     myVarBinary: T[geny.Bytes],
-    myUUID: T[java.util.UUID]
+    myUUID: T[java.util.UUID],
 )
 
 object DataTypes extends Table[DataTypes] {
@@ -77,7 +77,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalDateTime := value.myLocalDateTime,
           _.myInstant := value.myInstant,
           _.myVarBinary := value.myVarBinary,
-          _.myUUID := value.myUUID,
+          _.myUUID := value.myUUID
         ),
         value = 1
       )

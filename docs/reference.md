@@ -4516,7 +4516,9 @@ db.values(Seq(1, 2, 3)).filter(_ > 2)
 
 
 ```scala
-db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
+db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map {
+  case (a, b) => (a * 10 + b)
+}
 ```
 
 
@@ -6664,6 +6666,29 @@ Expr("2007-12-03 10:15:30.00").cast[java.time.Instant]
 
 
 
+### ExprOps.cast.castNamed
+
+
+
+```scala
+Expr(1234.5678).castNamed[String](sql"CHAR(3)")
+```
+
+
+*
+    ```sql
+    SELECT CAST(? AS CHAR(3)) AS res
+    ```
+
+
+
+*
+    ```scala
+    "123"
+    ```
+
+
+
 ## ExprBooleanOps
 Operations that can be performed on `Expr[Boolean]`
 ### ExprBooleanOps.and
@@ -7911,7 +7936,8 @@ DataTypes.insert.values(
   _.myLocalTime := value.myLocalTime,
   _.myLocalDateTime := value.myLocalDateTime,
   _.myInstant := value.myInstant,
-  _.myVarBinary := value.myVarBinary
+  _.myVarBinary := value.myVarBinary,
+  _.myUUID := value.myUUID
 )
 ```
 

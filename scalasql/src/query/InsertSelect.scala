@@ -12,9 +12,9 @@ import scalasql.utils.OptionPickler
 trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
 
 object InsertSelect {
-  class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
-                         (implicit dialect: Dialect)
-      extends InsertSelect[Q, C, R, R2] {
+  class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])(
+      implicit dialect: Dialect
+  ) extends InsertSelect[Q, C, R, R2] {
     import dialect.{dialectSelf => _, _}
     protected def expr = WithExpr.get(insert)
 
