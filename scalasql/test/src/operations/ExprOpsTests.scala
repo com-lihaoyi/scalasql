@@ -1,6 +1,7 @@
 package scalasql.operations
 
 import scalasql._
+import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.query.Expr
 import utest._
 import utils.ScalaSqlSuite
@@ -128,6 +129,12 @@ trait ExprOpsTests extends ScalaSqlSuite {
         value = java.time.Instant.parse("2007-12-03T02:15:30.00Z")
       )
 
+      test("castNamed") - checker(
+        query = Expr(1234.5678).castNamed[String](sql"CHAR(3)"),
+        sql = "SELECT CAST(? AS CHAR(3)) AS res",
+        value = "123",
+        moreValues = Seq("1234.5678") // SQLITE doesn't truncate on cast
+      )
     }
   }
 }

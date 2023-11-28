@@ -33,4 +33,12 @@ class ExprOps(v: Expr[_]) {
   def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
     sql"CAST($v AS ${SqlStr.raw(implicitly[TypeMapper[V]].typeString)})"
   }
+
+  /**
+   * Similar to [[cast]], but allows you to pass in an explicit [[SqlStr]] to
+   * further specify the SQL type you want to cast to
+   */
+  def castNamed[V: TypeMapper](typeName: SqlStr): Expr[V] = Expr { implicit ctx =>
+    sql"CAST($v AS $typeName)"
+  }
 }
