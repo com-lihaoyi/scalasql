@@ -1,7 +1,7 @@
 package scalasql.api
 
 import scalasql.Purchase
-import scalasql.utils.ScalaSqlSuite
+import scalasql.utils.{ScalaSqlSuite, SqliteSuite}
 import sourcecode.Text
 import utest._
 
@@ -32,26 +32,31 @@ trait TransactionTests extends ScalaSqlSuite {
           dbClient.transaction(_.run(Purchase.select.size)) ==> 0
         }
       )
-      test("isolation") - checker.recorded(
-        """
-        You can use `.updateRaw` to perform `SET TRANSACTION ISOLATION LEVEL` commands,
-        allowing you to configure the isolation and performance characteristics of
-        concurrent transactions in your database
-        """,
-        Text {
-          dbClient.transaction { implicit db =>
-            db.updateRaw("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+      test("isolation") - {
+        // Sqlite doesn't support configuring transaction isolation levels
+        if (!this.isInstanceOf[SqliteSuite]){
+          checker.recorded(
+            """
+            You can use `.updateRaw` to perform `SET TRANSACTION ISOLATION LEVEL` commands,
+            allowing you to configure the isolation and performance characteristics of
+            concurrent transactions in your database
+            """,
+            Text {
+              dbClient.transaction { implicit db =>
+                db.updateRaw("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
 
-            db.run(Purchase.select.size) ==> 7
+                db.run(Purchase.select.size) ==> 7
 
-            db.run(Purchase.delete(_ => true)) ==> 7
+                db.run(Purchase.delete(_ => true)) ==> 7
 
-            db.run(Purchase.select.size) ==> 0
-          }
+                db.run(Purchase.select.size) ==> 0
+              }
 
-          dbClient.transaction(_.run(Purchase.select.size)) ==> 0
+              dbClient.transaction(_.run(Purchase.select.size)) ==> 0
+            }
+          )
         }
-      )
+      }
 
       test("rollback") - checker.recorded(
         """
