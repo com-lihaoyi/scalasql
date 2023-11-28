@@ -356,7 +356,6 @@ Foo.delete(_.myStr === "hello")                               // Int
 * Scala 3 support
 * Transaction Isolation Configuration
 * JSON columns
-* Audit TypeMapper v.s. jetbrains/exposed
 * Enum String Columns
 * Multi-column IN VALUES clauses
 * Audit list of static functions for Postgres/MySql/Sqlite/H2 
