@@ -89,19 +89,16 @@ object TypeMapper {
   }
 
   implicit object UuidType extends TypeMapper[UUID] {
-    def jdbcType = JDBCType.BINARY
+    def jdbcType = JDBCType.VARBINARY
     def get(r: ResultSet, idx: Int) = {
-      val byteBuffer = ByteBuffer.wrap(r.getBytes(idx))
-      val mostSignificantBits = byteBuffer.getLong
-      val leastSignificantBits = byteBuffer.getLong
-      new UUID(mostSignificantBits, leastSignificantBits)
+      r.getObject(idx) match{
+        case u: UUID => u
+        case s: String => UUID.fromString(s)
+      }
     }
     def put(r: PreparedStatement, idx: Int, v: UUID) = {
-      val byteBuffer = ByteBuffer.wrap(new Array[Byte](16))
-      byteBuffer.putLong(v.getMostSignificantBits)
-      byteBuffer.putLong(v.getLeastSignificantBits)
 
-      r.setBytes(idx, byteBuffer.array)
+      r.setObject(idx, v)
     }
   }
 

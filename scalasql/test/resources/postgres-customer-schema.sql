@@ -47,7 +47,8 @@ CREATE TABLE data_types (
     my_local_time TIME,
     my_local_date_time TIMESTAMP,
     my_instant TIMESTAMP WITH TIME ZONE,
-    my_var_binary BYTEA
+    my_var_binary BYTEA,
+    my_uuid UUID
 --     my_offset_time TIME WITH TIME ZONE,
 
 );
