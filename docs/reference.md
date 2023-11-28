@@ -267,6 +267,31 @@ dbClient.transaction(_.run(Purchase.select.size)) ==> 0
 
 
 
+### Transaction.simple.isolation
+
+You can use `.updateRaw` to perform `SET TRANSACTION ISOLATION LEVEL` commands,
+allowing you to configure the isolation and performance characteristics of
+concurrent transactions in your database
+
+```scala
+dbClient.transaction { implicit db =>
+  db.updateRaw("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+
+  db.run(Purchase.select.size) ==> 7
+
+  db.run(Purchase.delete(_ => true)) ==> 7
+
+  db.run(Purchase.select.size) ==> 0
+}
+
+dbClient.transaction(_.run(Purchase.select.size)) ==> 0
+```
+
+
+
+
+
+
 ### Transaction.simple.rollback
 
 Example of explicitly rolling back a transaction using the `db.rollback()` method.

@@ -34,7 +34,7 @@ trait TransactionTests extends ScalaSqlSuite {
       )
       test("isolation") - {
         // Sqlite doesn't support configuring transaction isolation levels
-        if (!this.isInstanceOf[SqliteSuite]){
+        if (!this.isInstanceOf[SqliteSuite]) {
           checker.recorded(
             """
             You can use `.updateRaw` to perform `SET TRANSACTION ISOLATION LEVEL` commands,
