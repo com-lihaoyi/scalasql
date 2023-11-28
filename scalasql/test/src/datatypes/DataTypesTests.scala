@@ -65,7 +65,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         myUUID = new java.util.UUID(1234567890L, 9876543210L)
       )
       checker(
-        query = DataTypes.insert.values(
+        query = DataTypes.insert.columns(
           _.myTinyInt := value.myTinyInt,
           _.mySmallInt := value.mySmallInt,
           _.myInt := value.myInt,
@@ -101,7 +101,7 @@ trait DataTypesTests extends ScalaSqlSuite {
       )
 
       checker(
-        query = NonRoundTripTypes.insert.values(
+        query = NonRoundTripTypes.insert.columns(
           _.myOffsetDateTime := value.myOffsetDateTime,
           _.myZonedDateTime := value.myZonedDateTime
         ),

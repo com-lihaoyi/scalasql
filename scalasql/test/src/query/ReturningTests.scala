@@ -21,7 +21,7 @@ trait ReturningTests extends ScalaSqlSuite {
         checker(
           query = Text {
             Buyer.insert
-              .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+              .columns(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
               .returning(_.id)
           },
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?) RETURNING buyer.id AS res",
@@ -47,7 +47,7 @@ trait ReturningTests extends ScalaSqlSuite {
         checker(
           query = Text {
             Buyer.insert
-              .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+              .columns(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
               .returning(_.id)
               .single
           },

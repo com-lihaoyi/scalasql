@@ -9,17 +9,17 @@ import scalasql.{Column, Queryable, Table, TypeMapper}
 /**
  * A SQL `INSERT VALUES` query
  */
-trait InsertValues[Q, R] extends InsertReturnable[Q] with Query[Int] {
+trait InsertColumns[Q, R] extends InsertReturnable[Q] with Query[Int] {
   def columns: Seq[Column.ColumnExpr[_]]
   def valuesLists: Seq[Seq[Expr[_]]]
 }
-object InsertValues {
+object InsertColumns {
   class Impl[Q, R](
       insert: Insert[Q, R],
       val columns: Seq[Column.ColumnExpr[_]],
       val valuesLists: Seq[Seq[Expr[_]]]
   )(implicit val qr: Queryable[Q, R], dialect: Dialect)
-      extends InsertValues[Q, R] {
+      extends InsertColumns[Q, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table
     protected def expr: Q = WithExpr.get(insert)

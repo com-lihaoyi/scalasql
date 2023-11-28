@@ -10,7 +10,7 @@ import scalasql.query.{
   From,
   GroupBy,
   InsertSelect,
-  InsertValues,
+  InsertColumns,
   Join,
   JoinNullable,
   Joinable,

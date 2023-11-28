@@ -18,7 +18,7 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text {
           Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict
@@ -40,7 +40,7 @@ trait OnConflictTests extends ScalaSqlSuite {
         checker(
           query = Text {
             Buyer.insert
-              .values(
+              .columns(
                 _.name := "test buyer",
                 _.dateOfBirth := LocalDate.parse("2023-09-09"),
                 _.id := 1 // This should cause a primary key conflict
@@ -61,7 +61,7 @@ trait OnConflictTests extends ScalaSqlSuite {
         checker(
           query = Text {
             Buyer.insert
-              .values(
+              .columns(
                 _.name := "test buyer",
                 _.dateOfBirth := LocalDate.parse("2023-09-09"),
                 _.id := 4 // This should cause a primary key conflict
@@ -84,7 +84,7 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text {
           Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict
@@ -114,7 +114,7 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text {
           Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict
@@ -141,7 +141,7 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text {
           Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict

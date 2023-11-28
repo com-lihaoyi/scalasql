@@ -33,7 +33,7 @@ trait MySqlDialectTests extends MySqlSuite {
 
         checker(
           query = Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict
@@ -50,7 +50,7 @@ trait MySqlDialectTests extends MySqlSuite {
       test("update") - {
         checker(
           query = Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict
@@ -75,7 +75,7 @@ trait MySqlDialectTests extends MySqlSuite {
       test("updateComputed") - {
         checker(
           query = Buyer.insert
-            .values(
+            .columns(
               _.name := "test buyer",
               _.dateOfBirth := LocalDate.parse("2023-09-09"),
               _.id := 1 // This should cause a primary key conflict

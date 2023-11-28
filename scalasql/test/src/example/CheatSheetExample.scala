@@ -123,7 +123,7 @@ object CheatSheetExample {
 
     /// ### Insert/Update/Delete
 
-    Foo.insert.values(_.myStr := "hello", _.myInt := 123) // 1
+    Foo.insert.columns(_.myStr := "hello", _.myInt := 123) // 1
     // INSERT INTO foo (my_str, my_int) VALUES ("hello", 123)
 
     Foo.insert.batched(_.myStr, _.myInt)(("a", 1), ("b", 2)) // 2

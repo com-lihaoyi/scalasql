@@ -3,6 +3,8 @@ import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.renderer.{Context, SqlStr}
 import utest._
 
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
+
 object WorldSqlTests extends TestSuite {
   // +DOCS
   //
@@ -1134,7 +1136,7 @@ object WorldSqlTests extends TestSuite {
         // ScalaSql supports SQL `INSERT`s with multiple styles. You can insert
         // a single row via `.insert.values`, passing the columns you want to insert
         // (and leaving out any that the database would auto-populate)
-        val query = City.insert.values( // ID provided by database AUTO_INCREMENT
+        val query = City.insert.columns( // ID provided by database AUTO_INCREMENT
           _.name := "Sentosa",
           _.countryCode := "SGP",
           _.district := "South",
@@ -1401,6 +1403,42 @@ object WorldSqlTests extends TestSuite {
       // less commonly used functions that are nonetheless still needed in your application
       // -DOCS
     }
+    test("customTypeMapper") {
+      // +DOCS
+      // ## Custom Type Mappings
+      //
+      // ```scala
+      // object CityId {
+      //   implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
+      //     def jdbcType: JDBCType = JDBCType.INTEGER
+      //     def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
+      //     def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
+      //   }
+      // }
+      //
+      // case class City2[+T[_]](
+      //     id: T[CityId],
+      //     name: T[String],
+      //     countryCode: T[String],
+      //     district: T[String],
+      //    population: T[Long]
+      // )
+      //
+      // object City2 extends Table[City2]() {
+      //   initTableMetadata()
+      //   override def tableName: String = "city"
+      // }
+      // ```
+      db.run(
+        City2.insert.columns(
+          City2[Id](CityId(31337), "test", "ccode", "district", 1000000)
+        )
+      )
+
+      db.run(City2.select.filter(_.id === 31337).single) ==>
+        City2[Id](CityId(31337), "test", "ccode", "district", 1000000)
+      // -DOCS
+    }
     test("customTableColumnNames") {
       // +DOCS
       // ## Customizing Table and Column Names
@@ -1477,5 +1515,28 @@ object WorldSqlTests extends TestSuite {
       case "districtCustom" => "district"
       case "populationCustom" => "population"
     }
+  }
+
+  case class CityId(value: Int)
+
+  object CityId {
+    implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
+      def jdbcType: JDBCType = JDBCType.INTEGER
+      def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
+      def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
+    }
+  }
+
+  case class City2[+T[_]](
+      id: T[CityId],
+      name: T[String],
+      countryCode: T[String],
+      district: T[String],
+      population: T[Long]
+  )
+
+  object City2 extends Table[City2]() {
+    initTableMetadata()
+    override def tableName: String = "city"
   }
 }

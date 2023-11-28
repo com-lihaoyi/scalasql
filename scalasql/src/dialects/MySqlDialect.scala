@@ -9,7 +9,7 @@ import scalasql.query.{
   Expr,
   From,
   GroupBy,
-  InsertValues,
+  InsertColumns,
   Join,
   JoinNullable,
   JoinOps,
@@ -75,7 +75,7 @@ trait MySqlDialect extends Dialect {
     new MySqlDialect.TableOps(t)
 
   implicit def OnConflictableUpdate[Q, R](
-      query: InsertValues[Q, R]
+      query: InsertColumns[Q, R]
   ): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 

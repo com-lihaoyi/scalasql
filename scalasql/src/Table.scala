@@ -1,7 +1,7 @@
 package scalasql
 import scala.language.experimental.macros
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
+import scalasql.query.{Expr, Insert, InsertColumns, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
 import scalasql.dialects.Dialect
 import scalasql.utils.OptionPickler
