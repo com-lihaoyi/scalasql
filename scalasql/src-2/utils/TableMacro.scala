@@ -46,7 +46,7 @@ object TableMacros {
             () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
             table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
             $allTypeMappers,
-            _root_.scalasql.utils.OptionPickler.macroR
+            _root_.scalasql.utils.OptionPickler.macroRW
           )
         },
         ($tableRef: _root_.scalasql.query.TableRef, dialect) => {

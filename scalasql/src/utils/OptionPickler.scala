@@ -13,6 +13,9 @@ object OptionPickler
   implicit def reader[T: TypeMapper]: SimpleReader[T] = new SimpleReader[T] {
     override def expectedMsg: String = ???
   }
+  implicit def writer[T: TypeMapper]: Writer[T] = new Writer[T] {
+    override def write0[V](out: Visitor[_, V], v: T): V = ???
+  }
   override def taggedExpectedMsg: String = ???
 
   override def taggedWrite[T, R](

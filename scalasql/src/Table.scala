@@ -63,7 +63,7 @@ object Table {
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
         val toTypeMappers: Seq[TypeMapper[_]],
-        valueReader0: OptionPickler.Reader[R]
+        valueReader0: OptionPickler.ReadWriter[R]
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
