@@ -28,7 +28,7 @@ case class DataTypes[+T[_]](
     myLocalDateTime: T[LocalDateTime],
     myInstant: T[Instant],
     myVarBinary: T[geny.Bytes],
-    myUUID: T[java.util.UUID],
+    myUUID: T[java.util.UUID]
 )
 
 object DataTypes extends Table[DataTypes] {

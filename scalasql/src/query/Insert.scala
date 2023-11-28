@@ -10,7 +10,7 @@ trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R] {
   def table: TableRef
   def qr: Queryable[Q, R]
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2]
-//  def values(f: Q*): InsertValues[Q, R]
+
   def columns(f: (Q => Column.Assignment[_])*): InsertColumns[Q, R]
 
   def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertColumns[Q, R]

@@ -2241,7 +2241,7 @@ Basic `INSERT` operations
  or assigned to their default values
 
 ```scala
-Buyer.insert.values(
+Buyer.insert.columns(
   _.name := "test buyer",
   _.dateOfBirth := LocalDate.parse("2023-09-09"),
   _.id := 4
@@ -2287,7 +2287,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 ```scala
 Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+  .columns(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
 ```
 
 
@@ -3837,7 +3837,7 @@ Note that `.returning`/`RETURNING` is not supported in MySql, H2 or HsqlDB
 
 ```scala
 Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+  .columns(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
   .returning(_.id)
 ```
 
@@ -3882,7 +3882,7 @@ exception if zero or multiple rows are returned.
 
 ```scala
 Buyer.insert
-  .values(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
+  .columns(_.name := "test buyer", _.dateOfBirth := LocalDate.parse("2023-09-09"))
   .returning(_.id)
   .single
 ```
@@ -4171,7 +4171,7 @@ MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -4200,7 +4200,7 @@ Buyer.insert
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -4232,7 +4232,7 @@ Buyer.insert
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 4 // This should cause a primary key conflict
@@ -4264,7 +4264,7 @@ ScalaSql's `.onConflictUpdate` translates into SQL's `ON CONFLICT DO UPDATE`
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -4315,7 +4315,7 @@ Buyer.select
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -4366,7 +4366,7 @@ Buyer.select
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -7925,7 +7925,7 @@ Basic operations on all the data types that ScalaSql supports mapping between Da
 
 
 ```scala
-DataTypes.insert.values(
+DataTypes.insert.columns(
   _.myTinyInt := value.myTinyInt,
   _.mySmallInt := value.mySmallInt,
   _.myInt := value.myInt,
@@ -7974,7 +7974,7 @@ DataTypes.select
 
 
 ```scala
-NonRoundTripTypes.insert.values(
+NonRoundTripTypes.insert.columns(
   _.myOffsetDateTime := value.myOffsetDateTime,
   _.myZonedDateTime := value.myZonedDateTime
 )
@@ -9008,7 +9008,7 @@ Expr("Hello").rpad(10, "xy")
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -9037,7 +9037,7 @@ Buyer.insert
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict
@@ -9088,7 +9088,7 @@ Buyer.select
 
 ```scala
 Buyer.insert
-  .values(
+  .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
     _.id := 1 // This should cause a primary key conflict

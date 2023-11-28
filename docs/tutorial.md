@@ -1073,7 +1073,7 @@ ScalaSql supports SQL `INSERT`s with multiple styles. You can insert
 a single row via `.insert.values`, passing the columns you want to insert
 (and leaving out any that the database would auto-populate)
 ```scala
-val query = City.insert.values( // ID provided by database AUTO_INCREMENT
+val query = City.insert.columns( // ID provided by database AUTO_INCREMENT
   _.name := "Sentosa",
   _.countryCode := "SGP",
   _.district := "South",
@@ -1316,6 +1316,51 @@ Different databases have a huge range of functions available. ScalaSql comes
 with the most commonly-used functions built in, but it is expected that you will
 need to build up your own library of custom `Expr[T]` functions to to access
 less commonly used functions that are nonetheless still needed in your application
+
+## Custom Type Mappings
+
+You can define custom `TypeMapper`s to support reading and writing values to
+the database which are of a type not supported by ScalaSql. The example below
+demonstrates how to define a custom `CityId` type, define an implicit `TypeMapper`
+for it, and then `INSERT` it into the database and `SELECT` it out after.
+
+```scala
+case class CityId(value: Int)
+object CityId {
+  implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
+    def jdbcType: JDBCType = JDBCType.INTEGER
+    def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
+    def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
+  }
+}
+
+case class City2[+T[_]](
+    id: T[CityId],
+    name: T[String],
+    countryCode: T[String],
+    district: T[String],
+   population: T[Long]
+)
+
+object City2 extends Table[City2]() {
+  initTableMetadata()
+  override def tableName: String = "city"
+}
+```
+```scala
+db.run(
+  City2.insert.columns(
+    _.id := CityId(31337),
+    _.name := "test",
+    _.countryCode := "XYZ",
+    _.district := "district",
+    _.population := 1000000
+  )
+)
+
+db.run(City2.select.filter(_.id === 31337).single) ==>
+  City2[Id](CityId(31337), "test", "XYZ", "district", 1000000)
+```
 
 ## Customizing Table and Column Names
 

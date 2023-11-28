@@ -1407,7 +1407,13 @@ object WorldSqlTests extends TestSuite {
       // +DOCS
       // ## Custom Type Mappings
       //
+      // You can define custom `TypeMapper`s to support reading and writing values to
+      // the database which are of a type not supported by ScalaSql. The example below
+      // demonstrates how to define a custom `CityId` type, define an implicit `TypeMapper`
+      // for it, and then `INSERT` it into the database and `SELECT` it out after.
+      //
       // ```scala
+      // case class CityId(value: Int)
       // object CityId {
       //   implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
       //     def jdbcType: JDBCType = JDBCType.INTEGER
@@ -1431,12 +1437,16 @@ object WorldSqlTests extends TestSuite {
       // ```
       db.run(
         City2.insert.columns(
-          City2[Id](CityId(31337), "test", "ccode", "district", 1000000)
+          _.id := CityId(31337),
+          _.name := "test",
+          _.countryCode := "XYZ",
+          _.district := "district",
+          _.population := 1000000
         )
       )
 
       db.run(City2.select.filter(_.id === 31337).single) ==>
-        City2[Id](CityId(31337), "test", "ccode", "district", 1000000)
+        City2[Id](CityId(31337), "test", "XYZ", "district", 1000000)
       // -DOCS
     }
     test("customTableColumnNames") {
