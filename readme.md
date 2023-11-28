@@ -361,4 +361,5 @@ to allow ScalaSql to work with it
 * Scala 3 support
 * JSON columns
 * Multi-column IN VALUES clauses
+* Better `insert.values` syntax
 * Audit list of static functions for Postgres/MySql/Sqlite/H2 
