@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.{Queryable, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
@@ -9,7 +10,8 @@ import scalasql.utils.OptionPickler
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as
  * a [[Select]] query.
  */
-class Values[T: TypeMapper](val ts: Seq[T])(implicit val qr: Queryable.Row[Expr[T], T])
+class Values[T: TypeMapper](val ts: Seq[T])
+                           (implicit val qr: Queryable.Row[Expr[T], T], protected val dialect: Dialect)
     extends Select.Proxy[Expr[T], T] {
   assert(ts.nonEmpty, "`Values` clause does not support empty sequence")
 

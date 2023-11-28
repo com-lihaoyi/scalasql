@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.{Column, Queryable, Table, TypeMapper}
@@ -12,7 +13,9 @@ trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
 
 object InsertSelect {
   class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])
+                         (implicit dialect: Dialect)
       extends InsertSelect[Q, C, R, R2] {
+    import dialect.{dialectSelf => _, _}
     protected def expr = WithExpr.get(insert)
 
     def table = insert.table
@@ -21,7 +24,7 @@ object InsertSelect {
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, Table.tableName(table.value))
         .render()
 
-    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
+    protected override def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
 
     protected override def queryIsExecuteUpdate = true
 

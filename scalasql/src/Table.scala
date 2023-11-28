@@ -3,6 +3,7 @@ import scala.language.experimental.macros
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.query.{Expr, Insert, InsertValues, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
+import scalasql.dialects.Dialect
 import scalasql.utils.OptionPickler
 
 /**
@@ -33,7 +34,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
     )
   )
 
-  implicit def containerQr[E[_] <: Expr[_]]: Queryable.Row[V[E], V[Id]] = tableMetadata.queryable
+  implicit def containerQr[E[_] <: Expr[_]](implicit dialect: Dialect): Queryable.Row[V[E], V[Id]] = tableMetadata.queryable(dialect)
     .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
@@ -51,8 +52,8 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val queryable: Queryable[V[Expr], V[Id]],
-      val vExpr: TableRef => V[Column.ColumnExpr]
+      val queryable: Dialect => Queryable[V[Expr], V[Id]],
+      val vExpr: (TableRef, Dialect) => V[Column.ColumnExpr]
   )
 
   object Internal {

@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.{Column, Queryable, Table, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
@@ -41,15 +42,18 @@ object Update {
       val set0: Seq[Column.Assignment[_]],
       val joins: Seq[Join],
       val where: Seq[Expr[_]]
-  )(implicit val qr: Queryable.Row[Q, R])
+  )(implicit val qr: Queryable.Row[Q, R], dialect: Dialect)
       extends Update[Q, R] {
+
+    import dialect.{dialectSelf => _, _}
     protected def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R]): Update[Q, R] = new Impl(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R],
+      dialect: Dialect): Update[Q, R] = new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
@@ -64,14 +68,15 @@ object Update {
     ) = {
       val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
       this.copy(expr = ja.appendTuple(expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)(
-        ja.qr
+        ja.qr,
+        dialect
       )
     }
 
     protected override def renderToSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
+    protected override def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
 
     protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
 

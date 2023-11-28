@@ -47,8 +47,8 @@ object PostgresDialect extends PostgresDialect {
   class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
-        case TypeMapper.ByteType => "INTEGER"
-        case TypeMapper.StringType => "VARCHAR"
+        case ByteType => "INTEGER"
+        case StringType => "VARCHAR"
         case s => s.typeString
       }
 

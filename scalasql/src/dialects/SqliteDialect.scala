@@ -44,7 +44,7 @@ object SqliteDialect extends SqliteDialect {
   class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
-        case TypeMapper.LocalDateType | TypeMapper.LocalDateTimeType | TypeMapper.InstantType =>
+        case LocalDateType | LocalDateTimeType | InstantType =>
           "VARCHAR"
         case s => s.typeString
       }
@@ -64,7 +64,7 @@ object SqliteDialect extends SqliteDialect {
     protected override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref).asInstanceOf[V[Expr]],
+        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
         Seq(ref),
         Nil,
@@ -83,7 +83,7 @@ object SqliteDialect extends SqliteDialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -94,7 +94,7 @@ object SqliteDialect extends SqliteDialect {
         joins: Seq[Join],
         where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }

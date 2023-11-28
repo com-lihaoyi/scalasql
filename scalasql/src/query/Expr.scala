@@ -66,12 +66,7 @@ object Expr {
     def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
-  implicit def from(x: Int): Expr[Int] = apply(x)
-  implicit def from(x: Long): Expr[Long] = apply(x)
-  implicit def from(x: Boolean): Expr[Boolean] = apply0(x, x)
-  implicit def from(x: Double): Expr[Double] = apply(x)
-  implicit def from(x: scala.math.BigDecimal): Expr[scala.math.BigDecimal] = apply(x)
-  implicit def from(x: String): Expr[String] = apply(x)
+
   implicit def apply[T](
       x: T
   )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = {

@@ -1,9 +1,10 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler
-import scalasql.{TypeMapper, Queryable, Table}
+import scalasql.{Queryable, Table, TypeMapper}
 
 /**
  * A SQL `SELECT` query, with
@@ -15,7 +16,7 @@ class CompoundSelect[Q, R](
     val orderBy: Seq[OrderBy],
     val limit: Option[Int],
     val offset: Option[Int]
-)(implicit val qr: Queryable.Row[Q, R])
+)(implicit val qr: Queryable.Row[Q, R], val dialect: Dialect)
     extends Select.Proxy[Q, R] {
 
   protected def copy[Q, R](
@@ -94,7 +95,7 @@ object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.Renderer {
-
+    import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
     lazy val lhsLhsMap = Select.selectLhsMap(query.lhs, prevContext)

@@ -1,13 +1,16 @@
 package scalasql.operations
 
+import scalasql.dialects.Dialect
 import scalasql.{Column, Id, Table}
 import scalasql.query.{Delete, Expr, Insert, Joinable, Select, SimpleSelect, Update}
 
-class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
+class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Joinable[V[Expr], V[Id]] {
+
+  import dialect.{dialectSelf => _, _}
 
   protected def toFromExpr0 = {
     val ref = Table.tableRef(t)
-    (ref, Table.tableMetadata(t).vExpr(ref))
+    (ref, Table.tableMetadata(t).vExpr(ref, dialect))
   }
 
   protected def joinableToFromExpr = {
@@ -18,7 +21,7 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
   protected def joinableSelect: Select[V[Expr], V[Id]] = {
     val (ref, expr) = joinableToFromExpr
     new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
-      t.containerQr
+      t.containerQr, dialect
     )
   }
 
@@ -33,8 +36,9 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    */
   def update(filter: V[Column.ColumnExpr] => Expr[Boolean]): Update[V[Column.ColumnExpr], V[Id]] = {
     val (ref, expr) = toFromExpr0
-    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.tableMetadata(t).vExpr(ref))))(
-      t.containerQr
+    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.tableMetadata(t).vExpr(ref, dialect))))(
+      t.containerQr,
+      dialect
     )
   }
 
@@ -43,7 +47,7 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    */
   def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
     val (ref, expr) = toFromExpr0
-    new Insert.Impl(expr, ref)(t.containerQr)
+    new Insert.Impl(expr, ref)(t.containerQr, dialect)
   }
 
   /**
@@ -52,7 +56,7 @@ class TableOps[V[_[_]]](val t: Table[V]) extends Joinable[V[Expr], V[Id]] {
    */
   def delete(filter: V[Column.ColumnExpr] => Expr[Boolean]): Delete[V[Column.ColumnExpr]] = {
     val (ref, expr) = toFromExpr0
-    new Delete.Impl(expr, filter(Table.tableMetadata(t).vExpr(ref)), ref)
+    new Delete.Impl(expr, filter(Table.tableMetadata(t).vExpr(ref, dialect)), ref)
   }
 
   protected def joinableIsTrivial = true

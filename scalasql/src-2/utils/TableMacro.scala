@@ -40,13 +40,19 @@ object TableMacros {
     _root_.scalasql.Table.setTableMetadata0(
       $self,
       new _root_.scalasql.Table.Metadata[$wtt](
-        new _root_.scalasql.Table.Internal.TableQueryable(
-          () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
-          table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
-          $allTypeMappers,
-          _root_.scalasql.utils.OptionPickler.macroR
-        ),
-        ($tableRef: _root_.scalasql.query.TableRef) => new $wtt(..$queryParams)
+        dialect => {
+          import dialect._
+          new _root_.scalasql.Table.Internal.TableQueryable(
+            () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
+            table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
+            $allTypeMappers,
+            _root_.scalasql.utils.OptionPickler.macroR
+          )
+        },
+        ($tableRef: _root_.scalasql.query.TableRef, dialect) => {
+          import dialect._
+          new $wtt(..$queryParams)
+        }
       )
     )
     """)

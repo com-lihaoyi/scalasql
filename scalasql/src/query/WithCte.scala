@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.{FlatJson, OptionPickler}
@@ -13,7 +14,7 @@ class WithCte[Q, R](
     val lhsSubQuery: WithCteRef[_, _],
     val rhs: Select[Q, R],
     val withPrefix: SqlStr = sql"WITH "
-)(implicit val qr: Queryable.Row[Q, R])
+)(implicit val qr: Queryable.Row[Q, R], protected val dialect: Dialect)
     extends Select.Proxy[Q, R] {
 
   override protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
@@ -45,7 +46,10 @@ class WithCte[Q, R](
 }
 
 object WithCte {
-  class Proxy[Q, R](lhs: WithExpr[Q], lhsSubQueryRef: WithCteRef[Q, R], val qr: Queryable.Row[Q, R])
+  class Proxy[Q, R](lhs: WithExpr[Q],
+                    lhsSubQueryRef: WithCteRef[Q, R],
+                    val qr: Queryable.Row[Q, R],
+                    protected val dialect: Dialect)
       extends Select.Proxy[Q, R] {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true
@@ -58,7 +62,7 @@ object WithCte {
         joins = Nil,
         where = Nil,
         groupBy0 = None
-      )(qr)
+      )(qr, dialect)
 
     override def selectRenderer(prevContext: Context): Select.Renderer = new Select.Renderer {
       def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {

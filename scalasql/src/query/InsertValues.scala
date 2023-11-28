@@ -1,5 +1,6 @@
 package scalasql.query
 
+import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.utils.OptionPickler
@@ -17,15 +18,16 @@ object InsertValues {
       insert: Insert[Q, R],
       val columns: Seq[Column.ColumnExpr[_]],
       val valuesLists: Seq[Seq[Expr[_]]]
-  )(implicit val qr: Queryable[Q, R])
+  )(implicit val qr: Queryable[Q, R], dialect: Dialect)
       extends InsertValues[Q, R] {
+    import dialect.{dialectSelf => _, _}
     def table = insert.table
     protected def expr: Q = WithExpr.get(insert)
 
     protected override def renderToSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.tableName(table.value)).render()
 
-    protected override def queryTypeMappers() = Seq(TypeMapper.IntType)
+    protected override def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
 
     def queryWalkExprs() = Nil
     protected override def queryIsSingleRow = true

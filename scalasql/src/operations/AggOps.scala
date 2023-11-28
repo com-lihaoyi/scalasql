@@ -1,11 +1,12 @@
 package scalasql.operations
 
-import scalasql.{TypeMapper, Queryable}
+import scalasql.dialects.Dialect
+import scalasql.{Queryable, TypeMapper}
 import scalasql.query.{Aggregatable, Expr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
-class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _]) {
-
+class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: Dialect) {
+  import dialect._
   /** Counts the rows */
   def size: Expr[Int] = v.queryExpr(expr => implicit ctx => sql"COUNT(1)")
 

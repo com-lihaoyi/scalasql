@@ -48,7 +48,7 @@ trait MySqlDialect extends Dialect {
   ): MySqlDialect.OnConflictable[Q, Int] =
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 
-  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps {
+  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
     override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
   }
 
@@ -72,11 +72,11 @@ object MySqlDialect extends MySqlDialect {
   class ExprOps(protected val v: Expr[_]) extends operations.ExprOps(v) {
     override def cast[V: TypeMapper]: Expr[V] = Expr { implicit ctx =>
       val s = implicitly[TypeMapper[V]] match {
-        case TypeMapper.ByteType | TypeMapper.ShortType | TypeMapper.IntType |
-            TypeMapper.LongType =>
+        case ByteType | ShortType | IntType |
+            LongType =>
           "SIGNED"
-        case TypeMapper.StringType => "CHAR"
-        case TypeMapper.LocalDateTimeType | TypeMapper.InstantType => "DATETIME"
+        case StringType => "CHAR"
+        case LocalDateTimeType | InstantType => "DATETIME"
         case s => s.typeString
       }
 
@@ -131,7 +131,7 @@ object MySqlDialect extends MySqlDialect {
     ): Update[V[Column.ColumnExpr], V[Id]] = {
       val ref = Table.tableRef(t)
       val metadata = Table.tableMetadata(t)
-      new Update(metadata.vExpr(ref), ref, Nil, Nil, Seq(filter(metadata.vExpr(ref))))(
+      new Update(metadata.vExpr(ref, dialectSelf), ref, Nil, Nil, Seq(filter(metadata.vExpr(ref, dialectSelf))))(
         t.containerQr
       )
     }
@@ -139,7 +139,7 @@ object MySqlDialect extends MySqlDialect {
     protected override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref).asInstanceOf[V[Expr]],
+        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
         Seq(ref),
         Nil,
@@ -166,7 +166,7 @@ object MySqlDialect extends MySqlDialect {
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R]) = new Update(expr, table, set0, joins, where)
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect) = new Update(expr, table, set0, joins, where)
 
     protected override def renderToSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
@@ -235,7 +235,7 @@ object MySqlDialect extends MySqlDialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -246,7 +246,7 @@ object MySqlDialect extends MySqlDialect {
         joins: Seq[Join],
         where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }

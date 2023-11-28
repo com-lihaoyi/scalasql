@@ -1,6 +1,7 @@
 package scalasql.operations
 
 import scalasql.Expr
+import scalasql.dialects.Dialect
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
@@ -13,7 +14,8 @@ case class WindowExpr[T](
     frameStart0: Option[SqlStr],
     frameEnd0: Option[SqlStr],
     exclusions: Option[SqlStr]
-) extends Expr[T] {
+)(implicit dialect: Dialect) extends Expr[T] {
+  import dialect.{dialectSelf => _, _}
   protected def toSqlExpr0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }
     val sortBySql = CompoundSelect.orderToSqlStr(orderBy, ctx)

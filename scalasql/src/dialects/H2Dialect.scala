@@ -33,7 +33,7 @@ trait H2Dialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new H2Dialect.TableOps(t)
 
-  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps {
+  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
     override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
   }
 
@@ -70,7 +70,7 @@ object H2Dialect extends H2Dialect {
     protected override def joinableSelect: Select[V[Expr], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref).asInstanceOf[V[Expr]],
+        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
         Seq(ref),
         Nil,
@@ -89,7 +89,7 @@ object H2Dialect extends H2Dialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.CompoundSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -100,7 +100,7 @@ object H2Dialect extends H2Dialect {
         joins: Seq[Join],
         where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Row[Q, R]): scalasql.query.SimpleSelect[Q, R] = {
+    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }

@@ -1,11 +1,12 @@
 package scalasql.operations
 
+import scalasql.dialects.Dialect
 import scalasql.{Queryable, TypeMapper}
 import scalasql.query.{Expr, Select, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
 
-class DbApiOps {
-
+class DbApiOps(dialect: Dialect) {
+  import dialect._
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */
@@ -140,7 +141,7 @@ class DbApiOps {
       lhs: Select[Q, R]
   )(block: Select[Q, R] => Select[Q2, R2])(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     val lhsSubQueryRef = new WithCteRef[Q, R]()
-    val rhsSelect = new WithCte.Proxy[Q, R](lhs, lhsSubQueryRef, lhs.qr)
+    val rhsSelect = new WithCte.Proxy[Q, R](lhs, lhsSubQueryRef, lhs.qr, dialect)
 
     new WithCte(lhs, lhsSubQueryRef, block(rhsSelect))
   }
