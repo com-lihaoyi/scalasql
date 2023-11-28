@@ -7937,7 +7937,8 @@ DataTypes.insert.columns(
   _.myLocalDateTime := value.myLocalDateTime,
   _.myInstant := value.myInstant,
   _.myVarBinary := value.myVarBinary,
-  _.myUUID := value.myUUID
+  _.myUUID := value.myUUID,
+  _.myEnum := value.myEnum
 )
 ```
 

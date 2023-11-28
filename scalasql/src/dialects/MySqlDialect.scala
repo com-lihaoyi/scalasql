@@ -65,6 +65,13 @@ trait MySqlDialect extends Dialect {
     }
   }
 
+  override implicit def EnumType[T <: Enumeration#Value](
+      implicit constructor: String => T
+  ): TypeMapper[T] = new MySqlEnumType[T]
+  class MySqlEnumType[T](implicit constructor: String => T) extends EnumType[T] {
+    override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
+  }
+
   override implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
     new MySqlDialect.ExprTypedOps(v)
 

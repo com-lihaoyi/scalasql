@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS purchase CASCADE;
 DROP TABLE IF EXISTS data_types CASCADE;
 DROP TABLE IF EXISTS non_round_trip_types CASCADE;
 DROP TABLE IF EXISTS opt_cols CASCADE;
+DROP TYPE IF EXISTS my_enum CASCADE;
 
 CREATE TABLE buyer (
     id SERIAL PRIMARY KEY,
@@ -36,6 +37,7 @@ CREATE TABLE purchase (
     FOREIGN KEY(product_id) REFERENCES product(id)
 );
 
+CREATE TYPE my_enum AS ENUM ('foo', 'bar', 'baz');
 CREATE TABLE data_types (
     my_tiny_int SMALLINT,
     my_small_int SMALLINT,
@@ -48,7 +50,8 @@ CREATE TABLE data_types (
     my_local_date_time TIMESTAMP,
     my_instant TIMESTAMP WITH TIME ZONE,
     my_var_binary BYTEA,
-    my_uuid UUID
+    my_uuid UUID,
+    my_enum my_enum
 --     my_offset_time TIME WITH TIME ZONE,
 
 );

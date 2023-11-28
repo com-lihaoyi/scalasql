@@ -50,7 +50,8 @@ CREATE TABLE data_types (
     my_local_date_time TIMESTAMP,
     my_instant DATETIME,
     my_var_binary VARBINARY(256),
-    my_uuid CHAR(36)
+    my_uuid CHAR(36),
+    my_enum ENUM ('foo', 'bar', 'baz')
 );
 
 CREATE TABLE non_round_trip_types(

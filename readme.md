@@ -246,20 +246,25 @@ Foo.delete(_.myStr === "hello")                               // Int
 
 ### Type Mapping
 
-|            Scala |                   Postgres |              MySql |             Sqlite |                         H2 |
-|-----------------:|---------------------------:|-------------------:|-------------------:|---------------------------:|
-|          `Byte`  |                 `SMALLINT` |         `SMALLINT` |         `SMALLINT` |                  `TINYINT` |  
-|          `Short` |                 `SMALLINT` |         `SMALLINT` |         `SMALLINT` |                 `SMALLINT` |  
-|            `Int` |                  `INTEGER` |          `INTEGER` |          `INTEGER` |                  `INTEGER` |  
-|           `Long` |                   `BIGINT` |           `BIGINT` |           `BIGINT` |                   `BIGINT` |  
-|         `Double` |         `DOUBLE PRECISION` | `DOUBLE PRECISION` | `DOUBLE PRECISION` |                   `DOUBLE` |  
-|        `Boolean` |                  `BOOLEAN` |          `BOOLEAN` |          `BOOLEAN` |                  `BOOLEAN` |  
-|      `LocalDate` |                     `DATE` |             `DATE` |             `DATE` |                     `DATE` |  
-|      `LocalTime` |                     `TIME` |             `TIME` |             `TIME` |                     `TIME` |  
-|  `LocalDateTime` |                `TIMESTAMP` |        `TIMESTAMP` |        `TIMESTAMP` |                `TIMESTAMP` |  
-|        `Instant` | `TIMESTAMP WITH TIME ZONE` |         `DATETIME` |         `DATETIME` | `TIMESTAMP WITH TIME ZONE` |  
-|     `geny.Bytes` |                    `BYTEA` |   `VARBINARY(256)` |        `VARBINARY` |           `VARBINARY(256)` |  
-| `java.util.UUID` |                     `UUID` |         `CHAR(36)` |       `BINARY(16)` |                     `UUID` |  
+|                   Scala |                   Postgres |               MySql |                   Sqlite |                           H2 |
+|------------------------:|---------------------------:|--------------------:|-------------------------:|-----------------------------:|
+|                `String` |               `VARCHAR(n)` |        `VARCHAR(n)` |             `VARCHAR(n)` |                 `VARCHAR(n)` |
+|                  `Byte` |                 `SMALLINT` |          `SMALLINT` |               `SMALLINT` |                    `TINYINT` |
+|                 `Short` |                 `SMALLINT` |          `SMALLINT` |               `SMALLINT` |                   `SMALLINT` |
+|                   `Int` |                  `INTEGER` |           `INTEGER` |                `INTEGER` |                    `INTEGER` |
+|                  `Long` |                   `BIGINT` |            `BIGINT` |                 `BIGINT` |                     `BIGINT` |
+|                `Double` |         `DOUBLE PRECISION` |  `DOUBLE PRECISION` |       `DOUBLE PRECISION` |                     `DOUBLE` |
+|               `Boolean` |                  `BOOLEAN` |           `BOOLEAN` |                `BOOLEAN` |                    `BOOLEAN` |
+|             `LocalDate` |                     `DATE` |              `DATE` |                   `DATE` |                       `DATE` |
+|             `LocalTime` |                     `TIME` |              `TIME` |                   `TIME` |                       `TIME` |
+|         `LocalDateTime` |                `TIMESTAMP` |         `TIMESTAMP` |              `TIMESTAMP` |                  `TIMESTAMP` |
+|               `Instant` | `TIMESTAMP WITH TIME ZONE` |          `DATETIME` |               `DATETIME` |   `TIMESTAMP WITH TIME ZONE` |
+|            `geny.Bytes` |                    `BYTEA` |      `VARBINARY(n)` |              `VARBINARY` |             `VARBINARY(256)` |
+|        `java.util.UUID` |                     `UUID` |          `CHAR(36)` |             `BINARY(16)` |                       `UUID` |
+| `scala.Enumeration` (1) |                     `ENUM` |        `VARCHAR(n)` |             `VARCHAR(n)` |                 `VARCHAR(n)` |
+
+(1) Your subclass of `Enumeration` needs to define a `implicit def make: String => Value = withName`
+to allow ScalaSql to work with it 
 
 
 ### Common ScalaSql Functions
@@ -356,6 +361,5 @@ Foo.delete(_.myStr === "hello")                               // Int
 * Scala 3 support
 * Transaction Isolation Configuration
 * JSON columns
-* Enum String Columns
 * Multi-column IN VALUES clauses
 * Audit list of static functions for Postgres/MySql/Sqlite/H2 

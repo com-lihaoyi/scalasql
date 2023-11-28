@@ -48,7 +48,8 @@ CREATE TABLE data_types (
     my_local_date_time TIMESTAMP,
     my_instant DATETIME,
     my_var_binary VARBINARY,
-    my_uuid BINARY(16)
+    my_uuid BINARY(16),
+    my_enum VARCHAR(256)
 --     my_offset_time TIME WITH TIME ZONE,
 );
 

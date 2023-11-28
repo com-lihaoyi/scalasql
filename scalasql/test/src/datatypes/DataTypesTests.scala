@@ -4,6 +4,7 @@ import scalasql.{datatypes, _}
 import utest._
 import utils.ScalaSqlSuite
 
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
   Instant,
   LocalDate,
@@ -16,6 +17,11 @@ import java.time.{
   ZonedDateTime
 }
 
+object MyEnum extends Enumeration {
+  val foo, bar, baz = Value
+
+  implicit def make: String => Value = withName
+}
 case class DataTypes[+T[_]](
     myTinyInt: T[Byte],
     mySmallInt: T[Short],
@@ -28,7 +34,8 @@ case class DataTypes[+T[_]](
     myLocalDateTime: T[LocalDateTime],
     myInstant: T[Instant],
     myVarBinary: T[geny.Bytes],
-    myUUID: T[java.util.UUID]
+    myUUID: T[java.util.UUID],
+    myEnum: T[MyEnum.Value]
 )
 
 object DataTypes extends Table[DataTypes] {
@@ -62,7 +69,8 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
         myInstant = Instant.parse("2011-12-03T10:15:30Z"),
         myVarBinary = new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8)),
-        myUUID = new java.util.UUID(1234567890L, 9876543210L)
+        myUUID = new java.util.UUID(1234567890L, 9876543210L),
+        myEnum = MyEnum.bar
       )
       checker(
         query = DataTypes.insert.columns(
@@ -77,7 +85,8 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalDateTime := value.myLocalDateTime,
           _.myInstant := value.myInstant,
           _.myVarBinary := value.myVarBinary,
-          _.myUUID := value.myUUID
+          _.myUUID := value.myUUID,
+          _.myEnum := value.myEnum
         ),
         value = 1
       )

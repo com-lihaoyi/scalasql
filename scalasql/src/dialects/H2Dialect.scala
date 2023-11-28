@@ -9,8 +9,8 @@ import scalasql.query.{
   Expr,
   From,
   GroupBy,
-  InsertSelect,
   InsertColumns,
+  InsertSelect,
   Join,
   JoinNullable,
   Joinable,
@@ -20,9 +20,18 @@ import scalasql.query.{
 import scalasql.renderer.{Context, SqlStr}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
+
 trait H2Dialect extends Dialect {
 
   protected def dialectCastParams = true
+
+  override implicit def EnumType[T <: Enumeration#Value](
+      implicit constructor: String => T
+  ): TypeMapper[T] = new H2EnumType[T]
+  class H2EnumType[T](implicit constructor: String => T) extends EnumType[T] {
+    override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
+  }
 
   override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps =
     new H2Dialect.ExprStringOps(v)

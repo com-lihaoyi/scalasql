@@ -182,6 +182,14 @@ trait Dialect extends DialectConfig {
     }
   }
 
+  implicit def EnumType[T <: Enumeration#Value](implicit constructor: String => T): TypeMapper[T] =
+    new EnumType[T]
+  class EnumType[T](implicit constructor: String => T) extends TypeMapper[T] {
+    def jdbcType: JDBCType = JDBCType.VARCHAR
+    def get(r: ResultSet, idx: Int): T = constructor(r.getString(idx))
+    def put(r: PreparedStatement, idx: Int, v: T) = r.setObject(idx, v, java.sql.Types.OTHER)
+  }
+
   implicit def from(x: Int): Expr[Int] = Expr(x)
 
   implicit def from(x: Long): Expr[Long] = Expr(x)
