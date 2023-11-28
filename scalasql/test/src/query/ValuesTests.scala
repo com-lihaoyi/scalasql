@@ -69,7 +69,9 @@ trait ValuesTests extends ScalaSqlSuite {
 
     test("crossJoin") - checker(
       query = Text {
-        db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
+        db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map {
+          case (a, b) => (a * 10 + b)
+        }
       },
       sqls = Seq(
         """

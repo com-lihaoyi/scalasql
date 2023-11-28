@@ -26,8 +26,8 @@ case class DataTypes[+T[_]](
     myLocalDate: T[LocalDate],
     myLocalTime: T[LocalTime],
     myLocalDateTime: T[LocalDateTime],
-    myInstant: T[Instant]
-//  myOffsetTime: T[OffsetTime],
+    myInstant: T[Instant],
+    myVarBinary: T[geny.Bytes]
 )
 
 object DataTypes extends Table[DataTypes] {
@@ -59,9 +59,8 @@ trait DataTypesTests extends ScalaSqlSuite {
         myLocalDate = LocalDate.parse("2023-12-20"),
         myLocalTime = LocalTime.parse("10:15:30"),
         myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
-//        ,
-        myInstant = Instant.parse("2011-12-03T10:15:30Z")
-//        myOffsetTime = OffsetTime.parse("10:15:30+01:00"),
+        myInstant = Instant.parse("2011-12-03T10:15:30Z"),
+        myVarBinary = new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8))
       )
       checker(
         query = DataTypes.insert.values(
@@ -74,8 +73,8 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.myLocalDate := value.myLocalDate,
           _.myLocalTime := value.myLocalTime,
           _.myLocalDateTime := value.myLocalDateTime,
-//          _.myZonedDateTime := value.myZonedDateTime,
-          _.myInstant := value.myInstant
+          _.myInstant := value.myInstant,
+          _.myVarBinary := value.myVarBinary
         ),
         value = 1
       )

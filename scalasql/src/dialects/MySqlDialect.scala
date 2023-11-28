@@ -2,7 +2,26 @@ package scalasql.dialects
 
 import scalasql._
 import scalasql.operations.DbApiOps
-import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, Expr, From, GroupBy, InsertValues, Join, JoinNullable, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, TableRef, Update, WithExpr}
+import scalasql.query.{
+  Aggregatable,
+  AscDesc,
+  CompoundSelect,
+  Expr,
+  From,
+  GroupBy,
+  InsertValues,
+  Join,
+  JoinNullable,
+  JoinOps,
+  Joinable,
+  LateralJoinOps,
+  Nulls,
+  OrderBy,
+  Query,
+  TableRef,
+  Update,
+  WithExpr
+}
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.OptionPickler

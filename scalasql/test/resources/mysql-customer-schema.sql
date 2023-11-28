@@ -49,8 +49,7 @@ CREATE TABLE data_types (
     my_local_time TIME,
     my_local_date_time TIMESTAMP,
     my_instant DATETIME,
---     my_offset_time TIME WITH TIME ZONE,
-    my_offset_date_time TIMESTAMP
+    my_var_binary VARBINARY(256)
 );
 
 CREATE TABLE non_round_trip_types(

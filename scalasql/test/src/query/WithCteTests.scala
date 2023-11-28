@@ -97,7 +97,7 @@ trait WithCteTests extends ScalaSqlSuite {
     test("subquery") - checker(
       query = Text {
         db.withCte(Buyer.select) { bs =>
-            db.withCte(ShippingInfo.select) { sis =>
+          db.withCte(ShippingInfo.select) { sis =>
             bs.join(sis)(_.id === _.buyerId)
           }
         }.join(

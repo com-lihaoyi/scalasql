@@ -1,6 +1,7 @@
 package scalasql
 
-import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import java.nio.ByteBuffer
+import java.sql.{JDBCType, PreparedStatement, ResultSet, SQLType}
 import java.time.{
   Instant,
   LocalDate,
@@ -12,6 +13,7 @@ import java.time.{
   ZoneOffset,
   ZonedDateTime
 }
+import java.util.UUID
 
 // What Quill does
 // https://github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
@@ -96,6 +98,29 @@ object TypeMapper {
     def jdbcType = JDBCType.BOOLEAN
     def get(r: ResultSet, idx: Int) = r.getBoolean(idx)
     def put(r: PreparedStatement, idx: Int, v: Boolean) = r.setBoolean(idx, v)
+  }
+
+  implicit object UuidType extends TypeMapper[UUID] {
+    def jdbcType = JDBCType.BINARY
+    def get(r: ResultSet, idx: Int) = {
+      val byteBuffer = ByteBuffer.wrap(r.getBytes(idx))
+      val mostSignificantBits = byteBuffer.getLong
+      val leastSignificantBits = byteBuffer.getLong
+      new UUID(mostSignificantBits, leastSignificantBits)
+    }
+    def put(r: PreparedStatement, idx: Int, v: UUID) = {
+      val byteBuffer = ByteBuffer.wrap(new Array[Byte](16))
+      byteBuffer.putLong(v.getMostSignificantBits)
+      byteBuffer.putLong(v.getLeastSignificantBits)
+
+      r.setBytes(idx, byteBuffer.array)
+    }
+  }
+
+  implicit object BytesType extends TypeMapper[geny.Bytes] {
+    def jdbcType = JDBCType.VARBINARY
+    def get(r: ResultSet, idx: Int) = new geny.Bytes(r.getBytes(idx))
+    def put(r: PreparedStatement, idx: Int, v: geny.Bytes) = r.setBytes(idx, v.array)
   }
 
   implicit object LocalDateType extends TypeMapper[LocalDate] {

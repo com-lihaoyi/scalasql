@@ -1213,7 +1213,7 @@ allowing you to perform basic conditionals as part of your SQL query
 
 ```scala
 Product.select.map(p =>
-  caseWhen(
+  db.caseWhen(
     (p.price > 200) -> (p.name + " EXPENSIVE"),
     (p.price > 5) -> (p.name + " NORMAL"),
     (p.price <= 5) -> (p.name + " CHEAP")
@@ -1255,7 +1255,7 @@ Product.select.map(p =>
 
 ```scala
 Product.select.map(p =>
-  caseWhen(
+  db.caseWhen(
     (p.price > 200) -> (p.name + " EXPENSIVE"),
     (p.price > 5) -> (p.name + " NORMAL")
   ).`else` { p.name + " UNKNOWN" }
@@ -4401,7 +4401,7 @@ Basic `VALUES` operations
 You can use `Values` to generate a SQL `VALUES` clause
 
 ```scala
-values(Seq(1, 2, 3))
+db.values(Seq(1, 2, 3))
 ```
 
 
@@ -4424,7 +4424,7 @@ values(Seq(1, 2, 3))
 `Values` supports `.contains`
 
 ```scala
-values(Seq(1, 2, 3)).contains(1)
+db.values(Seq(1, 2, 3)).contains(1)
 ```
 
 
@@ -4447,7 +4447,7 @@ values(Seq(1, 2, 3)).contains(1)
 `Values` supports aggregate functions like `.max`
 
 ```scala
-values(Seq(1, 2, 3)).max
+db.values(Seq(1, 2, 3)).max
 ```
 
 
@@ -4470,7 +4470,7 @@ values(Seq(1, 2, 3)).max
 `Values` supports most `.select` operators like `.map`, `.filter`, `.crossJoin`, and so on
 
 ```scala
-values(Seq(1, 2, 3)).map(_ + 1)
+db.values(Seq(1, 2, 3)).map(_ + 1)
 ```
 
 
@@ -4493,7 +4493,7 @@ values(Seq(1, 2, 3)).map(_ + 1)
 
 
 ```scala
-values(Seq(1, 2, 3)).filter(_ > 2)
+db.values(Seq(1, 2, 3)).filter(_ > 2)
 ```
 
 
@@ -4516,7 +4516,7 @@ values(Seq(1, 2, 3)).filter(_ > 2)
 
 
 ```scala
-values(Seq(1, 2, 3)).crossJoin(values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
+db.values(Seq(1, 2, 3)).crossJoin(db.values(Seq(4, 5, 6))).map { case (a, b) => (a * 10 + b) }
 ```
 
 
@@ -4542,7 +4542,7 @@ You can also mix `values` calls and normal `selects` in the same query, e.g. wit
 
 ```scala
 for {
-  name <- values(Seq("Socks", "Face Mask", "Camera"))
+  name <- db.values(Seq("Socks", "Face Mask", "Camera"))
   product <- Product.join(_.name === name)
 } yield (name, product.price)
 ```
@@ -4827,7 +4827,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    rank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.rank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -4868,7 +4868,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.rowNumber().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -4909,7 +4909,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -4950,7 +4950,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.denseRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -4991,7 +4991,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    percentRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.percentRank().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5032,7 +5032,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    cumeDist().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.cumeDist().over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5073,7 +5073,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    ntile(3).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.ntile(3).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5114,7 +5114,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    lag(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.lag(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5155,7 +5155,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    lead(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.lead(p.total, 1, -1.0).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5196,7 +5196,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    firstValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.firstValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5237,7 +5237,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    lastValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.lastValue(p.total).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -5278,7 +5278,7 @@ Purchase.select.map(p =>
   (
     p.shippingInfoId,
     p.total,
-    nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+    db.nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
   )
 )
 ```
@@ -6050,7 +6050,7 @@ ScalaSql supports `WITH`-clauses, also known as "Common Table Expressions"
 (CTEs), via the `.withCte` syntax.
 
 ```scala
-withCte(Buyer.select.map(_.name)) { bs =>
+db.withCte(Buyer.select.map(_.name)) { bs =>
   bs.map(_ + "-suffix")
 }
 ```
@@ -6078,8 +6078,8 @@ Multiple `withCte` blocks can be stacked, turning into chained `WITH` clauses
 in the generated SQL
 
 ```scala
-withCte(Buyer.select) { bs =>
-  withCte(ShippingInfo.select) { sis =>
+db.withCte(Buyer.select) { bs =>
+  db.withCte(ShippingInfo.select) { sis =>
     bs.join(sis)(_.id === _.buyerId)
       .map { case (b, s) => (b.name, s.shippingDate) }
   }
@@ -6120,7 +6120,7 @@ Only the necessary columns are exported from the `WITH` clause; columns that
 are un-used in the downstream `SELECT` clause are eliminated
 
 ```scala
-withCte(Buyer.select) { bs =>
+db.withCte(Buyer.select) { bs =>
   bs.map(_.name + "-suffix")
 }
 ```
@@ -6149,12 +6149,12 @@ generated `WITH` clauses may be wrapped in sub-queries in scenarios where they
 cannot be easily combined into a single query
 
 ```scala
-withCte(Buyer.select) { bs =>
-  withCte(ShippingInfo.select) { sis =>
+db.withCte(Buyer.select) { bs =>
+  db.withCte(ShippingInfo.select) { sis =>
     bs.join(sis)(_.id === _.buyerId)
   }
 }.join(
-  withCte(Product.select) { prs =>
+  db.withCte(Product.select) { prs =>
     Purchase.select.join(prs)(_.productId === _.id)
   }
 )(_._2.id === _._1.shippingInfoId)
@@ -7910,8 +7910,8 @@ DataTypes.insert.values(
   _.myLocalDate := value.myLocalDate,
   _.myLocalTime := value.myLocalTime,
   _.myLocalDateTime := value.myLocalDateTime,
-//          _.myZonedDateTime := value.myZonedDateTime,
-  _.myInstant := value.myInstant
+  _.myInstant := value.myInstant,
+  _.myVarBinary := value.myVarBinary
 )
 ```
 
