@@ -265,7 +265,7 @@ object SimpleSelect {
           flattenedExpr.iterator.zip(exprsStrs).collect {
             case ((l, e), s) if liveExprs.fold(true)(_.contains(Expr.exprIdentity(e))) => s
           },
-          sql", "
+          SqlStr.commaSep
         )
       )
 
@@ -286,7 +286,7 @@ object SimpleSelect {
       lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => p(context) + sql" " }
 
       val tables = SqlStr
-        .join(query.from.map(renderedFroms(_)), sql", ")
+        .join(query.from.map(renderedFroms(_)), SqlStr.commaSep)
 
       sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
     }

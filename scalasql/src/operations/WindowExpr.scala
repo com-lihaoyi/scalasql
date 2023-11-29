@@ -26,7 +26,7 @@ case class WindowExpr[T](
     )
 
     val frameStr = (frameStart0, frameEnd0, exclusions) match {
-      case (None, None, None) => sql""
+      case (None, None, None) => SqlStr.empty
       case (Some(start), None, ex) => sql" ROWS $start" + SqlStr.opt(ex)(sql" " + _)
       case (Some(start), Some(end), ex) =>
         sql" ROWS BETWEEN $start AND $end" + SqlStr.opt(ex)(sql" " + _)

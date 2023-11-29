@@ -148,7 +148,7 @@ object CompoundSelect {
       val orderStr = SqlStr.join(
         orderBys.map { orderBy =>
           val ascDesc = orderBy.ascDesc match {
-            case None => sql""
+            case None => SqlStr.empty
             case Some(AscDesc.Asc) => sql" ASC"
             case Some(AscDesc.Desc) => sql" DESC"
           }
@@ -159,7 +159,7 @@ object CompoundSelect {
           }
           Renderable.renderToSql(orderBy.expr)(newCtx) + ascDesc + nulls
         },
-        sql", "
+        SqlStr.commaSep
       )
 
       val prefix = if (gap) sql" ORDER BY " else sql"ORDER BY "

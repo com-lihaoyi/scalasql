@@ -39,20 +39,25 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
       .asInstanceOf[Queryable.Row[V[E], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
-
+  protected[scalasql] def tableLabels: Seq[String] = {
+    tableMetadata.walkLabels0().map(_.head)
+  }
 }
 
 object Table {
   def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
   def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
-  def tableName[V[_[_]]](t: Table.Base) = t.tableName
+  def tableName(t: Table.Base) = t.tableName
+  def tableLabels(t: Table.Base) = t.tableLabels
   def tableColumnNameOverride[V[_[_]]](t: Table[V])(s: String) = t.tableColumnNameOverride(s)
   def setTableMetadata0[V[_[_]]](t: Table[V], m: Metadata[V]) = t.tableMetadata0 = m
   trait Base {
     protected[scalasql] def tableName: String
+    protected[scalasql] def tableLabels: Seq[String]
   }
 
   class Metadata[V[_[_]]](
+      val walkLabels0: () => Seq[List[String]],
       val queryable: Dialect => Queryable[V[Expr], V[Id]],
       val vExpr: (TableRef, Dialect) => V[Column.ColumnExpr]
   )
@@ -73,7 +78,7 @@ object Table {
       }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
-        ExprsToSql(this.walk(q), sql"", ctx)
+        ExprsToSql(this.walk(q), SqlStr.empty, ctx)
       }
 
     }

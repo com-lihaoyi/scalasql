@@ -247,7 +247,7 @@ object MySqlDialect extends MySqlDialect {
 
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
-        sql", "
+        SqlStr.commaSep
       )
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
@@ -339,7 +339,7 @@ object MySqlDialect extends MySqlDialect {
               case (None, Some(Nulls.Last)) => sql"$exprStr IS NULL ASC, $exprStr"
             }
           },
-          sql", "
+          SqlStr.commaSep
         )
 
         sql" ORDER BY $orderStr"

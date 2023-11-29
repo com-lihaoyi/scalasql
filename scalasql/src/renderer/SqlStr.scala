@@ -43,13 +43,13 @@ object SqlStr {
    * Helper method turn an `Option[T]` into a [[SqlStr]], returning
    * the empty string if the `Option` is `None`
    */
-  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(sql"")
+  def opt[T](t: Option[T])(f: T => SqlStr) = t.map(f).getOrElse(SqlStr.empty)
 
   /**
    * Helper method turn an `Seq[T]` into a [[SqlStr]], returning
    * the empty string if the `Seq` is empty
    */
-  def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else sql""
+  def optSeq[T](t: Seq[T])(f: Seq[T] => SqlStr) = if (t.nonEmpty) f(t) else SqlStr.empty
 
   /**
    * Flattens out a [[SqlStr]] into a single flattened [[SqlStr.Flattened]] object,
@@ -118,9 +118,12 @@ object SqlStr {
   /**
    * Joins a `Seq` of [[SqlStr]]s into a single [[SqlStr]] using the given [[sep]] separator
    */
-  def join(strs: IterableOnce[SqlStr], sep: SqlStr = sql""): SqlStr = {
-    strs.iterator.reduceOption(_ + sep + _).getOrElse(sql"")
+  def join(strs: IterableOnce[SqlStr], sep: SqlStr = empty): SqlStr = {
+    strs.iterator.reduceOption(_ + sep + _).getOrElse(empty)
   }
+
+  lazy val empty = sql""
+  lazy val commaSep = sql", "
 
   /**
    * Converts a raw `String` into a [[SqlStr]]. Note that this must be used

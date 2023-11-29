@@ -50,7 +50,7 @@ object Expr {
     def walkLabels() = Seq(Nil)
     def walkExprs(q: E[T]) = Seq(q)
 
-    def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
+    def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), SqlStr.empty, ctx)
 
     override def construct(args: ResultSetIterator): T = args.get(tm)
 

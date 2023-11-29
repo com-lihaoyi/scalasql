@@ -26,7 +26,7 @@ object OnConflict {
     protected def queryIsSingleRow = Query.queryIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {
       val str = Renderable.renderToSql(query)(ctx)
-      str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING"
+      str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)}) DO NOTHING"
     }
 
     protected override def queryIsExecuteUpdate = true
@@ -48,10 +48,10 @@ object OnConflict {
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderToSql(query)
-      val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")
+      val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
-        sql", "
+        SqlStr.commaSep
       )
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
     }

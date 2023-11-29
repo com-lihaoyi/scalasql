@@ -32,7 +32,7 @@ object TableMacros {
 
     val flattenLists = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
-      q"_root_.scalasql.Table.Internal.flattenPrefixedLists[_root_.scalasql.Expr[${applyParam.info.typeArgs.head}]](${name.toString})"
+      q"_root_.scala.List(List(${name.toString}))"
     }
 
     val flattenExprs = for (applyParam <- applyParameters) yield {
@@ -45,6 +45,7 @@ object TableMacros {
     _root_.scalasql.Table.setTableMetadata0(
       $self,
       new _root_.scalasql.Table.Metadata[$wtt](
+        () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
         dialect => {
           import dialect._
           new _root_.scalasql.Table.Internal.TableQueryable(

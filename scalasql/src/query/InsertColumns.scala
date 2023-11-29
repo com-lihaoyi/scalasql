@@ -42,13 +42,13 @@ object InsertColumns {
 
     implicit lazy val ctx: Context = prevContext.withExprNaming(Map()).withFromNaming(Map())
     lazy val columns = SqlStr
-      .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), sql", ")
+      .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), SqlStr.commaSep)
     lazy val values = SqlStr.join(
       valuesLists
         .map(values =>
-          sql"(" + SqlStr.join(values.map(Renderable.renderToSql(_)), sql", ") + sql")"
+          sql"(" + SqlStr.join(values.map(Renderable.renderToSql(_)), SqlStr.commaSep) + sql")"
         ),
-      sql", "
+      SqlStr.commaSep
     )
     def render() = {
       sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) VALUES $values"

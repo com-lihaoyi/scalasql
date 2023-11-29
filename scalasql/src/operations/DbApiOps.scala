@@ -74,7 +74,7 @@ class DbApiOps(dialect: Dialect) {
           Some(offset).filter(_ != -1).map(o => sql"$o"),
           Option(default).map(d => sql"$d")
         ).flatten,
-        sql", "
+        SqlStr.commaSep
       )
 
       sql"$prefix($args)"

@@ -83,7 +83,7 @@ object Queryable {
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         val walked = this.walk(q)
-        ExprsToSql(walked, sql"", ctx)
+        ExprsToSql(walked, SqlStr.empty, ctx)
       }
 
       def construct(args: ResultSetIterator) = construct0(args)

@@ -13,7 +13,7 @@ trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R] {
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2]
 
   def columns(f: (Q => Column.Assignment[_])*): InsertColumns[Q, R]
-  def values(f: R*)(implicit qr: Queryable.Row[Q, R]): InsertValues[Q, R]
+  def values(f: R*): InsertValues[Q, R]
 
   def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertColumns[Q, R]
 
@@ -21,7 +21,7 @@ trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R] {
 
 object Insert {
   class Impl[Q, R](val expr: Q, val table: TableRef)(
-      implicit val qr: Queryable[Q, R],
+      implicit val qr: Queryable.Row[Q, R],
       dialect: Dialect
   ) extends Insert[Q, R]
       with scalasql.generated.InsertImpl[Q, R] {
@@ -51,7 +51,7 @@ object Insert {
       newInsertValues(this, columns = Seq(f1(expr)), valuesLists = items.map(Seq(_)))
     }
 
-    override def values(values: R*)(implicit qr: Queryable.Row[Q, R]): InsertValues[Q, R] =
-      new InsertValues.Impl(this, values, dialect, qr)
+    override def values(values: R*): InsertValues[Q, R] =
+      new InsertValues.Impl(this, values, dialect, qr, Nil)
   }
 }

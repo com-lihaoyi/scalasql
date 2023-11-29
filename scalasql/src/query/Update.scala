@@ -98,7 +98,7 @@ object Update {
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
       sql"$kStr = ${assign.value}"
     }
-    lazy val sets = SqlStr.flatten(SqlStr.join(updateList, sql", "))
+    lazy val sets = SqlStr.flatten(SqlStr.join(updateList, SqlStr.commaSep))
 
     lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
@@ -110,7 +110,7 @@ object Update {
       JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, Some(liveExprs))
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
       val froms = firstJoin.from.map { jf => renderedFroms(jf.from) }
-      sql" FROM " + SqlStr.join(froms, sql", ")
+      sql" FROM " + SqlStr.join(froms, SqlStr.commaSep)
     }
     lazy val fromOns = joins0.headOption match {
       case None => Nil

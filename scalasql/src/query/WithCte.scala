@@ -18,7 +18,7 @@ class WithCte[Q, R](
     extends Select.Proxy[Q, R] {
 
   override protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
-  private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, sql", ")
+  private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, SqlStr.commaSep)
 
   protected def selectSimpleFrom() = this.subquery
 
@@ -95,7 +95,7 @@ object WithCte {
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))
       val rhsSql = SqlStr.flatten(
         (query.rhs match {
-          case w: WithCte[Q, R] => sql""
+          case w: WithCte[Q, R] => SqlStr.empty
           case r => sql" "
         }) +
           Select
@@ -116,7 +116,7 @@ object WithCte {
 
       val cteColumns = SqlStr.join(
         newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },
-        sql", "
+        SqlStr.commaSep
       )
 
       sql"$withPrefix$cteName ($cteColumns) AS ($lhsSql)$rhsSql"

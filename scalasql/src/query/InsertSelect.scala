@@ -45,7 +45,7 @@ object InsertSelect {
       exprs
         .map(_.asInstanceOf[Column.ColumnExpr[_]])
         .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
-      sql", "
+      SqlStr.commaSep
     )
 
     lazy val selectSql = Renderable.renderToSql(select).withCompleteQuery(false)

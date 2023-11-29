@@ -47,7 +47,7 @@ object Returning {
 
       val prefix = Renderable.renderToSql(returnable)
       val flattenedExpr = qr.walk(returning)
-      val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, sql"")
+      val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"
 
       prefix + suffix

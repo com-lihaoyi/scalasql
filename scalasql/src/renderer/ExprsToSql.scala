@@ -20,7 +20,7 @@ object ExprsToSql {
           flatQuery.map { case (k, v) =>
             sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
           },
-          sql", "
+          SqlStr.commaSep
         )
 
         prefix + exprsStr

@@ -20,7 +20,7 @@ class Values[T: TypeMapper](val ts: Seq[T])(
   protected def columnName = "column1"
   override protected val expr: Expr[T] = Expr { implicit ctx =>
     val prefix = ctx.fromNaming.get(tableRef) match {
-      case Some("") => sql""
+      case Some("") => SqlStr.empty
       case Some(s) => SqlStr.raw(s) + sql"."
       case None => sql"SCALASQL_MISSING_VALUES."
     }
@@ -41,7 +41,7 @@ object Values {
   class Renderer[T: TypeMapper](v: Values[T])(implicit ctx: Context) extends Select.Renderer {
     def wrapRow(t: T) = sql"($t)"
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {
-      val rows = SqlStr.join(v.ts.map(wrapRow), sql", ")
+      val rows = SqlStr.join(v.ts.map(wrapRow), SqlStr.commaSep)
       sql"VALUES $rows"
     }
 
