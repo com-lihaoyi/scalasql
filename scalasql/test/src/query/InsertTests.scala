@@ -11,7 +11,25 @@ trait InsertTests extends ScalaSqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("single") {
-      test("simple") - {
+      test("values") - {
+        checker(
+          query = Buyer.insert.values(
+            Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09"))
+          ),
+          sql = "INSERT INTO buyer VALUES (?, ?, ?)",
+          value = 1,
+          docs = """
+            `Table.insert.values` with a single value inserts a single row into the given table
+          """
+        )
+
+        checker(
+          query = Buyer.select.filter(_.name `=` "test buyer"),
+          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+        )
+      }
+
+      test("columns") - {
         checker(
           query = Buyer.insert.columns(
             _.name := "test buyer",
@@ -21,7 +39,7 @@ trait InsertTests extends ScalaSqlSuite {
           sql = "INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)",
           value = 1,
           docs = """
-            `Table.insert.values` inserts a single row into the given table, with the specified
+            `Table.insert.columns` inserts a single row into the given table, with the specified
              columns assigned to the given values, and any non-specified columns left `NULL`
              or assigned to their default values
           """
@@ -61,25 +79,20 @@ trait InsertTests extends ScalaSqlSuite {
     }
 
     test("batch") {
-      test("simple") - {
+      test("values") - {
         checker(
-          query = Buyer.insert.batched(_.name, _.dateOfBirth, _.id)(
-            ("test buyer A", LocalDate.parse("2001-04-07"), 4),
-            ("test buyer B", LocalDate.parse("2002-05-08"), 5),
-            ("test buyer C", LocalDate.parse("2003-06-09"), 6)
+          query = Buyer.insert.values(
+            Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
           ),
           sql = """
-            INSERT INTO buyer (name, date_of_birth, id)
-            VALUES
-              (?, ?, ?),
-              (?, ?, ?),
-              (?, ?, ?)
+            INSERT INTO buyer
+            VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?)
           """,
           value = 3,
           docs = """
-            `Table.insert.batched` inserts multiple rows into the given table, with the
-            relevant columns declared once in the first parameter list and the given
-            values provided as tuples in the second parameter list
+            You can insert multiple rows at once by passing them to `Buyer.insert.values`
           """
         )
 
@@ -89,6 +102,7 @@ trait InsertTests extends ScalaSqlSuite {
             Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
             Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
             Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            // id=4,5,6 comes from auto increment
             Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
             Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
             Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))

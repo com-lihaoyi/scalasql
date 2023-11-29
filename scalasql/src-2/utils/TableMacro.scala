@@ -27,7 +27,7 @@ object TableMacros {
     }
     val deconstructParams = for ((applyParam, i) <- applyParameters.zipWithIndex) yield {
       val tpe = applyParam.info.typeArgs.head
-      q"(v: Option[Any], r: scalasql.PreparedStatementWriter) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[Option[$tpe]], r)"
+      q"(v: Any) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[$tpe])"
     }
 
     val flattenLists = for (applyParam <- applyParameters) yield {

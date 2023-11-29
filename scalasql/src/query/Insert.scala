@@ -1,7 +1,8 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.{Column, Queryable, query}
+import scalasql.renderer.{Context, SqlStr}
+import scalasql.{Column, Queryable, ResultSetIterator, query}
 
 /**
  * A SQL `INSERT` query
@@ -12,6 +13,7 @@ trait Insert[Q, R] extends WithExpr[Q] with scalasql.generated.Insert[Q, R] {
   def select[C, R2](columns: Q => C, select: Select[C, R2]): InsertSelect[Q, C, R, R2]
 
   def columns(f: (Q => Column.Assignment[_])*): InsertColumns[Q, R]
+  def values(f: R*)(implicit qr: Queryable.Row[Q, R]): InsertValues[Q, R]
 
   def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertColumns[Q, R]
 
@@ -48,5 +50,8 @@ object Insert {
     def batched[T1](f1: Q => Column.ColumnExpr[T1])(items: Expr[T1]*): InsertColumns[Q, R] = {
       newInsertValues(this, columns = Seq(f1(expr)), valuesLists = items.map(Seq(_)))
     }
+
+    override def values(values: R*)(implicit qr: Queryable.Row[Q, R]): InsertValues[Q, R] =
+      new InsertValues.Impl(this, values, dialect, qr)
   }
 }

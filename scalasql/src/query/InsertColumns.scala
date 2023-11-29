@@ -30,9 +30,7 @@ object InsertColumns {
     protected override def queryIsSingleRow = true
     protected override def queryIsExecuteUpdate = true
 
-    override protected def queryConstruct(args: ResultSetIterator): Int = {
-      args.get(IntType)
-    }
+    override protected def queryConstruct(args: ResultSetIterator): Int = args.get(IntType)
   }
 
   class Renderer(

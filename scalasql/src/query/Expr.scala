@@ -1,7 +1,8 @@
 package scalasql.query
 
+import scalasql.renderer.SqlStr.Interp.TypeInterp
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.{Config, PreparedStatementWriter, Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 
 /**
@@ -53,7 +54,8 @@ object Expr {
 
     override def construct(args: ResultSetIterator): T = args.get(tm)
 
-    override def deconstruct(r: Option[T], stmt: PreparedStatementWriter): Unit = stmt.put(tm, r)
+    override def deconstruct(r: T) = Seq(TypeInterp(r))
+
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)

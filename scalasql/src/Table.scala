@@ -62,17 +62,14 @@ object Table {
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
         construct0: ResultSetIterator => R,
-        deconstruct0: Seq[(Option[Any], PreparedStatementWriter) => Unit],
+        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]]
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
       def construct(args: ResultSetIterator) = construct0(args)
-      def deconstruct(r0: Option[R], stmt: PreparedStatementWriter): Unit = {
-        r0 match {
-          case Some(r) => for ((v, d) <- r.productIterator.zip(deconstruct0)) d(Some(v), stmt)
-          case None => for (d <- deconstruct0) d(None, stmt)
-        }
+      def deconstruct(r: R) = {
+        r.productIterator.zip(deconstruct0).flatMap { case (v, d) => (d(v)) }.toSeq
       }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {

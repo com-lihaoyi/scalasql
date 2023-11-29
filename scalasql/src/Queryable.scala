@@ -25,17 +25,6 @@ trait Queryable[-Q, R] {
 
 }
 
-class PreparedStatementWriter(r: PreparedStatement) {
-  var index = 0
-  def put[T](tm: TypeMapper[T], vOpt: Option[T]) = {
-    index += 1
-    vOpt match{
-      case None => r.setNull(index, tm.jdbcType.getVendorTypeNumber)
-      case Some(v) => tm.put(r, index, v)
-    }
-  }
-}
-
 class ResultSetIterator(r: ResultSet) {
   var index = 0
   var nulls = 0
@@ -69,14 +58,14 @@ object Queryable {
 
     def construct(q: Q, args: ResultSetIterator): R = construct(args)
     def construct(args: ResultSetIterator): R
-    def deconstruct(r: Option[R], stmt: PreparedStatementWriter): Unit
+    def deconstruct(r: R): Seq[SqlStr.Interp.TypeInterp[_]]
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
         val walkExprs0: Q => Seq[Seq[Expr[_]]],
         construct0: ResultSetIterator => R,
-        deconstruct0: Seq[(Option[Any], PreparedStatementWriter) => Unit]
+        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]]
     ) extends Queryable.Row[Q, R] {
       def walkExprs(q: Q) = {
         walkExprs0(q).iterator.zipWithIndex
@@ -99,12 +88,8 @@ object Queryable {
 
       def construct(args: ResultSetIterator) = construct0(args)
 
-      def deconstruct(r0: Option[R], stmt: PreparedStatementWriter): Unit = {
-        r0 match{
-          case Some(r) => for((v, d) <- r.productIterator.zip(deconstruct0)) d(Some(v), stmt)
-          case None => for(d <- deconstruct0) d(None, stmt)
-        }
-
+      def deconstruct(r: R) = {
+        r.productIterator.zip(deconstruct0).flatMap { case (r, d) => d(r) }.toSeq
       }
     }
 
@@ -123,10 +108,8 @@ object Queryable {
         else Option(res)
       }
 
-      def deconstruct(r: Option[Option[R]], stmt: PreparedStatementWriter): Unit = {
-        qr.deconstruct(r.flatten, stmt)
+      def deconstruct(r: Option[R]) = qr.deconstruct(r.get)
 
-      }
     }
   }
 
