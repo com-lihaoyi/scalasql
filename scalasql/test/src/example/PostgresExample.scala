@@ -14,9 +14,7 @@ object PostgresExample {
       price: T[Double]
   )
 
-  object ExampleProduct extends Table[ExampleProduct] {
-    initTableMetadata()
-  }
+  object ExampleProduct extends Table[ExampleProduct]
 
   // The example PostgreSQLContainer comes from the library `org.testcontainers:postgresql:1.19.1`
   lazy val postgres = {

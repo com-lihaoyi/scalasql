@@ -8,9 +8,8 @@ import scalasql.dialects.Dialect
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */
-abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
-    extends Table.Base
-    with scalasql.utils.TableMacros {
+abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table.Metadata[V])
+    extends Table.Base {
 
   /**
    * The name of this table, before processing by [[Config.tableNameMapper]].
@@ -26,12 +25,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name)
   protected def tableColumnNameOverride(s: String): String = identity(s)
   protected implicit def tableSelf: Table[V] = this
 
-  protected var tableMetadata0: Table.Metadata[V] = null
-  protected def tableMetadata: Table.Metadata[V] = Option(tableMetadata0).getOrElse(
-    throw new Exception(
-      s"Table Metadata not initialized for ${tableName}, please ensure you run `initTableMetadata()"
-    )
-  )
+  protected def tableMetadata: Table.Metadata[V] = metadata0
 
   implicit def containerQr[E[_] <: Expr[_]](implicit dialect: Dialect): Queryable.Row[V[E], V[Id]] =
     tableMetadata
@@ -50,7 +44,6 @@ object Table {
   def tableName(t: Table.Base) = t.tableName
   def tableLabels(t: Table.Base) = t.tableLabels
   def tableColumnNameOverride[V[_[_]]](t: Table[V])(s: String) = t.tableColumnNameOverride(s)
-  def setTableMetadata0[V[_[_]]](t: Table[V], m: Metadata[V]) = t.tableMetadata0 = m
   trait Base {
     protected[scalasql] def tableName: String
     protected[scalasql] def tableLabels: Seq[String]
@@ -61,7 +54,7 @@ object Table {
       val queryable: Dialect => Queryable[V[Expr], V[Id]],
       val vExpr: (TableRef, Dialect) => V[Column.ColumnExpr]
   )
-
+  object Metadata extends scalasql.utils.TableMacros
   object Internal {
     class TableQueryable[Q, R <: scala.Product](
         walkLabels0: () => Seq[List[String]],

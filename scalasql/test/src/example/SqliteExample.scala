@@ -13,9 +13,7 @@ object SqliteExample {
       price: T[Double]
   )
 
-  object ExampleProduct extends Table[ExampleProduct] {
-    initTableMetadata()
-  }
+  object ExampleProduct extends Table[ExampleProduct]
 
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
   lazy val sqliteClient = new scalasql.DatabaseClient.Connection(

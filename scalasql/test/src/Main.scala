@@ -6,9 +6,7 @@ object Main {
 
   case class Example[+T[_]](bytes: T[geny.Bytes])
 
-  object Example extends Table[Example] {
-    initTableMetadata()
-  }
+  object Example extends Table[Example]
 
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   val conn = DriverManager.getConnection("jdbc:h2:mem:mydb")

@@ -70,9 +70,7 @@ object WorldSqlTests extends TestSuite {
       code2: T[String]
   )
 
-  object Country extends Table[Country]() {
-    initTableMetadata()
-  }
+  object Country extends Table[Country]()
 
   case class City[+T[_]](
       id: T[Int],
@@ -82,9 +80,7 @@ object WorldSqlTests extends TestSuite {
       population: T[Long]
   )
 
-  object City extends Table[City]() {
-    initTableMetadata()
-  }
+  object City extends Table[City]()
 
   case class CountryLanguage[+T[_]](
       countryCode: T[String],
@@ -93,9 +89,7 @@ object WorldSqlTests extends TestSuite {
       percentage: T[Double]
   )
 
-  object CountryLanguage extends Table[CountryLanguage]() {
-    initTableMetadata()
-  }
+  object CountryLanguage extends Table[CountryLanguage]()
   // -DOCS
 
   // Shadow uTest's `ArrowAssert` to add lenient SQL string comparisons
@@ -1514,7 +1508,6 @@ object WorldSqlTests extends TestSuite {
   )
 
   object CityCustom extends Table[CityCustom]() {
-    initTableMetadata()
 
     override def tableName: String = "city"
 
@@ -1546,7 +1539,6 @@ object WorldSqlTests extends TestSuite {
   )
 
   object City2 extends Table[City2]() {
-    initTableMetadata()
     override def tableName: String = "city"
   }
 }

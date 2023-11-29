@@ -15,18 +15,14 @@ object CheatSheetExample {
       myInt: T[Int]
   )
 
-  object Foo extends Table[Foo] {
-    initTableMetadata()
-  }
+  object Foo extends Table[Foo]
 
   case class Bar[+T[_]](
       id: T[Int],
       fooId: T[Int]
   )
 
-  object Bar extends Table[Bar] {
-    initTableMetadata()
-  }
+  object Bar extends Table[Bar]
 
   // Just make sure this stuff compiles; don't bother running it
   def main(args: Array[String]): Unit = {

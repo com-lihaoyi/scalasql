@@ -12,9 +12,7 @@ object HikariCpExample {
       price: T[Double]
   )
 
-  object ExampleProduct extends Table[ExampleProduct] {
-    initTableMetadata()
-  }
+  object ExampleProduct extends Table[ExampleProduct]
 
   lazy val postgres = {
     println("Initializing Postgres")

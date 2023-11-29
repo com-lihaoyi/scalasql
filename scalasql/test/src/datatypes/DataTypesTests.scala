@@ -29,36 +29,28 @@ case class DataTypes[+T[_]](
     myEnum: T[MyEnum.Value]
 )
 
-object DataTypes extends Table[DataTypes] {
-  initTableMetadata()
-}
+object DataTypes extends Table[DataTypes]
 
 case class NonRoundTripTypes[+T[_]](
     myZonedDateTime: T[ZonedDateTime],
     myOffsetDateTime: T[OffsetDateTime]
 )
 
-object NonRoundTripTypes extends Table[NonRoundTripTypes] {
-  initTableMetadata()
-}
+object NonRoundTripTypes extends Table[NonRoundTripTypes]
 
 
 case class Nested[+T[_]](
   fooId: T[Int],
   myBoolean: T[Boolean],
 )
-object Nested extends Table[Nested] {
-  initTableMetadata()
-}
+object Nested extends Table[Nested]
 
 case class Extending[+T[_]](
     barId: T[Int],
     myString: T[String],
     foo: Nested[T]
 )
-object Extending extends Table[Extending] {
-  initTableMetadata()
-}
+object Extending extends Table[Extending]
 
 
 trait DataTypesTests extends ScalaSqlSuite {

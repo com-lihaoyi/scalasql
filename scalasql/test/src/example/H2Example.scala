@@ -13,9 +13,7 @@ object H2Example {
       price: T[Double]
   )
 
-  object ExampleProduct extends Table[ExampleProduct] {
-    initTableMetadata()
-  }
+  object ExampleProduct extends Table[ExampleProduct]
 
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   lazy val h2Client = new scalasql.DatabaseClient.Connection(
