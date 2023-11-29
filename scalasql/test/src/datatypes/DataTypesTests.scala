@@ -51,6 +51,25 @@ object NonRoundTripTypes extends Table[NonRoundTripTypes] {
   initTableMetadata()
 }
 
+
+case class Extended[+T[_]](
+  fooId: T[Int],
+  myBoolean: T[Boolean],
+)
+object Extended extends Table[Extended] {
+  initTableMetadata()
+}
+
+case class Extending[+T[_]](
+    barId: T[Int],
+    myString: T[String],
+    foo: Extended[T]
+)
+object Extending extends Table[Extending] {
+  initTableMetadata()
+}
+
+
 trait DataTypesTests extends ScalaSqlSuite {
   def description =
     "Basic operations on all the data types that ScalaSql supports " +
@@ -121,6 +140,45 @@ trait DataTypesTests extends ScalaSqlSuite {
         query = NonRoundTripTypes.select,
         value = Seq(normalize(value)),
         normalize = (x: Seq[datatypes.NonRoundTripTypes[Id]]) => x.map(normalize)
+      )
+    }
+
+    test("extending") {
+      val value1 = Extending[Id](
+        barId = 1337,
+        myString = "hello",
+        foo = Extended[Id](
+          fooId = 271828,
+          myBoolean = true
+        )
+      )
+      val value2 = Extending[Id](
+        barId = 31337,
+        myString = "world",
+        foo = Extended[Id](
+          fooId = 1618,
+          myBoolean = false
+        )
+      )
+
+      checker(
+        query = Extending.insert.columns(
+          _.barId := value1.barId,
+          _.myString := value1.myString,
+          _.foo.fooId := value1.foo.fooId,
+          _.foo.myBoolean := value1.foo.myBoolean,
+        ),
+        value = 1
+      )
+
+      checker(
+        query = Extending.insert.values(value2),
+        value = 1
+      )
+
+      checker(
+        query = Extending.select,
+        value = Seq(value1, value2)
       )
     }
   }

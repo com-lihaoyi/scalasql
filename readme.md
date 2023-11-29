@@ -362,4 +362,3 @@ to allow ScalaSql to work with it
 * JSON columns
 * Multi-column IN VALUES clauses
 * Audit list of static functions for Postgres/MySql/Sqlite/H2
-* Allow embed table case classes in other tables

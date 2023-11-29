@@ -5,6 +5,8 @@ DROP TABLE IF EXISTS purchase CASCADE;
 DROP TABLE IF EXISTS data_types CASCADE;
 DROP TABLE IF EXISTS non_round_trip_types CASCADE;
 DROP TABLE IF EXISTS opt_cols CASCADE;
+DROP TABLE IF EXISTS extending CASCADE;
+DROP TABLE IF EXISTS extended CASCADE;
 
 CREATE TABLE buyer (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -61,4 +63,16 @@ CREATE TABLE non_round_trip_types(
 CREATE TABLE opt_cols(
     my_int INTEGER,
     my_int2 INTEGER
-)
+);
+
+CREATE TABLE extended(
+    foo_id INTEGER,
+    my_boolean BOOLEAN
+);
+
+CREATE TABLE extending(
+    bar_id INTEGER,
+    my_string VARCHAR(256),
+    foo_id INTEGER,
+    my_boolean BOOLEAN
+);
