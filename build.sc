@@ -56,7 +56,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
                  |""".stripMargin
         s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: Q => Column.ColumnExpr[T$j]")})(
           |    items: (${commaSep(j => s"Expr[T$j]")})*
-          |)(implicit qr: Queryable[Q, R]): scalasql.query.InsertValues[Q, R] $impl""".stripMargin
+          |)(implicit qr: Queryable[Q, R]): scalasql.query.InsertColumns[Q, R] $impl""".stripMargin
       }
     }
 
@@ -104,7 +104,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |        insert: scalasql.query.Insert[Q, R],
         |        columns: Seq[Column.ColumnExpr[_]],
         |        valuesLists: Seq[Seq[Expr[_]]]
-        |    )(implicit qr: Queryable[Q, R]): scalasql.query.InsertValues[Q, R]
+        |    )(implicit qr: Queryable[Q, R]): scalasql.query.InsertColumns[Q, R]
         |  ${defs(true).mkString("\n")}
         |}
         |
