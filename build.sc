@@ -29,7 +29,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
 
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode:0.3.1",
-    ivy"com.lihaoyi::upickle-implicits:3.1.3",
+    ivy"com.lihaoyi::geny:1.0.0",
 
     ivy"org.apache.logging.log4j:log4j-api:2.20.0",
     ivy"org.apache.logging.log4j:log4j-core:2.20.0",
@@ -69,8 +69,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |  new Queryable.Row.TupleNQueryable(
         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
-        |    Seq(${commaSep(j => s"q$j.toTypeMappers()")}),
-        |    scalasql.utils.OptionPickler.Tuple${i}Reader(${commaSep(j => s"q$j.valueReader()")})
+        |    rsi => (${commaSep(j => s"q$j.construct(rsi)")})
         |  )
         |}""".stripMargin
     }

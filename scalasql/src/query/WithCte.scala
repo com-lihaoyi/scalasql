@@ -3,8 +3,8 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
-import scalasql.utils.{FlatJson, OptionPickler}
-import scalasql.{Queryable, TypeMapper}
+import scalasql.utils.FlatJson
+import scalasql.{Queryable, ResultSetIterator, TypeMapper}
 
 /**
  * A SQL `WITH` clause
@@ -38,11 +38,12 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-  protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     Select.selectLhsMap(rhs, prevContext)
   }
+
+  override protected def queryConstruct(args: ResultSetIterator): Seq[R] = Query.queryConstruct(rhs, args)
 }
 
 object WithCte {

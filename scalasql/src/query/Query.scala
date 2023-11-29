@@ -1,9 +1,8 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.Renderable
-import scalasql.{TypeMapper, Queryable}
+import scalasql.{Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.utils.OptionPickler
 
 /**
  * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
@@ -12,26 +11,24 @@ import scalasql.utils.OptionPickler
 trait Query[R] extends Renderable {
   protected def queryWalkExprs(): Seq[(List[String], Expr[_])]
   protected def queryIsSingleRow: Boolean
-  protected def queryValueReader: OptionPickler.Reader[R]
   protected def queryIsExecuteUpdate: Boolean = false
 
-  protected def queryTypeMappers(): Seq[TypeMapper[_]]
+  protected def queryConstruct(args: ResultSetIterator): R
 }
 
 object Query {
-  def queryTypeMappers[R](q: Query[R]) = q.queryTypeMappers()
   def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
   def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
-  def queryValueReader[R](q: Query[R]) = q.queryValueReader
+  def queryConstruct[R](q: Query[R], args: ResultSetIterator) = q.queryConstruct(args)
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkExprs().map(_._1)
     override def walkExprs(q: Q) = q.queryWalkExprs().map(_._2)
     override def singleRow(q: Q) = q.queryIsSingleRow
 
-    override def valueReader(q: Q): OptionPickler.Reader[R] = q.queryValueReader
     def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderToSql(ctx)
-    def toTypeMappers(q: Q): Seq[TypeMapper[_]] = q.queryTypeMappers()
+
+    override def construct(q: Q, args: ResultSetIterator): R = q.queryConstruct(args)
   }
 
   trait Multiple[R] extends Query[Seq[R]]
@@ -43,10 +40,7 @@ object Query {
     protected def queryIsSingleRow: Boolean = true
 
     protected def renderToSql(ctx: Context): SqlStr = Renderable.renderToSql(query)(ctx)
-
-    protected def queryTypeMappers(): Seq[TypeMapper[_]] = query.queryTypeMappers()
-
-    protected def queryValueReader =
-      Query.queryValueReader(query).asInstanceOf[OptionPickler.SeqLikeReader2[Seq, R]].r
+    protected override def queryConstruct(args: ResultSetIterator): R =
+      query.queryConstruct(args).asInstanceOf[R]
   }
 }

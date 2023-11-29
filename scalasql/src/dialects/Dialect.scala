@@ -4,7 +4,6 @@ import scalasql.operations.{CaseWhen, DbApiOps, TableOps, WindowExpr}
 import scalasql.query.Expr.apply0
 import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
-import scalasql.utils.OptionPickler
 import scalasql.{DbApi, Queryable, Table, TypeMapper, operations}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
@@ -261,10 +260,7 @@ trait Dialect extends DialectConfig {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def ExprQueryable[T](
-      implicit valueReader0: OptionPickler.Reader[T],
-      mt: TypeMapper[T]
-  ): Queryable.Row[_, T] = {
+  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[_, T] = {
     new Expr.toExprable[Expr, T]()
   }
 }

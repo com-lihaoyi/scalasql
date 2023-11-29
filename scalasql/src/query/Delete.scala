@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Queryable, Table, TypeMapper}
+import scalasql.{Queryable, ResultSetIterator, Table, TypeMapper}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 /**
@@ -19,9 +19,8 @@ object Delete {
     def queryIsSingleRow = true
 
     protected def renderToSql(ctx: Context) = new Renderer(table, filter, ctx).render()
-    protected def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
 
-    protected def queryValueReader = implicitly
+    protected def queryConstruct(args: ResultSetIterator): Int = args.get(IntType)
   }
 
   class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context) {

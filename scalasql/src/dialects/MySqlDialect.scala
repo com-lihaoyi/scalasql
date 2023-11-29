@@ -24,7 +24,6 @@ import scalasql.query.{
 }
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.utils.OptionPickler
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDateTime}
@@ -242,7 +241,6 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryIsSingleRow = Query.queryIsSingleRow(insert.query)
 
-    protected def queryValueReader = Query.queryValueReader(insert.query)
 
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
@@ -254,8 +252,9 @@ object MySqlDialect extends MySqlDialect {
       )
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
-    protected def queryTypeMappers() = {
-      Query.queryTypeMappers(insert.query)
+
+    override protected def queryConstruct(args: ResultSetIterator): R = {
+      Query.queryConstruct(insert.query, args)
     }
   }
 

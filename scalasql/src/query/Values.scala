@@ -4,7 +4,6 @@ import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.{Queryable, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.utils.OptionPickler
 
 /**
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as
@@ -30,10 +29,6 @@ class Values[T: TypeMapper](val ts: Seq[T])(
 
   override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = Seq(Nil -> expr)
 
-  override protected def queryValueReader: OptionPickler.Reader[Seq[T]] =
-    implicitly[OptionPickler.Reader[Seq[T]]]
-
-  override protected def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(implicitly[TypeMapper[T]])
 
   override protected def selectRenderer(prevContext: Context): Select.Renderer =
     new Values.Renderer[T](this)(implicitly, prevContext)

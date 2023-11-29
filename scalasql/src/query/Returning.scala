@@ -2,8 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.{TypeMapper, Queryable}
-import scalasql.utils.OptionPickler
+import scalasql.{Queryable, ResultSetIterator, TypeMapper}
 
 /**
  * A query that could support a `RETURNING` clause, typically
@@ -34,8 +33,10 @@ object InsertReturning {
 object Returning {
   class Impl0[Q, R](qr: Queryable.Row[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
-    protected def queryValueReader =
-      OptionPickler.SeqLikeReader2(qr.valueReader(returning), implicitly)
+
+    override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
+      qr.construct(args).asInstanceOf[Seq[R]]
+    }
 
     def queryWalkExprs() = qr.walk(returning)
 
@@ -51,9 +52,7 @@ object Returning {
 
       prefix + suffix
     }
-    protected def queryTypeMappers(): Seq[TypeMapper[_]] = {
-      qr.toTypeMappers(returning)
-    }
+
   }
   class Impl[Q, R](returnable: Returnable[_], returning: Q)(implicit val qr: Queryable.Row[Q, R])
       extends Impl0[Q, R](qr, returnable, returning)

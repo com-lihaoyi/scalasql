@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Column, TypeMapper}
+import scalasql.{Column, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -29,12 +29,9 @@ object OnConflict {
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), sql", ")}) DO NOTHING"
     }
 
-    protected def queryTypeMappers() = Query.queryTypeMappers(query)
-
     protected override def queryIsExecuteUpdate = true
 
-    protected def queryValueReader = Query.queryValueReader(query)
-
+    override protected def queryConstruct(args: ResultSetIterator): R = Query.queryConstruct(query, args)
   }
 
   class Update[Q, R](
@@ -58,8 +55,7 @@ object OnConflict {
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
     }
 
-    protected def queryTypeMappers() = Query.queryTypeMappers(query)
     protected override def queryIsExecuteUpdate = true
-    protected def queryValueReader = Query.queryValueReader(query)
+    override protected def queryConstruct(args: ResultSetIterator): R = Query.queryConstruct(query, args)
   }
 }

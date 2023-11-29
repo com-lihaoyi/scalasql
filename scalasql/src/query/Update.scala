@@ -2,9 +2,8 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.{Column, Queryable, Table, TypeMapper}
+import scalasql.{Column, Queryable, ResultSetIterator, Table, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.utils.OptionPickler
 
 /**
  * A SQL `UPDATE` query
@@ -76,9 +75,9 @@ object Update {
     protected override def renderToSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    protected override def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
-
-    protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
+    override protected def queryConstruct(args: ResultSetIterator): Int = {
+      args.get(dialect.IntType)
+    }
 
   }
 

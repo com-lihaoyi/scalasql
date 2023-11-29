@@ -1,9 +1,8 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.{Config, Queryable, TypeMapper}
+import scalasql.{Config, Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
-import scalasql.utils.OptionPickler
 
 /**
  * A single "value" in your SQL query that can be mapped to and from
@@ -41,21 +40,18 @@ object Expr {
   class Identity()
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](
-      implicit valueReader0: OptionPickler.Reader[T],
-      mt: TypeMapper[T]
+                                                  implicit mt: TypeMapper[T]
   ): Queryable.Row[E[T], T] = new toExprable[E, T]()
 
   class toExprable[E[_] <: Expr[_], T](
-      implicit valueReader0: OptionPickler.Reader[T],
-      mt: TypeMapper[T]
+      implicit tm: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
     def walkLabels() = Seq(Nil)
     def walkExprs(q: E[T]) = Seq(q)
 
-    def valueReader() = valueReader0
-
     def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
-    def toTypeMappers() = Seq(mt)
+
+    override def construct(args: ResultSetIterator): T = args.get(tm)
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)

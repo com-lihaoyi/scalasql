@@ -4,9 +4,9 @@ import scalasql.dialects.Dialect
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, join}
-import scalasql.{Config, Queryable, TypeMapper}
+import scalasql.{Config, Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.utils.{FlatJson, OptionPickler}
+import scalasql.utils.FlatJson
 
 import scala.collection.mutable
 
@@ -139,7 +139,7 @@ class SimpleSelect[Q, R](
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
       implicit ctx => copied.renderToSql(ctx),
-      Query.queryTypeMappers(copied),
+      Query.queryConstruct(copied, _).asInstanceOf[V],
       selectProxyExpr
     )(qr)
   }
@@ -193,12 +193,10 @@ class SimpleSelect[Q, R](
   def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
   def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
-  protected def queryValueReader = OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
 
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
@@ -223,6 +221,10 @@ class SimpleSelect[Q, R](
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
     joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)(jqr)
+  }
+
+  override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
+    qr.construct(args).asInstanceOf[Seq[R]]
   }
 }
 

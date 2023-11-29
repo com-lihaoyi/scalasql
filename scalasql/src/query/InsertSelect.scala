@@ -3,8 +3,7 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Column, Queryable, Table, TypeMapper}
-import scalasql.utils.OptionPickler
+import scalasql.{Column, Queryable, ResultSetIterator, Table, TypeMapper}
 
 /**
  * A SQL `INSERT SELECT` query
@@ -24,7 +23,6 @@ object InsertSelect {
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, Table.tableName(table.value))
         .render()
 
-    protected override def queryTypeMappers(): Seq[TypeMapper[_]] = Seq(dialect.IntType)
 
     protected override def queryIsExecuteUpdate = true
 
@@ -32,7 +30,7 @@ object InsertSelect {
 
     protected override def queryIsSingleRow = true
 
-    protected override def queryValueReader: OptionPickler.Reader[Int] = implicitly
+    override protected def queryConstruct(args: ResultSetIterator): Int = args.get(IntType)
   }
 
   class Renderer(

@@ -1,8 +1,7 @@
 package scalasql.query
 
-import scalasql.{TypeMapper, Queryable}
+import scalasql.{Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.utils.OptionPickler
 
 /**
  * Something that supports aggregate operations. Most commonly a [[Select]], but
@@ -14,13 +13,13 @@ trait Aggregatable[Q] extends WithExpr[Q] {
   ): Expr[V]
 }
 
-class Aggregate[Q, R](toSqlStr0: Context => SqlStr, toTypeMappers: Seq[TypeMapper[_]], expr: Q)(
+class Aggregate[Q, R](toSqlStr0: Context => SqlStr, construct0: ResultSetIterator => R, expr: Q)(
     qr: Queryable[Q, R]
 ) extends Query[R] {
 
   protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
   protected def queryIsSingleRow: Boolean = true
   protected def renderToSql(ctx: Context) = toSqlStr0(ctx)
-  protected def queryTypeMappers() = toTypeMappers
-  protected def queryValueReader: OptionPickler.Reader[R] = qr.valueReader(expr)
+
+  override protected def queryConstruct(args: ResultSetIterator): R = construct0(args)
 }

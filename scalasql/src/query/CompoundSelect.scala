@@ -3,7 +3,6 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, JoinsToSql, SqlStr}
-import scalasql.utils.OptionPickler
 import scalasql.{Queryable, Table, TypeMapper}
 
 /**
@@ -79,12 +78,8 @@ class CompoundSelect[Q, R](
   override def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
   override def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  override protected def queryValueReader =
-    OptionPickler.SeqLikeReader2(qr.valueReader(expr), implicitly)
-
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
-  protected override def queryTypeMappers() = qr.toTypeMappers(expr)
 
   override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     Select.selectLhsMap(lhs, prevContext)

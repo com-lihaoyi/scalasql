@@ -11,7 +11,7 @@ object TableMacros {
     val tableRef = TermName(c.freshName("tableRef"))
     val applyParameters = c.prefix.actualType.member(TermName("apply")).info.paramLists.head
 
-    val queryParams = for (applyParam <- applyParameters) yield {
+    val columnParams = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
       q"""
         _root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(
@@ -21,8 +21,9 @@ object TableMacros {
         ).expr($tableRef)
       """
     }
-    val allTypeMappers = for (applyParam <- applyParameters) yield {
-      q"""implicitly[_root_.scalasql.TypeMapper[${applyParam.info.typeArgs.head}]]"""
+    val constructParams = for ((applyParam, i) <- applyParameters.zipWithIndex) yield {
+      val tpe = applyParam.info.typeArgs.head
+      q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
     }
 
     val flattenLists = for (applyParam <- applyParameters) yield {
@@ -35,6 +36,7 @@ object TableMacros {
       q"_root_.scalasql.Table.Internal.flattenPrefixedExprs(table.${TermName(name.toString)})"
     }
 
+
     c.Expr[Unit](q"""
     import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
     _root_.scalasql.Table.setTableMetadata0(
@@ -45,13 +47,12 @@ object TableMacros {
           new _root_.scalasql.Table.Internal.TableQueryable(
             () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
             table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
-            $allTypeMappers,
-            _root_.scalasql.utils.OptionPickler.macroRW
+            args => new $wtt(..$constructParams)
           )
         },
         ($tableRef: _root_.scalasql.query.TableRef, dialect) => {
           import dialect._
-          new $wtt(..$queryParams)
+          new $wtt(..$columnParams)
         }
       )
     )

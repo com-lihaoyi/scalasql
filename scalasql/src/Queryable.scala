@@ -1,10 +1,10 @@
 package scalasql
 
-import utils.OptionPickler.Reader
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.query.{Expr, JoinNullable, Query}
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.utils.OptionPickler
+
+import java.sql.ResultSet
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
@@ -18,15 +18,22 @@ trait Queryable[-Q, R] {
   def walkLabels(q: Q): Seq[List[String]]
   def walkExprs(q: Q): Seq[Expr[_]]
   def walk(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
-  def valueReader(q: Q): Reader[R]
   def singleRow(q: Q): Boolean
 
   def toSqlStr(q: Q, ctx: Context): SqlStr
-  def toTypeMappers(q: Q): Seq[TypeMapper[_]]
+  def construct(q: Q, args: ResultSetIterator): R
+}
+
+
+class ResultSetIterator(r: ResultSet){
+  var index = 0
+  def get[T](mt: TypeMapper[T]) = {
+    index += 1
+    mt.get(r, index)
+  }
 }
 
 object Queryable {
-
   /**
    * A [[Queryable]] that represents a part of a single database row. [[Queryable.Row]]s
    * can be nested within other [[Queryable]]s, but [[Queryable]]s in general cannot. e.g.
@@ -40,19 +47,17 @@ object Queryable {
   trait Row[-Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
-    def valueReader(q: Q): Reader[R] = valueReader()
-    def valueReader(): Reader[R]
-    def toTypeMappers(): Seq[TypeMapper[_]]
-    def toTypeMappers(q: Q): Seq[TypeMapper[_]] = toTypeMappers()
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
+
+    def construct(q: Q, args: ResultSetIterator): R = construct(args)
+    def construct(args: ResultSetIterator): R
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R](
         val walkLabels0: Seq[Seq[List[String]]],
         val walkExprs0: Q => Seq[Seq[Expr[_]]],
-        val toTypeMappersList: Seq[Seq[TypeMapper[_]]],
-        val valueReader0: Reader[R]
+        construct0: ResultSetIterator => R
     ) extends Queryable.Row[Q, R] {
       def walkExprs(q: Q) = {
         walkExprs0(q).iterator.zipWithIndex
@@ -73,9 +78,7 @@ object Queryable {
         ExprsToSql(walked, sql"", ctx)
       }
 
-      def toTypeMappers(): Seq[TypeMapper[_]] = toTypeMappersList.flatten
-
-      override def valueReader(): OptionPickler.Reader[R] = valueReader0
+      def construct(args: ResultSetIterator) = construct0(args)
     }
 
     implicit def NullableQueryable[Q, R](
@@ -84,13 +87,10 @@ object Queryable {
       def walkLabels() = qr.walkLabels()
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
-      def valueReader(): OptionPickler.Reader[Option[R]] = {
-        new OptionPickler.NullableReader(qr.valueReader())
-          .asInstanceOf[OptionPickler.Reader[Option[R]]]
-      }
 
       def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
-      def toTypeMappers() = qr.toTypeMappers()
+
+      def construct(args: ResultSetIterator): Option[R] = Option(qr.construct(args))
     }
   }
 

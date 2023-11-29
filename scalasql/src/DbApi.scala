@@ -2,11 +2,10 @@ package scalasql
 
 import geny.Generator
 import renderer.{Context, SqlStr}
-import upickle.core.Visitor
 import scalasql.dialects.DialectConfig
 import scalasql.dialects.DialectConfig.dialectCastParams
 import scalasql.renderer.SqlStr.{Interp, flatten}
-import scalasql.utils.{FlatJson, OptionPickler}
+import scalasql.utils.FlatJson
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
 
@@ -175,8 +174,7 @@ object DbApi {
         queryTimeoutSeconds: Int = -1
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
       streamRaw0[R](
-        valueReader = qr.valueReader(),
-        typeMappers = qr.toTypeMappers(),
+        construct = qr.construct,
         columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq),
         sql,
         anySeqPuts(variables),
@@ -269,15 +267,15 @@ object DbApi {
     def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      val (str, params, mappedTypes) = toSqlQuery0(query, castParams)
+      val (str, params) = toSqlQuery0(query, castParams)
       str
     }
 
     def toSqlQuery0[Q, R](query: Q, castParams: Boolean)(
         implicit qr: Queryable[Q, R]
-    ): (String, collection.Seq[SqlStr.Interp.TypeInterp[_]], Seq[TypeMapper[_]]) = {
-      val (mappedTypes, flattened) = unpackQueryable(query, qr)
-      (combineQueryString(flattened, castParams), flattened.params, mappedTypes)
+    ): (String, collection.Seq[SqlStr.Interp.TypeInterp[_]]) = {
+      val flattened = unpackQueryable(query, qr)
+      (combineQueryString(flattened, castParams), flattened.params)
     }
 
     private def combineQueryString(
@@ -299,17 +297,15 @@ object DbApi {
 
     private def unpackQueryable[R, Q](query: Q, qr: Queryable[Q, R]) = {
       val ctx = Context.Impl(Map(), Map(), config)
-      val sqlStr = qr.toSqlStr(query, ctx)
-      val mappedTypes = qr.toTypeMappers(query)
-      val flattened = SqlStr.flatten(sqlStr)
-      (mappedTypes, flattened)
+      val flattened = SqlStr.flatten(qr.toSqlStr(query, ctx))
+      flattened
     }
 
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
 
-      val (typeMappers, flattened) = unpackQueryable(query, qr)
+      val flattened = unpackQueryable(query, qr)
       if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
       else {
         try {
@@ -346,14 +342,11 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
-      val valueReader: OptionPickler.Reader[R] = qr.valueReader()
-      val typeMappers: Seq[TypeMapper[_]] = qr.toTypeMappers()
       val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
       val flattened = SqlStr.flatten(sql)
 
       streamFlattened(
-        valueReader,
-        typeMappers,
+        qr.construct,
         columnNameUnMapper,
         flattened,
         fetchSize,
@@ -362,15 +355,13 @@ object DbApi {
     }
 
     def streamFlattened[R](
-        valueReader: OptionPickler.Reader[R],
-        typeMappers: Seq[TypeMapper[_]],
+        construct: ResultSetIterator => R,
         columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         flattened: SqlStr.Flattened,
         fetchSize: Int,
         queryTimeoutSeconds: Int
     ) = streamRaw0(
-      valueReader,
-      typeMappers,
+      construct,
       columnNameUnMapper,
       combineQueryString(flattened),
       flattenParamPuts(flattened),
@@ -379,8 +370,7 @@ object DbApi {
     )
 
     def streamRaw0[R](
-        valueReader: OptionPickler.Reader[R],
-        typeMappers: Seq[TypeMapper[_]],
+        construct: ResultSetIterator => R,
         columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
@@ -392,13 +382,7 @@ object DbApi {
         runRawQuery0(sql, variables, fetchSize, queryTimeoutSeconds) { resultSet =>
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = handleResultRow(
-              resultSet,
-              valueReader,
-              typeMappers,
-              config,
-              columnNameUnMapper
-            )
+            val rowRes = construct(new ResultSetIterator(resultSet))
             action = handleItem(rowRes)
           }
           action
@@ -409,20 +393,15 @@ object DbApi {
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = {
-      val (typeMappers, flattened) = unpackQueryable(query, qr)
+      val flattened = unpackQueryable(query, qr)
       val columnUnMapper = prepareColumnUnmapper(query, qr)
       streamFlattened(
-        qr.valueReader(query) match {
-          case v: OptionPickler.SeqLikeReader2[Seq, R] => v.r
-          case v => v.asInstanceOf[OptionPickler.Reader[R]]
-        },
-        typeMappers,
+        qr.construct(query, _).asInstanceOf[R],
         Left(columnUnMapper),
         flattened,
         fetchSize,
         queryTimeoutSeconds
       )
-
     }
 
     def close() = connection.close()
@@ -432,47 +411,5 @@ object DbApi {
     def savepointId = savepoint.getSavepointId
     def savepointName = savepoint.getSavepointName
     def rollback() = rollback0()
-  }
-
-  def handleResultRow[V](
-      resultSet: ResultSet,
-      rowVisitor: Visitor[_, V],
-      exprs: Seq[TypeMapper[_]],
-      config: Config,
-      columnNameUnMapper0: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]]
-  ): V = {
-
-    val keys = Array.newBuilder[IndexedSeq[String]]
-    val values = Array.newBuilder[Object]
-    val nulls = Array.newBuilder[Boolean]
-    val metadata = resultSet.getMetaData
-
-    for (i <- Range(0, metadata.getColumnCount)) {
-      val k = columnNameUnMapper0 match {
-        case Left(columnNameUnMapper) =>
-          metadata.getColumnLabel(i + 1).toLowerCase match {
-            // Hack to support top-level `VALUES` clause; most databases do not
-            // let you rename their columns
-            case /*h2*/ "c1" | /*postgres/sqlite*/ "column1" | /*mysql*/ "column_0" => IndexedSeq()
-            case label =>
-              FlatJson
-                .fastSplitNonRegex(
-                  columnNameUnMapper(label),
-                  config.columnLabelDelimiter
-                )
-                .drop(1)
-          }
-        case Right(columnNameUnMapper) =>
-          columnNameUnMapper(i)
-      }
-      val v = exprs(i).get(resultSet, i + 1).asInstanceOf[Object]
-      val isNull = resultSet.getObject(i + 1) == null
-
-      keys.addOne(k)
-      values.addOne(v)
-      nulls.addOne(isNull)
-    }
-
-    FlatJson.unflatten[V](keys.result(), values.result(), nulls.result(), rowVisitor)
   }
 }

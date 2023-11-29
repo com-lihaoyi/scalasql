@@ -4,7 +4,6 @@ import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.query.{Expr, Insert, InsertColumns, Joinable, Select, TableRef, Update}
 import renderer.SqlStr.SqlStringSyntax
 import scalasql.dialects.Dialect
-import scalasql.utils.OptionPickler
 
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
@@ -62,13 +61,12 @@ object Table {
     class TableQueryable[Q, R](
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
-        val toTypeMappers: Seq[TypeMapper[_]],
-        valueReader0: OptionPickler.ReadWriter[R]
+        construct0: ResultSetIterator => R
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
-      override def valueReader(): OptionPickler.Reader[R] = valueReader0
+      def construct(args: ResultSetIterator) = construct0(args)
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         ExprsToSql(this.walk(q), sql"", ctx)
