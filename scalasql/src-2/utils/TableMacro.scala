@@ -25,6 +25,10 @@ object TableMacros {
       val tpe = applyParam.info.typeArgs.head
       q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
     }
+    val deconstructParams = for ((applyParam, i) <- applyParameters.zipWithIndex) yield {
+      val tpe = applyParam.info.typeArgs.head
+      q"(v: Option[Any], r: scalasql.PreparedStatementWriter) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[Option[$tpe]], r)"
+    }
 
     val flattenLists = for (applyParam <- applyParameters) yield {
       val name = applyParam.name
@@ -46,7 +50,8 @@ object TableMacros {
           new _root_.scalasql.Table.Internal.TableQueryable(
             () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
             table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
-            args => new $wtt(..$constructParams)
+            construct0 = args => new $wtt(..$constructParams),
+            deconstruct0 = Seq(..$deconstructParams)
           )
         },
         ($tableRef: _root_.scalasql.query.TableRef, dialect) => {

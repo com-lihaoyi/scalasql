@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.{Config, Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Config, PreparedStatementWriter, Queryable, ResultSetIterator, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 
 /**
@@ -52,6 +52,8 @@ object Expr {
     def toSqlStr(q: E[T], ctx: Context) = ExprsToSql(this.walk(q), sql"", ctx)
 
     override def construct(args: ResultSetIterator): T = args.get(tm)
+
+    override def deconstruct(r: Option[T], stmt: PreparedStatementWriter): Unit = stmt.put(tm, r)
   }
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
