@@ -1406,29 +1406,36 @@ object WorldSqlTests extends TestSuite {
       // demonstrates how to define a custom `CityId` type, define an implicit `TypeMapper`
       // for it, and then `INSERT` it into the database and `SELECT` it out after.
       //
-      // ```scala
-      // case class CityId(value: Int)
-      // object CityId {
-      //   implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
-      //     def jdbcType: JDBCType = JDBCType.INTEGER
-      //     def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
-      //     def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
-      //   }
-      // }
-      //
-      // case class City2[+T[_]](
-      //     id: T[CityId],
-      //     name: T[String],
-      //     countryCode: T[String],
-      //     district: T[String],
-      //    population: T[Long]
-      // )
-      //
-      // object City2 extends Table[City2]() {
-      //   initTableMetadata()
-      //   override def tableName: String = "city"
-      // }
-      // ```
+
+
+      case class CityId(value: Int)
+
+      object CityId {
+        implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
+          def jdbcType: JDBCType = JDBCType.INTEGER
+
+          def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
+
+          def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
+        }
+      }
+
+      // -DOCS
+      // Note sure why this is required, probably a Scalac bug
+      SqlStr.Interp.TypeInterp[CityId](CityId(1337))
+      // +DOCS
+
+      case class City2[+T[_]](
+                               id: T[CityId],
+                               name: T[String],
+                               countryCode: T[String],
+                               district: T[String],
+                               population: T[Long]
+                             )
+
+      object City2 extends Table[City2]() {
+        override def tableName: String = "city"
+      }
       db.run(
         City2.insert.columns(
           _.id := CityId(31337),
@@ -1449,29 +1456,29 @@ object WorldSqlTests extends TestSuite {
       //
       // ScalaSql allows you to customize the table and column names via overriding
       // `def table` and `def tableColumnNameOverride` om your `Table` object.
-      // ```scala
-      // case class CityCustom[+T[_]](
-      //   idCustom: T[Int],
-      //   nameCustom: T[String],
-      //   countryCodeCustom: T[String],
-      //   districtCustom: T[String],
-      //   populationCustom: T[Long]
-      // )
-      //
-      // object CityCustom extends Table[CityCustom]() {
-      //   initTableMetadata()
-      //
-      //   override def tableName: String = "city"
-      //
-      //   override def tableColumnNameOverride(s: String): String = s match{
-      //     case "idCustom" => "id"
-      //     case "nameCustom" => "name"
-      //     case "countryCodeCustom" => "countrycode"
-      //     case "districtCustom" => "district"
-      //     case "populationCustom" => "population"
-      //   }
-      // }
-      // ```
+
+
+      case class CityCustom[+T[_]](
+                                    idCustom: T[Int],
+                                    nameCustom: T[String],
+                                    countryCodeCustom: T[String],
+                                    districtCustom: T[String],
+                                    populationCustom: T[Long]
+                                  )
+
+      object CityCustom extends Table[CityCustom]() {
+
+        override def tableName: String = "city"
+
+        override def tableColumnNameOverride(s: String): String = s match {
+          case "idCustom" => "id"
+          case "nameCustom" => "name"
+          case "countryCodeCustom" => "countrycode"
+          case "districtCustom" => "district"
+          case "populationCustom" => "population"
+        }
+      }
+
 
       val query = CityCustom.select
       db.toSqlQuery(query) ==> """
@@ -1499,46 +1506,5 @@ object WorldSqlTests extends TestSuite {
     }
   }
 
-  case class CityCustom[+T[_]](
-      idCustom: T[Int],
-      nameCustom: T[String],
-      countryCodeCustom: T[String],
-      districtCustom: T[String],
-      populationCustom: T[Long]
-  )
 
-  object CityCustom extends Table[CityCustom]() {
-
-    override def tableName: String = "city"
-
-    override def tableColumnNameOverride(s: String): String = s match {
-      case "idCustom" => "id"
-      case "nameCustom" => "name"
-      case "countryCodeCustom" => "countrycode"
-      case "districtCustom" => "district"
-      case "populationCustom" => "population"
-    }
-  }
-
-  case class CityId(value: Int)
-
-  object CityId {
-    implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
-      def jdbcType: JDBCType = JDBCType.INTEGER
-      def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
-      def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
-    }
-  }
-
-  case class City2[+T[_]](
-      id: T[CityId],
-      name: T[String],
-      countryCode: T[String],
-      district: T[String],
-      population: T[Long]
-  )
-
-  object City2 extends Table[City2]() {
-    override def tableName: String = "city"
-  }
 }

@@ -16,7 +16,7 @@ object TableMacros {
 
     val columnParams = for (applyParam <- constructorParameters) yield {
       val name = applyParam.name
-      if (applyParam.info.typeSymbol.companion != NoSymbol){
+      if (applyParam.name.toString == "foo"){
         val companion = applyParam.info.typeSymbol.companion
         q"_root_.scalasql.Table.tableMetadata($companion).vExpr($tableRef, dialect)"
 
@@ -53,7 +53,7 @@ object TableMacros {
     }
 
     val flattenLists = for (param <- constructorParameters) yield {
-      if (param.info.typeSymbol.companion != NoSymbol) {
+      if (param.name.toString == "foo") {
         val companion = param.info.typeSymbol.companion
         q"_root_.scalasql.Table.tableLabels($companion).map(List(_))"
       }else {

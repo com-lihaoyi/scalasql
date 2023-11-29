@@ -8,35 +8,6 @@ import utils.ScalaSqlSuite
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
 
-object MyEnum extends Enumeration {
-  val foo, bar, baz = Value
-
-  implicit def make: String => Value = withName
-}
-case class DataTypes[+T[_]](
-    myTinyInt: T[Byte],
-    mySmallInt: T[Short],
-    myInt: T[Int],
-    myBigInt: T[Long],
-    myDouble: T[Double],
-    myBoolean: T[Boolean],
-    myLocalDate: T[LocalDate],
-    myLocalTime: T[LocalTime],
-    myLocalDateTime: T[LocalDateTime],
-    myInstant: T[Instant],
-    myVarBinary: T[geny.Bytes],
-    myUUID: T[java.util.UUID],
-    myEnum: T[MyEnum.Value]
-)
-
-object DataTypes extends Table[DataTypes]
-
-case class NonRoundTripTypes[+T[_]](
-    myZonedDateTime: T[ZonedDateTime],
-    myOffsetDateTime: T[OffsetDateTime]
-)
-
-object NonRoundTripTypes extends Table[NonRoundTripTypes]
 
 
 case class Nested[+T[_]](
@@ -64,6 +35,29 @@ trait DataTypesTests extends ScalaSqlSuite {
       and read back via ScalaSQL
       """,
       Text {
+        object MyEnum extends Enumeration {
+          val foo, bar, baz = Value
+
+          implicit def make: String => Value = withName
+        }
+        case class DataTypes[+T[_]](
+            myTinyInt: T[Byte],
+            mySmallInt: T[Short],
+            myInt: T[Int],
+            myBigInt: T[Long],
+            myDouble: T[Double],
+            myBoolean: T[Boolean],
+            myLocalDate: T[LocalDate],
+            myLocalTime: T[LocalTime],
+            myLocalDateTime: T[LocalDateTime],
+            myInstant: T[Instant],
+            myVarBinary: T[geny.Bytes],
+            myUUID: T[java.util.UUID],
+            myEnum: T[MyEnum.Value]
+        )
+
+        object DataTypes extends Table[DataTypes]
+
         val value = DataTypes[Id](
           myTinyInt = 123.toByte,
           mySmallInt = 12345.toShort,
@@ -110,6 +104,15 @@ trait DataTypesTests extends ScalaSqlSuite {
       their instant, but cannot be round-tripped preserving the offset.
       """,
       Text {
+
+        case class NonRoundTripTypes[+T[_]](
+            myZonedDateTime: T[ZonedDateTime],
+            myOffsetDateTime: T[OffsetDateTime]
+        )
+
+        object NonRoundTripTypes extends Table[NonRoundTripTypes]
+
+
         val value = NonRoundTripTypes[Id](
           myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
           myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
@@ -131,7 +134,7 @@ trait DataTypesTests extends ScalaSqlSuite {
         checker(
           query = NonRoundTripTypes.select,
           value = Seq(normalize(value)),
-          normalize = (x: Seq[datatypes.NonRoundTripTypes[Id]]) => x.map(normalize)
+          normalize = (x: Seq[NonRoundTripTypes[Id]]) => x.map(normalize)
         )
       }
     )
