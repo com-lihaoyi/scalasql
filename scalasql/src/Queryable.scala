@@ -24,16 +24,21 @@ trait Queryable[-Q, R] {
   def construct(q: Q, args: ResultSetIterator): R
 }
 
-
-class ResultSetIterator(r: ResultSet){
+class ResultSetIterator(r: ResultSet) {
   var index = 0
+  var nulls = 0
+  var nonNulls = 0
   def get[T](mt: TypeMapper[T]) = {
     index += 1
-    mt.get(r, index)
+    val res = mt.get(r, index)
+    if (r.wasNull()) nulls += 1
+    else nonNulls += 1
+    res
   }
 }
 
 object Queryable {
+
   /**
    * A [[Queryable]] that represents a part of a single database row. [[Queryable.Row]]s
    * can be nested within other [[Queryable]]s, but [[Queryable]]s in general cannot. e.g.
@@ -87,10 +92,14 @@ object Queryable {
       def walkLabels() = qr.walkLabels()
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
-
       def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
 
-      def construct(args: ResultSetIterator): Option[R] = Option(qr.construct(args))
+      def construct(args: ResultSetIterator): Option[R] = {
+        val startNonNulls = args.nonNulls
+        val res = qr.construct(args)
+        if (startNonNulls == args.nonNulls) None
+        else Option(res)
+      }
     }
   }
 

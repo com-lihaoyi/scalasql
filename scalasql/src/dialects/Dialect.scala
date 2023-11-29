@@ -261,6 +261,6 @@ trait Dialect extends DialectConfig {
   }
   // This is necessary for `runSql` to work.
   implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[_, T] = {
-    new Expr.toExprable[Expr, T]()
+    new Expr.ExprQueryable[Expr, T]()
   }
 }

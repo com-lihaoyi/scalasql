@@ -241,7 +241,6 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryIsSingleRow = Query.queryIsSingleRow(insert.query)
 
-
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderToSql(insert.query)

@@ -40,10 +40,10 @@ object Expr {
   class Identity()
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](
-                                                  implicit mt: TypeMapper[T]
-  ): Queryable.Row[E[T], T] = new toExprable[E, T]()
+      implicit mt: TypeMapper[T]
+  ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
 
-  class toExprable[E[_] <: Expr[_], T](
+  class ExprQueryable[E[_] <: Expr[_], T](
       implicit tm: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
     def walkLabels() = Seq(Nil)

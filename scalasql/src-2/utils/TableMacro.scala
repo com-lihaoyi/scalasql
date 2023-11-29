@@ -36,7 +36,6 @@ object TableMacros {
       q"_root_.scalasql.Table.Internal.flattenPrefixedExprs(table.${TermName(name.toString)})"
     }
 
-
     c.Expr[Unit](q"""
     import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
     _root_.scalasql.Table.setTableMetadata0(

@@ -38,12 +38,12 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-
   override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     Select.selectLhsMap(rhs, prevContext)
   }
 
-  override protected def queryConstruct(args: ResultSetIterator): Seq[R] = Query.queryConstruct(rhs, args)
+  override protected def queryConstruct(args: ResultSetIterator): Seq[R] =
+    Query.queryConstruct(rhs, args)
 }
 
 object WithCte {

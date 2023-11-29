@@ -26,7 +26,6 @@ object InsertColumns {
     protected override def renderToSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.tableName(table.value)).render()
 
-
     def queryWalkExprs() = Nil
     protected override def queryIsSingleRow = true
     protected override def queryIsExecuteUpdate = true

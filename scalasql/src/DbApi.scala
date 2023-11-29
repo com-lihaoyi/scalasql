@@ -396,7 +396,12 @@ object DbApi {
       val flattened = unpackQueryable(query, qr)
       val columnUnMapper = prepareColumnUnmapper(query, qr)
       streamFlattened(
-        qr.construct(query, _).asInstanceOf[R],
+        r => {
+          qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
+            case s: Seq[R] => s.head
+            case r: R => r
+          }
+        },
         Left(columnUnMapper),
         flattened,
         fetchSize,

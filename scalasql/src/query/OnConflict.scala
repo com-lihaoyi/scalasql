@@ -31,7 +31,8 @@ object OnConflict {
 
     protected override def queryIsExecuteUpdate = true
 
-    override protected def queryConstruct(args: ResultSetIterator): R = Query.queryConstruct(query, args)
+    override protected def queryConstruct(args: ResultSetIterator): R =
+      Query.queryConstruct(query, args)
   }
 
   class Update[Q, R](
@@ -56,6 +57,7 @@ object OnConflict {
     }
 
     protected override def queryIsExecuteUpdate = true
-    override protected def queryConstruct(args: ResultSetIterator): R = Query.queryConstruct(query, args)
+    override protected def queryConstruct(args: ResultSetIterator): R =
+      Query.queryConstruct(query, args)
   }
 }

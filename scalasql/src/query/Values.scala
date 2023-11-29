@@ -29,7 +29,6 @@ class Values[T: TypeMapper](val ts: Seq[T])(
 
   override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = Seq(Nil -> expr)
 
-
   override protected def selectRenderer(prevContext: Context): Select.Renderer =
     new Values.Renderer[T](this)(implicitly, prevContext)
 

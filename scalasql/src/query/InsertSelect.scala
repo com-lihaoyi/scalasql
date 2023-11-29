@@ -23,7 +23,6 @@ object InsertSelect {
       new Renderer(select, select.qr.walk(columns).map(_._2), ctx, Table.tableName(table.value))
         .render()
 
-
     protected override def queryIsExecuteUpdate = true
 
     protected def queryWalkExprs() = Nil

@@ -139,7 +139,7 @@ class SimpleSelect[Q, R](
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
       implicit ctx => copied.renderToSql(ctx),
-      Query.queryConstruct(copied, _).asInstanceOf[V],
+      r => Query.queryConstruct(copied, r).head,
       selectProxyExpr
     )(qr)
   }
@@ -193,10 +193,8 @@ class SimpleSelect[Q, R](
   def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
   def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
-
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
-
 
   protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
@@ -224,7 +222,7 @@ class SimpleSelect[Q, R](
   }
 
   override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
-    qr.construct(args).asInstanceOf[Seq[R]]
+    Seq(qr.construct(args))
   }
 }
 

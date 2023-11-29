@@ -35,7 +35,7 @@ object Returning {
       extends Returning[Q, R] {
 
     override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
-      qr.construct(args).asInstanceOf[Seq[R]]
+      Seq(qr.construct(args))
     }
 
     def queryWalkExprs() = qr.walk(returning)

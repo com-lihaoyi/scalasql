@@ -1604,6 +1604,41 @@ Buyer.select
 
 
 
+### Join.leftJoinMap2
+
+
+
+```scala
+Buyer.select
+  .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
+  .map { case (b, si) => (b.name, si.map(s => (s.id, s.shippingDate))) }
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.name AS res__0,
+      shipping_info1.id AS res__1__0,
+      shipping_info1.shipping_date AS res__1__1
+    FROM buyer buyer0
+    LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ("James Bond", Some((2, LocalDate.parse("2012-04-05")))),
+      ("Li Haoyi", None),
+      ("叉烧包", Some((1, LocalDate.parse("2010-02-03")))),
+      ("叉烧包", Some((3, LocalDate.parse("2012-05-06"))))
+    )
+    ```
+
+
+
 ### Join.leftJoinExpr
 
 `JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
