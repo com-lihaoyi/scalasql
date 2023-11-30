@@ -5,6 +5,7 @@ import scalasql.Table.Metadata
 import scala.language.experimental.macros
 
 object TableMacros {
+  def cast[T](x: Any): T = x.asInstanceOf[T]
   def applyImpl[V[_[_]]](
       c: scala.reflect.macros.blackbox.Context
   )(implicit caseClassType: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
@@ -38,21 +39,34 @@ object TableMacros {
       }
     }
 
-    def subParam(param: Symbol) = {
+    def subParam(paramInfo: Type) = {
 
-      param.info.substituteTypes(
+      paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
         List(typeOf[scalasql.Id[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
       )
     }
+    def subParam2(paramInfo: Type) = {
+
+      paramInfo.substituteTypes(
+        List(constructor.info.resultType.typeArgs.head.typeSymbol),
+        List(typeOf[scalasql.Expr[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
+      )
+    }
     val constructParams = for (param <- constructorParameters) yield {
-      val tpe = subParam(param)
+      val tpe = subParam(param.info)
       q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for (param <- constructorParameters) yield {
-      val tpe = subParam(param)
+      val tpe = subParam(param.info)
       q"(v: Any) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[$tpe])"
+    }
+    val deconstruct2Params = for (param <- constructorParameters) yield {
+      val tpe = subParam(param.info)
+      val tpe2 = subParam2(param.info)
+      val name = param.name
+      q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct2(r.${TermName(name.toString)}).asInstanceOf[$tpe2]"
     }
 
     val flattenLists = for (param <- constructorParameters) yield {

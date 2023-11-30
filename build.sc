@@ -66,11 +66,13 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |    implicit
         |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
         |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
+        |  import scalasql.renderer.SqlStr.SqlStringSyntax
         |  new Queryable.Row.TupleNQueryable(
         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
         |    construct0 = rsi => (${commaSep(j => s"q$j.construct(rsi)")}),
-        |    deconstruct0 = Seq(${commaSep(j => s"v => q$j.deconstruct(v.asInstanceOf[R$j])")})
+        |    deconstruct0 = Seq(${commaSep(j => s"v => q$j.deconstruct(v.asInstanceOf[R$j])")}),
+        |    deconstruct20 = { is => (${commaSep(j => s"""q$j.deconstruct2(is._$j)""")}) }
         |  )
         |}""".stripMargin
     }

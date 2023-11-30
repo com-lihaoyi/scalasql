@@ -151,6 +151,52 @@ trait ValuesTests extends ScalaSqlSuite {
           Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
         )
       )
+
+      test("map") - checker(
+        query = Text {
+          db.values(Seq((1, 2), (3, 4), (5, 6))).map{case (a, b) => (a + 10, b + 100)}
+        },
+        sqls = Seq(
+          """
+            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
+          """,
+          """
+            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            FROM (VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)) subquery0
+          """
+        ),
+        value = Seq((11, 102), (13, 104), (15, 106)),
+        docs = """
+            `values` supports tuples and other data structures as well
+        """
+      )
+      test("mapCaseClass") - checker(
+        query = Text {
+          val buyers = Seq(
+            Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+            Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+          )
+          db.values[Buyer[Expr], Buyer[Id]](buyers).map{ b => (b.id, b)}
+        },
+        sqls = Seq(
+          """
+            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
+          """,
+          """
+            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            FROM (VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)) subquery0
+          """
+        ),
+        value = Seq(
+          (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
+          (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+        ),
+        docs = """
+            `values` supports tuples and other data structures as well
+        """
+      )
     }
   }
 }

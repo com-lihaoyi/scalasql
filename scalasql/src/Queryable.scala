@@ -2,7 +2,7 @@ package scalasql
 
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.query.{Expr, JoinNullable, Query}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.SqlStr.{Interp, SqlStringSyntax}
 
 import java.sql.{PreparedStatement, ResultSet}
 
@@ -50,7 +50,7 @@ object Queryable {
    * - `Select[Select[Int]]` is invalid because although there is a `Queryable[Select[Q]]`
    *   available, there is no `Queryable.Row[Select[Q]]`, as `Select[Q]` returns multiple rows
    */
-  trait Row[-Q, R] extends Queryable[Q, R] {
+  trait Row[Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
     def singleRow(q: Q): Boolean = true
     def walkLabels(): Seq[List[String]]
@@ -59,13 +59,15 @@ object Queryable {
     def construct(q: Q, args: ResultSetIterator): R = construct(args)
     def construct(args: ResultSetIterator): R
     def deconstruct(r: R): Seq[SqlStr.Interp.TypeInterp[_]]
+    def deconstruct2(r: R): Q
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
         val walkExprs0: Q => Seq[Seq[Expr[_]]],
         construct0: ResultSetIterator => R,
-        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]]
+        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]],
+        deconstruct20: R => Q
     ) extends Queryable.Row[Q, R] {
       def walkExprs(q: Q) = {
         walkExprs0(q).iterator.zipWithIndex
@@ -91,6 +93,8 @@ object Queryable {
       def deconstruct(r: R) = {
         r.productIterator.zip(deconstruct0).flatMap { case (r, d) => d(r) }.toSeq
       }
+
+      def deconstruct2(r: R): Q = deconstruct20(r)
     }
 
     implicit def NullableQueryable[Q, R](
@@ -110,6 +114,7 @@ object Queryable {
 
       def deconstruct(r: Option[R]) = qr.deconstruct(r.get)
 
+      def deconstruct2(r: Option[R]): JoinNullable[Q] = JoinNullable(qr.deconstruct2(r.get))
     }
   }
 

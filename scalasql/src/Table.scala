@@ -70,13 +70,14 @@ object Table {
 
       def construct(args: ResultSetIterator) = construct0(args)
       def deconstruct(r: R) = {
-        r.productIterator.zip(deconstruct0).flatMap { case (v, d) => (d(v)) }.toSeq
+        r.asInstanceOf[scala.Product].productIterator.zip(deconstruct0).flatMap { case (v, d) => (d(v)) }.toSeq
       }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         ExprsToSql(this.walk(q), SqlStr.empty, ctx)
       }
 
+      def deconstruct2(r: R): Q = ???
     }
 
     def flattenPrefixedLists[T](
