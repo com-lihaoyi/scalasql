@@ -14,15 +14,18 @@ object TableMacros {
     val constructor = weakTypeOf[V[Any]].members.find(_.isConstructor).head
     val constructorParameters = constructor.info.paramLists.head
 
-    val columnParams = for (applyParam <- constructorParameters) yield {
-      val name = applyParam.name
-      if (applyParam.name.toString == "foo"){
-        val companion = applyParam.info.typeSymbol.companion
-        q"_root_.scalasql.Table.tableMetadata($companion).vExpr($tableRef, dialect)"
+    def isTypeParamType(param: Symbol) = {
+      param.info.typeSymbol.toString != caseClassType.tpe.typeParams.head.toString
+    }
 
+    val columnParams = for (param <- constructorParameters) yield {
+      val name = param.name
+
+      if (isTypeParamType(param)){
+        q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.vExpr($tableRef, dialect)"
       }else {
         q"""
-          _root_.scalasql.Column[${applyParam.info.typeArgs.head}]()(
+          _root_.scalasql.Column[${param.info.typeArgs.head}]()(
             implicitly,
             sourcecode.Name(
               _root_.scalasql.Table.tableColumnNameOverride(
@@ -35,27 +38,26 @@ object TableMacros {
       }
     }
 
-    def subApplyParam(applyParam: Symbol) = {
+    def subParam(param: Symbol) = {
 
-      applyParam.info.substituteTypes(
+      param.info.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
         List(typeOf[scalasql.Id[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
       )
     }
     val constructParams = for (param <- constructorParameters) yield {
-      val tpe = subApplyParam(param)
+      val tpe = subParam(param)
       q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for (param <- constructorParameters) yield {
-      val tpe = subApplyParam(param)
+      val tpe = subParam(param)
       q"(v: Any) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[$tpe])"
     }
 
     val flattenLists = for (param <- constructorParameters) yield {
-      if (param.name.toString == "foo") {
-        val companion = param.info.typeSymbol.companion
-        q"_root_.scalasql.Table.tableLabels($companion).map(List(_))"
+      if (isTypeParamType(param)){
+          q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.walkLabels0()"
       }else {
         val name = param.name
         q"_root_.scala.List(List(${name.toString}))"

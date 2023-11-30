@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS `data_types` CASCADE;
 DROP TABLE IF EXISTS `non_round_trip_types` CASCADE;
 DROP TABLE IF EXISTS `opt_cols` CASCADE;
 DROP TABLE IF EXISTS `nested` CASCADE;
-DROP TABLE IF EXISTS `extending` CASCADE;
+DROP TABLE IF EXISTS `enclosing` CASCADE;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE buyer (
@@ -71,7 +71,7 @@ CREATE TABLE nested(
     my_boolean BOOLEAN
 );
 
-CREATE TABLE extending(
+CREATE TABLE enclosing(
     bar_id INTEGER,
     my_string VARCHAR(256),
     foo_id INTEGER,

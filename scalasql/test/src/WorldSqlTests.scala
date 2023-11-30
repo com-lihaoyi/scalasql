@@ -1372,7 +1372,7 @@ object WorldSqlTests extends TestSuite {
       // ## Custom Expressions
       //
       // You can define custom SQL expressions via the `Expr` constructor. This is
-      // useful for extending ScalaSql when you need to use some operator or syntax
+      // useful for enclosing ScalaSql when you need to use some operator or syntax
       // that your Database supports but ScalaSql does not have built in. This example
       // shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally

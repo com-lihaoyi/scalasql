@@ -36,9 +36,12 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
   protected[scalasql] def tableLabels: Seq[String] = {
     tableMetadata.walkLabels0().map(_.head)
   }
+  implicit def tableImplicitMetadata: Table.ImplicitMetadata[V] = Table.ImplicitMetadata(tableMetadata)
 }
 
 object Table {
+  case class ImplicitMetadata[V[_[_]]](value: Metadata[V])
+
   def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
   def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
   def tableName(t: Table.Base) = t.tableName

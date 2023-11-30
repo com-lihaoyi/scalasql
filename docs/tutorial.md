@@ -98,9 +98,7 @@ case class Country[+T[_]](
     code2: T[String]
 )
 
-object Country extends Table[Country]() {
-  initTableMetadata()
-}
+object Country extends Table[Country]()
 
 case class City[+T[_]](
     id: T[Int],
@@ -110,9 +108,7 @@ case class City[+T[_]](
     population: T[Long]
 )
 
-object City extends Table[City]() {
-  initTableMetadata()
-}
+object City extends Table[City]()
 
 case class CountryLanguage[+T[_]](
     countryCode: T[String],
@@ -121,9 +117,7 @@ case class CountryLanguage[+T[_]](
     percentage: T[Double]
 )
 
-object CountryLanguage extends Table[CountryLanguage]() {
-  initTableMetadata()
-}
+object CountryLanguage extends Table[CountryLanguage]()
 ```
 
 ### Creating Your Database Client
@@ -1290,7 +1284,7 @@ dbClient.transaction { implicit db =>
 ## Custom Expressions
 
 You can define custom SQL expressions via the `Expr` constructor. This is
-useful for extending ScalaSql when you need to use some operator or syntax
+useful for enclosing ScalaSql when you need to use some operator or syntax
 that your Database supports but ScalaSql does not have built in. This example
 shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
 that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
@@ -1324,30 +1318,36 @@ the database which are of a type not supported by ScalaSql. The example below
 demonstrates how to define a custom `CityId` type, define an implicit `TypeMapper`
 for it, and then `INSERT` it into the database and `SELECT` it out after.
 
+
+
 ```scala
 case class CityId(value: Int)
+
 object CityId {
   implicit def tm: TypeMapper[CityId] = new TypeMapper[CityId] {
     def jdbcType: JDBCType = JDBCType.INTEGER
+
     def get(r: ResultSet, idx: Int): CityId = new CityId(r.getInt(idx))
+
     def put(r: PreparedStatement, idx: Int, v: CityId): Unit = r.setInt(idx, v.value)
   }
 }
 
+```
+
+
+```scala
 case class City2[+T[_]](
-    id: T[CityId],
-    name: T[String],
-    countryCode: T[String],
-    district: T[String],
-   population: T[Long]
-)
+                         id: T[CityId],
+                         name: T[String],
+                         countryCode: T[String],
+                         district: T[String],
+                         population: T[Long]
+                       )
 
 object City2 extends Table[City2]() {
-  initTableMetadata()
   override def tableName: String = "city"
 }
-```
-```scala
 db.run(
   City2.insert.columns(
     _.id := CityId(31337),
@@ -1366,21 +1366,22 @@ db.run(City2.select.filter(_.id === 31337).single) ==>
 
 ScalaSql allows you to customize the table and column names via overriding
 `def table` and `def tableColumnNameOverride` om your `Table` object.
+
+
 ```scala
 case class CityCustom[+T[_]](
-  idCustom: T[Int],
-  nameCustom: T[String],
-  countryCodeCustom: T[String],
-  districtCustom: T[String],
-  populationCustom: T[Long]
-)
+                              idCustom: T[Int],
+                              nameCustom: T[String],
+                              countryCodeCustom: T[String],
+                              districtCustom: T[String],
+                              populationCustom: T[Long]
+                            )
 
 object CityCustom extends Table[CityCustom]() {
-  initTableMetadata()
 
   override def tableName: String = "city"
 
-  override def tableColumnNameOverride(s: String): String = s match{
+  override def tableColumnNameOverride(s: String): String = s match {
     case "idCustom" => "id"
     case "nameCustom" => "name"
     case "countryCodeCustom" => "countrycode"
@@ -1388,9 +1389,8 @@ object CityCustom extends Table[CityCustom]() {
     case "populationCustom" => "population"
   }
 }
-```
 
-```scala
+
 val query = CityCustom.select
 db.toSqlQuery(query) ==> """
 SELECT

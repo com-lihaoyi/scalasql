@@ -16,12 +16,12 @@ case class Nested[+T[_]](
 )
 object Nested extends Table[Nested]
 
-case class Extending[+T[_]](
+case class Enclosing[+T[_]](
     barId: T[Int],
     myString: T[String],
     foo: Nested[T]
 )
-object Extending extends Table[Extending]
+object Enclosing extends Table[Enclosing]
 
 
 trait DataTypesTests extends ScalaSqlSuite {
@@ -139,12 +139,27 @@ trait DataTypesTests extends ScalaSqlSuite {
       }
     )
 
-    test("extending") - checker.recorded (
+    test("enclosing") - checker.recorded (
       """
-
+      You can nest `case class`es in other `case class`es to DRY up common sets of
+      table columns. These nested `case class`es have their columns flattened out
+      into the enclosing `case class`'s columns, such that at the SQL level it is
+      all flattened out without nesting.
       """,
       Text {
-        val value1 = Extending[Id](
+        // case class Nested[+T[_]](
+        //   fooId: T[Int],
+        //   myBoolean: T[Boolean],
+        // )
+        // object Nested extends Table[Nested]
+        //
+        // case class Enclosing[+T[_]](
+        //     barId: T[Int],
+        //     myString: T[String],
+        //     foo: Nested[T]
+        // )
+        // object Enclosing extends Table[Enclosing]
+        val value1 = Enclosing[Id](
           barId = 1337,
           myString = "hello",
           foo = Nested[Id](
@@ -152,7 +167,7 @@ trait DataTypesTests extends ScalaSqlSuite {
             myBoolean = true
           )
         )
-        val value2 = Extending[Id](
+        val value2 = Enclosing[Id](
           barId = 31337,
           myString = "world",
           foo = Nested[Id](
@@ -162,22 +177,38 @@ trait DataTypesTests extends ScalaSqlSuite {
         )
 
         checker(
-          query = Extending.insert.columns(
+          query = Enclosing.insert.columns(
             _.barId := value1.barId,
             _.myString := value1.myString,
             _.foo.fooId := value1.foo.fooId,
             _.foo.myBoolean := value1.foo.myBoolean,
           ),
+          sql = """
+            INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean)
+            VALUES (?, ?, ?, ?)
+          """,
           value = 1
         )
 
         checker(
-          query = Extending.insert.values(value2),
+          query = Enclosing.insert.values(value2),
+          sql = """
+            INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean)
+            VALUES (?, ?, ?, ?)
+          """,
           value = 1
         )
 
         checker(
-          query = Extending.select,
+          query = Enclosing.select,
+          sql = """
+            SELECT
+              enclosing0.bar_id AS res__bar_id,
+              enclosing0.my_string AS res__my_string,
+              enclosing0.foo_id AS res__foo_id,
+              enclosing0.my_boolean AS res__my_boolean
+            FROM enclosing enclosing0
+          """,
           value = Seq(value1, value2)
         )
       }

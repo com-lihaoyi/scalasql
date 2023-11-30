@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS purchase;
 DROP TABLE IF EXISTS data_types;
 DROP TABLE IF EXISTS non_round_trip_types;
 DROP TABLE IF EXISTS nested;
-DROP TABLE IF EXISTS extending;
+DROP TABLE IF EXISTS enclosing;
 DROP TABLE IF EXISTS opt_cols;
 
 CREATE TABLE buyer (
@@ -72,7 +72,7 @@ CREATE TABLE nested(
     my_boolean BOOLEAN
 );
 
-CREATE TABLE extending(
+CREATE TABLE enclosing(
     bar_id INTEGER,
     my_string VARCHAR(256),
     foo_id INTEGER,
