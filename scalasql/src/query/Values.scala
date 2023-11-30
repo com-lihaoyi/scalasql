@@ -39,7 +39,7 @@ class Values[Q, R](val ts: Seq[R])(
 
 object Values {
   class Renderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context) extends Select.Renderer {
-    def wrapRow(t: R): SqlStr = SqlStr.join(qr.deconstruct(t).map(i => sql"($i)"))
+    def wrapRow(t: R): SqlStr = sql"(" + SqlStr.join(qr.deconstruct(t).map(i => sql"$i"), SqlStr.commaSep) + sql")"
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {
       val rows = SqlStr.join(v.ts.map(wrapRow), SqlStr.commaSep)
       sql"VALUES $rows"

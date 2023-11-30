@@ -5,6 +5,8 @@ import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
 
+import java.time.LocalDate
+
 trait ValuesTests extends ScalaSqlSuite {
   def description = "Basic `VALUES` operations"
 
@@ -125,5 +127,30 @@ trait ValuesTests extends ScalaSqlSuite {
       normalize = (x: Seq[(String, Double)]) => x.sortBy(_._2)
     )
 
+    test("multiple"){
+      test("tuple") - checker(
+        query = Text {
+          db.values(Seq((1, 2), (3, 4), (5, 6)))
+        },
+        sqls = Seq("VALUES (?, ?), (?, ?), (?, ?)", "VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)"),
+        value = Seq((1, 2), (3, 4), (5, 6)),
+        docs = """
+            `values` supports tuples and other data structures as well
+        """
+      )
+      test("caseClass") - checker(
+        query = Text {
+          db.values(Seq(
+            Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+            Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+          ))
+        },
+        sqls = Seq("VALUES (?, ?, ?), (?, ?, ?)", "VALUES ROW(?, ?, ?), ROW(?, ?, ?)"),
+        value = Seq(
+          Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+          Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+        )
+      )
+    }
   }
 }
