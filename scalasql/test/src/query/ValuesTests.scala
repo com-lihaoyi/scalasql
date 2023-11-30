@@ -127,7 +127,7 @@ trait ValuesTests extends ScalaSqlSuite {
       normalize = (x: Seq[(String, Double)]) => x.sortBy(_._2)
     )
 
-    test("multiple"){
+    test("multiple") {
       test("tuple") - checker(
         query = Text {
           db.values(Seq((1, 2), (3, 4), (5, 6)))
@@ -140,10 +140,12 @@ trait ValuesTests extends ScalaSqlSuite {
       )
       test("caseClass") - checker(
         query = Text {
-          db.values(Seq(
-            Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
-          ))
+          db.values(
+            Seq(
+              Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+              Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+            )
+          )
         },
         sqls = Seq("VALUES (?, ?, ?), (?, ?, ?)", "VALUES ROW(?, ?, ?), ROW(?, ?, ?)"),
         value = Seq(
@@ -154,7 +156,7 @@ trait ValuesTests extends ScalaSqlSuite {
 
       test("map") - checker(
         query = Text {
-          db.values(Seq((1, 2), (3, 4), (5, 6))).map{case (a, b) => (a + 10, b + 100)}
+          db.values(Seq((1, 2), (3, 4), (5, 6))).map { case (a, b) => (a + 10, b + 100) }
         },
         sqls = Seq(
           """
@@ -162,7 +164,11 @@ trait ValuesTests extends ScalaSqlSuite {
             FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
           """,
           """
-            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            SELECT (subquery0.c1 + ?) AS res__0, (subquery0.c2 + ?) AS res__1
+            FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
+          """,
+          """
+            SELECT (subquery0.column_0 + ?) AS res__0, (subquery0.column_1 + ?) AS res__1
             FROM (VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)) subquery0
           """
         ),
@@ -177,7 +183,7 @@ trait ValuesTests extends ScalaSqlSuite {
             Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
             Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
           )
-          val query = db.values(buyers).map{ b => (b.id + 100, b)}
+          val query = db.values(buyers).map { b => (b.id + 100, b) }
           query
         },
         sqls = Seq(
@@ -191,10 +197,18 @@ trait ValuesTests extends ScalaSqlSuite {
           """,
           """
             SELECT
-              (subquery0.column1 + ?) AS res__0,
-              subquery0.column1 AS res__1__id,
-              subquery0.column2 AS res__1__name,
-              subquery0.column3 AS res__1__date_of_birth
+              (subquery0.c1 + ?) AS res__0,
+              subquery0.c1 AS res__1__id,
+              subquery0.c2 AS res__1__name,
+              subquery0.c3 AS res__1__date_of_birth
+            FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
+          """,
+          """
+            SELECT
+              (subquery0.column_0 + ?) AS res__0,
+              subquery0.column_0 AS res__1__id,
+              subquery0.column_1 AS res__1__name,
+              subquery0.column_2 AS res__1__date_of_birth
             FROM (VALUES ROW(?, ?, ?), ROW(?, ?, ?)) subquery0
           """
         ),

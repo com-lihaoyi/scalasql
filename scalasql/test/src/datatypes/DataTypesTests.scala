@@ -6,13 +6,23 @@ import utest._
 import utils.ScalaSqlSuite
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
-import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{
+  Instant,
+  LocalDate,
+  LocalDateTime,
+  LocalTime,
+  OffsetDateTime,
+  OffsetTime,
+  ZoneId,
+  ZoneOffset,
+  ZonedDateTime
+}
 
 import _root_.test.scalasql.WorldSqlTests.ArrowAssert
 
 case class Nested[+T[_]](
-  fooId: T[Int],
-  myBoolean: T[Boolean],
+    fooId: T[Int],
+    myBoolean: T[Boolean]
 )
 object Nested extends Table[Nested]
 
@@ -23,13 +33,12 @@ case class Enclosing[+T[_]](
 )
 object Enclosing extends Table[Enclosing]
 
-
 trait DataTypesTests extends ScalaSqlSuite {
   def description =
     "Basic operations on all the data types that ScalaSql supports " +
       "mapping between Database types and Scala types"
   def tests = Tests {
-    test("constant")  - checker.recorded(
+    test("constant") - checker.recorded(
       """
       This example demonstrates a range of different data types being written
       and read back via ScalaSQL
@@ -112,7 +121,6 @@ trait DataTypesTests extends ScalaSqlSuite {
 
         object NonRoundTripTypes extends Table[NonRoundTripTypes]
 
-
         val value = NonRoundTripTypes[Id](
           myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
           myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
@@ -130,12 +138,11 @@ trait DataTypesTests extends ScalaSqlSuite {
           )
         ) ==> 1
 
-
         db.run(NonRoundTripTypes.select).map(normalize) ==> Seq(normalize(value))
       }
     )
 
-    test("enclosing") - checker.recorded (
+    test("enclosing") - checker.recorded(
       """
       You can nest `case class`es in other `case class`es to DRY up common sets of
       table columns. These nested `case class`es have their columns flattened out
@@ -176,7 +183,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.barId := value1.barId,
           _.myString := value1.myString,
           _.foo.fooId := value1.foo.fooId,
-          _.foo.myBoolean := value1.foo.myBoolean,
+          _.foo.myBoolean := value1.foo.myBoolean
         )
         db.toSqlQuery(insertColumns) ==>
           "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"

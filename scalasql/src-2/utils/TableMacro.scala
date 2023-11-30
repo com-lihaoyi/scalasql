@@ -22,9 +22,9 @@ object TableMacros {
     val columnParams = for (param <- constructorParameters) yield {
       val name = param.name
 
-      if (isTypeParamType(param)){
+      if (isTypeParamType(param)) {
         q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.vExpr($tableRef, dialect)"
-      }else {
+      } else {
         q"""
           _root_.scalasql.Column[${param.info.typeArgs.head}]()(
             implicitly,
@@ -43,14 +43,28 @@ object TableMacros {
 
       paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
-        List(typeOf[scalasql.Id[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
+        List(
+          typeOf[scalasql.Id[_]]
+            .asInstanceOf[ExistentialType]
+            .underlying
+            .asInstanceOf[TypeRef]
+            .sym
+            .info
+        )
       )
     }
     def subParamExpr(paramInfo: Type) = {
 
       paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
-        List(typeOf[scalasql.Expr[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
+        List(
+          typeOf[scalasql.Expr[_]]
+            .asInstanceOf[ExistentialType]
+            .underlying
+            .asInstanceOf[TypeRef]
+            .sym
+            .info
+        )
       )
     }
     val constructParams = for (param <- constructorParameters) yield {
@@ -70,9 +84,9 @@ object TableMacros {
     }
 
     val flattenLists = for (param <- constructorParameters) yield {
-      if (isTypeParamType(param)){
-          q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.walkLabels0()"
-      }else {
+      if (isTypeParamType(param)) {
+        q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.walkLabels0()"
+      } else {
         val name = param.name
         q"_root_.scala.List(List(${name.toString}))"
       }

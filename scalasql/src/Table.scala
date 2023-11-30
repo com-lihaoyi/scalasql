@@ -9,7 +9,8 @@ import scalasql.dialects.Dialect
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table.Metadata[V])
-    extends Table.Base with Table.LowPri[V]{
+    extends Table.Base
+    with Table.LowPri[V] {
 
   /**
    * The name of this table, before processing by [[Config.tableNameMapper]].
@@ -32,17 +33,19 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
       .queryable(dialect)
       .asInstanceOf[Queryable.Row[V[Expr], V[Id]]]
 
-
   protected def tableRef = new scalasql.query.TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
     tableMetadata.walkLabels0().map(_.head)
   }
-  implicit def tableImplicitMetadata: Table.ImplicitMetadata[V] = Table.ImplicitMetadata(tableMetadata)
+  implicit def tableImplicitMetadata: Table.ImplicitMetadata[V] =
+    Table.ImplicitMetadata(tableMetadata)
 }
 
 object Table {
-  trait LowPri[V[_[_]]]{ this: Table[V] =>
-    implicit def containerQr2(implicit dialect: Dialect): Queryable.Row[V[Column.ColumnExpr], V[Id]] =
+  trait LowPri[V[_[_]]] { this: Table[V] =>
+    implicit def containerQr2(
+        implicit dialect: Dialect
+    ): Queryable.Row[V[Column.ColumnExpr], V[Id]] =
       tableMetadata
         .queryable(dialect)
         .asInstanceOf[Queryable.Row[V[Column.ColumnExpr], V[Id]]]
@@ -79,7 +82,11 @@ object Table {
 
       def construct(args: ResultSetIterator) = construct0(args)
       def deconstruct(r: R) = {
-        r.asInstanceOf[scala.Product].productIterator.zip(deconstruct0).flatMap { case (v, d) => (d(v)) }.toSeq
+        r.asInstanceOf[scala.Product]
+          .productIterator
+          .zip(deconstruct0)
+          .flatMap { case (v, d) => (d(v)) }
+          .toSeq
       }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {

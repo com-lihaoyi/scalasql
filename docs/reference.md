@@ -4712,6 +4712,122 @@ for {
 
 
 
+### Values.multiple.tuple
+
+`values` supports tuples and other data structures as well
+
+```scala
+db.values(Seq((1, 2), (3, 4), (5, 6)))
+```
+
+
+*
+    ```sql
+    VALUES (?, ?), (?, ?), (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 2), (3, 4), (5, 6))
+    ```
+
+
+
+### Values.multiple.caseClass
+
+
+
+```scala
+db.values(
+  Seq(
+    Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+  )
+)
+```
+
+
+*
+    ```sql
+    VALUES (?, ?, ?), (?, ?, ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+      Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+    )
+    ```
+
+
+
+### Values.multiple.map
+
+`values` supports tuples and other data structures as well
+
+```scala
+db.values(Seq((1, 2), (3, 4), (5, 6))).map { case (a, b) => (a + 10, b + 100) }
+```
+
+
+*
+    ```sql
+    SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+    FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
+    ```
+
+
+
+*
+    ```scala
+    Seq((11, 102), (13, 104), (15, 106))
+    ```
+
+
+
+### Values.multiple.mapCaseClass
+
+`values` supports tuples and other data structures as well
+
+```scala
+{
+  val buyers = Seq(
+    Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
+    Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+  )
+  val query = db.values(buyers).map { b => (b.id + 100, b) }
+  query
+}
+```
+
+
+*
+    ```sql
+    SELECT
+      (subquery0.column1 + ?) AS res__0,
+      subquery0.column1 AS res__1__id,
+      subquery0.column2 AS res__1__name,
+      subquery0.column3 AS res__1__date_of_birth
+    FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
+      (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+    )
+    ```
+
+
+
 ## LateralJoin
 
     `JOIN LATERAL`, for the databases that support it. This allows you to use the

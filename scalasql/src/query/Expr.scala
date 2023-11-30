@@ -55,7 +55,7 @@ object Expr {
     override def construct(args: ResultSetIterator): T = args.get(tm)
 
     override def deconstruct(r: T) = Seq(TypeInterp(r))
-    def deconstruct2(r: T): E[T] = Expr[T]{implicit ctx: Context =>
+    def deconstruct2(r: T): E[T] = Expr[T] { implicit ctx: Context =>
       sql"$r"
     }.asInstanceOf[E[T]]
   }

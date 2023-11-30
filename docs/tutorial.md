@@ -1319,7 +1319,6 @@ demonstrates how to define a custom `CityId` type, define an implicit `TypeMappe
 for it, and then `INSERT` it into the database and `SELECT` it out after.
 
 
-
 ```scala
 case class CityId(value: Int)
 
@@ -1338,12 +1337,12 @@ object CityId {
 
 ```scala
 case class City2[+T[_]](
-                         id: T[CityId],
-                         name: T[String],
-                         countryCode: T[String],
-                         district: T[String],
-                         population: T[Long]
-                       )
+    id: T[CityId],
+    name: T[String],
+    countryCode: T[String],
+    district: T[String],
+    population: T[Long]
+)
 
 object City2 extends Table[City2]() {
   override def tableName: String = "city"
@@ -1367,15 +1366,14 @@ db.run(City2.select.filter(_.id === 31337).single) ==>
 ScalaSql allows you to customize the table and column names via overriding
 `def table` and `def tableColumnNameOverride` om your `Table` object.
 
-
 ```scala
 case class CityCustom[+T[_]](
-                              idCustom: T[Int],
-                              nameCustom: T[String],
-                              countryCodeCustom: T[String],
-                              districtCustom: T[String],
-                              populationCustom: T[Long]
-                            )
+    idCustom: T[Int],
+    nameCustom: T[String],
+    countryCodeCustom: T[String],
+    districtCustom: T[String],
+    populationCustom: T[Long]
+)
 
 object CityCustom extends Table[CityCustom]() {
 
@@ -1389,7 +1387,6 @@ object CityCustom extends Table[CityCustom]() {
     case "populationCustom" => "population"
   }
 }
-
 
 val query = CityCustom.select
 db.toSqlQuery(query) ==> """
