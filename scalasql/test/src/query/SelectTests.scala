@@ -397,6 +397,33 @@ trait SelectTests extends ScalaSqlSuite {
       """
     )
 
+    test("containsMultiple") - checker(
+      query = Text {
+        Buyer.select.filter(b =>
+          ShippingInfo.select
+            .map(s => (s.buyerId, s.shippingDate))
+            .contains((b.id, LocalDate.parse("2010-02-03")))
+        )
+      },
+      sql = """
+        SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
+        FROM buyer buyer0
+        WHERE ((buyer0.id, ?) IN (SELECT
+            shipping_info1.buyer_id AS res__0,
+            shipping_info1.shipping_date AS res__1
+          FROM shipping_info shipping_info1))
+      """,
+      value = Seq(
+        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+      ),
+      docs = """
+        ScalaSql's `.contains` can take a compound Scala value, which translates into
+        SQL's `IN` syntax on a tuple with multiple columns. e.g. this query uses that ability
+        to find the `Buyer` which has a shipment on a specific date, as an alternative
+        to doing a `JOIN`.
+      """
+    )
+
     test("nonEmpty") - checker(
       query = Text {
         Buyer.select

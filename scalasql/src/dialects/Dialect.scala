@@ -250,9 +250,6 @@ trait Dialect extends DialectConfig {
 
   implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T]
 
-  implicit def SelectOpsConv[T](v: Select[T, _]): operations.SelectOps[T] =
-    new operations.SelectOps(v)
-
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
   implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 

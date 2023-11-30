@@ -1109,6 +1109,43 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 
 
 
+### Select.containsMultiple
+
+ScalaSql's `.contains` can take a compound Scala value, which translates into
+SQL's `IN` syntax on a tuple with multiple columns. e.g. this query uses that ability
+to find the `Buyer` which has a shipment on a specific date, as an alternative
+to doing a `JOIN`.
+
+```scala
+Buyer.select.filter(b =>
+  ShippingInfo.select
+    .map(s => (s.buyerId, s.shippingDate))
+    .contains((b.id, LocalDate.parse("2010-02-03")))
+)
+```
+
+
+*
+    ```sql
+    SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
+    FROM buyer buyer0
+    WHERE ((buyer0.id, ?) IN (SELECT
+        shipping_info1.buyer_id AS res__0,
+        shipping_info1.shipping_date AS res__1
+      FROM shipping_info shipping_info1))
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+    )
+    ```
+
+
+
 ### Select.nonEmpty
 
 ScalaSql's `.nonEmpty` and `.isEmpty` translates to SQL's `EXISTS` and `NOT EXISTS` syntax
@@ -4823,6 +4860,44 @@ db.values(Seq((1, 2), (3, 4), (5, 6))).map { case (a, b) => (a + 10, b + 100) }
     Seq(
       (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
       (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+    )
+    ```
+
+
+
+### Values.multiple.caseClassContains
+
+You can use `.contains` on multi-column Scala values, which are translated
+to a SQL `IN` clause on a tuple.
+
+```scala
+{
+  val buyers = Seq(
+    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+  )
+  Buyer.select.filter(!db.values(buyers).contains(_))
+}
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.id AS res__id,
+      buyer0.name AS res__name,
+      buyer0.date_of_birth AS res__date_of_birth
+    FROM buyer buyer0
+    WHERE (NOT
+      ((buyer0.id, buyer0.name, buyer0.date_of_birth) IN (VALUES (?, ?, ?), (?, ?, ?))))
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
     )
     ```
 

@@ -140,5 +140,4 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * JSON columns
-* Multi-column IN VALUES clauses
 * Audit list of static functions for Postgres/MySql/Sqlite/H2

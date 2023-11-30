@@ -244,6 +244,26 @@ trait Select[Q, R]
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])]
 
+  /**
+   * Returns whether or not the [[Select]] on the left contains the [[other]] value on the right
+   */
+  def contains(other: Q): Expr[Boolean] = Expr { implicit ctx =>
+    val lhs = qr.walkExprs(other).map(e => sql"$e") match {
+      case Seq(single) => single
+      case multiple => sql"(${SqlStr.join(multiple, SqlStr.commaSep)})"
+    }
+    sql"($lhs IN $this)"
+  }
+
+  /**
+   * Returns whether or not the [[Select]] on the left is empty with zero elements
+   */
+  def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"(NOT EXISTS $this)" }
+
+  /**
+   * Returns whether or not the [[Select]] on the left is nonempty with one or more elements
+   */
+  def nonEmpty: Expr[Boolean] = Expr { implicit ctx => sql"(EXISTS $this)" }
 }
 
 object Select {
