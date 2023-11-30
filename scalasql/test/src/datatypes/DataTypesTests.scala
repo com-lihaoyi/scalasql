@@ -8,7 +8,7 @@ import utils.ScalaSqlSuite
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDate, LocalDateTime, LocalTime, OffsetDateTime, OffsetTime, ZoneId, ZoneOffset, ZonedDateTime}
 
-
+import _root_.test.scalasql.WorldSqlTests.ArrowAssert
 
 case class Nested[+T[_]](
   fooId: T[Int],
@@ -123,19 +123,15 @@ trait DataTypesTests extends ScalaSqlSuite {
           myOffsetDateTime = v.myOffsetDateTime.withOffsetSameInstant(OffsetDateTime.now.getOffset)
         )
 
-        checker(
-          query = NonRoundTripTypes.insert.columns(
+        db.run(
+          NonRoundTripTypes.insert.columns(
             _.myOffsetDateTime := value.myOffsetDateTime,
             _.myZonedDateTime := value.myZonedDateTime
-          ),
-          value = 1
-        )
+          )
+        ) ==> 1
 
-        checker(
-          query = NonRoundTripTypes.select,
-          value = Seq(normalize(value)),
-          normalize = (x: Seq[NonRoundTripTypes[Id]]) => x.map(normalize)
-        )
+
+        db.run(NonRoundTripTypes.select).map(normalize) ==> Seq(normalize(value))
       }
     )
 
@@ -176,41 +172,34 @@ trait DataTypesTests extends ScalaSqlSuite {
           )
         )
 
-        checker(
-          query = Enclosing.insert.columns(
-            _.barId := value1.barId,
-            _.myString := value1.myString,
-            _.foo.fooId := value1.foo.fooId,
-            _.foo.myBoolean := value1.foo.myBoolean,
-          ),
-          sql = """
-            INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean)
-            VALUES (?, ?, ?, ?)
-          """,
-          value = 1
+        val insertColumns = Enclosing.insert.columns(
+          _.barId := value1.barId,
+          _.myString := value1.myString,
+          _.foo.fooId := value1.foo.fooId,
+          _.foo.myBoolean := value1.foo.myBoolean,
         )
+        db.toSqlQuery(insertColumns) ==>
+          "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
 
-        checker(
-          query = Enclosing.insert.values(value2),
-          sql = """
-            INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean)
-            VALUES (?, ?, ?, ?)
-          """,
-          value = 1
-        )
+        db.run(insertColumns) ==> 1
 
-        checker(
-          query = Enclosing.select,
-          sql = """
-            SELECT
-              enclosing0.bar_id AS res__bar_id,
-              enclosing0.my_string AS res__my_string,
-              enclosing0.foo_id AS res__foo_id,
-              enclosing0.my_boolean AS res__my_boolean
-            FROM enclosing enclosing0
-          """,
-          value = Seq(value1, value2)
-        )
+        val insertValues = Enclosing.insert.values(value2)
+        db.toSqlQuery(insertValues) ==>
+          "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
+
+        db.run(insertValues) ==> 1
+
+        db.toSqlQuery(Enclosing.select) ==> """
+          SELECT
+            enclosing0.bar_id AS res__bar_id,
+            enclosing0.my_string AS res__my_string,
+            enclosing0.foo_id AS res__foo_id,
+            enclosing0.my_boolean AS res__my_boolean
+          FROM enclosing enclosing0
+        """
+
+        db.run(Enclosing.select) ==> Seq(value1, value2)
+
       }
     )
   }

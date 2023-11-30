@@ -1,4 +1,4 @@
-# Design
+# ScalaSql Design
 
 The rough dataflow of how ScalaSql works is given by the following diagram:
 
