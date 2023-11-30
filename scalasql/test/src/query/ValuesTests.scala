@@ -177,16 +177,25 @@ trait ValuesTests extends ScalaSqlSuite {
             Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
             Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
           )
-          db.values[Buyer[Expr], Buyer[Id]](buyers).map{ b => (b.id, b)}
+          val query = db.values(buyers)(Buyer.containerQr[Expr]).map{ b => (b.id + 100, b)}
+          query
         },
         sqls = Seq(
           """
-            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
-            FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
+            SELECT
+              (subquery0.column1 + ?) AS res__0,
+              subquery0.column1 AS res__1__id,
+              subquery0.column2 AS res__1__name,
+              subquery0.column3 AS res__1__date_of_birth
+            FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
           """,
           """
-            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
-            FROM (VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)) subquery0
+            SELECT
+              (subquery0.column1 + ?) AS res__0,
+              subquery0.column1 AS res__1__id,
+              subquery0.column2 AS res__1__name,
+              subquery0.column3 AS res__1__date_of_birth
+            FROM (VALUES ROW(?, ?, ?), ROW(?, ?, ?)) subquery0
           """
         ),
         value = Seq(
@@ -197,6 +206,40 @@ trait ValuesTests extends ScalaSqlSuite {
             `values` supports tuples and other data structures as well
         """
       )
+//      test("caseClassContains") - checker(
+//        query = Text {
+//          val buyers = Seq(
+//            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
+//            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+//          )
+//          Buyer.select.filter(db.values(buyers).contains(_))
+//        },
+//        sqls = Seq(
+//          """
+//            SELECT
+//              (subquery0.column1 + ?) AS res__0,
+//              subquery0.column1 AS res__1__id,
+//              subquery0.column2 AS res__1__name,
+//              subquery0.column3 AS res__1__date_of_birth
+//            FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
+//          """,
+//          """
+//            SELECT
+//              (subquery0.column1 + ?) AS res__0,
+//              subquery0.column1 AS res__1__id,
+//              subquery0.column2 AS res__1__name,
+//              subquery0.column3 AS res__1__date_of_birth
+//            FROM (VALUES ROW(?, ?, ?), ROW(?, ?, ?)) subquery0
+//          """
+//        ),
+//        value = Seq(
+//          (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
+//          (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+//        ),
+//        docs = """
+//            `values` supports tuples and other data structures as well
+//        """
+//      )
     }
   }
 }

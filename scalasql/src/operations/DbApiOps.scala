@@ -2,7 +2,7 @@ package scalasql.operations
 
 import scalasql.dialects.Dialect
 import scalasql.{Queryable, TypeMapper}
-import scalasql.query.{Expr, Select, WithCte, WithCteRef}
+import scalasql.query.{Expr, Select, Values, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
 
 class DbApiOps(dialect: Dialect) {
@@ -16,7 +16,7 @@ class DbApiOps(dialect: Dialect) {
   /**
    * Creates a SQL `VALUES` clause
    */
-  def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) = new scalasql.query.Values(ts)
+  def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]): Values[Q, R] = new scalasql.query.Values(ts)
 
   import scalasql.renderer.SqlStr.SqlStringSyntax
 

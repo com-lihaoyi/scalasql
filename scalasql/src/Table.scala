@@ -63,7 +63,8 @@ object Table {
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
         construct0: ResultSetIterator => R,
-        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]]
+        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]],
+        deconstruct20: R => Q = ???
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
@@ -77,7 +78,7 @@ object Table {
         ExprsToSql(this.walk(q), SqlStr.empty, ctx)
       }
 
-      def deconstruct2(r: R): Q = ???
+      def deconstruct2(r: R): Q = deconstruct20(r)
     }
 
     def flattenPrefixedExprs[T](t: T)(implicit q: Queryable.Row[T, _]): Seq[Expr[_]] = {

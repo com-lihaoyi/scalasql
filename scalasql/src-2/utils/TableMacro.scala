@@ -39,14 +39,14 @@ object TableMacros {
       }
     }
 
-    def subParam(paramInfo: Type) = {
+    def subParamId(paramInfo: Type) = {
 
       paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
         List(typeOf[scalasql.Id[_]].asInstanceOf[ExistentialType].underlying.asInstanceOf[TypeRef].sym.info)
       )
     }
-    def subParam2(paramInfo: Type) = {
+    def subParamExpr(paramInfo: Type) = {
 
       paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
@@ -54,17 +54,17 @@ object TableMacros {
       )
     }
     val constructParams = for (param <- constructorParameters) yield {
-      val tpe = subParam(param.info)
+      val tpe = subParamId(param.info)
       q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for (param <- constructorParameters) yield {
-      val tpe = subParam(param.info)
+      val tpe = subParamId(param.info)
       q"(v: Any) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[$tpe])"
     }
     val deconstruct2Params = for (param <- constructorParameters) yield {
-      val tpe = subParam(param.info)
-      val tpe2 = subParam2(param.info)
+      val tpe = subParamId(param.info)
+      val tpe2 = subParamExpr(param.info)
       val name = param.name
       q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct2(r.${TermName(name.toString)}).asInstanceOf[$tpe2]"
     }
@@ -83,6 +83,12 @@ object TableMacros {
       q"_root_.scalasql.Table.Internal.flattenPrefixedExprs(table.${TermName(name.toString)})"
     }
 
+    import compat._
+    val newRef = TypeRef(
+      pre = caseClassType.tpe.resultType.asInstanceOf[TypeRef].pre,
+      sym = caseClassType.tpe.resultType.asInstanceOf[TypeRef].sym,
+      args = weakTypeOf[V[scalasql.Expr]].typeArgs
+    )
     c.Expr[Metadata[V]](q"""
     import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
     new _root_.scalasql.Table.Metadata[$caseClassType](
@@ -91,9 +97,10 @@ object TableMacros {
         import dialect._
         new _root_.scalasql.Table.Internal.TableQueryable(
           () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
-          table => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
+          (table: $newRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           construct0 = args => new $caseClassType(..$constructParams),
-          deconstruct0 = Seq(..$deconstructParams)
+          deconstruct0 = Seq(..$deconstructParams),
+          deconstruct20 = r => new $caseClassType(..$deconstruct2Params)
         )
       },
       ($tableRef: _root_.scalasql.query.TableRef, dialect) => {
