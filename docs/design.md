@@ -188,6 +188,11 @@ implementation or advanced users.
    difficult edge cases that emerge when trying to emulate local mutable state via database 
    queries 
 
+6. **Schema management and migrations**: ScalaSql focuses primarily on writing queries
+   to create, read, update, and delete rows from existing tables..
+   DDL statements like `CREATE TABLE`, `CREATE TYPE`, `ALTER TABLE`, etc. are out of scope
+   and will need to be managed separately (e.g. by a tool like [FlyWay](https://flywaydb.org/))
+
 ## Comparisons
 
 
