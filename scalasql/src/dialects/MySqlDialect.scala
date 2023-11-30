@@ -86,7 +86,7 @@ trait MySqlDialect extends Dialect {
     new MySqlDialect.OnConflictable[Q, Int](query, WithExpr.get(query), query.table)
 
   override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
-    override def values[T: TypeMapper](ts: Seq[T]) = new MySqlDialect.Values(ts)
+    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) = new MySqlDialect.Values(ts)
   }
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
@@ -347,14 +347,14 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
+  class Values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) extends scalasql.query.Values[Q, R](ts) {
     override protected def selectRenderer(prevContext: Context) =
-      new ValuesRenderer[T](this)(implicitly, prevContext)
-    override protected def columnName = "column_0"
+      new ValuesRenderer[Q, R](this)(implicitly, prevContext)
+    override protected def columnName(n: Int) = s"column_$n"
   }
-  class ValuesRenderer[T: TypeMapper](v: Values[T])(implicit ctx: Context)
-      extends scalasql.query.Values.Renderer[T](v) {
-    override def wrapRow(t: T) = sql"ROW($t)"
+  class ValuesRenderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context)
+      extends scalasql.query.Values.Renderer[Q, R](v) {
+    override def wrapRow(t: R): SqlStr = SqlStr.join(qr.deconstruct(t).map(i => sql"ROW($i)"))
   }
 
 }

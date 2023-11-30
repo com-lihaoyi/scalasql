@@ -16,7 +16,7 @@ class DbApiOps(dialect: Dialect) {
   /**
    * Creates a SQL `VALUES` clause
    */
-  def values[T: TypeMapper](ts: Seq[T]) = new scalasql.query.Values(ts)
+  def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) = new scalasql.query.Values(ts)
 
   import scalasql.renderer.SqlStr.SqlStringSyntax
 

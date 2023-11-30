@@ -43,7 +43,7 @@ trait H2Dialect extends Dialect {
     new H2Dialect.TableOps(t)
 
   override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
-    override def values[T: TypeMapper](ts: Seq[T]) = new H2Dialect.Values(ts)
+    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) = new H2Dialect.Values(ts)
   }
 
   implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
@@ -145,7 +145,7 @@ object H2Dialect extends H2Dialect {
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R]
 
-  class Values[T: TypeMapper](ts: Seq[T]) extends scalasql.query.Values[T](ts) {
-    override protected def columnName = "c1"
+  class Values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) extends scalasql.query.Values[Q, R](ts) {
+    override protected def columnName(n: Int) = s"c${n+1}"
   }
 }

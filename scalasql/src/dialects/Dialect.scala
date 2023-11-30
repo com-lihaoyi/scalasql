@@ -260,7 +260,7 @@ trait Dialect extends DialectConfig {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[_, T] = {
+  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Expr[T], T] = {
     new Expr.ExprQueryable[Expr, T]()
   }
 }
