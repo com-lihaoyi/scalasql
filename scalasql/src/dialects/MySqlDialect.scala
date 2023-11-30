@@ -161,7 +161,7 @@ object MySqlDialect extends MySqlDialect {
         Nil,
         Seq(filter(metadata.vExpr(ref, dialectSelf)))
       )(
-        t.containerQr
+        t.containerQr2
       )
     }
 

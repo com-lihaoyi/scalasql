@@ -39,7 +39,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
   def update(filter: V[Column.ColumnExpr] => Expr[Boolean]): Update[V[Column.ColumnExpr], V[Id]] = {
     val (ref, expr) = toFromExpr0
     new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.tableMetadata(t).vExpr(ref, dialect))))(
-      t.containerQr,
+      t.containerQr2,
       dialect
     )
   }
@@ -49,7 +49,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
    */
   def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
     val (ref, expr) = toFromExpr0
-    new Insert.Impl(expr, ref)(t.containerQr, dialect)
+    new Insert.Impl(expr, ref)(t.containerQr2, dialect)
   }
 
   /**

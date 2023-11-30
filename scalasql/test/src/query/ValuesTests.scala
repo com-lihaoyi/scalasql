@@ -177,7 +177,7 @@ trait ValuesTests extends ScalaSqlSuite {
             Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
             Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
           )
-          val query = db.values(buyers)(Buyer.containerQr[Expr]).map{ b => (b.id + 100, b)}
+          val query = db.values(buyers).map{ b => (b.id + 100, b)}
           query
         },
         sqls = Seq(

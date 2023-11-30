@@ -9,7 +9,7 @@ import scalasql.dialects.Dialect
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table.Metadata[V])
-    extends Table.Base {
+    extends Table.Base with Table.LowPri[V]{
 
   /**
    * The name of this table, before processing by [[Config.tableNameMapper]].
@@ -27,10 +27,11 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
 
-  implicit def containerQr[E[_] <: Expr[_]](implicit dialect: Dialect): Queryable.Row[V[E], V[Id]] =
+  implicit def containerQr(implicit dialect: Dialect): Queryable.Row[V[Expr], V[Id]] =
     tableMetadata
       .queryable(dialect)
-      .asInstanceOf[Queryable.Row[V[E], V[Id]]]
+      .asInstanceOf[Queryable.Row[V[Expr], V[Id]]]
+
 
   protected def tableRef = new scalasql.query.TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
@@ -40,6 +41,13 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 }
 
 object Table {
+  trait LowPri[V[_[_]]]{ this: Table[V] =>
+    implicit def containerQr2(implicit dialect: Dialect): Queryable.Row[V[Column.ColumnExpr], V[Id]] =
+      tableMetadata
+        .queryable(dialect)
+        .asInstanceOf[Queryable.Row[V[Column.ColumnExpr], V[Id]]]
+  }
+
   case class ImplicitMetadata[V[_[_]]](value: Metadata[V])
 
   def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
