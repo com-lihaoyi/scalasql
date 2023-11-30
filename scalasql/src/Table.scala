@@ -80,12 +80,6 @@ object Table {
       def deconstruct2(r: R): Q = ???
     }
 
-    def flattenPrefixedLists[T](
-        prefix: String
-    )(implicit q: Queryable.Row[T, _]): Seq[List[String]] = {
-      q.walkLabels().map(prefix +: _)
-    }
-
     def flattenPrefixedExprs[T](t: T)(implicit q: Queryable.Row[T, _]): Seq[Expr[_]] = {
       q.walkExprs(t)
     }
