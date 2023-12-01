@@ -96,10 +96,6 @@ object Table {
 
       def construct(args: Queryable.ResultSetIterator) = construct0(args)
 
-      def toSqlStr(q: Q, ctx: Context): SqlStr = {
-        ExprsToSql(this.walk(q), SqlStr.empty, ctx)
-      }
-
       def deconstruct(r: R): Q = deconstruct0(r)
     }
 

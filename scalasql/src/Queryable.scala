@@ -13,16 +13,31 @@ import java.sql.{PreparedStatement, ResultSet}
  * tree-shaped blob back into a return value via [[valueReader]]
  */
 trait Queryable[-Q, R] {
+  /**
+   * Whether this queryable value is executed using `java.sql.Statement.executeUpdate`
+   * instead of `.executeQuery`. Note that this needs to be known ahead of time, and
+   * cannot be discovered by just calling `.execute`, because some JDBC drivers do not
+   * properly handle updates in the `.execute` call
+   */
   def isExecuteUpdate(q: Q): Boolean
 
   def walkLabels(q: Q): Seq[List[String]]
   def walkExprs(q: Q): Seq[Expr[_]]
   def walk(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
+
+  /**
+   * Whether this query expects a single row to be returned, if so we can assert on
+   * the number of rows and raise an error if 0 rows or 2+ rows are present
+   */
   def singleRow(q: Q): Boolean
 
   def toSqlStr(q: Q, ctx: Context): SqlStr
-  def construct(q: Q, args: Queryable.ResultSetIterator): R
 
+  /**
+   * Construct a Scala return value from the [[Queryable.ResultSetIterator]] representing
+   * the return value of this query
+   */
+  def construct(q: Q, args: Queryable.ResultSetIterator): R
 }
 
 object Queryable {
@@ -57,9 +72,15 @@ object Queryable {
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 
+    def toSqlStr(q: Q, ctx: Context): SqlStr = {
+      val walked = this.walk(q)
+      ExprsToSql(walked, SqlStr.empty, ctx)
+    }
+
     def construct(q: Q, args: ResultSetIterator): R = construct(args)
     def construct(args: ResultSetIterator): R
     def deconstruct(r: R): Q
+
   }
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
@@ -82,11 +103,6 @@ object Queryable {
           .toIndexedSeq
       }
 
-      def toSqlStr(q: Q, ctx: Context): SqlStr = {
-        val walked = this.walk(q)
-        ExprsToSql(walked, SqlStr.empty, ctx)
-      }
-
       def construct(args: ResultSetIterator) = construct0(args)
 
       def deconstruct(r: R): Q = deconstruct0(r)
@@ -97,8 +113,6 @@ object Queryable {
     ): Queryable.Row[JoinNullable[Q], Option[R]] = new Queryable.Row[JoinNullable[Q], Option[R]] {
       def walkLabels() = qr.walkLabels()
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
-
-      def toSqlStr(q: JoinNullable[Q], ctx: Context) = qr.toSqlStr(q.get, ctx)
 
       def construct(args: ResultSetIterator): Option[R] = {
         val startNonNulls = args.nonNulls
