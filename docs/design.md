@@ -3,40 +3,39 @@
 The rough dataflow of how ScalaSql works is given by the following diagram:
 
 ```
-   {Table.select,update,map,
-    filter,join,aggregate}                         +-------->
-           |                                       |
-           |                                       |
-{Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
-   CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
-           |                                       |
-           |                                       |
-           +-------------+           +-------------+
-                         |           |
-                         v           |
-           +------ DatabaseApi#run(q: Q): R <------+
-           |                                       |
-         Q |                                       | R
-           |                                       |
-           v                                       |
- Queryable#{walk,toSqlStr}           Queryable#valueReader
-           |    |                            ^     ^
-           |    |                            |     |
-    SqlStr |    +------Seq[TypeMapper]-------+     | ResultSet
-           |                                       |
-           |                                       |
-           +---------> java.sql.execute -----------+
+     {Table.select,update,map,
+      filter,join,aggregate}                         +-------->
+             |                                       |
+             |                                       |
+  {Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
+     CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
+             |                                       |
+             |                                       |
+             +-------------+           +-------------+
+                           |           |
+                           v           |
+             +------ DatabaseApi#run(q: Q): R <------+
+             |                                       |
+           Q |                                       | R
+             |                                       |
+             v                                       |
+Queryable#{toSqlStr,walkExprs}               Queryable#construct
+             |                                       ^
+             |                                       |
+      SqlStr |                                       | ResultSet
+             |                                       |
+             |                                       |
+             +---------> java.sql.execute -----------+
 ```
 
 1. We start off constructing a query of type `Q`: an expression, query, or
    case-class/tuple containing expressions.
 
-2. These get converted into a `SqlStr` and `Seq[TypeMapper]` using the
-   `Queryable[Q, R]` typeclass
+2. These get converted into a `SqlStr` using the `Queryable[Q, R]` typeclass
 
 3. We execute the `SqlStr` using JDBC/`java.sql` APIs and get back a `ResultSet`
 
-4. We use `Queryable[Q, R]#valueReader` and `Seq[TypeMapper]` to convert the
+4. We use `Queryable[Q, R]#construct` to convert the
    `ResultSet` back into a Scala type `R`: typically primitive types, collections,
    or case-classes/tuples containing primitive types
 
@@ -47,9 +46,9 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
 The entire ScalaSql codebase is built around the `Queryable[Q, R]` typeclass:
 
 - `Q` -> `R` given `Queryable[Q, R]`
-   - `Query[Q_r]` -> `R_r`
-   - `Q_r` -> `R_r` given `Queryable.Row[Q_r, R_r]`
-      - `TupleN[Q_r1, Q_r2, ... Q_rn]` -> `TupleN[R_r1, R_r2, ... R_rn]`
+   - `Query[Q_row]` -> `R_row`
+   - `Q_row` -> `R_row` given `Queryable.Row[Q_row, R_row]`
+      - `TupleN[Q_row1, Q_row2, ... Q_rowN]` -> `TupleN[R_row1, R_row2, ... R_rowN]`
       - `CaseClass[Expr]` -> `CaseClass[Id]`
       - `Expr[T]` -> `T`
 
@@ -64,7 +63,7 @@ We need to use a `Queryable` typeclass here for two reasons:
    of the type parameter but the `CaseClass[Expr] -> CaseClass[Id]` and `TupleN` not
    following that pattern. Thus we need to use the typeclass to encode this logic
 
-Unlike `Queryable[Q, R]`,`Query[Q_r]` and `Expr[T]` are open class hierarchies. This is
+Unlike `Queryable[Q, R]`,`Query[Q_row]` and `Expr[T]` are open class hierarchies. This is
 done intentionally to allow users to easily `override` portions of this logic at runtime:
 e.g. MySql has a different syntax for `UPDATE`/`JOIN` commands than most other databases,
 and it can easily subclass `scalasql.query.Update` and override `toSqlQuery`. In general,
@@ -97,7 +96,8 @@ than static methods that receive `Expr[T]` as parameters. This has two goals:
 2. To avoid namespace collisions: extension methods via `implicit class`es tend 
    to cause fewer namespace collisions than imported static methods, as only the
    name of the `implicit class` must be imported for all extension methods to 
-   be available
+   be available. "static" methods that do not belong to any obvious type are provided
+   as extension methods on the `DbApi` type that you use to make queries
 
 Similarly, operations on `Select`, `Update`, etc. are mostly methods that aim to follow
 the Scala collections style.
@@ -236,7 +236,7 @@ user-facing complexity and internal maintainability:
 ### SLICK
 
 SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
-transactions, and query optimization. These areAS result in a lot of user-facing and
+transactions, and query optimization. These areas result in a lot of user-facing and
 internal complexity for the library. While it is possible to paper over some of this
 complexity with libraries such as [Blocking Slick](https://github.com/gitbucket/blocking-slick),
 the essential complexity remains to cause confusion for users and burden for maintainers.
