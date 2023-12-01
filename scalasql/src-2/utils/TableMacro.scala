@@ -68,7 +68,7 @@ object TableMacros {
       )
     }
 
-    val queryables = for(param <- constructorParameters) yield{
+    val queryables = for (param <- constructorParameters) yield {
       val tpe = subParamId(param.info)
       val tpe2 = subParamExpr(param.info)
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
@@ -89,7 +89,7 @@ object TableMacros {
         q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.walkLabels0()"
       } else {
         val name = param.name
-        q"_root_.scala.List(List(${name.toString}))"
+        q"_root_.scala.List(${name.toString})"
       }
     }
 
@@ -107,10 +107,10 @@ object TableMacros {
     c.Expr[Metadata[V]](q"""
     new _root_.scalasql.Table.Metadata[$caseClassType](
       () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
-      dialect => {
+      (walkLabels0, dialect) => {
         import dialect._
         new _root_.scalasql.Table.Internal.TableQueryable(
-          () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
+          walkLabels0,
           (table: $newRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           construct0 = args => new $caseClassType(..$constructParams),
           deconstruct0 = r => new $caseClassType(..$deconstructParams)

@@ -30,12 +30,12 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   implicit def containerQr(implicit dialect: Dialect): Queryable.Row[V[Expr], V[Id]] =
     tableMetadata
-      .queryable(dialect)
+      .queryable(tableMetadata.walkLabels0, dialect)
       .asInstanceOf[Queryable.Row[V[Expr], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
-    tableMetadata.walkLabels0().map(_.head)
+    tableMetadata.walkLabels0()
   }
   implicit def tableImplicitMetadata: Table.ImplicitMetadata[V] =
     Table.ImplicitMetadata(tableMetadata)
@@ -47,7 +47,7 @@ object Table {
         implicit dialect: Dialect
     ): Queryable.Row[V[Column.ColumnExpr], V[Id]] =
       tableMetadata
-        .queryable(dialect)
+        .queryable(tableMetadata.walkLabels0, dialect)
         .asInstanceOf[Queryable.Row[V[Column.ColumnExpr], V[Id]]]
   }
 
@@ -64,19 +64,19 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val walkLabels0: () => Seq[List[String]],
-      val queryable: Dialect => Queryable[V[Expr], V[Id]],
+      val walkLabels0: () => Seq[String],
+      val queryable: (() => Seq[String], Dialect) => Queryable[V[Expr], V[Id]],
       val vExpr: (TableRef, Dialect) => V[Column.ColumnExpr]
   )
   object Metadata extends scalasql.utils.TableMacros
   object Internal {
     class TableQueryable[Q, R <: scala.Product](
-        walkLabels0: () => Seq[List[String]],
+        walkLabels0: () => Seq[String],
         walkExprs0: Q => Seq[Expr[_]],
         construct0: ResultSetIterator => R,
         deconstruct0: R => Q = ???
     ) extends Queryable.Row[Q, R] {
-      def walkLabels(): Seq[List[String]] = walkLabels0()
+      def walkLabels(): Seq[List[String]] = walkLabels0().map(List(_))
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
       def construct(args: ResultSetIterator) = construct0(args)
