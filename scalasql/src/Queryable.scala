@@ -23,12 +23,12 @@ trait Queryable[-Q, R] {
 
   /**
    * Returns a sequence of labels, each represented by a list of tokens, representing
-   * the expressions created by this query
+   * the expressions created by this queryable value
    */
   def walkLabels(q: Q): Seq[List[String]]
 
   /**
-   * Returns a sequence of expressions created by this query
+   * Returns a sequence of expressions created by this queryable value
    */
   def walkExprs(q: Q): Seq[Expr[_]]
 
@@ -40,11 +40,15 @@ trait Queryable[-Q, R] {
    */
   def singleRow(q: Q): Boolean
 
+  /**
+   * Converts the given queryable value into a [[SqlStr]], that can then be executed
+   * by the underlying SQL JDBC interface
+   */
   def toSqlStr(q: Q, ctx: Context): SqlStr
 
   /**
    * Construct a Scala return value from the [[Queryable.ResultSetIterator]] representing
-   * the return value of this query
+   * the return value of this queryable value
    */
   def construct(q: Q, args: Queryable.ResultSetIterator): R
 }
@@ -88,6 +92,12 @@ object Queryable {
 
     def construct(q: Q, args: ResultSetIterator): R = construct(args)
     def construct(args: ResultSetIterator): R
+
+    /**
+     * Takes the Scala-value of type [[R]] and converts it into a database-value of type [[Q]],
+     * potentially representing multiple columns. Used for inserting Scala values into `INSERT`
+     * or `VALUES` clauses
+     */
     def deconstruct(r: R): Q
 
   }
