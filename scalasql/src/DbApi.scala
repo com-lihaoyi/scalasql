@@ -175,7 +175,6 @@ object DbApi {
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
       streamRaw0[R](
         construct = qr.construct,
-        columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq),
         sql,
         anySeqPuts(variables),
         fetchSize,
@@ -326,28 +325,15 @@ object DbApi {
       }
     }
 
-    private def prepareColumnUnmapper[Q, R](query: Q, qr: Queryable[Q, R]) = {
-      val walked = qr.walkLabels(query)
-
-      val columnUnMapper = walked.map { namesChunks =>
-        Config.joinName(namesChunks.map(config.columnNameMapper), config) ->
-          Config.joinName(namesChunks, config)
-      }.toMap
-
-      columnUnMapper
-    }
-
     def streamSql[R](
         sql: SqlStr,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
-      val columnNameUnMapper = Right(qr.walkLabels().map(_.toIndexedSeq).toIndexedSeq)
       val flattened = SqlStr.flatten(sql)
 
       streamFlattened(
         qr.construct,
-        columnNameUnMapper,
         flattened,
         fetchSize,
         queryTimeoutSeconds
@@ -356,13 +342,11 @@ object DbApi {
 
     def streamFlattened[R](
         construct: Queryable.ResultSetIterator => R,
-        columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         flattened: SqlStr.Flattened,
         fetchSize: Int,
         queryTimeoutSeconds: Int
     ) = streamRaw0(
       construct,
-      columnNameUnMapper,
       combineQueryString(flattened),
       flattenParamPuts(flattened),
       fetchSize,
@@ -371,7 +355,6 @@ object DbApi {
 
     def streamRaw0[R](
         construct: Queryable.ResultSetIterator => R,
-        columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
         fetchSize: Int,
@@ -394,7 +377,6 @@ object DbApi {
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = {
       val flattened = unpackQueryable(query, qr)
-      val columnUnMapper = prepareColumnUnmapper(query, qr)
       streamFlattened(
         r => {
           qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
@@ -402,7 +384,6 @@ object DbApi {
             case r: R => r
           }
         },
-        Left(columnUnMapper),
         flattened,
         fetchSize,
         queryTimeoutSeconds

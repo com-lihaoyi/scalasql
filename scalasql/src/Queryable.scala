@@ -13,6 +13,7 @@ import java.sql.{PreparedStatement, ResultSet}
  * tree-shaped blob back into a return value via [[valueReader]]
  */
 trait Queryable[-Q, R] {
+
   /**
    * Whether this queryable value is executed using `java.sql.Statement.executeUpdate`
    * instead of `.executeQuery`. Note that this needs to be known ahead of time, and
@@ -23,12 +24,14 @@ trait Queryable[-Q, R] {
 
   /**
    * Returns a sequence of labels, each represented by a list of tokens, representing
-   * the expressions created by this queryable value
+   * the expressions created by this queryable value. Used to add `AS foo_bar` labels
+   * to the generated queries, to aid in readability
    */
   def walkLabels(q: Q): Seq[List[String]]
 
   /**
-   * Returns a sequence of expressions created by this queryable value
+   * Returns a sequence of expressions created by this queryable value. Used to generate
+   * the column list `SELECT` clauses, both for nested and top level `SELECT`s
    */
   def walkExprs(q: Q): Seq[Expr[_]]
 
@@ -86,8 +89,7 @@ object Queryable {
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = {
-      val walked = this.walkLabelsAndExprs(q)
-      ExprsToSql(walked, SqlStr.empty, ctx)
+      ExprsToSql(this.walkLabelsAndExprs(q), SqlStr.empty, ctx)
     }
 
     def construct(q: Q, args: ResultSetIterator): R = construct(args)
