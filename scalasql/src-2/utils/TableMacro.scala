@@ -1,5 +1,5 @@
 package scalasql.utils
-import scalasql.Table
+import scalasql.{Id, Table}
 import scalasql.Table.Metadata
 
 import scala.language.experimental.macros
@@ -39,26 +39,11 @@ object TableMacros {
       }
     }
 
-    def subParamId(paramInfo: Type) = {
-
+    def subParam(paramInfo: Type, tpe: Type) = {
       paramInfo.substituteTypes(
         List(constructor.info.resultType.typeArgs.head.typeSymbol),
         List(
-          typeOf[scalasql.Id[_]]
-            .asInstanceOf[ExistentialType]
-            .underlying
-            .asInstanceOf[TypeRef]
-            .sym
-            .info
-        )
-      )
-    }
-    def subParamExpr(paramInfo: Type) = {
-
-      paramInfo.substituteTypes(
-        List(constructor.info.resultType.typeArgs.head.typeSymbol),
-        List(
-          typeOf[scalasql.Expr[_]]
+          tpe
             .asInstanceOf[ExistentialType]
             .underlying
             .asInstanceOf[TypeRef]
@@ -69,19 +54,21 @@ object TableMacros {
     }
 
     val queryables = for (param <- constructorParameters) yield {
-      val tpe = subParamId(param.info)
-      val tpe2 = subParamExpr(param.info)
+      val tpe = subParam(param.info, typeOf[Id[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
     }
+
     val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val tpe = subParamId(param.info)
-      q"${queryables(i)}.construct(args): scalasql.Id[$tpe]"
+      val tpe = subParam(param.info, typeOf[Id[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val tpe = subParamId(param.info)
-      val name = param.name
-      q"${queryables(i)}.deconstruct(r.${TermName(name.toString)})"
+      val tpe = subParam(param.info, typeOf[Id[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      q"queryable[$tpe2, $tpe]($i).deconstruct(r.${TermName(param.name.toString)})"
     }
 
     val flattenLists = for (param <- constructorParameters) yield {
@@ -94,21 +81,29 @@ object TableMacros {
     }
 
     val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val name = param.name
-      q"${queryables(i)}.walkExprs(table.${TermName(name.toString)})"
+      val tpe = subParam(param.info, typeOf[Id[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      q"queryable[$tpe2, $tpe]($i).walkExprs(table.${TermName(param.name.toString)})"
     }
 
     import compat._
+    val typeRef = caseClassType.tpe.resultType.asInstanceOf[TypeRef]
     val newRef = TypeRef(
-      pre = caseClassType.tpe.resultType.asInstanceOf[TypeRef].pre,
-      sym = caseClassType.tpe.resultType.asInstanceOf[TypeRef].sym,
+      pre = typeRef.pre,
+      sym = typeRef.sym,
       args = weakTypeOf[V[scalasql.Expr]].typeArgs
     )
-    c.Expr[Metadata[V]](q"""
+    c.Expr[Metadata[V]](q"""{
+
     new _root_.scalasql.Table.Metadata[$caseClassType](
+      (dialect, n) => {
+        import dialect._;
+        n match{ case ..${queryables.zipWithIndex.map { case (q, i) => cq"$i => $q" }} }
+      },
       () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
-      (walkLabels0, dialect) => {
+      (walkLabels0, dialect, queryable) => {
         import dialect._
+
         new _root_.scalasql.Table.Internal.TableQueryable(
           walkLabels0,
           (table: $newRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
@@ -116,12 +111,13 @@ object TableMacros {
           deconstruct0 = r => new $caseClassType(..$deconstructParams)
         )
       },
-      ($tableRef: _root_.scalasql.query.TableRef, dialect) => {
+      ($tableRef: _root_.scalasql.query.TableRef, dialect, queryable) => {
         import dialect._
+
         new $caseClassType(..$columnParams)
       }
     )
-    """)
+    }""")
   }
 
 }

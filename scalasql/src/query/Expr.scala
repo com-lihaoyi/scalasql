@@ -69,14 +69,13 @@ object Expr {
 
   implicit def apply[T](
       x: T
-  )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = {
-    apply0[T](x)(conv, mappedType0)
+  )(implicit conv: T => SqlStr.Interp): Expr[T] = {
+    apply0[T](x)(conv)
   }
   def apply0[T](
       x: T,
       exprIsLiteralTrue0: Boolean = false
-  )(implicit conv: T => SqlStr.Interp, mappedType0: TypeMapper[T]): Expr[T] = new Expr[T] {
-    def mappedType = mappedType0
+  )(implicit conv: T => SqlStr.Interp): Expr[T] = new Expr[T] {
     override def toSqlExpr0(implicit ctx: Context): SqlStr =
       new SqlStr(Array("", ""), Array(conv(x)), false, Array.empty[Expr.Identity])
     protected override def exprIsLiteralTrue = exprIsLiteralTrue0

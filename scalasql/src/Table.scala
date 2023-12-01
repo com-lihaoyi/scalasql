@@ -30,7 +30,11 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   implicit def containerQr(implicit dialect: Dialect): Queryable.Row[V[Expr], V[Id]] =
     tableMetadata
-      .queryable(tableMetadata.walkLabels0, dialect)
+      .queryable(
+        tableMetadata.walkLabels0,
+        dialect,
+        new Table.Metadata.QueryableProxy(tableMetadata.queryables(dialect, _))
+      )
       .asInstanceOf[Queryable.Row[V[Expr], V[Id]]]
 
   protected def tableRef = new scalasql.query.TableRef(this)
@@ -46,9 +50,7 @@ object Table {
     implicit def containerQr2(
         implicit dialect: Dialect
     ): Queryable.Row[V[Column.ColumnExpr], V[Id]] =
-      tableMetadata
-        .queryable(tableMetadata.walkLabels0, dialect)
-        .asInstanceOf[Queryable.Row[V[Column.ColumnExpr], V[Id]]]
+      containerQr.asInstanceOf[Queryable.Row[V[Column.ColumnExpr], V[Id]]]
   }
 
   case class ImplicitMetadata[V[_[_]]](value: Metadata[V])
@@ -64,11 +66,24 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
+      val queryables: (Dialect, Int) => Queryable.Row[_, _],
       val walkLabels0: () => Seq[String],
-      val queryable: (() => Seq[String], Dialect) => Queryable[V[Expr], V[Id]],
-      val vExpr: (TableRef, Dialect) => V[Column.ColumnExpr]
-  )
-  object Metadata extends scalasql.utils.TableMacros
+      val queryable: (
+          () => Seq[String],
+          Dialect,
+          Metadata.QueryableProxy
+      ) => Queryable[V[Expr], V[Id]],
+      val vExpr0: (TableRef, Dialect, Metadata.QueryableProxy) => V[Column.ColumnExpr]
+  ) {
+    def vExpr(t: TableRef, d: Dialect) = vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
+  }
+
+  object Metadata extends scalasql.utils.TableMacros {
+    class QueryableProxy(queryables: Int => Queryable.Row[_, _]) {
+      def apply[T, V](n: Int): Queryable.Row[T, V] = queryables(n).asInstanceOf[Queryable.Row[T, V]]
+    }
+  }
+
   object Internal {
     class TableQueryable[Q, R <: scala.Product](
         walkLabels0: () => Seq[String],
