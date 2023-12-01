@@ -80,7 +80,7 @@ object WithCte {
   class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
       extends Select.Renderer {
     def render(liveExprs: Option[Set[Expr.Identity]]) = {
-      val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walk(WithExpr.get(query.lhs))
+      val walked = query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walkLabelsAndExprs(WithExpr.get(query.lhs))
       val newExprNaming = walked.map { case (tokens, expr) =>
         (
           Expr.exprIdentity(expr),

@@ -16,9 +16,11 @@ object InsertValues {
       qr: Queryable.Row[Q, R],
       skippedColumns: Seq[Column.ColumnExpr[_]]
   ) extends InsertValues[Q, R] {
-    override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = Nil
+    protected def queryWalkLabels() = Nil
 
-    override protected def queryIsSingleRow: Boolean = true
+    protected def queryWalkExprs() = Nil
+
+    override protected def queryIsSingleRow = true
 
     protected override def queryIsExecuteUpdate = true
 

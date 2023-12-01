@@ -9,7 +9,8 @@ import scalasql.renderer.{Context, SqlStr}
  * a [[Query.Single]] that returns a single row
  */
 trait Query[R] extends Renderable {
-  protected def queryWalkExprs(): Seq[(List[String], Expr[_])]
+  protected def queryWalkLabels(): Seq[List[String]]
+  protected def queryWalkExprs(): Seq[Expr[_]]
   protected def queryIsSingleRow: Boolean
   protected def queryIsExecuteUpdate: Boolean = false
 
@@ -17,13 +18,14 @@ trait Query[R] extends Renderable {
 }
 
 object Query {
+  def queryWalkLabels[R](q: Query[R]) = q.queryWalkLabels()
   def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
   def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
   def queryConstruct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
-    override def walkLabels(q: Q) = q.queryWalkExprs().map(_._1)
-    override def walkExprs(q: Q) = q.queryWalkExprs().map(_._2)
+    override def walkLabels(q: Q) = q.queryWalkLabels()
+    override def walkExprs(q: Q) = q.queryWalkExprs()
     override def singleRow(q: Q) = q.queryIsSingleRow
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderToSql(ctx)
@@ -35,6 +37,7 @@ object Query {
 
   class Single[R](query: Multiple[R]) extends Query[R] {
     override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
+    protected def queryWalkLabels() = query.queryWalkLabels()
     protected def queryWalkExprs() = query.queryWalkExprs()
 
     protected def queryIsSingleRow: Boolean = true

@@ -22,6 +22,7 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     protected def expr = WithExpr.get(query)
+    protected def queryWalkLabels() = Query.queryWalkLabels(query)
     protected def queryWalkExprs() = Query.queryWalkExprs(query)
     protected def queryIsSingleRow = Query.queryIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {
@@ -43,6 +44,8 @@ object OnConflict {
   ) extends Query[R]
       with InsertReturnable[Q] {
     protected def expr = WithExpr.get(query)
+
+    protected def queryWalkLabels() = Query.queryWalkLabels(query)
     protected def queryWalkExprs() = Query.queryWalkExprs(query)
     protected def queryIsSingleRow = Query.queryIsSingleRow(query)
     protected def renderToSql(ctx: Context) = {

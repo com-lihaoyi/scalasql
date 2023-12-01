@@ -38,7 +38,9 @@ object Returning {
       Seq(qr.construct(args))
     }
 
-    def queryWalkExprs() = qr.walk(returning)
+    protected def queryWalkLabels() = qr.walkLabels(returning)
+
+    protected def queryWalkExprs() = qr.walkExprs(returning)
 
     override def queryIsSingleRow = false
 
@@ -46,7 +48,7 @@ object Returning {
       implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
       val prefix = Renderable.renderToSql(returnable)
-      val flattenedExpr = qr.walk(returning)
+      val flattenedExpr = qr.walkLabelsAndExprs(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"
 

@@ -21,7 +21,8 @@ class Aggregate[Q, R](
     qr: Queryable[Q, R]
 ) extends Query[R] {
 
-  protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = qr.walk(expr)
+  protected def queryWalkLabels() = qr.walkLabels(expr)
+  protected def queryWalkExprs() = qr.walkExprs(expr)
   protected def queryIsSingleRow: Boolean = true
   protected def renderToSql(ctx: Context) = toSqlStr0(ctx)
 

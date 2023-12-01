@@ -21,9 +21,9 @@ class Values[Q, R](val ts: Seq[R])(
 
   override val expr: Q = qr.deconstruct(ts.head)
 
-  override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = {
-    qr.walkExprs(expr).zipWithIndex.map { case (e, i) => List(i.toString) -> (e: Expr[_]) }
-  }
+  override protected def queryWalkLabels() = qr.walkExprs(expr).indices.map(i => List(i.toString))
+
+  override protected def queryWalkExprs() = qr.walkExprs(expr)
 
   override protected def selectRenderer(prevContext: Context): Select.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)

@@ -20,10 +20,12 @@ object InsertSelect {
     def table = insert.table
 
     protected override def renderToSql(ctx: Context) =
-      new Renderer(select, select.qr.walk(columns).map(_._2), ctx, Table.tableName(table.value))
+      new Renderer(select, select.qr.walkExprs(columns), ctx, Table.tableName(table.value))
         .render()
 
     protected override def queryIsExecuteUpdate = true
+
+    protected def queryWalkLabels() = Nil
 
     protected def queryWalkExprs() = Nil
 

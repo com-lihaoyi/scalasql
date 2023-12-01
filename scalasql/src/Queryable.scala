@@ -9,7 +9,7 @@ import java.sql.{PreparedStatement, ResultSet}
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to
  * return a result of type [[R]]. Involves two operations: flattening a structured
- * query to a flat list of expressions via [[walk]], and reading a JSON-ish
+ * query to a flat list of expressions via [[walkLabelsAndExprs]], and reading a JSON-ish
  * tree-shaped blob back into a return value via [[valueReader]]
  */
 trait Queryable[-Q, R] {
@@ -21,9 +21,18 @@ trait Queryable[-Q, R] {
    */
   def isExecuteUpdate(q: Q): Boolean
 
+  /**
+   * Returns a sequence of labels, each represented by a list of tokens, representing
+   * the expressions created by this query
+   */
   def walkLabels(q: Q): Seq[List[String]]
+
+  /**
+   * Returns a sequence of expressions created by this query
+   */
   def walkExprs(q: Q): Seq[Expr[_]]
-  def walk(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
+
+  def walkLabelsAndExprs(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
 
   /**
    * Whether this query expects a single row to be returned, if so we can assert on
@@ -73,7 +82,7 @@ object Queryable {
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = {
-      val walked = this.walk(q)
+      val walked = this.walkLabelsAndExprs(q)
       ExprsToSql(walked, SqlStr.empty, ctx)
     }
 

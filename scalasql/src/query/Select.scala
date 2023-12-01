@@ -181,7 +181,8 @@ trait Select[Q, R]
 
     renderer.render(None).withCompleteQuery(true)
   }
-  protected def queryWalkExprs() = qr.walk(expr)
+  protected def queryWalkLabels() = qr.walkLabels(expr)
+  protected def queryWalkExprs() = qr.walkExprs(expr)
   protected override def queryIsSingleRow = false
 
   protected def selectRenderer(prevContext: Context): Select.Renderer

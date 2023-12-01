@@ -155,7 +155,7 @@ class SimpleSelect[Q, R](
       groupAggregate: SelectProxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
     val groupKeyValue = groupKey(expr)
-    val Seq((_, groupKeyExpr)) = qrk.walk(groupKeyValue)
+    val Seq(groupKeyExpr) = qrk.walkExprs(groupKeyValue)
     val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
 
     // Weird hack to store the post-groupby `Select` as part of the `GroupBy`
@@ -198,7 +198,7 @@ class SimpleSelect[Q, R](
 
   protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
-    lazy val flattenedExpr = qr.walk(expr)
+    lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
     lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
       val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
@@ -239,7 +239,7 @@ object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
-    lazy val flattenedExpr = query.qr.walk(query.expr)
+    lazy val flattenedExpr = query.qr.walkLabelsAndExprs(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)
 

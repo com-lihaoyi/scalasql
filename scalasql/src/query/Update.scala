@@ -25,7 +25,8 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   def qr: Queryable.Row[Q, R]
   override def queryIsExecuteUpdate = true
   override def queryIsSingleRow = false
-  def queryWalkExprs() = Nil
+  protected def queryWalkLabels() = Nil
+  protected def queryWalkExprs() = Nil
 }
 
 object Update {

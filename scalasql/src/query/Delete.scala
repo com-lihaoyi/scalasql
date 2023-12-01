@@ -15,8 +15,9 @@ object Delete {
       extends Delete[Q] {
     import dialect._
     override def queryIsExecuteUpdate = true
-    def queryWalkExprs() = Nil
-    def queryIsSingleRow = true
+    protected def queryWalkLabels() = Nil
+    protected def queryWalkExprs() = Nil
+    protected def queryIsSingleRow = true
 
     protected def renderToSql(ctx: Context) = new Renderer(table, filter, ctx).render()
 

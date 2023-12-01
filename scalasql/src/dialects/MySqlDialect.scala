@@ -238,6 +238,7 @@ object MySqlDialect extends MySqlDialect {
   ) extends Query[R] {
 
     override def queryIsExecuteUpdate = true
+    protected def queryWalkLabels() = Query.queryWalkLabels(insert.query)
     protected def queryWalkExprs() = Query.queryWalkExprs(insert.query)
 
     protected def queryIsSingleRow = Query.queryIsSingleRow(insert.query)
