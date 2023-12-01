@@ -71,8 +71,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
         |    construct0 = rsi => (${commaSep(j => s"q$j.construct(rsi)")}),
-        |    deconstruct0 = Seq(${commaSep(j => s"v => q$j.deconstruct(v.asInstanceOf[R$j])")}),
-        |    deconstruct20 = { is => (${commaSep(j => s"""q$j.deconstruct2(is._$j)""")}) }
+        |    deconstruct0 = { is => (${commaSep(j => s"""q$j.deconstruct(is._$j)""")}) }
         |  )
         |}""".stripMargin
     }

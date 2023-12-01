@@ -417,7 +417,7 @@ trait SelectTests extends ScalaSqlSuite {
         Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       docs = """
-        ScalaSql's `.contains` can take a compound Scala value, which translates into
+      ScalaSql's `.contains` can take a compound Scala value, which translates into
         SQL's `IN` syntax on a tuple with multiple columns. e.g. this query uses that ability
         to find the `Buyer` which has a shipment on a specific date, as an alternative
         to doing a `JOIN`.

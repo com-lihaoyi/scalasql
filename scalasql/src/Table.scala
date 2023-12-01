@@ -74,26 +74,18 @@ object Table {
         walkLabels0: () => Seq[List[String]],
         walkExprs0: Q => Seq[Expr[_]],
         construct0: ResultSetIterator => R,
-        deconstruct0: Seq[Any => Seq[SqlStr.Interp.TypeInterp[_]]],
-        deconstruct20: R => Q = ???
+        deconstruct0: R => Q = ???
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0()
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
       def construct(args: ResultSetIterator) = construct0(args)
-      def deconstruct(r: R) = {
-        r.asInstanceOf[scala.Product]
-          .productIterator
-          .zip(deconstruct0)
-          .flatMap { case (v, d) => (d(v)) }
-          .toSeq
-      }
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         ExprsToSql(this.walk(q), SqlStr.empty, ctx)
       }
 
-      def deconstruct2(r: R): Q = deconstruct20(r)
+      def deconstruct(r: R): Q = deconstruct0(r)
     }
 
     def flattenPrefixedExprs[T](t: T)(implicit q: Queryable.Row[T, _]): Seq[Expr[_]] = {

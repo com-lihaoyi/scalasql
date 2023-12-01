@@ -29,10 +29,9 @@ object InsertValues {
         Table.tableName(insert.table.value),
         Table.tableLabels(insert.table.value),
         values,
-        ctx,
         qr,
         skippedColumns
-      ).render()
+      )(ctx).render()
     }
 
     override def skipColumns(x: (Q => Column.ColumnExpr[_])*) = {
@@ -50,10 +49,9 @@ object InsertValues {
       tableName: String,
       columnsList0: Seq[String],
       valuesList: Seq[R],
-      ctx: Context,
       qr: Queryable.Row[Q, R],
       skippedColumns: Seq[Column.ColumnExpr[_]]
-  ) {
+  )(implicit ctx: Context) {
 
     lazy val skippedColumnsNames = skippedColumns.map(_.name).toSet
 
@@ -70,7 +68,7 @@ object InsertValues {
 
     val valuesSqls = valuesList.map { v =>
       val commaSeparated = SqlStr.join(
-        qr.deconstruct(v)
+        qr.walkExprs(qr.deconstruct(v))
           .zipWithIndex
           .collect { case (s, i) if liveIndicesSet.contains(i) => sql"$s" },
         SqlStr.commaSep

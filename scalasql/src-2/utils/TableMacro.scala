@@ -67,20 +67,21 @@ object TableMacros {
         )
       )
     }
-    val constructParams = for (param <- constructorParameters) yield {
-      val tpe = subParamId(param.info)
-      q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].construct(args): scalasql.Id[$tpe]"
-    }
 
-    val deconstructParams = for (param <- constructorParameters) yield {
-      val tpe = subParamId(param.info)
-      q"(v: Any) => implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct(v.asInstanceOf[$tpe])"
-    }
-    val deconstruct2Params = for (param <- constructorParameters) yield {
+    val queryables = for (param <- constructorParameters) yield {
       val tpe = subParamId(param.info)
       val tpe2 = subParamExpr(param.info)
+      q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
+    }
+    val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
+      val tpe = subParamId(param.info)
+      q"${queryables(i)}.construct(args): scalasql.Id[$tpe]"
+    }
+
+    val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
+      val tpe = subParamId(param.info)
       val name = param.name
-      q"implicitly[_root_.scalasql.Queryable.Row[_, $tpe]].deconstruct2(r.${TermName(name.toString)}).asInstanceOf[$tpe2]"
+      q"${queryables(i)}.deconstruct(r.${TermName(name.toString)})"
     }
 
     val flattenLists = for (param <- constructorParameters) yield {
@@ -92,9 +93,9 @@ object TableMacros {
       }
     }
 
-    val flattenExprs = for (param <- constructorParameters) yield {
+    val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val name = param.name
-      q"_root_.scalasql.Table.Internal.flattenPrefixedExprs(table.${TermName(name.toString)})"
+      q"${queryables(i)}.walkExprs(table.${TermName(name.toString)})"
     }
 
     import compat._
@@ -105,6 +106,7 @@ object TableMacros {
     )
     c.Expr[Metadata[V]](q"""
     import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
+
     new _root_.scalasql.Table.Metadata[$caseClassType](
       () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
       dialect => {
@@ -113,8 +115,7 @@ object TableMacros {
           () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
           (table: $newRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           construct0 = args => new $caseClassType(..$constructParams),
-          deconstruct0 = Seq(..$deconstructParams),
-          deconstruct20 = r => new $caseClassType(..$deconstruct2Params)
+          deconstruct0 = r => new $caseClassType(..$deconstructParams)
         )
       },
       ($tableRef: _root_.scalasql.query.TableRef, dialect) => {

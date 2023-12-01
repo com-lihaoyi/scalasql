@@ -19,7 +19,7 @@ class Values[Q, R](val ts: Seq[R])(
   val tableRef = new SubqueryRef(this, qr)
   protected def columnName(n: Int) = s"column${n + 1}"
 
-  override val expr: Q = qr.deconstruct2(ts.head)
+  override val expr: Q = qr.deconstruct(ts.head)
 
   override protected def queryWalkExprs(): Seq[(List[String], Expr[_])] = {
     qr.walkExprs(expr).zipWithIndex.map { case (e, i) => List(i.toString) -> (e: Expr[_]) }
@@ -40,7 +40,7 @@ object Values {
   class Renderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context)
       extends Select.Renderer {
     def wrapRow(t: R): SqlStr = sql"(" + SqlStr.join(
-      qr.walkExprs(qr.deconstruct2(t)).map(i => sql"$i"),
+      qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep
     ) + sql")"
     def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {

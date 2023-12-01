@@ -357,7 +357,10 @@ object MySqlDialect extends MySqlDialect {
   class ValuesRenderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context)
       extends scalasql.query.Values.Renderer[Q, R](v) {
     override def wrapRow(t: R): SqlStr =
-      sql"ROW(" + SqlStr.join(qr.deconstruct(t).map(i => sql"$i"), SqlStr.commaSep) + sql")"
+      sql"ROW(" + SqlStr.join(
+        qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
+        SqlStr.commaSep
+      ) + sql")"
   }
 
 }
