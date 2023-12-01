@@ -68,7 +68,7 @@ object TableMacros {
       )
     }
 
-    val queryables = for (param <- constructorParameters) yield {
+    val queryables = for(param <- constructorParameters) yield{
       val tpe = subParamId(param.info)
       val tpe2 = subParamExpr(param.info)
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
@@ -105,8 +105,6 @@ object TableMacros {
       args = weakTypeOf[V[scalasql.Expr]].typeArgs
     )
     c.Expr[Metadata[V]](q"""
-    import _root_.scalasql.renderer.SqlStr.SqlStringSyntax
-
     new _root_.scalasql.Table.Metadata[$caseClassType](
       () => ${flattenLists.reduceLeft((l, r) => q"$l ++ $r")},
       dialect => {
