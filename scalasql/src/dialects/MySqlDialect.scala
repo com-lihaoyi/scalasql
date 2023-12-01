@@ -253,7 +253,7 @@ object MySqlDialect extends MySqlDialect {
       str + sql" ON DUPLICATE KEY UPDATE $updatesStr"
     }
 
-    override protected def queryConstruct(args: ResultSetIterator): R = {
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): R = {
       Query.queryConstruct(insert.query, args)
     }
   }

@@ -88,13 +88,13 @@ object Table {
     class TableQueryable[Q, R <: scala.Product](
         walkLabels0: () => Seq[String],
         walkExprs0: Q => Seq[Expr[_]],
-        construct0: ResultSetIterator => R,
+        construct0: Queryable.ResultSetIterator => R,
         deconstruct0: R => Q = ???
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0().map(List(_))
       def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
-      def construct(args: ResultSetIterator) = construct0(args)
+      def construct(args: Queryable.ResultSetIterator) = construct0(args)
 
       def toSqlStr(q: Q, ctx: Context): SqlStr = {
         ExprsToSql(this.walk(q), SqlStr.empty, ctx)

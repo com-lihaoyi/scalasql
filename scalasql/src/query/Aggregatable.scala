@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -13,7 +13,11 @@ trait Aggregatable[Q] extends WithExpr[Q] {
   ): Expr[V]
 }
 
-class Aggregate[Q, R](toSqlStr0: Context => SqlStr, construct0: ResultSetIterator => R, expr: Q)(
+class Aggregate[Q, R](
+    toSqlStr0: Context => SqlStr,
+    construct0: Queryable.ResultSetIterator => R,
+    expr: Q
+)(
     qr: Queryable[Q, R]
 ) extends Query[R] {
 
@@ -21,5 +25,5 @@ class Aggregate[Q, R](toSqlStr0: Context => SqlStr, construct0: ResultSetIterato
   protected def queryIsSingleRow: Boolean = true
   protected def renderToSql(ctx: Context) = toSqlStr0(ctx)
 
-  override protected def queryConstruct(args: ResultSetIterator): R = construct0(args)
+  override protected def queryConstruct(args: Queryable.ResultSetIterator): R = construct0(args)
 }

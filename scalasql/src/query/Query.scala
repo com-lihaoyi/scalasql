@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.Renderable
-import scalasql.{Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -13,13 +13,13 @@ trait Query[R] extends Renderable {
   protected def queryIsSingleRow: Boolean
   protected def queryIsExecuteUpdate: Boolean = false
 
-  protected def queryConstruct(args: ResultSetIterator): R
+  protected def queryConstruct(args: Queryable.ResultSetIterator): R
 }
 
 object Query {
   def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
   def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
-  def queryConstruct[R](q: Query[R], args: ResultSetIterator) = q.queryConstruct(args)
+  def queryConstruct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
   class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkExprs().map(_._1)
@@ -28,7 +28,7 @@ object Query {
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderToSql(ctx)
 
-    override def construct(q: Q, args: ResultSetIterator): R = q.queryConstruct(args)
+    override def construct(q: Q, args: Queryable.ResultSetIterator): R = q.queryConstruct(args)
   }
 
   trait Multiple[R] extends Query[Seq[R]]
@@ -40,7 +40,7 @@ object Query {
     protected def queryIsSingleRow: Boolean = true
 
     protected def renderToSql(ctx: Context): SqlStr = Renderable.renderToSql(query)(ctx)
-    protected override def queryConstruct(args: ResultSetIterator): R =
+    protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
       query.queryConstruct(args).asInstanceOf[R]
   }
 }

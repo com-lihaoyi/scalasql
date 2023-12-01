@@ -4,7 +4,7 @@ import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, SqlStr}
 import scalasql.utils.FlatJson
-import scalasql.{Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, TypeMapper}
 
 /**
  * A SQL `WITH` clause
@@ -42,7 +42,7 @@ class WithCte[Q, R](
     Select.selectLhsMap(rhs, prevContext)
   }
 
-  override protected def queryConstruct(args: ResultSetIterator): Seq[R] =
+  override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
     Query.queryConstruct(rhs, args)
 }
 

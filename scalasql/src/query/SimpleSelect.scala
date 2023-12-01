@@ -4,7 +4,7 @@ import scalasql.dialects.Dialect
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, join}
-import scalasql.{Config, Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Config, Queryable, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 import scalasql.utils.FlatJson
 
@@ -221,7 +221,7 @@ class SimpleSelect[Q, R](
     joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)(jqr)
   }
 
-  override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
+  override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {
     Seq(qr.construct(args))
   }
 }

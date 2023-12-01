@@ -21,24 +21,25 @@ trait Queryable[-Q, R] {
   def singleRow(q: Q): Boolean
 
   def toSqlStr(q: Q, ctx: Context): SqlStr
-  def construct(q: Q, args: ResultSetIterator): R
+  def construct(q: Q, args: Queryable.ResultSetIterator): R
 
-}
-
-class ResultSetIterator(r: ResultSet) {
-  var index = 0
-  var nulls = 0
-  var nonNulls = 0
-  def get[T](mt: TypeMapper[T]) = {
-    index += 1
-    val res = mt.get(r, index)
-    if (r.wasNull()) nulls += 1
-    else nonNulls += 1
-    res
-  }
 }
 
 object Queryable {
+
+  class ResultSetIterator(r: ResultSet) {
+    var index = 0
+    var nulls = 0
+    var nonNulls = 0
+
+    def get[T](mt: TypeMapper[T]) = {
+      index += 1
+      val res = mt.get(r, index)
+      if (r.wasNull()) nulls += 1
+      else nonNulls += 1
+      res
+    }
+  }
 
   /**
    * A [[Queryable]] that represents a part of a single database row. [[Queryable.Row]]s

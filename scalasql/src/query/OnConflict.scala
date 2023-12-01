@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Column, ResultSetIterator, TypeMapper}
+import scalasql.{Column, Queryable, TypeMapper}
 import scalasql.renderer.{Context, SqlStr}
 
 /**
@@ -31,7 +31,7 @@ object OnConflict {
 
     protected override def queryIsExecuteUpdate = true
 
-    override protected def queryConstruct(args: ResultSetIterator): R =
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): R =
       Query.queryConstruct(query, args)
   }
 
@@ -57,7 +57,7 @@ object OnConflict {
     }
 
     protected override def queryIsExecuteUpdate = true
-    override protected def queryConstruct(args: ResultSetIterator): R =
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): R =
       Query.queryConstruct(query, args)
   }
 }

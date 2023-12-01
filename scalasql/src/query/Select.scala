@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, TypeMapper}
 
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
@@ -341,7 +341,7 @@ object Select {
     ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] =
       selectSimpleFrom().outerJoin(other)(on)
 
-    override protected def queryConstruct(args: ResultSetIterator): Seq[R] =
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
       Query.queryConstruct(selectSimpleFrom(), args)
 
     override protected def join0[Q2, R2, QF, RF](

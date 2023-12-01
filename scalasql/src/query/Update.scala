@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.{Column, Queryable, ResultSetIterator, Table, TypeMapper}
+import scalasql.{Column, Queryable, Table, TypeMapper}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
 
 /**
@@ -75,7 +75,7 @@ object Update {
     protected override def renderToSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
-    override protected def queryConstruct(args: ResultSetIterator): Int = {
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): Int = {
       args.get(dialect.IntType)
     }
 

@@ -355,7 +355,7 @@ object DbApi {
     }
 
     def streamFlattened[R](
-        construct: ResultSetIterator => R,
+        construct: Queryable.ResultSetIterator => R,
         columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         flattened: SqlStr.Flattened,
         fetchSize: Int,
@@ -370,7 +370,7 @@ object DbApi {
     )
 
     def streamRaw0[R](
-        construct: ResultSetIterator => R,
+        construct: Queryable.ResultSetIterator => R,
         columnNameUnMapper: Either[Map[String, String], IndexedSeq[IndexedSeq[String]]],
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
@@ -382,7 +382,7 @@ object DbApi {
         runRawQuery0(sql, variables, fetchSize, queryTimeoutSeconds) { resultSet =>
           var action: Generator.Action = Generator.Continue
           while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = construct(new ResultSetIterator(resultSet))
+            val rowRes = construct(new Queryable.ResultSetIterator(resultSet))
             action = handleItem(rowRes)
           }
           action

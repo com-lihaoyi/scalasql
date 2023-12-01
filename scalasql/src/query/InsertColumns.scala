@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Column, Queryable, ResultSetIterator, Table, TypeMapper}
+import scalasql.{Column, Queryable, Table, TypeMapper}
 
 /**
  * A SQL `INSERT VALUES` query
@@ -30,7 +30,8 @@ object InsertColumns {
     protected override def queryIsSingleRow = true
     protected override def queryIsExecuteUpdate = true
 
-    override protected def queryConstruct(args: ResultSetIterator): Int = args.get(IntType)
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
+      args.get(IntType)
   }
 
   class Renderer(

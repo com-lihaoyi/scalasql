@@ -88,14 +88,19 @@ object TableMacros {
 
     import compat._
     val typeRef = caseClassType.tpe.resultType.asInstanceOf[TypeRef]
-    val newRef = TypeRef(
+    val exprRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
       args = weakTypeOf[V[scalasql.Expr]].typeArgs
     )
+    val idRef = TypeRef(
+      pre = typeRef.pre,
+      sym = typeRef.sym,
+      args = weakTypeOf[V[scalasql.Id]].typeArgs
+    )
     c.Expr[Metadata[V]](q"""{
 
-    new _root_.scalasql.Table.Metadata[$caseClassType](
+    new _root_.scalasql.Table.Metadata(
       (dialect, n) => {
         import dialect._;
         n match{ case ..${queryables.zipWithIndex.map { case (q, i) => cq"$i => $q" }} }
@@ -106,9 +111,9 @@ object TableMacros {
 
         new _root_.scalasql.Table.Internal.TableQueryable(
           walkLabels0,
-          (table: $newRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
-          construct0 = args => new $caseClassType(..$constructParams),
-          deconstruct0 = r => new $caseClassType(..$deconstructParams)
+          (table: $exprRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
+          construct0 = (args: _root_.scalasql.Queryable.ResultSetIterator) => new $caseClassType(..$constructParams),
+          deconstruct0 = (r: $idRef) => new $caseClassType(..$deconstructParams)
         )
       },
       ($tableRef: _root_.scalasql.query.TableRef, dialect, queryable) => {

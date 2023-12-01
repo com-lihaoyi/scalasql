@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{Column, Queryable, ResultSetIterator, Table}
+import scalasql.{Column, Queryable, Table}
 import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
@@ -22,7 +22,8 @@ object InsertValues {
 
     protected override def queryIsExecuteUpdate = true
 
-    override protected def queryConstruct(args: ResultSetIterator): Int = args.get(dialect.IntType)
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
+      args.get(dialect.IntType)
 
     override protected def renderToSql(ctx: Context): SqlStr = {
       new Renderer(

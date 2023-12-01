@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.{Queryable, ResultSetIterator, TypeMapper}
+import scalasql.{Queryable, TypeMapper}
 
 /**
  * A query that could support a `RETURNING` clause, typically
@@ -34,7 +34,7 @@ object Returning {
   class Impl0[Q, R](qr: Queryable.Row[Q, R], returnable: Returnable[_], returning: Q)
       extends Returning[Q, R] {
 
-    override protected def queryConstruct(args: ResultSetIterator): Seq[R] = {
+    override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {
       Seq(qr.construct(args))
     }
 
