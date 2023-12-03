@@ -31,9 +31,9 @@ trait DatabaseClient {
 object DatabaseClient {
 
   class Connection(
-                    connection: java.sql.Connection,
-                    config: Config = new Config{},
-                    dialect: DialectConfig,
+      connection: java.sql.Connection,
+      config: Config = new Config {},
+      dialect: DialectConfig
   ) extends DatabaseClient {
 
     def transaction[T](block: DbApi.Txn => T): T = {
@@ -55,9 +55,9 @@ object DatabaseClient {
   }
 
   class DataSource(
-                    dataSource: javax.sql.DataSource,
-                    config: Config = new Config{},
-                    dialect: DialectConfig
+      dataSource: javax.sql.DataSource,
+      config: Config = new Config {},
+      dialect: DialectConfig
   ) extends DatabaseClient {
 
     private def withConnection[T](f: DatabaseClient.Connection => T): T = {
