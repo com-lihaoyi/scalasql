@@ -67,14 +67,14 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-                           val queryables: (DialectTypeMappers, Int) => Queryable.Row[_, _],
-                           val walkLabels0: () => Seq[String],
-                           val queryable: (
+      val queryables: (DialectTypeMappers, Int) => Queryable.Row[_, _],
+      val walkLabels0: () => Seq[String],
+      val queryable: (
           () => Seq[String],
           DialectTypeMappers,
           Metadata.QueryableProxy
       ) => Queryable[V[Sql], V[Id]],
-                           val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
+      val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
   ) {
     def vExpr(t: TableRef, d: DialectTypeMappers) =
       vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))

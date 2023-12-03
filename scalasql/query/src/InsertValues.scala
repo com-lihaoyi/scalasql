@@ -8,11 +8,11 @@ trait InsertValues[V[_[_]], R] extends Query[Int] {
 }
 object InsertValues {
   class Impl[V[_[_]], R](
-                          insert: Insert[V, R],
-                          values: Seq[R],
-                          dialect: DialectTypeMappers,
-                          qr: Queryable.Row[V[Column], R],
-                          skippedColumns: Seq[Column[_]]
+      insert: Insert[V, R],
+      values: Seq[R],
+      dialect: DialectTypeMappers,
+      qr: Queryable.Row[V[Column], R],
+      skippedColumns: Seq[Column[_]]
   ) extends InsertValues[V, R] {
     protected def queryWalkLabels() = Nil
 
