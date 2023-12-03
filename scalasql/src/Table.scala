@@ -98,10 +98,6 @@ object Table {
 
       def deconstruct(r: R): Q = deconstruct0(r)
     }
-
-    def flattenPrefixedExprs[T](t: T)(implicit q: Queryable.Row[T, _]): Seq[Expr[_]] = {
-      q.walkExprs(t)
-    }
   }
 }
 
