@@ -57,7 +57,8 @@ dbClient.transaction { db =>
   val filterId = 2
   val output = db.runSql[String](
     sql"SELECT name FROM buyer WHERE id = $filterId"
-  )(ExprQueryable)
+  )
+
   assert(output == Seq("叉烧包"))
 
   val output2 = db.runSql[(String, LocalDate)](
