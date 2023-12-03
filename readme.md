@@ -140,7 +140,8 @@ ivy"com.lihaoyi::scalasql:0.1.0"
     what a user sees when they do `import scalasql._`, as well as the various database `*Dialect`s
     that provide the relevant set of `query`s and `operations` for each respective database
 
-* ScalaSql's tests are concentrated within a single `scalasql.test` module, 
+* ScalaSql's tests are concentrated within a single `scalasql.test` module, with subfolders
+  corresponding to the various ScalaSql sub-modules they are intended to cover
 
 ```
              scalasql.core
@@ -152,6 +153,10 @@ scalasql.operations   scalasql.query
         +------+      +------+
                |      |
                scalasql
+                      |
+                      +------+
+                             |
+                        scalasql.test
 ```
 
 ## Changelog
