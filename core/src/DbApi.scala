@@ -1,7 +1,6 @@
 package scalasql.core
 
 import geny.Generator
-import DialectConfig.dialectCastParams
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
 
@@ -275,7 +274,7 @@ object DbApi {
 
     private def combineQueryString(
         flattened: SqlStr.Flattened,
-        castParams: Boolean = dialectCastParams(dialectConfig)
+        castParams: Boolean = DialectConfig.castParams(dialectConfig)
     ) = {
       val queryStr = flattened.queryParts.iterator
         .zipAll(flattened.params, "", null)

@@ -25,10 +25,10 @@ class WithCte[Q, R](
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
     extends Select.Proxy[Q, R] {
 
-  override protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
+  override protected def expr = WithExpr.get(Joinable.toSelect(rhs))
   private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, SqlStr.commaSep)
 
-  protected def selectSimpleFrom() = this.subquery
+  protected def selectToSimpleSelect() = this.subquery
 
   override def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     new WithCte(lhs, lhsSubQuery, rhs.map(f))
@@ -47,11 +47,11 @@ class WithCte[Q, R](
     new WithCte.Renderer(withPrefix, this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    scalasql.core.SelectBase.selectLhsMap(rhs, prevContext)
+    scalasql.core.SelectBase.lhsMap(rhs, prevContext)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
-    Query.queryConstruct(rhs, args)
+    Query.construct(rhs, args)
 }
 
 object WithCte {
@@ -63,8 +63,8 @@ object WithCte {
   ) extends Select.Proxy[Q, R] {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true
-    protected override def joinableSelect = selectSimpleFrom()
-    override protected def selectSimpleFrom(): SimpleSelect[Q, R] =
+    protected override def joinableToSelect = selectToSimpleSelect()
+    override protected def selectToSimpleSelect(): SimpleSelect[Q, R] =
       new SimpleSelect[Q, R](
         expr = WithExpr.get(lhs),
         exprPrefix = None,
@@ -93,10 +93,10 @@ object WithCte {
         query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walkLabelsAndExprs(WithExpr.get(query.lhs))
       val newExprNaming = walked.map { case (tokens, expr) =>
         (
-          Sql.exprIdentity(expr),
+          Sql.identity(expr),
           SqlStr.raw(
             prevContext.config.tableNameMapper(FlatJson.flatten(tokens, prevContext)),
-            Array(Sql.exprIdentity(expr))
+            Array(Sql.identity(expr))
           )
         )
       }
@@ -109,7 +109,7 @@ object WithCte {
           case r => sql" "
         }) +
           scalasql.core.SelectBase
-            .selectRenderer(
+            .renderer(
               query.rhs match {
                 case w: WithCte[Q, R] => w.unprefixed
                 case r => r
@@ -123,7 +123,7 @@ object WithCte {
       )
       val rhsReferenced = rhsSql.referencedExprs.toSet
       val lhsSql =
-        scalasql.core.SelectBase.selectRenderer(query.lhs, prevContext).render(Some(rhsReferenced))
+        scalasql.core.SelectBase.renderer(query.lhs, prevContext).render(Some(rhsReferenced))
 
       val cteColumns = SqlStr.join(
         newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },

@@ -5,7 +5,7 @@ package scalasql.core
  */
 sealed trait From
 class TableRef(val value: Table.Base) extends From {
-  override def toString = s"TableRef(${Table.tableName(value)})"
+  override def toString = s"TableRef(${Table.name(value)})"
 }
 class SubqueryRef(val value: SelectBase, val qr: Queryable[_, _]) extends From
 class WithCteRef() extends From

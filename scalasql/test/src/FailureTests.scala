@@ -13,15 +13,15 @@ object FailureTests extends SqliteSuite {
 //      val ex = intercept[Exception] { Sql(1) == 2 }
 //      assert(ex.getMessage.contains("Sql#equals is not defined"))
 //
-      assert(Sql.exprIdentity(Sql(1)) != Sql.exprIdentity(Sql(1)))
+      assert(Sql.identity(Sql(1)) != Sql.identity(Sql(1)))
       val e = Sql(1)
-      assert(Sql.exprIdentity(e) == Sql.exprIdentity(e))
+      assert(Sql.identity(e) == Sql.identity(e))
     }
     test("toString") - {
       val ex = intercept[Exception] { Sql(1).toString }
       assert(ex.getMessage.contains("Sql#toString is not defined"))
 
-      val s: String = Sql.exprToString(Sql(1))
+      val s: String = Sql.toString(Sql(1))
     }
 
   }

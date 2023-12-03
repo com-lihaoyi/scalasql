@@ -6,7 +6,7 @@ import scalasql.core.{Sql, From, JoinNullable}
  * Something that can be joined; typically a [[Select]] or a [[Table]]
  */
 trait Joinable[Q, R] {
-  protected def joinableSelect: Select[Q, R]
+  protected def joinableToSelect: Select[Q, R]
   protected def joinableIsTrivial: Boolean
 
   protected def joinableToFromExpr: (From, Q)
@@ -43,7 +43,7 @@ trait Joinable[Q, R] {
 
 }
 object Joinable {
-  def joinableToFromExpr[Q, R](x: Joinable[Q, R]) = x.joinableToFromExpr
-  def joinableSelect[Q, R](x: Joinable[Q, R]) = x.joinableSelect
-  def joinableIsTrivial[Q, R](x: Joinable[Q, R]) = x.joinableIsTrivial
+  def toFromExpr[Q, R](x: Joinable[Q, R]) = x.joinableToFromExpr
+  def toSelect[Q, R](x: Joinable[Q, R]) = x.joinableToSelect
+  def isTrivial[Q, R](x: Joinable[Q, R]) = x.joinableIsTrivial
 }

@@ -134,7 +134,7 @@ object SqlStr {
   }
 
   object Renderable {
-    def renderToSql(x: Renderable)(implicit ctx: Context) = x.renderToSql(ctx)
+    def toSql(x: Renderable)(implicit ctx: Context) = x.renderToSql(ctx)
   }
 
   /**
@@ -143,7 +143,7 @@ object SqlStr {
   sealed trait Interp
   object Interp {
     implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
-      SqlStrInterp(Renderable.renderToSql(t)(ctx))
+      SqlStrInterp(Renderable.toSql(t)(ctx))
 
     implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
 

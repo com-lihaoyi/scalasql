@@ -66,7 +66,7 @@ trait Select[Q, R]
 
   def qr: Queryable.Row[Q, R]
   protected def joinableIsTrivial: Boolean = false
-  protected def joinableSelect = this
+  protected def joinableToSelect = this
 
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
@@ -220,7 +220,7 @@ trait Select[Q, R]
    */
   def toExpr(implicit mt: TypeMapper[R]): Sql[R] = Sql { implicit ctx => this.renderToSql(ctx) }
 
-  protected def selectSimpleFrom(): SimpleSelect[Q, R]
+  protected def selectToSimpleSelect(): SimpleSelect[Q, R]
 
   /**
    * Forces this [[Select]] to be treated as a subquery that any further operations
@@ -275,9 +275,9 @@ trait Select[Q, R]
 }
 
 object Select {
-  def selectSimpleFrom[Q, R](s: Select[Q, R]) = s.selectSimpleFrom()
+  def toSimpleFrom[Q, R](s: Select[Q, R]) = s.selectToSimpleSelect()
 
-  def selectWithExprPrefix[Q, R](s: Select[Q, R], str: Context => SqlStr) =
+  def withExprPrefix[Q, R](s: Select[Q, R], str: Context => SqlStr) =
     s.selectWithExprPrefix(str)
 
   implicit class ExprSelectOps[T](s: Select[Sql[T], T]) {
@@ -287,77 +287,77 @@ object Select {
   trait Proxy[Q, R] extends Select[Q, R] {
     override def qr: Queryable.Row[Q, R]
     override protected def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R] =
-      selectSimpleFrom().selectWithExprPrefix(s)
+      selectToSimpleSelect().selectWithExprPrefix(s)
 
     override def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] =
-      selectSimpleFrom().map(f)
+      selectToSimpleSelect().map(f)
 
     override def flatMap[Q2, R2](f: Q => FlatJoin.Rhs[Q2, R2])(
         implicit qr: Queryable.Row[Q2, R2]
-    ): Select[Q2, R2] = selectSimpleFrom().flatMap(f)
+    ): Select[Q2, R2] = selectToSimpleSelect().flatMap(f)
 
-    override def filter(f: Q => Sql[Boolean]): Select[Q, R] = selectSimpleFrom().filter(f)
+    override def filter(f: Q => Sql[Boolean]): Select[Q, R] = selectToSimpleSelect().filter(f)
 
     override def aggregate[E, V](f: SelectProxy[Q] => E)(
         implicit qr: Queryable.Row[E, V]
-    ): Aggregate[E, V] = selectSimpleFrom().aggregate(f)
+    ): Aggregate[E, V] = selectToSimpleSelect().aggregate(f)
 
     override def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(
         implicit qr: Queryable.Row[Q2, R2]
-    ): Select[Q2, R2] = selectSimpleFrom().mapAggregate(f)
+    ): Select[Q2, R2] = selectToSimpleSelect().mapAggregate(f)
 
     override def groupBy[K, V, R2, R3](groupKey: Q => K)(
         groupAggregate: SelectProxy[Q] => V
     )(implicit qrk: Queryable.Row[K, R2], qrv: Queryable.Row[V, R3]): Select[(K, V), (R2, R3)] =
-      selectSimpleFrom().groupBy(groupKey)(groupAggregate)
+      selectToSimpleSelect().groupBy(groupKey)(groupAggregate)
 
-    override def sortBy(f: Q => Sql[_]): Select[Q, R] = selectSimpleFrom().sortBy(f)
-    override def asc: Select[Q, R] = selectSimpleFrom().asc
-    override def desc: Select[Q, R] = selectSimpleFrom().desc
-    override def nullsFirst: Select[Q, R] = selectSimpleFrom().nullsFirst
-    override def nullsLast: Select[Q, R] = selectSimpleFrom().nullsLast
+    override def sortBy(f: Q => Sql[_]): Select[Q, R] = selectToSimpleSelect().sortBy(f)
+    override def asc: Select[Q, R] = selectToSimpleSelect().asc
+    override def desc: Select[Q, R] = selectToSimpleSelect().desc
+    override def nullsFirst: Select[Q, R] = selectToSimpleSelect().nullsFirst
+    override def nullsLast: Select[Q, R] = selectToSimpleSelect().nullsLast
 
     override protected def compound0(op: String, other: Select[Q, R]): CompoundSelect[Q, R] =
-      selectSimpleFrom().compound0(op, other)
+      selectToSimpleSelect().compound0(op, other)
 
-    override def drop(n: Int): Select[Q, R] = selectSimpleFrom().drop(n)
-    override def take(n: Int): Select[Q, R] = selectSimpleFrom().take(n)
+    override def drop(n: Int): Select[Q, R] = selectToSimpleSelect().drop(n)
+    override def take(n: Int): Select[Q, R] = selectToSimpleSelect().take(n)
 
     override protected def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
-      scalasql.core.SelectBase.selectRenderer(selectSimpleFrom(), prevContext)
+      scalasql.core.SelectBase.renderer(selectToSimpleSelect(), prevContext)
 
     override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] =
-      scalasql.core.SelectBase.selectLhsMap(selectSimpleFrom(), prevContext)
+      scalasql.core.SelectBase.lhsMap(selectToSimpleSelect(), prevContext)
 
-    override protected def selectSimpleFrom(): SimpleSelect[Q, R]
+    override protected def selectToSimpleSelect(): SimpleSelect[Q, R]
 
     override def leftJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
-    ): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = selectSimpleFrom().leftJoin(other)(on)
+    ): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = selectToSimpleSelect().leftJoin(other)(on)
 
     override def rightJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
-    ): Select[(JoinNullable[Q], Q2), (Option[R], R2)] = selectSimpleFrom().rightJoin(other)(on)
+    ): Select[(JoinNullable[Q], Q2), (Option[R], R2)] = selectToSimpleSelect().rightJoin(other)(on)
 
     override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] =
-      selectSimpleFrom().outerJoin(other)(on)
+      selectToSimpleSelect().outerJoin(other)(on)
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
-      Query.queryConstruct(selectSimpleFrom(), args)
+      Query.construct(selectToSimpleSelect(), args)
 
     override protected def join0[Q2, R2, QF, RF](
         prefix: String,
         other: Joinable[Q2, R2],
         on: Option[(Q, Q2) => Sql[Boolean]]
     )(implicit ja: JoinAppend[Q, Q2, QF, RF]): Select[QF, RF] =
-      selectSimpleFrom().join0(prefix, other, on)
+      selectToSimpleSelect().join0(prefix, other, on)
 
     override def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
         implicit qr: Queryable.Row[Sql[V], V]
-    ): Sql[V] = selectSimpleFrom().queryExpr(f)
+    ): Sql[V] = selectToSimpleSelect().queryExpr(f)
 
-    override protected def expr: Q = selectSimpleFrom().expr
+    override protected def expr: Q = selectToSimpleSelect().expr
   }
 }

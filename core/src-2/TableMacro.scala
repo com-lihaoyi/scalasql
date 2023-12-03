@@ -29,7 +29,7 @@ object TableMacros {
         q"""
           new _root_.scalasql.Column[${param.info.typeArgs.head}](
             $tableRef,
-            _root_.scalasql.Table.tableColumnNameOverride($tableRef.value)(${name.toString})
+            _root_.scalasql.Table.columnNameOverride($tableRef.value)(${name.toString})
           )
         """
       }

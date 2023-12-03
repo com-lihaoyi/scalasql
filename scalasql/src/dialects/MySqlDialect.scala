@@ -161,8 +161,8 @@ object MySqlDialect extends MySqlDialect {
     override def update(
         filter: V[Column] => Sql[Boolean]
     ): Update[V[Column], V[Id]] = {
-      val ref = Table.tableRef(t)
-      val metadata = Table.tableMetadata(t)
+      val ref = Table.ref(t)
+      val metadata = Table.metadata(t)
       new Update(
         metadata.vExpr(ref, dialectSelf),
         ref,
@@ -174,10 +174,10 @@ object MySqlDialect extends MySqlDialect {
       )
     }
 
-    protected override def joinableSelect: Select[V[Sql], V[Id]] = {
-      val ref = Table.tableRef(t)
+    protected override def joinableToSelect: Select[V[Sql], V[Id]] = {
+      val ref = Table.ref(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
         None,
         Seq(ref),
         Nil,
@@ -227,7 +227,7 @@ object MySqlDialect extends MySqlDialect {
 
     lazy val whereAll = ExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
     override lazy val joins = optSeq(joins0)(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
     override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + whereAll
@@ -246,14 +246,14 @@ object MySqlDialect extends MySqlDialect {
   ) extends Query[R] {
 
     override def queryIsExecuteUpdate = true
-    protected def queryWalkLabels() = Query.queryWalkLabels(insert.query)
-    protected def queryWalkExprs() = Query.queryWalkExprs(insert.query)
+    protected def queryWalkLabels() = Query.walkLabels(insert.query)
+    protected def queryWalkExprs() = Query.walkExprs(insert.query)
 
-    protected def queryIsSingleRow = Query.queryIsSingleRow(insert.query)
+    protected def queryIsSingleRow = Query.isSingleRow(insert.query)
 
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
-      val str = Renderable.renderToSql(insert.query)
+      val str = Renderable.toSql(insert.query)
 
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
@@ -263,7 +263,7 @@ object MySqlDialect extends MySqlDialect {
     }
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): R = {
-      Query.queryConstruct(insert.query, args)
+      Query.construct(insert.query, args)
     }
   }
 
@@ -342,7 +342,7 @@ object MySqlDialect extends MySqlDialect {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>
-            val exprStr = Renderable.renderToSql(orderBy.expr)(newCtx)
+            val exprStr = Renderable.toSql(orderBy.expr)(newCtx)
 
             (orderBy.ascDesc, orderBy.nulls) match {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"

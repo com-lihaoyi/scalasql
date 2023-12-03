@@ -11,7 +11,7 @@ object FlatJson {
   }
 
   def flatten(x: Seq[(List[String], Sql[_])], context: Context): Seq[(String, SqlStr)] = {
-    x.map { case (k, v) => (flatten(k, context), Renderable.renderToSql(v)(context)) }
+    x.map { case (k, v) => (flatten(k, context), Renderable.toSql(v)(context)) }
   }
 
 }

@@ -16,7 +16,7 @@ class Column[T](tableRef: TableRef, val name: String)(implicit val mappedType: T
       case Some("") => suffix
       case Some(s) => SqlStr.raw(s) + sql".$suffix"
       case None =>
-        sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.tableName(tableRef.value))}.$suffix"
+        sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.name(tableRef.value))}.$suffix"
     }
   }
 }

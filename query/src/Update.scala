@@ -104,7 +104,7 @@ object Update {
     implicit lazy val implicitCtx = Context.compute(prevContext, froms, Some(table))
 
     lazy val tableName =
-      SqlStr.raw(implicitCtx.config.tableNameMapper(Table.tableName(table.value)))
+      SqlStr.raw(implicitCtx.config.tableNameMapper(Table.name(table.value)))
 
     lazy val updateList = set0.map { case assign =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
@@ -131,7 +131,7 @@ object Update {
 
     lazy val joinOns = joins0
       .drop(1)
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
     lazy val joins = optSeq(joins0.drop(1))(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
 

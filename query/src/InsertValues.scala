@@ -27,8 +27,8 @@ object InsertValues {
 
     override protected def renderToSql(ctx: Context): SqlStr = {
       new Renderer(
-        Table.tableName(insert.table.value),
-        Table.tableLabels(insert.table.value),
+        Table.name(insert.table.value),
+        Table.labels(insert.table.value),
         values,
         qr,
         skippedColumns

@@ -31,10 +31,10 @@ trait Sql[T] extends SqlStr.Renderable {
 }
 
 object Sql {
-  def exprIsLiteralTrue[T](e: Sql[T]): Boolean = e.exprIsLiteralTrue
-  def exprToString[T](e: Sql[T]): String = e.exprToString
+  def isLiteralTrue[T](e: Sql[T]): Boolean = e.exprIsLiteralTrue
+  def toString[T](e: Sql[T]): String = e.exprToString
 
-  def exprIdentity[T](e: Sql[T]): Identity = e.exprIdentity
+  def identity[T](e: Sql[T]): Identity = e.exprIdentity
   class Identity()
 
   implicit def ExprQueryable[E[_] <: Sql[_], T](

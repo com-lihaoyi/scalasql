@@ -15,7 +15,7 @@ class Values[Q, R](val ts: Seq[R])(
 ) extends Select.Proxy[Q, R] {
   assert(ts.nonEmpty, "`Values` clause does not support empty sequence")
 
-  protected def selectSimpleFrom() = this.subquery
+  protected def selectToSimpleSelect() = this.subquery
   val tableRef = new SubqueryRef(this, qr)
   protected def columnName(n: Int) = s"column${n + 1}"
 
@@ -31,7 +31,7 @@ class Values[Q, R](val ts: Seq[R])(
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
     qr.walkExprs(expr)
       .zipWithIndex
-      .map { case (e, i) => (Sql.exprIdentity(e), SqlStr.raw(columnName(i))) }
+      .map { case (e, i) => (Sql.identity(e), SqlStr.raw(columnName(i))) }
       .toMap
   }
 }

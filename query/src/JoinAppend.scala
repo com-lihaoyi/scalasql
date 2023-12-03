@@ -2,6 +2,11 @@ package scalasql.query
 
 import scalasql.core.Queryable
 
+/**
+ * Typeclass to allow `.join` to append tuples, such that `Query[(A, B)].join(Query[C])`
+ * returns a flat `Query[(A, B, C)]` rather than a nested `Query[((A, B), B)]`. Can't
+ * eliminate nesting in all cases, but eliminates nesting often enough to be useful
+ */
 trait JoinAppend[Q, Q2, QF, RF] {
   def appendTuple(t: Q, v: Q2): QF
 

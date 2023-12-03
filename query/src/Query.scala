@@ -20,10 +20,10 @@ trait Query[R] extends Renderable {
 object Query {
   implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Queryable[Query[R], R]()
 
-  def queryWalkLabels[R](q: Query[R]) = q.queryWalkLabels()
-  def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
-  def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
-  def queryConstruct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
+  def walkLabels[R](q: Query[R]) = q.queryWalkLabels()
+  def walkExprs[R](q: Query[R]) = q.queryWalkExprs()
+  def isSingleRow[R](q: Query[R]) = q.queryIsSingleRow
+  def construct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
   class Queryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkLabels()
@@ -44,7 +44,7 @@ object Query {
 
     protected def queryIsSingleRow: Boolean = true
 
-    protected def renderToSql(ctx: Context): SqlStr = Renderable.renderToSql(query)(ctx)
+    protected def renderToSql(ctx: Context): SqlStr = Renderable.toSql(query)(ctx)
     protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
       query.queryConstruct(args).asInstanceOf[R]
   }

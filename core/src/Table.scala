@@ -42,11 +42,11 @@ object Table {
 
   case class ImplicitMetadata[V[_[_]]](value: Metadata[V])
 
-  def tableMetadata[V[_[_]]](t: Table[V]) = t.tableMetadata
-  def tableRef[V[_[_]]](t: Table[V]) = t.tableRef
-  def tableName(t: Table.Base) = t.tableName
-  def tableLabels(t: Table.Base) = t.tableLabels
-  def tableColumnNameOverride[V[_[_]]](t: Table.Base)(s: String) = t.tableColumnNameOverride(s)
+  def metadata[V[_[_]]](t: Table[V]) = t.tableMetadata
+  def ref[V[_[_]]](t: Table[V]) = t.tableRef
+  def name(t: Table.Base) = t.tableName
+  def labels(t: Table.Base) = t.tableLabels
+  def columnNameOverride[V[_[_]]](t: Table.Base)(s: String) = t.tableColumnNameOverride(s)
   trait Base {
 
     /**

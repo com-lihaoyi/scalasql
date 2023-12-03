@@ -31,9 +31,9 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
       other: Joinable[Q2, R2],
       on: Option[(Q, Q2) => Sql[Boolean]]
   ) = {
-    val otherSelect = Joinable.joinableSelect(other)
+    val otherSelect = Joinable.toSelect(other)
 
-    val isTrivialJoin = Joinable.joinableIsTrivial(other)
+    val isTrivialJoin = Joinable.isTrivial(other)
     val from =
       if (isTrivialJoin) otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head
       else new SubqueryRef(otherSelect, otherSelect.qr)

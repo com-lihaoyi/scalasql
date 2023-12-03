@@ -40,11 +40,11 @@ object Context {
       prevContext.fromNaming ++
         selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
           case (t: TableRef, i) =>
-            (t, prevContext.config.tableNameMapper(Table.tableName(t.value)) + (i + prevSize))
+            (t, prevContext.config.tableNameMapper(Table.name(t.value)) + (i + prevSize))
           case (s: SubqueryRef, i) => (s, "subquery" + (i + prevSize))
           case (s: WithCteRef, i) => (s, "cte" + (i + prevSize))
         } ++
-        updateTable.map(t => t -> prevContext.config.tableNameMapper(Table.tableName(t.value)))
+        updateTable.map(t => t -> prevContext.config.tableNameMapper(Table.name(t.value)))
 
     val newExprNaming =
       prevContext.exprNaming ++
@@ -52,7 +52,7 @@ object Context {
           .collect { case t: SubqueryRef => t }
           .flatMap { t =>
             SelectBase
-              .selectLhsMap(t.value, prevContext)
+              .lhsMap(t.value, prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 

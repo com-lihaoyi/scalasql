@@ -33,7 +33,7 @@ class SimpleSelect[Q, R](
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
     extends Select[Q, R] {
-  protected override def joinableSelect = this
+  protected override def joinableToSelect = this
 
   protected def copy[Q, R](
       expr: Q = this.expr,
@@ -62,7 +62,7 @@ class SimpleSelect[Q, R](
     }
   }
 
-  protected def selectSimpleFrom() = this
+  protected def selectToSimpleSelect() = this
 
   def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): SimpleSelect[Q2, R2] =
     copy(expr = f(expr))
@@ -149,7 +149,7 @@ class SimpleSelect[Q, R](
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
       implicit ctx => copied.renderToSql(ctx),
-      r => Query.queryConstruct(copied, r).head,
+      r => Query.construct(copied, r).head,
       selectProxyExpr
     )(qr)
   }
@@ -196,7 +196,7 @@ class SimpleSelect[Q, R](
   def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q, R]) = {
-    val op2 = CompoundSelect.Op(op, Select.selectSimpleFrom(other))
+    val op2 = CompoundSelect.Op(op, Select.toSimpleFrom(other))
     newCompoundSelect(this, Seq(op2), Nil, None, None)
   }
 
@@ -212,7 +212,7 @@ class SimpleSelect[Q, R](
 
     lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
       val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
-      val exprId = Sql.exprIdentity(v)
+      val exprId = Sql.identity(v)
 
       (exprId, SqlStr.raw(str, Array(exprId)))
     }.toMap
@@ -255,7 +255,7 @@ object SimpleSelect {
     implicit lazy val context = Context.compute(prevContext, froms, None)
 
     lazy val joinOns =
-      query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderToSql(t)))))
+      query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
     lazy val exprsStrs = {
       FlatJson.flatten(flattenedExpr, context).map { case (k, v) =>
@@ -274,7 +274,7 @@ object SimpleSelect {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.iterator.zip(exprsStrs).collect {
-            case ((l, e), s) if liveExprs.fold(true)(_.contains(Sql.exprIdentity(e))) => s
+            case ((l, e), s) if liveExprs.fold(true)(_.contains(Sql.identity(e))) => s
           },
           SqlStr.commaSep
         )

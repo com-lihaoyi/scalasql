@@ -46,7 +46,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
    * Version of `crossJoinLateral` meant for use in `for`-comprehensions
    */
   def crossJoinLateral[Q2, R2](): FlatJoin.Mapper[Q, Q2, R, R2] = {
-    val (from, expr) = Joinable.joinableToFromExpr(wrapped)
+    val (from, expr) = Joinable.toFromExpr(wrapped)
     new FlatJoin.Mapper[Q, Q2, R, R2]("CROSS JOIN LATERAL", from, expr, None, Nil)
   }
 
@@ -54,7 +54,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
    * Version of `joinLateral` meant for use in `for`-comprehensions
    */
   def joinLateral[Q2, R2](on: Q => Sql[Boolean]): FlatJoin.Mapper[Q, Q2, R, R2] = {
-    val (from, expr) = Joinable.joinableToFromExpr(wrapped)
+    val (from, expr) = Joinable.toFromExpr(wrapped)
     new FlatJoin.Mapper[Q, Q2, R, R2]("JOIN LATERAL", from, expr, Some(on(expr)), Nil)
   }
 
@@ -62,7 +62,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
    * Version of `leftJoinLateral` meant for use in `for`-comprehensions
    */
   def leftJoinLateral[Q2, R2](on: Q => Sql[Boolean]): FlatJoin.NullableMapper[Q, Q2, R, R2] = {
-    val (from, expr) = Joinable.joinableToFromExpr(wrapped)
+    val (from, expr) = Joinable.toFromExpr(wrapped)
     new FlatJoin.NullableMapper[Q, Q2, R, R2](
       "LEFT JOIN LATERAL",
       from,

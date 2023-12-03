@@ -11,8 +11,8 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
   import dialect.{dialectSelf => _, _}
 
   protected def toFromExpr0 = {
-    val ref = Table.tableRef(t)
-    (ref, Table.tableMetadata(t).vExpr(ref, dialect))
+    val ref = Table.ref(t)
+    (ref, Table.metadata(t).vExpr(ref, dialect))
   }
 
   protected def joinableToFromExpr = {
@@ -20,7 +20,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
     (ref, expr.asInstanceOf[V[Sql]])
   }
 
-  protected def joinableSelect: Select[V[Sql], V[Id]] = {
+  protected def joinableToSelect: Select[V[Sql], V[Id]] = {
     val (ref, expr) = joinableToFromExpr
     new SimpleSelect(expr, None, Seq(ref), Nil, Nil, None)(
       t.containerQr,
@@ -31,7 +31,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
   /**
    * Constructs a `SELECT` query
    */
-  def select = joinableSelect
+  def select = joinableToSelect
 
   /**
    * Constructs a `UPDATE` query with the given [[filter]] to select the
@@ -39,7 +39,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
    */
   def update(filter: V[Column] => Sql[Boolean]): Update[V[Column], V[Id]] = {
     val (ref, expr) = toFromExpr0
-    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.tableMetadata(t).vExpr(ref, dialect))))(
+    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.metadata(t).vExpr(ref, dialect))))(
       t.containerQr2,
       dialect
     )
@@ -59,7 +59,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
    */
   def delete(filter: V[Column] => Sql[Boolean]): Delete[V[Column]] = {
     val (ref, expr) = toFromExpr0
-    new Delete.Impl(expr, filter(Table.tableMetadata(t).vExpr(ref, dialect)), ref)
+    new Delete.Impl(expr, filter(Table.metadata(t).vExpr(ref, dialect)), ref)
   }
 
   protected def joinableIsTrivial = true

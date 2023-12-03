@@ -47,7 +47,7 @@ object Returning {
     protected override def renderToSql(ctx0: Context) = {
       implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
-      val prefix = Renderable.renderToSql(returnable)
+      val prefix = Renderable.toSql(returnable)
       val flattenedExpr = qr.walkLabelsAndExprs(returning)
       val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"

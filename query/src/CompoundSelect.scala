@@ -24,11 +24,11 @@ class CompoundSelect[Q, R](
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
-  override protected def expr = WithExpr.get(Joinable.joinableSelect(lhs))
+  override protected def expr = WithExpr.get(Joinable.toSelect(lhs))
 
-  protected override def joinableSelect = this
+  protected override def joinableToSelect = this
 
-  protected def selectSimpleFrom() = this.subquery
+  protected def selectToSimpleSelect() = this.subquery
 
   override def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
     (lhs, compoundOps) match {
@@ -36,15 +36,15 @@ class CompoundSelect[Q, R](
         val mapped = s.map(f)
         copy[Q2, R2](mapped, Nil, orderBy, limit, offset)
 
-      case _ => selectSimpleFrom().map(f)
+      case _ => selectToSimpleSelect().map(f)
     }
   }
 
   override def filter(f: Q => Sql[Boolean]): Select[Q, R] = {
     (lhs, compoundOps) match {
       case (s: SimpleSelect[Q, R], Nil) =>
-        copy(Select.selectSimpleFrom(s.filter(f)), compoundOps, orderBy, limit, offset)
-      case _ => selectSimpleFrom().filter(f)
+        copy(Select.toSimpleFrom(s.filter(f)), compoundOps, orderBy, limit, offset)
+      case _ => selectToSimpleSelect().filter(f)
     }
   }
 
@@ -52,7 +52,7 @@ class CompoundSelect[Q, R](
     val newOrder = Seq(OrderBy(f(expr), None, None))
 
     if (limit.isEmpty && offset.isEmpty) copy(orderBy = newOrder ++ orderBy)
-    else newCompoundSelect(selectSimpleFrom(), compoundOps, newOrder, None, None)
+    else newCompoundSelect(selectToSimpleSelect(), compoundOps, newOrder, None, None)
   }
 
   override def asc =
@@ -68,10 +68,10 @@ class CompoundSelect[Q, R](
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
   override def compound0(op: String, other: Select[Q, R]) = {
-    val op2 = CompoundSelect.Op(op, Select.selectSimpleFrom(other))
+    val op2 = CompoundSelect.Op(op, Select.toSimpleFrom(other))
     if (orderBy.isEmpty && limit.isEmpty && offset.isEmpty)
       copy(compoundOps = compoundOps ++ Seq(op2))
-    else newCompoundSelect(selectSimpleFrom(), Seq(op2), Nil, None, None)
+    else newCompoundSelect(selectToSimpleSelect(), Seq(op2), Nil, None, None)
   }
 
   override def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
@@ -81,7 +81,7 @@ class CompoundSelect[Q, R](
     new CompoundSelect.Renderer(this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    scalasql.core.SelectBase.selectLhsMap(lhs, prevContext)
+    scalasql.core.SelectBase.lhsMap(lhs, prevContext)
   }
 }
 
@@ -93,7 +93,7 @@ object CompoundSelect {
     import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsLhsMap = scalasql.core.SelectBase.selectLhsMap(query.lhs, prevContext)
+    lazy val lhsLhsMap = scalasql.core.SelectBase.lhsMap(query.lhs, prevContext)
     lazy val context = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
@@ -118,7 +118,7 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-          lazy val rhsLhsMap = scalasql.core.SelectBase.selectLhsMap(op.rhs, prevContext)
+          lazy val rhsLhsMap = scalasql.core.SelectBase.lhsMap(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
@@ -157,7 +157,7 @@ object CompoundSelect {
             case Nulls.First => sql" NULLS FIRST"
             case Nulls.Last => sql" NULLS LAST"
           }
-          Renderable.renderToSql(orderBy.expr)(newCtx) + ascDesc + nulls
+          Renderable.toSql(orderBy.expr)(newCtx) + ascDesc + nulls
         },
         SqlStr.commaSep
       )

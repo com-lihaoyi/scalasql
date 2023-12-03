@@ -4,5 +4,5 @@ trait DialectConfig {
   protected def dialectCastParams: Boolean
 }
 object DialectConfig {
-  def dialectCastParams(d: DialectConfig) = d.dialectCastParams
+  def castParams(d: DialectConfig) = d.dialectCastParams
 }

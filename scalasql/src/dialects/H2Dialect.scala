@@ -84,10 +84,10 @@ object H2Dialect extends H2Dialect {
       with BitwiseFunctionOps[T]
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
-    protected override def joinableSelect: Select[V[Sql], V[Id]] = {
-      val ref = Table.tableRef(t)
+    protected override def joinableToSelect: Select[V[Sql], V[Id]] = {
+      val ref = Table.ref(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
         None,
         Seq(ref),
         Nil,
