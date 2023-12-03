@@ -7,19 +7,19 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
       filter,join,aggregate}                         +-------->
              |                                       |
              |                                       |
-  {Expr[Int],Select[Q],Update[Q]                {Int,Seq[R],
-     CaseCls[Expr],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
+  {Sql[Int],Select[Q],Update[Q]                {Int,Seq[R],
+     CaseCls[Sql],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
              |                                       |
              |                                       |
-             +-------------+           +-------------+
-                           |           |
-                           v           |
+             +----------+                 +----------+
+                        |                 |
+                        v                 |
              +------ DatabaseApi#run(q: Q): R <------+
              |                                       |
            Q |                                       | R
              |                                       |
              v                                       |
-Queryable#{toSqlStr,walkExprs}               Queryable#construct
+Queryable#{toSqlStr,walkSqlExprs}            Queryable#construct
              |                                       ^
              |                                       |
       SqlStr |                                       | ResultSet
