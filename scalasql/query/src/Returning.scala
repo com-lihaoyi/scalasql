@@ -21,12 +21,11 @@ trait Returning[Q, R] extends Query.Multiple[R] {
   def single: Query.Single[R] = new Query.Single(this)
 }
 
-trait InsertReturning[Q, R] extends Returning[Q, R]
 object InsertReturning {
   class Impl[Q, R](returnable: InsertReturnable[_], returning: Q)(
       implicit val qr: Queryable.Row[Q, R]
   ) extends Returning.Impl0[Q, R](qr, returnable, returning)
-      with InsertReturning[Q, R] {
+      with Returning[Q, R] {
     protected def expr: Q = returning
   }
 }

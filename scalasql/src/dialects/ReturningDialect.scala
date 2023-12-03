@@ -5,7 +5,7 @@ import scalasql.query.{InsertReturnable, InsertReturning, OnConflict, Returnable
 
 trait ReturningDialect extends Dialect {
   implicit class InsertReturningConv[Q](r: InsertReturnable[Q]) {
-    def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R]): InsertReturning[Q2, R] = {
+    def returning[Q2, R](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R]): Returning[Q2, R] = {
       new InsertReturning.Impl(r, f(WithSqlExpr.get(r)))
     }
   }
