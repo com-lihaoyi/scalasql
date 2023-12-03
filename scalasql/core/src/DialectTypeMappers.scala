@@ -10,8 +10,8 @@ import java.time.{
   OffsetTime,
   OffsetDateTime
 }
-trait DialectBase extends DialectConfig {
-  implicit val dialectSelf: DialectBase
+trait DialectTypeMappers extends DialectConfig {
+  implicit val dialectSelf: DialectTypeMappers
 
   implicit def StringType: TypeMapper[String]
   implicit def ByteType: TypeMapper[Byte]

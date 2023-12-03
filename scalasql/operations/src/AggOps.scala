@@ -1,11 +1,11 @@
 package scalasql.operations
 
-import scalasql.core.DialectBase
+import scalasql.core.DialectTypeMappers
 import scalasql.core.{Queryable, TypeMapper, Sql}
 import scalasql.core.Aggregatable
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: DialectBase) {
+class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: DialectTypeMappers) {
   import dialect._
 
   /** Counts the rows */

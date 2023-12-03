@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.DialectBase
+import scalasql.core.DialectTypeMappers
 import scalasql.core.Context
 import scalasql.core.{Queryable, SqlStr, Sql}
 import scalasql.core.SqlStr.SqlStringSyntax
@@ -12,7 +12,7 @@ trait Delete[Q] extends Query[Int] with Returnable[Q]
 
 object Delete {
   class Impl[Q](val expr: Q, filter: Sql[Boolean], val table: TableRef)(
-      implicit dialect: DialectBase
+      implicit dialect: DialectTypeMappers
   ) extends Delete[Q] {
     import dialect._
     override def queryIsExecuteUpdate = true

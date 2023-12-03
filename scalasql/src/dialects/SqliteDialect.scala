@@ -76,7 +76,7 @@ object SqliteDialect extends SqliteDialect {
         offset: Option[Int]
     )(
         implicit qr: Queryable.Row[Q, R],
-        dialect: scalasql.core.DialectBase
+        dialect: scalasql.core.DialectTypeMappers
     ): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
@@ -90,7 +90,7 @@ object SqliteDialect extends SqliteDialect {
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
-        dialect: scalasql.core.DialectBase
+        dialect: scalasql.core.DialectTypeMappers
     ): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }

@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.core.{
   Context,
-  DialectBase,
+  DialectTypeMappers,
   SqlExprsToSql,
   Queryable,
   Sql,
@@ -50,7 +50,7 @@ object Update {
       val set0: Seq[Column.Assignment[_]],
       val joins: Seq[Join],
       val where: Seq[Sql[_]]
-  )(implicit val qr: Queryable.Row[Q, R], dialect: DialectBase)
+  )(implicit val qr: Queryable.Row[Q, R], dialect: DialectTypeMappers)
       extends Update[Q, R] {
 
     import dialect.{dialectSelf => _, _}
@@ -60,7 +60,7 @@ object Update {
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Sql[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R], dialect: DialectBase): Update[Q, R] =
+    )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): Update[Q, R] =
       new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Sql[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }

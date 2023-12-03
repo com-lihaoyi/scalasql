@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{DialectBase, Id, Queryable, Sql}
+import scalasql.core.{DialectTypeMappers, Id, Queryable, Sql}
 
 import scala.language.experimental.macros
 
@@ -17,7 +17,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
 
-  implicit def containerQr(implicit dialect: DialectBase): Queryable.Row[V[Sql], V[Id]] =
+  implicit def containerQr(implicit dialect: DialectTypeMappers): Queryable.Row[V[Sql], V[Id]] =
     tableMetadata
       .queryable(
         tableMetadata.walkLabels0,
@@ -37,7 +37,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 object Table {
   trait LowPri[V[_[_]]] { this: Table[V] =>
     implicit def containerQr2(
-        implicit dialect: DialectBase
+        implicit dialect: DialectTypeMappers
     ): Queryable.Row[V[Column], V[Id]] =
       containerQr.asInstanceOf[Queryable.Row[V[Column], V[Id]]]
   }
@@ -67,16 +67,16 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val queryables: (DialectBase, Int) => Queryable.Row[_, _],
-      val walkLabels0: () => Seq[String],
-      val queryable: (
+                           val queryables: (DialectTypeMappers, Int) => Queryable.Row[_, _],
+                           val walkLabels0: () => Seq[String],
+                           val queryable: (
           () => Seq[String],
-          DialectBase,
+          DialectTypeMappers,
           Metadata.QueryableProxy
       ) => Queryable[V[Sql], V[Id]],
-      val vExpr0: (TableRef, DialectBase, Metadata.QueryableProxy) => V[Column]
+                           val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
   ) {
-    def vExpr(t: TableRef, d: DialectBase) =
+    def vExpr(t: TableRef, d: DialectTypeMappers) =
       vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
   }
 

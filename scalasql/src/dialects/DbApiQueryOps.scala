@@ -4,7 +4,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core._
 import scalasql.query.{Select, Values, WithCte, WithCteRef}
 
-class DbApiQueryOps(dialect: DialectBase) {
+class DbApiQueryOps(dialect: DialectTypeMappers) {
   import dialect._
 
   /**

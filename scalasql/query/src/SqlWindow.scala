@@ -1,6 +1,6 @@
 package scalasql.query
 import scalasql.core.{Sql, SqlStr}
-import scalasql.core.DialectBase
+import scalasql.core.DialectTypeMappers
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Context
@@ -13,7 +13,7 @@ case class SqlWindow[T](
     frameStart0: Option[SqlStr],
     frameEnd0: Option[SqlStr],
     exclusions: Option[SqlStr]
-)(implicit dialect: DialectBase)
+)(implicit dialect: DialectTypeMappers)
     extends Sql[T] {
   import dialect.{dialectSelf => _, _}
   protected def renderToSql0(implicit ctx: Context): SqlStr = {

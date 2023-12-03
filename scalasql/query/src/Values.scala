@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.DialectBase
+import scalasql.core.DialectTypeMappers
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper}
 import scalasql.core.Context
@@ -11,7 +11,7 @@ import scalasql.core.Context
  */
 class Values[Q, R](val ts: Seq[R])(
     implicit val qr: Queryable.Row[Q, R],
-    protected val dialect: DialectBase
+    protected val dialect: DialectTypeMappers
 ) extends Select.Proxy[Q, R] {
   assert(ts.nonEmpty, "`Values` clause does not support empty sequence")
 

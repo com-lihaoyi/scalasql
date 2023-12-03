@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{
   Config,
   Context,
-  DialectBase,
+  DialectTypeMappers,
   SqlExprsToSql,
   FlatJson,
   JoinNullable,
@@ -30,7 +30,7 @@ class SimpleSelect[Q, R](
     val joins: Seq[Join],
     val where: Seq[Sql[_]],
     val groupBy0: Option[GroupBy]
-)(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
+)(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select[Q, R] {
   protected override def joinableToSelect = this
 

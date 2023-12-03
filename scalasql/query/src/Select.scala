@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{
   Aggregatable,
   Context,
-  DialectBase,
+  DialectTypeMappers,
   JoinNullable,
   Queryable,
   Sql,
@@ -41,7 +41,7 @@ trait Select[Q, R]
     with Query.Multiple[R]
     with SelectBase {
 
-  protected def dialect: DialectBase
+  protected def dialect: DialectTypeMappers
   protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
@@ -49,7 +49,7 @@ trait Select[Q, R]
       orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
-  )(implicit qr: Queryable.Row[Q, R], dialect: DialectBase): CompoundSelect[Q, R] =
+  )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): CompoundSelect[Q, R] =
     new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
 
   protected def newSimpleSelect[Q, R](
@@ -59,7 +59,7 @@ trait Select[Q, R]
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
-  )(implicit qr: Queryable.Row[Q, R], dialect: DialectBase): SimpleSelect[Q, R] =
+  )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
     new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]
