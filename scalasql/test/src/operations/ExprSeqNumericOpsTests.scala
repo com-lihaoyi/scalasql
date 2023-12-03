@@ -5,7 +5,7 @@ import utest._
 import utils.ScalaSqlSuite
 
 trait ExprSeqNumericOpsTests extends ScalaSqlSuite {
-  def description = "Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric"
+  def description = "Operations that can be performed on `Sql[Seq[T]]` where `T` is numeric"
   def tests = Tests {
     test("sum") - checker(
       query = Purchase.select.map(_.count).sum,

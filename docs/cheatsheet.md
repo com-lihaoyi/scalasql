@@ -73,7 +73,7 @@ Foo.select.aggregate(fs => (fs.sumBy(_.myInt), fs.maxBy(_.myInt)))  // (Int, Int
 Foo.select.filter(_.myStr === "hello")                              // Seq[Foo[Id]]
 // SELECT * FROM foo WHERE my_str = "hello"
 
-Foo.select.filter(_.myStr === Expr("hello"))                        // Seq[Foo[Id]]
+Foo.select.filter(_.myStr === Sql("hello"))                        // Seq[Foo[Id]]
 // SELECT * FROM foo WHERE my_str = "hello"
 
 Foo.select.filter(_.myStr === "hello").single                       // Foo[Id]

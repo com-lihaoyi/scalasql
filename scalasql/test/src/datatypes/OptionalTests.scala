@@ -1,6 +1,6 @@
 package scalasql.datatypes
 
-import scalasql.query.Expr
+import scalasql.query.Sql
 import scalasql.{datatypes, _}
 import utest._
 import utils.ScalaSqlSuite
@@ -12,7 +12,7 @@ object OptCols extends Table[OptCols]
 
 trait OptionalTests extends ScalaSqlSuite {
   def description =
-    "Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala"
+    "Queries using columns that may be `NULL`, `Sql[Option[T]]` or `Option[T]` in Scala"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
 
@@ -59,7 +59,7 @@ trait OptionalTests extends ScalaSqlSuite {
       value = Seq(None -> Some(4), Some(1) -> Some(2), Some(3) -> None),
       normalize = (x: Seq[(Option[Int], Option[Int])]) => x.sorted,
       docs = """
-        Some aggregates return `Expr[Option[V]]`s, et.c. `.maxByOpt`
+        Some aggregates return `Sql[Option[V]]`s, et.c. `.maxByOpt`
       """
     )
 
@@ -73,7 +73,7 @@ trait OptionalTests extends ScalaSqlSuite {
         WHERE (opt_cols0.my_int IS NOT NULL)""",
       value = Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None)),
       docs = """
-        `.isDefined` on `Expr[Option[V]]` translates to a SQL
+        `.isDefined` on `Sql[Option[V]]` translates to a SQL
         `IS NOT NULL` check
       """
     )
@@ -88,7 +88,7 @@ trait OptionalTests extends ScalaSqlSuite {
         WHERE (opt_cols0.my_int IS NULL)""",
       value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4))),
       docs = """
-        `.isEmpty` on `Expr[Option[V]]` translates to a SQL
+        `.isEmpty` on `Sql[Option[V]]` translates to a SQL
         `IS NULL` check
       """
     )
@@ -243,7 +243,7 @@ trait OptionalTests extends ScalaSqlSuite {
     }
 
     test("map") - checker(
-      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10))) },
+      query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + 10))) },
       sql = """
       SELECT
         (opt_cols0.my_int + ?) AS res__my_int,
@@ -258,7 +258,7 @@ trait OptionalTests extends ScalaSqlSuite {
       ),
       docs = """
         You can use operators like `.map` and `.flatMap` to work with
-        your `Expr[Option[V]]` values. These roughly follow the semantics
+        your `Sql[Option[V]]` values. These roughly follow the semantics
         that you would be familiar with from Scala.
       """
     )
@@ -272,7 +272,7 @@ trait OptionalTests extends ScalaSqlSuite {
     test("flatMap") - checker(
       query = Text {
         OptCols.select
-          .map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
+          .map(d => d.copy[Sql](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
       },
       sql = """
         SELECT
@@ -291,7 +291,7 @@ trait OptionalTests extends ScalaSqlSuite {
 
     test("mapGet") - checker(
       query = Text {
-        OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
+        OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
       },
       sql = """
         SELECT
@@ -307,16 +307,16 @@ trait OptionalTests extends ScalaSqlSuite {
         OptCols[Id](None, Some(4))
       ),
       docs = """
-        You can use `.get` to turn an `Expr[Option[V]]` into an `Expr[V]`. This follows
+        You can use `.get` to turn an `Sql[Option[V]]` into an `Sql[V]`. This follows
         SQL semantics, such that `NULL`s anywhere in that selected column automatically
-        will turn the whole column `None` (if it's an `Expr[Option[V]]` column) or `null`
+        will turn the whole column `None` (if it's an `Sql[Option[V]]` column) or `null`
         (if it's not an optional column)
       """
     )
 
     test("rawGet") - checker(
       query = Text {
-        OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
+        OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.get + d.myInt2.get + 1))
       },
       sql = """
         SELECT
@@ -334,7 +334,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("getOrElse") - checker(
-      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1))) },
+      query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1))) },
       sql = """
         SELECT
           COALESCE(opt_cols0.my_int, ?) AS res__my_int,
@@ -350,7 +350,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("orElse") - checker(
-      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2))) },
+      query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2))) },
       sql = """
         SELECT
           COALESCE(opt_cols0.my_int, opt_cols0.my_int2) AS res__my_int,
@@ -366,7 +366,7 @@ trait OptionalTests extends ScalaSqlSuite {
     )
 
     test("filter") - checker(
-      query = Text { OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2))) },
+      query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.filter(_ < 2))) },
       sql = """
         SELECT
           CASE

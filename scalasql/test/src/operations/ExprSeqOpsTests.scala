@@ -6,7 +6,7 @@ import utest._
 import utils.ScalaSqlSuite
 
 trait ExprSeqOpsTests extends ScalaSqlSuite {
-  def description = "Operations that can be performed on `Expr[Seq[_]]`"
+  def description = "Operations that can be performed on `Sql[Seq[_]]`"
   def tests = Tests {
     test("size") - checker(
       query = Purchase.select.size,

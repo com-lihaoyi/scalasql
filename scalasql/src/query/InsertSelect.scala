@@ -8,14 +8,14 @@ import scalasql.{Column, Queryable, Table, TypeMapper}
 /**
  * A SQL `INSERT SELECT` query
  */
-trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Expr]] with Query[Int]
+trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Sql]] with Query[Int]
 
 object InsertSelect {
   class Impl[V[_[_]], C, R, R2](insert: Insert[V, R], columns: C, select: Select[C, R2])(
       implicit dialect: Dialect
   ) extends InsertSelect[V, C, R, R2] {
     import dialect.{dialectSelf => _, _}
-    protected def expr = WithExpr.get(insert).asInstanceOf[V[Expr]]
+    protected def expr = WithExpr.get(insert).asInstanceOf[V[Sql]]
 
     def table = insert.table
 
@@ -37,7 +37,7 @@ object InsertSelect {
 
   class Renderer(
       select: Select[_, _],
-      exprs: Seq[Expr[_]],
+      exprs: Seq[Sql[_]],
       prevContext: Context,
       tableName: String
   ) {
@@ -46,7 +46,7 @@ object InsertSelect {
 
     lazy val columns = SqlStr.join(
       exprs
-        .map(_.asInstanceOf[Column.ColumnExpr[_]])
+        .map(_.asInstanceOf[Column[_]])
         .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
       SqlStr.commaSep
     )

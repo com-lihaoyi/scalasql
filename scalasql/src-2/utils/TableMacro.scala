@@ -26,15 +26,10 @@ object TableMacros {
         q"implicitly[scalasql.Table.ImplicitMetadata[${param.info.typeSymbol}]].value.vExpr($tableRef, dialect)"
       } else {
         q"""
-          _root_.scalasql.Column[${param.info.typeArgs.head}]()(
-            implicitly,
-            sourcecode.Name(
-              _root_.scalasql.Table.tableColumnNameOverride(
-                $tableRef.value.asInstanceOf[scalasql.Table[$caseClassType]]
-              )(${name.toString})
-            ),
-            $tableRef.value
-          ).expr($tableRef)
+          new _root_.scalasql.Column[${param.info.typeArgs.head}](
+            $tableRef,
+            _root_.scalasql.Table.tableColumnNameOverride($tableRef.value)(${name.toString})
+          )
         """
       }
     }
@@ -55,19 +50,19 @@ object TableMacros {
 
     val queryables = for (param <- constructorParameters) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
     }
 
     val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
       q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
       q"queryable[$tpe2, $tpe]($i).deconstruct(r.${TermName(param.name.toString)})"
     }
 
@@ -82,7 +77,7 @@ object TableMacros {
 
     val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Expr[_]])
+      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
       q"queryable[$tpe2, $tpe]($i).walkExprs(table.${TermName(param.name.toString)})"
     }
 
@@ -91,7 +86,7 @@ object TableMacros {
     val exprRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[scalasql.Expr]].typeArgs
+      args = weakTypeOf[V[scalasql.Sql]].typeArgs
     )
     val idRef = TypeRef(
       pre = typeRef.pre,

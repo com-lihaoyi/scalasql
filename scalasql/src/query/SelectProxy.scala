@@ -9,6 +9,6 @@ import scalasql.renderer.{Context, SqlStr}
  */
 class SelectProxy[Q](val expr: Q) extends Aggregatable[Q] {
   def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
-      implicit qr: Queryable.Row[Expr[V], V]
-  ): Expr[V] = { Expr[V] { implicit c => f(expr)(c) } }
+      implicit qr: Queryable.Row[Sql[V], V]
+  ): Sql[V] = { Sql[V] { implicit c => f(expr)(c) } }
 }

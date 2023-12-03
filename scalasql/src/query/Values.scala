@@ -28,10 +28,10 @@ class Values[Q, R](val ts: Seq[R])(
   override protected def selectRenderer(prevContext: Context): Select.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
     qr.walkExprs(expr)
       .zipWithIndex
-      .map { case (e, i) => (Expr.exprIdentity(e), SqlStr.raw(columnName(i))) }
+      .map { case (e, i) => (Sql.exprIdentity(e), SqlStr.raw(columnName(i))) }
       .toMap
   }
 }
@@ -43,7 +43,7 @@ object Values {
       qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep
     ) + sql")"
-    def render(liveExprs: Option[Set[Expr.Identity]]): SqlStr = {
+    def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
       val rows = SqlStr.join(v.ts.map(wrapRow), SqlStr.commaSep)
       sql"VALUES $rows"
     }

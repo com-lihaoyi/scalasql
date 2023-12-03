@@ -274,8 +274,8 @@ trait JoinTests extends ScalaSqlSuite {
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
       ),
       docs = """
-        `JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
-        them to participate in any database query logic than any other `Expr[Option[T]]`s
+        `JoinNullable[Sql[T]]`s can be implicitly used as `Sql[Option[T]]`s. This allows
+        them to participate in any database query logic than any other `Sql[Option[T]]`s
         can participate in, such as being used as sort key or in computing return values
         (below).
       """
@@ -349,7 +349,7 @@ trait JoinTests extends ScalaSqlSuite {
       ),
       normalize = (x: Seq[(String, Boolean)]) => x.sorted,
       docs = """
-        The conversion from `JoinNullable[T]` to `Expr[Option[T]]` can also be performed
+        The conversion from `JoinNullable[T]` to `Sql[Option[T]]` can also be performed
         explicitly via `JoinNullable.toExpr(...)`
       """
     )

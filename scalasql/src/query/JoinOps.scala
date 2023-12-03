@@ -7,7 +7,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   /**
    * Performs a `JOIN`/`INNER JOIN` on the given [[other]], typically a [[Table]] or [[Select]].
    */
-  def join[Q2, R2, QF, RF](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+  def join[Q2, R2, QF, RF](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF] = join0("JOIN", other, Some(on))
 
@@ -21,7 +21,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   protected def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Expr[Boolean]]
+      on: Option[(Q, Q2) => Sql[Boolean]]
   )(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF]
@@ -29,7 +29,7 @@ trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
   protected def joinInfo[Q2, R2](
       joinPrefix: String,
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Expr[Boolean]]
+      on: Option[(Q, Q2) => Sql[Boolean]]
   ) = {
     val otherSelect = Joinable.joinableSelect(other)
 
@@ -52,7 +52,7 @@ object JoinOps {
       v: JoinOps[C, Q, R],
       prefix: String,
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Expr[Boolean]]
+      on: Option[(Q, Q2) => Sql[Boolean]]
   )(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ) = {

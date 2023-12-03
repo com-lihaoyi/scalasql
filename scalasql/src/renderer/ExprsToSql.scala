@@ -1,15 +1,15 @@
 package scalasql.renderer
 
-import scalasql.query.Expr
+import scalasql.query.Sql
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.utils.FlatJson
 
 object ExprsToSql {
-  def apply(flattenedExpr: Seq[(List[String], Expr[_])], exprPrefix: SqlStr, context: Context) = {
+  def apply(flattenedExpr: Seq[(List[String], Sql[_])], exprPrefix: SqlStr, context: Context) = {
     apply0(flattenedExpr, context, sql"SELECT " + exprPrefix)
   }
 
-  def apply0(flattenedExpr: Seq[(List[String], Expr[_])], context: Context, prefix: SqlStr) = {
+  def apply0(flattenedExpr: Seq[(List[String], Sql[_])], context: Context, prefix: SqlStr) = {
     FlatJson.flatten(flattenedExpr, context) match {
       case Seq((prefix, singleExpr))
           if prefix == context.config.columnLabelPrefix && singleExpr.isCompleteQuery =>
@@ -27,8 +27,8 @@ object ExprsToSql {
     }
   }
 
-  def booleanExprs(prefix: SqlStr, exprs: Seq[Expr[_]])(implicit ctx: Context) = {
-    SqlStr.optSeq(exprs.filter(!Expr.exprIsLiteralTrue(_))) { having =>
+  def booleanExprs(prefix: SqlStr, exprs: Seq[Sql[_]])(implicit ctx: Context) = {
+    SqlStr.optSeq(exprs.filter(!Sql.exprIsLiteralTrue(_))) { having =>
       prefix + SqlStr.join(having.map(Renderable.renderToSql(_)), sql" AND ")
     }
   }

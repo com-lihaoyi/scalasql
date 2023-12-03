@@ -1,16 +1,16 @@
 package scalasql.dialects
 
-import scalasql.query.Expr
+import scalasql.query.Sql
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 trait PadOps {
-  protected def v: Expr[String]
+  protected def v: Sql[String]
 
-  def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+  def rpad(length: Sql[Int], fill: Sql[String]): Sql[String] = Sql { implicit ctx =>
     sql"RPAD($v, $length, $fill)"
   }
 
-  def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
+  def lpad(length: Sql[Int], fill: Sql[String]): Sql[String] = Sql { implicit ctx =>
     sql"LPAD($v, $length, $fill)"
   }
 }

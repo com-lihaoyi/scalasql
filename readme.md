@@ -101,8 +101,8 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
     covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
   * [Expression Ops](docs/reference.md#exprops), covering the different
-    types of `Expr[T]` values and the different operations you can do on each one
-  * [Option Ops](docs/reference.md#optional), operations on `Expr[Option[T]`
+    types of `Sql[T]` values and the different operations you can do on each one
+  * [Option Ops](docs/reference.md#optional), operations on `Sql[Option[T]`
   * [Window Functions](docs/reference.md#windowfunctions), 
     [With-Clauses/Common-Table-Expressions](docs/reference.md#withcte)
   * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),

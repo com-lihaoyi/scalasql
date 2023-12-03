@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.Expr
+import scalasql.query.Sql
 import sourcecode.Text
 import utest._
 import utils.PostgresSuite
@@ -36,28 +36,28 @@ trait PostgresDialectTests extends PostgresSuite {
     )
 
     test("ltrim2") - checker(
-      query = Expr("xxHellox").ltrim("x"),
+      query = Sql("xxHellox").ltrim("x"),
       sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
-      query = Expr("xxHellox").rtrim("x"),
+      query = Sql("xxHellox").rtrim("x"),
       sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 
     test("reverse") -
-      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
+      checker(query = Sql("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
 
     test("lpad") - checker(
-      query = Expr("Hello").lpad(10, "xy"),
+      query = Sql("Hello").lpad(10, "xy"),
       sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xyxyxHello"
     )
 
     test("rpad") - checker(
-      query = Expr("Hello").rpad(10, "xy"),
+      query = Sql("Hello").rpad(10, "xy"),
       sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxyxyx"
     )

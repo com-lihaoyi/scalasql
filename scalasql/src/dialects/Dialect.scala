@@ -1,8 +1,8 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, DbApiOps, TableOps, WindowExpr}
-import scalasql.query.Expr.apply0
-import scalasql.query.{Aggregatable, Expr, JoinNullable, Select, WithCte, WithCteRef}
+import scalasql.query.Sql.apply0
+import scalasql.query.{Aggregatable, Sql, JoinNullable, Select, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
 import scalasql.{DbApi, Queryable, Table, TypeMapper, operations}
 
@@ -189,17 +189,17 @@ trait Dialect extends DialectConfig {
     def put(r: PreparedStatement, idx: Int, v: T) = r.setObject(idx, v, java.sql.Types.OTHER)
   }
 
-  implicit def from(x: Int): Expr[Int] = Expr(x)
+  implicit def from(x: Int): Sql[Int] = Sql(x)
 
-  implicit def from(x: Long): Expr[Long] = Expr(x)
+  implicit def from(x: Long): Sql[Long] = Sql(x)
 
-  implicit def from(x: Boolean): Expr[Boolean] = Expr.apply0(x, x)
+  implicit def from(x: Boolean): Sql[Boolean] = Sql.apply0(x, x)
 
-  implicit def from(x: Double): Expr[Double] = Expr(x)
+  implicit def from(x: Double): Sql[Double] = Sql(x)
 
-  implicit def from(x: scala.math.BigDecimal): Expr[scala.math.BigDecimal] = Expr(x)
+  implicit def from(x: scala.math.BigDecimal): Sql[scala.math.BigDecimal] = Sql(x)
 
-  implicit def from(x: String): Expr[String] = Expr(x)
+  implicit def from(x: String): Sql[String] = Sql(x)
 
   implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
     new TypeMapper[Option[T]] {
@@ -216,48 +216,48 @@ trait Dialect extends DialectConfig {
         }
       }
     }
-  implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
+  implicit def ExprBooleanOpsConv(v: Sql[Boolean]): operations.ExprBooleanOps =
     new operations.ExprBooleanOps(v)
   implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
-      v: Expr[T]
+      v: Sql[T]
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
 
-  implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
+  implicit def ExprOpsConv(v: Sql[_]): operations.ExprOps = new operations.ExprOps(v)
 
-  implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
+  implicit def ExprTypedOpsConv[T: ClassTag](v: Sql[T]): operations.ExprTypedOps[T] =
     new operations.ExprTypedOps(v)
 
-  implicit def ExprOptionOpsConv[T: TypeMapper](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
+  implicit def ExprOptionOpsConv[T: TypeMapper](v: Sql[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)
 
-  implicit def NullableExprOpsConv[T: TypeMapper](v: JoinNullable[Expr[T]]): operations.ExprOps =
+  implicit def NullableExprOpsConv[T: TypeMapper](v: JoinNullable[Sql[T]]): operations.ExprOps =
     new operations.ExprOps(JoinNullable.toExpr(v))
 
   implicit def NullableExprOptionOpsConv[T: TypeMapper](
-      v: JoinNullable[Expr[T]]
+      v: JoinNullable[Sql[T]]
   ): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(JoinNullable.toExpr(v))
 
-  implicit def ExprStringOpsConv(v: Expr[String]): operations.ExprStringOps
+  implicit def ExprStringOpsConv(v: Sql[String]): operations.ExprStringOps
 
-  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Expr[V]])(
-      implicit qr: Queryable.Row[Expr[V], V]
+  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Sql[V]])(
+      implicit qr: Queryable.Row[Sql[V], V]
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
 
   implicit def AggOpsConv[T](v: Aggregatable[T])(
       implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T]
+  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
   implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 
-  implicit class WindowExtensions[T](e: Expr[T]) {
+  implicit class WindowExtensions[T](e: Sql[T]) {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Expr[T], T] = {
-    new Expr.ExprQueryable[Expr, T]()
+  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Sql[T], T] = {
+    new Sql.ExprQueryable[Sql, T]()
   }
 }

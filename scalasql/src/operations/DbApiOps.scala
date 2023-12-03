@@ -2,7 +2,7 @@ package scalasql.operations
 
 import scalasql.dialects.Dialect
 import scalasql.{Queryable, TypeMapper}
-import scalasql.query.{Expr, Select, Values, WithCte, WithCteRef}
+import scalasql.query.{Sql, Select, Values, WithCte, WithCteRef}
 import scalasql.renderer.SqlStr
 
 class DbApiOps(dialect: Dialect) {
@@ -11,7 +11,7 @@ class DbApiOps(dialect: Dialect) {
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */
-  def caseWhen[T: TypeMapper](values: (Expr[Boolean], Expr[T])*) = new CaseWhen(values)
+  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) = new CaseWhen(values)
 
   /**
    * Creates a SQL `VALUES` clause
@@ -26,14 +26,14 @@ class DbApiOps(dialect: Dialect) {
    * with gaps. If there is no ORDER BY clause, then all rows are considered peers and
    * this function always returns 1.
    */
-  def rank(): Expr[Int] = Expr { implicit ctx => sql"RANK()" }
+  def rank(): Sql[Int] = Sql { implicit ctx => sql"RANK()" }
 
   /**
    * The number of the row within the current partition. Rows are numbered starting
    * from 1 in the order defined by the ORDER BY clause in the window definition, or
    * in arbitrary order otherwise.
    */
-  def rowNumber(): Expr[Int] = Expr { implicit ctx => sql"ROW_NUMBER()" }
+  def rowNumber(): Sql[Int] = Sql { implicit ctx => sql"ROW_NUMBER()" }
 
   /**
    * The number of the current row's peer group within its partition - the rank of the
@@ -41,7 +41,7 @@ class DbApiOps(dialect: Dialect) {
    * by the ORDER BY clause in the window definition. If there is no ORDER BY clause,
    * then all rows are considered peers and this function always returns 1.
    */
-  def denseRank(): Expr[Int] = Expr { implicit ctx => sql"DENSE_RANK()" }
+  def denseRank(): Sql[Int] = Sql { implicit ctx => sql"DENSE_RANK()" }
 
   /**
    * Despite the name, this function always returns a value between 0.0 and 1.0 equal to
@@ -49,14 +49,14 @@ class DbApiOps(dialect: Dialect) {
    * function rank() and partition-rows is the total number of rows in the partition. If
    * the partition contains only one row, this function returns 0.0.
    */
-  def percentRank(): Expr[Double] = Expr { implicit ctx => sql"PERCENT_RANK()" }
+  def percentRank(): Sql[Double] = Sql { implicit ctx => sql"PERCENT_RANK()" }
 
   /**
    * The cumulative distribution. Calculated as row-number/partition-rows, where row-number
    * is the value returned by row_number() for the last peer in the group and partition-rows
    * the number of rows in the partition.
    */
-  def cumeDist(): Expr[Double] = Expr { implicit ctx => sql"CUME_DIST()" }
+  def cumeDist(): Sql[Double] = Sql { implicit ctx => sql"CUME_DIST()" }
 
   /**
    * Argument N is handled as an integer. This function divides the partition into N groups
@@ -65,10 +65,10 @@ class DbApiOps(dialect: Dialect) {
    * groups occur first. This function returns the integer value assigned to the group that
    * the current row is a part of.
    */
-  def ntile(n: Int): Expr[Int] = Expr { implicit ctx => sql"NTILE($n)" }
+  def ntile(n: Int): Sql[Int] = Sql { implicit ctx => sql"NTILE($n)" }
 
-  private def lagLead[T](prefix: SqlStr, e: Expr[T], offset: Int, default: Expr[T]): Expr[T] =
-    Expr { implicit ctx =>
+  private def lagLead[T](prefix: SqlStr, e: Sql[T], offset: Int, default: Sql[T]): Sql[T] =
+    Sql { implicit ctx =>
       val args = SqlStr.join(
         Seq(
           Some(sql"$e"),
@@ -95,7 +95,7 @@ class DbApiOps(dialect: Dialect) {
    * If default is also provided, then it is returned instead of NULL if the row identified
    * by offset does not exist.
    */
-  def lag[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
+  def lag[T](e: Sql[T], offset: Int = -1, default: Sql[T] = null): Sql[T] =
     lagLead(sql"LAG", e, offset, default)
 
   /**
@@ -112,7 +112,7 @@ class DbApiOps(dialect: Dialect) {
    * If default is also provided, then it is returned instead of NULL if the row identified
    * by offset does not exist.
    */
-  def lead[T](e: Expr[T], offset: Int = -1, default: Expr[T] = null): Expr[T] =
+  def lead[T](e: Sql[T], offset: Int = -1, default: Sql[T] = null): Sql[T] =
     lagLead(sql"LEAD", e, offset, default)
 
   /**
@@ -120,14 +120,14 @@ class DbApiOps(dialect: Dialect) {
    * function. It returns the value of expr evaluated against the first row in the window
    * frame for each row.
    */
-  def firstValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"FIRST_VALUE($e)" }
+  def firstValue[T](e: Sql[T]): Sql[T] = Sql { implicit ctx => sql"FIRST_VALUE($e)" }
 
   /**
    * Calculates the window frame for each row in the same way as an aggregate window
    * function. It returns the value of expr evaluated against the last row in the window
    * frame for each row.
    */
-  def lastValue[T](e: Expr[T]): Expr[T] = Expr { implicit ctx => sql"LAST_VALUE($e)" }
+  def lastValue[T](e: Sql[T]): Sql[T] = Sql { implicit ctx => sql"LAST_VALUE($e)" }
 
   /**
    * Calculates the window frame for each row in the same way as an aggregate window
@@ -136,7 +136,7 @@ class DbApiOps(dialect: Dialect) {
    * defined by the ORDER BY clause if one is present, or in arbitrary order otherwise.
    * If there is no Nth row in the partition, then NULL is returned.
    */
-  def nthValue[T](e: Expr[T], n: Int): Expr[T] = Expr { implicit ctx => sql"NTH_VALUE($e, $n)" }
+  def nthValue[T](e: Sql[T], n: Int): Sql[T] = Sql { implicit ctx => sql"NTH_VALUE($e, $n)" }
 
   /** Generates a SQL `WITH` common table expression clause */
   def withCte[Q, Q2, R, R2](

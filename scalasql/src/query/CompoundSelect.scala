@@ -41,7 +41,7 @@ class CompoundSelect[Q, R](
     }
   }
 
-  override def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
+  override def filter(f: Q => Sql[Boolean]): Select[Q, R] = {
     (lhs, compoundOps) match {
       case (s: SimpleSelect[Q, R], Nil) =>
         copy(Select.selectSimpleFrom(s.filter(f)), compoundOps, orderBy, limit, offset)
@@ -49,7 +49,7 @@ class CompoundSelect[Q, R](
     }
   }
 
-  override def sortBy(f: Q => Expr[_]) = {
+  override def sortBy(f: Q => Sql[_]) = {
     val newOrder = Seq(OrderBy(f(expr), None, None))
 
     if (limit.isEmpty && offset.isEmpty) copy(orderBy = newOrder ++ orderBy)
@@ -81,7 +81,7 @@ class CompoundSelect[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
     Select.selectLhsMap(lhs, prevContext)
   }
 }
@@ -110,7 +110,7 @@ object CompoundSelect {
 
     lazy val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
-    def render(liveExprs: Option[Set[Expr.Identity]]) = {
+    def render(liveExprs: Option[Set[Sql.Identity]]) = {
 
       val innerLiveExprs = if (preserveAll) None else liveExprs.map(_ ++ newReferencedExpressions)
       val lhsStr = lhsToSqlQuery.render(innerLiveExprs)

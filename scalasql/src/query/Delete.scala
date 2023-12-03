@@ -11,7 +11,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 trait Delete[Q] extends Query[Int] with Returnable[Q]
 
 object Delete {
-  class Impl[Q](val expr: Q, filter: Expr[Boolean], val table: TableRef)(implicit dialect: Dialect)
+  class Impl[Q](val expr: Q, filter: Sql[Boolean], val table: TableRef)(implicit dialect: Dialect)
       extends Delete[Q] {
     import dialect._
     override def queryIsExecuteUpdate = true
@@ -24,7 +24,7 @@ object Delete {
     protected def queryConstruct(args: Queryable.ResultSetIterator): Int = args.get(IntType)
   }
 
-  class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context) {
+  class Renderer(table: TableRef, expr: Sql[Boolean], prevContext: Context) {
     lazy val tableNameStr =
       SqlStr.raw(prevContext.config.tableNameMapper(Table.tableName(table.value)))
     implicit val implicitCtx = Context.compute(prevContext, Nil, Some(table))

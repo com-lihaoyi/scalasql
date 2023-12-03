@@ -54,9 +54,9 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
                  |      )
                  |
                  |""".stripMargin
-        s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column.ColumnExpr] => Column.ColumnExpr[T$j]")})(
-          |    items: (${commaSep(j => s"Expr[T$j]")})*
-          |)(implicit qr: Queryable[V[Column.ColumnExpr], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
+        s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column] => Column[T$j]")})(
+          |    items: (${commaSep(j => s"Sql[T$j]")})*
+          |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
       }
     }
 
@@ -96,16 +96,16 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
       s"""package scalasql.generated
         |import scalasql.Column
         |import scalasql.Queryable
-        |import scalasql.query.Expr
+        |import scalasql.query.Sql
         |trait Insert[V[_[_]], R]{
         |  ${defs(false).mkString("\n")}
         |}
         |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
         |  def newInsertValues[R](
         |        insert: scalasql.query.Insert[V, R],
-        |        columns: Seq[Column.ColumnExpr[_]],
-        |        valuesLists: Seq[Seq[Expr[_]]]
-        |    )(implicit qr: Queryable[V[Column.ColumnExpr], R]): scalasql.query.InsertColumns[V, R]
+        |        columns: Seq[Column[_]],
+        |        valuesLists: Seq[Seq[Sql[_]]]
+        |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
         |  ${defs(true).mkString("\n")}
         |}
         |

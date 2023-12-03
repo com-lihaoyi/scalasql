@@ -4,7 +4,7 @@ import SqlStr.SqlStringSyntax
 import scalasql.query.{
   AscDesc,
   CompoundSelect,
-  Expr,
+  Sql,
   From,
   Join,
   Joinable,
@@ -41,7 +41,7 @@ object JoinsToSql {
       selectables: Seq[From],
       prevContext: Context,
       namedFromsMap: Map[From, String],
-      liveExprs: Option[Set[Expr.Identity]]
+      liveExprs: Option[Set[Sql.Identity]]
   ) = {
     selectables.iterator.map { f =>
       (f, renderSingleFrom(prevContext, liveExprs, f, namedFromsMap))
@@ -50,7 +50,7 @@ object JoinsToSql {
 
   def renderSingleFrom(
       prevContext: Context,
-      liveExprs: Option[Set[Expr.Identity]],
+      liveExprs: Option[Set[Sql.Identity]],
       f: From,
       namedFromsMap: Map[From, String]
   ): SqlStr = {
@@ -70,7 +70,7 @@ object JoinsToSql {
   def renderLateralJoins(
       prevContext: Context,
       from: Seq[From],
-      innerLiveExprs: Set[Expr.Identity],
+      innerLiveExprs: Set[Sql.Identity],
       joins0: Seq[Join],
       renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]
   ) = {

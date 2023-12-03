@@ -1,7 +1,7 @@
 package scalasql.renderer
 
 import scalasql.{Config, Table}
-import scalasql.query.{Expr, From, Select, SubqueryRef, TableRef, WithCteRef}
+import scalasql.query.{Sql, From, Select, SubqueryRef, TableRef, WithCteRef}
 import scalasql.renderer.SqlStr.SqlStringSyntax
 
 /**
@@ -10,28 +10,28 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
  *
  * @param fromNaming any [[From]]/`FROM` clauses that are in scope, and the aliases those
  *                   clauses are given
- * @param exprNaming any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and
+ * @param exprNaming any [[Sql]]s/SQL-expressions that are present in [[fromNaming]], and
  *                   what those expressions are named in SQL
  * @param config The ScalaSql configuration
  */
 trait Context {
   def fromNaming: Map[From, String]
-  def exprNaming: Map[Expr.Identity, SqlStr]
+  def exprNaming: Map[Sql.Identity, SqlStr]
   def config: Config
 
   def withFromNaming(fromNaming: Map[From, String]): Context
-  def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
+  def withExprNaming(exprNaming: Map[Sql.Identity, SqlStr]): Context
 }
 
 object Context {
   case class Impl(
       fromNaming: Map[From, String],
-      exprNaming: Map[Expr.Identity, SqlStr],
+      exprNaming: Map[Sql.Identity, SqlStr],
       config: Config
   ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
-    def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context =
+    def withExprNaming(exprNaming: Map[Sql.Identity, SqlStr]): Context =
       copy(exprNaming = exprNaming)
   }
 

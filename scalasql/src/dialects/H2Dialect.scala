@@ -6,7 +6,7 @@ import scalasql.{Column, DbApi, Id, Queryable, Table, TypeMapper, dialects, oper
 import scalasql.query.{
   Aggregatable,
   CompoundSelect,
-  Expr,
+  Sql,
   From,
   GroupBy,
   InsertColumns,
@@ -33,10 +33,10 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps =
+  override implicit def ExprStringOpsConv(v: Sql[String]): H2Dialect.ExprStringOps =
     new H2Dialect.ExprStringOps(v)
   override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
-      v: Expr[T]
+      v: Sql[T]
   ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
@@ -47,13 +47,13 @@ trait H2Dialect extends Dialect {
       new H2Dialect.Values(ts)
   }
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
+  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
     new H2Dialect.AggExprOps(v)
 }
 
 object H2Dialect extends H2Dialect {
-  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v) {
-    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
+  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
+    def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
       assert(
         sep == null,
         "H2 database dialect does not support mkString separator due to a bug (?) where " +
@@ -65,22 +65,22 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class ExprStringOps(protected val v: Expr[String])
+  class ExprStringOps(protected val v: Sql[String])
       extends operations.ExprStringOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
+    def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Expr[T])
+  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Sql[T])
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
-    protected override def joinableSelect: Select[V[Expr], V[Id]] = {
+    protected override def joinableSelect: Select[V[Sql], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
         None,
         Seq(ref),
         Nil,
@@ -108,7 +108,7 @@ object H2Dialect extends H2Dialect {
         exprPrefix: Option[Context => SqlStr],
         from: Seq[From],
         joins: Seq[Join],
-        where: Seq[Expr[_]],
+        where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
     )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
@@ -120,12 +120,12 @@ object H2Dialect extends H2Dialect {
       exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
       with Select[Q, R] {
-    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)

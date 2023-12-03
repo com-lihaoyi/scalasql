@@ -9,8 +9,8 @@ import scalasql.renderer.{Context, SqlStr}
  */
 trait Aggregatable[Q] extends WithExpr[Q] {
   def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
-      implicit qr: Queryable.Row[Expr[V], V]
-  ): Expr[V]
+      implicit qr: Queryable.Row[Sql[V], V]
+  ): Sql[V]
 }
 
 class Aggregate[Q, R](

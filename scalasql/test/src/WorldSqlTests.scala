@@ -46,7 +46,7 @@ object WorldSqlTests extends TestSuite {
   // Next, you need to define your data model classes. In ScalaSql, your data model
   // is defined using `case class`es with each field wrapped in the wrapper type
   // parameter `T[_]`. This allows us to re-use the same case class to represent
-  // both database values (when `T` is `scalasql.Expr`) as well as Scala values
+  // both database values (when `T` is `scalasql.Sql`) as well as Scala values
   // (when `T` is `scalasql.Id`).
   //
   // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
@@ -151,24 +151,24 @@ object WorldSqlTests extends TestSuite {
     test("expr") {
       // +DOCS
       // ## Expressions
-      // The simplest thing you can query are `scalasql.Expr`s. These represent the SQL
+      // The simplest thing you can query are `scalasql.Sql`s. These represent the SQL
       // expressions that are part of a query, and can be evaluated even without being
       // part of any database table.
       //
-      // Here, we construct `Expr`s to represent the SQL query `1 + 3`. We can use
+      // Here, we construct `Sql`s to represent the SQL query `1 + 3`. We can use
       // `db.toSqlQuery` to see the generated SQL code, and `db.run` to send the
       // query to the database and return the output `4`
-      val query = Expr(1) + Expr(3)
+      val query = Sql(1) + Sql(3)
       db.toSqlQuery(query) ==> "SELECT (? + ?) AS res"
       db.run(query) ==> 4
       // In general, most primitive types that can be mapped to SQL can be converted
-      // to `scalasql.Expr`s: `Int`s and other numeric types, `String`s, `Boolean`s,
-      // etc., each returning an `Expr[T]` for the respective type `T`. Each type of
-      // `Expr[T]` has a set of operations representing what operations the database
+      // to `scalasql.Sql`s: `Int`s and other numeric types, `String`s, `Boolean`s,
+      // etc., each returning an `Sql[T]` for the respective type `T`. Each type of
+      // `Sql[T]` has a set of operations representing what operations the database
       // supports on that type of expression.
       //
       // You can check out the [ScalaSql Reference](reference.md#exprops) if you want a
-      // comprehensive list of built-in operations on various `Expr[T]` types.
+      // comprehensive list of built-in operations on various `Sql[T]` types.
       //
       // -DOCS
     }
@@ -234,13 +234,13 @@ object WorldSqlTests extends TestSuite {
 
         db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
         // Note that we use `===` rather than `==` for the equality comparison. The
-        // function literal passed to `.filter` is given a `City[Expr]` as its parameter,
+        // function literal passed to `.filter` is given a `City[Sql]` as its parameter,
         // representing a `City` that is part of the database query, in contrast to the
-        // `City[Id]`s that `db.run` returns , and so `_.name` is of type `Expr[String]`
+        // `City[Id]`s that `db.run` returns , and so `_.name` is of type `Sql[String]`
         // rather than just `String` or `Id[String]`. You can use your IDE's
-        // auto-complete to see what operations are available on `Expr[String]`: typically
+        // auto-complete to see what operations are available on `Sql[String]`: typically
         // they will represent SQL string functions rather than Scala string functions and
-        // take and return `Expr[String]`s rather than plain Scala `String`s. Database
+        // take and return `Sql[String]`s rather than plain Scala `String`s. Database
         // value equality is represented by the `===` operator.
         //
         // Note also the `.single` operator. This tells ScalaSql that you expect exactly
@@ -316,9 +316,9 @@ object WorldSqlTests extends TestSuite {
             City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
             City[Id](1891, "Peking", "CHN", district = "Peking", population = 7472000)
           )
-          // Again, all the operations within the query work on `Expr`s: `c` is a `City[Expr]`,
-          // `c.population` is an `Expr[Int]`, `c.countryCode` is an `Expr[String]`, and
-          // `===` and `>` and `&&` on `Expr`s all return `Expr[Boolean]`s that represent
+          // Again, all the operations within the query work on `Sql`s: `c` is a `City[Sql]`,
+          // `c.population` is an `Sql[Int]`, `c.countryCode` is an `Sql[String]`, and
+          // `===` and `>` and `&&` on `Sql`s all return `Sql[Boolean]`s that represent
           // a SQL expression that can be sent to the Database as part of your query.
           // -DOCS
         }
@@ -351,10 +351,10 @@ object WorldSqlTests extends TestSuite {
       test("implicit") {
         // +DOCS
         // ### Lifting
-        // Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
-        // `===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
-        // already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
-        // a `Expr[Int]` automatically
+        // Conversion of simple primitive `T`s into `Sql[T]`s happens implicitly. Below,
+        // `===` expects both left-hand and right-hand values to be `Sql`s. `_.id` is
+        // already an `Sql[Int]`, but `cityId` is a normal `Int` that is "lifted" into
+        // a `Sql[Int]` automatically
         def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
@@ -369,9 +369,9 @@ object WorldSqlTests extends TestSuite {
 
       test("explicit") {
         // +DOCS
-        // This implicit lifting can be done explicitly using the `Expr(...)` syntax
+        // This implicit lifting can be done explicitly using the `Sql(...)` syntax
         // as shown below
-        def find(cityId: Int) = db.run(City.select.filter(_.id === Expr(cityId)))
+        def find(cityId: Int) = db.run(City.select.filter(_.id === Sql(cityId)))
 
         assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
         assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
@@ -576,10 +576,10 @@ object WorldSqlTests extends TestSuite {
         // ### Nullable Columns
         //
         // Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
-        // meaning `Expr[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
-        // meaning `Option[V]`) in the returned data. `Expr[Option[V]]` supports a similar
+        // meaning `Sql[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
+        // meaning `Option[V]`) in the returned data. `Sql[Option[V]]` supports a similar
         // set of operations as `Option[V]`: `isDefined`, `isEmpty`, `map`, `flatMap`, `get`,
-        // `orElse`, etc., but returning `Expr[V]`s rather than plain `V`s.
+        // `orElse`, etc., but returning `Sql[V]`s rather than plain `V`s.
         val query = Country.select
           .filter(_.capital.isEmpty)
           .size
@@ -700,10 +700,10 @@ object WorldSqlTests extends TestSuite {
         )
         // Note that when you use a left/right/outer join, the corresponding
         // rows are provided to you as `scalasql.JoinNullable[T]` rather than plain `T`s, e.g.
-        // `cityOpt: scalasql.JoinNullable[City[Expr]]` above. `JoinNullable[T]` can be checked
+        // `cityOpt: scalasql.JoinNullable[City[Sql]]` above. `JoinNullable[T]` can be checked
         // for presence/absence using `.isEmpty` and specifying a specific column to check,
-        // and can be converted to an `Expr[Option[T]]` by `.map`ing itt to a particular
-        // `Expr[T]`.
+        // and can be converted to an `Sql[Option[T]]` by `.map`ing itt to a particular
+        // `Sql[T]`.
         //
         // -DOCS
       }
@@ -862,7 +862,7 @@ object WorldSqlTests extends TestSuite {
         // +DOCS
         // ## Window Functions
         // ScalaSql supports window functions via the `.over` operator, which
-        // enables the `.partitionBy` and `.sortBy` operators on `Expr[T]`. These
+        // enables the `.partitionBy` and `.sortBy` operators on `Sql[T]`. These
         // translate into SQL's `OVER`/`PARTITION BY`/`ORDER BY` clauses
         val query = City.select
           .map(c =>
@@ -1183,7 +1183,7 @@ object WorldSqlTests extends TestSuite {
           c => (c.name, c.countryCode, c.district, c.population),
           City.select
             .filter(_.name === "Singapore")
-            .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0L)))
+            .map(c => (Sql("New-") + c.name, c.countryCode, c.district, Sql(0L)))
         )
 
         db.toSqlQuery(query) ==> """
@@ -1371,15 +1371,15 @@ object WorldSqlTests extends TestSuite {
       // +DOCS
       // ## Custom Expressions
       //
-      // You can define custom SQL expressions via the `Expr` constructor. This is
+      // You can define custom SQL expressions via the `Sql` constructor. This is
       // useful for enclosing ScalaSql when you need to use some operator or syntax
       // that your Database supports but ScalaSql does not have built in. This example
-      // shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
+      // shows how to define a custom `rawToHex` Scala function working on `Sql[T]`s,
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
       // using that in a query to return a string.
       import scalasql.renderer.SqlStr.SqlStringSyntax
 
-      def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
+      def rawToHex(v: Sql[String]): Sql[String] = Sql { implicit ctx => sql"RAWTOHEX($v)" }
 
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
 
@@ -1388,12 +1388,12 @@ object WorldSqlTests extends TestSuite {
 
       db.run(query) ==> "00530069006e006700610070006f00720065"
       // Your custom Scala functions can either be standalone functions or extension
-      // methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
+      // methods. Most of the operators on `Sql[T]` that ScalaSql comes bundled with
       // are extension methods, with a different set being made available for each database.
       //
       // Different databases have a huge range of functions available. ScalaSql comes
       // with the most commonly-used functions built in, but it is expected that you will
-      // need to build up your own library of custom `Expr[T]` functions to to access
+      // need to build up your own library of custom `Sql[T]` functions to to access
       // less commonly used functions that are nonetheless still needed in your application
       // -DOCS
     }

@@ -5,7 +5,7 @@ import scalasql.query.{
   Aggregatable,
   AscDesc,
   CompoundSelect,
-  Expr,
+  Sql,
   From,
   GroupBy,
   Join,
@@ -32,39 +32,39 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
   class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
-  override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps =
+  override implicit def ExprStringOpsConv(v: Sql[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
     new SqliteDialect.TableOps(t)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Expr[T]]): operations.AggExprOps[T] =
+  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
     new SqliteDialect.AggExprOps(v)
 }
 
 object SqliteDialect extends SqliteDialect {
-  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.AggExprOps[T](v) {
+  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
 
     /** TRUE if all values in a set are TRUE */
-    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
+    def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
     }
   }
 
-  class ExprStringOps(protected val v: Expr[String])
+  class ExprStringOps(protected val v: Sql[String])
       extends operations.ExprStringOps(v)
       with TrimOps {
-    def indexOf(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
-    def glob(x: Expr[String]): Expr[Int] = Expr { implicit ctx => sql"GLOB($v, $x)" }
+    def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"INSTR($v, $x)" }
+    def glob(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"GLOB($v, $x)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
 
-    protected override def joinableSelect: Select[V[Expr], V[Id]] = {
+    protected override def joinableSelect: Select[V[Sql], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(
-        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        Table.tableMetadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
         None,
         Seq(ref),
         Nil,
@@ -92,7 +92,7 @@ object SqliteDialect extends SqliteDialect {
         exprPrefix: Option[Context => SqlStr],
         from: Seq[From],
         joins: Seq[Join],
-        where: Seq[Expr[_]],
+        where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
     )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
@@ -104,7 +104,7 @@ object SqliteDialect extends SqliteDialect {
       exprPrefix: Option[Context => SqlStr],
       from: Seq[From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)

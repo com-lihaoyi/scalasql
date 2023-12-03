@@ -1,7 +1,7 @@
 package scalasql
 
 import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.query.{Expr, JoinNullable, Query}
+import scalasql.query.{Sql, JoinNullable, Query}
 import scalasql.renderer.SqlStr.{Interp, SqlStringSyntax}
 
 import java.sql.{PreparedStatement, ResultSet}
@@ -33,9 +33,9 @@ trait Queryable[-Q, R] {
    * Returns a sequence of expressions created by this queryable value. Used to generate
    * the column list `SELECT` clauses, both for nested and top level `SELECT`s
    */
-  def walkExprs(q: Q): Seq[Expr[_]]
+  def walkExprs(q: Q): Seq[Sql[_]]
 
-  def walkLabelsAndExprs(q: Q): Seq[(List[String], Expr[_])] = walkLabels(q).zip(walkExprs(q))
+  def walkLabelsAndExprs(q: Q): Seq[(List[String], Sql[_])] = walkLabels(q).zip(walkExprs(q))
 
   /**
    * Whether this query expects a single row to be returned, if so we can assert on
@@ -106,7 +106,7 @@ object Queryable {
   object Row extends scalasql.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
-        val walkExprs0: Q => Seq[Seq[Expr[_]]],
+        val walkExprs0: Q => Seq[Seq[Sql[_]]],
         construct0: ResultSetIterator => R,
         deconstruct0: R => Q
     ) extends Queryable.Row[Q, R] {

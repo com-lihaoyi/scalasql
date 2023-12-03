@@ -383,8 +383,8 @@ trait SubQueryTests extends ScalaSqlSuite {
         example is contrived, it demonstrates how nested ScalaSql `.select` calls
         translate directly into nested SQL subqueries.
 
-        To turn the ScalaSql `Select[T]` into an `Expr[T]`, you can either use
-        an aggregate method like `.sumBy(...): Expr[Int]` that generates a `SUM(...)`
+        To turn the ScalaSql `Select[T]` into an `Sql[T]`, you can either use
+        an aggregate method like `.sumBy(...): Sql[Int]` that generates a `SUM(...)`
         aggregate, or via the `.toExpr` method that leaves the subquery untouched.
         SQL requires that subqueries used as expressions must return a single row
         and single column, and if the query returns some other number of rows/columns

@@ -6,15 +6,15 @@ import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 
 trait InsertValues[V[_[_]], R] extends Query[Int] {
-  def skipColumns(x: (V[Column.ColumnExpr] => Column.ColumnExpr[_])*): InsertValues[V, R]
+  def skipColumns(x: (V[Column] => Column[_])*): InsertValues[V, R]
 }
 object InsertValues {
   class Impl[V[_[_]], R](
       insert: Insert[V, R],
       values: Seq[R],
       dialect: Dialect,
-      qr: Queryable.Row[V[Column.ColumnExpr], R],
-      skippedColumns: Seq[Column.ColumnExpr[_]]
+      qr: Queryable.Row[V[Column], R],
+      skippedColumns: Seq[Column[_]]
   ) extends InsertValues[V, R] {
     protected def queryWalkLabels() = Nil
 
@@ -37,7 +37,7 @@ object InsertValues {
       )(ctx).render()
     }
 
-    override def skipColumns(x: (V[Column.ColumnExpr] => Column.ColumnExpr[_])*) = {
+    override def skipColumns(x: (V[Column] => Column[_])*) = {
 
       new Impl(
         insert,
@@ -53,7 +53,7 @@ object InsertValues {
       columnsList0: Seq[String],
       valuesList: Seq[R],
       qr: Queryable.Row[Q, R],
-      skippedColumns: Seq[Column.ColumnExpr[_]]
+      skippedColumns: Seq[Column[_]]
   )(implicit ctx: Context) {
 
     lazy val skippedColumnsNames = skippedColumns.map(_.name).toSet

@@ -8,20 +8,20 @@ import scalasql.{Column, Queryable, Table, TypeMapper}
 /**
  * A SQL `INSERT VALUES` query
  */
-trait InsertColumns[V[_[_]], R] extends InsertReturnable[V[Column.ColumnExpr]] with Query[Int] {
-  def columns: Seq[Column.ColumnExpr[_]]
-  def valuesLists: Seq[Seq[Expr[_]]]
+trait InsertColumns[V[_[_]], R] extends InsertReturnable[V[Column]] with Query[Int] {
+  def columns: Seq[Column[_]]
+  def valuesLists: Seq[Seq[Sql[_]]]
 }
 object InsertColumns {
   class Impl[V[_[_]], R](
       insert: Insert[V, R],
-      val columns: Seq[Column.ColumnExpr[_]],
-      val valuesLists: Seq[Seq[Expr[_]]]
-  )(implicit val qr: Queryable[V[Column.ColumnExpr], R], dialect: Dialect)
+      val columns: Seq[Column[_]],
+      val valuesLists: Seq[Seq[Sql[_]]]
+  )(implicit val qr: Queryable[V[Column], R], dialect: Dialect)
       extends InsertColumns[V, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table
-    protected def expr: V[Column.ColumnExpr] = WithExpr.get(insert)
+    protected def expr: V[Column] = WithExpr.get(insert)
 
     protected override def renderToSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.tableName(table.value)).render()
@@ -36,9 +36,9 @@ object InsertColumns {
   }
 
   class Renderer(
-      columns0: Seq[Column.ColumnExpr[_]],
+      columns0: Seq[Column[_]],
       prevContext: Context,
-      valuesLists: Seq[Seq[Expr[_]]],
+      valuesLists: Seq[Seq[Sql[_]]],
       tableName: String
   ) {
 

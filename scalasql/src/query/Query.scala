@@ -10,7 +10,7 @@ import scalasql.renderer.{Context, SqlStr}
  */
 trait Query[R] extends Renderable {
   protected def queryWalkLabels(): Seq[List[String]]
-  protected def queryWalkExprs(): Seq[Expr[_]]
+  protected def queryWalkExprs(): Seq[Sql[_]]
   protected def queryIsSingleRow: Boolean
   protected def queryIsExecuteUpdate: Boolean = false
 

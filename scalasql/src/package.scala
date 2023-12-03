@@ -1,7 +1,7 @@
 package object scalasql {
   type Id[T] = T
 
-  val Expr = query.Expr
-  type Expr[T] = query.Expr[T]
+  val Sql = query.Sql
+  type Sql[T] = query.Sql[T]
 
 }

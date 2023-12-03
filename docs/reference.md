@@ -478,12 +478,12 @@ dbClient.transaction(_.run(Purchase.select.size)) ==> 1
 Basic `SELECT` operations: map, filter, join, etc.
 ### Select.constant
 
-The most simple thing you can query in the database is an `Expr`. These do not need
+The most simple thing you can query in the database is an `Sql`. These do not need
 to be related to any database tables, and translate into raw `SELECT` calls without
 `FROM`.
 
 ```scala
-Expr(1) + Expr(2)
+Sql(1) + Sql(2)
 ```
 
 
@@ -825,7 +825,7 @@ Buyer.select.map(c => (c.id, c))
 
 `SELECT` queries that return a single row and column can be used as SQL expressions
 in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
-which turns a `Select[T]` into an `Expr[T]`. Note that if the `Select` returns more
+which turns a `Select[T]` into an `Sql[T]`. Note that if the `Select` returns more
 than one row or column, the database may select a row arbitrarily or will throw
 an exception at runtime (depend on implenmentation)
 
@@ -1208,8 +1208,8 @@ Buyer.select
 
 ### Select.nestedTuples
 
-Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
-instances of `Foo[Expr]`, which will be de-serialized into nested tuples
+Queries can output arbitrarily nested tuples of `Sql[T]` and `case class`
+instances of `Foo[Sql]`, which will be de-serialized into nested tuples
 of `T` and `Foo[Id]`s. The `AS` aliases assigned to each column will contain
 the path of indices and field names used to populate the final returned values
 
@@ -1678,8 +1678,8 @@ Buyer.select
 
 ### Join.leftJoinExpr
 
-`JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
-them to participate in any database query logic than any other `Expr[Option[T]]`s
+`JoinNullable[Sql[T]]`s can be implicitly used as `Sql[Option[T]]`s. This allows
+them to participate in any database query logic than any other `Sql[Option[T]]`s
 can participate in, such as being used as sort key or in computing return values
 (below).
 
@@ -1785,7 +1785,7 @@ Buyer.select
 
 ### Join.leftJoinExprExplicit
 
-The conversion from `JoinNullable[T]` to `Expr[Option[T]]` can also be performed
+The conversion from `JoinNullable[T]` to `Sql[Option[T]]` can also be performed
 explicitly via `JoinNullable.toExpr(...)`
 
 ```scala
@@ -2920,7 +2920,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 ### Update.dynamic
 
-The values assigned to columns in `Table.update` can also be computed `Expr[T]`s,
+The values assigned to columns in `Table.update` can also be computed `Sql[T]`s,
 not just literal Scala constants. This example shows how to to update the name of
 the row for `James Bond` with it's existing name in uppercase
 
@@ -3909,7 +3909,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ### UpdateSubQuery.setSubquery
 
 You can use subqueries to compute the values you want to update, using
-aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
+aggregates like `.maxBy` to convert the `Select[T]` into an `Sql[T]`
 
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
@@ -5019,7 +5019,7 @@ Buyer.select
 ```scala
 for {
   b <- Buyer.select
-  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Expr(true))
+  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Sql(true))
 } yield (b.name, s.shippingDate)
 ```
 
@@ -5054,7 +5054,7 @@ ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
 
 ```scala
 Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
-  Expr(true)
+  Sql(true)
 )
 ```
 
@@ -5108,7 +5108,7 @@ ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
 ```scala
 for {
   b <- Buyer.select
-  s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Expr(true))
+  s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Sql(true))
 } yield (b, s)
 ```
 
@@ -6308,8 +6308,8 @@ instead of using `JOIN`s it uses subqueries nested 4 layers deep. While this
 example is contrived, it demonstrates how nested ScalaSql `.select` calls
 translate directly into nested SQL subqueries.
 
-To turn the ScalaSql `Select[T]` into an `Expr[T]`, you can either use
-an aggregate method like `.sumBy(...): Expr[Int]` that generates a `SUM(...)`
+To turn the ScalaSql `Select[T]` into an `Sql[T]`, you can either use
+an aggregate method like `.sumBy(...): Sql[Int]` that generates a `SUM(...)`
 aggregate, or via the `.toExpr` method that leaves the subquery untouched.
 SQL requires that subqueries used as expressions must return a single row
 and single column, and if the query returns some other number of rows/columns
@@ -6542,13 +6542,13 @@ db.withCte(Buyer.select) { bs =>
 
 
 ## ExprOps
-Operations that can be performed on `Expr[T]` for any `T`
+Operations that can be performed on `Sql[T]` for any `T`
 ### ExprOps.numeric.greaterThan
 
 
 
 ```scala
-Expr(6) > Expr(2)
+Sql(6) > Sql(2)
 ```
 
 
@@ -6571,7 +6571,7 @@ Expr(6) > Expr(2)
 
 
 ```scala
-Expr(6) < Expr(2)
+Sql(6) < Sql(2)
 ```
 
 
@@ -6594,7 +6594,7 @@ Expr(6) < Expr(2)
 
 
 ```scala
-Expr(6) >= Expr(2)
+Sql(6) >= Sql(2)
 ```
 
 
@@ -6617,7 +6617,7 @@ Expr(6) >= Expr(2)
 
 
 ```scala
-Expr(6) <= Expr(2)
+Sql(6) <= Sql(2)
 ```
 
 
@@ -6640,7 +6640,7 @@ Expr(6) <= Expr(2)
 
 
 ```scala
-Expr("A") > Expr("B")
+Sql("A") > Sql("B")
 ```
 
 
@@ -6663,7 +6663,7 @@ Expr("A") > Expr("B")
 
 
 ```scala
-Expr("A") < Expr("B")
+Sql("A") < Sql("B")
 ```
 
 
@@ -6686,7 +6686,7 @@ Expr("A") < Expr("B")
 
 
 ```scala
-Expr("A") >= Expr("B")
+Sql("A") >= Sql("B")
 ```
 
 
@@ -6709,7 +6709,7 @@ Expr("A") >= Expr("B")
 
 
 ```scala
-Expr("A") <= Expr("B")
+Sql("A") <= Sql("B")
 ```
 
 
@@ -6732,7 +6732,7 @@ Expr("A") <= Expr("B")
 
 
 ```scala
-Expr(true) > Expr(false)
+Sql(true) > Sql(false)
 ```
 
 
@@ -6755,7 +6755,7 @@ Expr(true) > Expr(false)
 
 
 ```scala
-Expr(true) < Expr(true)
+Sql(true) < Sql(true)
 ```
 
 
@@ -6778,7 +6778,7 @@ Expr(true) < Expr(true)
 
 
 ```scala
-Expr(true) >= Expr(true)
+Sql(true) >= Sql(true)
 ```
 
 
@@ -6801,7 +6801,7 @@ Expr(true) >= Expr(true)
 
 
 ```scala
-Expr(true) <= Expr(true)
+Sql(true) <= Sql(true)
 ```
 
 
@@ -6824,7 +6824,7 @@ Expr(true) <= Expr(true)
 
 
 ```scala
-Expr(45.12).cast[Byte]
+Sql(45.12).cast[Byte]
 ```
 
 
@@ -6847,7 +6847,7 @@ Expr(45.12).cast[Byte]
 
 
 ```scala
-Expr(1234.1234).cast[Short]
+Sql(1234.1234).cast[Short]
 ```
 
 
@@ -6870,7 +6870,7 @@ Expr(1234.1234).cast[Short]
 
 
 ```scala
-Expr(1234.1234).cast[Int]
+Sql(1234.1234).cast[Int]
 ```
 
 
@@ -6893,7 +6893,7 @@ Expr(1234.1234).cast[Int]
 
 
 ```scala
-Expr(1234.1234).cast[Long]
+Sql(1234.1234).cast[Long]
 ```
 
 
@@ -6916,7 +6916,7 @@ Expr(1234.1234).cast[Long]
 
 
 ```scala
-Expr(1234.5678).cast[String]
+Sql(1234.5678).cast[String]
 ```
 
 
@@ -6939,7 +6939,7 @@ Expr(1234.5678).cast[String]
 
 
 ```scala
-Expr("2001-02-03").cast[java.time.LocalDate]
+Sql("2001-02-03").cast[java.time.LocalDate]
 ```
 
 
@@ -6962,7 +6962,7 @@ Expr("2001-02-03").cast[java.time.LocalDate]
 
 
 ```scala
-Expr("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
+Sql("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
 ```
 
 
@@ -6985,7 +6985,7 @@ Expr("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
 
 
 ```scala
-Expr("2007-12-03 10:15:30.00").cast[java.time.Instant]
+Sql("2007-12-03 10:15:30.00").cast[java.time.Instant]
 ```
 
 
@@ -7008,7 +7008,7 @@ Expr("2007-12-03 10:15:30.00").cast[java.time.Instant]
 
 
 ```scala
-Expr(1234.5678).castNamed[String](sql"CHAR(3)")
+Sql(1234.5678).castNamed[String](sql"CHAR(3)")
 ```
 
 
@@ -7027,13 +7027,13 @@ Expr(1234.5678).castNamed[String](sql"CHAR(3)")
 
 
 ## ExprBooleanOps
-Operations that can be performed on `Expr[Boolean]`
+Operations that can be performed on `Sql[Boolean]`
 ### ExprBooleanOps.and
 
 
 
 ```scala
-Expr(true) && Expr(true)
+Sql(true) && Sql(true)
 ```
 
 
@@ -7056,7 +7056,7 @@ Expr(true) && Expr(true)
 
 
 ```scala
-Expr(false) && Expr(true)
+Sql(false) && Sql(true)
 ```
 
 
@@ -7079,7 +7079,7 @@ Expr(false) && Expr(true)
 
 
 ```scala
-Expr(false) || Expr(false)
+Sql(false) || Sql(false)
 ```
 
 
@@ -7102,7 +7102,7 @@ Expr(false) || Expr(false)
 
 
 ```scala
-!Expr(false)
+!Sql(false)
 ```
 
 
@@ -7121,13 +7121,13 @@ Expr(false) || Expr(false)
 
 
 ## ExprNumericOps
-Operations that can be performed on `Expr[T]` when `T` is numeric
+Operations that can be performed on `Sql[T]` when `T` is numeric
 ### ExprNumericOps.plus
 
 
 
 ```scala
-Expr(6) + Expr(2)
+Sql(6) + Sql(2)
 ```
 
 
@@ -7150,7 +7150,7 @@ Expr(6) + Expr(2)
 
 
 ```scala
-Expr(6) - Expr(2)
+Sql(6) - Sql(2)
 ```
 
 
@@ -7173,7 +7173,7 @@ Expr(6) - Expr(2)
 
 
 ```scala
-Expr(6) * Expr(2)
+Sql(6) * Sql(2)
 ```
 
 
@@ -7196,7 +7196,7 @@ Expr(6) * Expr(2)
 
 
 ```scala
-Expr(6) / Expr(2)
+Sql(6) / Sql(2)
 ```
 
 
@@ -7219,7 +7219,7 @@ Expr(6) / Expr(2)
 
 
 ```scala
-Expr(6) % Expr(2)
+Sql(6) % Sql(2)
 ```
 
 
@@ -7242,7 +7242,7 @@ Expr(6) % Expr(2)
 
 
 ```scala
-Expr(6) & Expr(2)
+Sql(6) & Sql(2)
 ```
 
 
@@ -7265,7 +7265,7 @@ Expr(6) & Expr(2)
 
 
 ```scala
-Expr(6) | Expr(3)
+Sql(6) | Sql(3)
 ```
 
 
@@ -7288,7 +7288,7 @@ Expr(6) | Expr(3)
 
 
 ```scala
-Expr(4).between(Expr(2), Expr(6))
+Sql(4).between(Sql(2), Sql(6))
 ```
 
 
@@ -7311,7 +7311,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 ```scala
-+Expr(-4)
++Sql(-4)
 ```
 
 
@@ -7334,7 +7334,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 ```scala
--Expr(-4)
+-Sql(-4)
 ```
 
 
@@ -7357,7 +7357,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 ```scala
-~Expr(-4)
+~Sql(-4)
 ```
 
 
@@ -7380,7 +7380,7 @@ Expr(4).between(Expr(2), Expr(6))
 
 
 ```scala
-Expr(-4).abs
+Sql(-4).abs
 ```
 
 
@@ -7403,7 +7403,7 @@ Expr(-4).abs
 
 
 ```scala
-Expr(8).mod(Expr(3))
+Sql(8).mod(Sql(3))
 ```
 
 
@@ -7426,7 +7426,7 @@ Expr(8).mod(Expr(3))
 
 
 ```scala
-Expr(4.3).ceil
+Sql(4.3).ceil
 ```
 
 
@@ -7449,7 +7449,7 @@ Expr(4.3).ceil
 
 
 ```scala
-Expr(4.7).floor
+Sql(4.7).floor
 ```
 
 
@@ -7472,7 +7472,7 @@ Expr(4.7).floor
 
 
 ```scala
-Expr(4.7).floor
+Sql(4.7).floor
 ```
 
 
@@ -7495,7 +7495,7 @@ Expr(4.7).floor
 
 
 ```scala
-(Expr(2) + Expr(3)) * Expr(4)
+(Sql(2) + Sql(3)) * Sql(4)
 ```
 
 
@@ -7514,7 +7514,7 @@ Expr(4.7).floor
 
 
 ## ExprSeqNumericOps
-Operations that can be performed on `Expr[Seq[T]]` where `T` is numeric
+Operations that can be performed on `Sql[Seq[T]]` where `T` is numeric
 ### ExprSeqNumericOps.sum
 
 
@@ -7608,7 +7608,7 @@ Purchase.select.map(_.count).avg
 
 
 ## ExprSeqOps
-Operations that can be performed on `Expr[Seq[_]]`
+Operations that can be performed on `Sql[Seq[_]]`
 ### ExprSeqOps.size
 
 
@@ -7955,13 +7955,13 @@ Buyer.select.map(_.name).mkString(", ")
 
 
 ## ExprStringOps
-Operations that can be performed on `Expr[String]`
+Operations that can be performed on `Sql[String]`
 ### ExprStringOps.plus
 
 
 
 ```scala
-Expr("hello") + Expr("world")
+Sql("hello") + Sql("world")
 ```
 
 
@@ -7984,7 +7984,7 @@ Expr("hello") + Expr("world")
 
 
 ```scala
-Expr("hello").like("he%")
+Sql("hello").like("he%")
 ```
 
 
@@ -8007,7 +8007,7 @@ Expr("hello").like("he%")
 
 
 ```scala
-Expr("hello").length
+Sql("hello").length
 ```
 
 
@@ -8030,7 +8030,7 @@ Expr("hello").length
 
 
 ```scala
-Expr("叉烧包").octetLength
+Sql("叉烧包").octetLength
 ```
 
 
@@ -8053,7 +8053,7 @@ Expr("叉烧包").octetLength
 
 
 ```scala
-Expr("hello").indexOf("ll")
+Sql("hello").indexOf("ll")
 ```
 
 
@@ -8076,7 +8076,7 @@ Expr("hello").indexOf("ll")
 
 
 ```scala
-Expr("Hello").toLowerCase
+Sql("Hello").toLowerCase
 ```
 
 
@@ -8099,7 +8099,7 @@ Expr("Hello").toLowerCase
 
 
 ```scala
-Expr("  Hello ").trim
+Sql("  Hello ").trim
 ```
 
 
@@ -8122,7 +8122,7 @@ Expr("  Hello ").trim
 
 
 ```scala
-Expr("  Hello ").ltrim
+Sql("  Hello ").ltrim
 ```
 
 
@@ -8145,7 +8145,7 @@ Expr("  Hello ").ltrim
 
 
 ```scala
-Expr("  Hello ").rtrim
+Sql("  Hello ").rtrim
 ```
 
 
@@ -8168,7 +8168,7 @@ Expr("  Hello ").rtrim
 
 
 ```scala
-Expr("Hello").substring(2, 2)
+Sql("Hello").substring(2, 2)
 ```
 
 
@@ -8191,7 +8191,7 @@ Expr("Hello").substring(2, 2)
 
 
 ```scala
-Expr("Hello").startsWith("Hel")
+Sql("Hello").startsWith("Hel")
 ```
 
 
@@ -8214,7 +8214,7 @@ Expr("Hello").startsWith("Hel")
 
 
 ```scala
-Expr("Hello").endsWith("llo")
+Sql("Hello").endsWith("llo")
 ```
 
 
@@ -8237,7 +8237,7 @@ Expr("Hello").endsWith("llo")
 
 
 ```scala
-Expr("Hello").contains("ll")
+Sql("Hello").contains("ll")
 ```
 
 
@@ -8440,7 +8440,7 @@ db.run(Enclosing.select) ==> Seq(value1, value2)
 
 
 ## Optional
-Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala
+Queries using columns that may be `NULL`, `Sql[Option[T]]` or `Option[T]` in Scala
 ### Optional
 
 
@@ -8499,7 +8499,7 @@ OptCols.select
 
 ### Optional.groupByMaxGet
 
-Some aggregates return `Expr[Option[V]]`s, et.c. `.maxByOpt`
+Some aggregates return `Sql[Option[V]]`s, et.c. `.maxByOpt`
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -8524,7 +8524,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 ### Optional.isDefined
 
-`.isDefined` on `Expr[Option[V]]` translates to a SQL
+`.isDefined` on `Sql[Option[V]]` translates to a SQL
 `IS NOT NULL` check
 
 ```scala
@@ -8552,7 +8552,7 @@ OptCols.select.filter(_.myInt.isDefined)
 
 ### Optional.isEmpty
 
-`.isEmpty` on `Expr[Option[V]]` translates to a SQL
+`.isEmpty` on `Sql[Option[V]]` translates to a SQL
 `IS NULL` check
 
 ```scala
@@ -8781,11 +8781,11 @@ OptCols.select.filter(_.myInt !== Option.empty[Int])
 ### Optional.map
 
 You can use operators like `.map` and `.flatMap` to work with
-your `Expr[Option[V]]` values. These roughly follow the semantics
+your `Sql[Option[V]]` values. These roughly follow the semantics
 that you would be familiar with from Scala.
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + 10)))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + 10)))
 ```
 
 
@@ -8840,7 +8840,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 ```scala
 OptCols.select
-  .map(d => d.copy[Expr](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
+  .map(d => d.copy[Sql](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
 ```
 
 
@@ -8869,13 +8869,13 @@ OptCols.select
 
 ### Optional.mapGet
 
-You can use `.get` to turn an `Expr[Option[V]]` into an `Expr[V]`. This follows
+You can use `.get` to turn an `Sql[Option[V]]` into an `Sql[V]`. This follows
 SQL semantics, such that `NULL`s anywhere in that selected column automatically
-will turn the whole column `None` (if it's an `Expr[Option[V]]` column) or `null`
+will turn the whole column `None` (if it's an `Sql[Option[V]]` column) or `null`
 (if it's not an optional column)
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 ```
 
 
@@ -8907,7 +8907,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.get + d.myInt2.get + 1))
 ```
 
 
@@ -8939,7 +8939,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.get + d.myInt2.get + 1))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1)))
 ```
 
 
@@ -8970,7 +8970,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.getOrElse(-1)))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2)))
 ```
 
 
@@ -9001,7 +9001,7 @@ OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.orElse(d.myInt2)))
 `.filter` follows normal Scala semantics, and translates to a `CASE`/`WHEN (foo)`/`ELSE NULL`
 
 ```scala
-OptCols.select.map(d => d.copy[Expr](myInt = d.myInt.filter(_ < 2)))
+OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.filter(_ < 2)))
 ```
 
 
@@ -9252,7 +9252,7 @@ Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
 
 
 ```scala
-Expr("xxHellox").ltrim("x")
+Sql("xxHellox").ltrim("x")
 ```
 
 
@@ -9275,7 +9275,7 @@ Expr("xxHellox").ltrim("x")
 
 
 ```scala
-Expr("xxHellox").rtrim("x")
+Sql("xxHellox").rtrim("x")
 ```
 
 
@@ -9298,7 +9298,7 @@ Expr("xxHellox").rtrim("x")
 
 
 ```scala
-Expr("Hello").reverse
+Sql("Hello").reverse
 ```
 
 
@@ -9321,7 +9321,7 @@ Expr("Hello").reverse
 
 
 ```scala
-Expr("Hello").lpad(10, "xy")
+Sql("Hello").lpad(10, "xy")
 ```
 
 
@@ -9344,7 +9344,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 ```scala
-Expr("Hello").rpad(10, "xy")
+Sql("Hello").rpad(10, "xy")
 ```
 
 
@@ -9369,7 +9369,7 @@ Operations specific to working with MySql Databases
 
 
 ```scala
-Expr("Hello").reverse
+Sql("Hello").reverse
 ```
 
 
@@ -9392,7 +9392,7 @@ Expr("Hello").reverse
 
 
 ```scala
-Expr("Hello").lpad(10, "xy")
+Sql("Hello").lpad(10, "xy")
 ```
 
 
@@ -9415,7 +9415,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 ```scala
-Expr("Hello").rpad(10, "xy")
+Sql("Hello").rpad(10, "xy")
 ```
 
 
@@ -9571,7 +9571,7 @@ Operations specific to working with Sqlite Databases
 
 
 ```scala
-Expr("xxHellox").ltrim("x")
+Sql("xxHellox").ltrim("x")
 ```
 
 
@@ -9594,7 +9594,7 @@ Expr("xxHellox").ltrim("x")
 
 
 ```scala
-Expr("xxHellox").rtrim("x")
+Sql("xxHellox").rtrim("x")
 ```
 
 
@@ -9619,7 +9619,7 @@ Operations specific to working with H2 Databases
 
 
 ```scala
-Expr("xxHellox").ltrim("x")
+Sql("xxHellox").ltrim("x")
 ```
 
 
@@ -9642,7 +9642,7 @@ Expr("xxHellox").ltrim("x")
 
 
 ```scala
-Expr("xxHellox").rtrim("x")
+Sql("xxHellox").rtrim("x")
 ```
 
 
@@ -9665,7 +9665,7 @@ Expr("xxHellox").rtrim("x")
 
 
 ```scala
-Expr("Hello").lpad(10, "xy")
+Sql("Hello").lpad(10, "xy")
 ```
 
 
@@ -9688,7 +9688,7 @@ Expr("Hello").lpad(10, "xy")
 
 
 ```scala
-Expr("Hello").rpad(10, "xy")
+Sql("Hello").rpad(10, "xy")
 ```
 
 

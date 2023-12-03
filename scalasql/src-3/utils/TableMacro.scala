@@ -7,13 +7,13 @@ trait TableMacros{
 
 }
 object TableMacros{
-  def initMetadata0[V[_[_]]]()(table: Expr[scalasql.Table[V]])(using Type[V], Quotes): Expr[scalasql.Table.Metadata[V]] = {
+  def initMetadata0[V[_[_]]]()(table: Sql[scalasql.Table[V]])(using Type[V], Quotes): Sql[scalasql.Table.Metadata[V]] = {
     import quotes.reflect._
     println(Type.of[V])
-    println(Type.of[V[Expr]])
+    println(Type.of[V[Sql]])
     println(Type.show[V])
-    println(Type.show[V[Expr]])
-    println(TypeTree.of[V[Expr]].symbol)
+    println(Type.show[V[Sql]])
+    println(TypeTree.of[V[Sql]].symbol)
 //    val queryParams = for (applyParam <- applyParameters) yield {
 //      val name = applyParam.name
 //      type T = applyParam.info.typeArgs.head
@@ -31,7 +31,7 @@ object TableMacros{
     '{
       new scalasql.Table.Metadata[V](
         new scalasql.Table.Internal.TableQueryable(
-          table => ???.asInstanceOf[Seq[(List[String], scalasql.query.Expr[_])]],
+          table => ???.asInstanceOf[Seq[(List[String], scalasql.query.Sql[_])]],
           ???.asInstanceOf[OptionPickler.Reader[V[scalasql.Id]]]
         ),
         (tableRef: scalasql.query.TableRef) => ???
