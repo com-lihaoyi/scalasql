@@ -115,7 +115,7 @@ object Column {
   class ColumnExpr[T](tableRef: TableRef, val name: String)(implicit val mappedType: TypeMapper[T])
       extends Expr[T] {
     def :=(v: Expr[T]) = Assignment(this, v)
-    def toSqlExpr0(implicit ctx: Context) = {
+    def renderToSql0(implicit ctx: Context) = {
       val suffix = SqlStr.raw(ctx.config.columnNameMapper(name))
       ctx.fromNaming.get(tableRef) match {
         case Some("") => suffix

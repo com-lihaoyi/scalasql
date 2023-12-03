@@ -17,7 +17,7 @@ case class WindowExpr[T](
 )(implicit dialect: Dialect)
     extends Expr[T] {
   import dialect.{dialectSelf => _, _}
-  protected def toSqlExpr0(implicit ctx: Context): SqlStr = {
+  protected def renderToSql0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }
     val sortBySql = CompoundSelect.orderToSqlStr(orderBy, ctx)
     val overClause = SqlStr.join(

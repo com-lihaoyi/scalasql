@@ -6,7 +6,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 import scalasql.renderer.{Context, SqlStr}
 class CaseWhen[T: TypeMapper](values: Seq[(Expr[Boolean], Expr[T])]) extends Expr[T] {
 
-  def toSqlExpr0(implicit ctx: Context): SqlStr = {
+  def renderToSql0(implicit ctx: Context): SqlStr = {
     val whens = CaseWhen.renderWhens(values)
     sql"CASE $whens END"
   }
@@ -19,7 +19,7 @@ object CaseWhen {
   class Else[T: TypeMapper](values: Seq[(Expr[Boolean], Expr[T])], `else`: Expr[T])
       extends Expr[T] {
 
-    def toSqlExpr0(implicit ctx: Context): SqlStr = {
+    def renderToSql0(implicit ctx: Context): SqlStr = {
       val whens = renderWhens(values)
       sql"CASE $whens ELSE ${`else`} END"
     }

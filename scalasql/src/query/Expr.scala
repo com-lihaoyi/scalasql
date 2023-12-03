@@ -11,10 +11,10 @@ import scalasql.renderer.{Context, ExprsToSql, SqlStr}
  */
 trait Expr[T] extends SqlStr.Renderable {
   protected final def renderToSql(ctx: Context): SqlStr = {
-    ctx.exprNaming.get(this.exprIdentity).getOrElse(toSqlExpr0(ctx))
+    ctx.exprNaming.get(this.exprIdentity).getOrElse(renderToSql0(ctx))
   }
 
-  protected def toSqlExpr0(implicit ctx: Context): SqlStr
+  protected def renderToSql0(implicit ctx: Context): SqlStr
 
   override def toString: String =
     throw new Exception("Expr#toString is not defined. Use Expr#exprToString")
@@ -59,10 +59,10 @@ object Expr {
 
   def apply[T](f: Context => SqlStr): Expr[T] = new Simple[T](f)
   implicit def optionalize[T](e: Expr[T]): Expr[Option[T]] = {
-    new Simple[Option[T]](e.toSqlExpr0(_))
+    new Simple[Option[T]](e.renderToSql0(_))
   }
   class Simple[T](f: Context => SqlStr) extends Expr[T] {
-    def toSqlExpr0(implicit ctx: Context): SqlStr = f(ctx)
+    def renderToSql0(implicit ctx: Context): SqlStr = f(ctx)
   }
 
   implicit def apply[T](
@@ -74,7 +74,7 @@ object Expr {
       x: T,
       exprIsLiteralTrue0: Boolean = false
   )(implicit conv: T => SqlStr.Interp): Expr[T] = new Expr[T] {
-    override def toSqlExpr0(implicit ctx: Context): SqlStr =
+    override def renderToSql0(implicit ctx: Context): SqlStr =
       new SqlStr(Array("", ""), Array(conv(x)), false, Array.empty[Expr.Identity])
     protected override def exprIsLiteralTrue = exprIsLiteralTrue0
   }
