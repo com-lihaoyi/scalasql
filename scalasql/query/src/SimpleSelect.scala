@@ -4,14 +4,14 @@ import scalasql.core.{
   Config,
   Context,
   DialectBase,
-  ExprsToSql,
+  SqlExprsToSql,
   FlatJson,
   JoinNullable,
   Queryable,
   Sql,
   SqlStr,
   TypeMapper,
-  WithExpr
+  WithSqlExpr
 }
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, join}
@@ -227,7 +227,7 @@ class SimpleSelect[Q, R](
 
     val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
 
-    joinCopy0(f(expr, WithExpr.get(otherSelect)), otherJoin, Nil)(jqr)
+    joinCopy0(f(expr, WithSqlExpr.get(otherSelect)), otherJoin, Nil)(jqr)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {
@@ -262,10 +262,10 @@ object SimpleSelect {
       }
     }
 
-    lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
+    lazy val filtersOpt = SqlStr.flatten(SqlExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
-      val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
+      val havingOpt = SqlExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
       sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 

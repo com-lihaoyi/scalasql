@@ -4,7 +4,7 @@ import scalasql.core.Aggregatable
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.{Queryable, TypeMapper, Sql}
 
-abstract class AggExprOps[T](v: Aggregatable[Sql[T]]) {
+abstract class SqlAggOps[T](v: Aggregatable[Sql[T]]) {
 
   /** Concatenates the given values into one string using the given separator */
   def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String]

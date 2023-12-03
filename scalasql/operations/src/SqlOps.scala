@@ -5,7 +5,7 @@ import scalasql.core.Sql
 import scalasql.core.SqlStr
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class ExprOps(v: Sql[_]) {
+class SqlOps(v: Sql[_]) {
 
   /**
    * SQL-style Equals to, translates to SQL `=`. Returns `false` if both values are `NULL`

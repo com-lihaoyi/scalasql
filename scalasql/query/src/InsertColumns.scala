@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**
@@ -19,7 +19,7 @@ object InsertColumns {
       extends InsertColumns[V, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table
-    protected def expr: V[Column] = WithExpr.get(insert)
+    protected def expr: V[Column] = WithSqlExpr.get(insert)
 
     protected override def renderToSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()

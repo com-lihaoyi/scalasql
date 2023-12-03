@@ -21,7 +21,7 @@ object Query {
   implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Queryable[Query[R], R]()
 
   def walkLabels[R](q: Query[R]) = q.queryWalkLabels()
-  def walkExprs[R](q: Query[R]) = q.queryWalkExprs()
+  def walkSqlExprs[R](q: Query[R]) = q.queryWalkExprs()
   def isSingleRow[R](q: Query[R]) = q.queryIsSingleRow
   def construct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
   class Queryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {

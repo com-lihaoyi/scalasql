@@ -39,9 +39,9 @@ object Sql {
 
   implicit def ExprQueryable[E[_] <: Sql[_], T](
       implicit mt: TypeMapper[T]
-  ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
+  ): Queryable.Row[E[T], T] = new SqlQueryable[E, T]()
 
-  class ExprQueryable[E[_] <: Sql[_], T](
+  class SqlQueryable[E[_] <: Sql[_], T](
       implicit tm: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
     def walkLabels() = Seq(Nil)

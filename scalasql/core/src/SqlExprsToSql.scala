@@ -2,7 +2,7 @@ package scalasql.core
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
-object ExprsToSql {
+object SqlExprsToSql {
   def apply(flattenedExpr: Seq[(List[String], Sql[_])], exprPrefix: SqlStr, context: Context) = {
     apply0(flattenedExpr, context, sql"SELECT " + exprPrefix)
   }

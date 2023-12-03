@@ -1,14 +1,14 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Context, ExprsToSql, Queryable, SqlStr, TypeMapper, WithExpr}
+import scalasql.core.{Context, SqlExprsToSql, Queryable, SqlStr, TypeMapper, WithSqlExpr}
 import scalasql.renderer.JoinsToSql
 
 /**
  * A query that could support a `RETURNING` clause, typically
  * an `INSERT` or `UPDATE`
  */
-trait Returnable[Q] extends Renderable with WithExpr[Q] {
+trait Returnable[Q] extends Renderable with WithSqlExpr[Q] {
   def table: TableRef
 }
 
@@ -49,7 +49,7 @@ object Returning {
 
       val prefix = Renderable.toSql(returnable)
       val flattenedExpr = qr.walkLabelsAndExprs(returning)
-      val exprStr = ExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
+      val exprStr = SqlExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"
 
       prefix + suffix

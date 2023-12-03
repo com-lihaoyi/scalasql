@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectBase, Queryable, SqlStr, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 trait InsertValues[V[_[_]], R] extends Query[Int] {
@@ -42,7 +42,7 @@ object InsertValues {
         values,
         dialect,
         qr,
-        skippedColumns ++ x.map(_(WithExpr.get(insert)))
+        skippedColumns ++ x.map(_(WithSqlExpr.get(insert)))
       )
     }
   }

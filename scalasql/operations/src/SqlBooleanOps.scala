@@ -3,7 +3,7 @@ package scalasql.operations
 import scalasql.core.Sql
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class ExprBooleanOps(v: Sql[Boolean]) {
+class SqlBooleanOps(v: Sql[Boolean]) {
 
   /** TRUE if both Boolean expressions are TRUE */
   def &&(x: Sql[Boolean]): Sql[Boolean] = Sql { implicit ctx => sql"($v AND $x)" }

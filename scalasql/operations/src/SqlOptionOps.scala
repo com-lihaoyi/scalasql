@@ -6,7 +6,7 @@ import scalasql.core.Sql
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class ExprOptionOps[T: TypeMapper](v: Sql[Option[T]])(implicit dialect: DialectBase) {
+class SqlOptionOps[T: TypeMapper](v: Sql[Option[T]])(implicit dialect: DialectBase) {
   import dialect._
 
   def isDefined: Sql[Boolean] = Sql { implicit ctx => sql"($v IS NOT NULL)" }

@@ -3,13 +3,13 @@ package scalasql.query
 import scalasql.core.{
   Context,
   DialectBase,
-  ExprsToSql,
+  SqlExprsToSql,
   FlatJson,
   Queryable,
   Sql,
   SqlStr,
   TypeMapper,
-  WithExpr
+  WithSqlExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
@@ -24,7 +24,7 @@ class WithCte[Q, R](
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
     extends Select.Proxy[Q, R] {
 
-  override protected def expr = WithExpr.get(Joinable.toSelect(rhs))
+  override protected def expr = WithSqlExpr.get(Joinable.toSelect(rhs))
   private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, SqlStr.commaSep)
 
   protected def selectToSimpleSelect() = this.subquery
@@ -55,7 +55,7 @@ class WithCte[Q, R](
 
 object WithCte {
   class Proxy[Q, R](
-      lhs: WithExpr[Q],
+      lhs: WithSqlExpr[Q],
       lhsSubQueryRef: WithCteRef,
       val qr: Queryable.Row[Q, R],
       protected val dialect: DialectBase
@@ -65,7 +65,7 @@ object WithCte {
     protected override def joinableToSelect = selectToSimpleSelect()
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R] =
       new SimpleSelect[Q, R](
-        expr = WithExpr.get(lhs),
+        expr = WithSqlExpr.get(lhs),
         exprPrefix = None,
         from = Seq(lhsSubQueryRef),
         joins = Nil,
@@ -89,7 +89,9 @@ object WithCte {
       extends SelectBase.Renderer {
     def render(liveExprs: Option[Set[Sql.Identity]]) = {
       val walked =
-        query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walkLabelsAndExprs(WithExpr.get(query.lhs))
+        query.lhs.qr
+          .asInstanceOf[Queryable[Any, Any]]
+          .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
       val newExprNaming = walked.map { case (tokens, expr) =>
         (
           Sql.identity(expr),

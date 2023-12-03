@@ -1,7 +1,7 @@
 package scalasql.dialects
 
-import scalasql.operations.{CaseWhen, DbApiExprOps}
-import scalasql.query.WindowExpr
+import scalasql.operations.{CaseWhen, SqlDbApiOps}
+import scalasql.query.SqlWindow
 import scalasql.core.Sql.apply0
 import scalasql.{Table, operations}
 import scalasql.core.Aggregatable
@@ -217,29 +217,29 @@ trait Dialect extends DialectBase {
         }
       }
     }
-  implicit def ExprBooleanOpsConv(v: Sql[Boolean]): operations.ExprBooleanOps =
-    new operations.ExprBooleanOps(v)
-  implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
+  implicit def SqlBooleanOpsConv(v: Sql[Boolean]): operations.SqlBooleanOps =
+    new operations.SqlBooleanOps(v)
+  implicit def SqlNumericOpsConv[T: Numeric: TypeMapper](
       v: Sql[T]
-  ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
+  ): operations.SqlNumericOps[T] = new operations.SqlNumericOps(v)
 
-  implicit def ExprOpsConv(v: Sql[_]): operations.ExprOps = new operations.ExprOps(v)
+  implicit def SqlOpsConv(v: Sql[_]): operations.SqlOps = new operations.SqlOps(v)
 
-  implicit def ExprTypedOpsConv[T: ClassTag](v: Sql[T]): operations.ExprTypedOps[T] =
-    new operations.ExprTypedOps(v)
+  implicit def SqlTypedOpsConv[T: ClassTag](v: Sql[T]): operations.SqlTypedOps[T] =
+    new operations.SqlTypedOps(v)
 
-  implicit def ExprOptionOpsConv[T: TypeMapper](v: Sql[Option[T]]): operations.ExprOptionOps[T] =
-    new operations.ExprOptionOps(v)
+  implicit def SqlOptionOpsConv[T: TypeMapper](v: Sql[Option[T]]): operations.SqlOptionOps[T] =
+    new operations.SqlOptionOps(v)
 
-  implicit def NullableExprOpsConv[T: TypeMapper](v: JoinNullable[Sql[T]]): operations.ExprOps =
-    new operations.ExprOps(JoinNullable.toExpr(v))
+  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Sql[T]]): operations.SqlOps =
+    new operations.SqlOps(JoinNullable.toExpr(v))
 
-  implicit def NullableExprOptionOpsConv[T: TypeMapper](
+  implicit def JoinNullableOptionOpsConv[T: TypeMapper](
       v: JoinNullable[Sql[T]]
-  ): operations.ExprOptionOps[T] =
-    new operations.ExprOptionOps(JoinNullable.toExpr(v))
+  ): operations.SqlOptionOps[T] =
+    new operations.SqlOptionOps(JoinNullable.toExpr(v))
 
-  implicit def ExprStringOpsConv(v: Sql[String]): operations.ExprStringOps
+  implicit def SqlStringOpsConv(v: Sql[String]): operations.SqlStringOps
 
   implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Sql[V]])(
       implicit qr: Queryable.Row[Sql[V], V]
@@ -249,17 +249,17 @@ trait Dialect extends DialectBase {
       implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T]
+  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
   implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
-  implicit def DbApiExprOpsConv(db: => DbApi): DbApiExprOps = new DbApiExprOps(this)
+  implicit def SqlDbApiOpsConv(db: => DbApi): SqlDbApiOps = new SqlDbApiOps(this)
 
   implicit class WindowExtensions[T](e: Sql[T]) {
-    def over = new WindowExpr[T](e, None, None, Nil, None, None, None)
+    def over = new SqlWindow[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Sql[T], T] = {
-    new Sql.ExprQueryable[Sql, T]()
+  implicit def SqlQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Sql[T], T] = {
+    new Sql.SqlQueryable[Sql, T]()
   }
 }

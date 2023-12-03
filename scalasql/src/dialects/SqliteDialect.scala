@@ -23,18 +23,18 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
   class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
-  override implicit def ExprStringOpsConv(v: Sql[String]): SqliteDialect.ExprStringOps =
+  override implicit def SqlStringOpsConv(v: Sql[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new SqliteDialect.TableOps(t)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
+  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
     new SqliteDialect.AggExprOps(v)
 }
 
 object SqliteDialect extends SqliteDialect {
-  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
+  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
 
     /** TRUE if all values in a set are TRUE */
     def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
@@ -44,7 +44,7 @@ object SqliteDialect extends SqliteDialect {
   }
 
   class ExprStringOps(protected val v: Sql[String])
-      extends operations.ExprStringOps(v)
+      extends operations.SqlStringOps(v)
       with TrimOps {
     def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"INSTR($v, $x)" }
     def glob(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"GLOB($v, $x)" }

@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, Queryable, Sql, TypeMapper, WithExpr}
+import scalasql.core.{Aggregatable, Queryable, Sql, TypeMapper, WithSqlExpr}
 import scalasql.operations
 import scalasql.query.{JoinOps, Joinable, LateralJoinOps, Select}
 import scalasql.core.SqlStr
@@ -17,15 +17,15 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def StringType: TypeMapper[String] = new PostgresStringType
   class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
-  override implicit def ExprStringOpsConv(v: Sql[String]): PostgresDialect.ExprStringOps =
-    new PostgresDialect.ExprStringOps(v)
+  override implicit def SqlStringOpsConv(v: Sql[String]): PostgresDialect.SqlStringOps =
+    new PostgresDialect.SqlStringOps(v)
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
-    new PostgresDialect.AggExprOps(v)
+  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
+    new PostgresDialect.SqlAggOps(v)
 
   implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
 
@@ -37,20 +37,20 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row appears first. For example:
      */
     def distinctOn(f: Q => Sql[_]): Select[Q, R] = {
-      Select.withExprPrefix(r, implicit ctx => sql"DISTINCT ON (${f(WithExpr.get(r))})")
+      Select.withExprPrefix(r, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
     }
   }
 }
 
 object PostgresDialect extends PostgresDialect {
-  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
+  class SqlAggOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
     def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
-  class ExprStringOps(protected val v: Sql[String])
-      extends operations.ExprStringOps(v)
+  class SqlStringOps(protected val v: Sql[String])
+      extends operations.SqlStringOps(v)
       with TrimOps
       with PadOps {
     def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"POSITION($x IN $v)" }

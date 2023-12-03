@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{JoinNullable, Queryable, Sql, WithExpr}
+import scalasql.core.{JoinNullable, Queryable, Sql, WithSqlExpr}
 
 /**
  * Wrapper class with extension methods to add support for `JOIN LATERAL`, which
@@ -19,7 +19,7 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
   def crossJoinLateral[Q2, R2, QF, RF](other: Q => Joinable[Q2, R2])(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF] =
-    JoinOps.join0(wrapped, "CROSS JOIN LATERAL", other(WithExpr.get(wrapped)), None)
+    JoinOps.join0(wrapped, "CROSS JOIN LATERAL", other(WithSqlExpr.get(wrapped)), None)
 
   /**
    * Performs a `JOIN LATERAL`, similar to `JOIN` but allows the
@@ -29,14 +29,14 @@ class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R
   def joinLateral[Q2, R2, QF, RF](other: Q => Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): C[QF, RF] =
-    JoinOps.join0(wrapped, "JOIN LATERAL", other(WithExpr.get(wrapped)), Some(on))
+    JoinOps.join0(wrapped, "JOIN LATERAL", other(WithSqlExpr.get(wrapped)), Some(on))
 
   def leftJoinLateral[Q2, R2](other: Q => Joinable[Q2, R2])(
       on: (Q, Q2) => Sql[Boolean]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = {
     SimpleSelect.joinCopy(
       wrapped.asInstanceOf[SimpleSelect[Q, R]],
-      other(WithExpr.get(wrapped)),
+      other(WithSqlExpr.get(wrapped)),
       Some(on),
       "LEFT JOIN LATERAL"
     )((e, o) => (e, JoinNullable(o)))

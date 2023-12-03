@@ -26,10 +26,10 @@ import scalasql.core.{
   Sql,
   SqlStr,
   TypeMapper,
-  WithExpr
+  WithSqlExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.core.{Context, ExprsToSql}
+import scalasql.core.{Context, SqlExprsToSql}
 import scalasql.operations.PadOps
 import scalasql.renderer.JoinsToSql
 
@@ -79,11 +79,11 @@ trait MySqlDialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def ExprTypedOpsConv[T: ClassTag](v: Sql[T]): operations.ExprTypedOps[T] =
-    new MySqlDialect.ExprTypedOps(v)
+  override implicit def SqlTypedOpsConv[T: ClassTag](v: Sql[T]): operations.SqlTypedOps[T] =
+    new MySqlDialect.SqlTypedOps(v)
 
-  override implicit def ExprStringOpsConv(v: Sql[String]): MySqlDialect.ExprStringOps =
-    new MySqlDialect.ExprStringOps(v)
+  override implicit def SqlStringOpsConv(v: Sql[String]): MySqlDialect.SqlStringOps =
+    new MySqlDialect.SqlStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MySqlDialect.TableOps(t)
@@ -91,7 +91,7 @@ trait MySqlDialect extends Dialect {
   implicit def OnConflictableUpdate[V[_[_]], R](
       query: InsertColumns[V, R]
   ): MySqlDialect.OnConflictable[V[Column], Int] =
-    new MySqlDialect.OnConflictable[V[Column], Int](query, WithExpr.get(query), query.table)
+    new MySqlDialect.OnConflictable[V[Column], Int](query, WithSqlExpr.get(query), query.table)
 
   override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
     override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) =
@@ -102,12 +102,12 @@ trait MySqlDialect extends Dialect {
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
-    new MySqlDialect.AggExprOps(v)
+  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
+    new MySqlDialect.SqlAggOps(v)
 }
 
 object MySqlDialect extends MySqlDialect {
-  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
+  class SqlAggOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
     def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr =>
@@ -116,7 +116,7 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class ExprTypedOps[T: ClassTag](v: Sql[T]) extends operations.ExprTypedOps(v) {
+  class SqlTypedOps[T: ClassTag](v: Sql[T]) extends operations.SqlTypedOps(v) {
 
     /** Equals to */
     override def ===[V: ClassTag](x: Sql[V]): Sql[Boolean] = Sql { implicit ctx =>
@@ -136,9 +136,7 @@ object MySqlDialect extends MySqlDialect {
 
   }
 
-  class ExprStringOps(protected val v: Sql[String])
-      extends operations.ExprStringOps(v)
-      with PadOps {
+  class SqlStringOps(protected val v: Sql[String]) extends operations.SqlStringOps(v) with PadOps {
     override def +(x: Sql[String]): Sql[String] = Sql { implicit ctx => sql"CONCAT($v, $x)" }
 
     override def startsWith(other: Sql[String]): Sql[Boolean] = Sql { implicit ctx =>
@@ -225,7 +223,7 @@ object MySqlDialect extends MySqlDialect {
       sql"$tableName.$colStr = ${assign.value}"
     }
 
-    lazy val whereAll = ExprsToSql.booleanExprs(sql" WHERE ", where0)
+    lazy val whereAll = SqlExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
       .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
@@ -247,7 +245,7 @@ object MySqlDialect extends MySqlDialect {
 
     override def queryIsExecuteUpdate = true
     protected def queryWalkLabels() = Query.walkLabels(insert.query)
-    protected def queryWalkExprs() = Query.walkExprs(insert.query)
+    protected def queryWalkExprs() = Query.walkSqlExprs(insert.query)
 
     protected def queryIsSingleRow = Query.isSingleRow(insert.query)
 

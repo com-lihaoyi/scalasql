@@ -4,7 +4,7 @@ import scalasql.core.TypeMapper
 import scalasql.core.Sql
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class ExprNumericOps[T: Numeric](v: Sql[T])(implicit val m: TypeMapper[T]) {
+class SqlNumericOps[T: Numeric](v: Sql[T])(implicit val m: TypeMapper[T]) {
 
   /** Addition */
   def +[V: Numeric](x: Sql[V]): Sql[T] = Sql { implicit ctx => sql"($v + $x)" }

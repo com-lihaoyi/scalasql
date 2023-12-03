@@ -5,7 +5,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
 
 import scala.reflect.ClassTag
 
-class ExprTypedOps[T: ClassTag](v: Sql[T]) {
+class SqlTypedOps[T: ClassTag](v: Sql[T]) {
 
   protected def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]]
 

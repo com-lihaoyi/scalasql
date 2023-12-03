@@ -1,11 +1,11 @@
 package scalasql.query
 
-import scalasql.core.{DialectBase, Queryable, Sql, SqlStr, WithExpr}
+import scalasql.core.{DialectBase, Queryable, Sql, SqlStr, WithSqlExpr}
 
 /**
  * A SQL `INSERT` query
  */
-trait Insert[V[_[_]], R] extends WithExpr[V[Column]] with scalasql.generated.Insert[V, R] {
+trait Insert[V[_[_]], R] extends WithSqlExpr[V[Column]] with scalasql.generated.Insert[V, R] {
   def table: TableRef
   def qr: Queryable[V[Column], R]
   def select[C, R2](columns: V[Sql] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2]

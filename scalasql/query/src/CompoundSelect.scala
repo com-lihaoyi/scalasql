@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.JoinsToSql
-import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, TypeMapper, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, TypeMapper, WithSqlExpr}
 
 /**
  * A SQL `SELECT` query, with
@@ -24,7 +24,7 @@ class CompoundSelect[Q, R](
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
-  override protected def expr = WithExpr.get(Joinable.toSelect(lhs))
+  override protected def expr = WithSqlExpr.get(Joinable.toSelect(lhs))
 
   protected override def joinableToSelect = this
 

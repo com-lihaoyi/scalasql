@@ -31,11 +31,11 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def ExprStringOpsConv(v: Sql[String]): H2Dialect.ExprStringOps =
-    new H2Dialect.ExprStringOps(v)
-  override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
+  override implicit def SqlStringOpsConv(v: Sql[String]): H2Dialect.SqlStringOps =
+    new H2Dialect.SqlStringOps(v)
+  override implicit def SqlNumericOpsConv[T: Numeric: TypeMapper](
       v: Sql[T]
-  ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
+  ): H2Dialect.SqlNumericOps[T] = new H2Dialect.SqlNumericOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new H2Dialect.TableOps(t)
@@ -45,12 +45,12 @@ trait H2Dialect extends Dialect {
       new H2Dialect.Values(ts)
   }
 
-  implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
-    new H2Dialect.AggExprOps(v)
+  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
+    new H2Dialect.SqlAggOps(v)
 }
 
 object H2Dialect extends H2Dialect {
-  class AggExprOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.AggExprOps[T](v) {
+  class SqlAggOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
     def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
       assert(
         sep == null,
@@ -63,15 +63,15 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class ExprStringOps(protected val v: Sql[String])
-      extends operations.ExprStringOps(v)
+  class SqlStringOps(protected val v: Sql[String])
+      extends operations.SqlStringOps(v)
       with TrimOps
       with PadOps {
     def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Sql[T])
-      extends operations.ExprNumericOps[T](v)
+  class SqlNumericOps[T: Numeric: TypeMapper](protected val v: Sql[T])
+      extends operations.SqlNumericOps[T](v)
       with BitwiseFunctionOps[T]
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {

@@ -2,7 +2,7 @@ package scalasql.operations
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core._
 
-class DbApiExprOps(dialect: DialectBase) {
+class SqlDbApiOps(dialect: DialectBase) {
   import dialect._
 
   /**

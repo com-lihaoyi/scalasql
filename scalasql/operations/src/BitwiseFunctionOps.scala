@@ -2,7 +2,7 @@ package scalasql.operations
 import scalasql.core.Sql
 import scalasql.core.SqlStr.SqlStringSyntax
 
-trait BitwiseFunctionOps[T] extends scalasql.operations.ExprNumericOps[T] {
+trait BitwiseFunctionOps[T] extends scalasql.operations.SqlNumericOps[T] {
   protected def v: Sql[T]
   override def &[V: Numeric](x: Sql[V]): Sql[T] = Sql { implicit ctx => sql"BITAND($v, $x)" }
 

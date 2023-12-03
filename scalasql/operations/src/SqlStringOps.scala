@@ -3,7 +3,7 @@ package scalasql.operations
 import scalasql.core.Sql
 import scalasql.core.SqlStr.SqlStringSyntax
 
-abstract class ExprStringOps(v: Sql[String]) {
+abstract class SqlStringOps(v: Sql[String]) {
 
   /** Concatenates two strings */
   def +(x: Sql[String]): Sql[String] = Sql { implicit ctx => sql"($v || $x)" }

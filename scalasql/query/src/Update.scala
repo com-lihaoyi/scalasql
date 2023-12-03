@@ -3,12 +3,12 @@ package scalasql.query
 import scalasql.core.{
   Context,
   DialectBase,
-  ExprsToSql,
+  SqlExprsToSql,
   Queryable,
   Sql,
   SqlStr,
   TypeMapper,
-  WithExpr
+  WithSqlExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.JoinsToSql
@@ -75,7 +75,10 @@ object Update {
         implicit ja: JoinAppend[Q, Q2, QF, RF]
     ) = {
       val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
-      this.copy(expr = ja.appendTuple(expr, WithExpr.get(otherSelect)), joins = joins ++ otherJoin)(
+      this.copy(
+        expr = ja.appendTuple(expr, WithSqlExpr.get(otherSelect)),
+        joins = joins ++ otherJoin
+      )(
         ja.qr,
         dialect
       )
@@ -109,7 +112,7 @@ object Update {
     }
     lazy val sets = SqlStr.flatten(SqlStr.join(updateList, SqlStr.commaSep))
 
-    lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
+    lazy val where = SqlStr.flatten(SqlExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
     lazy val liveExprs =
       sets.referencedExprs.toSet ++ where.referencedExprs ++ joinOns.flatten.flatten.flatMap(

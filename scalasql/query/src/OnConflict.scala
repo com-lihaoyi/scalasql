@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Context, Queryable, SqlStr, WithExpr}
+import scalasql.core.{Context, Queryable, SqlStr, WithSqlExpr}
 
 /**
  * A query with a SQL `ON CONFLICT` clause, typically an `INSERT` or an `UPDATE`
@@ -20,9 +20,9 @@ object OnConflict {
       val table: TableRef
   ) extends Query[R]
       with InsertReturnable[Q] {
-    protected def expr = WithExpr.get(query)
+    protected def expr = WithSqlExpr.get(query)
     protected def queryWalkLabels() = Query.walkLabels(query)
-    protected def queryWalkExprs() = Query.walkExprs(query)
+    protected def queryWalkExprs() = Query.walkSqlExprs(query)
     protected def queryIsSingleRow = Query.isSingleRow(query)
     protected def renderToSql(ctx: Context) = {
       val str = Renderable.toSql(query)(ctx)
@@ -42,10 +42,10 @@ object OnConflict {
       val table: TableRef
   ) extends Query[R]
       with InsertReturnable[Q] {
-    protected def expr = WithExpr.get(query)
+    protected def expr = WithSqlExpr.get(query)
 
     protected def queryWalkLabels() = Query.walkLabels(query)
-    protected def queryWalkExprs() = Query.walkExprs(query)
+    protected def queryWalkExprs() = Query.walkSqlExprs(query)
     protected def queryIsSingleRow = Query.isSingleRow(query)
     protected def renderToSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))

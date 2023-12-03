@@ -1,8 +1,8 @@
 package scalasql.query
 
-import scalasql.core.{Queryable, Sql, WithExpr}
+import scalasql.core.{Queryable, Sql, WithSqlExpr}
 
-trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
+trait JoinOps[C[_, _], Q, R] extends WithSqlExpr[Q] {
 
   /**
    * Performs a `JOIN`/`INNER JOIN` on the given [[other]], typically a [[Table]] or [[Select]].

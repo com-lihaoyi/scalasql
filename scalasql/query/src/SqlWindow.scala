@@ -5,7 +5,7 @@ import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Context
 
-case class WindowExpr[T](
+case class SqlWindow[T](
     e: Sql[T],
     partitionBy0: Option[Sql[_]],
     filter0: Option[Sql[Boolean]],
@@ -58,7 +58,7 @@ case class WindowExpr[T](
   def nullsLast =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
-  class FrameConfig(f: Some[SqlStr] => WindowExpr[T]) {
+  class FrameConfig(f: Some[SqlStr] => SqlWindow[T]) {
     def preceding(offset: Int = -1) = offset match {
       case -1 => f(Some(sql"UNBOUNDED PRECEDING"))
       case offset => f(Some(sql"$offset PRECEDING"))
