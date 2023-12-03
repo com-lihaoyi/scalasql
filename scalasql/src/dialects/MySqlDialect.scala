@@ -205,7 +205,7 @@ object MySqlDialect extends MySqlDialect {
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
         where: Seq[Sql[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect) =
+    )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectBase) =
       new Update(expr, table, set0, joins, where)
 
     protected override def renderToSql(ctx: Context) = {
@@ -275,7 +275,10 @@ object MySqlDialect extends MySqlDialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.CompoundSelect[Q, R] = {
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectBase
+    ): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -286,7 +289,10 @@ object MySqlDialect extends MySqlDialect {
         joins: Seq[Join],
         where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectBase
+    ): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }

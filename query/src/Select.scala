@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Context
 import scalasql.core.{JoinNullable, From, Queryable, TypeMapper, SqlStr, Sql, SubqueryRef}
@@ -34,7 +34,7 @@ trait Select[Q, R]
     with Query.Multiple[R]
     with scalasql.core.SelectBase {
 
-  protected def dialect: Dialect
+  protected def dialect: DialectBase
   protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
@@ -42,7 +42,7 @@ trait Select[Q, R]
       orderBy: Seq[OrderBy],
       limit: Option[Int],
       offset: Option[Int]
-  )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): CompoundSelect[Q, R] =
+  )(implicit qr: Queryable.Row[Q, R], dialect: DialectBase): CompoundSelect[Q, R] =
     new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
 
   protected def newSimpleSelect[Q, R](
@@ -52,7 +52,7 @@ trait Select[Q, R]
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
-  )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): SimpleSelect[Q, R] =
+  )(implicit qr: Queryable.Row[Q, R], dialect: DialectBase): SimpleSelect[Q, R] =
     new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]

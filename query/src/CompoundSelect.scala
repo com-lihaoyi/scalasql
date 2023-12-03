@@ -1,9 +1,8 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{JoinsToSql}
-import scalasql.core.{Context, Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.core.{Context, Queryable, Sql, SqlStr, Table, TypeMapper, DialectBase}
 
 /**
  * A SQL `SELECT` query, with
@@ -15,7 +14,7 @@ class CompoundSelect[Q, R](
     val orderBy: Seq[OrderBy],
     val limit: Option[Int],
     val offset: Option[Int]
-)(implicit val qr: Queryable.Row[Q, R], val dialect: Dialect)
+)(implicit val qr: Queryable.Row[Q, R], val dialect: DialectBase)
     extends Select.Proxy[Q, R] {
 
   protected def copy[Q, R](

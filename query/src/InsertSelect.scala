@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.core.Context
 import scalasql.core.{Column, Queryable, Table, TypeMapper, SqlStr, Sql}
@@ -12,7 +12,7 @@ trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Sql]] with Quer
 
 object InsertSelect {
   class Impl[V[_[_]], C, R, R2](insert: Insert[V, R], columns: C, select: Select[C, R2])(
-      implicit dialect: Dialect
+      implicit dialect: DialectBase
   ) extends InsertSelect[V, C, R, R2] {
     import dialect.{dialectSelf => _, _}
     protected def expr = WithExpr.get(insert).asInstanceOf[V[Sql]]

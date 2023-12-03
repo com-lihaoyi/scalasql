@@ -71,60 +71,55 @@ trait Core extends Common{
   }
 
 }
-object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends Common{
+
+
+object query extends Cross[Query](scalaVersions)
+trait Query extends Common {
   def moduleDeps = Seq(core())
-  def ivyDeps = Agg(
 
 
-
-    ivy"org.apache.logging.log4j:log4j-api:2.20.0",
-    ivy"org.apache.logging.log4j:log4j-core:2.20.0",
-    ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
-
-  ) ++ Option.when(scalaVersion().startsWith("2."))(
-    ivy"org.scala-lang:scala-reflect:$scalaVersion"
-  )
-
-  def generatedSources: T[Seq[PathRef]] = T{
+  def generatedSources: T[Seq[PathRef]] = T {
     def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
+
     def defs(isImpl: Boolean) = {
-      for(i <- Range.inclusive(2, 22)) yield {
+      for (i <- Range.inclusive(2, 22)) yield {
         def commaSep(f: Int => String) = commaSep0(i, f)
 
         val impl =
           if (!isImpl) ""
-          else s"""= newInsertValues(
-                 |        this,
-                 |        columns = Seq(${commaSep(j => s"f$j(expr)")}),
-                 |        valuesLists = items.map(t => Seq(${commaSep(j => s"t._$j")}))
-                 |      )
-                 |
-                 |""".stripMargin
+          else
+            s"""= newInsertValues(
+               |        this,
+               |        columns = Seq(${commaSep(j => s"f$j(expr)")}),
+               |        valuesLists = items.map(t => Seq(${commaSep(j => s"t._$j")}))
+               |      )
+               |
+               |""".stripMargin
         s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column] => Column[T$j]")})(
-          |    items: (${commaSep(j => s"Sql[T$j]")})*
-          |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
+           |    items: (${commaSep(j => s"Sql[T$j]")})*
+           |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
       }
     }
 
-    val queryableRowDefs = for(i <- Range.inclusive(2, 22)) yield {
+    val queryableRowDefs = for (i <- Range.inclusive(2, 22)) yield {
       def commaSep(f: Int => String) = commaSep0(i, f)
       s"""implicit def Tuple${i}Queryable[${commaSep(j => s"Q$j")}, ${commaSep(j => s"R$j")}](
-        |    implicit
-        |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
-        |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
-        |  import scalasql.core.SqlStr.SqlStringSyntax
-        |  new Queryable.Row.TupleNQueryable(
-        |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
-        |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
-        |    construct0 = rsi => (${commaSep(j => s"q$j.construct(rsi)")}),
-        |    deconstruct0 = { is => (${commaSep(j => s"""q$j.deconstruct(is._$j)""")}) }
-        |  )
-        |}""".stripMargin
+         |    implicit
+         |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
+         |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
+         |  import scalasql.core.SqlStr.SqlStringSyntax
+         |  new Queryable.Row.TupleNQueryable(
+         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
+         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
+         |    construct0 = rsi => (${commaSep(j => s"q$j.construct(rsi)")}),
+         |    deconstruct0 = { is => (${commaSep(j => s"""q$j.deconstruct(is._$j)""")}) }
+         |  )
+         |}""".stripMargin
     }
 
-    val joinAppendDefs = for(i <- Range.inclusive(2, 21)) yield {
+    val joinAppendDefs = for (i <- Range.inclusive(2, 21)) yield {
       def commaSep(f: Int => String) = commaSep0(i, f)
+
       val commaSepQ = commaSep(j => s"Q$j")
       val commaSepR = commaSep(j => s"R$j")
       val joinAppendType = s"scalasql.query.JoinAppend[($commaSepQ), QA, ($commaSepQ, QA), ($commaSepR, RA)]"
@@ -141,30 +136,47 @@ trait ScalaSql extends Common{
     os.write(
       T.dest / "Generated.scala",
       s"""package scalasql.generated
-        |import scalasql.core.{Column, Queryable, Sql}
-        |trait Insert[V[_[_]], R]{
-        |  ${defs(false).mkString("\n")}
-        |}
-        |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
-        |  def newInsertValues[R](
-        |        insert: scalasql.query.Insert[V, R],
-        |        columns: Seq[Column[_]],
-        |        valuesLists: Seq[Seq[Sql[_]]]
-        |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
-        |  ${defs(true).mkString("\n")}
-        |}
-        |
-        |trait QueryableRow{
-        |  ${queryableRowDefs.mkString("\n")}
-        |}
-        |
-        |trait JoinAppend extends scalasql.query.JoinAppendLowPriority{
-        |  ${joinAppendDefs.mkString("\n")}
-        |}
-        |""".stripMargin
+         |import scalasql.core.{Column, Queryable, Sql}
+         |trait Insert[V[_[_]], R]{
+         |  ${defs(false).mkString("\n")}
+         |}
+         |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
+         |  def newInsertValues[R](
+         |        insert: scalasql.query.Insert[V, R],
+         |        columns: Seq[Column[_]],
+         |        valuesLists: Seq[Seq[Sql[_]]]
+         |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
+         |  ${defs(true).mkString("\n")}
+         |}
+         |
+         |trait QueryableRow{
+         |  ${queryableRowDefs.mkString("\n")}
+         |}
+         |
+         |trait JoinAppend extends scalasql.query.JoinAppendLowPriority{
+         |  ${joinAppendDefs.mkString("\n")}
+         |}
+         |""".stripMargin
     )
     Seq(PathRef(T.dest / "Generated.scala"))
   }
+}
+
+object scalasql extends Cross[ScalaSql](scalaVersions)
+trait ScalaSql extends Common{
+  def moduleDeps = Seq(query())
+  def ivyDeps = Agg(
+
+
+
+    ivy"org.apache.logging.log4j:log4j-api:2.20.0",
+    ivy"org.apache.logging.log4j:log4j-core:2.20.0",
+    ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
+
+  ) ++ Option.when(scalaVersion().startsWith("2."))(
+    ivy"org.scala-lang:scala-reflect:$scalaVersion"
+  )
+
 
   object test extends ScalaTests {
     def ivyDeps = Agg(

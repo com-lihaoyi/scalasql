@@ -1,7 +1,6 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
-import scalasql.operations.TableOps
+import scalasql.core.DialectBase
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, join}
 import scalasql.core.{
@@ -31,7 +30,7 @@ class SimpleSelect[Q, R](
     val joins: Seq[Join],
     val where: Seq[Sql[_]],
     val groupBy0: Option[GroupBy]
-)(implicit val qr: Queryable.Row[Q, R], protected val dialect: Dialect)
+)(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
     extends Select[Q, R] {
   protected override def joinableSelect = this
 

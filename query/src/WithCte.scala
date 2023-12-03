@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.core.{FlatJson, ExprsToSql, Context, Queryable, TypeMapper, SqlStr, Sql, WithCteRef}
 
@@ -12,7 +12,7 @@ class WithCte[Q, R](
     val lhsSubQuery: WithCteRef,
     val rhs: Select[Q, R],
     val withPrefix: SqlStr = sql"WITH "
-)(implicit val qr: Queryable.Row[Q, R], protected val dialect: Dialect)
+)(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectBase)
     extends Select.Proxy[Q, R] {
 
   override protected def expr = WithExpr.get(Joinable.joinableSelect(rhs))
@@ -49,7 +49,7 @@ object WithCte {
       lhs: WithExpr[Q],
       lhsSubQueryRef: WithCteRef,
       val qr: Queryable.Row[Q, R],
-      protected val dialect: Dialect
+      protected val dialect: DialectBase
   ) extends Select.Proxy[Q, R] {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true

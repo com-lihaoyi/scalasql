@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.core.Context
 import scalasql.core.{Column, Queryable, Table, SqlStr, Sql}
@@ -17,7 +17,7 @@ object InsertColumns {
       insert: Insert[V, R],
       val columns: Seq[Column[_]],
       val valuesLists: Seq[Seq[Sql[_]]]
-  )(implicit val qr: Queryable[V[Column], R], dialect: Dialect)
+  )(implicit val qr: Queryable[V[Column], R], dialect: DialectBase)
       extends InsertColumns[V, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table

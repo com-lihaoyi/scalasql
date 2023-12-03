@@ -97,7 +97,10 @@ object H2Dialect extends H2Dialect {
         orderBy: Seq[OrderBy],
         limit: Option[Int],
         offset: Option[Int]
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.CompoundSelect[Q, R] = {
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectBase
+    ): scalasql.query.CompoundSelect[Q, R] = {
       new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
     }
 
@@ -108,7 +111,10 @@ object H2Dialect extends H2Dialect {
         joins: Seq[Join],
         where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
-    )(implicit qr: Queryable.Row[Q, R], dialect: Dialect): scalasql.query.SimpleSelect[Q, R] = {
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectBase
+    ): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
     }
   }

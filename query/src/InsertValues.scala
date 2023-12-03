@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.core.{Column, Queryable, Table, SqlStr}
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.core.Context
 
@@ -12,7 +12,7 @@ object InsertValues {
   class Impl[V[_[_]], R](
       insert: Insert[V, R],
       values: Seq[R],
-      dialect: Dialect,
+      dialect: DialectBase,
       qr: Queryable.Row[V[Column], R],
       skippedColumns: Seq[Column[_]]
   ) extends InsertValues[V, R] {
