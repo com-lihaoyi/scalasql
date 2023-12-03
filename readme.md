@@ -5,7 +5,7 @@ SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
 ```scala
-import scalasql._, H2Dialect._
+import scalasql._, SqliteDialect._
 
 // Define your table model classes
 case class City[T[_]](
@@ -18,13 +18,16 @@ case class City[T[_]](
 object City extends Table[City]
 
 // Connect to your database (example uses in-memory H2, requires com.h2database:h2:2.2.224)
-val dbClient = new scalasql.DatabaseClient.Connection(
-  connection = java.sql.DriverManager.getConnection("jdbc:h2:mem:mydb"),
-  dialect = H2Dialect,
+val dbClient = new scalasql.DbClient.Connection(
+  connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
+  dialect = SqliteDialect,
   config = new Config {
     // Override default snake_case name mapping to match table schemas
     override def columnNameMapper(v: String) = v.toLowerCase()
     override def tableNameMapper(v: String) = v.toLowerCase()
+    override def logSqlQuery(sql: String, fileName: String, lineNum: Int): Unit = {
+      println(s"$fileName:$lineNum $sql")
+    }
   }
 )
 val db: DbApi = dbClient.getAutoCommitClientConnection
@@ -34,21 +37,22 @@ db.updateRaw(os.read(os.Path("scalasql/test/resources/world-schema.sql", os.pwd)
 db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
 
 // Adding up population of all cities in China
-def query1 = City.select.filter(_.countryCode === "CHN").map(_.population).sum
-db.renderSql(query1) // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
-db.run(query1) // 175953614
+val populationSum = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
+// SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
+println(populationSum)
+// 175953614
 
-// Finding the 5-10th largest cities by population
-def query2 = City.select
-  .sortBy(_.population).desc
-  .drop(5).take(3)
-  .map(c => (c.name, c.population))
-
-db.renderSql(query2)
+// Finding the 5-8th largest cities by population
+val fewLargestCities = db.run(
+  City.select
+      .sortBy(_.population).desc
+      .drop(5).take(3)
+      .map(c => (c.name, c.population))
+)
 // SELECT city0.name AS res__0, city0.population AS res__1
 // FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
-
-db.run(query2) // Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México\, 8591309))
+println(fewLargestCities)
+// Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México, 8591309))
 ```
 
 ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 

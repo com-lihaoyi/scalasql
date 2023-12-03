@@ -18,14 +18,18 @@ trait DbApi extends AutoCloseable {
    * Runs the given query [[Q]] and returns a value of type [[R]]
    */
   def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable[Q, R]
+      implicit qr: Queryable[Q, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
   ): R
 
   /**
    * Runs the given [[SqlStr]] of the form `sql"..."` and returns a value of type [[R]]
    */
   def runSql[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable.Row[_, R]
+      implicit qr: Queryable.Row[_, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
   ): IndexedSeq[R]
 
   /**
@@ -34,7 +38,9 @@ trait DbApi extends AutoCloseable {
    * the entire list of results in memory
    */
   def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable[Q, Seq[R]]
+      implicit qr: Queryable[Q, Seq[R]],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
   ): Generator[R]
 
   /**
@@ -42,7 +48,9 @@ trait DbApi extends AutoCloseable {
    * arbitrary [[SqlStr]] of the form `sql"..."` and  streams the results back to you
    */
   def streamSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable.Row[_, R]
+      implicit qr: Queryable.Row[_, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
   ): Generator[R]
 
   /**
@@ -54,7 +62,11 @@ trait DbApi extends AutoCloseable {
       variables: Seq[Any] = Nil,
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
-  )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R]
+  )(
+      implicit qr: Queryable.Row[_, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
+  ): IndexedSeq[R]
 
   /**
    * Runs a `java.lang.String` (and any interpolated variables) and deserializes
@@ -65,13 +77,20 @@ trait DbApi extends AutoCloseable {
       variables: Seq[Any] = Nil,
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
-  )(implicit qr: Queryable.Row[_, R]): Generator[R]
+  )(
+      implicit qr: Queryable.Row[_, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
+  ): Generator[R]
 
   /**
    * Runs an [[SqlStr]] of the form `sql"..."` containing an `UPDATE` or `INSERT` query and returns the
    * number of rows affected
    */
-  def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int
+  def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+      implicit fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
+  ): Int
 
   /**
    * Runs an `java.lang.String` (and any interpolated variables) containing an
@@ -82,7 +101,7 @@ trait DbApi extends AutoCloseable {
       variables: Seq[Any] = Nil,
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
-  ): Int
+  )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int
 
 }
 
@@ -158,7 +177,11 @@ object DbApi {
         variables: Seq[Any] = Nil,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R] = {
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): IndexedSeq[R] = {
       streamRaw(sql, variables, fetchSize, queryTimeoutSeconds).toVector
     }
 
@@ -167,13 +190,19 @@ object DbApi {
         variables: Seq[Any] = Nil,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Generator[R] = {
       streamRaw0[R](
         construct = qr.construct,
         sql,
         anySeqPuts(variables),
         fetchSize,
-        queryTimeoutSeconds
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
       )
     }
 
@@ -189,14 +218,17 @@ object DbApi {
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
         fetchSize: Int,
-        queryTimeoutSeconds: Int
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     )(
         block: ResultSet => T
     ): T = {
       val statement = connection.prepareStatement(sql)
+
       for ((variable, i) <- variables.iterator.zipWithIndex) variable(statement, i + 1)
-      configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(s =>
-        block(s.executeQuery())
+      configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds, sql, fileName, lineNum)(
+        s => block(s.executeQuery())
       )
     }
 
@@ -204,39 +236,62 @@ object DbApi {
         sql: SqlStr,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    )(implicit qr: Queryable.Row[_, R]): IndexedSeq[R] =
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): IndexedSeq[R] =
       streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
 
     def runRawUpdate0(
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
         fetchSize: Int,
-        queryTimeoutSeconds: Int
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     ): Int = {
       // Sqlite and HsqlDb for some reason blow up if you try to do DDL
       // like DROP TABLE or CREATE TABLE inside a prepared statement, so
       // fall back to vanilla `createStatement`
       if (variables.isEmpty) {
         val statement = connection.createStatement()
-        configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(_.executeUpdate(sql))
+        configureRunCloseStatement(
+          statement,
+          fetchSize,
+          queryTimeoutSeconds,
+          sql,
+          fileName,
+          lineNum
+        )(_.executeUpdate(sql))
       } else {
         val statement = connection.prepareStatement(sql)
         for ((v, i) <- variables.iterator.zipWithIndex) v(statement, i + 1)
-        configureRunCloseStatement(statement, fetchSize, queryTimeoutSeconds)(_.executeUpdate())
+        configureRunCloseStatement(
+          statement,
+          fetchSize,
+          queryTimeoutSeconds,
+          sql,
+          fileName,
+          lineNum
+        )(_.executeUpdate())
       }
     }
 
     def configureRunCloseStatement[P <: Statement, T](
         statement: P,
         fetchSize: Int,
-        queryTimeoutSeconds: Int
+        queryTimeoutSeconds: Int,
+        sql: String,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     )(f: P => T): T = {
       if (autoCommit) connection.setAutoCommit(true)
       Seq(fetchSize, config.defaultFetchSize).find(_ != -1).foreach(statement.setFetchSize)
       Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds)
         .find(_ != -1)
         .foreach(statement.setQueryTimeout)
-
+      config.logSqlQuery(sql, fileName.value, lineNum.value)
       try f(statement)
       finally statement.close()
     }
@@ -246,15 +301,21 @@ object DbApi {
         variables: Seq[Any] = Nil,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    ): Int = runRawUpdate0(sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds)
+    )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int =
+      runRawUpdate0(sql, anySeqPuts(variables), fetchSize, queryTimeoutSeconds, fileName, lineNum)
 
-    def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int = {
+    def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Int = {
       val flattened = SqlStr.flatten(sql)
       runRawUpdate0(
         DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
         flattenParamPuts(flattened),
         fetchSize,
-        queryTimeoutSeconds
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
       )
     }
 
@@ -265,7 +326,9 @@ object DbApi {
     }
 
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-        implicit qr: Queryable[Q, R]
+        implicit qr: Queryable[Q, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     ): R = {
 
       val flattened = DialectConfig.unpackQueryable(query, qr, config)
@@ -273,7 +336,9 @@ object DbApi {
       else {
         try {
           val res = stream(query, fetchSize, queryTimeoutSeconds)(
-            qr.asInstanceOf[Queryable[Q, Seq[_]]]
+            qr.asInstanceOf[Queryable[Q, Seq[_]]],
+            fileName,
+            lineNum
           )
           if (qr.singleRow(query)) {
             val results = res.take(2).toVector
@@ -293,14 +358,20 @@ object DbApi {
         sql: SqlStr,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    )(implicit qr: Queryable.Row[_, R]): Generator[R] = {
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Generator[R] = {
       val flattened = SqlStr.flatten(sql)
 
       streamFlattened(
         qr.construct,
         flattened,
         fetchSize,
-        queryTimeoutSeconds
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
       )
     }
 
@@ -308,13 +379,17 @@ object DbApi {
         construct: Queryable.ResultSetIterator => R,
         flattened: SqlStr.Flattened,
         fetchSize: Int,
-        queryTimeoutSeconds: Int
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     ) = streamRaw0(
       construct,
       DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
       flattenParamPuts(flattened),
       fetchSize,
-      queryTimeoutSeconds
+      queryTimeoutSeconds,
+      fileName,
+      lineNum
     )
 
     def streamRaw0[R](
@@ -322,23 +397,28 @@ object DbApi {
         sql: String,
         variables: Seq[(PreparedStatement, Int) => Unit],
         fetchSize: Int,
-        queryTimeoutSeconds: Int
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     ) = new Generator[R] {
       def generate(handleItem: R => Generator.Action): Generator.Action = {
 
-        runRawQuery0(sql, variables, fetchSize, queryTimeoutSeconds) { resultSet =>
-          var action: Generator.Action = Generator.Continue
-          while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = construct(new Queryable.ResultSetIterator(resultSet))
-            action = handleItem(rowRes)
-          }
-          action
+        runRawQuery0(sql, variables, fetchSize, queryTimeoutSeconds, fileName, lineNum) {
+          resultSet =>
+            var action: Generator.Action = Generator.Continue
+            while (resultSet.next() && action == Generator.Continue) {
+              val rowRes = construct(new Queryable.ResultSetIterator(resultSet))
+              action = handleItem(rowRes)
+            }
+            action
         }
       }
     }
 
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-        implicit qr: Queryable[Q, Seq[R]]
+        implicit qr: Queryable[Q, Seq[R]],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
     ): Generator[R] = {
       val flattened = DialectConfig.unpackQueryable(query, qr, config)
       streamFlattened(
@@ -350,7 +430,9 @@ object DbApi {
         },
         flattened,
         fetchSize,
-        queryTimeoutSeconds
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
       )
     }
 

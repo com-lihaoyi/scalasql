@@ -26,6 +26,11 @@ trait Config {
    * Translates column names from Scala `case class` field names to SQL names.
    */
   def columnNameMapper(v: String): String = Config.camelToSnake(v)
+
+  /**
+   * Override this to log the executed SQL queries
+   */
+  def logSqlQuery(sql: String, fileName: String, lineNum: Int): Unit = ()
 }
 
 object Config {
