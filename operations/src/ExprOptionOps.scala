@@ -1,12 +1,12 @@
 package scalasql.operations
 
 import scalasql.core.TypeMapper
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.core.Sql
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class ExprOptionOps[T: TypeMapper](v: Sql[Option[T]])(implicit dialect: Dialect) {
+class ExprOptionOps[T: TypeMapper](v: Sql[Option[T]])(implicit dialect: DialectBase) {
   import dialect._
 
   def isDefined: Sql[Boolean] = Sql { implicit ctx => sql"($v IS NOT NULL)" }

@@ -1,13 +1,12 @@
 package scalasql.dialects
 
-import scalasql.core.Queryable
+import scalasql.core.{  WithExpr, Queryable}
 import scalasql.query.{
   InsertReturnable,
   InsertReturning,
   OnConflict,
   Returnable,
   Returning,
-  WithExpr
 }
 
 trait ReturningDialect extends Dialect {

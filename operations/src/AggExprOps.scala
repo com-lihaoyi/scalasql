@@ -1,6 +1,6 @@
 package scalasql.operations
 
-import scalasql.query.{Aggregatable}
+import scalasql.core.Aggregatable
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.{Queryable, TypeMapper, Sql}
 

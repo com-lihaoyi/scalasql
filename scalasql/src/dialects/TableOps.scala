@@ -1,4 +1,4 @@
-package scalasql.operations
+package scalasql.dialects
 
 import scalasql.dialects.Dialect
 import scalasql.core.{Column, Table, Sql}

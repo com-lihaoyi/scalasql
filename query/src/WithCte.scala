@@ -1,8 +1,7 @@
 package scalasql.query
 
-import scalasql.core.DialectBase
+import scalasql.core.{Context, DialectBase, ExprsToSql, FlatJson, Queryable, Sql, SqlStr, TypeMapper, WithCteRef, WithExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{FlatJson, ExprsToSql, Context, Queryable, TypeMapper, SqlStr, Sql, WithCteRef}
 
 /**
  * A SQL `WITH` clause

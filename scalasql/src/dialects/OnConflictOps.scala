@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.core.{Column, Sql}
+import scalasql.core.{Column, Sql, WithExpr}
 import scalasql.query._
 
 trait OnConflictOps {

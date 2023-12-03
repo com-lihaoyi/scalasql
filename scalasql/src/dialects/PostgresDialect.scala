@@ -1,8 +1,8 @@
 package scalasql.dialects
 
-import scalasql.core.{Queryable, TypeMapper, Sql}
+import scalasql.core.{Aggregatable, Queryable, TypeMapper, Sql, WithExpr}
 import scalasql.operations
-import scalasql.query.{Aggregatable, JoinOps, Joinable, LateralJoinOps, Select, WithExpr}
+import scalasql.query.{JoinOps, Joinable, LateralJoinOps, Select}
 import scalasql.core.SqlStr
 import scalasql.core.SqlStr.SqlStringSyntax
 

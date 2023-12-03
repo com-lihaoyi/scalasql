@@ -1,7 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{TypeMapper, Queryable, SqlStr, Sql}
-import scalasql.core.Context
+import scalasql.core.{Aggregatable, Context, Queryable, Sql, SqlStr, TypeMapper}
 
 /**
  * A reference that aggregations for usage within [[Select.aggregate]], to allow

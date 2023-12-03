@@ -1,9 +1,7 @@
 package scalasql.query
 
-import scalasql.core.DialectBase
+import scalasql.core.{Aggregatable, Context, DialectBase, From, JoinNullable, Queryable, Sql, SqlStr, SubqueryRef, TypeMapper}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.core.Context
-import scalasql.core.{JoinNullable, From, Queryable, TypeMapper, SqlStr, Sql, SubqueryRef}
 
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,

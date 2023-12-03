@@ -1,11 +1,9 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.operations.DbApiOps
-import scalasql.core.{JoinNullable, From, Column, DbApi, Queryable, Table, TypeMapper, Sql, SqlStr}
+import scalasql.core.{Aggregatable, JoinNullable, From, Column, DbApi, Queryable, Table, TypeMapper, Sql, SqlStr}
 import scalasql.{Id, dialects, operations}
 import scalasql.query.{
-  Aggregatable,
   CompoundSelect,
   GroupBy,
   InsertColumns,
@@ -37,7 +35,7 @@ trait H2Dialect extends Dialect {
       v: Sql[T]
   ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
 
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new H2Dialect.TableOps(t)
 
   override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
@@ -74,7 +72,7 @@ object H2Dialect extends H2Dialect {
       extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T]
 
-  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
+  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
     protected override def joinableSelect: Select[V[Sql], V[Id]] = {
       val ref = Table.tableRef(t)
       new SimpleSelect(

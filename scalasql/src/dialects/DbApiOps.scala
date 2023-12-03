@@ -1,17 +1,15 @@
-package scalasql.operations
+package scalasql.dialects
 
-import scalasql.dialects.Dialect
-import scalasql.core.{Sql, Queryable, TypeMapper, WithCteRef}
+import scalasql.core._
 import scalasql.query.{Select, Values, WithCte}
-import scalasql.core.SqlStr
 
-class DbApiOps(dialect: Dialect) {
+class DbApiOps(dialect: DialectBase) {
   import dialect._
 
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */
-  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) = new CaseWhen(values)
+  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) = new scalasql.operations.CaseWhen(values)
 
   /**
    * Creates a SQL `VALUES` clause

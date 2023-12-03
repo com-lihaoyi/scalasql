@@ -1,21 +1,20 @@
-package scalasql.operations
-
+package scalasql.query
 import scalasql.core.{Sql, SqlStr}
-import scalasql.dialects.Dialect
+import scalasql.core.DialectBase
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Context
 
 case class WindowExpr[T](
-    e: Sql[T],
-    partitionBy0: Option[Sql[_]],
-    filter0: Option[Sql[Boolean]],
-    orderBy: Seq[scalasql.query.OrderBy],
-    frameStart0: Option[SqlStr],
-    frameEnd0: Option[SqlStr],
-    exclusions: Option[SqlStr]
-)(implicit dialect: Dialect)
-    extends Sql[T] {
+                          e: Sql[T],
+                          partitionBy0: Option[Sql[_]],
+                          filter0: Option[Sql[Boolean]],
+                          orderBy: Seq[scalasql.query.OrderBy],
+                          frameStart0: Option[SqlStr],
+                          frameEnd0: Option[SqlStr],
+                          exclusions: Option[SqlStr]
+                        )(implicit dialect: DialectBase)
+  extends Sql[T] {
   import dialect.{dialectSelf => _, _}
   protected def renderToSql0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }

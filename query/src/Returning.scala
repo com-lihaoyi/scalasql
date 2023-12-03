@@ -1,9 +1,8 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{From, Context, ExprsToSql, TableRef}
+import scalasql.core.{Context, ExprsToSql, From, Queryable, SqlStr, TableRef, TypeMapper, WithExpr}
 import scalasql.renderer.JoinsToSql
-import scalasql.core.{Queryable, TypeMapper, SqlStr}
 
 /**
  * A query that could support a `RETURNING` clause, typically

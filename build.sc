@@ -73,6 +73,11 @@ trait Core extends Common{
 }
 
 
+object operations extends Cross[Operations](scalaVersions)
+trait Operations extends Common{
+  def moduleDeps = Seq(core())
+}
+
 object query extends Cross[Query](scalaVersions)
 trait Query extends Common {
   def moduleDeps = Seq(core())
@@ -164,7 +169,7 @@ trait Query extends Common {
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends Common{
-  def moduleDeps = Seq(query())
+  def moduleDeps = Seq(query(), operations())
   def ivyDeps = Agg(
 
 

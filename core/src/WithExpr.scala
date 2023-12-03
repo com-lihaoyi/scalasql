@@ -1,5 +1,4 @@
-package scalasql.query
-
+package scalasql.core
 trait WithExpr[Q] {
   protected def expr: Q
 }

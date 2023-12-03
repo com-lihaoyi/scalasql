@@ -1,9 +1,8 @@
 package scalasql.dialects
 
-import scalasql.operations.DbApiOps
 import scalasql.{Id, operations}
 import scalasql.query.{
-  Aggregatable,
+
   AscDesc,
   CompoundSelect,
   GroupBy,
@@ -16,9 +15,11 @@ import scalasql.query.{
   OrderBy,
   Query,
   Update,
-  WithExpr
+
 }
 import scalasql.core.{
+  WithExpr,
+  Aggregatable,
   JoinNullable,
   From,
   TableRef,
@@ -86,7 +87,7 @@ trait MySqlDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Sql[String]): MySqlDialect.ExprStringOps =
     new MySqlDialect.ExprStringOps(v)
 
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MySqlDialect.TableOps(t)
 
   implicit def OnConflictableUpdate[V[_[_]], R](
@@ -158,7 +159,7 @@ object MySqlDialect extends MySqlDialect {
     def reverse: Sql[String] = Sql { implicit ctx => sql"REVERSE($v)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
+  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
     override def update(
         filter: V[Column] => Sql[Boolean]
     ): Update[V[Column], V[Id]] = {

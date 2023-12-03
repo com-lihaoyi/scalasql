@@ -1,8 +1,8 @@
 package scalasql.dialects
 
-import scalasql.core.{From, Sql, Queryable, Table, TypeMapper, SqlStr}
+import scalasql.core.{Aggregatable, From, Sql, Queryable, Table, TypeMapper, SqlStr}
 import scalasql.{Id, dialects, operations}
-import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select}
+import scalasql.query.{AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select}
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
@@ -25,7 +25,7 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def ExprStringOpsConv(v: Sql[String]): SqliteDialect.ExprStringOps =
     new SqliteDialect.ExprStringOps(v)
 
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.operations.TableOps[V] =
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new SqliteDialect.TableOps(t)
 
   implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T] =
@@ -49,7 +49,7 @@ object SqliteDialect extends SqliteDialect {
     def glob(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"GLOB($v, $x)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.operations.TableOps[V](t) {
+  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
 
     protected override def joinableSelect: Select[V[Sql], V[Id]] = {
       val ref = Table.tableRef(t)

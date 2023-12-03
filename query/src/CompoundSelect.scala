@@ -1,8 +1,8 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.renderer.{JoinsToSql}
-import scalasql.core.{Context, Queryable, Sql, SqlStr, Table, TypeMapper, DialectBase}
+import scalasql.renderer.JoinsToSql
+import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, Table, TypeMapper, WithExpr}
 
 /**
  * A SQL `SELECT` query, with
