@@ -1,12 +1,11 @@
 package scalasql.dialects
 
-import scalasql._
 import scalasql.operations.DbApiOps
+import scalasql.{Id, operations}
 import scalasql.query.{
   Aggregatable,
   AscDesc,
   CompoundSelect,
-  Sql,
   From,
   GroupBy,
   InsertColumns,
@@ -22,8 +21,9 @@ import scalasql.query.{
   Update,
   WithExpr
 }
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
+import scalasql.core.{Column, DbApi, Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
+import scalasql.renderer.{Context, ExprsToSql, JoinsToSql}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDateTime}

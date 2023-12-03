@@ -1,7 +1,7 @@
 package scalasql.operations
 
-import scalasql.query.Sql
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.Sql
+import scalasql.core.SqlStr.SqlStringSyntax
 
 abstract class ExprStringOps(v: Sql[String]) {
 

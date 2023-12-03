@@ -1,10 +1,10 @@
 package scalasql.operations
 
-import scalasql.Sql
+import scalasql.core.{Sql, SqlStr}
 import scalasql.dialects.Dialect
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
-import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.renderer.Context
 
 case class WindowExpr[T](
     e: Sql[T],

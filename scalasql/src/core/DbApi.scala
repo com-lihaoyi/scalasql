@@ -1,11 +1,9 @@
-package scalasql
+package scalasql.core
 
 import geny.Generator
-import renderer.{Context, SqlStr}
 import scalasql.dialects.DialectConfig
 import scalasql.dialects.DialectConfig.dialectCastParams
-import scalasql.renderer.SqlStr.{Interp, flatten}
-import scalasql.utils.FlatJson
+import scalasql.renderer.Context
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
 

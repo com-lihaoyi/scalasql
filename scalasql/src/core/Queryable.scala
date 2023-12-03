@@ -1,10 +1,9 @@
-package scalasql
+package scalasql.core
 
-import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.query.{Sql, JoinNullable, Query}
-import scalasql.renderer.SqlStr.{Interp, SqlStringSyntax}
+import scalasql.query.{JoinNullable, Query}
+import scalasql.renderer.{Context, ExprsToSql}
 
-import java.sql.{PreparedStatement, ResultSet}
+import java.sql.ResultSet
 
 /**
  * Typeclass to indicate that we are able to evaluate a query of type [[Q]] to

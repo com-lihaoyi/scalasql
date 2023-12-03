@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.{Queryable, Table}
+import scalasql.core.{Queryable, Sql, Table}
 
 /**
  * Wrapper class with extension methods to add support for `JOIN LATERAL`, which

@@ -1,9 +1,10 @@
 package scalasql.operations
 
-import scalasql.TypeMapper
-import scalasql.query.Sql
-import scalasql.renderer.SqlStr.SqlStringSyntax
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.core.TypeMapper
+import scalasql.core.Sql
+import scalasql.core.SqlStr
+import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.renderer.Context
 class CaseWhen[T: TypeMapper](values: Seq[(Sql[Boolean], Sql[T])]) extends Sql[T] {
 
   def renderToSql0(implicit ctx: Context): SqlStr = {

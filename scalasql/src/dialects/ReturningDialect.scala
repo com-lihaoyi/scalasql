@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.Queryable
+import scalasql.core.Queryable
 import scalasql.query.{
   InsertReturnable,
   InsertReturning,

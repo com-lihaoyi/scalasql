@@ -1,6 +1,7 @@
 package scalasql.utils
-import scalasql.{Id, Table}
-import scalasql.Table.Metadata
+import scalasql.Id
+import scalasql.core.Table
+import scalasql.core.Table.Metadata
 
 import scala.language.experimental.macros
 
@@ -86,7 +87,7 @@ object TableMacros {
     val exprRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[scalasql.Sql]].typeArgs
+      args = weakTypeOf[V[scalasql.core.Sql]].typeArgs
     )
     val idRef = TypeRef(
       pre = typeRef.pre,
@@ -95,7 +96,7 @@ object TableMacros {
     )
     c.Expr[Metadata[V]](q"""{
 
-    new _root_.scalasql.Table.Metadata(
+    new _root_.scalasql.core.Table.Metadata(
       (dialect, n) => {
         import dialect._;
         n match{ case ..${queryables.zipWithIndex.map { case (q, i) => cq"$i => $q" }} }
@@ -104,7 +105,7 @@ object TableMacros {
       (walkLabels0, dialect, queryable) => {
         import dialect._
 
-        new _root_.scalasql.Table.Internal.TableQueryable(
+        new _root_.scalasql.core.Table.Internal.TableQueryable(
           walkLabels0,
           (table: $exprRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           construct0 = (args: _root_.scalasql.Queryable.ResultSetIterator) => new $caseClassType(..$constructParams),

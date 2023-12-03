@@ -1,7 +1,7 @@
 package scalasql.dialects
 
-import scalasql.query.Sql
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.Sql
+import scalasql.core.SqlStr.SqlStringSyntax
 
 trait PadOps {
   protected def v: Sql[String]

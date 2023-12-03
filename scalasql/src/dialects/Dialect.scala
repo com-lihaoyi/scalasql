@@ -1,10 +1,10 @@
 package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, DbApiOps, TableOps, WindowExpr}
-import scalasql.query.Sql.apply0
-import scalasql.query.{Aggregatable, Sql, JoinNullable, Select, WithCte, WithCteRef}
-import scalasql.renderer.SqlStr
-import scalasql.{DbApi, Queryable, Table, TypeMapper, operations}
+import scalasql.core.Sql.apply0
+import scalasql.operations
+import scalasql.query.{Aggregatable, JoinNullable}
+import scalasql.core.{DbApi, Queryable, Sql, SqlStr, Table, TypeMapper}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{

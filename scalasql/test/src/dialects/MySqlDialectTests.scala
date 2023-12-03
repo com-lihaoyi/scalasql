@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.query.Sql
+import scalasql.core.Sql
 import sourcecode.Text
 import utest._
 import utils.MySqlSuite

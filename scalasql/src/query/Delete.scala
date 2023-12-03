@@ -1,9 +1,9 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Queryable, Table, TypeMapper}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.renderer.{Context}
+import scalasql.core.{Queryable, Table, TypeMapper, SqlStr, Sql}
+import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
  * A SQL `DELETE` query

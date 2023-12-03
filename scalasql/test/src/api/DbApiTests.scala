@@ -1,7 +1,7 @@
 package scalasql.api
 
 import geny.Generator
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.{Buyer, Id}
 import scalasql.utils.{MySqlSuite, ScalaSqlSuite}
 import sourcecode.Text

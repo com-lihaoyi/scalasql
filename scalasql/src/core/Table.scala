@@ -1,9 +1,10 @@
-package scalasql
-import scala.language.experimental.macros
-import renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
-import scalasql.query.{Sql, Insert, InsertColumns, Joinable, Select, TableRef, Update}
-import renderer.SqlStr.SqlStringSyntax
+package scalasql.core
+
+import scalasql.Id
 import scalasql.dialects.Dialect
+import scalasql.query.TableRef
+
+import scala.language.experimental.macros
 
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
@@ -102,22 +103,4 @@ object Table {
     }
 
   }
-}
-
-class Column[T](tableRef: TableRef, val name: String)(implicit val mappedType: TypeMapper[T])
-    extends Sql[T] {
-  def :=(v: Sql[T]) = Column.Assignment(this, v)
-
-  def renderToSql0(implicit ctx: Context) = {
-    val suffix = SqlStr.raw(ctx.config.columnNameMapper(name))
-    ctx.fromNaming.get(tableRef) match {
-      case Some("") => suffix
-      case Some(s) => SqlStr.raw(s) + sql".$suffix"
-      case None =>
-        sql"SCALASQL_MISSING_TABLE_${SqlStr.raw(Table.tableName(tableRef.value))}.$suffix"
-    }
-  }
-}
-object Column {
-  case class Assignment[T](column: Column[T], value: Sql[T])
 }

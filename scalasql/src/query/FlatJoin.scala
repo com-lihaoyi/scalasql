@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.Queryable
+import scalasql.core.{Queryable, Sql}
 
 object FlatJoin {
   trait Rhs[Q2, R2]

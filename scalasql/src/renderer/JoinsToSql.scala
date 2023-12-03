@@ -1,10 +1,10 @@
 package scalasql.renderer
 
-import SqlStr.SqlStringSyntax
+import scalasql.core.{Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.query.{
   AscDesc,
   CompoundSelect,
-  Sql,
   From,
   Join,
   Joinable,
@@ -15,7 +15,6 @@ import scalasql.query.{
   TableRef,
   WithCteRef
 }
-import scalasql.{Queryable, Table, TypeMapper}
 import scalasql.utils.FlatJson
 
 object JoinsToSql {

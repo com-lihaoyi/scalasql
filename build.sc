@@ -66,7 +66,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
         |    implicit
         |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
         |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
-        |  import scalasql.renderer.SqlStr.SqlStringSyntax
+        |  import scalasql.core.SqlStr.SqlStringSyntax
         |  new Queryable.Row.TupleNQueryable(
         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
@@ -94,9 +94,7 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
     os.write(
       T.dest / "Generated.scala",
       s"""package scalasql.generated
-        |import scalasql.Column
-        |import scalasql.Queryable
-        |import scalasql.query.Sql
+        |import scalasql.core.{Column, Queryable, Sql}
         |trait Insert[V[_[_]], R]{
         |  ${defs(false).mkString("\n")}
         |}

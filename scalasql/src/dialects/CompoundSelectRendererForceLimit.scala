@@ -1,8 +1,8 @@
 package scalasql.dialects
 
-import scalasql.TypeMapper
-import scalasql.renderer.SqlStr
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.TypeMapper
+import scalasql.core.SqlStr
+import scalasql.core.SqlStr.SqlStringSyntax
 
 object CompoundSelectRendererForceLimit {
   def limitToSqlStr(limit: Option[Int], offset: Option[Int])(implicit tm: TypeMapper[Int]) = {

@@ -1,10 +1,10 @@
 package scalasql.operations
 
-import scalasql.TypeMapper
+import scalasql.core.TypeMapper
 import scalasql.dialects.Dialect
-import scalasql.query.Sql
+import scalasql.core.Sql
 import scalasql.renderer.Context
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.SqlStr.SqlStringSyntax
 
 class ExprOptionOps[T: TypeMapper](v: Sql[Option[T]])(implicit dialect: Dialect) {
   import dialect._

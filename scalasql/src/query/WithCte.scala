@@ -1,10 +1,10 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.renderer.{Context, ExprsToSql, SqlStr}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.renderer.{Context, ExprsToSql}
 import scalasql.utils.FlatJson
-import scalasql.{Queryable, TypeMapper}
+import scalasql.core.{Queryable, TypeMapper, SqlStr, Sql}
 
 /**
  * A SQL `WITH` clause

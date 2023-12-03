@@ -1,6 +1,7 @@
 package test.scalasql
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.renderer.Context
+import scalasql.SqlStr
 import utest._
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
@@ -1377,7 +1378,7 @@ object WorldSqlTests extends TestSuite {
       // shows how to define a custom `rawToHex` Scala function working on `Sql[T]`s,
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
       // using that in a query to return a string.
-      import scalasql.renderer.SqlStr.SqlStringSyntax
+      import scalasql.core.SqlStr.SqlStringSyntax
 
       def rawToHex(v: Sql[String]): Sql[String] = Sql { implicit ctx => sql"RAWTOHEX($v)" }
 

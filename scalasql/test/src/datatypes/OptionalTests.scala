@@ -1,6 +1,6 @@
 package scalasql.datatypes
 
-import scalasql.query.Sql
+import scalasql.core.Sql
 import scalasql.{datatypes, _}
 import utest._
 import utils.ScalaSqlSuite

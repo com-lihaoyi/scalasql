@@ -1,9 +1,9 @@
 package scalasql.operations
 
 import scalasql.dialects.Dialect
-import scalasql.{Queryable, TypeMapper}
-import scalasql.query.{Aggregatable, Sql}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.{Queryable, TypeMapper, Sql}
+import scalasql.query.{Aggregatable}
+import scalasql.core.SqlStr.SqlStringSyntax
 
 class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: Dialect) {
   import dialect._

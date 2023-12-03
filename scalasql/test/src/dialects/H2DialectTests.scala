@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.query.Sql
+import scalasql.core.Sql
 import scalasql.utils.H2Suite
 import utest._
 

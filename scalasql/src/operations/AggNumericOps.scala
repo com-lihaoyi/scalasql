@@ -1,8 +1,8 @@
 package scalasql.operations
 
-import scalasql.{TypeMapper, Queryable}
-import scalasql.query.{Aggregatable, Sql}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.{Queryable, Sql, TypeMapper}
+import scalasql.query.Aggregatable
+import scalasql.core.SqlStr.SqlStringSyntax
 
 class AggNumericOps[V: Numeric: TypeMapper](v: Aggregatable[Sql[V]])(
     implicit qr: Queryable.Row[Sql[V], V]

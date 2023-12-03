@@ -1,8 +1,8 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.Renderable
-import scalasql.{Queryable, TypeMapper}
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.core.SqlStr.Renderable
+import scalasql.core.{Queryable, SqlStr, Sql}
+import scalasql.renderer.Context
 
 /**
  * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
@@ -22,7 +22,7 @@ object Query {
   def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
   def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow
   def queryConstruct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
-  class Queryable[Q <: Query[R], R]() extends scalasql.Queryable[Q, R] {
+  class Queryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkLabels()
     override def walkExprs(q: Q) = q.queryWalkExprs()

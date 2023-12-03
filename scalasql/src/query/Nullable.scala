@@ -1,8 +1,8 @@
 package scalasql.query
 
-import scalasql.{TypeMapper, Queryable}
-import scalasql.renderer.{Context, SqlStr}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.{Queryable, Sql, TypeMapper}
+import scalasql.renderer.Context
+import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
  * Represents a set of nullable columns that come from a `LEFT`/`RIGHT`/`OUTER` `JOIN`

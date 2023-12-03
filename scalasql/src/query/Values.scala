@@ -1,9 +1,9 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Queryable, TypeMapper}
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper}
+import scalasql.renderer.Context
 
 /**
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as

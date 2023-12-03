@@ -1,4 +1,4 @@
-package scalasql
+package scalasql.core
 
 /**
  * Things you to do to configure ScalaSql

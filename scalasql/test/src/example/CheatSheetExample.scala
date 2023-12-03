@@ -5,7 +5,7 @@ import scalasql.{DbApi, Id, Table}
 
 import java.sql.DriverManager
 import scalasql.dialects.SqliteDialect._
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.SqlStr.SqlStringSyntax
 
 object CheatSheetExample {
 
@@ -28,7 +28,7 @@ object CheatSheetExample {
   def main(args: Array[String]): Unit = {
     val db: DbApi = ???
     import scalasql.dialects.SqliteDialect._
-    import scalasql.Sql
+    import scalasql.core.Sql
 
     val str = "hello"
 

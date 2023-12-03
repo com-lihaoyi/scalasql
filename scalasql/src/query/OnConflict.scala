@@ -1,8 +1,8 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.{Column, Queryable, TypeMapper}
-import scalasql.renderer.{Context, SqlStr}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.core.{Column, Queryable, TypeMapper, SqlStr}
+import scalasql.renderer.{Context}
 
 /**
  * A query with a SQL `ON CONFLICT` clause, typically an `INSERT` or an `UPDATE`

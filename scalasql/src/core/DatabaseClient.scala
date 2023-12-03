@@ -1,4 +1,5 @@
-package scalasql
+package scalasql.core
+
 import scalasql.dialects.DialectConfig
 
 /**

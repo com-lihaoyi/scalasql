@@ -1,5 +1,5 @@
 package scalasql
-import scalasql.query.Sql
+import scalasql.core.Sql
 import utest._
 import utils.SqliteSuite
 

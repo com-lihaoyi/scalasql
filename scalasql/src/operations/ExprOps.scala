@@ -1,9 +1,9 @@
 package scalasql.operations
 
-import scalasql.TypeMapper
-import scalasql.query.Sql
-import scalasql.renderer.SqlStr
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.TypeMapper
+import scalasql.core.Sql
+import scalasql.core.SqlStr
+import scalasql.core.SqlStr.SqlStringSyntax
 
 class ExprOps(v: Sql[_]) {
 

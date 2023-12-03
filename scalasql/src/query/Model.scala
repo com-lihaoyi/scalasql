@@ -1,7 +1,6 @@
 package scalasql.query
 
-import scalasql.renderer.SqlStr
-import scalasql.{Queryable, Table}
+import scalasql.core.{Sql, SqlStr, Queryable, Table}
 
 /**
  * Models a SQL `ORDER BY` clause

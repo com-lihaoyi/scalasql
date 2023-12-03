@@ -1,7 +1,6 @@
-package scalasql.renderer
+package scalasql.core
 
-import scalasql.TypeMapper
-import scalasql.query.Sql
+import scalasql.renderer.Context
 
 /**
  * A SQL query with interpolated `?`s expressions and the associated

@@ -3,9 +3,9 @@ package scalasql.query
 import scalasql.dialects.Dialect
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax, join}
-import scalasql.{Config, Queryable, TypeMapper}
-import scalasql.renderer.{Context, ExprsToSql, JoinsToSql, SqlStr}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, join}
+import scalasql.core.{Config, Queryable, Sql, SqlStr, TypeMapper}
+import scalasql.renderer.{Context, ExprsToSql, JoinsToSql}
 import scalasql.utils.FlatJson
 
 import scala.collection.mutable

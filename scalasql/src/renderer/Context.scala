@@ -1,8 +1,8 @@
 package scalasql.renderer
 
-import scalasql.{Config, Table}
-import scalasql.query.{Sql, From, Select, SubqueryRef, TableRef, WithCteRef}
-import scalasql.renderer.SqlStr.SqlStringSyntax
+import scalasql.core.{Config, Sql, SqlStr, Table}
+import scalasql.query.{From, Select, SubqueryRef, TableRef, WithCteRef}
+import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
  * The contextual information necessary for rendering a ScalaSql query or expression

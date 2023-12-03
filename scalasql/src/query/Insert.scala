@@ -1,8 +1,7 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.renderer.{Context, SqlStr}
-import scalasql.{Column, Queryable, query}
+import scalasql.core.{Column, Queryable, SqlStr, Sql}
 
 /**
  * A SQL `INSERT` query

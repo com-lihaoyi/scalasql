@@ -1,9 +1,9 @@
 package scalasql.operations
 
 import scalasql.dialects.Dialect
-import scalasql.{Queryable, TypeMapper}
-import scalasql.query.{Sql, Select, Values, WithCte, WithCteRef}
-import scalasql.renderer.SqlStr
+import scalasql.core.{Sql, Queryable, TypeMapper}
+import scalasql.query.{Select, Values, WithCte, WithCteRef}
+import scalasql.core.SqlStr
 
 class DbApiOps(dialect: Dialect) {
   import dialect._
@@ -19,7 +19,7 @@ class DbApiOps(dialect: Dialect) {
   def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]): Values[Q, R] =
     new scalasql.query.Values(ts)
 
-  import scalasql.renderer.SqlStr.SqlStringSyntax
+  import scalasql.core.SqlStr.SqlStringSyntax
 
   /**
    * The row_number() of the first peer in each group - the rank of the current row

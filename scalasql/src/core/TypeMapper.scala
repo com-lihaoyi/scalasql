@@ -1,6 +1,6 @@
-package scalasql
+package scalasql.core
 
-import java.sql.{JDBCType, PreparedStatement, ResultSet, SQLType}
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
 // What Quill does
 // https://github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104

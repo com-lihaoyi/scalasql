@@ -1,7 +1,7 @@
 package scalasql.renderer
 
-import scalasql.query.Sql
-import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.core.{Sql, SqlStr}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.utils.FlatJson
 
 object ExprsToSql {

@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.Queryable
+import scalasql.core.Queryable
 
 trait JoinAppend[Q, Q2, QF, RF] {
   def appendTuple(t: Q, v: Q2): QF
