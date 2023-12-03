@@ -1,7 +1,18 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.core.{Aggregatable, JoinNullable, From, Column, DbApi, Queryable, Table, TypeMapper, Sql, SqlStr}
+import scalasql.core.{
+  Aggregatable,
+  JoinNullable,
+  From,
+  Column,
+  DbApi,
+  Queryable,
+  Table,
+  TypeMapper,
+  Sql,
+  SqlStr
+}
 import scalasql.{Id, dialects, operations}
 import scalasql.query.{
   CompoundSelect,

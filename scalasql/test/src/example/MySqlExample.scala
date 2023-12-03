@@ -3,7 +3,7 @@ package scalasql.example
 import java.sql.DriverManager
 import org.testcontainers.containers.MySQLContainer
 import scalasql.Table
-import scalasql.dialects.MySqlDialect._
+import scalasql.MySqlDialect._
 object MySqlExample {
 
   case class ExampleProduct[T[_]](
@@ -30,7 +30,7 @@ object MySqlExample {
       mysql.getUsername,
       mysql.getPassword
     ),
-    dialectConfig = scalasql.dialects.PostgresDialect,
+    dialectConfig = scalasql.PostgresDialect,
     config = new scalasql.Config {}
   )
 

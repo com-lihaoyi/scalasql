@@ -2,7 +2,7 @@ package scalasql.example
 
 import org.testcontainers.containers.PostgreSQLContainer
 import scalasql.Table
-import scalasql.dialects.PostgresDialect._
+import scalasql.PostgresDialect._
 object HikariCpExample {
 
   case class ExampleProduct[T[_]](
@@ -29,7 +29,7 @@ object HikariCpExample {
 
   lazy val hikariClient = new scalasql.DatabaseClient.DataSource(
     hikariDataSource,
-    dialectConfig = scalasql.dialects.PostgresDialect,
+    dialectConfig = scalasql.PostgresDialect,
     config = new scalasql.Config {}
   )
 

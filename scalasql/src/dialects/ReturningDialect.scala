@@ -1,13 +1,7 @@
 package scalasql.dialects
 
-import scalasql.core.{  WithExpr, Queryable}
-import scalasql.query.{
-  InsertReturnable,
-  InsertReturning,
-  OnConflict,
-  Returnable,
-  Returning,
-}
+import scalasql.core.{WithExpr, Queryable}
+import scalasql.query.{InsertReturnable, InsertReturning, OnConflict, Returnable, Returning}
 
 trait ReturningDialect extends Dialect {
   implicit class InsertReturningConv[Q](r: InsertReturnable[Q]) {

@@ -2,7 +2,6 @@ package scalasql.dialects
 
 import scalasql.{Id, operations}
 import scalasql.query.{
-
   AscDesc,
   CompoundSelect,
   GroupBy,
@@ -14,8 +13,7 @@ import scalasql.query.{
   Nulls,
   OrderBy,
   Query,
-  Update,
-
+  Update
 }
 import scalasql.core.{
   WithExpr,

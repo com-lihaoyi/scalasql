@@ -26,4 +26,16 @@ package object scalasql {
 
   val SqlStr = core.SqlStr
   type SqlStr = core.SqlStr
+
+  val MySqlDialect = dialects.MySqlDialect
+  type MySqlDialect = dialects.MySqlDialect
+
+  val PostgresDialect = dialects.PostgresDialect
+  type PostgresDialect = dialects.PostgresDialect
+
+  val H2Dialect = dialects.H2Dialect
+  type H2Dialect = dialects.H2Dialect
+
+  val SqliteDialect = dialects.SqliteDialect
+  type SqliteDialect = dialects.SqliteDialect
 }

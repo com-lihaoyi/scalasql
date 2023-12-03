@@ -1,6 +1,17 @@
 package scalasql.query
 
-import scalasql.core.{Aggregatable, Context, DialectBase, From, JoinNullable, Queryable, Sql, SqlStr, SubqueryRef, TypeMapper}
+import scalasql.core.{
+  Aggregatable,
+  Context,
+  DialectBase,
+  From,
+  JoinNullable,
+  Queryable,
+  Sql,
+  SqlStr,
+  SubqueryRef,
+  TypeMapper
+}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**

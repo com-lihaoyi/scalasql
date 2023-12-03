@@ -2,7 +2,7 @@ package scalasql.example
 
 import scalasql.Table
 import java.sql.DriverManager
-import scalasql.dialects.H2Dialect._
+import scalasql.H2Dialect._
 
 object H2Example {
 
@@ -18,7 +18,7 @@ object H2Example {
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   lazy val h2Client = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection("jdbc:h2:mem:mydb"),
-    dialectConfig = scalasql.dialects.H2Dialect,
+    dialectConfig = scalasql.H2Dialect,
     config = new scalasql.Config {}
   )
 

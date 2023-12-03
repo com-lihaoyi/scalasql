@@ -3,7 +3,7 @@ package scalasql.example
 import scalasql.Table
 
 import java.sql.DriverManager
-import scalasql.dialects.SqliteDialect._
+import scalasql.SqliteDialect._
 object SqliteExample {
 
   case class ExampleProduct[T[_]](
@@ -18,7 +18,7 @@ object SqliteExample {
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
   lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
-    dialectConfig = scalasql.dialects.SqliteDialect,
+    dialectConfig = scalasql.SqliteDialect,
     config = new scalasql.Config {}
   )
 

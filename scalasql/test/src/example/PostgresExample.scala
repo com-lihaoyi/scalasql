@@ -4,7 +4,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import scalasql.Table
 
 import java.sql.DriverManager
-import scalasql.dialects.PostgresDialect._
+import scalasql.PostgresDialect._
 object PostgresExample {
 
   case class ExampleProduct[T[_]](
@@ -26,7 +26,7 @@ object PostgresExample {
 
   lazy val postgresClient = new scalasql.DatabaseClient.Connection(
     DriverManager.getConnection(postgres.getJdbcUrl, postgres.getUsername, postgres.getPassword),
-    dialectConfig = scalasql.dialects.PostgresDialect,
+    dialectConfig = scalasql.PostgresDialect,
     config = new scalasql.Config {}
   )
 

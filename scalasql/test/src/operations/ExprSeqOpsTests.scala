@@ -1,7 +1,7 @@
 package scalasql.operations
 
 import scalasql._
-import scalasql.dialects.H2Dialect
+import scalasql.H2Dialect
 import utest._
 import utils.ScalaSqlSuite
 

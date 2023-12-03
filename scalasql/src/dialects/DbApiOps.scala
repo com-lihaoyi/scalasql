@@ -9,7 +9,8 @@ class DbApiOps(dialect: DialectBase) {
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */
-  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) = new scalasql.operations.CaseWhen(values)
+  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) =
+    new scalasql.operations.CaseWhen(values)
 
   /**
    * Creates a SQL `VALUES` clause

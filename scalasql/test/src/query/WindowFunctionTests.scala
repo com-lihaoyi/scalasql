@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql._
-import scalasql.dialects.MySqlDialect
+import scalasql.MySqlDialect
 import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite

@@ -18,7 +18,7 @@ object WorldSqlTests extends TestSuite {
   // ### Importing Your Database Dialect
   // To begin using ScalaSql, you need the following imports:
   import scalasql._
-  import scalasql.dialects.H2Dialect._
+  import scalasql.H2Dialect._
   // This readme will use the H2 database for simplicity, but you can change the `Dialect`
   // above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
   // Postgres, and MySql out of the box. The `Dialect` import provides the
@@ -128,7 +128,7 @@ object WorldSqlTests extends TestSuite {
         override def columnNameMapper(v: String) = v.toLowerCase()
         override def tableNameMapper(v: String) = v.toLowerCase()
       },
-      scalasql.dialects.H2Dialect
+      scalasql.H2Dialect
     )
 
     val db = dbClient.getAutoCommitClientConnection

@@ -11,7 +11,7 @@ see what we will cover and find anything specific of interest to you.
 To begin using ScalaSql, you need the following imports:
 ```scala
 import scalasql._
-import scalasql.dialects.H2Dialect._
+import scalasql.H2Dialect._
 
 ```
 This readme will use the H2 database for simplicity, but you can change the `Dialect`
@@ -132,7 +132,7 @@ val dbClient = new DatabaseClient.Connection(
     override def columnNameMapper(v: String) = v.toLowerCase()
     override def tableNameMapper(v: String) = v.toLowerCase()
   },
-  scalasql.dialects.H2Dialect
+  scalasql.H2Dialect
 )
 
 val db = dbClient.getAutoCommitClientConnection
