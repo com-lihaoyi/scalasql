@@ -35,7 +35,7 @@ db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
 
 // Adding up population of all cities in China
 def query1 = City.select.filter(_.countryCode === "CHN").map(_.population).sum
-db.toSqlQuery(query1) // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
+db.renderSql(query1) // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
 db.run(query1) // 175953614
 
 // Finding the 5-10th largest cities by population
@@ -44,7 +44,7 @@ def query2 = City.select
   .drop(5).take(3)
   .map(c => (c.name, c.population))
 
-db.toSqlQuery(query2)
+db.renderSql(query2)
 // SELECT city0.name AS res__0, city0.population AS res__1
 // FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
 
