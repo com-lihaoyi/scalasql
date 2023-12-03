@@ -1,7 +1,5 @@
-package scalasql.renderer
+package scalasql.core
 
-import scalasql.core.{Config, Sql, SqlStr, Table}
-import scalasql.query.{From, Select, SubqueryRef, TableRef, WithCteRef}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
@@ -43,17 +41,17 @@ object Context {
         selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
           case (t: TableRef, i) =>
             (t, prevContext.config.tableNameMapper(Table.tableName(t.value)) + (i + prevSize))
-          case (s: SubqueryRef[_, _], i) => (s, "subquery" + (i + prevSize))
-          case (s: WithCteRef[_, _], i) => (s, "cte" + (i + prevSize))
+          case (s: SubqueryRef, i) => (s, "subquery" + (i + prevSize))
+          case (s: WithCteRef, i) => (s, "cte" + (i + prevSize))
         } ++
         updateTable.map(t => t -> prevContext.config.tableNameMapper(Table.tableName(t.value)))
 
     val newExprNaming =
       prevContext.exprNaming ++
         selectables
-          .collect { case t: SubqueryRef[_, _] => t }
+          .collect { case t: SubqueryRef => t }
           .flatMap { t =>
-            Select
+            SelectBase
               .selectLhsMap(t.value, prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }

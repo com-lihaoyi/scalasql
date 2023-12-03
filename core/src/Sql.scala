@@ -1,7 +1,6 @@
 package scalasql.core
 
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.renderer.Context
 
 /**
  * A single "value" in your SQL query that can be mapped to and from

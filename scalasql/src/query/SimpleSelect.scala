@@ -4,9 +4,19 @@ import scalasql.dialects.Dialect
 import scalasql.operations.TableOps
 import scalasql.renderer.JoinsToSql.joinsToSqlStr
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, join}
-import scalasql.core.{Config, Queryable, Sql, SqlStr, TypeMapper}
-import scalasql.renderer.{Context, ExprsToSql, JoinsToSql}
-import scalasql.utils.FlatJson
+import scalasql.core.{
+  JoinNullable,
+  FlatJson,
+  From,
+  Context,
+  ExprsToSql,
+  Config,
+  Queryable,
+  Sql,
+  SqlStr,
+  TypeMapper
+}
+import scalasql.renderer.{JoinsToSql}
 
 import scala.collection.mutable
 
@@ -238,7 +248,8 @@ object SimpleSelect {
   }
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.selectRenderer(prevContext)
-  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context) extends Select.Renderer {
+  class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context)
+      extends scalasql.core.SelectBase.Renderer {
     lazy val flattenedExpr = query.qr.walkLabelsAndExprs(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)

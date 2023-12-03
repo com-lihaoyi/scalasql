@@ -1,9 +1,5 @@
 package scalasql.core
 
-import scalasql.Id
-import scalasql.dialects.Dialect
-import scalasql.query.TableRef
-
 import scala.language.experimental.macros
 
 /**
@@ -19,7 +15,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
 
-  implicit def containerQr(implicit dialect: Dialect): Queryable.Row[V[Sql], V[Id]] =
+  implicit def containerQr(implicit dialect: DialectBase): Queryable.Row[V[Sql], V[Id]] =
     tableMetadata
       .queryable(
         tableMetadata.walkLabels0,
@@ -28,7 +24,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
       )
       .asInstanceOf[Queryable.Row[V[Sql], V[Id]]]
 
-  protected def tableRef = new scalasql.query.TableRef(this)
+  protected def tableRef = new TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
     tableMetadata.walkLabels0()
   }
@@ -39,7 +35,7 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 object Table {
   trait LowPri[V[_[_]]] { this: Table[V] =>
     implicit def containerQr2(
-        implicit dialect: Dialect
+        implicit dialect: DialectBase
     ): Queryable.Row[V[Column], V[Id]] =
       containerQr.asInstanceOf[Queryable.Row[V[Column], V[Id]]]
   }
@@ -69,19 +65,20 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val queryables: (Dialect, Int) => Queryable.Row[_, _],
+      val queryables: (DialectBase, Int) => Queryable.Row[_, _],
       val walkLabels0: () => Seq[String],
       val queryable: (
           () => Seq[String],
-          Dialect,
+          DialectBase,
           Metadata.QueryableProxy
       ) => Queryable[V[Sql], V[Id]],
-      val vExpr0: (TableRef, Dialect, Metadata.QueryableProxy) => V[Column]
+      val vExpr0: (TableRef, DialectBase, Metadata.QueryableProxy) => V[Column]
   ) {
-    def vExpr(t: TableRef, d: Dialect) = vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
+    def vExpr(t: TableRef, d: DialectBase) =
+      vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
   }
 
-  object Metadata extends scalasql.utils.TableMacros {
+  object Metadata extends scalasql.core.TableMacros {
     class QueryableProxy(queryables: Int => Queryable.Row[_, _]) {
       def apply[T, V](n: Int): Queryable.Row[T, V] = queryables(n).asInstanceOf[Queryable.Row[T, V]]
     }

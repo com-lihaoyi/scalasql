@@ -2,8 +2,8 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.renderer.{Context}
-import scalasql.core.{Queryable, TypeMapper, SqlStr, Sql}
+import scalasql.core.Context
+import scalasql.core.{JoinNullable, From, Queryable, TypeMapper, SqlStr, Sql, SubqueryRef}
 
 /**
  * A SQL `SELECT` query, possible with `JOIN`, `WHERE`, `GROUP BY`,
@@ -31,7 +31,8 @@ trait Select[Q, R]
     with Aggregatable[Q]
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query.Multiple[R] {
+    with Query.Multiple[R]
+    with scalasql.core.SelectBase {
 
   protected def dialect: Dialect
   protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
@@ -64,7 +65,7 @@ trait Select[Q, R]
   def distinct: Select[Q, R] = selectWithExprPrefix(ctx => sql"DISTINCT")
   protected def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R]
 
-  protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef[Q, R](this, qr)
+  protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this, qr)
 
   /**
    * Transforms the return value of this [[Select]] with the given function
@@ -185,9 +186,6 @@ trait Select[Q, R]
   protected def queryWalkExprs() = qr.walkExprs(expr)
   protected override def queryIsSingleRow = false
 
-  protected def selectRenderer(prevContext: Context): Select.Renderer
-  protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr]
-
   /**
    * Asserts that this query returns exactly one row, and returns a single
    * value of type [[R]] rather than a `Seq[R]`. Throws an exception if
@@ -269,14 +267,9 @@ trait Select[Q, R]
 
 object Select {
   def selectSimpleFrom[Q, R](s: Select[Q, R]) = s.selectSimpleFrom()
-  def selectRenderer(s: Select[_, _], prevContext: Context) = s.selectRenderer(prevContext)
-  def selectLhsMap(s: Select[_, _], prevContext: Context) = s.selectLhsMap(prevContext)
+
   def selectWithExprPrefix[Q, R](s: Select[Q, R], str: Context => SqlStr) =
     s.selectWithExprPrefix(str)
-
-  trait Renderer {
-    def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr
-  }
 
   implicit class ExprSelectOps[T](s: Select[Sql[T], T]) {
     def sorted(implicit tm: TypeMapper[T]): Select[Sql[T], T] = s.sortBy(identity)
@@ -321,11 +314,11 @@ object Select {
     override def drop(n: Int): Select[Q, R] = selectSimpleFrom().drop(n)
     override def take(n: Int): Select[Q, R] = selectSimpleFrom().take(n)
 
-    override protected def selectRenderer(prevContext: Context): Select.Renderer =
-      Select.selectRenderer(selectSimpleFrom(), prevContext)
+    override protected def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
+      scalasql.core.SelectBase.selectRenderer(selectSimpleFrom(), prevContext)
 
     override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] =
-      Select.selectLhsMap(selectSimpleFrom(), prevContext)
+      scalasql.core.SelectBase.selectLhsMap(selectSimpleFrom(), prevContext)
 
     override protected def selectSimpleFrom(): SimpleSelect[Q, R]
 

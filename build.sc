@@ -7,8 +7,7 @@ import mill._, scalalib._, publish._
 
 val scalaVersions = Seq("2.13.12"/*, "3.3.1"*/)
 
-object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends CrossScalaModule with PublishModule{
+trait Common extends CrossScalaModule with PublishModule{
   def scalaVersion = crossScalaVersion
 
   def publishVersion = VcsVersion.vcsState().format()
@@ -27,14 +26,62 @@ trait ScalaSql extends CrossScalaModule with PublishModule{
     )
   )
 
+}
+object core extends Cross[Core](scalaVersions)
+trait Core extends Common{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::sourcecode:0.3.1",
     ivy"com.lihaoyi::geny:1.0.0",
+    ivy"com.lihaoyi::sourcecode:0.3.1",
+    ivy"com.lihaoyi::pprint:0.8.1",
+  ) ++ Option.when(scalaVersion().startsWith("2."))(
+    ivy"org.scala-lang:scala-reflect:$scalaVersion"
+  )
+
+  def generatedSources: T[Seq[PathRef]] = T {
+    def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
+
+
+    val queryableRowDefs = for (i <- Range.inclusive(2, 22)) yield {
+      def commaSep(f: Int => String) = commaSep0(i, f)
+      s"""implicit def Tuple${i}Queryable[${commaSep(j => s"Q$j")}, ${commaSep(j => s"R$j")}](
+         |    implicit
+         |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
+         |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
+         |  import scalasql.core.SqlStr.SqlStringSyntax
+         |  new Queryable.Row.TupleNQueryable(
+         |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
+         |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
+         |    construct0 = rsi => (${commaSep(j => s"q$j.construct(rsi)")}),
+         |    deconstruct0 = { is => (${commaSep(j => s"""q$j.deconstruct(is._$j)""")}) }
+         |  )
+         |}""".stripMargin
+    }
+
+
+    os.write(
+      T.dest / "Generated.scala",
+      s"""package scalasql.core.generated
+         |import scalasql.core.{Column, Queryable, Sql}
+         |trait QueryableRow{
+         |  ${queryableRowDefs.mkString("\n")}
+         |}
+         |""".stripMargin
+    )
+    Seq(PathRef(T.dest / "Generated.scala"))
+  }
+
+}
+object scalasql extends Cross[ScalaSql](scalaVersions)
+trait ScalaSql extends Common{
+  def moduleDeps = Seq(core())
+  def ivyDeps = Agg(
+
+
 
     ivy"org.apache.logging.log4j:log4j-api:2.20.0",
     ivy"org.apache.logging.log4j:log4j-core:2.20.0",
     ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
-    ivy"com.lihaoyi::pprint:0.8.1",
+
   ) ++ Option.when(scalaVersion().startsWith("2."))(
     ivy"org.scala-lang:scala-reflect:$scalaVersion"
   )

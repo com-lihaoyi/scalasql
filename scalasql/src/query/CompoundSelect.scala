@@ -2,8 +2,8 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.renderer.{Context, JoinsToSql}
-import scalasql.core.{Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.renderer.{JoinsToSql}
+import scalasql.core.{Context, Queryable, Sql, SqlStr, Table, TypeMapper}
 
 /**
  * A SQL `SELECT` query, with
@@ -82,18 +82,19 @@ class CompoundSelect[Q, R](
     new CompoundSelect.Renderer(this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    Select.selectLhsMap(lhs, prevContext)
+    scalasql.core.SelectBase.selectLhsMap(lhs, prevContext)
   }
 }
 
 object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
-  class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context) extends Select.Renderer {
+  class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context)
+      extends scalasql.core.SelectBase.Renderer {
     import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsLhsMap = Select.selectLhsMap(query.lhs, prevContext)
+    lazy val lhsLhsMap = scalasql.core.SelectBase.selectLhsMap(query.lhs, prevContext)
     lazy val context = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
@@ -118,7 +119,7 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-          lazy val rhsLhsMap = Select.selectLhsMap(op.rhs, prevContext)
+          lazy val rhsLhsMap = scalasql.core.SelectBase.selectLhsMap(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions

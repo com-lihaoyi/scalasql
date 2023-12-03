@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{Column, Queryable, Table, SqlStr}
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.renderer.{Context}
+import scalasql.core.Context
 
 trait InsertValues[V[_[_]], R] extends Query[Int] {
   def skipColumns(x: (V[Column] => Column[_])*): InsertValues[V, R]

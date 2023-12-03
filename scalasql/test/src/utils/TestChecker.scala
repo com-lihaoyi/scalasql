@@ -3,8 +3,7 @@ package scalasql.utils
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
-import scalasql.dialects.DialectConfig
-import scalasql.query.{SubqueryRef}
+import scalasql.core.{DialectConfig, SubqueryRef}
 import scalasql.{Sql, Config, DatabaseClient, Queryable, UtestFramework}
 
 import java.sql.Connection
@@ -98,7 +97,7 @@ class TestChecker(
 object TestChecker {
 
   lazy val pprinter: PPrinter = PPrinter.Color.copy(additionalHandlers = {
-    case v: SubqueryRef[_, _] => pprinter.treeify(v.value, false, true)
+    case v: SubqueryRef => pprinter.treeify(v.value, false, true)
     case v: Sql[_] if !v.isInstanceOf[scala.Product] =>
       pprinter.treeify(Sql.exprToString(v), false, true)
   })

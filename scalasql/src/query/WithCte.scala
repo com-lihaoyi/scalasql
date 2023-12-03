@@ -2,16 +2,14 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.renderer.{Context, ExprsToSql}
-import scalasql.utils.FlatJson
-import scalasql.core.{Queryable, TypeMapper, SqlStr, Sql}
+import scalasql.core.{FlatJson, ExprsToSql, Context, Queryable, TypeMapper, SqlStr, Sql, WithCteRef}
 
 /**
  * A SQL `WITH` clause
  */
 class WithCte[Q, R](
     val lhs: Select[_, _],
-    val lhsSubQuery: WithCteRef[_, _],
+    val lhsSubQuery: WithCteRef,
     val rhs: Select[Q, R],
     val withPrefix: SqlStr = sql"WITH "
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: Dialect)
@@ -39,7 +37,7 @@ class WithCte[Q, R](
     new WithCte.Renderer(withPrefix, this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    Select.selectLhsMap(rhs, prevContext)
+    scalasql.core.SelectBase.selectLhsMap(rhs, prevContext)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
@@ -49,7 +47,7 @@ class WithCte[Q, R](
 object WithCte {
   class Proxy[Q, R](
       lhs: WithExpr[Q],
-      lhsSubQueryRef: WithCteRef[Q, R],
+      lhsSubQueryRef: WithCteRef,
       val qr: Queryable.Row[Q, R],
       protected val dialect: Dialect
   ) extends Select.Proxy[Q, R] {
@@ -66,11 +64,12 @@ object WithCte {
         groupBy0 = None
       )(qr, dialect)
 
-    override def selectRenderer(prevContext: Context): Select.Renderer = new Select.Renderer {
-      def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
-        SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
+    override def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
+      new scalasql.core.SelectBase.Renderer {
+        def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
+          SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
+        }
       }
-    }
 
     override protected def renderToSql(ctx: Context): SqlStr = {
       SqlStr.raw(ctx.fromNaming(lhsSubQueryRef))
@@ -78,7 +77,7 @@ object WithCte {
   }
 
   class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
-      extends Select.Renderer {
+      extends scalasql.core.SelectBase.Renderer {
     def render(liveExprs: Option[Set[Sql.Identity]]) = {
       val walked =
         query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walkLabelsAndExprs(WithExpr.get(query.lhs))
@@ -99,7 +98,7 @@ object WithCte {
           case w: WithCte[Q, R] => SqlStr.empty
           case r => sql" "
         }) +
-          Select
+          scalasql.core.SelectBase
             .selectRenderer(
               query.rhs match {
                 case w: WithCte[Q, R] => w.unprefixed
@@ -113,7 +112,8 @@ object WithCte {
             .render(liveExprs)
       )
       val rhsReferenced = rhsSql.referencedExprs.toSet
-      val lhsSql = Select.selectRenderer(query.lhs, prevContext).render(Some(rhsReferenced))
+      val lhsSql =
+        scalasql.core.SelectBase.selectRenderer(query.lhs, prevContext).render(Some(rhsReferenced))
 
       val cteColumns = SqlStr.join(
         newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },

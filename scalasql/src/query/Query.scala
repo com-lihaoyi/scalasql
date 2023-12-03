@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.core.SqlStr.Renderable
 import scalasql.core.{Queryable, SqlStr, Sql}
-import scalasql.renderer.Context
+import scalasql.core.Context
 
 /**
  * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
@@ -18,6 +18,8 @@ trait Query[R] extends Renderable {
 }
 
 object Query {
+  implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Queryable[Query[R], R]()
+
   def queryWalkLabels[R](q: Query[R]) = q.queryWalkLabels()
   def queryWalkExprs[R](q: Query[R]) = q.queryWalkExprs()
   def queryIsSingleRow[R](q: Query[R]) = q.queryIsSingleRow

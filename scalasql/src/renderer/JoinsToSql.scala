@@ -1,21 +1,20 @@
 package scalasql.renderer
 
-import scalasql.core.{Queryable, Sql, SqlStr, Table, TypeMapper}
-import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.query.{
-  AscDesc,
-  CompoundSelect,
+import scalasql.core.{
   From,
-  Join,
-  Joinable,
-  Nulls,
-  Select,
-  SimpleSelect,
+  Queryable,
+  Sql,
+  SqlStr,
+  Table,
+  TypeMapper,
   SubqueryRef,
   TableRef,
-  WithCteRef
+  WithCteRef,
+  FlatJson,
+  Context
 }
-import scalasql.utils.FlatJson
+import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.query.{AscDesc, CompoundSelect, Join, Joinable, Nulls, Select, SimpleSelect}
 
 object JoinsToSql {
 
@@ -58,11 +57,11 @@ object JoinsToSql {
       case t: TableRef =>
         SqlStr.raw(prevContext.config.tableNameMapper(Table.tableName(t.value))) + sql" " + name
 
-      case t: SubqueryRef[_, _] =>
-        val toSqlQuery = Select.selectRenderer(t.value, prevContext)
+      case t: SubqueryRef =>
+        val toSqlQuery = scalasql.core.SelectBase.selectRenderer(t.value, prevContext)
         sql"(${toSqlQuery.render(liveExprs)}) $name"
 
-      case t: WithCteRef[_, _] => name
+      case t: WithCteRef => name
     }
   }
 

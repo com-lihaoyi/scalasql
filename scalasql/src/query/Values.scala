@@ -2,8 +2,8 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper}
-import scalasql.renderer.Context
+import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper, SubqueryRef}
+import scalasql.core.Context
 
 /**
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as
@@ -25,7 +25,7 @@ class Values[Q, R](val ts: Seq[R])(
 
   override protected def queryWalkExprs() = qr.walkExprs(expr)
 
-  override protected def selectRenderer(prevContext: Context): Select.Renderer =
+  override protected def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
@@ -38,7 +38,7 @@ class Values[Q, R](val ts: Seq[R])(
 
 object Values {
   class Renderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context)
-      extends Select.Renderer {
+      extends scalasql.core.SelectBase.Renderer {
     def wrapRow(t: R): SqlStr = sql"(" + SqlStr.join(
       qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep

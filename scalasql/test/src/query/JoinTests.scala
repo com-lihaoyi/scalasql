@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql._
+import scalasql.core.JoinNullable
 import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite

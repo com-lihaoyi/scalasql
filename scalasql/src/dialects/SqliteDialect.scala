@@ -1,19 +1,9 @@
 package scalasql.dialects
 
-import scalasql.core.{Sql, Queryable, Table, TypeMapper, SqlStr}
+import scalasql.core.{From, Sql, Queryable, Table, TypeMapper, SqlStr}
 import scalasql.{Id, dialects, operations}
-import scalasql.query.{
-  Aggregatable,
-  AscDesc,
-  CompoundSelect,
-  From,
-  GroupBy,
-  Join,
-  Nulls,
-  OrderBy,
-  Select
-}
-import scalasql.renderer.{Context}
+import scalasql.query.{Aggregatable, AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select}
+import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
 import java.time.{Instant, LocalDate, LocalDateTime}

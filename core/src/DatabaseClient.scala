@@ -1,6 +1,6 @@
 package scalasql.core
 
-import scalasql.dialects.DialectConfig
+import scalasql.core.DialectConfig
 
 /**
  * A database client. Primarily allows you to access the database within a [[transaction]]

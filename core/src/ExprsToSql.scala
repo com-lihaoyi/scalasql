@@ -1,8 +1,6 @@
-package scalasql.renderer
+package scalasql.core
 
-import scalasql.core.{Sql, SqlStr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.utils.FlatJson
 
 object ExprsToSql {
   def apply(flattenedExpr: Seq[(List[String], Sql[_])], exprPrefix: SqlStr, context: Context) = {

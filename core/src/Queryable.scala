@@ -1,7 +1,6 @@
 package scalasql.core
 
-import scalasql.query.{JoinNullable, Query}
-import scalasql.renderer.{Context, ExprsToSql}
+import scalasql.core.{Context, ExprsToSql}
 
 import java.sql.ResultSet
 
@@ -102,7 +101,7 @@ object Queryable {
     def deconstruct(r: R): Q
 
   }
-  object Row extends scalasql.generated.QueryableRow {
+  object Row extends scalasql.core.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
         val walkExprs0: Q => Seq[Seq[Sql[_]]],
@@ -132,9 +131,10 @@ object Queryable {
         implicit qr: Queryable.Row[Q, R]
     ): Queryable.Row[JoinNullable[Q], Option[R]] = new Queryable.Row[JoinNullable[Q], Option[R]] {
       def walkLabels() = qr.walkLabels()
+
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
-      def construct(args: ResultSetIterator): Option[R] = {
+      def construct(args: Queryable.ResultSetIterator): Option[R] = {
         val startNonNulls = args.nonNulls
         val res = qr.construct(args)
         if (startNonNulls == args.nonNulls) None
@@ -144,7 +144,4 @@ object Queryable {
       def deconstruct(r: Option[R]): JoinNullable[Q] = JoinNullable(qr.deconstruct(r.get))
     }
   }
-
-  implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Query.Queryable[Query[R], R]()
-
 }

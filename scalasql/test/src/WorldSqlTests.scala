@@ -1,6 +1,6 @@
 package test.scalasql
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
-import scalasql.renderer.Context
+import scalasql.core.Context
 import scalasql.SqlStr
 import utest._
 

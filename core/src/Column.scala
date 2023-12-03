@@ -1,8 +1,6 @@
 package scalasql.core
 
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.query.TableRef
-import scalasql.renderer.Context
 
 /**
  * A variant of [[Sql]] representing a raw table column; allows assignment in updates

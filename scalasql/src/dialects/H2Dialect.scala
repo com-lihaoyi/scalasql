@@ -2,22 +2,20 @@ package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
 import scalasql.operations.DbApiOps
-import scalasql.core.{Column, DbApi, Queryable, Table, TypeMapper, Sql, SqlStr}
+import scalasql.core.{JoinNullable, From, Column, DbApi, Queryable, Table, TypeMapper, Sql, SqlStr}
 import scalasql.{Id, dialects, operations}
 import scalasql.query.{
   Aggregatable,
   CompoundSelect,
-  From,
   GroupBy,
   InsertColumns,
   InsertSelect,
   Join,
-  JoinNullable,
   Joinable,
   OrderBy,
   Query
 }
-import scalasql.renderer.{Context}
+import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}

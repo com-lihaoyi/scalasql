@@ -1,8 +1,8 @@
 package scalasql.query
 
 import scalasql.dialects.Dialect
-import scalasql.renderer.{Context}
-import scalasql.core.{Queryable, Table, TypeMapper, SqlStr, Sql}
+import scalasql.core.Context
+import scalasql.core.{Queryable, Table, TypeMapper, SqlStr, Sql, TableRef}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**

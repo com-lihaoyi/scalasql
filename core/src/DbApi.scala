@@ -1,9 +1,7 @@
 package scalasql.core
 
 import geny.Generator
-import scalasql.dialects.DialectConfig
-import scalasql.dialects.DialectConfig.dialectCastParams
-import scalasql.renderer.Context
+import DialectConfig.dialectCastParams
 
 import java.sql.{PreparedStatement, ResultSet, Statement}
 

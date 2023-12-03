@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.Sql
+import scalasql.core.{Sql, From, JoinNullable}
 
 /**
  * Something that can be joined; typically a [[Select]] or a [[Table]]

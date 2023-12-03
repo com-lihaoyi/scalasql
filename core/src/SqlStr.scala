@@ -1,7 +1,5 @@
 package scalasql.core
 
-import scalasql.renderer.Context
-
 /**
  * A SQL query with interpolated `?`s expressions and the associated
  * interpolated values, of type [[Interp]]. Accumulates SQL snippets, parameters,

@@ -1,11 +1,11 @@
-package scalasql.utils
-import scalasql.Id
+package scalasql.core
 import scalasql.core.Table
 import scalasql.core.Table.Metadata
 
 import scala.language.experimental.macros
 
 object TableMacros {
+  type Sql[T] = scalasql.core.Sql[T]
   def cast[T](x: Any): T = x.asInstanceOf[T]
   def applyImpl[V[_[_]]](
       c: scala.reflect.macros.blackbox.Context
@@ -51,19 +51,19 @@ object TableMacros {
 
     val queryables = for (param <- constructorParameters) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
+      val tpe2 = subParam(param.info, typeOf[Sql[_]])
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
     }
 
     val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
+      val tpe2 = subParam(param.info, typeOf[Sql[_]])
       q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Id[$tpe]"
     }
 
     val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
+      val tpe2 = subParam(param.info, typeOf[Sql[_]])
       q"queryable[$tpe2, $tpe]($i).deconstruct(r.${TermName(param.name.toString)})"
     }
 
@@ -78,7 +78,7 @@ object TableMacros {
 
     val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[scalasql.Sql[_]])
+      val tpe2 = subParam(param.info, typeOf[Sql[_]])
       q"queryable[$tpe2, $tpe]($i).walkExprs(table.${TermName(param.name.toString)})"
     }
 
@@ -92,7 +92,7 @@ object TableMacros {
     val idRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[scalasql.Id]].typeArgs
+      args = weakTypeOf[V[Id]].typeArgs
     )
     c.Expr[Metadata[V]](q"""{
 
@@ -112,7 +112,7 @@ object TableMacros {
           deconstruct0 = (r: $idRef) => new $caseClassType(..$deconstructParams)
         )
       },
-      ($tableRef: _root_.scalasql.query.TableRef, dialect, queryable) => {
+      ($tableRef: _root_.scalasql.core.TableRef, dialect, queryable) => {
         import dialect._
 
         new $caseClassType(..$columnParams)

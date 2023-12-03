@@ -1,7 +1,7 @@
-package scalasql.query
+package scalasql.core
 
 import scalasql.core.{Queryable, Sql, TypeMapper}
-import scalasql.renderer.Context
+import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
@@ -31,4 +31,5 @@ object JoinNullable {
     }
     def map[V](f: Q => V) = JoinNullable(f(t))
   }
+
 }

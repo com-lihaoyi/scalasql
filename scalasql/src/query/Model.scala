@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Sql, SqlStr, Queryable, Table}
+import scalasql.core.{From, Sql, SqlStr, Queryable, Table}
 
 /**
  * Models a SQL `ORDER BY` clause
@@ -38,16 +38,6 @@ object Nulls {
 }
 
 /**
- * Models a SQL `FROM` clause
- */
-sealed trait From
-class TableRef(val value: Table.Base) extends From {
-  override def toString = s"TableRef(${Table.tableName(value)})"
-}
-class SubqueryRef[Q, R](val value: Select[Q, R], val qr: Queryable[Q, R]) extends From
-class WithCteRef[Q, R]() extends From
-
-/**
  * Models a SQL `GROUP BY` clause
  */
 case class GroupBy(key: Sql[_], select: () => Select[_, _], having: Seq[Sql[_]])
@@ -57,5 +47,5 @@ case class GroupBy(key: Sql[_], select: () => Select[_, _], having: Seq[Sql[_]])
  */
 case class Join(prefix: String, from: Seq[Join.From])
 object Join {
-  case class From(from: scalasql.query.From, on: Option[Sql[_]])
+  case class From(from: scalasql.core.From, on: Option[Sql[_]])
 }

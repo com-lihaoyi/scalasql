@@ -1,4 +1,4 @@
-package scalasql.dialects
+package scalasql.core
 
 trait DialectConfig {
   protected def dialectCastParams: Boolean

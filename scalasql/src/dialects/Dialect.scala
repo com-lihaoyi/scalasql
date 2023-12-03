@@ -3,8 +3,8 @@ package scalasql.dialects
 import scalasql.operations.{CaseWhen, DbApiOps, TableOps, WindowExpr}
 import scalasql.core.Sql.apply0
 import scalasql.operations
-import scalasql.query.{Aggregatable, JoinNullable}
-import scalasql.core.{DbApi, Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.query.{Aggregatable}
+import scalasql.core.{JoinNullable, DbApi, Queryable, Sql, SqlStr, Table, TypeMapper, DialectBase}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
@@ -24,7 +24,7 @@ import scala.reflect.ClassTag
  * Base type for all SQL dialects. A Dialect proides extension methods, extension operators,
  * and custom implementations of various query classes that may differ between databases
  */
-trait Dialect extends DialectConfig {
+trait Dialect extends DialectBase {
   implicit val dialectSelf: Dialect = this
 
   implicit def StringType: TypeMapper[String] = new StringType

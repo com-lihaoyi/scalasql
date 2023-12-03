@@ -2,8 +2,18 @@ package scalasql.query
 
 import scalasql.dialects.Dialect
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.core.{Column, Queryable, Table, TypeMapper, SqlStr, Sql}
-import scalasql.renderer.{Context, ExprsToSql, JoinsToSql}
+import scalasql.core.{
+  TableRef,
+  Context,
+  ExprsToSql,
+  Column,
+  Queryable,
+  Table,
+  TypeMapper,
+  SqlStr,
+  Sql
+}
+import scalasql.renderer.{JoinsToSql}
 
 /**
  * A SQL `UPDATE` query

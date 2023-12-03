@@ -6,24 +6,33 @@ import scalasql.query.{
   Aggregatable,
   AscDesc,
   CompoundSelect,
-  From,
   GroupBy,
   InsertColumns,
   Join,
-  JoinNullable,
   JoinOps,
   Joinable,
   LateralJoinOps,
   Nulls,
   OrderBy,
   Query,
-  TableRef,
   Update,
   WithExpr
 }
-import scalasql.core.{Column, DbApi, Queryable, Sql, SqlStr, Table, TypeMapper}
+import scalasql.core.{
+  JoinNullable,
+  From,
+  TableRef,
+  Column,
+  DbApi,
+  Queryable,
+  Sql,
+  SqlStr,
+  Table,
+  TypeMapper
+}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.renderer.{Context, ExprsToSql, JoinsToSql}
+import scalasql.core.{Context, ExprsToSql}
+import scalasql.renderer.JoinsToSql
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{Instant, LocalDateTime}

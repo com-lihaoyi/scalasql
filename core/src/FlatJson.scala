@@ -1,8 +1,6 @@
-package scalasql.utils
+package scalasql.core
 
-import scalasql.core.{Config, Sql, SqlStr}
 import scalasql.core.SqlStr.Renderable
-import scalasql.renderer.Context
 
 /**
  * Converts back and forth between a tree-shaped JSON and flat key-value map

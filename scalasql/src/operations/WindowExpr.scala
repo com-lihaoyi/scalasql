@@ -4,7 +4,7 @@ import scalasql.core.{Sql, SqlStr}
 import scalasql.dialects.Dialect
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.renderer.Context
+import scalasql.core.Context
 
 case class WindowExpr[T](
     e: Sql[T],
