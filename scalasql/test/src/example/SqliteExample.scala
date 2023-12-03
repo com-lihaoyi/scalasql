@@ -6,7 +6,7 @@ import java.sql.DriverManager
 import scalasql.dialects.SqliteDialect._
 object SqliteExample {
 
-  case class ExampleProduct[+T[_]](
+  case class ExampleProduct[T[_]](
       id: T[Int],
       kebabCaseName: T[String],
       name: T[String],

@@ -8268,7 +8268,7 @@ object MyEnum extends Enumeration {
 
   implicit def make: String => Value = withName
 }
-case class DataTypes[+T[_]](
+case class DataTypes[T[_]](
     myTinyInt: T[Byte],
     mySmallInt: T[Short],
     myInt: T[Int],
@@ -8336,7 +8336,7 @@ timezone the client queries it from. Thus values of type `OffsetDateTime` can pr
 their instant, but cannot be round-tripped preserving the offset.
 
 ```scala
-case class NonRoundTripTypes[+T[_]](
+case class NonRoundTripTypes[T[_]](
     myZonedDateTime: T[ZonedDateTime],
     myOffsetDateTime: T[OffsetDateTime]
 )
@@ -8376,13 +8376,13 @@ into the enclosing `case class`'s columns, such that at the SQL level it is
 all flattened out without nesting.
 
 ```scala
-// case class Nested[+T[_]](
+// case class Nested[T[_]](
 //   fooId: T[Int],
 //   myBoolean: T[Boolean],
 // )
 // object Nested extends Table[Nested]
 //
-// case class Enclosing[+T[_]](
+// case class Enclosing[T[_]](
 //     barId: T[Int],
 //     myString: T[String],
 //     foo: Nested[T]

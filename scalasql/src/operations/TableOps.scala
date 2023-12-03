@@ -47,7 +47,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
   /**
    * Constructs a `INSERT` query
    */
-  def insert: Insert[V[Column.ColumnExpr], V[Id]] = {
+  def insert: Insert[V, V[Id]] = {
     val (ref, expr) = toFromExpr0
     new Insert.Impl(expr, ref)(t.containerQr2, dialect)
   }

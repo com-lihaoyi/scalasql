@@ -8,14 +8,14 @@ import scalasql.{Column, Queryable, Table, TypeMapper}
 /**
  * A SQL `INSERT SELECT` query
  */
-trait InsertSelect[Q, C, R, R2] extends InsertReturnable[Q] with Query[Int]
+trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Expr]] with Query[Int]
 
 object InsertSelect {
-  class Impl[Q, C, R, R2](insert: Insert[Q, R], columns: C, select: Select[C, R2])(
+  class Impl[V[_[_]], C, R, R2](insert: Insert[V, R], columns: C, select: Select[C, R2])(
       implicit dialect: Dialect
-  ) extends InsertSelect[Q, C, R, R2] {
+  ) extends InsertSelect[V, C, R, R2] {
     import dialect.{dialectSelf => _, _}
-    protected def expr = WithExpr.get(insert)
+    protected def expr = WithExpr.get(insert).asInstanceOf[V[Expr]]
 
     def table = insert.table
 

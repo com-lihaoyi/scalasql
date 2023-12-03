@@ -4,7 +4,7 @@ import java.sql.DriverManager
 import scalasql.dialects.H2Dialect._
 object Main {
 
-  case class Example[+T[_]](bytes: T[geny.Bytes])
+  case class Example[T[_]](bytes: T[geny.Bytes])
 
   object Example extends Table[Example]
 

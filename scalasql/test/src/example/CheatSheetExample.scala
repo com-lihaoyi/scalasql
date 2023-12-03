@@ -9,7 +9,7 @@ import scalasql.renderer.SqlStr.SqlStringSyntax
 
 object CheatSheetExample {
 
-  case class Foo[+T[_]](
+  case class Foo[T[_]](
       id: T[Int],
       myStr: T[String],
       myInt: T[Int]
@@ -17,7 +17,7 @@ object CheatSheetExample {
 
   object Foo extends Table[Foo]
 
-  case class Bar[+T[_]](
+  case class Bar[T[_]](
       id: T[Int],
       fooId: T[Int]
   )

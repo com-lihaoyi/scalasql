@@ -20,13 +20,13 @@ import java.time.{
 
 import _root_.test.scalasql.WorldSqlTests.ArrowAssert
 
-case class Nested[+T[_]](
+case class Nested[T[_]](
     fooId: T[Int],
     myBoolean: T[Boolean]
 )
 object Nested extends Table[Nested]
 
-case class Enclosing[+T[_]](
+case class Enclosing[T[_]](
     barId: T[Int],
     myString: T[String],
     foo: Nested[T]
@@ -49,7 +49,7 @@ trait DataTypesTests extends ScalaSqlSuite {
 
           implicit def make: String => Value = withName
         }
-        case class DataTypes[+T[_]](
+        case class DataTypes[T[_]](
             myTinyInt: T[Byte],
             mySmallInt: T[Short],
             myInt: T[Int],
@@ -114,7 +114,7 @@ trait DataTypesTests extends ScalaSqlSuite {
       """,
       Text {
 
-        case class NonRoundTripTypes[+T[_]](
+        case class NonRoundTripTypes[T[_]](
             myZonedDateTime: T[ZonedDateTime],
             myOffsetDateTime: T[OffsetDateTime]
         )
@@ -150,13 +150,13 @@ trait DataTypesTests extends ScalaSqlSuite {
       all flattened out without nesting.
       """,
       Text {
-        // case class Nested[+T[_]](
+        // case class Nested[T[_]](
         //   fooId: T[Int],
         //   myBoolean: T[Boolean],
         // )
         // object Nested extends Table[Nested]
         //
-        // case class Enclosing[+T[_]](
+        // case class Enclosing[T[_]](
         //     barId: T[Int],
         //     myString: T[String],
         //     foo: Nested[T]

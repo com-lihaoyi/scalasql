@@ -5,7 +5,7 @@ SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
 ```scala
-case class City[+T[_]](
+case class City[T[_]](
     id: T[Int],
     name: T[String],
     countryCode: T[String],

@@ -6,7 +6,7 @@ import scalasql.dialects.H2Dialect._
 
 object H2Example {
 
-  case class ExampleProduct[+T[_]](
+  case class ExampleProduct[T[_]](
       id: T[Int],
       kebabCaseName: T[String],
       name: T[String],

@@ -12,16 +12,16 @@ import java.time.{
   ZonedDateTime
 }
 
-case class Product[+T[_]](id: T[Int], kebabCaseName: T[String], name: T[String], price: T[Double])
+case class Product[T[_]](id: T[Int], kebabCaseName: T[String], name: T[String], price: T[Double])
 object Product extends Table[Product]
 
-case class Buyer[+T[_]](id: T[Int], name: T[String], dateOfBirth: T[LocalDate])
+case class Buyer[T[_]](id: T[Int], name: T[String], dateOfBirth: T[LocalDate])
 object Buyer extends Table[Buyer]
 
-case class ShippingInfo[+T[_]](id: T[Int], buyerId: T[Int], shippingDate: T[LocalDate])
+case class ShippingInfo[T[_]](id: T[Int], buyerId: T[Int], shippingDate: T[LocalDate])
 object ShippingInfo extends Table[ShippingInfo]
 
-case class Purchase[+T[_]](
+case class Purchase[T[_]](
     id: T[Int],
     shippingInfoId: T[Int],
     productId: T[Int],

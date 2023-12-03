@@ -45,14 +45,14 @@ object WorldSqlTests extends TestSuite {
   //
   // Next, you need to define your data model classes. In ScalaSql, your data model
   // is defined using `case class`es with each field wrapped in the wrapper type
-  // parameter `+T[_]`. This allows us to re-use the same case class to represent
+  // parameter `T[_]`. This allows us to re-use the same case class to represent
   // both database values (when `T` is `scalasql.Expr`) as well as Scala values
   // (when `T` is `scalasql.Id`).
   //
   // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
   // the database tables we saw above
   //
-  case class Country[+T[_]](
+  case class Country[T[_]](
       code: T[String],
       name: T[String],
       continent: T[String],
@@ -72,7 +72,7 @@ object WorldSqlTests extends TestSuite {
 
   object Country extends Table[Country]()
 
-  case class City[+T[_]](
+  case class City[T[_]](
       id: T[Int],
       name: T[String],
       countryCode: T[String],
@@ -82,7 +82,7 @@ object WorldSqlTests extends TestSuite {
 
   object City extends Table[City]()
 
-  case class CountryLanguage[+T[_]](
+  case class CountryLanguage[T[_]](
       countryCode: T[String],
       language: T[String],
       isOfficial: T[Boolean],
@@ -1424,7 +1424,7 @@ object WorldSqlTests extends TestSuite {
       SqlStr.Interp.TypeInterp[CityId](CityId(1337))
       // +DOCS
 
-      case class City2[+T[_]](
+      case class City2[T[_]](
           id: T[CityId],
           name: T[String],
           countryCode: T[String],
@@ -1456,7 +1456,7 @@ object WorldSqlTests extends TestSuite {
       // ScalaSql allows you to customize the table and column names via overriding
       // `def table` and `def tableColumnNameOverride` om your `Table` object.
 
-      case class CityCustom[+T[_]](
+      case class CityCustom[T[_]](
           idCustom: T[Int],
           nameCustom: T[String],
           countryCodeCustom: T[String],

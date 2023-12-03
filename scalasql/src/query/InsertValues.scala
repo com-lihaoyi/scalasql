@@ -5,17 +5,17 @@ import scalasql.dialects.Dialect
 import scalasql.renderer.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.{Context, SqlStr}
 
-trait InsertValues[Q, R] extends Query[Int] {
-  def skipColumns(x: (Q => Column.ColumnExpr[_])*): InsertValues[Q, R]
+trait InsertValues[V[_[_]], R] extends Query[Int] {
+  def skipColumns(x: (V[Column.ColumnExpr] => Column.ColumnExpr[_])*): InsertValues[V, R]
 }
 object InsertValues {
-  class Impl[Q, R](
-      insert: Insert[Q, R],
+  class Impl[V[_[_]], R](
+      insert: Insert[V, R],
       values: Seq[R],
       dialect: Dialect,
-      qr: Queryable.Row[Q, R],
+      qr: Queryable.Row[V[Column.ColumnExpr], R],
       skippedColumns: Seq[Column.ColumnExpr[_]]
-  ) extends InsertValues[Q, R] {
+  ) extends InsertValues[V, R] {
     protected def queryWalkLabels() = Nil
 
     protected def queryWalkExprs() = Nil
@@ -37,7 +37,7 @@ object InsertValues {
       )(ctx).render()
     }
 
-    override def skipColumns(x: (Q => Column.ColumnExpr[_])*) = {
+    override def skipColumns(x: (V[Column.ColumnExpr] => Column.ColumnExpr[_])*) = {
 
       new Impl(
         insert,

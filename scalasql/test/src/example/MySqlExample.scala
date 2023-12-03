@@ -6,7 +6,7 @@ import scalasql.Table
 import scalasql.dialects.MySqlDialect._
 object MySqlExample {
 
-  case class ExampleProduct[+T[_]](
+  case class ExampleProduct[T[_]](
       id: T[Int],
       kebabCaseName: T[String],
       name: T[String],

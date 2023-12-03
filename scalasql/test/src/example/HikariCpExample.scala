@@ -5,7 +5,7 @@ import scalasql.Table
 import scalasql.dialects.PostgresDialect._
 object HikariCpExample {
 
-  case class ExampleProduct[+T[_]](
+  case class ExampleProduct[T[_]](
       id: T[Int],
       kebabCaseName: T[String],
       name: T[String],
