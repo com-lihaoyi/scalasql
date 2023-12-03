@@ -130,6 +130,30 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 ./mill -i -w  mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference
 ```
 
+* ScalaSql comprises 4 main submodules:
+  * `scalasql.core`: the core functionality of evaluating `SqlStr` queries, but without any typed
+    helpers to construct them
+  * `scalasql.operations`: extension methods on `Sql[T]` values representing operations on typed
+    SQL expressions, like `LOWER(str)` or `a || b`/`CONCAT(a, b)`
+  * `scalasql.query`: builders for entire SQL queries, `INSERT`, `SELECT`, `UPDATE`, `DELETE`.
+  * `scalasql`: the main user-facing ScalaSql module, contains the `package object` defining
+    what a user sees when they do `import scalasql._`, as well as the various database `*Dialect`s
+    that provide the relevant set of `query`s and `operations` for each respective database
+
+* ScalaSql's tests are concentrated within a single `scalasql.test` module, 
+
+```
+             scalasql.core
+              |        |
+        +-----+        +-----+
+        |                    |
+scalasql.operations   scalasql.query
+        |                    |
+        +------+      +------+
+               |      |
+               scalasql
+```
+
 ## Changelog
 
 ### 0.1.0
