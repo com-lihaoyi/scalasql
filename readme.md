@@ -5,6 +5,9 @@ SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
 ```scala
+import scalasql._, H2Dialect._
+
+// Define your table model classes
 case class City[T[_]](
     id: T[Int],
     name: T[String],
@@ -12,40 +15,40 @@ case class City[T[_]](
     district: T[String],
     population: T[Long]
 )
+object City extends Table[City]
 
-object City extends Table[City]() {
-  val metadata = initMetadata()
-}
+// Connect to your database (example uses in-memory H2, requires com.h2database:h2:2.2.224)
+val dbClient = new scalasql.DatabaseClient.Connection(
+  connection = java.sql.DriverManager.getConnection("jdbc:h2:mem:mydb"),
+  dialect = H2Dialect,
+  config = new Config {
+    // Override default snake_case name mapping to match table schemas
+    override def columnNameMapper(v: String) = v.toLowerCase()
+    override def tableNameMapper(v: String) = v.toLowerCase()
+  }
+)
+val db: DbApi = dbClient.getAutoCommitClientConnection
 
-val db: DbApi = ???
+// Initialize database table schema and data
+db.updateRaw(os.read(os.Path("scalasql/test/resources/world-schema.sql", os.pwd)))
+db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
 
 // Adding up population of all cities in China
-val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
-db.toSqlQuery(query) ==>
-  "SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?"
-
-db.run(query) ==> 175953614
+def query1 = City.select.filter(_.countryCode === "CHN").map(_.population).sum
+db.toSqlQuery(query1) // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
+db.run(query1) // 175953614
 
 // Finding the 5-10th largest cities by population
-val query = City.select
+def query2 = City.select
   .sortBy(_.population).desc
-  .drop(5).take(5)
+  .drop(5).take(3)
   .map(c => (c.name, c.population))
 
-db.toSqlQuery(query) ==> """
-SELECT city0.name AS res__0, city0.population AS res__1
-FROM city city0
-ORDER BY res__1 DESC
-LIMIT ? OFFSET ?
-"""
+db.toSqlQuery(query2)
+// SELECT city0.name AS res__0, city0.population AS res__1
+// FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
 
-db.run(query) ==> Seq(
-  ("Karachi", 9269265),
-  ("Istanbul", 8787958),
-  ("Ciudad de México", 8591309),
-  ("Moscow", 8389200),
-  ("New York", 8008278)
-)
+db.run(query2) // Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México\, 8591309))
 ```
 
 ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 
@@ -100,9 +103,9 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   * [Join](docs/reference.md#join), covering different kinds of joins
   * [Returning](docs/reference.md#returning), [On Conflict](docs/reference.md#onconflict):
     covering these modifiers on `INSERT` and `UPDATE` for the databases that support them
-  * [Expression Ops](docs/reference.md#exprops), covering the different
+  * [Expression Operations](docs/reference.md#exprops), covering the different
     types of `Sql[T]` values and the different operations you can do on each one
-  * [Option Ops](docs/reference.md#optional), operations on `Sql[Option[T]`
+  * [Option Operations](docs/reference.md#optional), operations on `Sql[Option[T]`
   * [Window Functions](docs/reference.md#windowfunctions), 
     [With-Clauses/Common-Table-Expressions](docs/reference.md#withcte)
   * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),

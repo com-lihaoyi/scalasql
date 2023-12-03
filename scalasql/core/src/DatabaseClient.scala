@@ -31,15 +31,15 @@ trait DatabaseClient {
 object DatabaseClient {
 
   class Connection(
-      connection: java.sql.Connection,
-      config: Config,
-      dialectConfig: DialectConfig
+                    connection: java.sql.Connection,
+                    config: Config = new Config{},
+                    dialect: DialectConfig,
   ) extends DatabaseClient {
 
     def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
       val txn =
-        new DbApi.Impl(connection, config, dialectConfig, false, () => connection.rollback())
+        new DbApi.Impl(connection, config, dialect, false, () => connection.rollback())
       try block(txn)
       catch {
         case e: Throwable =>
@@ -50,19 +50,19 @@ object DatabaseClient {
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialectConfig, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
     }
   }
 
   class DataSource(
-      dataSource: javax.sql.DataSource,
-      config: Config,
-      dialectConfig: DialectConfig
+                    dataSource: javax.sql.DataSource,
+                    config: Config = new Config{},
+                    dialect: DialectConfig
   ) extends DatabaseClient {
 
     private def withConnection[T](f: DatabaseClient.Connection => T): T = {
       val connection = dataSource.getConnection
-      try f(new DatabaseClient.Connection(connection, config, dialectConfig))
+      try f(new DatabaseClient.Connection(connection, config, dialect))
       finally connection.close()
     }
 
@@ -71,7 +71,7 @@ object DatabaseClient {
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialectConfig, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
     }
   }
 }
