@@ -7,8 +7,8 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
       filter,join,aggregate}                         +-------->
              |                                       |
              |                                       |
-  {Sql[Int],Select[Q],Update[Q]                {Int,Seq[R],
-     CaseCls[Sql],Tuple[Q]}                 CaseCls[Id],Tuple[R]}
+  {Sql[Int],Select[Q],Update[Q]           {Int,Seq[R],Generator[R],
+  CaseCls[Sql],Tuple[Q],SqlStr}             CaseCls[Id],Tuple[R]}
              |                                       |
              |                                       |
              +----------+                 +----------+
