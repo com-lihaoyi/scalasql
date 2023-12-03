@@ -29,7 +29,6 @@ object HikariCpExample {
 
   lazy val hikariClient = new scalasql.DbClient.DataSource(
     hikariDataSource,
-    dialect = scalasql.PostgresDialect,
     config = new scalasql.Config {}
   )
 

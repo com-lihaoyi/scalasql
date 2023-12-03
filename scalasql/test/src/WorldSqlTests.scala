@@ -127,8 +127,7 @@ object WorldSqlTests extends TestSuite {
       new Config {
         override def columnNameMapper(v: String) = v.toLowerCase()
         override def tableNameMapper(v: String) = v.toLowerCase()
-      },
-      scalasql.H2Dialect
+      }
     )
 
     val db = dbClient.getAutoCommitClientConnection

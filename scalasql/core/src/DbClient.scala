@@ -37,9 +37,9 @@ object DbClient {
 
   class Connection(
       connection: java.sql.Connection,
-      config: Config = new Config {},
-      dialect: DialectConfig
-  ) extends DbClient {
+      config: Config = new Config {}
+  )(implicit dialect: DialectConfig)
+      extends DbClient {
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -67,9 +67,9 @@ object DbClient {
 
   class DataSource(
       dataSource: javax.sql.DataSource,
-      config: Config = new Config {},
-      dialect: DialectConfig
-  ) extends DbClient {
+      config: Config = new Config {}
+  )(implicit dialect: DialectConfig)
+      extends DbClient {
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -79,7 +79,7 @@ object DbClient {
 
     private def withConnection[T](f: DbClient.Connection => T): T = {
       val connection = dataSource.getConnection
-      try f(new DbClient.Connection(connection, config, dialect))
+      try f(new DbClient.Connection(connection, config))
       finally connection.close()
     }
 

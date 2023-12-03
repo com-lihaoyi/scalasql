@@ -30,7 +30,6 @@ object MySqlExample {
       mysql.getUsername,
       mysql.getPassword
     ),
-    dialect = scalasql.PostgresDialect,
     config = new scalasql.Config {}
   )
 

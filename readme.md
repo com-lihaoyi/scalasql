@@ -20,7 +20,6 @@ object City extends Table[City]
 // Connect to your database (example uses in-memory H2, requires com.h2database:h2:2.2.224)
 val dbClient = new scalasql.DbClient.Connection(
   connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
-  dialect = SqliteDialect,
   config = new Config {
     // Override default snake_case name mapping to match table schemas
     override def columnNameMapper(v: String) = v.toLowerCase()

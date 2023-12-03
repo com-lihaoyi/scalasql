@@ -17,8 +17,7 @@ object H2Example {
 
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   lazy val h2Client = new scalasql.DbClient.Connection(
-    DriverManager.getConnection("jdbc:h2:mem:mydb"),
-    dialect = scalasql.H2Dialect
+    DriverManager.getConnection("jdbc:h2:mem:mydb")
   )
 
   def main(args: Array[String]): Unit = {
