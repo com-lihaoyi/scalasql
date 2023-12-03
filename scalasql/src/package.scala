@@ -1,8 +1,11 @@
 package object scalasql {
   type Id[T] = T
 
-  val Table = core.Table
-  type Table[V[_[_]]] = core.Table[V]
+  val Table = query.Table
+  type Table[V[_[_]]] = query.Table[V]
+
+  val Column = query.Column
+  type Column[T] = query.Column[T]
 
   val DbClient = core.DbClient
   type DbClient = core.DbClient
@@ -15,9 +18,6 @@ package object scalasql {
 
   val Sql = core.Sql
   type Sql[T] = core.Sql[T]
-
-  val Column = core.Column
-  type Column[T] = core.Column[T]
 
   type TypeMapper[T] = core.TypeMapper[T]
 

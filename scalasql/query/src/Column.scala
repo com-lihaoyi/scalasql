@@ -1,5 +1,6 @@
-package scalasql.core
+package scalasql.query
 
+import scalasql.core.{Context, Sql, SqlStr, TypeMapper}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**

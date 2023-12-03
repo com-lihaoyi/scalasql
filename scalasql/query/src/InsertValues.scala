@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Column, Context, DialectBase, Queryable, SqlStr, Table, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, SqlStr, WithExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 trait InsertValues[V[_[_]], R] extends Query[Int] {

@@ -4,12 +4,10 @@ import scalasql.core.{
   Aggregatable,
   Context,
   DialectBase,
-  From,
   JoinNullable,
   Queryable,
   Sql,
   SqlStr,
-  SubqueryRef,
   TypeMapper
 }
 import scalasql.core.SqlStr.SqlStringSyntax
@@ -41,7 +39,7 @@ trait Select[Q, R]
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
     with Query.Multiple[R]
-    with scalasql.core.SelectBase {
+    with SelectBase {
 
   protected def dialect: DialectBase
   protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
@@ -57,7 +55,7 @@ trait Select[Q, R]
   protected def newSimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
-      from: Seq[From],
+      from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
@@ -323,11 +321,11 @@ object Select {
     override def drop(n: Int): Select[Q, R] = selectToSimpleSelect().drop(n)
     override def take(n: Int): Select[Q, R] = selectToSimpleSelect().take(n)
 
-    override protected def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
-      scalasql.core.SelectBase.renderer(selectToSimpleSelect(), prevContext)
+    override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
+      SelectBase.renderer(selectToSimpleSelect(), prevContext)
 
     override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] =
-      scalasql.core.SelectBase.lhsMap(selectToSimpleSelect(), prevContext)
+      SelectBase.lhsMap(selectToSimpleSelect(), prevContext)
 
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R]
 

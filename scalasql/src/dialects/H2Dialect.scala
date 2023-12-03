@@ -1,18 +1,7 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.core.{
-  Aggregatable,
-  JoinNullable,
-  From,
-  Column,
-  DbApi,
-  Queryable,
-  Table,
-  TypeMapper,
-  Sql,
-  SqlStr
-}
+import scalasql.core.{Aggregatable, DbApi, JoinNullable, Queryable, Sql, SqlStr, TypeMapper}
 import scalasql.{Id, dialects, operations}
 import scalasql.query.{
   CompoundSelect,
@@ -22,7 +11,8 @@ import scalasql.query.{
   Join,
   Joinable,
   OrderBy,
-  Query
+  Query,
+  Table
 }
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
@@ -116,7 +106,7 @@ object H2Dialect extends H2Dialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
-        from: Seq[From],
+        from: Seq[Context.From],
         joins: Seq[Join],
         where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
@@ -131,7 +121,7 @@ object H2Dialect extends H2Dialect {
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
-      from: Seq[From],
+      from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]

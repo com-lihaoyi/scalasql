@@ -1,4 +1,6 @@
-package scalasql.core
+package scalasql.query
+
+import scalasql.core.{DialectBase, Id, Queryable, Sql}
 
 import scala.language.experimental.macros
 
@@ -78,7 +80,7 @@ object Table {
       vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
   }
 
-  object Metadata extends scalasql.core.TableMacros {
+  object Metadata extends scalasql.query.TableMacros {
     class QueryableProxy(queryables: Int => Queryable.Row[_, _]) {
       def apply[T, V](n: Int): Queryable.Row[T, V] = queryables(n).asInstanceOf[Queryable.Row[T, V]]
     }

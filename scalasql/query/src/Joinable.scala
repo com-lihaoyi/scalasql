@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Sql, From, JoinNullable}
+import scalasql.core.{Context, JoinNullable, Sql}
 
 /**
  * Something that can be joined; typically a [[Select]] or a [[Table]]
@@ -9,7 +9,7 @@ trait Joinable[Q, R] {
   protected def joinableToSelect: Select[Q, R]
   protected def joinableIsTrivial: Boolean
 
-  protected def joinableToFromExpr: (From, Q)
+  protected def joinableToFromExpr: (Context.From, Q)
 
   /**
    * Version of `crossJoin` meant for usage in `for`-comprehensions

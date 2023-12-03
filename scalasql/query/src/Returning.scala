@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Context, ExprsToSql, From, Queryable, SqlStr, TableRef, TypeMapper, WithExpr}
+import scalasql.core.{Context, ExprsToSql, Queryable, SqlStr, TypeMapper, WithExpr}
 import scalasql.renderer.JoinsToSql
 
 /**

@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{From, Sql, SqlStr, Queryable, Table}
+import scalasql.core.Sql
 
 /**
  * Models a SQL `ORDER BY` clause
@@ -47,5 +47,5 @@ case class GroupBy(key: Sql[_], select: () => Select[_, _], having: Seq[Sql[_]])
  */
 case class Join(prefix: String, from: Seq[Join.From])
 object Join {
-  case class From(from: scalasql.core.From, on: Option[Sql[_]])
+  case class From(from: scalasql.core.Context.From, on: Option[Sql[_]])
 }

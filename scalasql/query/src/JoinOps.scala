@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Queryable, Sql, SubqueryRef, Table, WithExpr}
+import scalasql.core.{Queryable, Sql, WithExpr}
 
 trait JoinOps[C[_, _], Q, R] extends WithExpr[Q] {
 

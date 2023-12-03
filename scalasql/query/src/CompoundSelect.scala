@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.JoinsToSql
-import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, Table, TypeMapper, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, TypeMapper, WithExpr}
 
 /**
  * A SQL `SELECT` query, with
@@ -81,7 +81,7 @@ class CompoundSelect[Q, R](
     new CompoundSelect.Renderer(this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    scalasql.core.SelectBase.lhsMap(lhs, prevContext)
+    SelectBase.lhsMap(lhs, prevContext)
   }
 }
 
@@ -89,11 +89,11 @@ object CompoundSelect {
   case class Op[Q, R](op: String, rhs: SimpleSelect[Q, R])
 
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context)
-      extends scalasql.core.SelectBase.Renderer {
+      extends SelectBase.Renderer {
     import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsLhsMap = scalasql.core.SelectBase.lhsMap(query.lhs, prevContext)
+    lazy val lhsLhsMap = SelectBase.lhsMap(query.lhs, prevContext)
     lazy val context = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
@@ -118,7 +118,7 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-          lazy val rhsLhsMap = scalasql.core.SelectBase.lhsMap(op.rhs, prevContext)
+          lazy val rhsLhsMap = SelectBase.lhsMap(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions

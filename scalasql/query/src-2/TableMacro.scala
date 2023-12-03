@@ -1,7 +1,6 @@
-package scalasql.core
-import scalasql.core.Table
-import scalasql.core.Table.Metadata
+package scalasql.query
 
+import scalasql.core.Id
 import scala.language.experimental.macros
 
 object TableMacros {
@@ -9,7 +8,7 @@ object TableMacros {
   def cast[T](x: Any): T = x.asInstanceOf[T]
   def applyImpl[V[_[_]]](
       c: scala.reflect.macros.blackbox.Context
-  )(implicit caseClassType: c.WeakTypeTag[V[Any]]): c.Expr[Metadata[V]] = {
+  )(implicit caseClassType: c.WeakTypeTag[V[Any]]): c.Expr[Table.Metadata[V]] = {
     import c.universe._
 
     val tableRef = TermName(c.freshName("tableRef"))
@@ -94,9 +93,9 @@ object TableMacros {
       sym = typeRef.sym,
       args = weakTypeOf[V[Id]].typeArgs
     )
-    c.Expr[Metadata[V]](q"""{
+    c.Expr[Table.Metadata[V]](q"""{
 
-    new _root_.scalasql.core.Table.Metadata(
+    new _root_.scalasql.query.Table.Metadata(
       (dialect, n) => {
         import dialect._;
         n match{ case ..${queryables.zipWithIndex.map { case (q, i) => cq"$i => $q" }} }
@@ -105,14 +104,14 @@ object TableMacros {
       (walkLabels0, dialect, queryable) => {
         import dialect._
 
-        new _root_.scalasql.core.Table.Internal.TableQueryable(
+        new _root_.scalasql.query.Table.Internal.TableQueryable(
           walkLabels0,
           (table: $exprRef) => ${flattenExprs.reduceLeft((l, r) => q"$l ++ $r")},
           construct0 = (args: _root_.scalasql.Queryable.ResultSetIterator) => new $caseClassType(..$constructParams),
           deconstruct0 = (r: $idRef) => new $caseClassType(..$deconstructParams)
         )
       },
-      ($tableRef: _root_.scalasql.core.TableRef, dialect, queryable) => {
+      ($tableRef: _root_.scalasql.query.TableRef, dialect, queryable) => {
         import dialect._
 
         new $caseClassType(..$columnParams)
@@ -123,5 +122,5 @@ object TableMacros {
 
 }
 trait TableMacros {
-  implicit def initTableMetadata[V[_[_]]]: Metadata[V] = macro TableMacros.applyImpl[V]
+  implicit def initTableMetadata[V[_[_]]]: Table.Metadata[V] = macro TableMacros.applyImpl[V]
 }

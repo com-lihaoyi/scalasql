@@ -3,6 +3,7 @@ package scalasql.dialects
 import scalasql.{Id, operations}
 import scalasql.query.{
   AscDesc,
+  Column,
   CompoundSelect,
   GroupBy,
   InsertColumns,
@@ -13,21 +14,19 @@ import scalasql.query.{
   Nulls,
   OrderBy,
   Query,
+  Table,
+  TableRef,
   Update
 }
 import scalasql.core.{
-  WithExpr,
   Aggregatable,
-  JoinNullable,
-  From,
-  TableRef,
-  Column,
   DbApi,
+  JoinNullable,
   Queryable,
   Sql,
   SqlStr,
-  Table,
-  TypeMapper
+  TypeMapper,
+  WithExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.core.{Context, ExprsToSql}
@@ -284,7 +283,7 @@ object MySqlDialect extends MySqlDialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
-        from: Seq[From],
+        from: Seq[Context.From],
         joins: Seq[Join],
         where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
@@ -299,7 +298,7 @@ object MySqlDialect extends MySqlDialect {
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
-      from: Seq[From],
+      from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]

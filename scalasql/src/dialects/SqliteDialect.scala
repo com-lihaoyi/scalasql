@@ -1,8 +1,8 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, From, Sql, Queryable, Table, TypeMapper, SqlStr}
+import scalasql.core.{Aggregatable, Queryable, Sql, SqlStr, TypeMapper}
 import scalasql.{Id, dialects, operations}
-import scalasql.query.{AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select}
+import scalasql.query.{AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select, Table}
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
@@ -83,7 +83,7 @@ object SqliteDialect extends SqliteDialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
-        from: Seq[From],
+        from: Seq[Context.From],
         joins: Seq[Join],
         where: Seq[Sql[_]],
         groupBy0: Option[GroupBy]
@@ -98,7 +98,7 @@ object SqliteDialect extends SqliteDialect {
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
-      from: Seq[From],
+      from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]

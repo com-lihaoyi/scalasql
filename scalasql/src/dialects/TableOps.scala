@@ -1,9 +1,9 @@
 package scalasql.dialects
 
 import scalasql.dialects.Dialect
-import scalasql.core.{Column, Table, Sql}
+import scalasql.core.Sql
 import scalasql.Id
-import scalasql.query.{Delete, Insert, Joinable, Select, SimpleSelect, Update}
+import scalasql.query.{Column, Delete, Insert, Joinable, Select, SimpleSelect, Table, Update}
 
 class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
     extends Joinable[V[Sql], V[Id]] {

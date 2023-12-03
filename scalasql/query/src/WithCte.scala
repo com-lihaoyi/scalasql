@@ -9,7 +9,6 @@ import scalasql.core.{
   Sql,
   SqlStr,
   TypeMapper,
-  WithCteRef,
   WithExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
@@ -47,7 +46,7 @@ class WithCte[Q, R](
     new WithCte.Renderer(withPrefix, this, prevContext)
 
   override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
-    scalasql.core.SelectBase.lhsMap(rhs, prevContext)
+    SelectBase.lhsMap(rhs, prevContext)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
@@ -74,8 +73,8 @@ object WithCte {
         groupBy0 = None
       )(qr, dialect)
 
-    override def selectRenderer(prevContext: Context): scalasql.core.SelectBase.Renderer =
-      new scalasql.core.SelectBase.Renderer {
+    override def selectRenderer(prevContext: Context): SelectBase.Renderer =
+      new SelectBase.Renderer {
         def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
           SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
         }
@@ -87,7 +86,7 @@ object WithCte {
   }
 
   class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
-      extends scalasql.core.SelectBase.Renderer {
+      extends SelectBase.Renderer {
     def render(liveExprs: Option[Set[Sql.Identity]]) = {
       val walked =
         query.lhs.qr.asInstanceOf[Queryable[Any, Any]].walkLabelsAndExprs(WithExpr.get(query.lhs))
@@ -108,7 +107,7 @@ object WithCte {
           case w: WithCte[Q, R] => SqlStr.empty
           case r => sql" "
         }) +
-          scalasql.core.SelectBase
+          SelectBase
             .renderer(
               query.rhs match {
                 case w: WithCte[Q, R] => w.unprefixed
@@ -123,7 +122,7 @@ object WithCte {
       )
       val rhsReferenced = rhsSql.referencedExprs.toSet
       val lhsSql =
-        scalasql.core.SelectBase.renderer(query.lhs, prevContext).render(Some(rhsReferenced))
+        SelectBase.renderer(query.lhs, prevContext).render(Some(rhsReferenced))
 
       val cteColumns = SqlStr.join(
         newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },

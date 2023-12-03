@@ -3,8 +3,8 @@ package scalasql.utils
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
-import scalasql.core.{DialectConfig, SubqueryRef}
-import scalasql.{Sql, Config, DbClient, Queryable, UtestFramework}
+import scalasql.query.SubqueryRef
+import scalasql.{Config, DbClient, Queryable, Sql, UtestFramework}
 
 import java.sql.Connection
 

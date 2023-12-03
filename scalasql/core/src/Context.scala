@@ -13,15 +13,24 @@ import scalasql.core.SqlStr.SqlStringSyntax
  * @param config The ScalaSql configuration
  */
 trait Context {
-  def fromNaming: Map[From, String]
+  def fromNaming: Map[Context.From, String]
   def exprNaming: Map[Sql.Identity, SqlStr]
   def config: Config
 
-  def withFromNaming(fromNaming: Map[From, String]): Context
+  def withFromNaming(fromNaming: Map[Context.From, String]): Context
   def withExprNaming(exprNaming: Map[Sql.Identity, SqlStr]): Context
 }
 
 object Context {
+  trait From {
+    def fromRefPrefix(prevContext: Context): String
+    def fromLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr]
+    def renderSingleFrom(
+        name: SqlStr,
+        prevContext: Context,
+        liveExprs: Option[Set[Sql.Identity]]
+    ): SqlStr
+  }
   case class Impl(
       fromNaming: Map[From, String],
       exprNaming: Map[Sql.Identity, SqlStr],
@@ -33,26 +42,22 @@ object Context {
       copy(exprNaming = exprNaming)
   }
 
-  def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[TableRef]) = {
+  def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[From]) = {
 
     val prevSize = prevContext.fromNaming.size
     val newFromNaming =
       prevContext.fromNaming ++
         selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
-          case (t: TableRef, i) =>
-            (t, prevContext.config.tableNameMapper(Table.name(t.value)) + (i + prevSize))
-          case (s: SubqueryRef, i) => (s, "subquery" + (i + prevSize))
-          case (s: WithCteRef, i) => (s, "cte" + (i + prevSize))
+          case (r, i) => (r, r.fromRefPrefix(prevContext) + (i + prevSize))
         } ++
-        updateTable.map(t => t -> prevContext.config.tableNameMapper(Table.name(t.value)))
+        updateTable.map(t => t -> t.fromRefPrefix(prevContext))
 
     val newExprNaming =
       prevContext.exprNaming ++
         selectables
-          .collect { case t: SubqueryRef => t }
           .flatMap { t =>
-            SelectBase
-              .lhsMap(t.value, prevContext)
+            t
+              .fromLhsMap(prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 

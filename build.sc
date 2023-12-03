@@ -71,7 +71,7 @@ trait ScalaSql extends Common{
       ivy"org.scala-lang:scala-reflect:$scalaVersion"
     )
 
-    def generatedSources: T[Seq[PathRef]] = T {
+    def generatedSources = T {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
 
 
@@ -95,7 +95,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.core.generated
-           |import scalasql.core.{Column, Queryable, Sql}
+           |import scalasql.core.{Queryable, Sql}
            |trait QueryableRow{
            |  ${queryableRowDefs.mkString("\n")}
            |}
@@ -115,7 +115,7 @@ trait ScalaSql extends Common{
     def moduleDeps = Seq(core)
 
 
-    def generatedSources: T[Seq[PathRef]] = T {
+    def generatedSources = T {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
 
       def defs(isImpl: Boolean) = {
@@ -173,7 +173,8 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.generated
-           |import scalasql.core.{Column, Queryable, Sql}
+           |import scalasql.core.{Queryable, Sql}
+           |import scalasql.query.Column
            |trait Insert[V[_[_]], R]{
            |  ${defs(false).mkString("\n")}
            |}

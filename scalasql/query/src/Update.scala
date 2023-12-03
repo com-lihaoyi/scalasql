@@ -1,15 +1,12 @@
 package scalasql.query
 
 import scalasql.core.{
-  Column,
   Context,
   DialectBase,
   ExprsToSql,
   Queryable,
   Sql,
   SqlStr,
-  Table,
-  TableRef,
   TypeMapper,
   WithExpr
 }

@@ -6,7 +6,6 @@ import scalasql.core.{
   DialectBase,
   ExprsToSql,
   FlatJson,
-  From,
   JoinNullable,
   Queryable,
   Sql,
@@ -27,7 +26,7 @@ import scala.collection.mutable
 class SimpleSelect[Q, R](
     val expr: Q,
     val exprPrefix: Option[Context => SqlStr],
-    val from: Seq[From],
+    val from: Seq[Context.From],
     val joins: Seq[Join],
     val where: Seq[Sql[_]],
     val groupBy0: Option[GroupBy]
@@ -38,7 +37,7 @@ class SimpleSelect[Q, R](
   protected def copy[Q, R](
       expr: Q = this.expr,
       exprPrefix: Option[Context => SqlStr] = this.exprPrefix,
-      from: Seq[From] = this.from,
+      from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
       where: Seq[Sql[_]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
@@ -249,7 +248,7 @@ object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context)
-      extends scalasql.core.SelectBase.Renderer {
+      extends SelectBase.Renderer {
     lazy val flattenedExpr = query.qr.walkLabelsAndExprs(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)

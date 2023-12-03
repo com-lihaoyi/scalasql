@@ -1,12 +1,12 @@
 package scalasql.query
 
-import scalasql.core.{JoinNullable, From, Queryable, Sql}
+import scalasql.core.{Context, JoinNullable, Queryable, Sql}
 
 object FlatJoin {
   trait Rhs[Q2, R2]
   class MapResult[Q, Q2, R, R2](
       val prefix: String,
-      val from: From,
+      val from: Context.From,
       val on: Option[Sql[Boolean]],
       val qr: Queryable.Row[Q2, R2],
       val f: Q2,
@@ -15,7 +15,7 @@ object FlatJoin {
 
   class FlatMapResult[Q, Q2, R, R2](
       val prefix: String,
-      val from: From,
+      val from: Context.From,
       val on: Option[Sql[Boolean]],
       val qr: Queryable.Row[Q2, R2],
       val f: Rhs[Q2, R2],
@@ -24,7 +24,7 @@ object FlatJoin {
 
   class Mapper[Q, Q2, R, R2](
       prefix: String,
-      from: From,
+      from: Context.From,
       expr: Q,
       on: Option[Sql[Boolean]],
       where: Seq[Sql[Boolean]]
@@ -45,7 +45,7 @@ object FlatJoin {
   }
   class NullableMapper[Q, Q2, R, R2](
       prefix: String,
-      from: From,
+      from: Context.From,
       expr: JoinNullable[Q],
       on: Option[Sql[Boolean]],
       where: Seq[Sql[Boolean]]

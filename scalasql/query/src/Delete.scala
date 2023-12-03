@@ -2,7 +2,7 @@ package scalasql.query
 
 import scalasql.core.DialectBase
 import scalasql.core.Context
-import scalasql.core.{Queryable, Table, TypeMapper, SqlStr, Sql, TableRef}
+import scalasql.core.{Queryable, SqlStr, Sql}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**

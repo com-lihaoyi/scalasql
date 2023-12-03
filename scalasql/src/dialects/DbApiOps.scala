@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql.core._
-import scalasql.query.{Select, Values, WithCte}
+import scalasql.query.{Select, Values, WithCte, WithCteRef}
 
 class DbApiOps(dialect: DialectBase) {
   import dialect._

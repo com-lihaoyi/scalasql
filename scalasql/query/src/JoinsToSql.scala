@@ -1,18 +1,6 @@
 package scalasql.renderer
 
-import scalasql.core.{
-  From,
-  Queryable,
-  Sql,
-  SqlStr,
-  Table,
-  TypeMapper,
-  SubqueryRef,
-  TableRef,
-  WithCteRef,
-  FlatJson,
-  Context
-}
+import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper, FlatJson, Context}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.query.{AscDesc, CompoundSelect, Join, Joinable, Nulls, Select, SimpleSelect}
 
@@ -20,7 +8,7 @@ object JoinsToSql {
 
   def joinsToSqlStr(
       joins: Seq[Join],
-      renderedFroms: Map[From, SqlStr],
+      renderedFroms: Map[Context.From, SqlStr],
       joinOns: Seq[Seq[Option[SqlStr.Flattened]]]
   ) = {
 
@@ -36,9 +24,9 @@ object JoinsToSql {
   }
 
   def renderFroms(
-      selectables: Seq[From],
+      selectables: Seq[Context.From],
       prevContext: Context,
-      namedFromsMap: Map[From, String],
+      namedFromsMap: Map[Context.From, String],
       liveExprs: Option[Set[Sql.Identity]]
   ) = {
     selectables.iterator.map { f =>
@@ -49,25 +37,15 @@ object JoinsToSql {
   def renderSingleFrom(
       prevContext: Context,
       liveExprs: Option[Set[Sql.Identity]],
-      f: From,
-      namedFromsMap: Map[From, String]
+      f: Context.From,
+      namedFromsMap: Map[Context.From, String]
   ): SqlStr = {
-    val name = SqlStr.raw(namedFromsMap(f))
-    f match {
-      case t: TableRef =>
-        SqlStr.raw(prevContext.config.tableNameMapper(Table.name(t.value))) + sql" " + name
-
-      case t: SubqueryRef =>
-        val renderSql = scalasql.core.SelectBase.renderer(t.value, prevContext)
-        sql"(${renderSql.render(liveExprs)}) $name"
-
-      case t: WithCteRef => name
-    }
+    f.renderSingleFrom(SqlStr.raw(namedFromsMap(f)), prevContext, liveExprs)
   }
 
   def renderLateralJoins(
       prevContext: Context,
-      from: Seq[From],
+      from: Seq[Context.From],
       innerLiveExprs: Set[Sql.Identity],
       joins0: Seq[Join],
       renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]

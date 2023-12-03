@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Column, Context, DialectBase, Queryable, Sql, SqlStr, Table, WithExpr}
+import scalasql.core.{Context, DialectBase, Queryable, Sql, SqlStr, WithExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**

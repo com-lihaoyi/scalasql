@@ -1,4 +1,6 @@
-package scalasql.core
+package scalasql.query
+
+import scalasql.core.{Context, Sql, SqlStr}
 
 trait SelectBase {
   protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr]
