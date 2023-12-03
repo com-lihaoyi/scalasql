@@ -16,6 +16,7 @@ import scalasql.query.{
 }
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.operations.{BitwiseFunctionOps, PadOps, TrimOps}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
@@ -39,7 +40,7 @@ trait H2Dialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new H2Dialect.TableOps(t)
 
-  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
+  override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
     override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) =
       new H2Dialect.Values(ts)
   }

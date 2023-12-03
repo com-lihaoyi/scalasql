@@ -5,6 +5,7 @@ import scalasql.{Id, dialects, operations}
 import scalasql.query.{AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select, Table}
 import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.operations.TrimOps
 
 import java.time.{Instant, LocalDate, LocalDateTime}
 

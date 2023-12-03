@@ -1,10 +1,11 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, Queryable, TypeMapper, Sql, WithExpr}
+import scalasql.core.{Aggregatable, Queryable, Sql, TypeMapper, WithExpr}
 import scalasql.operations
 import scalasql.query.{JoinOps, Joinable, LateralJoinOps, Select}
 import scalasql.core.SqlStr
 import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.operations.{PadOps, TrimOps}
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 

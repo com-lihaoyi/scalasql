@@ -30,6 +30,7 @@ import scalasql.core.{
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.core.{Context, ExprsToSql}
+import scalasql.operations.PadOps
 import scalasql.renderer.JoinsToSql
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
@@ -92,7 +93,7 @@ trait MySqlDialect extends Dialect {
   ): MySqlDialect.OnConflictable[V[Column], Int] =
     new MySqlDialect.OnConflictable[V[Column], Int](query, WithExpr.get(query), query.table)
 
-  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this) {
+  override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
     override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) =
       new MySqlDialect.Values(ts)
   }

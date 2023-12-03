@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.operations.CaseWhen
+import scalasql.operations.{CaseWhen, DbApiExprOps}
 import scalasql.query.WindowExpr
 import scalasql.core.Sql.apply0
 import scalasql.{Table, operations}
@@ -252,7 +252,8 @@ trait Dialect extends DialectBase {
   implicit def AggExprOpsConv[T](v: Aggregatable[Sql[T]]): operations.AggExprOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
-  implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
+  implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
+  implicit def DbApiExprOpsConv(db: => DbApi): DbApiExprOps = new DbApiExprOps(this)
 
   implicit class WindowExtensions[T](e: Sql[T]) {
     def over = new WindowExpr[T](e, None, None, Nil, None, None, None)

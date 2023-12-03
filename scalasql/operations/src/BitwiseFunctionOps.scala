@@ -1,5 +1,4 @@
-package scalasql.dialects
-
+package scalasql.operations
 import scalasql.core.Sql
 import scalasql.core.SqlStr.SqlStringSyntax
 
