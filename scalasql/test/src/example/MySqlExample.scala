@@ -24,7 +24,7 @@ object MySqlExample {
     mysql
   }
 
-  lazy val mysqlClient = new scalasql.DatabaseClient.Connection(
+  lazy val mysqlClient = new scalasql.DbClient.Connection(
     DriverManager.getConnection(
       mysql.getJdbcUrl + "?allowMultiQueries=true",
       mysql.getUsername,

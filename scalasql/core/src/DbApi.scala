@@ -12,7 +12,7 @@ trait DbApi extends AutoCloseable {
   /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging
    */
-  def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
+  def renderSql[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
 
   /**
    * Runs the given query [[Q]] and returns a value of type [[R]]
@@ -109,7 +109,7 @@ object DbApi {
   class Impl(
       connection: java.sql.Connection,
       config: Config,
-      dialectConfig: DialectConfig,
+      dialect: DialectConfig,
       autoCommit: Boolean,
       rollBack0: () => Unit
   ) extends DbApi.Txn {
@@ -251,55 +251,24 @@ object DbApi {
     def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1): Int = {
       val flattened = SqlStr.flatten(sql)
       runRawUpdate0(
-        combineQueryString(flattened),
+        DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
         flattenParamPuts(flattened),
         fetchSize,
         queryTimeoutSeconds
       )
     }
 
-    def toSqlQuery[Q, R](query: Q, castParams: Boolean = false)(
+    def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      val (str, params) = toSqlQuery0(query, castParams)
-      str
-    }
-
-    def toSqlQuery0[Q, R](query: Q, castParams: Boolean)(
-        implicit qr: Queryable[Q, R]
-    ): (String, collection.Seq[SqlStr.Interp.TypeInterp[_]]) = {
-      val flattened = unpackQueryable(query, qr)
-      (combineQueryString(flattened, castParams), flattened.params)
-    }
-
-    private def combineQueryString(
-        flattened: SqlStr.Flattened,
-        castParams: Boolean = DialectConfig.castParams(dialectConfig)
-    ) = {
-      val queryStr = flattened.queryParts.iterator
-        .zipAll(flattened.params, "", null)
-        .map {
-          case (part, null) => part
-          case (part, param) =>
-            val jdbcTypeString = param.mappedType.castTypeString
-            if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
-        }
-        .mkString
-
-      queryStr
-    }
-
-    private def unpackQueryable[R, Q](query: Q, qr: Queryable[Q, R]) = {
-      val ctx = Context.Impl(Map(), Map(), config)
-      val flattened = SqlStr.flatten(qr.toSqlStr(query, ctx))
-      flattened
+      dialect.renderSql(query, config, castParams)
     }
 
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R]
     ): R = {
 
-      val flattened = unpackQueryable(query, qr)
+      val flattened = DialectConfig.unpackQueryable(query, qr, config)
       if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
       else {
         try {
@@ -342,7 +311,7 @@ object DbApi {
         queryTimeoutSeconds: Int
     ) = streamRaw0(
       construct,
-      combineQueryString(flattened),
+      DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
       flattenParamPuts(flattened),
       fetchSize,
       queryTimeoutSeconds
@@ -371,7 +340,7 @@ object DbApi {
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]]
     ): Generator[R] = {
-      val flattened = unpackQueryable(query, qr)
+      val flattened = DialectConfig.unpackQueryable(query, qr, config)
       streamFlattened(
         r => {
           qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {

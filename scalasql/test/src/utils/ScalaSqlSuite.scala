@@ -1,6 +1,6 @@
 package scalasql.utils
 
-import scalasql.{DatabaseClient, DbApi, dialects}
+import scalasql.{DbClient, DbApi, dialects}
 import scalasql.dialects._
 import utest.TestSuite
 

@@ -118,10 +118,10 @@ object WorldSqlTests extends TestSuite {
   def tests = Tests {
     // +DOCS
     // ### Creating Your Database Client
-    // Lastly, we need to initialize our `scalasql.DatabaseClient`. This requires
+    // Lastly, we need to initialize our `scalasql.DbClient`. This requires
     // passing in a `java.sql.Connection`, a `scalasql.Config` object, and the SQL dialect
     // you are targeting (in this case `H2Dialect`).
-    val dbClient = new DatabaseClient.Connection(
+    val dbClient = new DbClient.Connection(
       java.sql.DriverManager
         .getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
       new Config {
@@ -157,10 +157,10 @@ object WorldSqlTests extends TestSuite {
       // part of any database table.
       //
       // Here, we construct `Sql`s to represent the SQL query `1 + 3`. We can use
-      // `db.toSqlQuery` to see the generated SQL code, and `db.run` to send the
+      // `db.renderSql` to see the generated SQL code, and `db.run` to send the
       // query to the database and return the output `4`
       val query = Sql(1) + Sql(3)
-      db.toSqlQuery(query) ==> "SELECT (? + ?) AS res"
+      db.renderSql(query) ==> "SELECT (? + ?) AS res"
       db.run(query) ==> 4
       // In general, most primitive types that can be mapped to SQL can be converted
       // to `scalasql.Sql`s: `Int`s and other numeric types, `String`s, `Boolean`s,
@@ -183,7 +183,7 @@ object WorldSqlTests extends TestSuite {
       // methods to help construct the respective queries. You can run a `Table.select`
       // on its own in order to retrieve all the data in the table:
       val query = City.select
-      db.toSqlQuery(query) ==> """
+      db.renderSql(query) ==> """
       SELECT
         city0.id AS res__id,
         city0.name AS res__name,
@@ -222,7 +222,7 @@ object WorldSqlTests extends TestSuite {
         // query the city whose name is "Singapore"
         val query = City.select.filter(_.name === "Singapore").single
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.id AS res__id,
           city0.name AS res__name,
@@ -259,7 +259,7 @@ object WorldSqlTests extends TestSuite {
         // rather than causing an exception. `.head` is short for `.take(1).single`
         val query = City.select.filter(_.name === "Singapore").head
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.id AS res__id,
           city0.name AS res__name,
@@ -281,7 +281,7 @@ object WorldSqlTests extends TestSuite {
         // Apart from filtering by name, it is also very common to filter by ID,
         // as shown below:
         val query = City.select.filter(_.id === 3208).single
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.id AS res__id,
           city0.name AS res__name,
@@ -302,7 +302,7 @@ object WorldSqlTests extends TestSuite {
           // You can filter on multiple things, e.g. here we look for cities in China
           // with population more than 5 million:
           val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
-          db.toSqlQuery(query) ==> """
+          db.renderSql(query) ==> """
           SELECT
             city0.id AS res__id,
             city0.name AS res__name,
@@ -328,7 +328,7 @@ object WorldSqlTests extends TestSuite {
           // +DOCS
           // You can also stack multiple separate filters together, as shown below:
           val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
-          db.toSqlQuery(query) ==> """
+          db.renderSql(query) ==> """
           SELECT
             city0.id AS res__id,
             city0.name AS res__name,
@@ -387,7 +387,7 @@ object WorldSqlTests extends TestSuite {
           .filter(c => db.values(Seq("Singapore", "Kuala Lumpur", "Jakarta")).contains(c.name))
           .map(_.countryCode)
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT city0.countrycode AS res
         FROM city city0
         WHERE (city0.name IN (VALUES (?), (?), (?)))
@@ -407,7 +407,7 @@ object WorldSqlTests extends TestSuite {
         // Below, we query the `country` table, but only want the `name` and `continent` of
         // each country, without all the other metadata:
         val query = Country.select.map(c => (c.name, c.continent))
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT country0.name AS res__0, country0.continent AS res__1
         FROM country country0
         """
@@ -433,7 +433,7 @@ object WorldSqlTests extends TestSuite {
           .map(c => (c, c.name.toUpperCase, c.population / 1000000))
           .single
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.id AS res__0__id,
           city0.name AS res__0__name,
@@ -464,7 +464,7 @@ object WorldSqlTests extends TestSuite {
         // You can perform simple aggregates like `.sum` as below, where we
         // query all cities in China and sum up their populations
         val query = City.select.filter(_.countryCode === "CHN").map(_.population).sum
-        db.toSqlQuery(query) ==>
+        db.renderSql(query) ==>
           "SELECT SUM(city0.population) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
         db.run(query) ==> 175953614
@@ -475,7 +475,7 @@ object WorldSqlTests extends TestSuite {
         // Many aggregates have a `By` version, e.g. `.sumBy`, which allows you to
         // customize exactly what you are aggregating:
         val query = City.select.sumBy(_.population)
-        db.toSqlQuery(query) ==> "SELECT SUM(city0.population) AS res FROM city city0"
+        db.renderSql(query) ==> "SELECT SUM(city0.population) AS res FROM city city0"
 
         db.run(query) ==> 1429559884
         // -DOCS
@@ -486,7 +486,7 @@ object WorldSqlTests extends TestSuite {
         // `COUNT(1)`. Below, we count how many countries in our database have population
         // greater than one million
         val query = Country.select.filter(_.population > 1000000).size
-        db.toSqlQuery(query) ==>
+        db.renderSql(query) ==>
           "SELECT COUNT(1) AS res FROM country country0 WHERE (country0.population > ?)"
 
         db.run(query) ==> 154
@@ -499,7 +499,7 @@ object WorldSqlTests extends TestSuite {
         // maximum populations across all countries in our dataset
         val query = Country.select
           .aggregate(cs => (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population)))
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           MIN(country0.population) AS res__0,
           AVG(country0.population) AS res__1,
@@ -525,7 +525,7 @@ object WorldSqlTests extends TestSuite {
         .take(5)
         .map(c => (c.name, c.population))
 
-      db.toSqlQuery(query) ==> """
+      db.renderSql(query) ==> """
       SELECT city0.name AS res__0, city0.population AS res__1
       FROM city city0
       ORDER BY res__1 DESC
@@ -557,7 +557,7 @@ object WorldSqlTests extends TestSuite {
         .map(_.lifeExpectancy.cast[Int])
         .single
 
-      db.toSqlQuery(query) ==> """
+      db.renderSql(query) ==> """
       SELECT CAST(country0.lifeexpectancy AS INTEGER) AS res
       FROM country country0
       WHERE (country0.name = ?)
@@ -585,7 +585,7 @@ object WorldSqlTests extends TestSuite {
           .filter(_.capital.isEmpty)
           .size
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital IS NULL)
@@ -626,7 +626,7 @@ object WorldSqlTests extends TestSuite {
           .filter(_.capital `=` myOptionalCityId)
           .size
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital = ?)
@@ -642,7 +642,7 @@ object WorldSqlTests extends TestSuite {
           .filter(_.capital === myOptionalCityId)
           .size
 
-        db.toSqlQuery(query2) ==> """
+        db.renderSql(query2) ==> """
         SELECT COUNT(1) AS res
         FROM country country0
         WHERE (country0.capital IS NOT DISTINCT FROM ?)
@@ -665,7 +665,7 @@ object WorldSqlTests extends TestSuite {
           .filter { case (city, country) => country.name === "Liechtenstein" }
           .map { case (city, country) => city.name }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT city0.name AS res
         FROM city city0
         JOIN country country1 ON (city0.countrycode = country1.code)
@@ -683,7 +683,7 @@ object WorldSqlTests extends TestSuite {
           .filter { case (cityOpt, country) => cityOpt.isEmpty(_.id) }
           .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT city0.name AS res__0, country1.name AS res__1
         FROM city city0
         RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
@@ -721,7 +721,7 @@ object WorldSqlTests extends TestSuite {
           if country.name === "Liechtenstein"
         } yield city.name
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
       SELECT city0.name AS res
       FROM city city0
       JOIN country country1 ON (city0.countrycode = country1.code)
@@ -746,7 +746,7 @@ object WorldSqlTests extends TestSuite {
           .map { case (language, country) => (language.language, country.name) }
           .sortBy(_._1)
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
         FROM countrylanguage countrylanguage0
         JOIN (SELECT
@@ -783,7 +783,7 @@ object WorldSqlTests extends TestSuite {
           }
           .sortBy(_._1)
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
         FROM (SELECT
             country0.code AS res__code,
@@ -813,7 +813,7 @@ object WorldSqlTests extends TestSuite {
         // database query plan changes based on whether a subquery is present or not
         val query = Country.select.sortBy(_.population).desc.subquery.take(2).map(_.name)
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT subquery0.res__name AS res
         FROM (SELECT country0.name AS res__name, country0.population AS res__population
           FROM country country0
@@ -841,7 +841,7 @@ object WorldSqlTests extends TestSuite {
 
       val query = smallestCountries.union(largestCountries)
 
-      db.toSqlQuery(query) ==> """
+      db.renderSql(query) ==> """
       SELECT subquery0.res AS res
       FROM (SELECT country0.name AS res
         FROM country country0
@@ -879,7 +879,7 @@ object WorldSqlTests extends TestSuite {
               .contains(name)
           }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.name AS res__0,
           city0.countrycode AS res__1,
@@ -918,7 +918,7 @@ object WorldSqlTests extends TestSuite {
             db.values(Seq("Singapore", "Kuala Lumpur", "Pinang", "Johor Baharu")).contains(name)
           }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           city0.name AS res__0,
           city0.countrycode AS res__1,
@@ -955,7 +955,7 @@ object WorldSqlTests extends TestSuite {
           .desc
           .take(10)
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
         FROM city city0
         JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
@@ -991,7 +991,7 @@ object WorldSqlTests extends TestSuite {
           .sortBy(_._2)
           .desc
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           country0.continent AS res__0,
           (SUM((country0.lifeexpectancy * country0.population)) / SUM(country0.population)) AS res__1
@@ -1041,7 +1041,7 @@ object WorldSqlTests extends TestSuite {
             (country.name, country.population, city.name, city.population)
           }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           subquery0.res__name AS res__0,
           subquery0.res__population AS res__1,
@@ -1091,7 +1091,7 @@ object WorldSqlTests extends TestSuite {
             (name, population, countryCode, r)
           }
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         SELECT
           subquery0.res__0__name AS res__0,
           subquery0.res__0__population AS res__1,
@@ -1137,7 +1137,7 @@ object WorldSqlTests extends TestSuite {
           _.district := "South",
           _.population := 1337
         )
-        db.toSqlQuery(query) ==>
+        db.renderSql(query) ==>
           "INSERT INTO city (name, countrycode, district, population) VALUES (?, ?, ?, ?)"
 
         db.run(query)
@@ -1158,7 +1158,7 @@ object WorldSqlTests extends TestSuite {
           ("Loyang", "SGP", "East", 31337),
           ("Jurong", "SGP", "West", 313373)
         )
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         INSERT INTO city (name, countrycode, district, population) VALUES
         (?, ?, ?, ?),
         (?, ?, ?, ?),
@@ -1187,7 +1187,7 @@ object WorldSqlTests extends TestSuite {
             .map(c => (Sql("New-") + c.name, c.countryCode, c.district, Sql(0L)))
         )
 
-        db.toSqlQuery(query) ==> """
+        db.renderSql(query) ==> """
         INSERT INTO city (name, countrycode, district, population)
         SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
         FROM city city0
@@ -1218,7 +1218,7 @@ object WorldSqlTests extends TestSuite {
           .update(_.countryCode === "SGP")
           .set(_.population := 0, _.district := "UNKNOWN")
 
-        db.toSqlQuery(query) ==>
+        db.renderSql(query) ==>
           "UPDATE city SET population = ?, district = ? WHERE (city.countrycode = ?)"
 
         db.run(query)
@@ -1235,7 +1235,7 @@ object WorldSqlTests extends TestSuite {
         val query = City
           .update(_.countryCode === "SGP")
           .set(c => c.population := (c.population + 1000000))
-        db.toSqlQuery(query) ==>
+        db.renderSql(query) ==>
           "UPDATE city SET population = (city.population + ?) WHERE (city.countrycode = ?)"
 
         db.run(query)
@@ -1250,7 +1250,7 @@ object WorldSqlTests extends TestSuite {
         // an entire database table accidentally . If you really want to perform an update
         // on every single row, you can pass in `_ => true` as your filter:
         val query = City.update(_ => true).set(_.population := 0)
-        db.toSqlQuery(query) ==> "UPDATE city SET population = ?"
+        db.renderSql(query) ==> "UPDATE city SET population = ?"
 
         db.run(query)
 
@@ -1268,7 +1268,7 @@ object WorldSqlTests extends TestSuite {
       // Deletes are performed by the `.delete` method, which takes a predicate
       // letting you specify what rows you want to delete.
       val query = City.delete(_.countryCode === "SGP")
-      db.toSqlQuery(query) ==> "DELETE FROM city WHERE (city.countrycode = ?)"
+      db.renderSql(query) ==> "DELETE FROM city WHERE (city.countrycode = ?)"
       db.run(query)
 
       db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
@@ -1384,7 +1384,7 @@ object WorldSqlTests extends TestSuite {
 
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
 
-      db.toSqlQuery(query) ==>
+      db.renderSql(query) ==>
         "SELECT RAWTOHEX(city0.name) AS res FROM city city0 WHERE (city0.countrycode = ?)"
 
       db.run(query) ==> "00530069006e006700610070006f00720065"
@@ -1479,7 +1479,7 @@ object WorldSqlTests extends TestSuite {
       }
 
       val query = CityCustom.select
-      db.toSqlQuery(query) ==> """
+      db.renderSql(query) ==> """
       SELECT
         city0.id AS res__idcustom,
         city0.name AS res__namecustom,

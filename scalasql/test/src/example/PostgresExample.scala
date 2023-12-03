@@ -24,7 +24,7 @@ object PostgresExample {
     pg
   }
 
-  lazy val postgresClient = new scalasql.DatabaseClient.Connection(
+  lazy val postgresClient = new scalasql.DbClient.Connection(
     DriverManager.getConnection(postgres.getJdbcUrl, postgres.getUsername, postgres.getPassword),
     dialect = scalasql.PostgresDialect,
     config = new scalasql.Config {}

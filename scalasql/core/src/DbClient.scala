@@ -6,7 +6,12 @@ import scalasql.core.DialectConfig
  * A database client. Primarily allows you to access the database within a [[transaction]]
  * block or via [[getAutoCommitClientConnection]]
  */
-trait DatabaseClient {
+trait DbClient {
+
+  /**
+   * Converts the given query [[Q]] into a string. Useful for debugging and logging
+   */
+  def renderSql[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
 
   /**
    * Opens a database transaction within the given [[block]], automatically committing it
@@ -28,13 +33,19 @@ trait DatabaseClient {
   def getAutoCommitClientConnection: DbApi
 }
 
-object DatabaseClient {
+object DbClient {
 
   class Connection(
       connection: java.sql.Connection,
       config: Config = new Config {},
       dialect: DialectConfig
-  ) extends DatabaseClient {
+  ) extends DbClient {
+
+    def renderSql[Q, R](query: Q, castParams: Boolean = false)(
+        implicit qr: Queryable[Q, R]
+    ): String = {
+      dialect.renderSql(query, config, castParams)
+    }
 
     def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
@@ -58,11 +69,17 @@ object DatabaseClient {
       dataSource: javax.sql.DataSource,
       config: Config = new Config {},
       dialect: DialectConfig
-  ) extends DatabaseClient {
+  ) extends DbClient {
 
-    private def withConnection[T](f: DatabaseClient.Connection => T): T = {
+    def renderSql[Q, R](query: Q, castParams: Boolean = false)(
+        implicit qr: Queryable[Q, R]
+    ): String = {
+      dialect.renderSql(query, config, castParams)
+    }
+
+    private def withConnection[T](f: DbClient.Connection => T): T = {
       val connection = dataSource.getConnection
-      try f(new DatabaseClient.Connection(connection, config, dialect))
+      try f(new DbClient.Connection(connection, config, dialect))
       finally connection.close()
     }
 

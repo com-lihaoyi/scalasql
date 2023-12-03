@@ -18,6 +18,21 @@ ScalaSql should do the right thing for you.
 
 ## DbApi
 Basic usage of `db.*` operations such as `db.run`
+### DbApi.renderSql
+
+You can use `.renderSql` on the `DbApi` or `DbClient` to see the SQL
+that is generated without actually running it
+
+```scala
+dbClient.renderSql(Buyer.select) ==>
+  "SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth FROM buyer buyer0"
+```
+
+
+
+
+
+
 ### DbApi.run
 
 Most common usage of `dbClient.transaction`/`db.run`
@@ -8412,18 +8427,18 @@ val insertColumns = Enclosing.insert.columns(
   _.foo.fooId := value1.foo.fooId,
   _.foo.myBoolean := value1.foo.myBoolean
 )
-db.toSqlQuery(insertColumns) ==>
+db.renderSql(insertColumns) ==>
   "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
 
 db.run(insertColumns) ==> 1
 
 val insertValues = Enclosing.insert.values(value2)
-db.toSqlQuery(insertValues) ==>
+db.renderSql(insertValues) ==>
   "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
 
 db.run(insertValues) ==> 1
 
-db.toSqlQuery(Enclosing.select) ==> """
+db.renderSql(Enclosing.select) ==> """
           SELECT
             enclosing0.bar_id AS res__bar_id,
             enclosing0.my_string AS res__my_string,

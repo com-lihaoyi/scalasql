@@ -16,7 +16,7 @@ object SqliteExample {
   object ExampleProduct extends Table[ExampleProduct]
 
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
-  lazy val sqliteClient = new scalasql.DatabaseClient.Connection(
+  lazy val sqliteClient = new scalasql.DbClient.Connection(
     DriverManager.getConnection("jdbc:sqlite::memory:"),
     dialect = scalasql.SqliteDialect,
     config = new scalasql.Config {}

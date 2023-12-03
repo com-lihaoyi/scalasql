@@ -15,6 +15,16 @@ trait DbApiTests extends ScalaSqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
 
   def tests = Tests {
+    test("renderSql") - checker.recorded(
+      """
+      You can use `.renderSql` on the `DbApi` or `DbClient` to see the SQL
+      that is generated without actually running it
+      """,
+      Text {
+        dbClient.renderSql(Buyer.select) ==>
+          "SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth FROM buyer buyer0"
+      }
+    )
     test("run") - checker.recorded(
       """
       Most common usage of `dbClient.transaction`/`db.run`

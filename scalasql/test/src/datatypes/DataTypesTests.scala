@@ -185,18 +185,18 @@ trait DataTypesTests extends ScalaSqlSuite {
           _.foo.fooId := value1.foo.fooId,
           _.foo.myBoolean := value1.foo.myBoolean
         )
-        db.toSqlQuery(insertColumns) ==>
+        db.renderSql(insertColumns) ==>
           "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
 
         db.run(insertColumns) ==> 1
 
         val insertValues = Enclosing.insert.values(value2)
-        db.toSqlQuery(insertValues) ==>
+        db.renderSql(insertValues) ==>
           "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
 
         db.run(insertValues) ==> 1
 
-        db.toSqlQuery(Enclosing.select) ==> """
+        db.renderSql(Enclosing.select) ==> """
           SELECT
             enclosing0.bar_id AS res__bar_id,
             enclosing0.my_string AS res__my_string,

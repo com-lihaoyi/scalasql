@@ -27,7 +27,7 @@ object HikariCpExample {
   hikariDataSource.setUsername(postgres.getUsername)
   hikariDataSource.setPassword(postgres.getPassword)
 
-  lazy val hikariClient = new scalasql.DatabaseClient.DataSource(
+  lazy val hikariClient = new scalasql.DbClient.DataSource(
     hikariDataSource,
     dialect = scalasql.PostgresDialect,
     config = new scalasql.Config {}

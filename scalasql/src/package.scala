@@ -4,8 +4,8 @@ package object scalasql {
   val Table = core.Table
   type Table[V[_[_]]] = core.Table[V]
 
-  val DatabaseClient = core.DatabaseClient
-  type DatabaseClient = core.DatabaseClient
+  val DbClient = core.DbClient
+  type DbClient = core.DbClient
 
   val DbApi = core.DbApi
   type DbApi = core.DbApi

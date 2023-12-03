@@ -4,12 +4,12 @@ import com.github.vertical_blank.sqlformatter.SqlFormatter
 import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import scalasql.core.{DialectConfig, SubqueryRef}
-import scalasql.{Sql, Config, DatabaseClient, Queryable, UtestFramework}
+import scalasql.{Sql, Config, DbClient, Queryable, UtestFramework}
 
 import java.sql.Connection
 
 class TestChecker(
-    val dbClient: DatabaseClient,
+    val dbClient: DbClient,
     testSchemaFileName: String,
     testDataFileName: String,
     suiteName: String,
@@ -58,7 +58,7 @@ class TestChecker(
       docs: String = ""
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
     val sqlResult = autoCommitConnection
-      .toSqlQuery(query.value)
+      .renderSql(query.value)
 
     val allCheckedSqls = Option(sql) ++ sqls
     val matchedSql = allCheckedSqls.find { sql =>

@@ -58,8 +58,8 @@ object JoinsToSql {
         SqlStr.raw(prevContext.config.tableNameMapper(Table.name(t.value))) + sql" " + name
 
       case t: SubqueryRef =>
-        val toSqlQuery = scalasql.core.SelectBase.renderer(t.value, prevContext)
-        sql"(${toSqlQuery.render(liveExprs)}) $name"
+        val renderSql = scalasql.core.SelectBase.renderer(t.value, prevContext)
+        sql"(${renderSql.render(liveExprs)}) $name"
 
       case t: WithCteRef => name
     }
