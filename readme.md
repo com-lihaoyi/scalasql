@@ -176,3 +176,4 @@ scalasql.operations   scalasql.query
 * Scala 3 support
 * JSON columns
 * Audit list of static functions for Postgres/MySql/Sqlite/H2
+* Make `implicit ctx =>` for defining `sql"..."` snippets optional
