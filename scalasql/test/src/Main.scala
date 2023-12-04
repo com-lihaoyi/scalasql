@@ -29,7 +29,7 @@ object Main {
     val results = conn
       .createStatement()
       .executeQuery(
-        "SELECT data_types0.my_var_binary AS res__my_var_binary FROM data_types data_types0"
+        "SELECT data_types0.my_var_binary AS my_var_binary FROM data_types data_types0"
       )
 
     results.next()

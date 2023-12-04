@@ -173,9 +173,9 @@ trait InsertTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (id, name, date_of_birth)
             SELECT
-              (buyer0.id + (SELECT MAX(buyer1.id) AS res FROM buyer buyer1)) AS res__id,
-              buyer0.name AS res__name,
-              buyer0.date_of_birth AS res__date_of_birth
+              (buyer0.id + (SELECT MAX(buyer1.id) AS res FROM buyer buyer1)) AS id,
+              buyer0.name AS name,
+              buyer0.date_of_birth AS date_of_birth
             FROM buyer buyer0
             WHERE (buyer0.name <> ?)
           """,
@@ -206,7 +206,7 @@ trait InsertTests extends ScalaSqlSuite {
           ),
           sql = """
             INSERT INTO buyer (name, date_of_birth)
-            SELECT buyer0.name AS res__0, buyer0.date_of_birth AS res__1
+            SELECT buyer0.name AS res_0, buyer0.date_of_birth AS res_1
             FROM buyer buyer0
             WHERE (buyer0.name <> ?)
           """,

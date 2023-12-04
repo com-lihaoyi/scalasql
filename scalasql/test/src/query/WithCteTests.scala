@@ -48,15 +48,15 @@ trait WithCteTests extends ScalaSqlSuite {
       },
       sql = """
         WITH
-          cte0 (res__id, res__name) AS (SELECT
-            buyer0.id AS res__id, buyer0.name AS res__name FROM buyer buyer0),
-          cte1 (res__buyer_id, res__shipping_date) AS (SELECT
-              shipping_info1.buyer_id AS res__buyer_id,
-              shipping_info1.shipping_date AS res__shipping_date
+          cte0 (id, name) AS (SELECT
+            buyer0.id AS id, buyer0.name AS name FROM buyer buyer0),
+          cte1 (buyer_id, shipping_date) AS (SELECT
+              shipping_info1.buyer_id AS buyer_id,
+              shipping_info1.shipping_date AS shipping_date
             FROM shipping_info shipping_info1)
-        SELECT cte0.res__name AS res__0, cte1.res__shipping_date AS res__1
+        SELECT cte0.name AS res_0, cte1.shipping_date AS res_1
         FROM cte0
-        JOIN cte1 ON (cte0.res__id = cte1.res__buyer_id)
+        JOIN cte1 ON (cte0.id = cte1.buyer_id)
       """,
       value = Seq(
         ("叉烧包", LocalDate.parse("2010-02-03")),
@@ -77,13 +77,13 @@ trait WithCteTests extends ScalaSqlSuite {
       },
       sqls = Seq(
         """
-          WITH cte0 (res__name) AS (SELECT buyer0.name AS res__name FROM buyer buyer0)
-          SELECT (cte0.res__name || ?) AS res
+          WITH cte0 (name) AS (SELECT buyer0.name AS name FROM buyer buyer0)
+          SELECT (cte0.name || ?) AS res
           FROM cte0
         """,
         """
-          WITH cte0 (res__name) AS (SELECT buyer0.name AS res__name FROM buyer buyer0)
-          SELECT CONCAT(cte0.res__name, ?) AS res
+          WITH cte0 (name) AS (SELECT buyer0.name AS name FROM buyer buyer0)
+          SELECT CONCAT(cte0.name, ?) AS res
           FROM cte0
         """
       ),
@@ -108,25 +108,25 @@ trait WithCteTests extends ScalaSqlSuite {
           .map { case (b, s, (pu, pr)) => (b.name, pr.name) }
       },
       sql = """
-        SELECT subquery0.res__0__name AS res__0, subquery1.res__1__name AS res__1
+        SELECT subquery0.res_0_name AS res_0, subquery1.res_1_name AS res_1
         FROM (WITH
-            cte0 (res__id, res__name)
-            AS (SELECT buyer0.id AS res__id, buyer0.name AS res__name FROM buyer buyer0),
-            cte1 (res__id, res__buyer_id)
-            AS (SELECT shipping_info1.id AS res__id, shipping_info1.buyer_id AS res__buyer_id
+            cte0 (id, name)
+            AS (SELECT buyer0.id AS id, buyer0.name AS name FROM buyer buyer0),
+            cte1 (id, buyer_id)
+            AS (SELECT shipping_info1.id AS id, shipping_info1.buyer_id AS buyer_id
               FROM shipping_info shipping_info1)
-          SELECT cte0.res__name AS res__0__name, cte1.res__id AS res__1__id
+          SELECT cte0.name AS res_0_name, cte1.id AS res_1_id
           FROM cte0
-          JOIN cte1 ON (cte0.res__id = cte1.res__buyer_id)) subquery0
+          JOIN cte1 ON (cte0.id = cte1.buyer_id)) subquery0
         JOIN (WITH
-            cte1 (res__id, res__name)
-            AS (SELECT product1.id AS res__id, product1.name AS res__name FROM product product1)
+            cte1 (id, name)
+            AS (SELECT product1.id AS id, product1.name AS name FROM product product1)
           SELECT
-            purchase2.shipping_info_id AS res__0__shipping_info_id,
-            cte1.res__name AS res__1__name
+            purchase2.shipping_info_id AS res_0_shipping_info_id,
+            cte1.name AS res_1_name
           FROM purchase purchase2
-          JOIN cte1 ON (purchase2.product_id = cte1.res__id)) subquery1
-        ON (subquery0.res__1__id = subquery1.res__0__shipping_info_id)
+          JOIN cte1 ON (purchase2.product_id = cte1.id)) subquery1
+        ON (subquery0.res_1_id = subquery1.res_0_shipping_info_id)
       """,
       value = Seq[(String, String)](
         ("James Bond", "Camera"),

@@ -116,8 +116,8 @@ trait ReturningTests extends ScalaSqlSuite {
           sql = """
             INSERT INTO buyer (name, date_of_birth)
             SELECT
-              buyer0.name AS res__0,
-              buyer0.date_of_birth AS res__1
+              buyer0.name AS res_0,
+              buyer0.date_of_birth AS res_1
             FROM buyer buyer0
             WHERE (buyer0.name <> ?)
             RETURNING buyer.id AS res
@@ -179,12 +179,12 @@ trait ReturningTests extends ScalaSqlSuite {
             """
             UPDATE buyer
             SET date_of_birth = ?, name = ? WHERE (buyer.name = ?)
-            RETURNING buyer.id AS res__0, buyer.name AS res__1, buyer.date_of_birth AS res__2
+            RETURNING buyer.id AS res_0, buyer.name AS res_1, buyer.date_of_birth AS res_2
           """,
             """
             UPDATE buyer
             SET buyer.date_of_birth = ?, buyer.name = ? (WHERE buyer.name = ?)
-            RETURNING buyer.id AS res__0, buyer.name AS res__1, buyer.date_of_birth AS res__2
+            RETURNING buyer.id AS res_0, buyer.name AS res_1, buyer.date_of_birth AS res_2
           """
           ),
           value = Seq((1, "John Dee", LocalDate.parse("2019-04-07")))

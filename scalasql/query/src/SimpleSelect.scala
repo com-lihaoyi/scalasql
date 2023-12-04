@@ -5,7 +5,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   SqlExprsToSql,
-  FlatJson,
+  ColumnNamer,
   JoinNullable,
   Queryable,
   Sql,
@@ -209,12 +209,7 @@ class SimpleSelect[Q, R](
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
-    lazy val jsonQueryMap = flattenedExpr.map { case (k, v) =>
-      val str = Config.joinName(k.map(prevContext.config.columnNameMapper), prevContext.config)
-      val exprId = Sql.identity(v)
-
-      (exprId, SqlStr.raw(str, Array(exprId)))
-    }.toMap
+    lazy val jsonQueryMap = ColumnNamer.flattenCte(flattenedExpr, prevContext).toMap
 
     jsonQueryMap
   }
@@ -257,7 +252,7 @@ object SimpleSelect {
       query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
     lazy val exprsStrs = {
-      FlatJson.flatten(flattenedExpr, context).map { case (k, v) =>
+      ColumnNamer.flatten(flattenedExpr, context).map { case (k, v) =>
         sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
       }
     }

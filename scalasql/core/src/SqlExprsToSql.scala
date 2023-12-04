@@ -8,9 +8,9 @@ object SqlExprsToSql {
   }
 
   def apply0(flattenedExpr: Seq[(List[String], Sql[_])], context: Context, prefix: SqlStr) = {
-    FlatJson.flatten(flattenedExpr, context) match {
+    ColumnNamer.flatten(flattenedExpr, context) match {
       case Seq((prefix, singleExpr))
-          if prefix == context.config.columnLabelPrefix && singleExpr.isCompleteQuery =>
+          if prefix == context.config.columnLabelDefault && singleExpr.isCompleteQuery =>
         singleExpr
 
       case flatQuery =>

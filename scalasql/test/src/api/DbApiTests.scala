@@ -22,7 +22,7 @@ trait DbApiTests extends ScalaSqlSuite {
       """,
       Text {
         dbClient.renderSql(Buyer.select) ==>
-          "SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth FROM buyer buyer0"
+          "SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth FROM buyer buyer0"
       }
     )
     test("run") - checker.recorded(

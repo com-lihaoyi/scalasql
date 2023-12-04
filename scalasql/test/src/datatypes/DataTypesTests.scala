@@ -198,10 +198,10 @@ trait DataTypesTests extends ScalaSqlSuite {
 
         db.renderSql(Enclosing.select) ==> """
           SELECT
-            enclosing0.bar_id AS res__bar_id,
-            enclosing0.my_string AS res__my_string,
-            enclosing0.foo_id AS res__foo_id,
-            enclosing0.my_boolean AS res__my_boolean
+            enclosing0.bar_id AS bar_id,
+            enclosing0.my_string AS my_string,
+            enclosing0.foo_id AS foo_id,
+            enclosing0.my_boolean AS my_boolean
           FROM enclosing enclosing0
         """
 

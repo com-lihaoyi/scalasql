@@ -106,17 +106,17 @@ trait ValuesTests extends ScalaSqlSuite {
       },
       sqls = Seq(
         """
-        SELECT subquery0.column1 AS res__0, product1.price AS res__1
+        SELECT subquery0.column1 AS res_0, product1.price AS res_1
         FROM (VALUES (?), (?), (?)) subquery0
         JOIN product product1 ON (product1.name = subquery0.column1)
         """,
         """
-        SELECT subquery0.c1 AS res__0, product1.price AS res__1
+        SELECT subquery0.c1 AS res_0, product1.price AS res_1
         FROM (VALUES (?), (?), (?)) subquery0
         JOIN product product1 ON (product1.name = subquery0.c1)
         """,
         """
-        SELECT subquery0.column_0 AS res__0, product1.price AS res__1
+        SELECT subquery0.column_0 AS res_0, product1.price AS res_1
         FROM (VALUES ROW(?), ROW(?), ROW(?)) subquery0
         JOIN product product1 ON (product1.name = subquery0.column_0)
         """
@@ -160,15 +160,15 @@ trait ValuesTests extends ScalaSqlSuite {
         },
         sqls = Seq(
           """
-            SELECT (subquery0.column1 + ?) AS res__0, (subquery0.column2 + ?) AS res__1
+            SELECT (subquery0.column1 + ?) AS res_0, (subquery0.column2 + ?) AS res_1
             FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
           """,
           """
-            SELECT (subquery0.c1 + ?) AS res__0, (subquery0.c2 + ?) AS res__1
+            SELECT (subquery0.c1 + ?) AS res_0, (subquery0.c2 + ?) AS res_1
             FROM (VALUES (?, ?), (?, ?), (?, ?)) subquery0
           """,
           """
-            SELECT (subquery0.column_0 + ?) AS res__0, (subquery0.column_1 + ?) AS res__1
+            SELECT (subquery0.column_0 + ?) AS res_0, (subquery0.column_1 + ?) AS res_1
             FROM (VALUES ROW(?, ?), ROW(?, ?), ROW(?, ?)) subquery0
           """
         ),
@@ -189,26 +189,26 @@ trait ValuesTests extends ScalaSqlSuite {
         sqls = Seq(
           """
             SELECT
-              (subquery0.column1 + ?) AS res__0,
-              subquery0.column1 AS res__1__id,
-              subquery0.column2 AS res__1__name,
-              subquery0.column3 AS res__1__date_of_birth
+              (subquery0.column1 + ?) AS res_0,
+              subquery0.column1 AS res_1_id,
+              subquery0.column2 AS res_1_name,
+              subquery0.column3 AS res_1_date_of_birth
             FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
           """,
           """
             SELECT
-              (subquery0.c1 + ?) AS res__0,
-              subquery0.c1 AS res__1__id,
-              subquery0.c2 AS res__1__name,
-              subquery0.c3 AS res__1__date_of_birth
+              (subquery0.c1 + ?) AS res_0,
+              subquery0.c1 AS res_1_id,
+              subquery0.c2 AS res_1_name,
+              subquery0.c3 AS res_1_date_of_birth
             FROM (VALUES (?, ?, ?), (?, ?, ?)) subquery0
           """,
           """
             SELECT
-              (subquery0.column_0 + ?) AS res__0,
-              subquery0.column_0 AS res__1__id,
-              subquery0.column_1 AS res__1__name,
-              subquery0.column_2 AS res__1__date_of_birth
+              (subquery0.column_0 + ?) AS res_0,
+              subquery0.column_0 AS res_1_id,
+              subquery0.column_1 AS res_1_name,
+              subquery0.column_2 AS res_1_date_of_birth
             FROM (VALUES ROW(?, ?, ?), ROW(?, ?, ?)) subquery0
           """
         ),
@@ -231,18 +231,18 @@ trait ValuesTests extends ScalaSqlSuite {
         sqls = Seq(
           """
             SELECT
-              buyer0.id AS res__id,
-              buyer0.name AS res__name,
-              buyer0.date_of_birth AS res__date_of_birth
+              buyer0.id AS id,
+              buyer0.name AS name,
+              buyer0.date_of_birth AS date_of_birth
             FROM buyer buyer0
             WHERE (NOT
               ((buyer0.id, buyer0.name, buyer0.date_of_birth) IN (VALUES (?, ?, ?), (?, ?, ?))))
           """,
           """
             SELECT
-              buyer0.id AS res__id,
-              buyer0.name AS res__name,
-              buyer0.date_of_birth AS res__date_of_birth
+              buyer0.id AS id,
+              buyer0.name AS name,
+              buyer0.date_of_birth AS date_of_birth
             FROM buyer buyer0
             WHERE (NOT
               ((buyer0.id, buyer0.name, buyer0.date_of_birth) IN (VALUES ROW(?, ?, ?), ROW(?, ?, ?))))

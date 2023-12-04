@@ -25,9 +25,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Int)](
@@ -58,9 +58,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            ROW_NUMBER() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            ROW_NUMBER() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Int)](
@@ -87,9 +87,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            DENSE_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            DENSE_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Int)](
@@ -116,9 +116,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            DENSE_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            DENSE_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Int)](
@@ -145,9 +145,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            PERCENT_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            PERCENT_RANK() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -174,9 +174,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            CUME_DIST() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            CUME_DIST() OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -203,9 +203,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            NTILE(?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            NTILE(?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Int)](
@@ -232,9 +232,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            LAG(purchase0.total, ?, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            LAG(purchase0.total, ?, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -261,9 +261,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            LEAD(purchase0.total, ?, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            LEAD(purchase0.total, ?, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -290,9 +290,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            FIRST_VALUE(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            FIRST_VALUE(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -319,9 +319,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            LAST_VALUE(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            LAST_VALUE(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -348,9 +348,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            NTH_VALUE(purchase0.total, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            NTH_VALUE(purchase0.total, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq[(Int, Double, Double)](
@@ -379,9 +379,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            SUM(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            SUM(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq(
@@ -422,9 +422,9 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            purchase0.shipping_info_id AS res__0,
-            purchase0.total AS res__1,
-            AVG(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res__2
+            purchase0.shipping_info_id AS res_0,
+            purchase0.total AS res_1,
+            AVG(purchase0.total) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
           FROM purchase purchase0
         """,
         value = Seq(
@@ -497,13 +497,13 @@ trait WindowFunctionTests extends ScalaSqlSuite {
           },
           sql = """
         SELECT
-          purchase0.shipping_info_id AS res__0,
-          purchase0.total AS res__1,
+          purchase0.shipping_info_id AS res_0,
+          purchase0.total AS res_1,
           SUM(purchase0.total)
           OVER (PARTITION BY purchase0.shipping_info_id
             ORDER BY purchase0.total ASC
             ROWS BETWEEN UNBOUNDED PRECEDING
-            AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW) AS res__2
+            AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW) AS res_2
         FROM purchase purchase0
       """,
           value = Seq[(Int, Double, Double)](
@@ -543,12 +543,12 @@ trait WindowFunctionTests extends ScalaSqlSuite {
           },
           sql = """
         SELECT
-          purchase0.shipping_info_id AS res__0,
-          purchase0.total AS res__1,
+          purchase0.shipping_info_id AS res_0,
+          purchase0.total AS res_1,
           SUM(purchase0.total)
             FILTER (WHERE (purchase0.total > ?))
             OVER (PARTITION BY purchase0.shipping_info_id
-              ORDER BY purchase0.total ASC) AS res__2
+              ORDER BY purchase0.total ASC) AS res_2
         FROM purchase purchase0
       """,
           value = Seq[(Int, Double, Double)](

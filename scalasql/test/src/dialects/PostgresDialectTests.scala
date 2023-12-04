@@ -16,13 +16,13 @@ trait PostgresDialectTests extends PostgresSuite {
       query = Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc,
       sql = """
         SELECT
-          DISTINCT ON (purchase0.shipping_info_id) purchase0.id AS res__id,
-          purchase0.shipping_info_id AS res__shipping_info_id,
-          purchase0.product_id AS res__product_id,
-          purchase0.count AS res__count,
-          purchase0.total AS res__total
+          DISTINCT ON (purchase0.shipping_info_id) purchase0.id AS id,
+          purchase0.shipping_info_id AS shipping_info_id,
+          purchase0.product_id AS product_id,
+          purchase0.count AS count,
+          purchase0.total AS total
         FROM purchase purchase0
-        ORDER BY res__shipping_info_id DESC
+        ORDER BY shipping_info_id DESC
       """,
       value = Seq(
         Purchase[Id](6, 3, 1, 5, 44.4),

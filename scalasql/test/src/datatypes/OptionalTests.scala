@@ -32,8 +32,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select },
       sql = """
         SELECT
-          opt_cols0.my_int AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          opt_cols0.my_int AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -52,7 +52,7 @@ trait OptionalTests extends ScalaSqlSuite {
     test("groupByMaxGet") - checker(
       query = Text { OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get)) },
       sql = """
-        SELECT opt_cols0.my_int AS res__0, MAX(opt_cols0.my_int2) AS res__1
+        SELECT opt_cols0.my_int AS res_0, MAX(opt_cols0.my_int2) AS res_1
         FROM opt_cols opt_cols0
         GROUP BY opt_cols0.my_int
       """,
@@ -67,8 +67,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.filter(_.myInt.isDefined) },
       sql = """
         SELECT
-          opt_cols0.my_int AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          opt_cols0.my_int AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
         WHERE (opt_cols0.my_int IS NOT NULL)""",
       value = Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None)),
@@ -82,8 +82,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.filter(_.myInt.isEmpty) },
       sql = """
         SELECT
-          opt_cols0.my_int AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          opt_cols0.my_int AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
         WHERE (opt_cols0.my_int IS NULL)""",
       value = Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4))),
@@ -98,8 +98,8 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.filter(_.myInt `=` 1) },
         sql = """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int = ?)
         """,
@@ -115,8 +115,8 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.filter(_.myInt `=` 2) },
         sql = """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int = ?)
         """,
@@ -127,8 +127,8 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.filter(_.myInt `=` Option.empty[Int]) },
         sql = """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int = ?)
         """,
@@ -141,16 +141,16 @@ trait OptionalTests extends ScalaSqlSuite {
         sqls = Seq(
           """
             SELECT
-              opt_cols0.my_int AS res__my_int,
-              opt_cols0.my_int2 AS res__my_int2
+              opt_cols0.my_int AS my_int,
+              opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             WHERE (opt_cols0.my_int IS NOT DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
             SELECT
-              opt_cols0.my_int AS res__my_int,
-              opt_cols0.my_int2 AS res__my_int2
+              opt_cols0.my_int AS my_int,
+              opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             WHERE (opt_cols0.my_int <=> ?)
           """
@@ -168,16 +168,16 @@ trait OptionalTests extends ScalaSqlSuite {
         sqls = Seq(
           """
             SELECT
-              opt_cols0.my_int AS res__my_int,
-              opt_cols0.my_int2 AS res__my_int2
+              opt_cols0.my_int AS my_int,
+              opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             WHERE (opt_cols0.my_int IS NOT DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
             SELECT
-              opt_cols0.my_int AS res__my_int,
-              opt_cols0.my_int2 AS res__my_int2
+              opt_cols0.my_int AS my_int,
+              opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             WHERE (opt_cols0.my_int <=> ?)
           """
@@ -192,16 +192,16 @@ trait OptionalTests extends ScalaSqlSuite {
         sqls = Seq(
           """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int IS DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (NOT (opt_cols0.my_int <=> ?))
           """
@@ -220,16 +220,16 @@ trait OptionalTests extends ScalaSqlSuite {
         sqls = Seq(
           """
           SELECT
-            opt_cols0.my_int AS res__my_int,
-            opt_cols0.my_int2 AS res__my_int2
+            opt_cols0.my_int AS my_int,
+            opt_cols0.my_int2 AS my_int2
           FROM opt_cols opt_cols0
           WHERE (opt_cols0.my_int IS DISTINCT FROM ?)
           """,
           // MySQL syntax
           """
             SELECT
-              opt_cols0.my_int AS res__my_int,
-              opt_cols0.my_int2 AS res__my_int2
+              opt_cols0.my_int AS my_int,
+              opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             WHERE (NOT (opt_cols0.my_int <=> ?))
           """
@@ -246,8 +246,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + 10))) },
       sql = """
       SELECT
-        (opt_cols0.my_int + ?) AS res__my_int,
-        opt_cols0.my_int2 AS res__my_int2
+        (opt_cols0.my_int + ?) AS my_int,
+        opt_cols0.my_int2 AS my_int2
       FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -276,8 +276,8 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -295,8 +295,8 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -320,8 +320,8 @@ trait OptionalTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -337,8 +337,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1))) },
       sql = """
         SELECT
-          COALESCE(opt_cols0.my_int, ?) AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          COALESCE(opt_cols0.my_int, ?) AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -353,8 +353,8 @@ trait OptionalTests extends ScalaSqlSuite {
       query = Text { OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2))) },
       sql = """
         SELECT
-          COALESCE(opt_cols0.my_int, opt_cols0.my_int2) AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          COALESCE(opt_cols0.my_int, opt_cols0.my_int2) AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -372,8 +372,8 @@ trait OptionalTests extends ScalaSqlSuite {
           CASE
             WHEN (opt_cols0.my_int < ?) THEN opt_cols0.my_int
             ELSE NULL
-          END AS res__my_int,
-          opt_cols0.my_int2 AS res__my_int2
+          END AS my_int,
+          opt_cols0.my_int2 AS my_int2
         FROM opt_cols opt_cols0
       """,
       value = Seq(
@@ -391,14 +391,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).nullsLast },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int NULLS LAST
+            ORDER BY my_int NULLS LAST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int IS NULL ASC, res__my_int
+            ORDER BY my_int IS NULL ASC, my_int
           """
         ),
         value = Seq(
@@ -415,14 +415,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).nullsFirst },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int NULLS FIRST
+            ORDER BY my_int NULLS FIRST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int IS NULL DESC, res__my_int
+            ORDER BY my_int IS NULL DESC, my_int
           """
         ),
         value = Seq(
@@ -436,14 +436,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsLast },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int ASC NULLS LAST
+            ORDER BY my_int ASC NULLS LAST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int IS NULL ASC, res__my_int ASC
+            ORDER BY my_int IS NULL ASC, my_int ASC
           """
         ),
         value = Seq(
@@ -457,14 +457,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsFirst },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int ASC NULLS FIRST
+            ORDER BY my_int ASC NULLS FIRST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int ASC
+            ORDER BY my_int ASC
           """
         ),
         value = Seq(
@@ -478,14 +478,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsLast },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int DESC NULLS LAST
+            ORDER BY my_int DESC NULLS LAST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int DESC
+            ORDER BY my_int DESC
           """
         ),
         value = Seq(
@@ -499,14 +499,14 @@ trait OptionalTests extends ScalaSqlSuite {
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsFirst },
         sqls = Seq(
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int DESC NULLS FIRST
+            ORDER BY my_int DESC NULLS FIRST
           """,
           """
-            SELECT opt_cols0.my_int AS res__my_int, opt_cols0.my_int2 AS res__my_int2
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
-            ORDER BY res__my_int IS NULL DESC, res__my_int DESC
+            ORDER BY my_int IS NULL DESC, my_int DESC
           """
         ),
         value = Seq(

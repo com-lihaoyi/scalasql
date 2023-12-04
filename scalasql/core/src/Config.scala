@@ -4,8 +4,8 @@ package scalasql.core
  * Things you to do to configure ScalaSql
  */
 trait Config {
-  def columnLabelPrefix = "res"
-  def columnLabelDelimiter = "__"
+  def columnLabelDefault = "res"
+  def columnLabelDelimiter = "_"
 
   /**
    * Configures the underlying JDBC connection's `setFetchSize`
@@ -34,10 +34,6 @@ trait Config {
 }
 
 object Config {
-  def joinName(chunks: List[String], config: Config) = {
-    (config.columnLabelPrefix +: chunks).mkString(config.columnLabelDelimiter)
-  }
-
   def camelToSnake(s: String) = {
     val chars = new collection.mutable.StringBuilder
     var lowercase = false

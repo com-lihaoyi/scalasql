@@ -27,9 +27,9 @@ trait LateralJoinTests extends ScalaSqlSuite {
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+        SELECT buyer0.name AS res_0, subquery1.shipping_date AS res_1
         FROM buyer buyer0
-        CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+        CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
         """,
@@ -51,9 +51,9 @@ trait LateralJoinTests extends ScalaSqlSuite {
         } yield (b.name, s.shippingDate)
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+        SELECT buyer0.name AS res_0, subquery1.shipping_date AS res_1
         FROM buyer buyer0
-        CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+        CROSS JOIN LATERAL (SELECT shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
         """,
@@ -74,9 +74,9 @@ trait LateralJoinTests extends ScalaSqlSuite {
           .map { case (b, s) => (b.name, s.shippingDate) }
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+        SELECT buyer0.name AS res_0, subquery1.shipping_date AS res_1
         FROM buyer buyer0
-        JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+        JOIN LATERAL (SELECT shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
           ON ?
@@ -99,9 +99,9 @@ trait LateralJoinTests extends ScalaSqlSuite {
         } yield (b.name, s.shippingDate)
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery1.res__shipping_date AS res__1
+        SELECT buyer0.name AS res_0, subquery1.shipping_date AS res_1
         FROM buyer buyer0
-        JOIN LATERAL (SELECT shipping_info1.shipping_date AS res__shipping_date
+        JOIN LATERAL (SELECT shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1
         ON ?
@@ -124,17 +124,17 @@ trait LateralJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.id AS res__0__id,
-          buyer0.name AS res__0__name,
-          buyer0.date_of_birth AS res__0__date_of_birth,
-          subquery1.res__id AS res__1__id,
-          subquery1.res__buyer_id AS res__1__buyer_id,
-          subquery1.res__shipping_date AS res__1__shipping_date
+          buyer0.id AS res_0_id,
+          buyer0.name AS res_0_name,
+          buyer0.date_of_birth AS res_0_date_of_birth,
+          subquery1.id AS res_1_id,
+          subquery1.buyer_id AS res_1_buyer_id,
+          subquery1.shipping_date AS res_1_shipping_date
         FROM buyer buyer0
         LEFT JOIN LATERAL (SELECT
-            shipping_info1.id AS res__id,
-            shipping_info1.buyer_id AS res__buyer_id,
-            shipping_info1.shipping_date AS res__shipping_date
+            shipping_info1.id AS id,
+            shipping_info1.buyer_id AS buyer_id,
+            shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1 ON ?
       """,
@@ -170,17 +170,17 @@ trait LateralJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.id AS res__0__id,
-          buyer0.name AS res__0__name,
-          buyer0.date_of_birth AS res__0__date_of_birth,
-          subquery1.res__id AS res__1__id,
-          subquery1.res__buyer_id AS res__1__buyer_id,
-          subquery1.res__shipping_date AS res__1__shipping_date
+          buyer0.id AS res_0_id,
+          buyer0.name AS res_0_name,
+          buyer0.date_of_birth AS res_0_date_of_birth,
+          subquery1.id AS res_1_id,
+          subquery1.buyer_id AS res_1_buyer_id,
+          subquery1.shipping_date AS res_1_shipping_date
         FROM buyer buyer0
         LEFT JOIN LATERAL (SELECT
-            shipping_info1.id AS res__id,
-            shipping_info1.buyer_id AS res__buyer_id,
-            shipping_info1.shipping_date AS res__shipping_date
+            shipping_info1.id AS id,
+            shipping_info1.buyer_id AS buyer_id,
+            shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
           WHERE (buyer0.id = shipping_info1.buyer_id)) subquery1 ON ?
       """,

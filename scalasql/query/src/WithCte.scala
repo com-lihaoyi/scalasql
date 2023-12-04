@@ -4,7 +4,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   SqlExprsToSql,
-  FlatJson,
+  ColumnNamer,
   Queryable,
   Sql,
   SqlStr,
@@ -92,15 +92,8 @@ object WithCte {
         query.lhs.qr
           .asInstanceOf[Queryable[Any, Any]]
           .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
-      val newExprNaming = walked.map { case (tokens, expr) =>
-        (
-          Sql.identity(expr),
-          SqlStr.raw(
-            prevContext.config.tableNameMapper(FlatJson.flatten(tokens, prevContext)),
-            Array(Sql.identity(expr))
-          )
-        )
-      }
+
+      val newExprNaming = ColumnNamer.flattenCte(walked, prevContext)
 
       val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))

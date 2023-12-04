@@ -18,7 +18,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, si.shippingDate)
       },
       sql = """
-        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
+        SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
@@ -46,7 +46,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, pr.name, pr.price)
       },
       sql = """
-        SELECT buyer0.name AS res__0, product3.name AS res__1, product3.price AS res__2
+        SELECT buyer0.name AS res_0, product3.name AS res_1, product3.price AS res_2
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (shipping_info1.id = buyer0.id)
         JOIN purchase purchase2 ON (purchase2.shipping_info_id = shipping_info1.id)
@@ -73,7 +73,7 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, si.map(_.shippingDate))
       },
       sql = """
-        SELECT buyer0.name AS res__0, shipping_info1.shipping_date AS res__1
+        SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (shipping_info1.buyer_id = buyer0.id)
       """,
@@ -156,15 +156,15 @@ trait FlatJoinTests extends ScalaSqlSuite {
         } yield (b.name, pr.name)
       },
       sql = """
-        SELECT buyer0.name AS res__0, subquery2.res__1__name AS res__1
+        SELECT buyer0.name AS res_0, subquery2.res_1_name AS res_1
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         CROSS JOIN (SELECT
-            purchase2.shipping_info_id AS res__0__shipping_info_id,
-            product3.name AS res__1__name
+            purchase2.shipping_info_id AS res_0_shipping_info_id,
+            product3.name AS res_1_name
           FROM purchase purchase2
           JOIN product product3 ON (purchase2.product_id = product3.id)) subquery2
-        WHERE (shipping_info1.id = subquery2.res__0__shipping_info_id)
+        WHERE (shipping_info1.id = subquery2.res_0_shipping_info_id)
       """,
       value = Seq(
         ("James Bond", "Camera"),
@@ -191,11 +191,11 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__0 AS res__0,
-          subquery0.res__1 AS res__1,
-          shipping_info1.id AS res__2,
-          shipping_info1.shipping_date AS res__3
-        FROM (SELECT buyer0.name AS res__0, MIN(buyer0.date_of_birth) AS res__1
+          subquery0.res_0 AS res_0,
+          subquery0.res_1 AS res_1,
+          shipping_info1.id AS res_2,
+          shipping_info1.shipping_date AS res_3
+        FROM (SELECT buyer0.name AS res_0, MIN(buyer0.date_of_birth) AS res_1
           FROM buyer buyer0
           GROUP BY buyer0.name) subquery0
         CROSS JOIN shipping_info shipping_info1
@@ -228,18 +228,18 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__0 AS res__0,
-          subquery0.res__1 AS res__1,
-          subquery1.res__0 AS res__2,
-          subquery1.res__1 AS res__3
+          subquery0.res_0 AS res_0,
+          subquery0.res_1 AS res_1,
+          subquery1.res_0 AS res_2,
+          subquery1.res_1 AS res_3
         FROM (SELECT
-            buyer0.name AS res__0,
-            MIN(buyer0.date_of_birth) AS res__1
+            buyer0.name AS res_0,
+            MIN(buyer0.date_of_birth) AS res_1
           FROM buyer buyer0
           GROUP BY buyer0.name) subquery0
         CROSS JOIN (SELECT
-            shipping_info1.id AS res__0,
-            MIN(shipping_info1.shipping_date) AS res__1
+            shipping_info1.id AS res_0,
+            MIN(shipping_info1.shipping_date) AS res_1
           FROM shipping_info shipping_info1
           GROUP BY shipping_info1.id) subquery1
       """,
@@ -269,18 +269,18 @@ trait FlatJoinTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          subquery0.res__name AS res__0,
-          subquery1.res__shipping_date AS res__1
+          subquery0.name AS res_0,
+          subquery1.shipping_date AS res_1
         FROM
-          (SELECT buyer0.id AS res__id, buyer0.name AS res__name
+          (SELECT buyer0.id AS id, buyer0.name AS name
           FROM buyer buyer0
-          ORDER BY res__id ASC
+          ORDER BY id ASC
           LIMIT ?) subquery0
         CROSS JOIN (SELECT
-            shipping_info1.id AS res__id,
-            shipping_info1.shipping_date AS res__shipping_date
+            shipping_info1.id AS id,
+            shipping_info1.shipping_date AS shipping_date
           FROM shipping_info shipping_info1
-          ORDER BY res__id ASC
+          ORDER BY id ASC
           LIMIT ?) subquery1
       """,
       value = Seq(

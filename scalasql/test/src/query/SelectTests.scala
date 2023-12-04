@@ -25,10 +25,7 @@ trait SelectTests extends ScalaSqlSuite {
     test("table") - checker(
       query = Text { Buyer.select },
       sql = """
-        SELECT
-          buyer0.id AS res__id,
-          buyer0.name AS res__name,
-          buyer0.date_of_birth AS res__date_of_birth
+        SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
         FROM buyer buyer0
       """,
       value = Seq(
@@ -48,12 +45,12 @@ trait SelectTests extends ScalaSqlSuite {
       test("single") - checker(
         query = Text { ShippingInfo.select.filter(_.buyerId `=` 2) },
         sql = """
-        SELECT
-          shipping_info0.id AS res__id,
-          shipping_info0.buyer_id AS res__buyer_id,
-          shipping_info0.shipping_date AS res__shipping_date
-        FROM shipping_info shipping_info0
-        WHERE (shipping_info0.buyer_id = ?)
+          SELECT
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
+            FROM shipping_info shipping_info0
+            WHERE (shipping_info0.buyer_id = ?)
         """,
         value = Seq(
           ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
@@ -72,13 +69,12 @@ trait SelectTests extends ScalaSqlSuite {
             .filter(_.shippingDate `=` LocalDate.parse("2012-05-06"))
         },
         sql = """
-        SELECT
-          shipping_info0.id AS res__id,
-          shipping_info0.buyer_id AS res__buyer_id,
-          shipping_info0.shipping_date AS res__shipping_date
-        FROM shipping_info shipping_info0
-        WHERE (shipping_info0.buyer_id = ?)
-        AND (shipping_info0.shipping_date = ?)
+          SELECT
+            shipping_info0.id AS id,
+            shipping_info0.buyer_id AS buyer_id,
+            shipping_info0.shipping_date AS shipping_date
+          FROM shipping_info shipping_info0
+          WHERE (shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?)
         """,
         value =
           Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))),
@@ -97,12 +93,11 @@ trait SelectTests extends ScalaSqlSuite {
           },
           sql = """
             SELECT
-              shipping_info0.id AS res__id,
-              shipping_info0.buyer_id AS res__buyer_id,
-              shipping_info0.shipping_date AS res__shipping_date
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
             FROM shipping_info shipping_info0
-            WHERE (shipping_info0.buyer_id = ?)
-            AND (shipping_info0.shipping_date = ?)
+            WHERE (shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?)
           """,
           value =
             ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")),
@@ -133,12 +128,11 @@ trait SelectTests extends ScalaSqlSuite {
         },
         sql = """
           SELECT
-            shipping_info0.id AS res__id,
-            shipping_info0.buyer_id AS res__buyer_id,
-            shipping_info0.shipping_date AS res__shipping_date
+            shipping_info0.id AS id,
+            shipping_info0.buyer_id AS buyer_id,
+            shipping_info0.shipping_date AS shipping_date
           FROM shipping_info shipping_info0
-          WHERE ((shipping_info0.buyer_id = ?)
-          AND (shipping_info0.shipping_date = ?))
+          WHERE ((shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?))
         """,
         value = Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
         docs = """
@@ -172,7 +166,7 @@ trait SelectTests extends ScalaSqlSuite {
 
       test("tuple2") - checker(
         query = Text { Buyer.select.map(c => (c.name, c.id)) },
-        sql = "SELECT buyer0.name AS res__0, buyer0.id AS res__1 FROM buyer buyer0",
+        sql = "SELECT buyer0.name AS res_0, buyer0.id AS res_1 FROM buyer buyer0",
         value = Seq(("James Bond", 1), ("叉烧包", 2), ("Li Haoyi", 3)),
         docs = """
           You can return multiple values from your `.map` by returning a tuple in your query,
@@ -184,9 +178,9 @@ trait SelectTests extends ScalaSqlSuite {
         query = Text { Buyer.select.map(c => (c.name, c.id, c.dateOfBirth)) },
         sql = """
           SELECT
-            buyer0.name AS res__0,
-            buyer0.id AS res__1,
-            buyer0.date_of_birth AS res__2
+            buyer0.name AS res_0,
+            buyer0.id AS res_1,
+            buyer0.date_of_birth AS res_2
           FROM buyer buyer0
         """,
         value = Seq(
@@ -209,10 +203,10 @@ trait SelectTests extends ScalaSqlSuite {
         query = Text { Buyer.select.map(c => (c.id, c)) },
         sql = """
           SELECT
-            buyer0.id AS res__0,
-            buyer0.id AS res__1__id,
-            buyer0.name AS res__1__name,
-            buyer0.date_of_birth AS res__1__date_of_birth
+            buyer0.id AS res_0,
+            buyer0.id AS res_1_id,
+            buyer0.name AS res_1_name,
+            buyer0.date_of_birth AS res_1_date_of_birth
           FROM buyer buyer0
         """,
         value = Seq(
@@ -244,12 +238,12 @@ trait SelectTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          product0.name AS res__0,
+          product0.name AS res_0,
           (SELECT purchase1.total AS res
             FROM purchase purchase1
             WHERE (purchase1.product_id = product0.id)
             ORDER BY res DESC
-            LIMIT ?) AS res__1
+            LIMIT ?) AS res_1
         FROM product product0""",
       value = Seq(
         ("Face Mask", 888.0),
@@ -271,8 +265,8 @@ trait SelectTests extends ScalaSqlSuite {
     test("subquery") - checker(
       query = Text { Buyer.select.subquery.map(_.name) },
       sql = """
-        SELECT subquery0.res__name AS res
-        FROM (SELECT buyer0.name AS res__name FROM buyer buyer0) subquery0
+        SELECT subquery0.name AS res
+        FROM (SELECT buyer0.name AS name FROM buyer buyer0) subquery0
       """,
       value = Seq("James Bond", "叉烧包", "Li Haoyi"),
       docs = """
@@ -297,7 +291,7 @@ trait SelectTests extends ScalaSqlSuite {
       test("multiple") - checker(
         query = Text { Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total))) },
         sql =
-          "SELECT SUM(purchase0.total) AS res__0, MAX(purchase0.total) AS res__1 FROM purchase purchase0",
+          "SELECT SUM(purchase0.total) AS res_0, MAX(purchase0.total) AS res_1 FROM purchase purchase0",
         value = (12343.2, 10000.0),
         docs = """
           If you want to perform multiple aggregates at once, you can use the `.aggregate` method
@@ -310,7 +304,7 @@ trait SelectTests extends ScalaSqlSuite {
       test("simple") - checker(
         query = Text { Purchase.select.groupBy(_.productId)(_.sumBy(_.total)) },
         sql = """
-          SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
+          SELECT purchase0.product_id AS res_0, SUM(purchase0.total) AS res_1
           FROM purchase purchase0
           GROUP BY purchase0.product_id
         """,
@@ -329,7 +323,7 @@ trait SelectTests extends ScalaSqlSuite {
           Purchase.select.groupBy(_.productId)(_.sumBy(_.total)).filter(_._2 > 100).filter(_._1 > 1)
         },
         sql = """
-          SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
+          SELECT purchase0.product_id AS res_0, SUM(purchase0.total) AS res_1
           FROM purchase purchase0
           GROUP BY purchase0.product_id
           HAVING (SUM(purchase0.total) > ?) AND (purchase0.product_id > ?)
@@ -349,7 +343,7 @@ trait SelectTests extends ScalaSqlSuite {
             .filter(_._2 > 100)
         },
         sql = """
-          SELECT purchase0.product_id AS res__0, SUM(purchase0.total) AS res__1
+          SELECT purchase0.product_id AS res_0, SUM(purchase0.total) AS res_1
           FROM purchase purchase0
           WHERE (purchase0.count > ?)
           GROUP BY purchase0.product_id
@@ -383,7 +377,7 @@ trait SelectTests extends ScalaSqlSuite {
     test("contains") - checker(
       query = Text { Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id)) },
       sql = """
-        SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
+        SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
         FROM buyer buyer0
         WHERE (buyer0.id IN (SELECT shipping_info1.buyer_id AS res FROM shipping_info shipping_info1))
       """,
@@ -406,11 +400,11 @@ trait SelectTests extends ScalaSqlSuite {
         )
       },
       sql = """
-        SELECT buyer0.id AS res__id, buyer0.name AS res__name, buyer0.date_of_birth AS res__date_of_birth
+        SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
         FROM buyer buyer0
         WHERE ((buyer0.id, ?) IN (SELECT
-            shipping_info1.buyer_id AS res__0,
-            shipping_info1.shipping_date AS res__1
+            shipping_info1.buyer_id AS res_0,
+            shipping_info1.shipping_date AS res_1
           FROM shipping_info shipping_info1))
       """,
       value = Seq(
@@ -431,11 +425,11 @@ trait SelectTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.name AS res__0,
+          buyer0.name AS res_0,
           (EXISTS (SELECT
             shipping_info1.id AS res
             FROM shipping_info shipping_info1
-            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false)),
@@ -451,11 +445,11 @@ trait SelectTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.name AS res__0,
+          buyer0.name AS res_0,
           (NOT EXISTS (SELECT
             shipping_info1.id AS res
             FROM shipping_info shipping_info1
-            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res__1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
       """,
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
@@ -470,17 +464,17 @@ trait SelectTests extends ScalaSqlSuite {
       },
       sql = """
         SELECT
-          buyer0.id AS res__0,
-          buyer0.id AS res__1__0__id,
-          buyer0.name AS res__1__0__name,
-          buyer0.date_of_birth AS res__1__0__date_of_birth,
-          shipping_info1.id AS res__1__1__0,
-          shipping_info1.id AS res__1__1__1__id,
-          shipping_info1.buyer_id AS res__1__1__1__buyer_id,
-          shipping_info1.shipping_date AS res__1__1__1__shipping_date
+          buyer0.id AS res_0,
+          buyer0.id AS res_1_0_id,
+          buyer0.name AS res_1_0_name,
+          buyer0.date_of_birth AS res_1_0_date_of_birth,
+          shipping_info1.id AS res_1_1_0,
+          shipping_info1.id AS res_1_1_1_id,
+          shipping_info1.buyer_id AS res_1_1_1_buyer_id,
+          shipping_info1.shipping_date AS res_1_1_1_shipping_date
         FROM buyer buyer0
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-        ORDER BY res__1__0__id
+        ORDER BY res_1_0_id
       """,
       value = Seq[(Int, (Buyer[Id], (Int, ShippingInfo[Id])))](
         (
