@@ -187,11 +187,11 @@ on its own in order to retrieve all the data in the table:
 val query = City.select
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 """
 
@@ -222,11 +222,11 @@ val query = City.select.filter(_.name === "Singapore").single
 
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 WHERE (city0.name = ?)
 """
@@ -258,11 +258,11 @@ val query = City.select.filter(_.name === "Singapore").head
 
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 WHERE (city0.name = ?)
 LIMIT ?
@@ -277,11 +277,11 @@ as shown below:
 val query = City.select.filter(_.id === 3208).single
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 WHERE (city0.id = ?)
 """
@@ -295,11 +295,11 @@ with population more than 5 million:
 val query = City.select.filter(c => c.population > 5000000 && c.countryCode === "CHN")
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 WHERE ((city0.population > ?) AND (city0.countrycode = ?))
 """
@@ -320,11 +320,11 @@ You can also stack multiple separate filters together, as shown below:
 val query = City.select.filter(_.population > 5000000).filter(_.countryCode === "CHN")
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__id,
-  city0.name AS res__name,
-  city0.countrycode AS res__countrycode,
-  city0.district AS res__district,
-  city0.population AS res__population
+  city0.id AS id,
+  city0.name AS name,
+  city0.countrycode AS countrycode,
+  city0.district AS district,
+  city0.population AS population
 FROM city city0
 WHERE (city0.population > ?) AND (city0.countrycode = ?)
 """
@@ -386,7 +386,7 @@ each country, without all the other metadata:
 ```scala
 val query = Country.select.map(c => (c.name, c.continent))
 db.renderSql(query) ==> """
-SELECT country0.name AS res__0, country0.continent AS res__1
+SELECT country0.name AS res_0, country0.continent AS res_1
 FROM country country0
 """
 
@@ -411,13 +411,13 @@ val query = City.select
 
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__0__id,
-  city0.name AS res__0__name,
-  city0.countrycode AS res__0__countrycode,
-  city0.district AS res__0__district,
-  city0.population AS res__0__population,
-  UPPER(city0.name) AS res__1,
-  (city0.population / ?) AS res__2
+  city0.id AS res_0_id,
+  city0.name AS res_0_name,
+  city0.countrycode AS res_0_countrycode,
+  city0.district AS res_0_district,
+  city0.population AS res_0_population,
+  UPPER(city0.name) AS res_1,
+  (city0.population / ?) AS res_2
 FROM city city0
 WHERE (city0.name = ?)
 """
@@ -470,9 +470,9 @@ val query = Country.select
   .aggregate(cs => (cs.minBy(_.population), cs.avgBy(_.population), cs.maxBy(_.population)))
 db.renderSql(query) ==> """
 SELECT
-  MIN(country0.population) AS res__0,
-  AVG(country0.population) AS res__1,
-  MAX(country0.population) AS res__2
+  MIN(country0.population) AS res_0,
+  AVG(country0.population) AS res_1,
+  MAX(country0.population) AS res_2
 FROM country country0
 """
 
@@ -492,9 +492,9 @@ val query = City.select
   .map(c => (c.name, c.population))
 
 db.renderSql(query) ==> """
-SELECT city0.name AS res__0, city0.population AS res__1
+SELECT city0.name AS res_0, city0.population AS res_1
 FROM city city0
-ORDER BY res__1 DESC
+ORDER BY res_1 DESC
 LIMIT ? OFFSET ?
 """
 
@@ -646,7 +646,7 @@ val query = City.select
   .map { case (cityOpt, country) => (cityOpt.map(_.name), country.name) }
 
 db.renderSql(query) ==> """
-SELECT city0.name AS res__0, country1.name AS res__1
+SELECT city0.name AS res_0, country1.name AS res_1
 FROM city city0
 RIGHT JOIN country country1 ON (city0.countrycode = country1.code)
 WHERE (city0.id IS NULL)
@@ -704,17 +704,17 @@ val query = CountryLanguage.select
   .sortBy(_._1)
 
 db.renderSql(query) ==> """
-SELECT countrylanguage0.language AS res__0, subquery1.res__name AS res__1
+SELECT countrylanguage0.language AS res_0, subquery1.name AS res_1
 FROM countrylanguage countrylanguage0
 JOIN (SELECT
-    country1.code AS res__code,
-    country1.name AS res__name,
-    country1.population AS res__population
+    country1.code AS code,
+    country1.name AS name,
+    country1.population AS population
   FROM country country1
-  ORDER BY res__population DESC
+  ORDER BY population DESC
   LIMIT ?) subquery1
-ON (countrylanguage0.countrycode = subquery1.res__code)
-ORDER BY res__0
+ON (countrylanguage0.countrycode = subquery1.code)
+ORDER BY res_0
 """
 
 db.run(query).take(5) ==> Seq(
@@ -740,17 +740,17 @@ val query = Country.select
   .sortBy(_._1)
 
 db.renderSql(query) ==> """
-SELECT countrylanguage1.language AS res__0, subquery0.res__name AS res__1
+SELECT countrylanguage1.language AS res_0, subquery0.name AS res_1
 FROM (SELECT
-    country0.code AS res__code,
-    country0.name AS res__name,
-    country0.population AS res__population
+    country0.code AS code,
+    country0.name AS name,
+    country0.population AS population
   FROM country country0
-  ORDER BY res__population DESC
+  ORDER BY population DESC
   LIMIT ?) subquery0
 JOIN countrylanguage countrylanguage1
-ON (subquery0.res__code = countrylanguage1.countrycode)
-ORDER BY res__0
+ON (subquery0.code = countrylanguage1.countrycode)
+ORDER BY res_0
 """
 
 db.run(query).take(5) ==> List(
@@ -769,10 +769,10 @@ database query plan changes based on whether a subquery is present or not
 val query = Country.select.sortBy(_.population).desc.subquery.take(2).map(_.name)
 
 db.renderSql(query) ==> """
-SELECT subquery0.res__name AS res
-FROM (SELECT country0.name AS res__name, country0.population AS res__population
+SELECT subquery0.name AS res
+FROM (SELECT country0.name AS name, country0.population AS population
   FROM country country0
-  ORDER BY res__population DESC) subquery0
+  ORDER BY population DESC) subquery0
 LIMIT ?
 """
 
@@ -831,10 +831,10 @@ val query = City.select
 
 db.renderSql(query) ==> """
 SELECT
-  city0.name AS res__0,
-  city0.countrycode AS res__1,
-  city0.population AS res__2,
-  RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__3
+  city0.name AS res_0,
+  city0.countrycode AS res_1,
+  city0.population AS res_2,
+  RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res_3
 FROM city city0
 WHERE (city0.name IN (VALUES (?), (?), (?), (?), (?)))
 """
@@ -869,10 +869,10 @@ val query = City.select
 
 db.renderSql(query) ==> """
 SELECT
-  city0.name AS res__0,
-  city0.countrycode AS res__1,
-  city0.population AS res__2,
-  SUM(city0.population) OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__3
+  city0.name AS res_0,
+  city0.countrycode AS res_1,
+  city0.population AS res_2,
+  SUM(city0.population) OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res_3
 FROM city city0
 WHERE (city0.name IN (VALUES (?), (?), (?), (?)))
 """
@@ -901,11 +901,11 @@ val query = City.select
   .take(10)
 
 db.renderSql(query) ==> """
-SELECT countrylanguage1.language AS res__0, COUNT(1) AS res__1
+SELECT countrylanguage1.language AS res_0, COUNT(1) AS res_1
 FROM city city0
 JOIN countrylanguage countrylanguage1 ON (city0.countrycode = countrylanguage1.countrycode)
 GROUP BY countrylanguage1.language
-ORDER BY res__1 DESC
+ORDER BY res_1 DESC
 LIMIT ?
 """
 
@@ -936,11 +936,11 @@ val query = Country.select
 
 db.renderSql(query) ==> """
 SELECT
-  country0.continent AS res__0,
-  (SUM((country0.lifeexpectancy * country0.population)) / SUM(country0.population)) AS res__1
+  country0.continent AS res_0,
+  (SUM((country0.lifeexpectancy * country0.population)) / SUM(country0.population)) AS res_1
 FROM country country0
 GROUP BY country0.continent
-ORDER BY res__1 DESC
+ORDER BY res_1 DESC
 """
 
 db.run(query) ==> Seq(
@@ -984,22 +984,22 @@ val query = Country.select
 
 db.renderSql(query) ==> """
 SELECT
-  subquery0.res__name AS res__0,
-  subquery0.res__population AS res__1,
-  city1.name AS res__2,
-  city1.population AS res__3
+  subquery0.name AS res_0,
+  subquery0.population AS res_1,
+  city1.name AS res_2,
+  city1.population AS res_3
 FROM (SELECT
-    country0.code AS res__code,
-    country0.name AS res__name,
-    country0.population AS res__population
+    country0.code AS code,
+    country0.name AS name,
+    country0.population AS population
   FROM country country0
-  ORDER BY res__population DESC
+  ORDER BY population DESC
   LIMIT ?) subquery0
-JOIN city city1 ON (subquery0.res__code = city1.countrycode)
+JOIN city city1 ON (subquery0.code = city1.countrycode)
 WHERE (city1.id = (SELECT
     city2.id AS res
     FROM city city2
-    WHERE (city2.countrycode = subquery0.res__code)
+    WHERE (city2.countrycode = subquery0.code)
     ORDER BY city2.population DESC
     LIMIT ?))
 """
@@ -1032,18 +1032,18 @@ val query = City.select
 
 db.renderSql(query) ==> """
 SELECT
-  subquery0.res__0__name AS res__0,
-  subquery0.res__0__population AS res__1,
-  subquery0.res__0__countrycode AS res__2,
-  subquery0.res__1 AS res__3
+  subquery0.res_0_name AS res_0,
+  subquery0.res_0_population AS res_1,
+  subquery0.res_0_countrycode AS res_2,
+  subquery0.res_1 AS res_3
 FROM (SELECT
-    city0.name AS res__0__name,
-    city0.countrycode AS res__0__countrycode,
-    city0.population AS res__0__population,
-    RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res__1
+    city0.name AS res_0_name,
+    city0.countrycode AS res_0_countrycode,
+    city0.population AS res_0_population,
+    RANK() OVER (PARTITION BY city0.countrycode ORDER BY city0.population DESC) AS res_1
   FROM city city0) subquery0
-JOIN country country1 ON (subquery0.res__0__countrycode = country1.code)
-WHERE (subquery0.res__1 <= ?)
+JOIN country country1 ON (subquery0.res_0_countrycode = country1.code)
+WHERE (subquery0.res_1 <= ?)
 ORDER BY country1.population DESC
 """
 
@@ -1120,7 +1120,7 @@ val query = City.insert.select(
 
 db.renderSql(query) ==> """
 INSERT INTO city (name, countrycode, district, population)
-SELECT (? || city0.name) AS res__0, city0.countrycode AS res__1, city0.district AS res__2, ? AS res__3
+SELECT (? || city0.name) AS res_0, city0.countrycode AS res_1, city0.district AS res_2, ? AS res_3
 FROM city city0
 WHERE (city0.name = ?)
 """
@@ -1390,11 +1390,11 @@ object CityCustom extends Table[CityCustom]() {
 val query = CityCustom.select
 db.renderSql(query) ==> """
 SELECT
-  city0.id AS res__idcustom,
-  city0.name AS res__namecustom,
-  city0.countrycode AS res__countrycodecustom,
-  city0.district AS res__districtcustom,
-  city0.population AS res__populationcustom
+  city0.id AS idcustom,
+  city0.name AS namecustom,
+  city0.countrycode AS countrycodecustom,
+  city0.district AS districtcustom,
+  city0.population AS populationcustom
 FROM city city0
 """
 

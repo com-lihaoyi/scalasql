@@ -3,22 +3,30 @@ package scalasql.core
 import scalasql.core.SqlStr.Renderable
 
 /**
- * Converts back and forth between a tree-shaped JSON and flat key-value map
+ * Provides pretty column labels for your SELECT clauses. The mapping is
+ * are unique, concise, and readable, but does not need to be reversible
+ * since we do not use the names when re-constructing the final query
+ * return values.
  */
 object ColumnNamer {
   def isNormalCharacter(c: Char) =
     (c >= 'a' && c <= 'z') ||
-    (c >= 'Z' && c <= 'Z') ||
-    c == '_'
+      (c >= 'Z' && c <= 'Z') ||
+      c == '_'
 
-  def getSuffixedName(counter: collection.mutable.Map[String, Int],
-                      tokens: Seq[String],
-                      context: Context) = {
+  def getSuffixedName(
+      counter: collection.mutable.Map[String, Int],
+      tokens: Seq[String],
+      context: Context
+  ) = {
     val prefixedTokens =
-      if (tokens.isEmpty || !isNormalCharacter(tokens.head.head)) context.config.columnLabelDefault +: tokens
+      if (tokens.isEmpty || !isNormalCharacter(tokens.head.head))
+        context.config.columnLabelDefault +: tokens
       else tokens
 
-    val name0 = prefixedTokens.map(context.config.tableNameMapper).mkString(context.config.columnLabelDelimiter)
+    val name0 = prefixedTokens
+      .map(context.config.tableNameMapper)
+      .mkString(context.config.columnLabelDelimiter)
 
     val updated = counter.updateWith(name0) {
       case None => Some(1)
@@ -35,10 +43,12 @@ object ColumnNamer {
     }
   }
 
-  def flattenCte(walked: Seq[(List[String], Sql[_])], prevContext: Context): Seq[(Sql.Identity, SqlStr)] = {
+  def flattenCte(
+      walked: Seq[(List[String], Sql[_])],
+      prevContext: Context
+  ): Seq[(Sql.Identity, SqlStr)] = {
     val counter = collection.mutable.Map.empty[String, Int]
     walked.map { case (tokens, expr) =>
-
       (
         Sql.identity(expr),
         SqlStr.raw(
