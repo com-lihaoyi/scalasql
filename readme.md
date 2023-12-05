@@ -17,7 +17,7 @@ case class City[T[_]](
 )
 object City extends Table[City]
 
-// Connect to your database (example uses in-memory H2, requires com.h2database:h2:2.2.224)
+// Connect to your database (example uses in-memory sqlite, org.xerial:sqlite-jdbc:3.43.0.0)
 val dbClient = new scalasql.DbClient.Connection(
   connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
   config = new Config {
