@@ -291,7 +291,7 @@ object DbApi {
       Seq(queryTimeoutSeconds, config.defaultQueryTimeoutSeconds)
         .find(_ != -1)
         .foreach(statement.setQueryTimeout)
-      config.logSqlQuery(sql, fileName.value, lineNum.value)
+      config.logSql(sql, fileName.value, lineNum.value)
       try f(statement)
       finally statement.close()
     }

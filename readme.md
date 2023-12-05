@@ -21,12 +21,8 @@ object City extends Table[City]
 val dbClient = new scalasql.DbClient.Connection(
   connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
   config = new Config {
-    // Override default snake_case name mapping to match table schemas
-    override def columnNameMapper(v: String) = v.toLowerCase()
-    override def tableNameMapper(v: String) = v.toLowerCase()
-    override def logSqlQuery(sql: String, fileName: String, lineNum: Int): Unit = {
-      println(s"$fileName:$lineNum $sql")
-    }
+    override def nameMapper(v: String) = v.toLowerCase() // Override default snake_case mapping
+    override def logSql(sql: String, file: String, line: Int): Unit = println(s"$file:$line $sql")
   }
 )
 val db: DbApi = dbClient.getAutoCommitClientConnection

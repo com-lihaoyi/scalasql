@@ -18,19 +18,27 @@ trait Config {
   def defaultQueryTimeoutSeconds: Int = -1
 
   /**
+   * Translates table and column names from Scala `object` names to SQL names.
+   *
+   * Use [[tableNameMapper]] and [[columnNameMapper]] if you want different
+   * translations for table and column names
+   */
+  def nameMapper(v: String): String = Config.camelToSnake(v)
+
+  /**
    * Translates table names from Scala `object` names to SQL names.
    */
-  def tableNameMapper(v: String): String = Config.camelToSnake(v)
+  def tableNameMapper(v: String): String = nameMapper(v)
 
   /**
    * Translates column names from Scala `case class` field names to SQL names.
    */
-  def columnNameMapper(v: String): String = Config.camelToSnake(v)
+  def columnNameMapper(v: String): String = nameMapper(v)
 
   /**
    * Override this to log the executed SQL queries
    */
-  def logSqlQuery(sql: String, fileName: String, lineNum: Int): Unit = ()
+  def logSql(sql: String, file: String, line: Int): Unit = ()
 }
 
 object Config {

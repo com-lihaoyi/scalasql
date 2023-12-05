@@ -125,8 +125,7 @@ object WorldSqlTests extends TestSuite {
       java.sql.DriverManager
         .getConnection("jdbc:h2:mem:testdb" + scala.util.Random.nextInt(), "sa", ""),
       new Config {
-        override def columnNameMapper(v: String) = v.toLowerCase()
-        override def tableNameMapper(v: String) = v.toLowerCase()
+        override def nameMapper(v: String) = v.toLowerCase()
       }
     )
 
