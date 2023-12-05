@@ -1,14 +1,15 @@
 package scalasql.query
 
 import scalasql.core.{
+  ColumnNamer,
   Config,
   Context,
   DialectTypeMappers,
-  SqlExprsToSql,
-  ColumnNamer,
   JoinNullable,
+  LiveSqlExprs,
   Queryable,
   Sql,
+  SqlExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -264,22 +265,22 @@ object SimpleSelect {
       sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 
-    def render(liveExprs: Option[Set[Sql.Identity]]) = {
+    def render(liveExprs: LiveSqlExprs) = {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.iterator.zip(exprsStrs).collect {
-            case ((l, e), s) if liveExprs.fold(true)(_.contains(Sql.identity(e))) => s
+            case ((l, e), s) if liveExprs.isLive(Sql.identity(e)) => s
           },
           SqlStr.commaSep
         )
       )
 
-      val innerLiveExprs =
+      val innerLiveExprs = LiveSqlExprs.some(
         exprStr.referencedExprs.toSet ++
           filtersOpt.referencedExprs ++
           groupByOpt.referencedExprs ++
           joinOns.flatMap(_.flatMap(_.toSeq.flatMap(_.referencedExprs)))
-
+      )
       val (renderedFroms, joins) = JoinsToSql.renderLateralJoins(
         prevContext,
         query.from,

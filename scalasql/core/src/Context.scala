@@ -23,6 +23,7 @@ trait Context {
 
 object Context {
   trait From {
+
     /**
      * What alias to name this [[From]] for better readability
      */
@@ -41,7 +42,7 @@ object Context {
     def renderSql(
         name: SqlStr,
         prevContext: Context,
-        liveExprs: Option[Set[Sql.Identity]]
+        liveExprs: LiveSqlExprs
     ): SqlStr
   }
   case class Impl(

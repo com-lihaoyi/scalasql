@@ -1,9 +1,7 @@
 package scalasql.query
 
-import scalasql.core.DialectTypeMappers
+import scalasql.core.{Context, DialectTypeMappers, LiveSqlExprs, Queryable, Sql, SqlStr, TypeMapper}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Queryable, Sql, SqlStr, TypeMapper}
-import scalasql.core.Context
 
 /**
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as
@@ -43,7 +41,7 @@ object Values {
       qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep
     ) + sql")"
-    def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
+    def render(liveExprs: LiveSqlExprs): SqlStr = {
       val rows = SqlStr.join(v.ts.map(wrapRow), SqlStr.commaSep)
       sql"VALUES $rows"
     }

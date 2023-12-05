@@ -2,7 +2,16 @@ package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.JoinsToSql
-import scalasql.core.{Context, DialectTypeMappers, Queryable, Sql, SqlStr, TypeMapper, WithSqlExpr}
+import scalasql.core.{
+  Context,
+  DialectTypeMappers,
+  LiveSqlExprs,
+  Queryable,
+  Sql,
+  SqlStr,
+  TypeMapper,
+  WithSqlExpr
+}
 
 /**
  * A SQL `SELECT` query, with
@@ -110,9 +119,12 @@ object CompoundSelect {
 
     lazy val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
-    def render(liveExprs: Option[Set[Sql.Identity]]) = {
+    def render(liveExprs: LiveSqlExprs) = {
 
-      val innerLiveExprs = if (preserveAll) None else liveExprs.map(_ ++ newReferencedExpressions)
+      val innerLiveExprs =
+        if (preserveAll) LiveSqlExprs.none
+        else liveExprs.map(_ ++ newReferencedExpressions)
+
       val lhsStr = lhsToSqlQuery.render(innerLiveExprs)
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>

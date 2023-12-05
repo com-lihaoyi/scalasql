@@ -3,9 +3,10 @@ package scalasql.query
 import scalasql.core.{
   Context,
   DialectTypeMappers,
-  SqlExprsToSql,
+  LiveSqlExprs,
   Queryable,
   Sql,
+  SqlExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -114,12 +115,13 @@ object Update {
 
     lazy val where = SqlStr.flatten(SqlExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
-    lazy val liveExprs =
-      sets.referencedExprs.toSet ++ where.referencedExprs ++ joinOns.flatten.flatten.flatMap(
-        _.referencedExprs
-      )
+    lazy val liveExprs = LiveSqlExprs.some(
+      sets.referencedExprs.toSet ++
+        where.referencedExprs ++
+        joinOns.flatten.flatten.flatMap(_.referencedExprs)
+    )
     lazy val renderedFroms =
-      JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, Some(liveExprs))
+      JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, liveExprs)
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
       val froms = firstJoin.from.map { jf => renderedFroms(jf.from) }
       sql" FROM " + SqlStr.join(froms, SqlStr.commaSep)

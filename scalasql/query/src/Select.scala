@@ -5,6 +5,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   JoinNullable,
+  LiveSqlExprs,
   Queryable,
   Sql,
   SqlStr,
@@ -187,7 +188,7 @@ trait Select[Q, R]
   protected def renderToSql(ctx: Context): SqlStr = {
     val renderer = selectRenderer(ctx)
 
-    renderer.render(None).withCompleteQuery(true)
+    renderer.render(LiveSqlExprs.none).withCompleteQuery(true)
   }
   protected def queryWalkLabels() = qr.walkLabels(expr)
   protected def queryWalkExprs() = qr.walkExprs(expr)

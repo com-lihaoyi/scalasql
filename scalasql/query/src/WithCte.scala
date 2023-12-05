@@ -1,12 +1,13 @@
 package scalasql.query
 
 import scalasql.core.{
+  ColumnNamer,
   Context,
   DialectTypeMappers,
-  SqlExprsToSql,
-  ColumnNamer,
+  LiveSqlExprs,
   Queryable,
   Sql,
+  SqlExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -75,7 +76,7 @@ object WithCte {
 
     override def selectRenderer(prevContext: Context): SelectBase.Renderer =
       new SelectBase.Renderer {
-        def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr = {
+        def render(liveExprs: LiveSqlExprs): SqlStr = {
           SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
         }
       }
@@ -87,7 +88,7 @@ object WithCte {
 
   class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
       extends SelectBase.Renderer {
-    def render(liveExprs: Option[Set[Sql.Identity]]) = {
+    def render(liveExprs: LiveSqlExprs) = {
       val walked =
         query.lhs.qr
           .asInstanceOf[Queryable[Any, Any]]
@@ -115,12 +116,12 @@ object WithCte {
             )
             .render(liveExprs)
       )
-      val rhsReferenced = rhsSql.referencedExprs.toSet
+      val rhsReferenced = LiveSqlExprs.some(rhsSql.referencedExprs.toSet)
       val lhsSql =
-        SelectBase.renderer(query.lhs, prevContext).render(Some(rhsReferenced))
+        SelectBase.renderer(query.lhs, prevContext).render(rhsReferenced)
 
       val cteColumns = SqlStr.join(
-        newExprNaming.collect { case (exprId, name) if rhsReferenced.contains(exprId) => name },
+        newExprNaming.collect { case (exprId, name) if rhsReferenced.isLive(exprId) => name },
         SqlStr.commaSep
       )
 

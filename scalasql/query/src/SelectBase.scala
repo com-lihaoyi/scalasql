@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, Sql, SqlStr}
+import scalasql.core.{Context, LiveSqlExprs, Sql, SqlStr}
 
 trait SelectBase {
   protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr]
@@ -11,7 +11,7 @@ object SelectBase {
   def renderer(s: SelectBase, prevContext: Context) = s.selectRenderer(prevContext)
 
   trait Renderer {
-    def render(liveExprs: Option[Set[Sql.Identity]]): SqlStr
+    def render(liveExprs: LiveSqlExprs): SqlStr
   }
 
 }
