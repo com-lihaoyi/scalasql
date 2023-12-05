@@ -121,9 +121,6 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   the structure of the ScalaSql codebase, or for advanced users who may need to
   understand enough to extend ScalaSql with custom functionality.
 
-
-## Cheat Sheet
-
 ## Developer Docs
 
 * Running all unit tests: `./mill -i -w "__.test"`
