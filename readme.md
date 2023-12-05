@@ -22,7 +22,7 @@ val dbClient = new scalasql.DbClient.Connection(
   connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
   config = new Config {
     override def nameMapper(v: String) = v.toLowerCase() // Override default snake_case mapping
-    override def logSql(sql: String, file: String, line: Int): Unit = println(s"$file:$line $sql")
+    override def logSql(sql: String, file: String, line: Int) = println(s"$file:$line $sql")
   }
 )
 val db: DbApi = dbClient.getAutoCommitClientConnection
