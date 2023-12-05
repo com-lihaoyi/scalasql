@@ -23,9 +23,22 @@ trait Context {
 
 object Context {
   trait From {
+    /**
+     * What alias to name this [[From]] for better readability
+     */
     def fromRefPrefix(prevContext: Context): String
+
+    /**
+     * A mapping of the [[Sql]] expressions that this [[From]] produces along
+     * with their rendered [[SqlStr]]s
+     */
     def fromLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr]
-    def renderSingleFrom(
+
+    /**
+     * How this [[From]] can be rendered into a [[SqlStr]] for embedding into
+     * a larger query
+     */
+    def renderSql(
         name: SqlStr,
         prevContext: Context,
         liveExprs: Option[Set[Sql.Identity]]

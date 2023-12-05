@@ -40,7 +40,7 @@ object JoinsToSql {
       f: Context.From,
       namedFromsMap: Map[Context.From, String]
   ): SqlStr = {
-    f.renderSingleFrom(SqlStr.raw(namedFromsMap(f)), prevContext, liveExprs)
+    f.renderSql(SqlStr.raw(namedFromsMap(f)), prevContext, liveExprs)
   }
 
   def renderLateralJoins(
