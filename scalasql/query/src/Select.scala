@@ -275,6 +275,18 @@ trait Select[Q, R]
 }
 
 object Select {
+  def newSimpleSelect[Q, R](
+      lhs: Select[Q, R],
+      expr: Q,
+      exprPrefix: Option[Context => SqlStr],
+      preserveAll: Boolean,
+      from: Seq[Context.From],
+      joins: Seq[Join],
+      where: Seq[Sql[_]],
+      groupBy0: Option[GroupBy]
+  )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
+    lhs.newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+
   def toSimpleFrom[Q, R](s: Select[Q, R]) = s.selectToSimpleSelect()
 
   def withExprPrefix[Q, R](s: Select[Q, R], preserveAll: Boolean, str: Context => SqlStr) =

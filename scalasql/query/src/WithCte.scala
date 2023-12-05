@@ -56,7 +56,7 @@ class WithCte[Q, R](
 
 object WithCte {
   class Proxy[Q, R](
-      lhs: WithSqlExpr[Q],
+      lhs: Select[Q, R],
       lhsSubQueryRef: WithCteRef,
       val qr: Queryable.Row[Q, R],
       protected val dialect: DialectTypeMappers
@@ -64,8 +64,9 @@ object WithCte {
 //    override def joinableSelect = this
     override def joinableIsTrivial = true
     protected override def joinableToSelect = selectToSimpleSelect()
-    override protected def selectToSimpleSelect(): SimpleSelect[Q, R] =
-      new SimpleSelect[Q, R](
+    override protected def selectToSimpleSelect(): SimpleSelect[Q, R] = {
+      Select.newSimpleSelect[Q, R](
+        lhs,
         expr = WithSqlExpr.get(lhs),
         exprPrefix = None,
         preserveAll = false,
@@ -74,6 +75,7 @@ object WithCte {
         where = Nil,
         groupBy0 = None
       )(qr, dialect)
+    }
 
     override def selectRenderer(prevContext: Context): SelectBase.Renderer =
       new SelectBase.Renderer {

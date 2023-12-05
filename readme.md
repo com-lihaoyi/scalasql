@@ -170,4 +170,3 @@ scalasql.operations   scalasql.query
 * JSON columns
 * Audit list of static functions for Postgres/MySql/Sqlite/H2
 * Make `implicit ctx =>` for defining `sql"..."` snippets optional
-* Properly inject dialect-specific `SimpleSelect` implementations into `WithCte`
