@@ -57,6 +57,7 @@ object SqliteDialect extends SqliteDialect {
       new SimpleSelect(
         Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
         None,
+        false,
         Seq(ref),
         Nil,
         Nil,
@@ -84,6 +85,7 @@ object SqliteDialect extends SqliteDialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
+        preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
         where: Seq[Sql[_]],
@@ -92,19 +94,28 @@ object SqliteDialect extends SqliteDialect {
         implicit qr: Queryable.Row[Q, R],
         dialect: scalasql.core.DialectTypeMappers
     ): scalasql.query.SimpleSelect[Q, R] = {
-      new SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+      new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
     }
   }
 
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
+      preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Sql[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
-      extends scalasql.query.SimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+      extends scalasql.query.SimpleSelect(
+        expr,
+        exprPrefix,
+        preserveAll,
+        from,
+        joins,
+        where,
+        groupBy0
+      )
       with Select[Q, R]
 
   class CompoundSelect[Q, R](

@@ -68,6 +68,7 @@ object WithCte {
       new SimpleSelect[Q, R](
         expr = WithSqlExpr.get(lhs),
         exprPrefix = None,
+        preserveAll = false,
         from = Seq(lhsSubQueryRef),
         joins = Nil,
         where = Nil,

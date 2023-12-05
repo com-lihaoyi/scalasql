@@ -27,6 +27,7 @@ import scala.collection.mutable
 class SimpleSelect[Q, R](
     val expr: Q,
     val exprPrefix: Option[Context => SqlStr],
+    val preserveAll: Boolean,
     val from: Seq[Context.From],
     val joins: Seq[Join],
     val where: Seq[Sql[_]],
@@ -38,14 +39,16 @@ class SimpleSelect[Q, R](
   protected def copy[Q, R](
       expr: Q = this.expr,
       exprPrefix: Option[Context => SqlStr] = this.exprPrefix,
+      preserveAll: Boolean = this.preserveAll,
       from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
       where: Seq[Sql[_]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
-    newSimpleSelect(expr, exprPrefix, from, joins, where, groupBy0)
+    newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
 
-  def selectWithExprPrefix(s: Context => SqlStr): Select[Q, R] = this.copy(exprPrefix = Some(s))
+  def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
+    this.copy(exprPrefix = Some(s), preserveAll = preserveAll)
 
   def queryExpr[V: TypeMapper](
       f: Q => Context => SqlStr
@@ -265,7 +268,8 @@ object SimpleSelect {
       sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 
-    def render(liveExprs: LiveSqlExprs) = {
+    def render(liveExprs0: LiveSqlExprs) = {
+      val liveExprs = if (query.preserveAll) LiveSqlExprs.none else liveExprs0
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.iterator.zip(exprsStrs).collect {

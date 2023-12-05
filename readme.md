@@ -168,6 +168,5 @@ scalasql.operations   scalasql.query
 
 * Scala 3 support
 * JSON columns
-* Make sure DCE is disabled when running `SELECT DISTINCT` to avoid changing behavior
 * Audit list of static functions for Postgres/MySql/Sqlite/H2
 * Make `implicit ctx =>` for defining `sql"..."` snippets optional

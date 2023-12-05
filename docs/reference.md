@@ -1090,6 +1090,34 @@ Purchase.select.map(_.shippingInfoId).distinct
 
 
 
+### Select.distinct.subquery
+
+Columns inside nested subqueries cannot be elided when `SELECT DISTINCT` is used
+
+```scala
+ShippingInfo.select.distinct.subquery.map(_.buyerId)
+```
+
+
+*
+    ```sql
+    SELECT subquery0.buyer_id AS res
+    FROM (SELECT DISTINCT
+        shipping_info0.id AS id,
+        shipping_info0.buyer_id AS buyer_id,
+        shipping_info0.shipping_date AS shipping_date
+      FROM shipping_info shipping_info0) subquery0
+    ```
+
+
+
+*
+    ```scala
+    Seq(1, 2, 2)
+    ```
+
+
+
 ### Select.contains
 
 ScalaSql's `.contains` method translates into SQL's `IN` syntax, e.g. here checking if a

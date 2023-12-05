@@ -37,7 +37,7 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row appears first. For example:
      */
     def distinctOn(f: Q => Sql[_]): Select[Q, R] = {
-      Select.withExprPrefix(r, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
+      Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
     }
   }
 }
