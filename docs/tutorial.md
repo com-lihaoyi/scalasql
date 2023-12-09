@@ -202,7 +202,7 @@ db.run(query).take(3) ==> Seq(
 
 ```
 Notice that `db.run` returns instances of type `City[Sc]`. `Sc` is `scalasql.Sc`,
-short for the "Identity" type, representing a `City` object containing normal Scala
+short for the "Scala" type, representing a `City` object containing normal Scala
 values. The `[Sc]` type parameter must be provided explicitly whenever creating,
 type-annotating, or otherwise working with these `City` values.
 
