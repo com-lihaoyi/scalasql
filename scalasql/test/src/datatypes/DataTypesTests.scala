@@ -67,7 +67,7 @@ trait DataTypesTests extends ScalaSqlSuite {
 
         object DataTypes extends Table[DataTypes]
 
-        val value = DataTypes[Id](
+        val value = DataTypes[Sc](
           myTinyInt = 123.toByte,
           mySmallInt = 12345.toShort,
           myInt = 12345678,
@@ -121,12 +121,12 @@ trait DataTypesTests extends ScalaSqlSuite {
 
         object NonRoundTripTypes extends Table[NonRoundTripTypes]
 
-        val value = NonRoundTripTypes[Id](
+        val value = NonRoundTripTypes[Sc](
           myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
           myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
         )
 
-        def normalize(v: NonRoundTripTypes[Id]) = v.copy[Id](
+        def normalize(v: NonRoundTripTypes[Sc]) = v.copy[Sc](
           myZonedDateTime = v.myZonedDateTime.withZoneSameInstant(ZoneId.systemDefault),
           myOffsetDateTime = v.myOffsetDateTime.withOffsetSameInstant(OffsetDateTime.now.getOffset)
         )
@@ -162,18 +162,18 @@ trait DataTypesTests extends ScalaSqlSuite {
         //     foo: Nested[T]
         // )
         // object Enclosing extends Table[Enclosing]
-        val value1 = Enclosing[Id](
+        val value1 = Enclosing[Sc](
           barId = 1337,
           myString = "hello",
-          foo = Nested[Id](
+          foo = Nested[Sc](
             fooId = 271828,
             myBoolean = true
           )
         )
-        val value2 = Enclosing[Id](
+        val value2 = Enclosing[Sc](
           barId = 31337,
           myString = "world",
-          foo = Nested[Id](
+          foo = Nested[Sc](
             fooId = 1618,
             myBoolean = false
           )

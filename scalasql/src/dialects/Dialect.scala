@@ -1,11 +1,11 @@
 package scalasql.dialects
 
-import scalasql.operations.{CaseWhen, SqlDbApiOps}
+import scalasql.operations.{CaseWhen, DbApiOps}
 import scalasql.query.SqlWindow
-import scalasql.core.Sql.apply0
+import scalasql.core.Db.apply0
 import scalasql.{Table, operations}
 import scalasql.core.Aggregatable
-import scalasql.core.{DbApi, DialectTypeMappers, JoinNullable, Queryable, Sql, SqlStr, TypeMapper}
+import scalasql.core.{DbApi, DialectTypeMappers, JoinNullable, Queryable, Db, SqlStr, TypeMapper}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
@@ -190,17 +190,17 @@ trait Dialect extends DialectTypeMappers {
     def put(r: PreparedStatement, idx: Int, v: T) = r.setObject(idx, v, java.sql.Types.OTHER)
   }
 
-  implicit def from(x: Int): Sql[Int] = Sql(x)
+  implicit def from(x: Int): Db[Int] = Db(x)
 
-  implicit def from(x: Long): Sql[Long] = Sql(x)
+  implicit def from(x: Long): Db[Long] = Db(x)
 
-  implicit def from(x: Boolean): Sql[Boolean] = Sql.apply0(x, x)
+  implicit def from(x: Boolean): Db[Boolean] = Db.apply0(x, x)
 
-  implicit def from(x: Double): Sql[Double] = Sql(x)
+  implicit def from(x: Double): Db[Double] = Db(x)
 
-  implicit def from(x: scala.math.BigDecimal): Sql[scala.math.BigDecimal] = Sql(x)
+  implicit def from(x: scala.math.BigDecimal): Db[scala.math.BigDecimal] = Db(x)
 
-  implicit def from(x: String): Sql[String] = Sql(x)
+  implicit def from(x: String): Db[String] = Db(x)
 
   implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
     new TypeMapper[Option[T]] {
@@ -217,49 +217,49 @@ trait Dialect extends DialectTypeMappers {
         }
       }
     }
-  implicit def SqlBooleanOpsConv(v: Sql[Boolean]): operations.SqlBooleanOps =
-    new operations.SqlBooleanOps(v)
-  implicit def SqlNumericOpsConv[T: Numeric: TypeMapper](
-      v: Sql[T]
-  ): operations.SqlNumericOps[T] = new operations.SqlNumericOps(v)
+  implicit def DbBooleanOpsConv(v: Db[Boolean]): operations.DbBooleanOps =
+    new operations.DbBooleanOps(v)
+  implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
+      v: Db[T]
+  ): operations.DbNumericOps[T] = new operations.DbNumericOps(v)
 
-  implicit def SqlOpsConv(v: Sql[_]): operations.SqlOps = new operations.SqlOps(v)
+  implicit def DbOpsConv(v: Db[_]): operations.DbOps = new operations.DbOps(v)
 
-  implicit def SqlTypedOpsConv[T: ClassTag](v: Sql[T]): operations.SqlTypedOps[T] =
-    new operations.SqlTypedOps(v)
+  implicit def DbTypedOpsConv[T: ClassTag](v: Db[T]): operations.DbTypedOps[T] =
+    new operations.DbTypedOps(v)
 
-  implicit def SqlOptionOpsConv[T: TypeMapper](v: Sql[Option[T]]): operations.SqlOptionOps[T] =
-    new operations.SqlOptionOps(v)
+  implicit def DbOptionOpsConv[T: TypeMapper](v: Db[Option[T]]): operations.DbOptionOps[T] =
+    new operations.DbOptionOps(v)
 
-  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Sql[T]]): operations.SqlOps =
-    new operations.SqlOps(JoinNullable.toExpr(v))
+  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Db[T]]): operations.DbOps =
+    new operations.DbOps(JoinNullable.toExpr(v))
 
   implicit def JoinNullableOptionOpsConv[T: TypeMapper](
-      v: JoinNullable[Sql[T]]
-  ): operations.SqlOptionOps[T] =
-    new operations.SqlOptionOps(JoinNullable.toExpr(v))
+      v: JoinNullable[Db[T]]
+  ): operations.DbOptionOps[T] =
+    new operations.DbOptionOps(JoinNullable.toExpr(v))
 
-  implicit def SqlStringOpsConv(v: Sql[String]): operations.SqlStringOps
+  implicit def DbStringOpsConv(v: Db[String]): operations.DbStringOps
 
-  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Sql[V]])(
-      implicit qr: Queryable.Row[Sql[V], V]
+  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Db[V]])(
+      implicit qr: Queryable.Row[Db[V], V]
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
 
   implicit def AggOpsConv[T](v: Aggregatable[T])(
       implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
-  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T]
+  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
   implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
-  implicit def SqlDbApiOpsConv(db: => DbApi): SqlDbApiOps = new SqlDbApiOps(this)
+  implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 
-  implicit class WindowExtensions[T](e: Sql[T]) {
+  implicit class WindowExtensions[T](e: Db[T]) {
     def over = new SqlWindow[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def SqlQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Sql[T], T] = {
-    new Sql.SqlQueryable[Sql, T]()
+  implicit def DbQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Db[T], T] = {
+    new Db.SqlQueryable[Db, T]()
   }
 }

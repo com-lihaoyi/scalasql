@@ -29,12 +29,12 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
         )
       ),
       docs = """
@@ -76,16 +76,16 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
         (
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         )
       ),
       docs = """
@@ -111,31 +111,31 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         ),
         (
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         (
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
         )
       ),
-      normalize = (x: Seq[(Buyer[Id], Buyer[Id])]) => x.sortBy(t => (t._1.id, t._2.id))
+      normalize = (x: Seq[(Buyer[Sc], Buyer[Sc])]) => x.sortBy(t => (t._1.id, t._2.id))
     )
 
     test("mapForGroupBy") - checker(
@@ -175,21 +175,21 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
         ),
-        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+        (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
       ),
       normalize =
-        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
+        (x: Seq[(Buyer[Sc], Option[ShippingInfo[Sc]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
       docs = """
         ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
         `.leftJoin`/`.rightJoin`/`.outerJoin` methods
@@ -275,8 +275,8 @@ trait JoinTests extends ScalaSqlSuite {
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
       ),
       docs = """
-        `JoinNullable[Sql[T]]`s can be implicitly used as `Sql[Option[T]]`s. This allows
-        them to participate in any database query logic than any other `Sql[Option[T]]`s
+        `JoinNullable[Db[T]]`s can be implicitly used as `Db[Option[T]]`s. This allows
+        them to participate in any database query logic than any other `Db[Option[T]]`s
         can participate in, such as being used as sort key or in computing return values
         (below).
       """
@@ -350,7 +350,7 @@ trait JoinTests extends ScalaSqlSuite {
       ),
       normalize = (x: Seq[(String, Boolean)]) => x.sorted,
       docs = """
-        The conversion from `JoinNullable[T]` to `Sql[Option[T]]` can also be performed
+        The conversion from `JoinNullable[T]` to `Db[Option[T]]` can also be performed
         explicitly via `JoinNullable.toExpr(...)`
       """
     )
@@ -370,21 +370,21 @@ trait JoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+          Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05"))),
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         (
-          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
         (
-          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
         ),
-        (None, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+        (None, Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
       ),
       normalize =
-        (x: Seq[(Option[ShippingInfo[Id]], Buyer[Id])]) => x.sortBy(t => t._2.id -> t._1.map(_.id))
+        (x: Seq[(Option[ShippingInfo[Sc]], Buyer[Sc])]) => x.sortBy(t => t._2.id -> t._1.map(_.id))
     )
 
     test("outerJoin") - checker(
@@ -424,20 +424,20 @@ trait JoinTests extends ScalaSqlSuite {
       ),
       value = Seq(
         (
-          Option(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-          Option(Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")))
+          Option(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05"))),
+          Option(Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")))
         ),
         (
-          Option(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-          Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+          Option(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))),
+          Option(Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")))
         ),
         (
-          Option(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-          Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+          Option(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))),
+          Option(Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")))
         ),
-        (Option.empty, Option(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
+        (Option.empty, Option(Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
       ),
-      normalize = (x: Seq[(Option[ShippingInfo[Id]], Option[Buyer[Id]])]) =>
+      normalize = (x: Seq[(Option[ShippingInfo[Sc]], Option[Buyer[Sc]])]) =>
         x.sortBy(t => t._2.map(_.id) -> t._1.map(_.id))
     )
 

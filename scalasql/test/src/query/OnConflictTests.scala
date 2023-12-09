@@ -102,11 +102,11 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text { Buyer.select },
         value = Seq(
-          Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         ),
-        normalize = (x: Seq[Buyer[Id]]) => x.sortBy(_.id)
+        normalize = (x: Seq[Buyer[Sc]]) => x.sortBy(_.id)
       )
     }
 
@@ -129,11 +129,11 @@ trait OnConflictTests extends ScalaSqlSuite {
       checker(
         query = Text { Buyer.select },
         value = Seq(
-          Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         ),
-        normalize = (x: Seq[Buyer[Id]]) => x.sortBy(_.id)
+        normalize = (x: Seq[Buyer[Sc]]) => x.sortBy(_.id)
       )
     }
 

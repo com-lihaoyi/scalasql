@@ -31,9 +31,9 @@ trait Queryable[-Q, R] {
    * Returns a sequence of expressions created by this queryable value. Used to generate
    * the column list `SELECT` clauses, both for nested and top level `SELECT`s
    */
-  def walkExprs(q: Q): Seq[Sql[_]]
+  def walkExprs(q: Q): Seq[Db[_]]
 
-  def walkLabelsAndExprs(q: Q): Seq[(List[String], Sql[_])] = walkLabels(q).zip(walkExprs(q))
+  def walkLabelsAndExprs(q: Q): Seq[(List[String], Db[_])] = walkLabels(q).zip(walkExprs(q))
 
   /**
    * Whether this query expects a single row to be returned, if so we can assert on
@@ -104,7 +104,7 @@ object Queryable {
   object Row extends scalasql.core.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
-        val walkExprs0: Q => Seq[Seq[Sql[_]]],
+        val walkExprs0: Q => Seq[Seq[Db[_]]],
         construct0: ResultSetIterator => R,
         deconstruct0: R => Q
     ) extends Queryable.Row[Q, R] {

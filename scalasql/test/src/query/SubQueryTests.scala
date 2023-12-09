@@ -179,7 +179,7 @@ trait SubQueryTests extends ScalaSqlSuite {
             FROM shipping_info shipping_info1
             WHERE (buyer0.id = shipping_info1.buyer_id)) = ?)
       """,
-      value = Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))),
+      value = Seq(Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))),
       docs = """
         You can use `.select`s and aggregate operations like `.size` anywhere an expression is
         expected; these translate into SQL subqueries as expressions. SQL
@@ -203,9 +203,9 @@ trait SubQueryTests extends ScalaSqlSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
-        (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
-        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
+        (Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
+        (Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
+        (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
       ),
       docs = """
         Similar to the above example, but we do the subquery/aggregate in
@@ -228,9 +228,9 @@ trait SubQueryTests extends ScalaSqlSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), true),
-        (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
-        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
+        (Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")), true),
+        (Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
+        (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
       )
     )
 
@@ -383,8 +383,8 @@ trait SubQueryTests extends ScalaSqlSuite {
         example is contrived, it demonstrates how nested ScalaSql `.select` calls
         translate directly into nested SQL subqueries.
 
-        To turn the ScalaSql `Select[T]` into an `Sql[T]`, you can either use
-        an aggregate method like `.sumBy(...): Sql[Int]` that generates a `SUM(...)`
+        To turn the ScalaSql `Select[T]` into an `Db[T]`, you can either use
+        an aggregate method like `.sumBy(...): Db[Int]` that generates a `SUM(...)`
         aggregate, or via the `.toExpr` method that leaves the subquery untouched.
         SQL requires that subqueries used as expressions must return a single row
         and single column, and if the query returns some other number of rows/columns

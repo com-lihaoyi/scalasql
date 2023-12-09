@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.{Id, operations}
+import scalasql.{Sc, operations}
 import scalasql.query.{
   AscDesc,
   Column,
@@ -23,7 +23,7 @@ import scalasql.core.{
   DbApi,
   JoinNullable,
   Queryable,
-  Sql,
+  Db,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -79,10 +79,10 @@ trait MySqlDialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def SqlTypedOpsConv[T: ClassTag](v: Sql[T]): operations.SqlTypedOps[T] =
+  override implicit def DbTypedOpsConv[T: ClassTag](v: Db[T]): operations.DbTypedOps[T] =
     new MySqlDialect.SqlTypedOps(v)
 
-  override implicit def SqlStringOpsConv(v: Sql[String]): MySqlDialect.SqlStringOps =
+  override implicit def DbStringOpsConv(v: Db[String]): MySqlDialect.SqlStringOps =
     new MySqlDialect.SqlStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
@@ -102,13 +102,13 @@ trait MySqlDialect extends Dialect {
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
-  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
+  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
     new MySqlDialect.SqlAggOps(v)
 }
 
 object MySqlDialect extends MySqlDialect {
-  class SqlAggOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
-    def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
+  class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+    def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr =>
         implicit ctx => sql"GROUP_CONCAT(CONCAT($expr, '') SEPARATOR ${sepRender})"
@@ -116,10 +116,10 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class SqlTypedOps[T: ClassTag](v: Sql[T]) extends operations.SqlTypedOps(v) {
+  class SqlTypedOps[T: ClassTag](v: Db[T]) extends operations.DbTypedOps(v) {
 
     /** Equals to */
-    override def ===[V: ClassTag](x: Sql[V]): Sql[Boolean] = Sql { implicit ctx =>
+    override def ===[V: ClassTag](x: Db[V]): Db[Boolean] = Db { implicit ctx =>
       (isNullable[T], isNullable[V]) match {
         case (true, true) => sql"($v <=> $x)"
         case _ => sql"($v = $x)"
@@ -127,7 +127,7 @@ object MySqlDialect extends MySqlDialect {
     }
 
     /** Not equal to */
-    override def !==[V: ClassTag](x: Sql[V]): Sql[Boolean] = Sql { implicit ctx =>
+    override def !==[V: ClassTag](x: Db[V]): Db[Boolean] = Db { implicit ctx =>
       (isNullable[T], isNullable[V]) match {
         case (true, true) => sql"(NOT ($v <=> $x))"
         case _ => sql"($v <> $x)"
@@ -136,29 +136,29 @@ object MySqlDialect extends MySqlDialect {
 
   }
 
-  class SqlStringOps(protected val v: Sql[String]) extends operations.SqlStringOps(v) with PadOps {
-    override def +(x: Sql[String]): Sql[String] = Sql { implicit ctx => sql"CONCAT($v, $x)" }
+  class SqlStringOps(protected val v: Db[String]) extends operations.DbStringOps(v) with PadOps {
+    override def +(x: Db[String]): Db[String] = Db { implicit ctx => sql"CONCAT($v, $x)" }
 
-    override def startsWith(other: Sql[String]): Sql[Boolean] = Sql { implicit ctx =>
+    override def startsWith(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT($other, '%'))"
     }
 
-    override def endsWith(other: Sql[String]): Sql[Boolean] = Sql { implicit ctx =>
+    override def endsWith(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT('%', $other))"
     }
 
-    override def contains(other: Sql[String]): Sql[Boolean] = Sql { implicit ctx =>
+    override def contains(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT('%', $other, '%'))"
     }
 
-    def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"POSITION($x IN $v)" }
-    def reverse: Sql[String] = Sql { implicit ctx => sql"REVERSE($v)" }
+    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
+    def reverse: Db[String] = Db { implicit ctx => sql"REVERSE($v)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
     override def update(
-        filter: V[Column] => Sql[Boolean]
-    ): Update[V[Column], V[Id]] = {
+        filter: V[Column] => Db[Boolean]
+    ): Update[V[Column], V[Sc]] = {
       val ref = Table.ref(t)
       val metadata = Table.metadata(t)
       new Update(
@@ -172,10 +172,10 @@ object MySqlDialect extends MySqlDialect {
       )
     }
 
-    protected override def joinableToSelect: Select[V[Sql], V[Id]] = {
+    protected override def joinableToSelect: Select[V[Db], V[Sc]] = {
       val ref = Table.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Db]],
         None,
         false,
         Seq(ref),
@@ -193,7 +193,7 @@ object MySqlDialect extends MySqlDialect {
       table: TableRef,
       set0: Seq[Column.Assignment[_]],
       joins: Seq[Join],
-      where: Seq[Sql[_]]
+      where: Seq[Db[_]]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
@@ -202,7 +202,7 @@ object MySqlDialect extends MySqlDialect {
         table: TableRef = this.table,
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
-        where: Seq[Sql[_]] = this.where
+        where: Seq[Db[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectTypeMappers) =
       new Update(expr, table, set0, joins, where)
 
@@ -216,7 +216,7 @@ object MySqlDialect extends MySqlDialect {
       joins0: Seq[Join],
       table: TableRef,
       set0: Seq[Column.Assignment[_]],
-      where0: Seq[Sql[_]],
+      where0: Seq[Db[_]],
       prevContext: Context
   ) extends scalasql.query.Update.Renderer(joins0, table, set0, where0, prevContext) {
     override lazy val updateList = set0.map { case assign =>
@@ -286,7 +286,7 @@ object MySqlDialect extends MySqlDialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Sql[_]],
+        where: Seq[Db[_]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -302,7 +302,7 @@ object MySqlDialect extends MySqlDialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Sql[_]],
+      where: Seq[Db[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(
@@ -315,7 +315,7 @@ object MySqlDialect extends MySqlDialect {
         groupBy0
       )
       with Select[Q, R] {
-    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Db[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)

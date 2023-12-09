@@ -2,7 +2,7 @@ package scalasql.api
 
 import geny.Generator
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.{Buyer, Id}
+import scalasql.{Buyer, Sc}
 import scalasql.utils.{MySqlSuite, ScalaSqlSuite}
 import sourcecode.Text
 import utest._
@@ -33,9 +33,9 @@ trait DbApiTests extends ScalaSqlSuite {
       Text {
         dbClient.transaction { db =>
           db.run(Buyer.select) ==> List(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           )
         }
       }
@@ -48,7 +48,7 @@ trait DbApiTests extends ScalaSqlSuite {
           `db.runSql` can be used to run `sql"..."` strings, while providing a
           specified type that the query results will be deserialized as the specified
           type. `db.runSql` supports the all the same data types as `db.run`:
-          primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
+          primitives, date and time types, tuples, `Foo[Sc]` `case class`s, and
           any combination of these.
 
           The `sql"..."` string interpolator automatically converts interpolated values
@@ -75,7 +75,7 @@ trait DbApiTests extends ScalaSqlSuite {
                   Seq(("叉烧包", LocalDate.parse("1923-11-12")))
               )
 
-              val output3 = db.runSql[(String, LocalDate, Buyer[Id])](
+              val output3 = db.runSql[(String, LocalDate, Buyer[Sc])](
                 sql"SELECT name, date_of_birth, * FROM buyer WHERE id = $filterId"
               )
               assert(
@@ -84,7 +84,7 @@ trait DbApiTests extends ScalaSqlSuite {
                     (
                       "叉烧包",
                       LocalDate.parse("1923-11-12"),
-                      Buyer[Id](
+                      Buyer[Sc](
                         id = 2,
                         name = "叉烧包",
                         dateOfBirth = LocalDate.parse("1923-11-12")
@@ -116,10 +116,10 @@ trait DbApiTests extends ScalaSqlSuite {
           assert(count == 1)
 
           db.run(Buyer.select) ==> List(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
         }
       }
@@ -152,10 +152,10 @@ trait DbApiTests extends ScalaSqlSuite {
           assert(count == 1)
 
           db.run(Buyer.select) ==> List(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
         }
       }
@@ -194,7 +194,7 @@ trait DbApiTests extends ScalaSqlSuite {
         dbClient.transaction { db =>
           val excluded = "James Bond"
           val output = db
-            .streamSql[Buyer[Id]](sql"SELECT * FROM buyer where name != $excluded")
+            .streamSql[Buyer[Sc]](sql"SELECT * FROM buyer where name != $excluded")
             .takeWhile(_.id <= 2)
             .map(_.name)
             .toList
@@ -214,7 +214,7 @@ trait DbApiTests extends ScalaSqlSuite {
         dbClient.transaction { db =>
           val excluded = "James Bond"
           val output = db
-            .streamRaw[Buyer[Id]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
+            .streamRaw[Buyer[Sc]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
             .takeWhile(_.id <= 2)
             .map(_.name)
             .toList

@@ -47,8 +47,8 @@ object WorldSqlTests extends TestSuite {
   // Next, you need to define your data model classes. In ScalaSql, your data model
   // is defined using `case class`es with each field wrapped in the wrapper type
   // parameter `T[_]`. This allows us to re-use the same case class to represent
-  // both database values (when `T` is `scalasql.Sql`) as well as Scala values
-  // (when `T` is `scalasql.Id`).
+  // both database values (when `T` is `scalasql.Db`) as well as Scala values
+  // (when `T` is `scalasql.Sc`).
   //
   // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
   // the database tables we saw above
@@ -150,24 +150,24 @@ object WorldSqlTests extends TestSuite {
     test("expr") {
       // +DOCS
       // ## Expressions
-      // The simplest thing you can query are `scalasql.Sql`s. These represent the SQL
+      // The simplest thing you can query are `scalasql.Db`s. These represent the SQL
       // expressions that are part of a query, and can be evaluated even without being
       // part of any database table.
       //
-      // Here, we construct `Sql`s to represent the SQL query `1 + 3`. We can use
+      // Here, we construct `Db`s to represent the SQL query `1 + 3`. We can use
       // `db.renderSql` to see the generated SQL code, and `db.run` to send the
       // query to the database and return the output `4`
-      val query = Sql(1) + Sql(3)
+      val query = Db(1) + Db(3)
       db.renderSql(query) ==> "SELECT (? + ?) AS res"
       db.run(query) ==> 4
       // In general, most primitive types that can be mapped to SQL can be converted
-      // to `scalasql.Sql`s: `Int`s and other numeric types, `String`s, `Boolean`s,
-      // etc., each returning an `Sql[T]` for the respective type `T`. Each type of
-      // `Sql[T]` has a set of operations representing what operations the database
+      // to `scalasql.Db`s: `Int`s and other numeric types, `String`s, `Boolean`s,
+      // etc., each returning an `Db[T]` for the respective type `T`. Each type of
+      // `Db[T]` has a set of operations representing what operations the database
       // supports on that type of expression.
       //
       // You can check out the [ScalaSql Reference](reference.md#exprops) if you want a
-      // comprehensive list of built-in operations on various `Sql[T]` types.
+      // comprehensive list of built-in operations on various `Db[T]` types.
       //
       // -DOCS
     }
@@ -192,13 +192,13 @@ object WorldSqlTests extends TestSuite {
       """
 
       db.run(query).take(3) ==> Seq(
-        City[Id](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
-        City[Id](2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
-        City[Id](3, "Herat", "AFG", district = "Herat", population = 186800)
+        City[Sc](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
+        City[Sc](2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
+        City[Sc](3, "Herat", "AFG", district = "Herat", population = 186800)
       )
-      // Notice that `db.run` returns instances of type `City[Id]`. `Id` is `scalasql.Id`,
-      // short for the "Identity" type, representing a `City` object containing normal Scala
-      // values. The `[Id]` type parameter must be provided explicitly whenever creating,
+      // Notice that `db.run` returns instances of type `City[Sc]`. `Sc` is `scalasql.Sc`,
+      // short for the "Scala" type, representing a `City` object containing normal Scala
+      // values. The `[Sc]` type parameter must be provided explicitly whenever creating,
       // type-annotating, or otherwise working with these `City` values.
       //
       // In this example, we do `.take(3)` after running the query to show only the first
@@ -231,20 +231,20 @@ object WorldSqlTests extends TestSuite {
         WHERE (city0.name = ?)
         """
 
-        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         // Note that we use `===` rather than `==` for the equality comparison. The
-        // function literal passed to `.filter` is given a `City[Sql]` as its parameter,
+        // function literal passed to `.filter` is given a `City[Db]` as its parameter,
         // representing a `City` that is part of the database query, in contrast to the
-        // `City[Id]`s that `db.run` returns , and so `_.name` is of type `Sql[String]`
-        // rather than just `String` or `Id[String]`. You can use your IDE's
-        // auto-complete to see what operations are available on `Sql[String]`: typically
+        // `City[Sc]`s that `db.run` returns , and so `_.name` is of type `Db[String]`
+        // rather than just `String` or `Sc[String]`. You can use your IDE's
+        // auto-complete to see what operations are available on `Db[String]`: typically
         // they will represent SQL string functions rather than Scala string functions and
-        // take and return `Sql[String]`s rather than plain Scala `String`s. Database
+        // take and return `Db[String]`s rather than plain Scala `String`s. Database
         // value equality is represented by the `===` operator.
         //
         // Note also the `.single` operator. This tells ScalaSql that you expect exactly
         // own result row from this query: not zero rows, and not more than one row. This
-        // causes `db.run` to return a `City[Id]` rather than `Seq[City[Id]]`, and throw
+        // causes `db.run` to return a `City[Sc]` rather than `Seq[City[Sc]]`, and throw
         // an exception if zero or multiple rows are returned by the query.
         //
         // -DOCS
@@ -269,7 +269,7 @@ object WorldSqlTests extends TestSuite {
         LIMIT ?
         """
 
-        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
       }
 
@@ -290,7 +290,7 @@ object WorldSqlTests extends TestSuite {
         WHERE (city0.id = ?)
         """
 
-        db.run(query) ==> City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
       }
 
@@ -312,12 +312,12 @@ object WorldSqlTests extends TestSuite {
           """
 
           db.run(query).take(2) ==> Seq(
-            City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
-            City[Id](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+            City[Sc](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City[Sc](1891, "Peking", "CHN", district = "Peking", population = 7472000)
           )
-          // Again, all the operations within the query work on `Sql`s: `c` is a `City[Sql]`,
-          // `c.population` is an `Sql[Int]`, `c.countryCode` is an `Sql[String]`, and
-          // `===` and `>` and `&&` on `Sql`s all return `Sql[Boolean]`s that represent
+          // Again, all the operations within the query work on `Db`s: `c` is a `City[Db]`,
+          // `c.population` is an `Db[Int]`, `c.countryCode` is an `Db[String]`, and
+          // `===` and `>` and `&&` on `Db`s all return `Db[Boolean]`s that represent
           // a SQL expression that can be sent to the Database as part of your query.
           // -DOCS
         }
@@ -338,8 +338,8 @@ object WorldSqlTests extends TestSuite {
           """
 
           db.run(query).take(2) ==> Seq(
-            City[Id](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
-            City[Id](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+            City[Sc](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City[Sc](1891, "Peking", "CHN", district = "Peking", population = 7472000)
           )
           // -DOCS
         }
@@ -350,14 +350,14 @@ object WorldSqlTests extends TestSuite {
       test("implicit") {
         // +DOCS
         // ### Lifting
-        // Conversion of simple primitive `T`s into `Sql[T]`s happens implicitly. Below,
-        // `===` expects both left-hand and right-hand values to be `Sql`s. `_.id` is
-        // already an `Sql[Int]`, but `cityId` is a normal `Int` that is "lifted" into
-        // a `Sql[Int]` automatically
+        // Conversion of simple primitive `T`s into `Db[T]`s happens implicitly. Below,
+        // `===` expects both left-hand and right-hand values to be `Db`s. `_.id` is
+        // already an `Db[Int]`, but `cityId` is a normal `Int` that is "lifted" into
+        // a `Db[Int]` automatically
         def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
-        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
-        assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        assert(find(3208) == List(City[Sc](3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City[Sc](3209, "Bratislava", "SVK", "Bratislava", 448292)))
         // Lifting of Scala values into your ScalaSql queries is dependent on there being
         // an implicit `scalasql.TypeMapper[T]` in scope.
         //
@@ -368,12 +368,12 @@ object WorldSqlTests extends TestSuite {
 
       test("explicit") {
         // +DOCS
-        // This implicit lifting can be done explicitly using the `Sql(...)` syntax
+        // This implicit lifting can be done explicitly using the `Db(...)` syntax
         // as shown below
-        def find(cityId: Int) = db.run(City.select.filter(_.id === Sql(cityId)))
+        def find(cityId: Int) = db.run(City.select.filter(_.id === Db(cityId)))
 
-        assert(find(3208) == List(City[Id](3208, "Singapore", "SGP", "", 4017733)))
-        assert(find(3209) == List(City[Id](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        assert(find(3208) == List(City[Sc](3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City[Sc](3209, "Bratislava", "SVK", "Bratislava", 448292)))
         // -DOCS
       }
 
@@ -423,9 +423,9 @@ object WorldSqlTests extends TestSuite {
       test("heterogenousTuple") {
         // +DOCS
         // These `.map` calls can contains arbitrarily complex data: below, we query
-        // the `city` table to look for `Singapore` and get the entire row as a `City[Id]`,
+        // the `city` table to look for `Singapore` and get the entire row as a `City[Sc]`,
         // but also want to fetch the uppercase name and the population-in-millions. As
-        // you would expect, you get a tuple of `(City[Id], String, Int)` back.
+        // you would expect, you get a tuple of `(City[Sc], String, Int)` back.
         val query = City.select
           .filter(_.name === "Singapore")
           .map(c => (c, c.name.toUpperCase, c.population / 1000000))
@@ -446,7 +446,7 @@ object WorldSqlTests extends TestSuite {
 
         db.run(query) ==>
           (
-            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
+            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
             "SINGAPORE",
             4 // population in millions
           )
@@ -575,10 +575,10 @@ object WorldSqlTests extends TestSuite {
         // ### Nullable Columns
         //
         // Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
-        // meaning `Sql[Option[V]]` in your query and meaning `Id[Option[V]]` (or just
-        // meaning `Option[V]`) in the returned data. `Sql[Option[V]]` supports a similar
+        // meaning `Db[Option[V]]` in your query and meaning `Sc[Option[V]]` (or just
+        // meaning `Option[V]`) in the returned data. `Db[Option[V]]` supports a similar
         // set of operations as `Option[V]`: `isDefined`, `isEmpty`, `map`, `flatMap`, `get`,
-        // `orElse`, etc., but returning `Sql[V]`s rather than plain `V`s.
+        // `orElse`, etc., but returning `Db[V]`s rather than plain `V`s.
         val query = Country.select
           .filter(_.capital.isEmpty)
           .size
@@ -699,10 +699,10 @@ object WorldSqlTests extends TestSuite {
         )
         // Note that when you use a left/right/outer join, the corresponding
         // rows are provided to you as `scalasql.JoinNullable[T]` rather than plain `T`s, e.g.
-        // `cityOpt: scalasql.JoinNullable[City[Sql]]` above. `JoinNullable[T]` can be checked
+        // `cityOpt: scalasql.JoinNullable[City[Db]]` above. `JoinNullable[T]` can be checked
         // for presence/absence using `.isEmpty` and specifying a specific column to check,
-        // and can be converted to an `Sql[Option[T]]` by `.map`ing itt to a particular
-        // `Sql[T]`.
+        // and can be converted to an `Db[Option[T]]` by `.map`ing itt to a particular
+        // `Db[T]`.
         //
         // -DOCS
       }
@@ -861,7 +861,7 @@ object WorldSqlTests extends TestSuite {
         // +DOCS
         // ## Window Functions
         // ScalaSql supports window functions via the `.over` operator, which
-        // enables the `.partitionBy` and `.sortBy` operators on `Sql[T]`. These
+        // enables the `.partitionBy` and `.sortBy` operators on `Db[T]`. These
         // translate into SQL's `OVER`/`PARTITION BY`/`ORDER BY` clauses
         val query = City.select
           .map(c =>
@@ -1141,8 +1141,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Id](4080, "Sentosa", "SGP", district = "South", population = 1337)
+          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Sc](4080, "Sentosa", "SGP", district = "South", population = 1337)
         )
         // -DOCS
       }
@@ -1166,10 +1166,10 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Id](4080, "Sentosa", "SGP", district = "South", population = 1337),
-          City[Id](4081, "Loyang", "SGP", district = "East", population = 31337),
-          City[Id](4082, "Jurong", "SGP", district = "West", population = 313373)
+          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Sc](4080, "Sentosa", "SGP", district = "South", population = 1337),
+          City[Sc](4081, "Loyang", "SGP", district = "East", population = 31337),
+          City[Sc](4082, "Jurong", "SGP", district = "West", population = 313373)
         )
         // -DOCS
       }
@@ -1182,7 +1182,7 @@ object WorldSqlTests extends TestSuite {
           c => (c.name, c.countryCode, c.district, c.population),
           City.select
             .filter(_.name === "Singapore")
-            .map(c => (Sql("New-") + c.name, c.countryCode, c.district, Sql(0L)))
+            .map(c => (Db("New-") + c.name, c.countryCode, c.district, Db(0L)))
         )
 
         db.renderSql(query) ==> """
@@ -1195,8 +1195,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Id](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Id](4080, "New-Singapore", "SGP", district = "", population = 0)
+          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
+          City[Sc](4080, "New-Singapore", "SGP", district = "", population = 0)
         )
         // These three styles of inserts that ScalaSql provides correspond directly to the
         // various `INSERT` syntaxes supported by the underlying database.
@@ -1222,7 +1222,7 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-          City[Id](3208, "Singapore", "SGP", district = "UNKNOWN", population = 0)
+          City[Sc](3208, "Singapore", "SGP", district = "UNKNOWN", population = 0)
         // -DOCS
       }
 
@@ -1239,7 +1239,7 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-          City[Id](3208, "Singapore", "SGP", district = "", population = 5017733)
+          City[Sc](3208, "Singapore", "SGP", district = "", population = 5017733)
         // -DOCS
       }
       test("all") {
@@ -1253,8 +1253,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "LIE")) ==> Seq(
-          City[Id](2445, "Schaan", "LIE", district = "Schaan", population = 0),
-          City[Id](2446, "Vaduz", "LIE", district = "Vaduz", population = 0)
+          City[Sc](2445, "Schaan", "LIE", district = "Schaan", population = 0),
+          City[Sc](2446, "Vaduz", "LIE", district = "Vaduz", population = 0)
         )
         // -DOCS
       }
@@ -1297,7 +1297,7 @@ object WorldSqlTests extends TestSuite {
 
         dbClient.transaction { implicit db =>
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1314,7 +1314,7 @@ object WorldSqlTests extends TestSuite {
 
         dbClient.transaction { implicit db =>
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1342,7 +1342,7 @@ object WorldSqlTests extends TestSuite {
           } catch { case e: Exception => /*do nothing*/ }
 
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
 
         }
         // -DOCS
@@ -1360,7 +1360,7 @@ object WorldSqlTests extends TestSuite {
           }
 
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Id](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1370,15 +1370,15 @@ object WorldSqlTests extends TestSuite {
       // +DOCS
       // ## Custom Expressions
       //
-      // You can define custom SQL expressions via the `Sql` constructor. This is
+      // You can define custom SQL expressions via the `Db` constructor. This is
       // useful for enclosing ScalaSql when you need to use some operator or syntax
       // that your Database supports but ScalaSql does not have built in. This example
-      // shows how to define a custom `rawToHex` Scala function working on `Sql[T]`s,
+      // shows how to define a custom `rawToHex` Scala function working on `Db[T]`s,
       // that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
       // using that in a query to return a string.
       import scalasql.core.SqlStr.SqlStringSyntax
 
-      def rawToHex(v: Sql[String]): Sql[String] = Sql { implicit ctx => sql"RAWTOHEX($v)" }
+      def rawToHex(v: Db[String]): Db[String] = Db { implicit ctx => sql"RAWTOHEX($v)" }
 
       val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
 
@@ -1387,12 +1387,12 @@ object WorldSqlTests extends TestSuite {
 
       db.run(query) ==> "00530069006e006700610070006f00720065"
       // Your custom Scala functions can either be standalone functions or extension
-      // methods. Most of the operators on `Sql[T]` that ScalaSql comes bundled with
+      // methods. Most of the operators on `Db[T]` that ScalaSql comes bundled with
       // are extension methods, with a different set being made available for each database.
       //
       // Different databases have a huge range of functions available. ScalaSql comes
       // with the most commonly-used functions built in, but it is expected that you will
-      // need to build up your own library of custom `Sql[T]` functions to to access
+      // need to build up your own library of custom `Db[T]` functions to to access
       // less commonly used functions that are nonetheless still needed in your application
       // -DOCS
     }
@@ -1445,7 +1445,7 @@ object WorldSqlTests extends TestSuite {
       )
 
       db.run(City2.select.filter(_.id === 31337).single) ==>
-        City2[Id](CityId(31337), "test", "XYZ", "district", 1000000)
+        City2[Sc](CityId(31337), "test", "XYZ", "district", 1000000)
       // -DOCS
     }
     test("customTableColumnNames") {
@@ -1488,15 +1488,15 @@ object WorldSqlTests extends TestSuite {
       """
 
       db.run(query).take(3) ==> Seq(
-        CityCustom[Id](1, "Kabul", "AFG", districtCustom = "Kabol", populationCustom = 1780000),
-        CityCustom[Id](
+        CityCustom[Sc](1, "Kabul", "AFG", districtCustom = "Kabol", populationCustom = 1780000),
+        CityCustom[Sc](
           2,
           "Qandahar",
           "AFG",
           districtCustom = "Qandahar",
           populationCustom = 237500
         ),
-        CityCustom[Id](3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
+        CityCustom[Sc](3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
       )
       // -DOCS
     }

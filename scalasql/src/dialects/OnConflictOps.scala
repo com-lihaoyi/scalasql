@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.core.{Sql, WithSqlExpr}
+import scalasql.core.{Db, WithSqlExpr}
 import scalasql.query._
 
 trait OnConflictOps {
@@ -11,8 +11,8 @@ trait OnConflictOps {
 
   implicit def OnConflictableInsertSelect[V[_[_]], C, R, R2](
       query: InsertSelect[V, C, R, R2]
-  ): OnConflict[V[Sql], Int] = {
-    new OnConflict[V[Sql], Int](query, WithSqlExpr.get(query), query.table)
+  ): OnConflict[V[Db], Int] = {
+    new OnConflict[V[Db], Int](query, WithSqlExpr.get(query), query.table)
   }
 
 }

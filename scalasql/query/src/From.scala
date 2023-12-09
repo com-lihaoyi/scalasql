@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, LiveSqlExprs, Queryable, Sql, SqlStr}
+import scalasql.core.{Context, LiveSqlExprs, Queryable, Db, SqlStr}
 import scalasql.core.Context.From
 import scalasql.core.SqlStr.SqlStringSyntax
 

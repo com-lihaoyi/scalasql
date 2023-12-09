@@ -36,7 +36,7 @@ object ColumnNamer {
     (Seq(name0) ++ updated.filter(_ != 1)).mkString(context.config.columnLabelDelimiter)
 
   }
-  def flatten(x: Seq[(List[String], Sql[_])], context: Context): Seq[(String, SqlStr)] = {
+  def flatten(x: Seq[(List[String], Db[_])], context: Context): Seq[(String, SqlStr)] = {
     val counter = collection.mutable.Map.empty[String, Int]
     x.map { case (k, v) =>
       (getSuffixedName(counter, k, context), Renderable.toSql(v)(context))
@@ -44,16 +44,16 @@ object ColumnNamer {
   }
 
   def flattenCte(
-      walked: Seq[(List[String], Sql[_])],
+      walked: Seq[(List[String], Db[_])],
       prevContext: Context
-  ): Seq[(Sql.Identity, SqlStr)] = {
+  ): Seq[(Db.Identity, SqlStr)] = {
     val counter = collection.mutable.Map.empty[String, Int]
     walked.map { case (tokens, expr) =>
       (
-        Sql.identity(expr),
+        Db.identity(expr),
         SqlStr.raw(
           getSuffixedName(counter, tokens, prevContext),
-          Array(Sql.identity(expr))
+          Array(Db.identity(expr))
         )
       )
     }

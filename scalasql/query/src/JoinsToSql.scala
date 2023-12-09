@@ -1,6 +1,6 @@
 package scalasql.renderer
 
-import scalasql.core.{ColumnNamer, Context, LiveSqlExprs, Queryable, Sql, SqlStr, TypeMapper}
+import scalasql.core.{ColumnNamer, Context, LiveSqlExprs, Queryable, Db, SqlStr, TypeMapper}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.query.{AscDesc, CompoundSelect, Join, Joinable, Nulls, Select, SimpleSelect}
 

@@ -95,7 +95,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Sql(true))
+          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Db(true))
         } yield (b.name, s.shippingDate)
       },
       sql = """
@@ -119,7 +119,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
     test("leftJoin") - checker(
       query = Text {
         Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
-          Sql(true)
+          Db(true)
         )
       },
       sql = """
@@ -140,21 +140,21 @@ trait LateralJoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
         ),
-        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+        (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
       ),
       normalize =
-        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
+        (x: Seq[(Buyer[Sc], Option[ShippingInfo[Sc]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
       docs = """
         ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
         `.leftJoin`/`.rightJoin`/`.outerJoin` methods
@@ -165,7 +165,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Sql(true))
+          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Db(true))
         } yield (b, s)
       },
       sql = """
@@ -186,21 +186,21 @@ trait LateralJoinTests extends ScalaSqlSuite {
       """,
       value = Seq(
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
         ),
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
         ),
-        (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+        (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
       ),
       normalize =
-        (x: Seq[(Buyer[Id], Option[ShippingInfo[Id]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
+        (x: Seq[(Buyer[Sc], Option[ShippingInfo[Sc]])]) => x.sortBy(t => t._1.id -> t._2.map(_.id)),
       docs = """
         ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
         `.leftJoin`/`.rightJoin`/`.outerJoin` methods

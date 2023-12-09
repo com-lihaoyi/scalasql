@@ -1,8 +1,8 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.core.{Aggregatable, DbApi, JoinNullable, Queryable, Sql, SqlStr, TypeMapper}
-import scalasql.{Id, dialects, operations}
+import scalasql.core.{Aggregatable, DbApi, JoinNullable, Queryable, Db, SqlStr, TypeMapper}
+import scalasql.{Sc, dialects, operations}
 import scalasql.query.{
   CompoundSelect,
   GroupBy,
@@ -31,10 +31,10 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def SqlStringOpsConv(v: Sql[String]): H2Dialect.SqlStringOps =
+  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.SqlStringOps =
     new H2Dialect.SqlStringOps(v)
-  override implicit def SqlNumericOpsConv[T: Numeric: TypeMapper](
-      v: Sql[T]
+  override implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
+      v: Db[T]
   ): H2Dialect.SqlNumericOps[T] = new H2Dialect.SqlNumericOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
@@ -45,13 +45,13 @@ trait H2Dialect extends Dialect {
       new H2Dialect.Values(ts)
   }
 
-  implicit def SqlAggOpsConv[T](v: Aggregatable[Sql[T]]): operations.SqlAggOps[T] =
+  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
     new H2Dialect.SqlAggOps(v)
 }
 
 object H2Dialect extends H2Dialect {
-  class SqlAggOps[T](v: Aggregatable[Sql[T]]) extends scalasql.operations.SqlAggOps[T](v) {
-    def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String] = {
+  class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+    def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       assert(
         sep == null,
         "H2 database dialect does not support mkString separator due to a bug (?) where " +
@@ -63,22 +63,22 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class SqlStringOps(protected val v: Sql[String])
-      extends operations.SqlStringOps(v)
+  class SqlStringOps(protected val v: Db[String])
+      extends operations.DbStringOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Sql[String]): Sql[Int] = Sql { implicit ctx => sql"INSTR($v, $x)" }
+    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class SqlNumericOps[T: Numeric: TypeMapper](protected val v: Sql[T])
-      extends operations.SqlNumericOps[T](v)
+  class SqlNumericOps[T: Numeric: TypeMapper](protected val v: Db[T])
+      extends operations.DbNumericOps[T](v)
       with BitwiseFunctionOps[T]
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
-    protected override def joinableToSelect: Select[V[Sql], V[Id]] = {
+    protected override def joinableToSelect: Select[V[Db], V[Sc]] = {
       val ref = Table.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Sql]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Db]],
         None,
         false,
         Seq(ref),
@@ -111,7 +111,7 @@ object H2Dialect extends H2Dialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Sql[_]],
+        where: Seq[Db[_]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -127,7 +127,7 @@ object H2Dialect extends H2Dialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Sql[_]],
+      where: Seq[Db[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(
@@ -140,7 +140,7 @@ object H2Dialect extends H2Dialect {
         groupBy0
       )
       with Select[Q, R] {
-    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Db[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)

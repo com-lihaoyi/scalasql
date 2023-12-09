@@ -12,11 +12,11 @@ trait SelectTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("constant") - checker(
-      query = Text { Sql(1) + Sql(2) },
+      query = Text { Db(1) + Db(2) },
       sql = "SELECT (? + ?) AS res",
       value = 3,
       docs = """
-        The most simple thing you can query in the database is an `Sql`. These do not need
+        The most simple thing you can query in the database is an `Db`. These do not need
         to be related to any database tables, and translate into raw `SELECT` calls without
         `FROM`.
       """
@@ -29,13 +29,13 @@ trait SelectTests extends ScalaSqlSuite {
         FROM buyer buyer0
       """,
       value = Seq(
-        Buyer[Id](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
-        Buyer[Id](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
-        Buyer[Id](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
+        Buyer[Sc](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
+        Buyer[Sc](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
+        Buyer[Sc](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
       ),
       docs = """
         You can list the contents of a table via the query `Table.select`. It returns a
-        `Seq[CaseClass[Id]]` with the entire contents of the table. Note that listing
+        `Seq[CaseClass[Sc]]` with the entire contents of the table. Note that listing
         entire tables can be prohibitively expensive on real-world databases, and you
         should generally use `filter`s as shown below
       """
@@ -53,8 +53,8 @@ trait SelectTests extends ScalaSqlSuite {
             WHERE (shipping_info0.buyer_id = ?)
         """,
         value = Seq(
-          ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
-          ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
         ),
         docs = """
           ScalaSql's `.filter` translates to SQL `WHERE`, in this case we
@@ -77,7 +77,7 @@ trait SelectTests extends ScalaSqlSuite {
           WHERE (shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?)
         """,
         value =
-          Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))),
+          Seq(ShippingInfo[Sc](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))),
         docs = """
           You can stack multiple `.filter`s on a query.
         """
@@ -100,7 +100,7 @@ trait SelectTests extends ScalaSqlSuite {
             WHERE (shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?)
           """,
           value =
-            ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")),
+            ShippingInfo[Sc](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")),
           docs = """
             Queries that you expect to return a single row can be annotated with `.single`.
             This changes the return type of the `.select` from `Seq[T]` to just `T`, and throws
@@ -110,13 +110,13 @@ trait SelectTests extends ScalaSqlSuite {
         test("failTooMany") - intercept[java.lang.AssertionError] {
           checker(
             query = ShippingInfo.select.filter(_.buyerId `=` 2).single,
-            value = null.asInstanceOf[ShippingInfo[Id]]
+            value = null.asInstanceOf[ShippingInfo[Sc]]
           )
         }
         test("failNotEnough") - intercept[java.lang.AssertionError] {
           checker(
             query = ShippingInfo.select.filter(_.buyerId `=` 123).single,
-            value = null.asInstanceOf[ShippingInfo[Id]]
+            value = null.asInstanceOf[ShippingInfo[Sc]]
           )
         }
       }
@@ -134,7 +134,7 @@ trait SelectTests extends ScalaSqlSuite {
           FROM shipping_info shipping_info0
           WHERE ((shipping_info0.buyer_id = ?) AND (shipping_info0.shipping_date = ?))
         """,
-        value = Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
+        value = Seq(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))),
         docs = """
           You can perform multiple checks in a single filter using `&&`
         """
@@ -210,13 +210,13 @@ trait SelectTests extends ScalaSqlSuite {
           FROM buyer buyer0
         """,
         value = Seq(
-          (1, Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))),
-          (2, Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))),
-          (3, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+          (1, Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))),
+          (2, Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))),
+          (3, Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
         ),
         docs = """
           `.map` can return any combination of tuples, `case class`es, and primitives,
-          arbitrarily nested. here we return a tuple of `(Int, Buyer[Id])`
+          arbitrarily nested. here we return a tuple of `(Int, Buyer[Sc])`
         """
       )
     }
@@ -256,7 +256,7 @@ trait SelectTests extends ScalaSqlSuite {
       docs = """
         `SELECT` queries that return a single row and column can be used as SQL expressions
         in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
-        which turns a `Select[T]` into an `Sql[T]`. Note that if the `Select` returns more
+        which turns a `Select[T]` into an `Db[T]`. Note that if the `Select` returns more
         than one row or column, the database may select a row arbitrarily or will throw
         an exception at runtime (depend on implenmentation)
       """
@@ -397,8 +397,8 @@ trait SelectTests extends ScalaSqlSuite {
         WHERE (buyer0.id IN (SELECT shipping_info1.buyer_id AS res FROM shipping_info shipping_info1))
       """,
       value = Seq(
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       docs = """
         ScalaSql's `.contains` method translates into SQL's `IN` syntax, e.g. here checking if a
@@ -423,7 +423,7 @@ trait SelectTests extends ScalaSqlSuite {
           FROM shipping_info shipping_info1))
       """,
       value = Seq(
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       docs = """
       ScalaSql's `.contains` can take a compound Scala value, which translates into
@@ -491,33 +491,33 @@ trait SelectTests extends ScalaSqlSuite {
         JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res_1_0_id
       """,
-      value = Seq[(Int, (Buyer[Id], (Int, ShippingInfo[Id])))](
+      value = Seq[(Int, (Buyer[Sc], (Int, ShippingInfo[Sc])))](
         (
           1,
           (
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            (2, ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            (2, ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
           )
         ),
         (
           2,
           (
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            (1, ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            (1, ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
           )
         ),
         (
           2,
           (
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            (3, ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            (3, ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
           )
         )
       ),
       docs = """
-        Queries can output arbitrarily nested tuples of `Sql[T]` and `case class`
-        instances of `Foo[Sql]`, which will be de-serialized into nested tuples
-        of `T` and `Foo[Id]`s. The `AS` aliases assigned to each column will contain
+        Queries can output arbitrarily nested tuples of `Db[T]` and `case class`
+        instances of `Foo[Db]`, which will be de-serialized into nested tuples
+        of `T` and `Foo[Sc]`s. The `AS` aliases assigned to each column will contain
         the path of indices and field names used to populate the final returned values
       """
     )

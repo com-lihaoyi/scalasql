@@ -2,13 +2,13 @@ package scalasql.operations
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core._
 
-class SqlDbApiOps(dialect: DialectTypeMappers) {
+class DbApiOps(dialect: DialectTypeMappers) {
   import dialect._
 
   /**
    * Creates a SQL `CASE`/`WHEN`/`ELSE` clause
    */
-  def caseWhen[T: TypeMapper](values: (Sql[Boolean], Sql[T])*) =
+  def caseWhen[T: TypeMapper](values: (Db[Boolean], Db[T])*) =
     new scalasql.operations.CaseWhen(values)
 
   /**
@@ -16,14 +16,14 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * with gaps. If there is no ORDER BY clause, then all rows are considered peers and
    * this function always returns 1.
    */
-  def rank(): Sql[Int] = Sql { implicit ctx => sql"RANK()" }
+  def rank(): Db[Int] = Db { implicit ctx => sql"RANK()" }
 
   /**
    * The number of the row within the current partition. Rows are numbered starting
    * from 1 in the order defined by the ORDER BY clause in the window definition, or
    * in arbitrary order otherwise.
    */
-  def rowNumber(): Sql[Int] = Sql { implicit ctx => sql"ROW_NUMBER()" }
+  def rowNumber(): Db[Int] = Db { implicit ctx => sql"ROW_NUMBER()" }
 
   /**
    * The number of the current row's peer group within its partition - the rank of the
@@ -31,7 +31,7 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * by the ORDER BY clause in the window definition. If there is no ORDER BY clause,
    * then all rows are considered peers and this function always returns 1.
    */
-  def denseRank(): Sql[Int] = Sql { implicit ctx => sql"DENSE_RANK()" }
+  def denseRank(): Db[Int] = Db { implicit ctx => sql"DENSE_RANK()" }
 
   /**
    * Despite the name, this function always returns a value between 0.0 and 1.0 equal to
@@ -39,14 +39,14 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * function rank() and partition-rows is the total number of rows in the partition. If
    * the partition contains only one row, this function returns 0.0.
    */
-  def percentRank(): Sql[Double] = Sql { implicit ctx => sql"PERCENT_RANK()" }
+  def percentRank(): Db[Double] = Db { implicit ctx => sql"PERCENT_RANK()" }
 
   /**
    * The cumulative distribution. Calculated as row-number/partition-rows, where row-number
    * is the value returned by row_number() for the last peer in the group and partition-rows
    * the number of rows in the partition.
    */
-  def cumeDist(): Sql[Double] = Sql { implicit ctx => sql"CUME_DIST()" }
+  def cumeDist(): Db[Double] = Db { implicit ctx => sql"CUME_DIST()" }
 
   /**
    * Argument N is handled as an integer. This function divides the partition into N groups
@@ -55,10 +55,10 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * groups occur first. This function returns the integer value assigned to the group that
    * the current row is a part of.
    */
-  def ntile(n: Int): Sql[Int] = Sql { implicit ctx => sql"NTILE($n)" }
+  def ntile(n: Int): Db[Int] = Db { implicit ctx => sql"NTILE($n)" }
 
-  private def lagLead[T](prefix: SqlStr, e: Sql[T], offset: Int, default: Sql[T]): Sql[T] =
-    Sql { implicit ctx =>
+  private def lagLead[T](prefix: SqlStr, e: Db[T], offset: Int, default: Db[T]): Db[T] =
+    Db { implicit ctx =>
       val args = SqlStr.join(
         Seq(
           Some(sql"$e"),
@@ -85,7 +85,7 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * If default is also provided, then it is returned instead of NULL if the row identified
    * by offset does not exist.
    */
-  def lag[T](e: Sql[T], offset: Int = -1, default: Sql[T] = null): Sql[T] =
+  def lag[T](e: Db[T], offset: Int = -1, default: Db[T] = null): Db[T] =
     lagLead(sql"LAG", e, offset, default)
 
   /**
@@ -102,7 +102,7 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * If default is also provided, then it is returned instead of NULL if the row identified
    * by offset does not exist.
    */
-  def lead[T](e: Sql[T], offset: Int = -1, default: Sql[T] = null): Sql[T] =
+  def lead[T](e: Db[T], offset: Int = -1, default: Db[T] = null): Db[T] =
     lagLead(sql"LEAD", e, offset, default)
 
   /**
@@ -110,14 +110,14 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * function. It returns the value of expr evaluated against the first row in the window
    * frame for each row.
    */
-  def firstValue[T](e: Sql[T]): Sql[T] = Sql { implicit ctx => sql"FIRST_VALUE($e)" }
+  def firstValue[T](e: Db[T]): Db[T] = Db { implicit ctx => sql"FIRST_VALUE($e)" }
 
   /**
    * Calculates the window frame for each row in the same way as an aggregate window
    * function. It returns the value of expr evaluated against the last row in the window
    * frame for each row.
    */
-  def lastValue[T](e: Sql[T]): Sql[T] = Sql { implicit ctx => sql"LAST_VALUE($e)" }
+  def lastValue[T](e: Db[T]): Db[T] = Db { implicit ctx => sql"LAST_VALUE($e)" }
 
   /**
    * Calculates the window frame for each row in the same way as an aggregate window
@@ -126,6 +126,6 @@ class SqlDbApiOps(dialect: DialectTypeMappers) {
    * defined by the ORDER BY clause if one is present, or in arbitrary order otherwise.
    * If there is no Nth row in the partition, then NULL is returned.
    */
-  def nthValue[T](e: Sql[T], n: Int): Sql[T] = Sql { implicit ctx => sql"NTH_VALUE($e, $n)" }
+  def nthValue[T](e: Db[T], n: Int): Db[T] = Db { implicit ctx => sql"NTH_VALUE($e, $n)" }
 
 }

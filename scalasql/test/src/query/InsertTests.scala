@@ -14,7 +14,7 @@ trait InsertTests extends ScalaSqlSuite {
       test("values") - {
         checker(
           query = Buyer.insert.values(
-            Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09"))
+            Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09"))
           ),
           sql = "INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)",
           value = 1,
@@ -25,14 +25,14 @@ trait InsertTests extends ScalaSqlSuite {
 
         checker(
           query = Buyer.select.filter(_.name `=` "test buyer"),
-          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+          value = Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
       test("skipped") - {
         checker(
           query = Buyer.insert
             .values(
-              Buyer[Id](-1, "test buyer", LocalDate.parse("2023-09-09"))
+              Buyer[Sc](-1, "test buyer", LocalDate.parse("2023-09-09"))
             )
             .skipColumns(_.id),
           sql = "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?)",
@@ -46,7 +46,7 @@ trait InsertTests extends ScalaSqlSuite {
 
         checker(
           query = Buyer.select.filter(_.name `=` "test buyer"),
-          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+          value = Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
 
@@ -68,7 +68,7 @@ trait InsertTests extends ScalaSqlSuite {
 
         checker(
           query = Buyer.select.filter(_.name `=` "test buyer"),
-          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+          value = Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
 
@@ -83,7 +83,7 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.select.filter(_.name `=` "test buyer"),
           // id=4 comes from auto increment
-          value = Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+          value = Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
         )
       }
     }
@@ -103,9 +103,9 @@ trait InsertTests extends ScalaSqlSuite {
       test("values") - {
         checker(
           query = Buyer.insert.values(
-            Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-            Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-            Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+            Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
           ),
           sql = """
             INSERT INTO buyer (id, name, date_of_birth)
@@ -120,13 +120,13 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-            Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-            Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+            Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
           )
         )
       }
@@ -148,13 +148,13 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5,6 comes from auto increment
-            Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-            Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-            Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+            Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+            Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+            Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
           )
         )
       }
@@ -189,11 +189,11 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-            Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](4, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](5, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         )
       }
@@ -216,12 +216,12 @@ trait InsertTests extends ScalaSqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             // id=4,5 comes from auto increment, 6 is filtered out in the select
-            Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-            Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+            Buyer[Sc](4, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](5, "叉烧包", LocalDate.parse("1923-11-12"))
           )
         )
       }

@@ -2,13 +2,13 @@ package scalasql.operations
 
 import scalasql.core.Aggregatable
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.core.{Queryable, TypeMapper, Sql}
+import scalasql.core.{Queryable, TypeMapper, Db}
 
-abstract class SqlAggOps[T](v: Aggregatable[Sql[T]]) {
+abstract class DbAggOps[T](v: Aggregatable[Db[T]]) {
 
   /** Concatenates the given values into one string using the given separator */
-  def mkString(sep: Sql[String] = null)(implicit tm: TypeMapper[T]): Sql[String]
+  def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String]
 
   /** TRUE if the operand is equal to one of a list of expressions or one or more rows returned by a subquery */
-  //    def contains(e: Sql[_]): Sql[Boolean] = v.queryExpr(implicit ctx => sql"ALL($e in $v})")
+  //    def contains(e: Db[_]): Db[Boolean] = v.queryExpr(implicit ctx => sql"ALL($e in $v})")
 }

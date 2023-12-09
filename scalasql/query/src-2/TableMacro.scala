@@ -1,10 +1,10 @@
 package scalasql.query
 
-import scalasql.core.Id
+import scalasql.core.Sc
 import scala.language.experimental.macros
 
 object TableMacros {
-  type Sql[T] = scalasql.core.Sql[T]
+  type Db[T] = scalasql.core.Db[T]
   def cast[T](x: Any): T = x.asInstanceOf[T]
   def applyImpl[V[_[_]]](
       c: scala.reflect.macros.blackbox.Context
@@ -49,20 +49,20 @@ object TableMacros {
     }
 
     val queryables = for (param <- constructorParameters) yield {
-      val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[Sql[_]])
+      val tpe = subParam(param.info, typeOf[Sc[_]])
+      val tpe2 = subParam(param.info, typeOf[Db[_]])
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
     }
 
     val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[Sql[_]])
-      q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Id[$tpe]"
+      val tpe = subParam(param.info, typeOf[Sc[_]])
+      val tpe2 = subParam(param.info, typeOf[Db[_]])
+      q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Sc[$tpe]"
     }
 
     val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[Sql[_]])
+      val tpe = subParam(param.info, typeOf[Sc[_]])
+      val tpe2 = subParam(param.info, typeOf[Db[_]])
       q"queryable[$tpe2, $tpe]($i).deconstruct(r.${TermName(param.name.toString)})"
     }
 
@@ -76,8 +76,8 @@ object TableMacros {
     }
 
     val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
-      val tpe = subParam(param.info, typeOf[Id[_]])
-      val tpe2 = subParam(param.info, typeOf[Sql[_]])
+      val tpe = subParam(param.info, typeOf[Sc[_]])
+      val tpe2 = subParam(param.info, typeOf[Db[_]])
       q"queryable[$tpe2, $tpe]($i).walkExprs(table.${TermName(param.name.toString)})"
     }
 
@@ -86,12 +86,12 @@ object TableMacros {
     val exprRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[scalasql.core.Sql]].typeArgs
+      args = weakTypeOf[V[scalasql.core.Db]].typeArgs
     )
     val idRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[Id]].typeArgs
+      args = weakTypeOf[V[Sc]].typeArgs
     )
     c.Expr[Table.Metadata[V]](q"""{
 

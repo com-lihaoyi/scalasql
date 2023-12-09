@@ -1,5 +1,5 @@
 package scalasql
-import scalasql.core.Sql
+import scalasql.core.Db
 import utest._
 import utils.SqliteSuite
 
@@ -10,18 +10,18 @@ object FailureTests extends SqliteSuite {
   def description = "Things that should not compile or should give runtime errors"
   def tests = Tests {
     test("equals") - {
-//      val ex = intercept[Exception] { Sql(1) == 2 }
-//      assert(ex.getMessage.contains("Sql#equals is not defined"))
+//      val ex = intercept[Exception] { Db(1) == 2 }
+//      assert(ex.getMessage.contains("Db#equals is not defined"))
 //
-      assert(Sql.identity(Sql(1)) != Sql.identity(Sql(1)))
-      val e = Sql(1)
-      assert(Sql.identity(e) == Sql.identity(e))
+      assert(Db.identity(Db(1)) != Db.identity(Db(1)))
+      val e = Db(1)
+      assert(Db.identity(e) == Db.identity(e))
     }
     test("toString") - {
-      val ex = intercept[Exception] { Sql(1).toString }
-      assert(ex.getMessage.contains("Sql#toString is not defined"))
+      val ex = intercept[Exception] { Db(1).toString }
+      assert(ex.getMessage.contains("Db#toString is not defined"))
 
-      val s: String = Sql.toString(Sql(1))
+      val s: String = Db.toString(Db(1))
     }
 
   }

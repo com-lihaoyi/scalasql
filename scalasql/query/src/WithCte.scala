@@ -6,7 +6,7 @@ import scalasql.core.{
   DialectTypeMappers,
   LiveSqlExprs,
   Queryable,
-  Sql,
+  Db,
   SqlExprsToSql,
   SqlStr,
   TypeMapper,
@@ -34,11 +34,11 @@ class WithCte[Q, R](
     new WithCte(lhs, lhsSubQuery, rhs.map(f))
   }
 
-  override def filter(f: Q => Sql[Boolean]): Select[Q, R] = {
+  override def filter(f: Q => Db[Boolean]): Select[Q, R] = {
     new WithCte(rhs.filter(f), lhsSubQuery, rhs)
   }
 
-  override def sortBy(f: Q => Sql[_]) = new WithCte(lhs, lhsSubQuery, rhs.sortBy(f))
+  override def sortBy(f: Q => Db[_]) = new WithCte(lhs, lhsSubQuery, rhs.sortBy(f))
 
   override def drop(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.drop(n))
   override def take(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.take(n))
@@ -46,7 +46,7 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Db.Identity, SqlStr] = {
     SelectBase.lhsMap(rhs, prevContext)
   }
 

@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectTypeMappers, LiveSqlExprs, Queryable, Sql, SqlStr, TypeMapper}
+import scalasql.core.{Context, DialectTypeMappers, LiveSqlExprs, Queryable, Db, SqlStr, TypeMapper}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**
@@ -26,10 +26,10 @@ class Values[Q, R](val ts: Seq[R])(
   override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Db.Identity, SqlStr] = {
     qr.walkExprs(expr)
       .zipWithIndex
-      .map { case (e, i) => (Sql.identity(e), SqlStr.raw(columnName(i))) }
+      .map { case (e, i) => (Db.identity(e), SqlStr.raw(columnName(i))) }
       .toMap
   }
 }

@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.core.Sql
+import scalasql.core.Db
 import sourcecode.Text
 import utest._
 import utils.MySqlSuite
@@ -13,16 +13,16 @@ trait MySqlDialectTests extends MySqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("reverse") -
-      checker(query = Sql("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
+      checker(query = Db("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
 
     test("lpad") - checker(
-      query = Sql("Hello").lpad(10, "xy"),
+      query = Db("Hello").lpad(10, "xy"),
       sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xyxyxHello"
     )
 
     test("rpad") - checker(
-      query = Sql("Hello").rpad(10, "xy"),
+      query = Db("Hello").rpad(10, "xy"),
       sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxyxyx"
     )
@@ -64,11 +64,11 @@ trait MySqlDialectTests extends MySqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
-          normalize = (x: Seq[Buyer[Id]]) => x.sortBy(_.id)
+          normalize = (x: Seq[Buyer[Sc]]) => x.sortBy(_.id)
         )
       }
 
@@ -89,11 +89,11 @@ trait MySqlDialectTests extends MySqlSuite {
         checker(
           query = Buyer.select,
           value = Seq(
-            Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           ),
-          normalize = (x: Seq[Buyer[Id]]) => x.sortBy(_.id)
+          normalize = (x: Seq[Buyer[Sc]]) => x.sortBy(_.id)
         )
       }
 

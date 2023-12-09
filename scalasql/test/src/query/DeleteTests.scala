@@ -24,13 +24,13 @@ trait DeleteTests extends ScalaSqlSuite {
       checker(
         query = Purchase.select,
         value = Seq(
-          Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
+          Purchase[Sc](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
           // id==2 got deleted
-          Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
-          Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-          Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-          Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-          Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+          Purchase[Sc](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
+          Purchase[Sc](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+          Purchase[Sc](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+          Purchase[Sc](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+          Purchase[Sc](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
         )
       )
     }
@@ -49,7 +49,7 @@ trait DeleteTests extends ScalaSqlSuite {
       checker(
         query = Purchase.select,
         value =
-          Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
+          Seq(Purchase[Sc](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
       )
     }
     test("all") {
@@ -65,7 +65,7 @@ trait DeleteTests extends ScalaSqlSuite {
 
       checker(
         query = Purchase.select,
-        value = Seq[Purchase[Id]](
+        value = Seq[Purchase[Sc]](
           // all Deleted
         )
       )

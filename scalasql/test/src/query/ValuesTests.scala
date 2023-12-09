@@ -142,15 +142,15 @@ trait ValuesTests extends ScalaSqlSuite {
         query = Text {
           db.values(
             Seq(
-              Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-              Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+              Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+              Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
             )
           )
         },
         sqls = Seq("VALUES (?, ?, ?), (?, ?, ?)", "VALUES ROW(?, ?, ?), ROW(?, ?, ?)"),
         value = Seq(
-          Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-          Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+          Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
         )
       )
 
@@ -180,8 +180,8 @@ trait ValuesTests extends ScalaSqlSuite {
       test("mapCaseClass") - checker(
         query = Text {
           val buyers = Seq(
-            Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-            Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+            Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
           )
           val query = db.values(buyers).map { b => (b.id + 100, b) }
           query
@@ -213,8 +213,8 @@ trait ValuesTests extends ScalaSqlSuite {
           """
         ),
         value = Seq(
-          (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
-          (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+          (101, Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03"))),
+          (102, Buyer[Sc](2, "world", LocalDate.parse("2004-05-06")))
         ),
         docs = """
             `values` supports tuples and other data structures as well
@@ -223,8 +223,8 @@ trait ValuesTests extends ScalaSqlSuite {
       test("caseClassContains") - checker(
         query = Text {
           val buyers = Seq(
-            Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-            Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
           )
           Buyer.select.filter(!db.values(buyers).contains(_))
         },
@@ -249,7 +249,7 @@ trait ValuesTests extends ScalaSqlSuite {
           """
         ),
         value = Seq(
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
         ),
         docs = """
           You can use `.contains` on multi-column Scala values, which are translated

@@ -8,7 +8,7 @@ import scalasql.core.{
   JoinNullable,
   LiveSqlExprs,
   Queryable,
-  Sql,
+  Db,
   SqlExprsToSql,
   SqlStr,
   TypeMapper,
@@ -30,7 +30,7 @@ class SimpleSelect[Q, R](
     val preserveAll: Boolean,
     val from: Seq[Context.From],
     val joins: Seq[Join],
-    val where: Seq[Sql[_]],
+    val where: Seq[Db[_]],
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select[Q, R] {
@@ -42,7 +42,7 @@ class SimpleSelect[Q, R](
       preserveAll: Boolean = this.preserveAll,
       from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
-      where: Seq[Sql[_]] = this.where,
+      where: Seq[Db[_]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
     newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
@@ -52,10 +52,10 @@ class SimpleSelect[Q, R](
 
   def queryExpr[V: TypeMapper](
       f: Q => Context => SqlStr
-  )(implicit qr2: Queryable.Row[Sql[V], V]): Sql[V] = {
-    Sql[V] { implicit outerCtx: Context =>
+  )(implicit qr2: Queryable.Row[Db[V], V]): Db[V] = {
+    Db[V] { implicit outerCtx: Context =>
       this
-        .copy(expr = Sql[V] { implicit ctx: Context =>
+        .copy(expr = Db[V] { implicit ctx: Context =>
           val newCtx = ctx.withFromNaming(outerCtx.fromNaming ++ ctx.fromNaming)
 
           f(expr)(newCtx)
@@ -76,7 +76,7 @@ class SimpleSelect[Q, R](
     def rec(
         thing: FlatJoin.Rhs[Q2, R2],
         joinOns: Seq[Join],
-        wheres: Seq[Sql[Boolean]]
+        wheres: Seq[Db[Boolean]]
     ): Select[Q2, R2] = thing match {
 
       case other: FlatJoin.MapResult[Q, Q2, R, R2] =>
@@ -91,7 +91,7 @@ class SimpleSelect[Q, R](
     rec(f(expr), Nil, Nil)
   }
 
-  def filter(f: Q => Sql[Boolean]): Select[Q, R] = {
+  def filter(f: Q => Db[Boolean]): Select[Q, R] = {
     if (groupBy0.isEmpty) copy(where = where ++ Seq(f(expr)))
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
@@ -99,7 +99,7 @@ class SimpleSelect[Q, R](
   def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Sql[Boolean]]
+      on: Option[(Q, Q2) => Db[Boolean]]
   )(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): Select[QF, RF] = { joinCopy(other, on, prefix)(ja.appendTuple(_, _))(ja.qr) }
@@ -107,7 +107,7 @@ class SimpleSelect[Q, R](
   protected def joinCopy0[Q3, R3](
       newExpr: Q3,
       newJoins: Seq[Join],
-      newWheres: Seq[Sql[Boolean]]
+      newWheres: Seq[Db[Boolean]]
   )(
       implicit jqr: Queryable.Row[Q3, R3]
   ): SimpleSelect[Q3, R3] = {
@@ -130,18 +130,18 @@ class SimpleSelect[Q, R](
   }
 
   def leftJoin[Q2, R2](other: Joinable[Q2, R2])(
-      on: (Q, Q2) => Sql[Boolean]
+      on: (Q, Q2) => Db[Boolean]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(Q, JoinNullable[Q2]), (R, Option[R2])] = {
     joinCopy(other, Some(on), "LEFT JOIN")((e, o) => (e, JoinNullable(o)))
   }
 
   def rightJoin[Q2, R2](other: Joinable[Q2, R2])(
-      on: (Q, Q2) => Sql[Boolean]
+      on: (Q, Q2) => Db[Boolean]
   )(implicit joinQr: Queryable.Row[Q2, R2]): Select[(JoinNullable[Q], Q2), (Option[R], R2)] = {
     joinCopy(other, Some(on), "RIGHT JOIN")((e, o) => (JoinNullable(e), o))
   }
 
-  def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Sql[Boolean])(
+  def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Db[Boolean])(
       implicit joinQr: Queryable.Row[Q2, R2]
   ): Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
     joinCopy(other, Some(on), "FULL OUTER JOIN")((e, o) => (JoinNullable(e), JoinNullable(o)))
@@ -189,7 +189,7 @@ class SimpleSelect[Q, R](
     res
   }
 
-  def sortBy(f: Q => Sql[_]) = {
+  def sortBy(f: Q => Db[_]) = {
     newCompoundSelect(this, Nil, Seq(OrderBy(f(expr), None, None)), None, None)
   }
 
@@ -209,7 +209,7 @@ class SimpleSelect[Q, R](
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  protected def selectLhsMap(prevContext: Context): Map[Sql.Identity, SqlStr] = {
+  protected def selectLhsMap(prevContext: Context): Map[Db.Identity, SqlStr] = {
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
@@ -220,7 +220,7 @@ class SimpleSelect[Q, R](
 
   protected def joinCopy[Q2, R2, Q3, R3](
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Sql[Boolean]],
+      on: Option[(Q, Q2) => Db[Boolean]],
       joinPrefix: String
   )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
 
@@ -239,7 +239,7 @@ object SimpleSelect {
   def joinCopy[Q, R, Q2, R2, Q3, R3](
       self: SimpleSelect[Q, R],
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Sql[Boolean]],
+      on: Option[(Q, Q2) => Db[Boolean]],
       joinPrefix: String
   )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
     self.joinCopy(other, on, joinPrefix)(f)
@@ -273,7 +273,7 @@ object SimpleSelect {
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.iterator.zip(exprsStrs).collect {
-            case ((l, e), s) if liveExprs.isLive(Sql.identity(e)) => s
+            case ((l, e), s) if liveExprs.isLive(Db.identity(e)) => s
           },
           SqlStr.commaSep
         )

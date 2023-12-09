@@ -5,8 +5,8 @@ import scalasql.H2Dialect
 import utest._
 import utils.ScalaSqlSuite
 
-trait ExprSeqOpsTests extends ScalaSqlSuite {
-  def description = "Operations that can be performed on `Sql[Seq[_]]`"
+trait DbAggOpsTests extends ScalaSqlSuite {
+  def description = "Operations that can be performed on `Db[Seq[_]]`"
   def tests = Tests {
     test("size") - checker(
       query = Purchase.select.size,

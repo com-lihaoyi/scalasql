@@ -2,59 +2,59 @@ package scalasql.operations
 
 import scalasql._
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.core.Sql
+import scalasql.core.Db
 import utest._
 import utils.ScalaSqlSuite
 
-trait ExprOpsTests extends ScalaSqlSuite {
-  def description = "Operations that can be performed on `Sql[T]` for any `T`"
+trait DbOpsTests extends ScalaSqlSuite {
+  def description = "Operations that can be performed on `Db[T]` for any `T`"
   def tests = Tests {
 
     test("numeric") {
       test("greaterThan") -
-        checker(query = Sql(6) > Sql(2), sql = "SELECT (? > ?) AS res", value = true)
+        checker(query = Db(6) > Db(2), sql = "SELECT (? > ?) AS res", value = true)
 
       test("lessThan") -
-        checker(query = Sql(6) < Sql(2), sql = "SELECT (? < ?) AS res", value = false)
+        checker(query = Db(6) < Db(2), sql = "SELECT (? < ?) AS res", value = false)
 
       test("greaterThanOrEquals") -
-        checker(query = Sql(6) >= Sql(2), sql = "SELECT (? >= ?) AS res", value = true)
+        checker(query = Db(6) >= Db(2), sql = "SELECT (? >= ?) AS res", value = true)
 
       test("lessThanOrEquals") -
-        checker(query = Sql(6) <= Sql(2), sql = "SELECT (? <= ?) AS res", value = false)
+        checker(query = Db(6) <= Db(2), sql = "SELECT (? <= ?) AS res", value = false)
     }
 
     test("string") {
       test("greaterThan") -
-        checker(query = Sql("A") > Sql("B"), sql = "SELECT (? > ?) AS res", value = false)
+        checker(query = Db("A") > Db("B"), sql = "SELECT (? > ?) AS res", value = false)
 
       test("lessThan") -
-        checker(query = Sql("A") < Sql("B"), sql = "SELECT (? < ?) AS res", value = true)
+        checker(query = Db("A") < Db("B"), sql = "SELECT (? < ?) AS res", value = true)
 
       test("greaterThanOrEquals") -
-        checker(query = Sql("A") >= Sql("B"), sql = "SELECT (? >= ?) AS res", value = false)
+        checker(query = Db("A") >= Db("B"), sql = "SELECT (? >= ?) AS res", value = false)
 
       test("lessThanOrEquals") -
-        checker(query = Sql("A") <= Sql("B"), sql = "SELECT (? <= ?) AS res", value = true)
+        checker(query = Db("A") <= Db("B"), sql = "SELECT (? <= ?) AS res", value = true)
     }
 
     test("boolean") {
       test("greaterThan") -
-        checker(query = Sql(true) > Sql(false), sql = "SELECT (? > ?) AS res", value = true)
+        checker(query = Db(true) > Db(false), sql = "SELECT (? > ?) AS res", value = true)
 
       test("lessThan") -
-        checker(query = Sql(true) < Sql(true), sql = "SELECT (? < ?) AS res", value = false)
+        checker(query = Db(true) < Db(true), sql = "SELECT (? < ?) AS res", value = false)
 
       test("greaterThanOrEquals") -
-        checker(query = Sql(true) >= Sql(true), sql = "SELECT (? >= ?) AS res", value = true)
+        checker(query = Db(true) >= Db(true), sql = "SELECT (? >= ?) AS res", value = true)
 
       test("lessThanOrEquals") -
-        checker(query = Sql(true) <= Sql(true), sql = "SELECT (? <= ?) AS res", value = true)
+        checker(query = Db(true) <= Db(true), sql = "SELECT (? <= ?) AS res", value = true)
     }
 
     test("cast") {
       test("byte") - checker(
-        query = Sql(45.12).cast[Byte],
+        query = Db(45.12).cast[Byte],
         sqls = Seq(
           "SELECT CAST(? AS TINYINT) AS res",
           "SELECT CAST(? AS INTEGER) AS res",
@@ -64,7 +64,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("short") - checker(
-        query = Sql(1234.1234).cast[Short],
+        query = Db(1234.1234).cast[Short],
         sqls = Seq(
           "SELECT CAST(? AS SMALLINT) AS res",
           "SELECT CAST(? AS SIGNED) AS res"
@@ -73,7 +73,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("int") - checker(
-        query = Sql(1234.1234).cast[Int],
+        query = Db(1234.1234).cast[Int],
         sqls = Seq(
           "SELECT CAST(? AS INTEGER) AS res",
           "SELECT CAST(? AS SIGNED) AS res"
@@ -82,7 +82,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("long") - checker(
-        query = Sql(1234.1234).cast[Long],
+        query = Db(1234.1234).cast[Long],
         sqls = Seq(
           "SELECT CAST(? AS BIGINT) AS res",
           "SELECT CAST(? AS SIGNED) AS res"
@@ -91,7 +91,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("string") - checker(
-        query = Sql(1234.5678).cast[String],
+        query = Db(1234.5678).cast[String],
         sqls = Seq(
           "SELECT CAST(? AS LONGVARCHAR) AS res",
           "SELECT CAST(? AS VARCHAR) AS res",
@@ -101,7 +101,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("localdate") - checker(
-        query = Sql("2001-02-03").cast[java.time.LocalDate],
+        query = Db("2001-02-03").cast[java.time.LocalDate],
         sqls = Seq(
           "SELECT CAST(? AS DATE) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
@@ -110,7 +110,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("localdatetime") - checker(
-        query = Sql("2023-11-12 03:22:41").cast[java.time.LocalDateTime],
+        query = Db("2023-11-12 03:22:41").cast[java.time.LocalDateTime],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
@@ -120,7 +120,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("instant") - checker(
-        query = Sql("2007-12-03 10:15:30.00").cast[java.time.Instant],
+        query = Db("2007-12-03 10:15:30.00").cast[java.time.Instant],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
@@ -130,7 +130,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
       )
 
       test("castNamed") - checker(
-        query = Sql(1234.5678).castNamed[String](sql"CHAR(3)"),
+        query = Db(1234.5678).castNamed[String](sql"CHAR(3)"),
         sql = "SELECT CAST(? AS CHAR(3)) AS res",
         value = "123",
         moreValues = Seq("1234.5678") // SQLITE doesn't truncate on cast

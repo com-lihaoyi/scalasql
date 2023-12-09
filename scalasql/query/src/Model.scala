@@ -1,11 +1,11 @@
 package scalasql.query
 
-import scalasql.core.Sql
+import scalasql.core.Db
 
 /**
  * Models a SQL `ORDER BY` clause
  */
-case class OrderBy(expr: Sql[_], ascDesc: Option[AscDesc], nulls: Option[Nulls])
+case class OrderBy(expr: Db[_], ascDesc: Option[AscDesc], nulls: Option[Nulls])
 
 sealed trait AscDesc
 
@@ -40,12 +40,12 @@ object Nulls {
 /**
  * Models a SQL `GROUP BY` clause
  */
-case class GroupBy(key: Sql[_], select: () => Select[_, _], having: Seq[Sql[_]])
+case class GroupBy(key: Db[_], select: () => Select[_, _], having: Seq[Db[_]])
 
 /**
  * Models a SQL `JOIN` clause
  */
 case class Join(prefix: String, from: Seq[Join.From])
 object Join {
-  case class From(from: scalasql.core.Context.From, on: Option[Sql[_]])
+  case class From(from: scalasql.core.Context.From, on: Option[Db[_]])
 }

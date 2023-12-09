@@ -34,13 +34,13 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           FROM purchase purchase0
           ORDER BY shipping_info_id DESC, product_id ASC""",
         value = Seq(
-          Purchase[Id](6, 3, 1, 5, 44.4),
-          Purchase[Id](7, 3, 6, 13, 1.3),
-          Purchase[Id](4, 2, 4, 4, 493.8),
-          Purchase[Id](5, 2, 5, 10, 10000.0),
-          Purchase[Id](1, 1, 1, 100, 888.0),
-          Purchase[Id](2, 1, 2, 3, 900.0),
-          Purchase[Id](3, 1, 3, 5, 15.7)
+          Purchase[Sc](6, 3, 1, 5, 44.4),
+          Purchase[Sc](7, 3, 6, 13, 1.3),
+          Purchase[Sc](4, 2, 4, 4, 493.8),
+          Purchase[Sc](5, 2, 5, 10, 10000.0),
+          Purchase[Sc](1, 1, 1, 100, 888.0),
+          Purchase[Sc](2, 1, 2, 3, 900.0),
+          Purchase[Sc](3, 1, 3, 5, 15.7)
         ),
         docs = """
           If you want to sort by multiple columns, you can call `.sortBy` multiple times,

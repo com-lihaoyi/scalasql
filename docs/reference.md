@@ -41,9 +41,9 @@ to run a simple query within a transaction
 ```scala
 dbClient.transaction { db =>
   db.run(Buyer.select) ==> List(
-    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
   )
 }
 ```
@@ -58,7 +58,7 @@ dbClient.transaction { db =>
 `db.runSql` can be used to run `sql"..."` strings, while providing a
 specified type that the query results will be deserialized as the specified
 type. `db.runSql` supports the all the same data types as `db.run`:
-primitives, date and time types, tuples, `Foo[Id]` `case class`s, and
+primitives, date and time types, tuples, `Foo[Sc]` `case class`s, and
 any combination of these.
 
 The `sql"..."` string interpolator automatically converts interpolated values
@@ -84,7 +84,7 @@ dbClient.transaction { db =>
       Seq(("叉烧包", LocalDate.parse("1923-11-12")))
   )
 
-  val output3 = db.runSql[(String, LocalDate, Buyer[Id])](
+  val output3 = db.runSql[(String, LocalDate, Buyer[Sc])](
     sql"SELECT name, date_of_birth, * FROM buyer WHERE id = $filterId"
   )
   assert(
@@ -93,7 +93,7 @@ dbClient.transaction { db =>
         (
           "叉烧包",
           LocalDate.parse("1923-11-12"),
-          Buyer[Id](
+          Buyer[Sc](
             id = 2,
             name = "叉烧包",
             dateOfBirth = LocalDate.parse("1923-11-12")
@@ -126,10 +126,10 @@ dbClient.transaction { db =>
   assert(count == 1)
 
   db.run(Buyer.select) ==> List(
-    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-    Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+    Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+    Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
   )
 }
 ```
@@ -170,10 +170,10 @@ dbClient.transaction { db =>
   assert(count == 1)
 
   db.run(Buyer.select) ==> List(
-    Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-    Buyer[Id](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+    Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+    Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+    Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
   )
 }
 ```
@@ -220,7 +220,7 @@ in a streaming fashion without.
 dbClient.transaction { db =>
   val excluded = "James Bond"
   val output = db
-    .streamSql[Buyer[Id]](sql"SELECT * FROM buyer where name != $excluded")
+    .streamSql[Buyer[Sc]](sql"SELECT * FROM buyer where name != $excluded")
     .takeWhile(_.id <= 2)
     .map(_.name)
     .toList
@@ -244,7 +244,7 @@ statement variables
 dbClient.transaction { db =>
   val excluded = "James Bond"
   val output = db
-    .streamRaw[Buyer[Id]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
+    .streamRaw[Buyer[Sc]]("SELECT * FROM buyer WHERE buyer.name <> ?", Seq(excluded))
     .takeWhile(_.id <= 2)
     .map(_.name)
     .toList
@@ -494,12 +494,12 @@ dbClient.transaction(_.run(Purchase.select.size)) ==> 1
 Basic `SELECT` operations: map, filter, join, etc.
 ### Select.constant
 
-The most simple thing you can query in the database is an `Sql`. These do not need
+The most simple thing you can query in the database is an `Db`. These do not need
 to be related to any database tables, and translate into raw `SELECT` calls without
 `FROM`.
 
 ```scala
-Sql(1) + Sql(2)
+Db(1) + Db(2)
 ```
 
 
@@ -520,7 +520,7 @@ Sql(1) + Sql(2)
 ### Select.table
 
 You can list the contents of a table via the query `Table.select`. It returns a
-`Seq[CaseClass[Id]]` with the entire contents of the table. Note that listing
+`Seq[CaseClass[Sc]]` with the entire contents of the table. Note that listing
 entire tables can be prohibitively expensive on real-world databases, and you
 should generally use `filter`s as shown below
 
@@ -540,9 +540,9 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
-      Buyer[Id](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
-      Buyer[Id](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
+      Buyer[Sc](id = 1, name = "James Bond", dateOfBirth = LocalDate.parse("2001-02-03")),
+      Buyer[Sc](id = 2, name = "叉烧包", dateOfBirth = LocalDate.parse("1923-11-12")),
+      Buyer[Sc](id = 3, name = "Li Haoyi", dateOfBirth = LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -573,8 +573,8 @@ ShippingInfo.select.filter(_.buyerId `=` 2)
 *
     ```scala
     Seq(
-      ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")),
-      ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
+      ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+      ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
     )
     ```
 
@@ -605,7 +605,7 @@ ShippingInfo.select
 
 *
     ```scala
-    Seq(ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
+    Seq(ShippingInfo[Sc](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06")))
     ```
 
 
@@ -638,7 +638,7 @@ ShippingInfo.select
 
 *
     ```scala
-    ShippingInfo[Id](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
+    ShippingInfo[Sc](id = 3, buyerId = 2, shippingDate = LocalDate.parse("2012-05-06"))
     ```
 
 
@@ -667,7 +667,7 @@ ShippingInfo.select
 
 *
     ```scala
-    Seq(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+    Seq(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
     ```
 
 
@@ -801,7 +801,7 @@ Product.select.map(_.price * 2)
 ### Select.map.heterogenousTuple
 
 `.map` can return any combination of tuples, `case class`es, and primitives,
-arbitrarily nested. here we return a tuple of `(Int, Buyer[Id])`
+arbitrarily nested. here we return a tuple of `(Int, Buyer[Sc])`
 
 ```scala
 Buyer.select.map(c => (c.id, c))
@@ -823,9 +823,9 @@ Buyer.select.map(c => (c.id, c))
 *
     ```scala
     Seq(
-      (1, Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))),
-      (2, Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))),
-      (3, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+      (1, Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))),
+      (2, Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))),
+      (3, Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     ```
 
@@ -835,7 +835,7 @@ Buyer.select.map(c => (c.id, c))
 
 `SELECT` queries that return a single row and column can be used as SQL expressions
 in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
-which turns a `Select[T]` into an `Sql[T]`. Note that if the `Select` returns more
+which turns a `Select[T]` into an `Db[T]`. Note that if the `Select` returns more
 than one row or column, the database may select a row arbitrarily or will throw
 an exception at runtime (depend on implenmentation)
 
@@ -1140,8 +1140,8 @@ Buyer.select.filter(b => ShippingInfo.select.map(_.buyerId).contains(b.id))
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
 
@@ -1178,7 +1178,7 @@ Buyer.select.filter(b =>
 *
     ```scala
     Seq(
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
 
@@ -1246,9 +1246,9 @@ Buyer.select
 
 ### Select.nestedTuples
 
-Queries can output arbitrarily nested tuples of `Sql[T]` and `case class`
-instances of `Foo[Sql]`, which will be de-serialized into nested tuples
-of `T` and `Foo[Id]`s. The `AS` aliases assigned to each column will contain
+Queries can output arbitrarily nested tuples of `Db[T]` and `case class`
+instances of `Foo[Db]`, which will be de-serialized into nested tuples
+of `T` and `Foo[Sc]`s. The `AS` aliases assigned to each column will contain
 the path of indices and field names used to populate the final returned values
 
 ```scala
@@ -1279,26 +1279,26 @@ Buyer.select
 
 *
     ```scala
-    Seq[(Int, (Buyer[Id], (Int, ShippingInfo[Id])))](
+    Seq[(Int, (Buyer[Sc], (Int, ShippingInfo[Sc])))](
       (
         1,
         (
-          Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-          (2, ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+          Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+          (2, ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
         )
       ),
       (
         2,
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          (1, ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          (1, ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
         )
       ),
       (
         2,
         (
-          Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          (3, ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+          Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+          (3, ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
         )
       )
     )
@@ -1424,12 +1424,12 @@ Buyer.select.join(ShippingInfo)(_.id `=` _.buyerId).filter(_._1.name `=` "叉烧
     ```scala
     Seq(
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
       )
     )
     ```
@@ -1496,16 +1496,16 @@ Buyer.select.join(Buyer)(_.id `=` _.id)
     ```scala
     Seq(
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       (
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
       )
     )
     ```
@@ -1540,28 +1540,28 @@ Buyer.select.join(Buyer)(_.id <> _.id)
     ```scala
     Seq(
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
       ),
       (
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
       ),
       (
-        Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       )
     )
     ```
@@ -1628,18 +1628,18 @@ Buyer.select.leftJoin(ShippingInfo)(_.id `=` _.buyerId)
     ```scala
     Seq(
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
       ),
-      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+      (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
     )
     ```
 
@@ -1716,8 +1716,8 @@ Buyer.select
 
 ### Join.leftJoinExpr
 
-`JoinNullable[Sql[T]]`s can be implicitly used as `Sql[Option[T]]`s. This allows
-them to participate in any database query logic than any other `Sql[Option[T]]`s
+`JoinNullable[Db[T]]`s can be implicitly used as `Db[Option[T]]`s. This allows
+them to participate in any database query logic than any other `Db[Option[T]]`s
 can participate in, such as being used as sort key or in computing return values
 (below).
 
@@ -1823,7 +1823,7 @@ Buyer.select
 
 ### Join.leftJoinExprExplicit
 
-The conversion from `JoinNullable[T]` to `Sql[Option[T]]` can also be performed
+The conversion from `JoinNullable[T]` to `Db[Option[T]]` can also be performed
 explicitly via `JoinNullable.toExpr(...)`
 
 ```scala
@@ -1886,18 +1886,18 @@ ShippingInfo.select.rightJoin(Buyer)(_.buyerId `=` _.id)
     ```scala
     Seq(
       (
-        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+        Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05"))),
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
       ),
       (
-        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
       (
-        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12"))
+        Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))),
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
       ),
-      (None, Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+      (None, Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     )
     ```
 
@@ -1931,18 +1931,18 @@ ShippingInfo.select.outerJoin(Buyer)(_.buyerId `=` _.id)
     ```scala
     Seq(
       (
-        Option(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05"))),
-        Option(Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")))
+        Option(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05"))),
+        Option(Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")))
       ),
       (
-        Option(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03"))),
-        Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+        Option(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03"))),
+        Option(Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")))
       ),
       (
-        Option(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06"))),
-        Option(Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")))
+        Option(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))),
+        Option(Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")))
       ),
-      (Option.empty, Option(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
+      (Option.empty, Option(Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))))
     )
     ```
 
@@ -2375,7 +2375,7 @@ Basic `INSERT` operations
 
 ```scala
 Buyer.insert.values(
-  Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09"))
+  Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09"))
 )
 ```
 
@@ -2407,7 +2407,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -2421,7 +2421,7 @@ auto-generated by the database.
 ```scala
 Buyer.insert
   .values(
-    Buyer[Id](-1, "test buyer", LocalDate.parse("2023-09-09"))
+    Buyer[Sc](-1, "test buyer", LocalDate.parse("2023-09-09"))
   )
   .skipColumns(_.id)
 ```
@@ -2454,7 +2454,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -2501,7 +2501,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -2543,7 +2543,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -2554,9 +2554,9 @@ You can insert multiple rows at once by passing them to `Buyer.insert.values`
 
 ```scala
 Buyer.insert.values(
-  Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-  Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-  Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+  Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+  Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+  Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
 )
 ```
 
@@ -2590,13 +2590,13 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
       // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+      Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
     )
     ```
 
@@ -2644,13 +2644,13 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
       // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+      Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
     )
     ```
 
@@ -2705,11 +2705,11 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](5, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
 
@@ -2758,12 +2758,12 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
       // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+      Buyer[Sc](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](5, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
 
@@ -2958,7 +2958,7 @@ Buyer.select.filter(_.name `=` "John Dee").map(_.dateOfBirth)
 
 ### Update.dynamic
 
-The values assigned to columns in `Table.update` can also be computed `Sql[T]`s,
+The values assigned to columns in `Table.update` can also be computed `Db[T]`s,
 not just literal Scala constants. This example shows how to to update the name of
 the row for `James Bond` with it's existing name in uppercase
 
@@ -3057,13 +3057,13 @@ Purchase.select
 *
     ```scala
     Seq(
-      Purchase[Id](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
+      Purchase[Sc](id = 1, shippingInfoId = 1, productId = 1, count = 100, total = 888.0),
       // id==2 got deleted
-      Purchase[Id](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+      Purchase[Sc](id = 3, shippingInfoId = 1, productId = 3, count = 5, total = 15.7),
+      Purchase[Sc](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+      Purchase[Sc](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+      Purchase[Sc](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+      Purchase[Sc](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
     )
     ```
 
@@ -3107,7 +3107,7 @@ Purchase.select
 
 *
     ```scala
-    Seq(Purchase[Id](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
+    Seq(Purchase[Sc](id = 2, shippingInfoId = 1, productId = 2, count = 3, total = 900.0))
     ```
 
 
@@ -3149,7 +3149,7 @@ Purchase.select
 
 *
     ```scala
-    Seq[Purchase[Id]](
+    Seq[Purchase[Sc]](
       // all Deleted
     )
     ```
@@ -3210,13 +3210,13 @@ Purchase.select.sortBy(_.productId).asc.sortBy(_.shippingInfoId).desc
 *
     ```scala
     Seq(
-      Purchase[Id](6, 3, 1, 5, 44.4),
-      Purchase[Id](7, 3, 6, 13, 1.3),
-      Purchase[Id](4, 2, 4, 4, 493.8),
-      Purchase[Id](5, 2, 5, 10, 10000.0),
-      Purchase[Id](1, 1, 1, 100, 888.0),
-      Purchase[Id](2, 1, 2, 3, 900.0),
-      Purchase[Id](3, 1, 3, 5, 15.7)
+      Purchase[Sc](6, 3, 1, 5, 44.4),
+      Purchase[Sc](7, 3, 6, 13, 1.3),
+      Purchase[Sc](4, 2, 4, 4, 493.8),
+      Purchase[Sc](5, 2, 5, 10, 10000.0),
+      Purchase[Sc](1, 1, 1, 100, 888.0),
+      Purchase[Sc](2, 1, 2, 3, 900.0),
+      Purchase[Sc](3, 1, 3, 5, 15.7)
     )
     ```
 
@@ -3947,7 +3947,7 @@ Buyer.select.filter(_.name `=` "James Bond").map(_.dateOfBirth)
 ### UpdateSubQuery.setSubquery
 
 You can use subqueries to compute the values you want to update, using
-aggregates like `.maxBy` to convert the `Select[T]` into an `Sql[T]`
+aggregates like `.maxBy` to convert the `Select[T]` into an `Db[T]`
 
 ```scala
 Product.update(_ => true).set(_.price := Product.select.maxBy(_.price))
@@ -4090,7 +4090,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -4136,7 +4136,7 @@ Buyer.select.filter(_.name `=` "test buyer")
 
 *
     ```scala
-    Seq(Buyer[Id](4, "test buyer", LocalDate.parse("2023-09-09")))
+    Seq(Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09")))
     ```
 
 
@@ -4189,13 +4189,13 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
       // id=4,5,6 comes from auto increment
-      Buyer[Id](4, "test buyer A", LocalDate.parse("2001-04-07")),
-      Buyer[Id](5, "test buyer B", LocalDate.parse("2002-05-08")),
-      Buyer[Id](6, "test buyer C", LocalDate.parse("2003-06-09"))
+      Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
+      Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
+      Buyer[Sc](6, "test buyer C", LocalDate.parse("2003-06-09"))
     )
     ```
 
@@ -4251,12 +4251,12 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
       // id=4,5 comes from auto increment, 6 is filtered out in the select
-      Buyer[Id](4, "James Bond", LocalDate.parse("2001-02-03")),
-      Buyer[Id](5, "叉烧包", LocalDate.parse("1923-11-12"))
+      Buyer[Sc](4, "James Bond", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](5, "叉烧包", LocalDate.parse("1923-11-12"))
     )
     ```
 
@@ -4372,10 +4372,10 @@ Purchase.select
     ```scala
     Seq(
       // id=1,2,3 had shippingInfoId=1 and thus got deleted
-      Purchase[Id](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
-      Purchase[Id](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
-      Purchase[Id](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
-      Purchase[Id](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
+      Purchase[Sc](id = 4, shippingInfoId = 2, productId = 4, count = 4, total = 493.8),
+      Purchase[Sc](id = 5, shippingInfoId = 2, productId = 5, count = 10, total = 10000.0),
+      Purchase[Sc](id = 6, shippingInfoId = 3, productId = 1, count = 5, total = 44.4),
+      Purchase[Sc](id = 7, shippingInfoId = 3, productId = 6, count = 13, total = 1.3)
     )
     ```
 
@@ -4522,9 +4522,9 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -4573,9 +4573,9 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -4817,8 +4817,8 @@ db.values(Seq((1, 2), (3, 4), (5, 6)))
 ```scala
 db.values(
   Seq(
-    Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-    Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+    Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+    Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
   )
 )
 ```
@@ -4834,8 +4834,8 @@ db.values(
 *
     ```scala
     Seq(
-      Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+      Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
     )
     ```
 
@@ -4872,8 +4872,8 @@ db.values(Seq((1, 2), (3, 4), (5, 6))).map { case (a, b) => (a + 10, b + 100) }
 ```scala
 {
   val buyers = Seq(
-    Buyer[Id](1, "hello", LocalDate.parse("2001-02-03")),
-    Buyer[Id](2, "world", LocalDate.parse("2004-05-06"))
+    Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03")),
+    Buyer[Sc](2, "world", LocalDate.parse("2004-05-06"))
   )
   val query = db.values(buyers).map { b => (b.id + 100, b) }
   query
@@ -4896,8 +4896,8 @@ db.values(Seq((1, 2), (3, 4), (5, 6))).map { case (a, b) => (a + 10, b + 100) }
 *
     ```scala
     Seq(
-      (101, Buyer[Id](1, "hello", LocalDate.parse("2001-02-03"))),
-      (102, Buyer[Id](2, "world", LocalDate.parse("2004-05-06")))
+      (101, Buyer[Sc](1, "hello", LocalDate.parse("2001-02-03"))),
+      (102, Buyer[Sc](2, "world", LocalDate.parse("2004-05-06")))
     )
     ```
 
@@ -4911,8 +4911,8 @@ to a SQL `IN` clause on a tuple.
 ```scala
 {
   val buyers = Seq(
-    Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-    Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+    Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+    Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
   )
   Buyer.select.filter(!db.values(buyers).contains(_))
 }
@@ -4935,7 +4935,7 @@ to a SQL `IN` clause on a tuple.
 *
     ```scala
     Seq(
-      Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03"))
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
     )
     ```
 
@@ -5057,7 +5057,7 @@ Buyer.select
 ```scala
 for {
   b <- Buyer.select
-  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Sql(true))
+  s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Db(true))
 } yield (b.name, s.shippingDate)
 ```
 
@@ -5092,7 +5092,7 @@ ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
 
 ```scala
 Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
-  Sql(true)
+  Db(true)
 )
 ```
 
@@ -5121,18 +5121,18 @@ Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId)
     ```scala
     Seq(
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
       ),
-      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+      (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
     )
     ```
 
@@ -5146,7 +5146,7 @@ ScalaSql supports `LEFT JOIN`s, `RIGHT JOIN`s and `OUTER JOIN`s via the
 ```scala
 for {
   b <- Buyer.select
-  s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Sql(true))
+  s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Db(true))
 } yield (b, s)
 ```
 
@@ -5175,18 +5175,18 @@ for {
     ```scala
     Seq(
       (
-        Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")),
-        Some(ShippingInfo[Id](2, 1, LocalDate.parse("2012-04-05")))
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+        Some(ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](1, 2, LocalDate.parse("2010-02-03")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
       ),
       (
-        Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-        Some(ShippingInfo[Id](3, 2, LocalDate.parse("2012-05-06")))
+        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+        Some(ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
       ),
-      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
+      (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), None)
     )
     ```
 
@@ -6124,7 +6124,7 @@ Buyer.select.filter(c => ShippingInfo.select.filter(p => c.id `=` p.buyerId).siz
 
 *
     ```scala
-    Seq(Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
+    Seq(Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")))
     ```
 
 
@@ -6156,9 +6156,9 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 *
     ```scala
     Seq(
-      (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
-      (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
-      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
+      (Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")), 1),
+      (Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")), 2),
+      (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), 0)
     )
     ```
 
@@ -6191,9 +6191,9 @@ Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).si
 *
     ```scala
     Seq(
-      (Buyer[Id](1, "James Bond", LocalDate.parse("2001-02-03")), true),
-      (Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
-      (Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
+      (Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")), true),
+      (Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
+      (Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")), false)
     )
     ```
 
@@ -6346,8 +6346,8 @@ instead of using `JOIN`s it uses subqueries nested 4 layers deep. While this
 example is contrived, it demonstrates how nested ScalaSql `.select` calls
 translate directly into nested SQL subqueries.
 
-To turn the ScalaSql `Select[T]` into an `Sql[T]`, you can either use
-an aggregate method like `.sumBy(...): Sql[Int]` that generates a `SUM(...)`
+To turn the ScalaSql `Select[T]` into an `Db[T]`, you can either use
+an aggregate method like `.sumBy(...): Db[Int]` that generates a `SUM(...)`
 aggregate, or via the `.toExpr` method that leaves the subquery untouched.
 SQL requires that subqueries used as expressions must return a single row
 and single column, and if the query returns some other number of rows/columns
@@ -6580,13 +6580,13 @@ db.withCte(Buyer.select) { bs =>
 
 
 ## ExprOps
-Operations that can be performed on `Sql[T]` for any `T`
+Operations that can be performed on `Db[T]` for any `T`
 ### ExprOps.numeric.greaterThan
 
 
 
 ```scala
-Sql(6) > Sql(2)
+Db(6) > Db(2)
 ```
 
 
@@ -6609,7 +6609,7 @@ Sql(6) > Sql(2)
 
 
 ```scala
-Sql(6) < Sql(2)
+Db(6) < Db(2)
 ```
 
 
@@ -6632,7 +6632,7 @@ Sql(6) < Sql(2)
 
 
 ```scala
-Sql(6) >= Sql(2)
+Db(6) >= Db(2)
 ```
 
 
@@ -6655,7 +6655,7 @@ Sql(6) >= Sql(2)
 
 
 ```scala
-Sql(6) <= Sql(2)
+Db(6) <= Db(2)
 ```
 
 
@@ -6678,7 +6678,7 @@ Sql(6) <= Sql(2)
 
 
 ```scala
-Sql("A") > Sql("B")
+Db("A") > Db("B")
 ```
 
 
@@ -6701,7 +6701,7 @@ Sql("A") > Sql("B")
 
 
 ```scala
-Sql("A") < Sql("B")
+Db("A") < Db("B")
 ```
 
 
@@ -6724,7 +6724,7 @@ Sql("A") < Sql("B")
 
 
 ```scala
-Sql("A") >= Sql("B")
+Db("A") >= Db("B")
 ```
 
 
@@ -6747,7 +6747,7 @@ Sql("A") >= Sql("B")
 
 
 ```scala
-Sql("A") <= Sql("B")
+Db("A") <= Db("B")
 ```
 
 
@@ -6770,7 +6770,7 @@ Sql("A") <= Sql("B")
 
 
 ```scala
-Sql(true) > Sql(false)
+Db(true) > Db(false)
 ```
 
 
@@ -6793,7 +6793,7 @@ Sql(true) > Sql(false)
 
 
 ```scala
-Sql(true) < Sql(true)
+Db(true) < Db(true)
 ```
 
 
@@ -6816,7 +6816,7 @@ Sql(true) < Sql(true)
 
 
 ```scala
-Sql(true) >= Sql(true)
+Db(true) >= Db(true)
 ```
 
 
@@ -6839,7 +6839,7 @@ Sql(true) >= Sql(true)
 
 
 ```scala
-Sql(true) <= Sql(true)
+Db(true) <= Db(true)
 ```
 
 
@@ -6862,7 +6862,7 @@ Sql(true) <= Sql(true)
 
 
 ```scala
-Sql(45.12).cast[Byte]
+Db(45.12).cast[Byte]
 ```
 
 
@@ -6885,7 +6885,7 @@ Sql(45.12).cast[Byte]
 
 
 ```scala
-Sql(1234.1234).cast[Short]
+Db(1234.1234).cast[Short]
 ```
 
 
@@ -6908,7 +6908,7 @@ Sql(1234.1234).cast[Short]
 
 
 ```scala
-Sql(1234.1234).cast[Int]
+Db(1234.1234).cast[Int]
 ```
 
 
@@ -6931,7 +6931,7 @@ Sql(1234.1234).cast[Int]
 
 
 ```scala
-Sql(1234.1234).cast[Long]
+Db(1234.1234).cast[Long]
 ```
 
 
@@ -6954,7 +6954,7 @@ Sql(1234.1234).cast[Long]
 
 
 ```scala
-Sql(1234.5678).cast[String]
+Db(1234.5678).cast[String]
 ```
 
 
@@ -6977,7 +6977,7 @@ Sql(1234.5678).cast[String]
 
 
 ```scala
-Sql("2001-02-03").cast[java.time.LocalDate]
+Db("2001-02-03").cast[java.time.LocalDate]
 ```
 
 
@@ -7000,7 +7000,7 @@ Sql("2001-02-03").cast[java.time.LocalDate]
 
 
 ```scala
-Sql("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
+Db("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
 ```
 
 
@@ -7023,7 +7023,7 @@ Sql("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
 
 
 ```scala
-Sql("2007-12-03 10:15:30.00").cast[java.time.Instant]
+Db("2007-12-03 10:15:30.00").cast[java.time.Instant]
 ```
 
 
@@ -7046,7 +7046,7 @@ Sql("2007-12-03 10:15:30.00").cast[java.time.Instant]
 
 
 ```scala
-Sql(1234.5678).castNamed[String](sql"CHAR(3)")
+Db(1234.5678).castNamed[String](sql"CHAR(3)")
 ```
 
 
@@ -7065,13 +7065,13 @@ Sql(1234.5678).castNamed[String](sql"CHAR(3)")
 
 
 ## ExprBooleanOps
-Operations that can be performed on `Sql[Boolean]`
+Operations that can be performed on `Db[Boolean]`
 ### ExprBooleanOps.and
 
 
 
 ```scala
-Sql(true) && Sql(true)
+Db(true) && Db(true)
 ```
 
 
@@ -7094,7 +7094,7 @@ Sql(true) && Sql(true)
 
 
 ```scala
-Sql(false) && Sql(true)
+Db(false) && Db(true)
 ```
 
 
@@ -7117,7 +7117,7 @@ Sql(false) && Sql(true)
 
 
 ```scala
-Sql(false) || Sql(false)
+Db(false) || Db(false)
 ```
 
 
@@ -7140,7 +7140,7 @@ Sql(false) || Sql(false)
 
 
 ```scala
-!Sql(false)
+!Db(false)
 ```
 
 
@@ -7159,13 +7159,13 @@ Sql(false) || Sql(false)
 
 
 ## ExprNumericOps
-Operations that can be performed on `Sql[T]` when `T` is numeric
+Operations that can be performed on `Db[T]` when `T` is numeric
 ### ExprNumericOps.plus
 
 
 
 ```scala
-Sql(6) + Sql(2)
+Db(6) + Db(2)
 ```
 
 
@@ -7188,7 +7188,7 @@ Sql(6) + Sql(2)
 
 
 ```scala
-Sql(6) - Sql(2)
+Db(6) - Db(2)
 ```
 
 
@@ -7211,7 +7211,7 @@ Sql(6) - Sql(2)
 
 
 ```scala
-Sql(6) * Sql(2)
+Db(6) * Db(2)
 ```
 
 
@@ -7234,7 +7234,7 @@ Sql(6) * Sql(2)
 
 
 ```scala
-Sql(6) / Sql(2)
+Db(6) / Db(2)
 ```
 
 
@@ -7257,7 +7257,7 @@ Sql(6) / Sql(2)
 
 
 ```scala
-Sql(6) % Sql(2)
+Db(6) % Db(2)
 ```
 
 
@@ -7280,7 +7280,7 @@ Sql(6) % Sql(2)
 
 
 ```scala
-Sql(6) & Sql(2)
+Db(6) & Db(2)
 ```
 
 
@@ -7303,7 +7303,7 @@ Sql(6) & Sql(2)
 
 
 ```scala
-Sql(6) | Sql(3)
+Db(6) | Db(3)
 ```
 
 
@@ -7326,7 +7326,7 @@ Sql(6) | Sql(3)
 
 
 ```scala
-Sql(4).between(Sql(2), Sql(6))
+Db(4).between(Db(2), Db(6))
 ```
 
 
@@ -7349,7 +7349,7 @@ Sql(4).between(Sql(2), Sql(6))
 
 
 ```scala
-+Sql(-4)
++Db(-4)
 ```
 
 
@@ -7372,7 +7372,7 @@ Sql(4).between(Sql(2), Sql(6))
 
 
 ```scala
--Sql(-4)
+-Db(-4)
 ```
 
 
@@ -7395,7 +7395,7 @@ Sql(4).between(Sql(2), Sql(6))
 
 
 ```scala
-~Sql(-4)
+~Db(-4)
 ```
 
 
@@ -7418,7 +7418,7 @@ Sql(4).between(Sql(2), Sql(6))
 
 
 ```scala
-Sql(-4).abs
+Db(-4).abs
 ```
 
 
@@ -7441,7 +7441,7 @@ Sql(-4).abs
 
 
 ```scala
-Sql(8).mod(Sql(3))
+Db(8).mod(Db(3))
 ```
 
 
@@ -7464,7 +7464,7 @@ Sql(8).mod(Sql(3))
 
 
 ```scala
-Sql(4.3).ceil
+Db(4.3).ceil
 ```
 
 
@@ -7487,7 +7487,7 @@ Sql(4.3).ceil
 
 
 ```scala
-Sql(4.7).floor
+Db(4.7).floor
 ```
 
 
@@ -7510,7 +7510,7 @@ Sql(4.7).floor
 
 
 ```scala
-Sql(4.7).floor
+Db(4.7).floor
 ```
 
 
@@ -7533,7 +7533,7 @@ Sql(4.7).floor
 
 
 ```scala
-(Sql(2) + Sql(3)) * Sql(4)
+(Db(2) + Db(3)) * Db(4)
 ```
 
 
@@ -7552,7 +7552,7 @@ Sql(4.7).floor
 
 
 ## ExprSeqNumericOps
-Operations that can be performed on `Sql[Seq[T]]` where `T` is numeric
+Operations that can be performed on `Db[Seq[T]]` where `T` is numeric
 ### ExprSeqNumericOps.sum
 
 
@@ -7646,7 +7646,7 @@ Purchase.select.map(_.count).avg
 
 
 ## ExprSeqOps
-Operations that can be performed on `Sql[Seq[_]]`
+Operations that can be performed on `Db[Seq[_]]`
 ### ExprSeqOps.size
 
 
@@ -7993,13 +7993,13 @@ Buyer.select.map(_.name).mkString(", ")
 
 
 ## ExprStringOps
-Operations that can be performed on `Sql[String]`
+Operations that can be performed on `Db[String]`
 ### ExprStringOps.plus
 
 
 
 ```scala
-Sql("hello") + Sql("world")
+Db("hello") + Db("world")
 ```
 
 
@@ -8022,7 +8022,7 @@ Sql("hello") + Sql("world")
 
 
 ```scala
-Sql("hello").like("he%")
+Db("hello").like("he%")
 ```
 
 
@@ -8045,7 +8045,7 @@ Sql("hello").like("he%")
 
 
 ```scala
-Sql("hello").length
+Db("hello").length
 ```
 
 
@@ -8068,7 +8068,7 @@ Sql("hello").length
 
 
 ```scala
-Sql("叉烧包").octetLength
+Db("叉烧包").octetLength
 ```
 
 
@@ -8091,7 +8091,7 @@ Sql("叉烧包").octetLength
 
 
 ```scala
-Sql("hello").indexOf("ll")
+Db("hello").indexOf("ll")
 ```
 
 
@@ -8114,7 +8114,7 @@ Sql("hello").indexOf("ll")
 
 
 ```scala
-Sql("Hello").toLowerCase
+Db("Hello").toLowerCase
 ```
 
 
@@ -8137,7 +8137,7 @@ Sql("Hello").toLowerCase
 
 
 ```scala
-Sql("  Hello ").trim
+Db("  Hello ").trim
 ```
 
 
@@ -8160,7 +8160,7 @@ Sql("  Hello ").trim
 
 
 ```scala
-Sql("  Hello ").ltrim
+Db("  Hello ").ltrim
 ```
 
 
@@ -8183,7 +8183,7 @@ Sql("  Hello ").ltrim
 
 
 ```scala
-Sql("  Hello ").rtrim
+Db("  Hello ").rtrim
 ```
 
 
@@ -8206,7 +8206,7 @@ Sql("  Hello ").rtrim
 
 
 ```scala
-Sql("Hello").substring(2, 2)
+Db("Hello").substring(2, 2)
 ```
 
 
@@ -8229,7 +8229,7 @@ Sql("Hello").substring(2, 2)
 
 
 ```scala
-Sql("Hello").startsWith("Hel")
+Db("Hello").startsWith("Hel")
 ```
 
 
@@ -8252,7 +8252,7 @@ Sql("Hello").startsWith("Hel")
 
 
 ```scala
-Sql("Hello").endsWith("llo")
+Db("Hello").endsWith("llo")
 ```
 
 
@@ -8275,7 +8275,7 @@ Sql("Hello").endsWith("llo")
 
 
 ```scala
-Sql("Hello").contains("ll")
+Db("Hello").contains("ll")
 ```
 
 
@@ -8324,7 +8324,7 @@ case class DataTypes[T[_]](
 
 object DataTypes extends Table[DataTypes]
 
-val value = DataTypes[Id](
+val value = DataTypes[Sc](
   myTinyInt = 123.toByte,
   mySmallInt = 12345.toShort,
   myInt = 12345678,
@@ -8381,12 +8381,12 @@ case class NonRoundTripTypes[T[_]](
 
 object NonRoundTripTypes extends Table[NonRoundTripTypes]
 
-val value = NonRoundTripTypes[Id](
+val value = NonRoundTripTypes[Sc](
   myZonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"),
   myOffsetDateTime = OffsetDateTime.parse("2011-12-03T10:15:30+00:00")
 )
 
-def normalize(v: NonRoundTripTypes[Id]) = v.copy[Id](
+def normalize(v: NonRoundTripTypes[Sc]) = v.copy[Sc](
   myZonedDateTime = v.myZonedDateTime.withZoneSameInstant(ZoneId.systemDefault),
   myOffsetDateTime = v.myOffsetDateTime.withOffsetSameInstant(OffsetDateTime.now.getOffset)
 )
@@ -8426,18 +8426,18 @@ all flattened out without nesting.
 //     foo: Nested[T]
 // )
 // object Enclosing extends Table[Enclosing]
-val value1 = Enclosing[Id](
+val value1 = Enclosing[Sc](
   barId = 1337,
   myString = "hello",
-  foo = Nested[Id](
+  foo = Nested[Sc](
     fooId = 271828,
     myBoolean = true
   )
 )
-val value2 = Enclosing[Id](
+val value2 = Enclosing[Sc](
   barId = 31337,
   myString = "world",
-  foo = Nested[Id](
+  foo = Nested[Sc](
     fooId = 1618,
     myBoolean = false
   )
@@ -8478,7 +8478,7 @@ db.run(Enclosing.select) ==> Seq(value1, value2)
 
 
 ## Optional
-Queries using columns that may be `NULL`, `Sql[Option[T]]` or `Option[T]` in Scala
+Queries using columns that may be `NULL`, `Db[Option[T]]` or `Option[T]` in Scala
 ### Optional
 
 
@@ -8526,10 +8526,10 @@ OptCols.select
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -8537,7 +8537,7 @@ OptCols.select
 
 ### Optional.groupByMaxGet
 
-Some aggregates return `Sql[Option[V]]`s, et.c. `.maxByOpt`
+Some aggregates return `Db[Option[V]]`s, et.c. `.maxByOpt`
 
 ```scala
 OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
@@ -8562,7 +8562,7 @@ OptCols.select.groupBy(_.myInt)(_.maxByOpt(_.myInt2.get))
 
 ### Optional.isDefined
 
-`.isDefined` on `Sql[Option[V]]` translates to a SQL
+`.isDefined` on `Db[Option[V]]` translates to a SQL
 `IS NOT NULL` check
 
 ```scala
@@ -8583,14 +8583,14 @@ OptCols.select.filter(_.myInt.isDefined)
 
 *
     ```scala
-    Seq(OptCols[Id](Some(1), Some(2)), OptCols[Id](Some(3), None))
+    Seq(OptCols[Sc](Some(1), Some(2)), OptCols[Sc](Some(3), None))
     ```
 
 
 
 ### Optional.isEmpty
 
-`.isEmpty` on `Sql[Option[V]]` translates to a SQL
+`.isEmpty` on `Db[Option[V]]` translates to a SQL
 `IS NULL` check
 
 ```scala
@@ -8611,7 +8611,7 @@ OptCols.select.filter(_.myInt.isEmpty)
 
 *
     ```scala
-    Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+    Seq(OptCols[Sc](None, None), OptCols[Sc](None, Some(4)))
     ```
 
 
@@ -8640,7 +8640,7 @@ OptCols.select.filter(_.myInt `=` 1)
 
 *
     ```scala
-    Seq(OptCols[Id](Some(1), Some(2)))
+    Seq(OptCols[Sc](Some(1), Some(2)))
     ```
 
 
@@ -8667,7 +8667,7 @@ OptCols.select.filter(_.myInt `=` 2)
 
 *
     ```scala
-    Seq[OptCols[Id]]()
+    Seq[OptCols[Sc]]()
     ```
 
 
@@ -8694,7 +8694,7 @@ OptCols.select.filter(_.myInt `=` Option.empty[Int])
 
 *
     ```scala
-    Seq[OptCols[Id]]()
+    Seq[OptCols[Sc]]()
     ```
 
 
@@ -8723,7 +8723,7 @@ OptCols.select.filter(_.myInt === Option(1))
 
 *
     ```scala
-    Seq(OptCols[Id](Some(1), Some(2)))
+    Seq(OptCols[Sc](Some(1), Some(2)))
     ```
 
 
@@ -8750,7 +8750,7 @@ OptCols.select.filter(_.myInt === Option.empty[Int])
 
 *
     ```scala
-    Seq(OptCols[Id](None, None), OptCols[Id](None, Some(4)))
+    Seq(OptCols[Sc](None, None), OptCols[Sc](None, Some(4)))
     ```
 
 
@@ -8778,9 +8778,9 @@ OptCols.select.filter(_.myInt !== Option(1))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](None, Some(value = 4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](None, Some(value = 4))
     )
     ```
 
@@ -8809,8 +8809,8 @@ OptCols.select.filter(_.myInt !== Option.empty[Int])
 *
     ```scala
     Seq(
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None)
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None)
     )
     ```
 
@@ -8819,11 +8819,11 @@ OptCols.select.filter(_.myInt !== Option.empty[Int])
 ### Optional.map
 
 You can use operators like `.map` and `.flatMap` to work with
-your `Sql[Option[V]]` values. These roughly follow the semantics
+your `Db[Option[V]]` values. These roughly follow the semantics
 that you would be familiar with from Scala.
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + 10)))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.map(_ + 10)))
 ```
 
 
@@ -8840,10 +8840,10 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + 10)))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(11), Some(2)),
-      OptCols[Id](Some(13), None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(11), Some(2)),
+      OptCols[Sc](Some(13), None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -8878,7 +8878,7 @@ OptCols.select.map(_.myInt.map(_ + 10))
 
 ```scala
 OptCols.select
-  .map(d => d.copy[Sql](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
+  .map(d => d.copy[Db](myInt = d.myInt.flatMap(v => d.myInt2.map(v2 => v + v2 + 10))))
 ```
 
 
@@ -8895,11 +8895,11 @@ OptCols.select
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(13), Some(2)),
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(13), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -8907,13 +8907,13 @@ OptCols.select
 
 ### Optional.mapGet
 
-You can use `.get` to turn an `Sql[Option[V]]` into an `Sql[V]`. This follows
+You can use `.get` to turn an `Db[Option[V]]` into an `Db[V]`. This follows
 SQL semantics, such that `NULL`s anywhere in that selected column automatically
-will turn the whole column `None` (if it's an `Sql[Option[V]]` column) or `null`
+will turn the whole column `None` (if it's an `Db[Option[V]]` column) or `null`
 (if it's not an optional column)
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 ```
 
 
@@ -8930,11 +8930,11 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(4), Some(2)),
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(4), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -8945,7 +8945,7 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.map(_ + d.myInt2.get + 1)))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.get + d.myInt2.get + 1))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.get + d.myInt2.get + 1))
 ```
 
 
@@ -8962,11 +8962,11 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.get + d.myInt2.get + 1))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(4), Some(2)),
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(4), Some(2)),
       // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -8977,7 +8977,7 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.get + d.myInt2.get + 1))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1)))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.getOrElse(-1)))
 ```
 
 
@@ -8994,10 +8994,10 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1)))
 *
     ```scala
     Seq(
-      OptCols[Id](Some(-1), None),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](Some(-1), Some(4))
+      OptCols[Sc](Some(-1), None),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](Some(-1), Some(4))
     )
     ```
 
@@ -9008,7 +9008,7 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.getOrElse(-1)))
 
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2)))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.orElse(d.myInt2)))
 ```
 
 
@@ -9025,10 +9025,10 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2)))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](Some(4), Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](Some(4), Some(4))
     )
     ```
 
@@ -9039,7 +9039,7 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.orElse(d.myInt2)))
 `.filter` follows normal Scala semantics, and translates to a `CASE`/`WHEN (foo)`/`ELSE NULL`
 
 ```scala
-OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.filter(_ < 2)))
+OptCols.select.map(d => d.copy[Db](myInt = d.myInt.filter(_ < 2)))
 ```
 
 
@@ -9059,10 +9059,10 @@ OptCols.select.map(d => d.copy[Sql](myInt = d.myInt.filter(_ < 2)))
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](None, None),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -9089,10 +9089,10 @@ OptCols.select.sortBy(_.myInt).nullsLast
 *
     ```scala
     Seq(
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -9119,10 +9119,10 @@ OptCols.select.sortBy(_.myInt).nullsFirst
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4)),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None)
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4)),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None)
     )
     ```
 
@@ -9149,10 +9149,10 @@ OptCols.select.sortBy(_.myInt).asc.nullsLast
 *
     ```scala
     Seq(
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -9179,10 +9179,10 @@ OptCols.select.sortBy(_.myInt).asc.nullsFirst
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4)),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](Some(3), None)
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4)),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](Some(3), None)
     )
     ```
 
@@ -9209,10 +9209,10 @@ OptCols.select.sortBy(_.myInt).desc.nullsLast
 *
     ```scala
     Seq(
-      OptCols[Id](Some(3), None),
-      OptCols[Id](Some(1), Some(2)),
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4))
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](Some(1), Some(2)),
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4))
     )
     ```
 
@@ -9239,10 +9239,10 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 *
     ```scala
     Seq(
-      OptCols[Id](None, None),
-      OptCols[Id](None, Some(4)),
-      OptCols[Id](Some(3), None),
-      OptCols[Id](Some(1), Some(2))
+      OptCols[Sc](None, None),
+      OptCols[Sc](None, Some(4)),
+      OptCols[Sc](Some(3), None),
+      OptCols[Sc](Some(1), Some(2))
     )
     ```
 
@@ -9277,9 +9277,9 @@ Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
 *
     ```scala
     Seq(
-      Purchase[Id](6, 3, 1, 5, 44.4),
-      Purchase[Id](4, 2, 4, 4, 493.8),
-      Purchase[Id](2, 1, 2, 3, 900.0)
+      Purchase[Sc](6, 3, 1, 5, 44.4),
+      Purchase[Sc](4, 2, 4, 4, 493.8),
+      Purchase[Sc](2, 1, 2, 3, 900.0)
     )
     ```
 
@@ -9290,7 +9290,7 @@ Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
 
 
 ```scala
-Sql("xxHellox").ltrim("x")
+Db("xxHellox").ltrim("x")
 ```
 
 
@@ -9313,7 +9313,7 @@ Sql("xxHellox").ltrim("x")
 
 
 ```scala
-Sql("xxHellox").rtrim("x")
+Db("xxHellox").rtrim("x")
 ```
 
 
@@ -9336,7 +9336,7 @@ Sql("xxHellox").rtrim("x")
 
 
 ```scala
-Sql("Hello").reverse
+Db("Hello").reverse
 ```
 
 
@@ -9359,7 +9359,7 @@ Sql("Hello").reverse
 
 
 ```scala
-Sql("Hello").lpad(10, "xy")
+Db("Hello").lpad(10, "xy")
 ```
 
 
@@ -9382,7 +9382,7 @@ Sql("Hello").lpad(10, "xy")
 
 
 ```scala
-Sql("Hello").rpad(10, "xy")
+Db("Hello").rpad(10, "xy")
 ```
 
 
@@ -9407,7 +9407,7 @@ Operations specific to working with MySql Databases
 
 
 ```scala
-Sql("Hello").reverse
+Db("Hello").reverse
 ```
 
 
@@ -9430,7 +9430,7 @@ Sql("Hello").reverse
 
 
 ```scala
-Sql("Hello").lpad(10, "xy")
+Db("Hello").lpad(10, "xy")
 ```
 
 
@@ -9453,7 +9453,7 @@ Sql("Hello").lpad(10, "xy")
 
 
 ```scala
-Sql("Hello").rpad(10, "xy")
+Db("Hello").rpad(10, "xy")
 ```
 
 
@@ -9543,9 +9543,9 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -9594,9 +9594,9 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Id](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
-      Buyer[Id](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Id](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -9609,7 +9609,7 @@ Operations specific to working with Sqlite Databases
 
 
 ```scala
-Sql("xxHellox").ltrim("x")
+Db("xxHellox").ltrim("x")
 ```
 
 
@@ -9632,7 +9632,7 @@ Sql("xxHellox").ltrim("x")
 
 
 ```scala
-Sql("xxHellox").rtrim("x")
+Db("xxHellox").rtrim("x")
 ```
 
 
@@ -9657,7 +9657,7 @@ Operations specific to working with H2 Databases
 
 
 ```scala
-Sql("xxHellox").ltrim("x")
+Db("xxHellox").ltrim("x")
 ```
 
 
@@ -9680,7 +9680,7 @@ Sql("xxHellox").ltrim("x")
 
 
 ```scala
-Sql("xxHellox").rtrim("x")
+Db("xxHellox").rtrim("x")
 ```
 
 
@@ -9703,7 +9703,7 @@ Sql("xxHellox").rtrim("x")
 
 
 ```scala
-Sql("Hello").lpad(10, "xy")
+Db("Hello").lpad(10, "xy")
 ```
 
 
@@ -9726,7 +9726,7 @@ Sql("Hello").lpad(10, "xy")
 
 
 ```scala
-Sql("Hello").rpad(10, "xy")
+Db("Hello").rpad(10, "xy")
 ```
 
 

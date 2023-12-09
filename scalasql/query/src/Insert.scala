@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{DialectTypeMappers, Queryable, Sql, SqlStr, WithSqlExpr}
+import scalasql.core.{DialectTypeMappers, Queryable, Db, SqlStr, WithSqlExpr}
 
 /**
  * A SQL `INSERT` query
@@ -8,12 +8,12 @@ import scalasql.core.{DialectTypeMappers, Queryable, Sql, SqlStr, WithSqlExpr}
 trait Insert[V[_[_]], R] extends WithSqlExpr[V[Column]] with scalasql.generated.Insert[V, R] {
   def table: TableRef
   def qr: Queryable[V[Column], R]
-  def select[C, R2](columns: V[Sql] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2]
+  def select[C, R2](columns: V[Db] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2]
 
   def columns(f: (V[Column] => Column.Assignment[_])*): InsertColumns[V, R]
   def values(f: R*): InsertValues[V, R]
 
-  def batched[T1](f1: V[Column] => Column[T1])(items: Sql[T1]*): InsertColumns[V, R]
+  def batched[T1](f1: V[Column] => Column[T1])(items: Db[T1]*): InsertColumns[V, R]
 
 }
 
@@ -33,13 +33,13 @@ object Insert {
     def newInsertValues[R](
         insert: Insert[V, R],
         columns: Seq[Column[_]],
-        valuesLists: Seq[Seq[Sql[_]]]
+        valuesLists: Seq[Seq[Db[_]]]
     )(implicit qr: Queryable[V[Column], R]) = {
       new InsertColumns.Impl(insert, columns, valuesLists)
     }
 
-    def select[C, R2](columns: V[Sql] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2] = {
-      newInsertSelect(this, columns(expr.asInstanceOf[V[Sql]]), select)
+    def select[C, R2](columns: V[Db] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2] = {
+      newInsertSelect(this, columns(expr.asInstanceOf[V[Db]]), select)
     }
 
     def columns(f: (V[Column] => Column.Assignment[_])*): InsertColumns[V, R] = {
@@ -47,7 +47,7 @@ object Insert {
       newInsertValues(this, columns = kvs.map(_.column), valuesLists = Seq(kvs.map(_.value)))
     }
 
-    def batched[T1](f1: V[Column] => Column[T1])(items: Sql[T1]*): InsertColumns[V, R] = {
+    def batched[T1](f1: V[Column] => Column[T1])(items: Db[T1]*): InsertColumns[V, R] = {
       newInsertValues(this, columns = Seq(f1(expr)), valuesLists = items.map(Seq(_)))
     }
 
