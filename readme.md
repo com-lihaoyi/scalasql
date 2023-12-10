@@ -130,5 +130,5 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 * Scala 3 support
 * JSON columns
-* Audit list of static functions for Postgres/MySql/Sqlite/H2
+* Add datetime functions
 * Make `implicit ctx =>` for defining `sql"..."` snippets optional
