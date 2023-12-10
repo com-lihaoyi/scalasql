@@ -110,5 +110,11 @@ trait MySqlDialectTests extends MySqlSuite {
       sql = "SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res",
       value = "i am cow 1337"
     )
+
+    test("rand") - checker(
+      query = db.rand,
+      sql = "SELECT RAND() AS res"
+    )
+
   }
 }

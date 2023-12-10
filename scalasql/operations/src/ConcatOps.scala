@@ -2,7 +2,7 @@ package scalasql.operations
 import scalasql.core.{Db, SqlStr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
-trait ConcatOps  {
+trait ConcatOps {
 
   /**
    * Concatenate all arguments. NULL arguments are ignored.

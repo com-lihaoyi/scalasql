@@ -55,10 +55,12 @@ abstract class DbStringOps(v: Db[String]) {
     sql"($v LIKE '%' || $other || '%')"
   }
 
-  /** Returns the result of replacing a substring of one string with another. */
-  // Not supported by SQlite
-//  def overlay(replacement: Db[String], start: Db[Int], length: Db[Int] = null): Db[String] = Db { implicit ctx =>
-//    val lengthStr = if (length == null) sql"" else sql" FOR $length"
-//    sql"OVERLAY($v PLACING $replacement FROM $start$lengthStr)"
-//  }
+  /**
+   * The replace(X,Y,Z) function returns a string formed by substituting string Z
+   * for every occurrence of string Y in string X
+   */
+  def replace(y: Db[String], z: Db[String]): Db[String] = Db { implicit ctx =>
+    sql"REPLACE($v, $y, $z)"
+  }
+
 }

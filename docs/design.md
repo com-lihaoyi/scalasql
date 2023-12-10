@@ -220,11 +220,13 @@ user-facing complexity and internal maintainability:
 
 1. From a user perspective, Quill naturally does not support the entire
    Scala language as part of its queries, and my experience using it is that the boundary
-   between what's "supported" vs "not" is often not clear. Exactly how the translation
-   to SQL happens is also relatively opaque. In contrast, ScalaSql has database operations
-   clearly separated from Scala operations via the `Expr[T]` vs `T` types, and the translation
-   to SQL is handled via normal classes with `.toSqlStr` and `.toSqlQuery` methods that are
-   composed and invoked at runtime.
+   between what's "supported" vs "not" is often not clear. For example, a `String` in Quill
+   exposes all `java.lang.String` operations to dot-completion, even though only a few are
+   valid translated to SQL, and even for those it is unclear what they are translated into:
+   jump-to-definition just takes you to `java.lang.String` sources. With ScalaSql, 
+   dot-completion exposes a minimal subset of operations valid for translation to SQL, and
+   for any of them you can jump-to-definition to easily see the exact SQL string that it 
+   generates
 
 2. From a maintainers perspective, Quill's compile-time approach means it needs two
    completely distinct implementations for Scala 2 and Scala 3, and is largely implemented

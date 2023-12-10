@@ -1,11 +1,38 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.core.{Aggregatable, Context, Db, DbApi, DialectTypeMappers, JoinNullable, Queryable, SqlStr, TypeMapper}
+import scalasql.core.{
+  Aggregatable,
+  Context,
+  Db,
+  DbApi,
+  DialectTypeMappers,
+  JoinNullable,
+  Queryable,
+  SqlStr,
+  TypeMapper
+}
 import scalasql.{Sc, dialects, operations}
-import scalasql.query.{CompoundSelect, GroupBy, InsertColumns, InsertSelect, Join, Joinable, OrderBy, Query, Table}
+import scalasql.query.{
+  CompoundSelect,
+  GroupBy,
+  InsertColumns,
+  InsertSelect,
+  Join,
+  Joinable,
+  OrderBy,
+  Query,
+  Table
+}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.{BitwiseFunctionOps, ConcatOps, PadOps, TrimOps}
+import scalasql.operations.{
+  BitwiseFunctionOps,
+  ConcatOps,
+  HyperbolicMathOps,
+  MathOps,
+  PadOps,
+  TrimOps
+}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
@@ -20,11 +47,11 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.SqlStringOps =
-    new H2Dialect.SqlStringOps(v)
+  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.DbStringOps =
+    new H2Dialect.DbStringOps(v)
   override implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
       v: Db[T]
-  ): H2Dialect.SqlNumericOps[T] = new H2Dialect.SqlNumericOps(v)
+  ): H2Dialect.DbNumericOps[T] = new H2Dialect.DbNumericOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new H2Dialect.TableOps(t)
@@ -35,14 +62,21 @@ trait H2Dialect extends Dialect {
   }
 
   implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
-    new H2Dialect.SqlAggOps(v)
+    new H2Dialect.DbAggOps(v)
 
-  override implicit def DbApiOpsConv(db: => DbApi): H2Dialect.DbApiOps = new H2Dialect.DbApiOps(this)
+  override implicit def DbApiOpsConv(db: => DbApi): H2Dialect.DbApiOps =
+    new H2Dialect.DbApiOps(this)
+
 }
 
 object H2Dialect extends H2Dialect {
-  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
-  class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+  class DbApiOps(dialect: DialectTypeMappers)
+      extends scalasql.operations.DbApiOps(dialect)
+      with ConcatOps
+      with MathOps
+      with HyperbolicMathOps
+
+  class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       assert(
         sep == null,
@@ -55,16 +89,18 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class SqlStringOps(protected val v: Db[String])
+  class DbStringOps(protected val v: Db[String])
       extends operations.DbStringOps(v)
       with TrimOps
       with PadOps {
     def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class SqlNumericOps[T: Numeric: TypeMapper](protected val v: Db[T])
+  class DbNumericOps[T: Numeric: TypeMapper](protected val v: Db[T])
       extends operations.DbNumericOps[T](v)
-      with BitwiseFunctionOps[T]
+      with BitwiseFunctionOps[T] {
+    def power(y: Db[T]): Db[T] = Db { implicit ctx => sql"POWER($v, $y)" }
+  }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
     protected override def joinableToSelect: Select[V[Db], V[Sc]] = {

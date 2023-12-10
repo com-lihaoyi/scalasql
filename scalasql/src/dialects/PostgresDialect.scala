@@ -1,10 +1,19 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, Db, DbApi, DialectTypeMappers, Queryable, SqlStr, TypeMapper, WithSqlExpr}
+import scalasql.core.{
+  Aggregatable,
+  Db,
+  DbApi,
+  DialectTypeMappers,
+  Queryable,
+  SqlStr,
+  TypeMapper,
+  WithSqlExpr
+}
 import scalasql.operations
 import scalasql.query.{JoinOps, Joinable, LateralJoinOps, Select}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.{ConcatOps, PadOps, TrimOps}
+import scalasql.operations.{ConcatOps, HyperbolicMathOps, MathOps, PadOps, TrimOps}
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
@@ -16,15 +25,15 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def StringType: TypeMapper[String] = new PostgresStringType
   class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
-  override implicit def DbStringOpsConv(v: Db[String]): PostgresDialect.SqlStringOps =
-    new PostgresDialect.SqlStringOps(v)
+  override implicit def DbStringOpsConv(v: Db[String]): PostgresDialect.DbStringOps =
+    new PostgresDialect.DbStringOps(v)
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
   implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
-    new PostgresDialect.SqlAggOps(v)
+    new PostgresDialect.DbAggOps(v)
 
   implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
 
@@ -40,19 +49,38 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     }
   }
 
-  override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps = new PostgresDialect.DbApiOps(this)
+  override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps =
+    new PostgresDialect.DbApiOps(this)
 }
 
 object PostgresDialect extends PostgresDialect {
-  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
 
-  class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+  class DbApiOps(dialect: DialectTypeMappers)
+      extends scalasql.operations.DbApiOps(dialect)
+      with ConcatOps
+      with MathOps
+      with HyperbolicMathOps {
+
+    /**
+     * Formats arguments according to a format string. This function is similar to the C function sprintf.
+     */
+    def format(template: Db[String], values: Db[_]*): Db[String] = Db { implicit ctx =>
+      sql"FORMAT($template, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
+    }
+
+    /**
+     * Returns a random value in the range 0.0 <= x < 1.0
+     */
+    def random: Db[Double] = Db { implicit ctx => sql"RANDOM()" }
+  }
+
+  class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
-  class SqlStringOps(protected val v: Db[String])
+  class DbStringOps(protected val v: Db[String])
       extends operations.DbStringOps(v)
       with TrimOps
       with PadOps {

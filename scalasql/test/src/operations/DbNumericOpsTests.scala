@@ -55,12 +55,16 @@ trait DbNumericOpsTests extends ScalaSqlSuite {
 
     test("floor") - checker(query = Db(4.7).floor, sql = "SELECT FLOOR(?) AS res", value = 4.0)
 
-    test("floor") - checker(query = Db(4.7).floor, sql = "SELECT FLOOR(?) AS res", value = 4.0)
-
     test("precedence") - checker(
       query = (Db(2) + Db(3)) * Db(4),
       sql = "SELECT ((? + ?) * ?) AS res",
       value = 20
+    )
+
+    test("sign") - checker(
+      query = Db(-100).sign,
+      sql = "SELECT SIGN(?) AS res",
+      value = -1
     )
   }
 }

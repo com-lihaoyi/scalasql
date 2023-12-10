@@ -1,10 +1,38 @@
 package scalasql.dialects
 
 import scalasql.{Sc, operations}
-import scalasql.query.{AscDesc, Column, CompoundSelect, GroupBy, InsertColumns, Join, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, Table, TableRef, Update}
-import scalasql.core.{Aggregatable, Context, Db, DbApi, DialectTypeMappers, JoinNullable, Queryable, SqlExprsToSql, SqlStr, TypeMapper, WithSqlExpr}
+import scalasql.query.{
+  AscDesc,
+  Column,
+  CompoundSelect,
+  GroupBy,
+  InsertColumns,
+  Join,
+  JoinOps,
+  Joinable,
+  LateralJoinOps,
+  Nulls,
+  OrderBy,
+  Query,
+  Table,
+  TableRef,
+  Update
+}
+import scalasql.core.{
+  Aggregatable,
+  Context,
+  Db,
+  DbApi,
+  DialectTypeMappers,
+  JoinNullable,
+  Queryable,
+  SqlExprsToSql,
+  SqlStr,
+  TypeMapper,
+  WithSqlExpr
+}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.operations.{ConcatOps, PadOps}
+import scalasql.operations.{ConcatOps, DbNumericOps, MathOps, PadOps}
 import scalasql.renderer.JoinsToSql
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
@@ -54,10 +82,10 @@ trait MySqlDialect extends Dialect {
   }
 
   override implicit def DbTypedOpsConv[T: ClassTag](v: Db[T]): operations.DbTypedOps[T] =
-    new MySqlDialect.SqlTypedOps(v)
+    new MySqlDialect.DbTypedOps(v)
 
-  override implicit def DbStringOpsConv(v: Db[String]): MySqlDialect.SqlStringOps =
-    new MySqlDialect.SqlStringOps(v)
+  override implicit def DbStringOpsConv(v: Db[String]): MySqlDialect.DbStringOps =
+    new MySqlDialect.DbStringOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MySqlDialect.TableOps(t)
@@ -77,15 +105,27 @@ trait MySqlDialect extends Dialect {
   ) = new LateralJoinOps(wrapped)
 
   implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
-    new MySqlDialect.SqlAggOps(v)
+    new MySqlDialect.DbAggOps(v)
 
-  override implicit def DbApiOpsConv(db: => DbApi): MySqlDialect.DbApiOps = new MySqlDialect.DbApiOps(this)
+  override implicit def DbApiOpsConv(db: => DbApi): MySqlDialect.DbApiOps =
+    new MySqlDialect.DbApiOps(this)
+
 }
 
 object MySqlDialect extends MySqlDialect {
-  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
 
-  class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+  class DbApiOps(dialect: DialectTypeMappers)
+      extends scalasql.operations.DbApiOps(dialect)
+      with ConcatOps
+      with MathOps {
+
+    /**
+     * Returns a random value in the range 0.0 <= x < 1.0
+     */
+    def rand: Db[Double] = Db { implicit ctx => sql"RAND()" }
+  }
+
+  class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.queryExpr(expr =>
@@ -94,7 +134,7 @@ object MySqlDialect extends MySqlDialect {
     }
   }
 
-  class SqlTypedOps[T: ClassTag](v: Db[T]) extends operations.DbTypedOps(v) {
+  class DbTypedOps[T: ClassTag](v: Db[T]) extends operations.DbTypedOps(v) {
 
     /** Equals to */
     override def ===[V: ClassTag](x: Db[V]): Db[Boolean] = Db { implicit ctx =>
@@ -114,7 +154,7 @@ object MySqlDialect extends MySqlDialect {
 
   }
 
-  class SqlStringOps(protected val v: Db[String]) extends operations.DbStringOps(v) with PadOps {
+  class DbStringOps(protected val v: Db[String]) extends operations.DbStringOps(v) with PadOps {
     override def +(x: Db[String]): Db[String] = Db { implicit ctx => sql"CONCAT($v, $x)" }
 
     override def startsWith(other: Db[String]): Db[Boolean] = Db { implicit ctx =>

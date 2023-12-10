@@ -6579,9 +6579,9 @@ db.withCte(Buyer.select) { bs =>
 
 
 
-## ExprOps
+## DbOps
 Operations that can be performed on `Db[T]` for any `T`
-### ExprOps.numeric.greaterThan
+### DbOps.numeric.greaterThan
 
 
 
@@ -6604,7 +6604,7 @@ Db(6) > Db(2)
 
 
 
-### ExprOps.numeric.lessThan
+### DbOps.numeric.lessThan
 
 
 
@@ -6627,7 +6627,7 @@ Db(6) < Db(2)
 
 
 
-### ExprOps.numeric.greaterThanOrEquals
+### DbOps.numeric.greaterThanOrEquals
 
 
 
@@ -6650,7 +6650,7 @@ Db(6) >= Db(2)
 
 
 
-### ExprOps.numeric.lessThanOrEquals
+### DbOps.numeric.lessThanOrEquals
 
 
 
@@ -6673,7 +6673,7 @@ Db(6) <= Db(2)
 
 
 
-### ExprOps.string.greaterThan
+### DbOps.string.greaterThan
 
 
 
@@ -6696,7 +6696,7 @@ Db("A") > Db("B")
 
 
 
-### ExprOps.string.lessThan
+### DbOps.string.lessThan
 
 
 
@@ -6719,7 +6719,7 @@ Db("A") < Db("B")
 
 
 
-### ExprOps.string.greaterThanOrEquals
+### DbOps.string.greaterThanOrEquals
 
 
 
@@ -6742,7 +6742,7 @@ Db("A") >= Db("B")
 
 
 
-### ExprOps.string.lessThanOrEquals
+### DbOps.string.lessThanOrEquals
 
 
 
@@ -6765,7 +6765,7 @@ Db("A") <= Db("B")
 
 
 
-### ExprOps.boolean.greaterThan
+### DbOps.boolean.greaterThan
 
 
 
@@ -6788,7 +6788,7 @@ Db(true) > Db(false)
 
 
 
-### ExprOps.boolean.lessThan
+### DbOps.boolean.lessThan
 
 
 
@@ -6811,7 +6811,7 @@ Db(true) < Db(true)
 
 
 
-### ExprOps.boolean.greaterThanOrEquals
+### DbOps.boolean.greaterThanOrEquals
 
 
 
@@ -6834,7 +6834,7 @@ Db(true) >= Db(true)
 
 
 
-### ExprOps.boolean.lessThanOrEquals
+### DbOps.boolean.lessThanOrEquals
 
 
 
@@ -6857,7 +6857,7 @@ Db(true) <= Db(true)
 
 
 
-### ExprOps.cast.byte
+### DbOps.cast.byte
 
 
 
@@ -6880,7 +6880,7 @@ Db(45.12).cast[Byte]
 
 
 
-### ExprOps.cast.short
+### DbOps.cast.short
 
 
 
@@ -6903,7 +6903,7 @@ Db(1234.1234).cast[Short]
 
 
 
-### ExprOps.cast.int
+### DbOps.cast.int
 
 
 
@@ -6926,7 +6926,7 @@ Db(1234.1234).cast[Int]
 
 
 
-### ExprOps.cast.long
+### DbOps.cast.long
 
 
 
@@ -6949,7 +6949,7 @@ Db(1234.1234).cast[Long]
 
 
 
-### ExprOps.cast.string
+### DbOps.cast.string
 
 
 
@@ -6972,7 +6972,7 @@ Db(1234.5678).cast[String]
 
 
 
-### ExprOps.cast.localdate
+### DbOps.cast.localdate
 
 
 
@@ -6995,7 +6995,7 @@ Db("2001-02-03").cast[java.time.LocalDate]
 
 
 
-### ExprOps.cast.localdatetime
+### DbOps.cast.localdatetime
 
 
 
@@ -7018,7 +7018,7 @@ Db("2023-11-12 03:22:41").cast[java.time.LocalDateTime]
 
 
 
-### ExprOps.cast.instant
+### DbOps.cast.instant
 
 
 
@@ -7041,7 +7041,7 @@ Db("2007-12-03 10:15:30.00").cast[java.time.Instant]
 
 
 
-### ExprOps.cast.castNamed
+### DbOps.cast.castNamed
 
 
 
@@ -7064,9 +7064,9 @@ Db(1234.5678).castNamed[String](sql"CHAR(3)")
 
 
 
-## ExprBooleanOps
+## DbBooleanOps
 Operations that can be performed on `Db[Boolean]`
-### ExprBooleanOps.and
+### DbBooleanOps.and
 
 
 
@@ -7112,7 +7112,7 @@ Db(false) && Db(true)
 
 
 
-### ExprBooleanOps.or
+### DbBooleanOps.or
 
 
 
@@ -7158,9 +7158,9 @@ Db(false) || Db(false)
 
 
 
-## ExprNumericOps
+## DbNumericOps
 Operations that can be performed on `Db[T]` when `T` is numeric
-### ExprNumericOps.plus
+### DbNumericOps.plus
 
 
 
@@ -7183,7 +7183,7 @@ Db(6) + Db(2)
 
 
 
-### ExprNumericOps.minus
+### DbNumericOps.minus
 
 
 
@@ -7206,7 +7206,7 @@ Db(6) - Db(2)
 
 
 
-### ExprNumericOps.times
+### DbNumericOps.times
 
 
 
@@ -7229,7 +7229,7 @@ Db(6) * Db(2)
 
 
 
-### ExprNumericOps.divide
+### DbNumericOps.divide
 
 
 
@@ -7252,7 +7252,7 @@ Db(6) / Db(2)
 
 
 
-### ExprNumericOps.modulo
+### DbNumericOps.modulo
 
 
 
@@ -7275,7 +7275,7 @@ Db(6) % Db(2)
 
 
 
-### ExprNumericOps.bitwiseAnd
+### DbNumericOps.bitwiseAnd
 
 
 
@@ -7298,7 +7298,7 @@ Db(6) & Db(2)
 
 
 
-### ExprNumericOps.bitwiseOr
+### DbNumericOps.bitwiseOr
 
 
 
@@ -7321,7 +7321,7 @@ Db(6) | Db(3)
 
 
 
-### ExprNumericOps.between
+### DbNumericOps.between
 
 
 
@@ -7344,7 +7344,7 @@ Db(4).between(Db(2), Db(6))
 
 
 
-### ExprNumericOps.unaryPlus
+### DbNumericOps.unaryPlus
 
 
 
@@ -7367,7 +7367,7 @@ Db(4).between(Db(2), Db(6))
 
 
 
-### ExprNumericOps.unaryMinus
+### DbNumericOps.unaryMinus
 
 
 
@@ -7390,7 +7390,7 @@ Db(4).between(Db(2), Db(6))
 
 
 
-### ExprNumericOps.unaryTilde
+### DbNumericOps.unaryTilde
 
 
 
@@ -7413,7 +7413,7 @@ Db(4).between(Db(2), Db(6))
 
 
 
-### ExprNumericOps.abs
+### DbNumericOps.abs
 
 
 
@@ -7436,7 +7436,7 @@ Db(-4).abs
 
 
 
-### ExprNumericOps.mod
+### DbNumericOps.mod
 
 
 
@@ -7459,7 +7459,7 @@ Db(8).mod(Db(3))
 
 
 
-### ExprNumericOps.ceil
+### DbNumericOps.ceil
 
 
 
@@ -7482,7 +7482,7 @@ Db(4.3).ceil
 
 
 
-### ExprNumericOps.floor
+### DbNumericOps.floor
 
 
 
@@ -7505,30 +7505,7 @@ Db(4.7).floor
 
 
 
-----
-
-
-
-```scala
-Db(4.7).floor
-```
-
-
-*
-    ```sql
-    SELECT FLOOR(?) AS res
-    ```
-
-
-
-*
-    ```scala
-    4.0
-    ```
-
-
-
-### ExprNumericOps.precedence
+### DbNumericOps.precedence
 
 
 
@@ -7551,9 +7528,32 @@ Db(4.7).floor
 
 
 
-## ExprSeqNumericOps
+### DbNumericOps.sign
+
+
+
+```scala
+Db(-100).sign
+```
+
+
+*
+    ```sql
+    SELECT SIGN(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    -1
+    ```
+
+
+
+## DbSeqNumericOps
 Operations that can be performed on `Db[Seq[T]]` where `T` is numeric
-### ExprSeqNumericOps.sum
+### DbSeqNumericOps.sum
 
 
 
@@ -7576,7 +7576,7 @@ Purchase.select.map(_.count).sum
 
 
 
-### ExprSeqNumericOps.min
+### DbSeqNumericOps.min
 
 
 
@@ -7599,7 +7599,7 @@ Purchase.select.map(_.count).min
 
 
 
-### ExprSeqNumericOps.max
+### DbSeqNumericOps.max
 
 
 
@@ -7622,7 +7622,7 @@ Purchase.select.map(_.count).max
 
 
 
-### ExprSeqNumericOps.avg
+### DbSeqNumericOps.avg
 
 
 
@@ -7645,9 +7645,9 @@ Purchase.select.map(_.count).avg
 
 
 
-## ExprSeqOps
+## DbSeqOps
 Operations that can be performed on `Db[Seq[_]]`
-### ExprSeqOps.size
+### DbSeqOps.size
 
 
 
@@ -7670,7 +7670,7 @@ Purchase.select.size
 
 
 
-### ExprSeqOps.sumBy.simple
+### DbSeqOps.sumBy.simple
 
 
 
@@ -7693,7 +7693,7 @@ Purchase.select.sumBy(_.count)
 
 
 
-### ExprSeqOps.sumBy.some
+### DbSeqOps.sumBy.some
 
 
 
@@ -7716,7 +7716,7 @@ Purchase.select.sumByOpt(_.count)
 
 
 
-### ExprSeqOps.sumBy.none
+### DbSeqOps.sumBy.none
 
 
 
@@ -7739,7 +7739,7 @@ Purchase.select.filter(_ => false).sumByOpt(_.count)
 
 
 
-### ExprSeqOps.minBy.simple
+### DbSeqOps.minBy.simple
 
 
 
@@ -7762,7 +7762,7 @@ Purchase.select.minBy(_.count)
 
 
 
-### ExprSeqOps.minBy.some
+### DbSeqOps.minBy.some
 
 
 
@@ -7785,7 +7785,7 @@ Purchase.select.minByOpt(_.count)
 
 
 
-### ExprSeqOps.minBy.none
+### DbSeqOps.minBy.none
 
 
 
@@ -7808,7 +7808,7 @@ Purchase.select.filter(_ => false).minByOpt(_.count)
 
 
 
-### ExprSeqOps.maxBy.simple
+### DbSeqOps.maxBy.simple
 
 
 
@@ -7831,7 +7831,7 @@ Purchase.select.maxBy(_.count)
 
 
 
-### ExprSeqOps.maxBy.some
+### DbSeqOps.maxBy.some
 
 
 
@@ -7854,7 +7854,7 @@ Purchase.select.maxByOpt(_.count)
 
 
 
-### ExprSeqOps.maxBy.none
+### DbSeqOps.maxBy.none
 
 
 
@@ -7877,7 +7877,7 @@ Purchase.select.filter(_ => false).maxByOpt(_.count)
 
 
 
-### ExprSeqOps.avgBy.simple
+### DbSeqOps.avgBy.simple
 
 
 
@@ -7900,7 +7900,7 @@ Purchase.select.avgBy(_.count)
 
 
 
-### ExprSeqOps.avgBy.some
+### DbSeqOps.avgBy.some
 
 
 
@@ -7923,7 +7923,7 @@ Purchase.select.avgByOpt(_.count)
 
 
 
-### ExprSeqOps.avgBy.none
+### DbSeqOps.avgBy.none
 
 
 
@@ -7946,7 +7946,7 @@ Purchase.select.filter(_ => false).avgByOpt(_.count)
 
 
 
-### ExprSeqOps.mkString.simple
+### DbSeqOps.mkString.simple
 
 
 
@@ -7969,7 +7969,7 @@ Buyer.select.map(_.name).mkString()
 
 
 
-### ExprSeqOps.mkString.sep
+### DbSeqOps.mkString.sep
 
 
 
@@ -7992,9 +7992,9 @@ Buyer.select.map(_.name).mkString(", ")
 
 
 
-## ExprStringOps
+## DbStringOps
 Operations that can be performed on `Db[String]`
-### ExprStringOps.plus
+### DbStringOps.plus
 
 
 
@@ -8017,7 +8017,7 @@ Db("hello") + Db("world")
 
 
 
-### ExprStringOps.like
+### DbStringOps.like
 
 
 
@@ -8040,7 +8040,7 @@ Db("hello").like("he%")
 
 
 
-### ExprStringOps.length
+### DbStringOps.length
 
 
 
@@ -8063,7 +8063,7 @@ Db("hello").length
 
 
 
-### ExprStringOps.octetLength
+### DbStringOps.octetLength
 
 
 
@@ -8086,7 +8086,7 @@ Db("叉烧包").octetLength
 
 
 
-### ExprStringOps.position
+### DbStringOps.position
 
 
 
@@ -8109,7 +8109,7 @@ Db("hello").indexOf("ll")
 
 
 
-### ExprStringOps.toLowerCase
+### DbStringOps.toLowerCase
 
 
 
@@ -8132,7 +8132,7 @@ Db("Hello").toLowerCase
 
 
 
-### ExprStringOps.trim
+### DbStringOps.trim
 
 
 
@@ -8155,7 +8155,7 @@ Db("  Hello ").trim
 
 
 
-### ExprStringOps.ltrim
+### DbStringOps.ltrim
 
 
 
@@ -8178,7 +8178,7 @@ Db("  Hello ").ltrim
 
 
 
-### ExprStringOps.rtrim
+### DbStringOps.rtrim
 
 
 
@@ -8201,7 +8201,7 @@ Db("  Hello ").rtrim
 
 
 
-### ExprStringOps.substring
+### DbStringOps.substring
 
 
 
@@ -8224,7 +8224,7 @@ Db("Hello").substring(2, 2)
 
 
 
-### ExprStringOps.startsWith
+### DbStringOps.startsWith
 
 
 
@@ -8247,7 +8247,7 @@ Db("Hello").startsWith("Hel")
 
 
 
-### ExprStringOps.endsWith
+### DbStringOps.endsWith
 
 
 
@@ -8270,7 +8270,7 @@ Db("Hello").endsWith("llo")
 
 
 
-### ExprStringOps.contains
+### DbStringOps.contains
 
 
 
@@ -8290,6 +8290,329 @@ Db("Hello").contains("ll")
     ```scala
     true
     ```
+
+
+
+### DbStringOps.replace
+
+
+
+```scala
+Db("Hello").replace("ll", "rr")
+```
+
+
+*
+    ```sql
+    SELECT REPLACE(?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "Herro"
+    ```
+
+
+
+## DbMathOps
+Math operations; supported by H2/Postgres/MySql, not supported by Sqlite
+### DbMathOps.power
+
+
+
+```scala
+db.power(10, 3)
+```
+
+
+*
+    ```sql
+    SELECT POWER(?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    1000.0
+    ```
+
+
+
+### DbMathOps.sqrt
+
+
+
+```scala
+db.sqrt(9)
+```
+
+
+*
+    ```sql
+    SELECT SQRT(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    3.0
+    ```
+
+
+
+### DbMathOps.ln
+
+
+
+```scala
+db.ln(16.0)
+```
+
+
+*
+    ```sql
+    SELECT LN(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.log
+
+
+
+```scala
+db.log(2, 8)
+```
+
+
+*
+    ```sql
+    SELECT LOG(?, ?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.log10
+
+
+
+```scala
+db.log10(16.0)
+```
+
+
+*
+    ```sql
+    SELECT LOG10(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.exp
+
+
+
+```scala
+db.exp(16.0)
+```
+
+
+*
+    ```sql
+    SELECT EXP(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.sin
+
+
+
+```scala
+db.sin(16.0)
+```
+
+
+*
+    ```sql
+    SELECT SIN(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.cos
+
+
+
+```scala
+db.cos(16.0)
+```
+
+
+*
+    ```sql
+    SELECT COS(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.tan
+
+
+
+```scala
+db.tan(16.0)
+```
+
+
+*
+    ```sql
+    SELECT TAN(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.asin
+
+
+
+```scala
+db.asin(1.0)
+```
+
+
+*
+    ```sql
+    SELECT ASIN(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.acos
+
+
+
+```scala
+db.acos(1.0)
+```
+
+
+*
+    ```sql
+    SELECT ACOS(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.atan
+
+
+
+```scala
+db.atan(1.0)
+```
+
+
+*
+    ```sql
+    SELECT ATAN(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.atan2
+
+
+
+```scala
+db.atan2(16.0, 23.0)
+```
+
+
+*
+    ```sql
+    SELECT ATAN2(?, ?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.pi
+
+
+
+```scala
+db.pi
+```
+
+
+*
+    ```sql
+    SELECT PI() AS res
+    ```
+
+
+
+
+
+### DbMathOps.degrees
+
+
+
+```scala
+db.degrees(180)
+```
+
+
+*
+    ```sql
+    SELECT DEGREES(?) AS res
+    ```
+
+
+
+
+
+### DbMathOps.radians
+
+
+
+```scala
+db.radians(180)
+```
+
+
+*
+    ```sql
+    SELECT RADIANS(?) AS res
+    ```
+
+
 
 
 
@@ -9400,6 +9723,93 @@ Db("Hello").rpad(10, "xy")
 
 
 
+### PostgresDialect.concat
+
+
+
+```scala
+db.concat("i ", "am", " cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT(?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow1337"
+    ```
+
+
+
+### PostgresDialect.concatWs
+
+
+
+```scala
+db.concatWs(" ", "i", "am", "cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow 1337"
+    ```
+
+
+
+### PostgresDialect.format
+
+
+
+```scala
+db.format("i am cow %s hear me moo %s", 1337, 31337)
+```
+
+
+*
+    ```sql
+    SELECT FORMAT(?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow 1337 hear me moo 31337"
+    ```
+
+
+
+### PostgresDialect.random
+
+
+
+```scala
+db.random
+```
+
+
+*
+    ```sql
+    SELECT RANDOM() AS res
+    ```
+
+
+
+
+
 ## MySqlDialect
 Operations specific to working with MySql Databases
 ### MySqlDialect.reverse
@@ -9602,6 +10012,70 @@ Buyer.select
 
 
 
+### MySqlDialect.concat
+
+
+
+```scala
+db.concat("i ", "am", " cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT(?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow1337"
+    ```
+
+
+
+### MySqlDialect.concatWs
+
+
+
+```scala
+db.concatWs(" ", "i", "am", "cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow 1337"
+    ```
+
+
+
+### MySqlDialect.rand
+
+
+
+```scala
+db.rand
+```
+
+
+*
+    ```sql
+    SELECT RAND() AS res
+    ```
+
+
+
+
+
 ## SqliteDialect
 Operations specific to working with Sqlite Databases
 ### SqliteDialect.ltrim2
@@ -9646,6 +10120,221 @@ Db("xxHellox").rtrim("x")
 *
     ```scala
     "xxHello"
+    ```
+
+
+
+### SqliteDialect.glob
+
+
+
+```scala
+Db("*cop*").glob("roflcopter")
+```
+
+
+*
+    ```sql
+    SELECT GLOB(?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### SqliteDialect.changes
+
+
+
+```scala
+db.changes
+```
+
+
+*
+    ```sql
+    SELECT CHANGES() AS res
+    ```
+
+
+
+
+
+### SqliteDialect.totalChanges
+
+
+
+```scala
+db.totalChanges
+```
+
+
+*
+    ```sql
+    SELECT TOTAL_CHANGES() AS res
+    ```
+
+
+
+
+
+### SqliteDialect.typeOf
+
+
+
+```scala
+db.typeOf(123)
+```
+
+
+*
+    ```sql
+    SELECT TYPEOF(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "integer"
+    ```
+
+
+
+### SqliteDialect.lastInsertRowId
+
+
+
+```scala
+db.lastInsertRowId
+```
+
+
+*
+    ```sql
+    SELECT LAST_INSERT_ROWID() AS res
+    ```
+
+
+
+
+
+### SqliteDialect.char
+
+
+
+```scala
+db.char(108, 111, 108)
+```
+
+
+*
+    ```sql
+    SELECT CHAR(?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "lol"
+    ```
+
+
+
+### SqliteDialect.format
+
+
+
+```scala
+db.format("i am cow %s hear me moo %s", 1337, 31337)
+```
+
+
+*
+    ```sql
+    SELECT FORMAT(?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow 1337 hear me moo 31337"
+    ```
+
+
+
+### SqliteDialect.hex
+
+
+
+```scala
+db.hex(new geny.Bytes(Array(1, 10, 100, -127)))
+```
+
+
+*
+    ```sql
+    SELECT HEX(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "010A6481"
+    ```
+
+
+
+### SqliteDialect.unhex
+
+
+
+```scala
+db.unhex("010A6481")
+```
+
+
+*
+    ```sql
+    SELECT UNHEX(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    new geny.Bytes(Array(1, 10, 100, -127))
+    ```
+
+
+
+### SqliteDialect.zeroBlob
+
+
+
+```scala
+db.zeroBlob(16)
+```
+
+
+*
+    ```sql
+    SELECT ZEROBLOB(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    new geny.Bytes(new Array[Byte](16))
     ```
 
 
@@ -9740,6 +10429,52 @@ Db("Hello").rpad(10, "xy")
 *
     ```scala
     "Helloxxxxx"
+    ```
+
+
+
+### H2Dialect.concat
+
+
+
+```scala
+db.concat("i ", "am", " cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT(?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow1337"
+    ```
+
+
+
+### H2Dialect.concatWs
+
+
+
+```scala
+db.concatWs(" ", "i", "am", "cow", 1337)
+```
+
+
+*
+    ```sql
+    SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    "i am cow 1337"
     ```
 
 

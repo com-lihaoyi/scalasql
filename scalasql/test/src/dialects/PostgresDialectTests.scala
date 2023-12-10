@@ -73,5 +73,16 @@ trait PostgresDialectTests extends PostgresSuite {
       sql = "SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res",
       value = "i am cow 1337"
     )
+
+    test("format") - checker(
+      query = db.format("i am cow %s hear me moo %s", 1337, 31337),
+      sql = "SELECT FORMAT(?, ?, ?) AS res",
+      value = "i am cow 1337 hear me moo 31337"
+    )
+
+    test("random") - checker(
+      query = db.random,
+      sql = "SELECT RANDOM() AS res"
+    )
   }
 }

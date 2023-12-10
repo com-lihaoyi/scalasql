@@ -56,15 +56,11 @@ class DbNumericOps[T: Numeric](v: Db[T])(implicit val m: TypeMapper[T]) {
   /** Rounds a noninteger value downwards to the next least integer. Returns an integer value unchanged. */
   def floor: Db[T] = Db { implicit ctx => sql"FLOOR($v)" }
 
-  /** Raises a value to the power of the mathematical constant known as e. */
-  def exp(x: Db[T]): Db[T] = Db { implicit ctx => sql"EXP($v, $x)" }
-
-  /** Returns the natural logarithm of a number. */
-  def ln: Db[T] = Db { implicit ctx => sql"LN($v)" }
-
-  /** Raises a number to a specified power. */
-  def pow(x: Db[T]): Db[T] = Db { implicit ctx => sql"POW($v, $x)" }
-
-  /** Computes the square root of a number. */
-  def sqrt: Db[T] = Db { implicit ctx => sql"SQRT($v)" }
+  /**
+   * The sign(X) function returns -1, 0, or +1 if the argument X is a numeric
+   * value that is negative, zero, or positive, respectively. If the argument to sign(X)
+   * is NULL or is a string or blob that cannot be losslessly converted into a number,
+   * then sign(X) returns NULL.
+   */
+  def sign: Db[T] = Db { implicit ctx => sql"SIGN($v)" }
 }

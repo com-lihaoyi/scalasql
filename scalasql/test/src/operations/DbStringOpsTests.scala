@@ -71,6 +71,13 @@ trait DbStringOpsTests extends ScalaSqlSuite {
       ),
       value = true
     )
+    test("replace") - checker(
+      query = Db("Hello").replace("ll", "rr"),
+      sqls = Seq(
+        "SELECT REPLACE(?, ?, ?) AS res"
+      ),
+      value = "Herro"
+    )
 
 //    test("overlay") - checker(
 //      query = Db("Hello").overlay("LL", 2, 2),

@@ -74,9 +74,11 @@ class TestChecker(
 
     val result = autoCommitConnection.run(query.value)
 
-    val values = Option(value.value) ++ moreValues
+    val values = Option(value).map(_.value) ++ moreValues
     val normalized = normalize(result)
-    assert(values.exists(value => normalized == value), pprint.apply(normalized))
+    if (values.nonEmpty) {
+      assert(values.exists(value => normalized == value), pprint.apply(normalized))
+    }
 
     UtestFramework.recordedTests.append(
       UtestFramework.Record(
@@ -86,7 +88,7 @@ class TestChecker(
         docs = docs,
         queryCodeString = query.source,
         sqlString = matchedSql,
-        resultCodeString = Some(value.source)
+        resultCodeString = Option(value).map(_.source)
       )
     )
 

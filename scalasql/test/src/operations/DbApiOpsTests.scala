@@ -8,9 +8,5 @@ import utest._
 
 trait DbApiOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Db[T]` for any `T`"
-  def tests = Tests {
-
-
-
-  }
+  def tests = Tests {}
 }
