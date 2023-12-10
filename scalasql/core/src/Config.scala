@@ -4,6 +4,7 @@ package scalasql.core
  * Things you to do to configure ScalaSql
  */
 trait Config {
+
   /**
    * Render a sequence of tokens to a column label; used primarily for
    * making the generated queries more easily human readable.

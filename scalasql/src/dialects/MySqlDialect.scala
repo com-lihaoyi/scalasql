@@ -87,7 +87,9 @@ trait MySqlDialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): MySqlDialect.ExprStringOps[String] =
     new MySqlDialect.ExprStringOps(v)
 
-  override implicit def ExprBlobOpsConv(v: Expr[geny.Bytes]): MySqlDialect.ExprStringLikeOps[geny.Bytes] =
+  override implicit def ExprBlobOpsConv(
+      v: Expr[geny.Bytes]
+  ): MySqlDialect.ExprStringLikeOps[geny.Bytes] =
     new MySqlDialect.ExprStringLikeOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =

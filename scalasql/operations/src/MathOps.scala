@@ -11,7 +11,9 @@ trait MathOps {
   def radians[T: Numeric](x: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"RADIANS($x)" }
 
   /** `x` raised to the power of `y` */
-  def power[T: Numeric](x: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"POWER($x, $y)" }
+  def power[T: Numeric](x: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+    sql"POWER($x, $y)"
+  }
 
   /** Raises a value to the power of the mathematical constant known as e. */
   def exp[T: Numeric](x: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"EXP($x)" }
@@ -20,7 +22,9 @@ trait MathOps {
   def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LN($v)" }
 
   /** Logarithm of x to base b */
-  def log[T: Numeric](b: Expr[Int], x: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG($b, $x)" }
+  def log[T: Numeric](b: Expr[Int], x: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+    sql"LOG($b, $x)"
+  }
 
   /** Base 10 logarithm */
   def log10[T: Numeric](x: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG10($x)" }
@@ -47,7 +51,9 @@ trait MathOps {
   def atan[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"ATAN($v)" }
 
   /** Calculate the arc tangent */
-  def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"ATAN2($v, $y)" }
+  def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+    sql"ATAN2($v, $y)"
+  }
 
   /** Returns the value of Pi */
   def pi: Expr[Double] = Expr { implicit ctx => sql"PI()" }

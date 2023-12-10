@@ -50,7 +50,9 @@ trait H2Dialect extends Dialect {
   override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps[String] =
     new H2Dialect.ExprStringOps(v)
 
-  override implicit def ExprBlobOpsConv(v: Expr[geny.Bytes]): H2Dialect.ExprStringLikeOps[geny.Bytes] =
+  override implicit def ExprBlobOpsConv(
+      v: Expr[geny.Bytes]
+  ): H2Dialect.ExprStringLikeOps[geny.Bytes] =
     new H2Dialect.ExprStringLikeOps(v)
 
   override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](

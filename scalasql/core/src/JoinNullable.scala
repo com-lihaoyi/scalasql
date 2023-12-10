@@ -21,11 +21,13 @@ object JoinNullable {
 
   def apply[Q](t: Q): JoinNullable[Q] = new JoinNullable[Q] {
     def get: Q = t
-    def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"(${f(t)} IS NULL)"
+    def isEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        sql"(${f(t)} IS NULL)"
     }
-    def nonEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"(${f(t)} IS NOT NULL)"
+    def nonEmpty[T](f: Q => Expr[T])(implicit qr: Queryable[Q, _]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        sql"(${f(t)} IS NOT NULL)"
     }
     def map[V](f: Q => V) = JoinNullable(f(t))
   }

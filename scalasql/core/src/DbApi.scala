@@ -112,6 +112,7 @@ object DbApi {
    * create savepoints, or roll back the transaction.
    */
   trait Txn extends DbApi {
+
     /**
      * Creates a SQL Savepoint that is active within the given block; automatically
      * releases the savepoint if the block completes successfully and rolls it back
@@ -135,18 +136,23 @@ object DbApi {
     def rollback(): Unit
   }
 
+  // Call hierechy the various DbApi.Impl methods, both public and private:
   //
-  //                                     run
-  //                                      |
-  //  runRaw       runSql       +---------+---------+
-  //    |            |          |                   |
-  // streamRaw    streamSql  stream   updateRaw  updateSql
-  //    |            |          |         |         |
-  //    |           streamFlattened       |         |
-  //    |            |                    +----+----+
-  //    +-----+------+                         |
-  //          |                           runRawUpdate0
-  //      streamRaw0
+  //                                      run
+  //                                       |
+  //   runRaw       runSql       +---------+---------+
+  //     |            |          |                   |
+  // streamRaw    streamSql   stream   updateRaw  updateSql
+  //     |            |          |         |         |
+  //     |          streamFlattened0       |         |
+  //     |                  |              |         |
+  //     +-----+------------+              +----+----+
+  //           |                                |
+  //       streamRaw0                      runRawUpdate0
+  //           |                                |
+  //           +----------------+---------------+
+  //                            |
+  //                  configureRunCloseStatement
 
   class Impl(
       connection: java.sql.Connection,
@@ -155,45 +161,99 @@ object DbApi {
       autoCommit: Boolean,
       rollBack0: () => Unit
   ) extends DbApi.Txn {
-    val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
+    def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable[Q, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): R = {
 
-    def savepoint[T](block: DbApi.Savepoint => T): T = {
-      val savepoint = connection.setSavepoint()
-      savepointStack.append(savepoint)
-
-      try {
-        val res = block(new DbApi.SavepointImpl(savepoint, () => rollbackSavepoint(savepoint)))
-        if (savepointStack.lastOption.exists(_ eq savepoint)) {
-          // Only release if this savepoint has not been rolled back,
-          // directly or indirectly
-          connection.releaseSavepoint(savepoint)
+      val flattened = DialectConfig.unpackQueryable(query, qr, config)
+      if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
+      else {
+        try {
+          val res = stream(query, fetchSize, queryTimeoutSeconds)(
+            qr.asInstanceOf[Queryable[Q, Seq[_]]],
+            fileName,
+            lineNum
+          )
+          if (qr.singleRow(query)) {
+            val results = res.take(2).toVector
+            assert(
+              results.size == 1,
+              s"Single row query must return 1 result, not ${results.size}"
+            )
+            results.head.asInstanceOf[R]
+          } else {
+            res.toVector.asInstanceOf[R]
+          }
         }
-        res
-      } catch {
-        case e: Throwable =>
-          rollbackSavepoint(savepoint)
-          throw e
       }
     }
 
-    // Make sure we keep track of what savepoints are active on the stack, so we do
-    // not release or rollback the same savepoint multiple times even in the case of
-    // exceptions or explicit rollbacks
-    def rollbackSavepoint(savepoint: java.sql.Savepoint) = {
-      savepointStack.indexOf(savepoint) match {
-        case -1 => // do nothing
-        case savepointIndex =>
-          connection.rollback(savepointStack(savepointIndex))
-          savepointStack.takeInPlace(savepointIndex)
-      }
+    def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable[Q, Seq[R]],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Generator[R] = {
+      val flattened = DialectConfig.unpackQueryable(query, qr, config)
+      streamFlattened0(
+        r => {
+          qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
+            case s: Seq[R] => s.head
+            case r: R => r
+          }
+        },
+        flattened,
+        fetchSize,
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
+      )
     }
 
-    def rollback() = {
-      savepointStack.clear()
-      rollBack0()
+    def runSql[R](
+        sql: SqlStr,
+        fetchSize: Int = -1,
+        queryTimeoutSeconds: Int = -1
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): IndexedSeq[R] = streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
+
+    def streamSql[R](
+        sql: SqlStr,
+        fetchSize: Int = -1,
+        queryTimeoutSeconds: Int = -1
+    )(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Generator[R] = {
+      streamFlattened0(
+        qr.construct,
+        SqlStr.flatten(sql),
+        fetchSize,
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
+      )
     }
 
-    private def cast[T](t: Any): T = t.asInstanceOf[T]
+    def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Int = {
+      val flattened = SqlStr.flatten(sql)
+      runRawUpdate0(
+        DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
+        flattenParamPuts(flattened),
+        fetchSize,
+        queryTimeoutSeconds,
+        fileName,
+        lineNum
+      )
+    }
 
     def runRaw[R](
         sql: String,
@@ -229,23 +289,68 @@ object DbApi {
       )
     }
 
-    private def flattenParamPuts[T](flattened: SqlStr.Flattened) = {
-      flattened.params.map(v => (s, n) => v.mappedType.put(s, n, cast(v.value))).toSeq
-    }
-
-    private def anySeqPuts(variables: Seq[Any]) = {
-      variables.map(v => (s: PreparedStatement, n: Int) => s.setObject(n, v))
-    }
-
-    def runSql[R](
-        sql: SqlStr,
+    def updateRaw(
+        sql: String,
+        variables: Seq[Any] = Nil,
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
-    )(
-        implicit qr: Queryable.Row[_, R],
+    )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int = runRawUpdate0(
+      sql,
+      anySeqPuts(variables),
+      fetchSize,
+      queryTimeoutSeconds,
+      fileName,
+      lineNum
+    )
+
+    def streamFlattened0[R](
+        construct: Queryable.ResultSetIterator => R,
+        flattened: SqlStr.Flattened,
+        fetchSize: Int,
+        queryTimeoutSeconds: Int,
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
-    ): IndexedSeq[R] = streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
+    ) = streamRaw0(
+      construct,
+      DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
+      flattenParamPuts(flattened),
+      fetchSize,
+      queryTimeoutSeconds,
+      fileName,
+      lineNum
+    )
+
+    def streamRaw0[R](
+        construct: Queryable.ResultSetIterator => R,
+        sql: String,
+        variables: Seq[(PreparedStatement, Int) => Unit],
+        fetchSize: Int,
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ) = new Generator[R] {
+      def generate(handleItem: R => Generator.Action): Generator.Action = {
+        val statement = connection.prepareStatement(sql)
+        for ((setVariable, i) <- variables.iterator.zipWithIndex) setVariable(statement, i + 1)
+
+        configureRunCloseStatement(
+          statement,
+          fetchSize,
+          queryTimeoutSeconds,
+          sql,
+          fileName,
+          lineNum
+        ) { stmt =>
+          val resultSet = stmt.executeQuery()
+          var action: Generator.Action = Generator.Continue
+          while (resultSet.next() && action == Generator.Continue) {
+            val rowRes = construct(new Queryable.ResultSetIterator(resultSet))
+            action = handleItem(rowRes)
+          }
+          action
+        }
+      }
+    }
 
     def runRawUpdate0(
         sql: String,
@@ -300,157 +405,58 @@ object DbApi {
       finally statement.close()
     }
 
-    def updateRaw(
-        sql: String,
-        variables: Seq[Any] = Nil,
-        fetchSize: Int = -1,
-        queryTimeoutSeconds: Int = -1
-    )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int = runRawUpdate0(
-      sql,
-      anySeqPuts(variables),
-      fetchSize,
-      queryTimeoutSeconds,
-      fileName,
-      lineNum
-    )
-
-    def updateSql(sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-        implicit fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ): Int = {
-      val flattened = SqlStr.flatten(sql)
-      runRawUpdate0(
-        DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
-        flattenParamPuts(flattened),
-        fetchSize,
-        queryTimeoutSeconds,
-        fileName,
-        lineNum
-      )
-    }
-
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
       dialect.renderSql(query, config, castParams)
     }
 
-    def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-        implicit qr: Queryable[Q, R],
-        fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ): R = {
+    val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
 
-      val flattened = DialectConfig.unpackQueryable(query, qr, config)
-      if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
-      else {
-        try {
-          val res = stream(query, fetchSize, queryTimeoutSeconds)(
-            qr.asInstanceOf[Queryable[Q, Seq[_]]],
-            fileName,
-            lineNum
-          )
-          if (qr.singleRow(query)) {
-            val results = res.take(2).toVector
-            assert(
-              results.size == 1,
-              s"Single row query must return 1 result, not ${results.size}"
-            )
-            results.head.asInstanceOf[R]
-          } else {
-            res.toVector.asInstanceOf[R]
-          }
+    def savepoint[T](block: DbApi.Savepoint => T): T = {
+      val savepoint = connection.setSavepoint()
+      savepointStack.append(savepoint)
+
+      try {
+        val res = block(new DbApi.SavepointImpl(savepoint, () => rollbackSavepoint(savepoint)))
+        if (savepointStack.lastOption.exists(_ eq savepoint)) {
+          // Only release if this savepoint has not been rolled back,
+          // directly or indirectly
+          connection.releaseSavepoint(savepoint)
         }
+        res
+      } catch {
+        case e: Throwable =>
+          rollbackSavepoint(savepoint)
+          throw e
       }
     }
 
-    def streamSql[R](
-        sql: SqlStr,
-        fetchSize: Int = -1,
-        queryTimeoutSeconds: Int = -1
-    )(
-        implicit qr: Queryable.Row[_, R],
-        fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ): Generator[R] = {
-      streamFlattened(
-        qr.construct,
-        SqlStr.flatten(sql),
-        fetchSize,
-        queryTimeoutSeconds,
-        fileName,
-        lineNum
-      )
-    }
-
-    def streamFlattened[R](
-        construct: Queryable.ResultSetIterator => R,
-        flattened: SqlStr.Flattened,
-        fetchSize: Int,
-        queryTimeoutSeconds: Int,
-        fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ) = streamRaw0(
-      construct,
-      DialectConfig.combineQueryString(flattened, DialectConfig.castParams(dialect)),
-      flattenParamPuts(flattened),
-      fetchSize,
-      queryTimeoutSeconds,
-      fileName,
-      lineNum
-    )
-
-    def streamRaw0[R](
-        construct: Queryable.ResultSetIterator => R,
-        sql: String,
-        variables: Seq[(PreparedStatement, Int) => Unit],
-        fetchSize: Int,
-        queryTimeoutSeconds: Int,
-        fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ) = new Generator[R] {
-      def generate(handleItem: R => Generator.Action): Generator.Action = {
-        val statement = connection.prepareStatement(sql)
-        for ((setVariable, i) <- variables.iterator.zipWithIndex) setVariable(statement, i + 1)
-
-        configureRunCloseStatement(
-          statement,
-          fetchSize,
-          queryTimeoutSeconds,
-          sql,
-          fileName,
-          lineNum
-        ) { stmt =>
-          val resultSet = stmt.executeQuery()
-          var action: Generator.Action = Generator.Continue
-          while (resultSet.next() && action == Generator.Continue) {
-            val rowRes = construct(new Queryable.ResultSetIterator(resultSet))
-            action = handleItem(rowRes)
-          }
-          action
-        }
+    // Make sure we keep track of what savepoints are active on the stack, so we do
+    // not release or rollback the same savepoint multiple times even in the case of
+    // exceptions or explicit rollbacks
+    def rollbackSavepoint(savepoint: java.sql.Savepoint) = {
+      savepointStack.indexOf(savepoint) match {
+        case -1 => // do nothing
+        case savepointIndex =>
+          connection.rollback(savepointStack(savepointIndex))
+          savepointStack.takeInPlace(savepointIndex)
       }
     }
 
-    def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-        implicit qr: Queryable[Q, Seq[R]],
-        fileName: sourcecode.FileName,
-        lineNum: sourcecode.Line
-    ): Generator[R] = {
-      val flattened = DialectConfig.unpackQueryable(query, qr, config)
-      streamFlattened(
-        r => {
-          qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
-            case s: Seq[R] => s.head
-            case r: R => r
-          }
-        },
-        flattened,
-        fetchSize,
-        queryTimeoutSeconds,
-        fileName,
-        lineNum
-      )
+    def rollback() = {
+      savepointStack.clear()
+      rollBack0()
+    }
+
+    private def cast[T](t: Any): T = t.asInstanceOf[T]
+
+    private def flattenParamPuts[T](flattened: SqlStr.Flattened) = {
+      flattened.params.map(v => (s, n) => v.mappedType.put(s, n, cast(v.value))).toSeq
+    }
+
+    private def anySeqPuts(variables: Seq[Any]) = {
+      variables.map(v => (s: PreparedStatement, n: Int) => s.setObject(n, v))
     }
 
     def close() = connection.close()

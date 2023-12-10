@@ -1,6 +1,14 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectTypeMappers, LiveSqlExprs, Queryable, Expr, SqlStr, TypeMapper}
+import scalasql.core.{
+  Context,
+  DialectTypeMappers,
+  LiveSqlExprs,
+  Queryable,
+  Expr,
+  SqlStr,
+  TypeMapper
+}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**

@@ -25,12 +25,14 @@ object SqlExprsToSql {
     }
   }
 
-
   def selectColumnSql(walked: Queryable.Walked, ctx: Context): Seq[(String, SqlStr)] = {
     walked.map { case (k, v) => (ctx.config.renderColumnLabel(k), Renderable.toSql(v)(ctx)) }
   }
 
-  def selectColumnReferences(walked: Queryable.Walked, ctx: Context): Seq[(Expr.Identity, SqlStr)] = {
+  def selectColumnReferences(
+      walked: Queryable.Walked,
+      ctx: Context
+  ): Seq[(Expr.Identity, SqlStr)] = {
     walked.map { case (tokens, expr) =>
       val dbId = Expr.identity(expr)
       (dbId, SqlStr.raw(ctx.config.renderColumnLabel(tokens), Array(dbId)))
