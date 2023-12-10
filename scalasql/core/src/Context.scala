@@ -5,16 +5,22 @@ import scalasql.core.SqlStr.SqlStringSyntax
 /**
  * The contextual information necessary for rendering a ScalaSql query or expression
  * into a SQL string
- *
- * @param fromNaming any [[From]]/`FROM` clauses that are in scope, and the aliases those
- *                   clauses are given
- * @param exprNaming any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and
- *                   what those expressions are named in SQL
- * @param config The ScalaSql configuration
  */
 trait Context {
+  /**
+   * Any [[From]]/`FROM` clauses that are in scope, and the aliases those clauses are given
+   */
   def fromNaming: Map[Context.From, String]
+
+  /**
+   * Any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and what those
+   * expressions are named in SQL
+   */
   def exprNaming: Map[Expr.Identity, SqlStr]
+
+  /**
+   * The ScalaSql configuration
+   */
   def config: Config
 
   def withFromNaming(fromNaming: Map[Context.From, String]): Context
@@ -33,7 +39,7 @@ object Context {
      * A mapping of the [[Expr]] expressions that this [[From]] produces along
      * with their rendered [[SqlStr]]s
      */
-    def fromLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr]
+    def fromColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr]
 
     /**
      * How this [[From]] can be rendered into a [[SqlStr]] for embedding into
@@ -45,6 +51,7 @@ object Context {
         liveExprs: LiveSqlExprs
     ): SqlStr
   }
+
   case class Impl(
       fromNaming: Map[From, String],
       exprNaming: Map[Expr.Identity, SqlStr],
@@ -56,22 +63,32 @@ object Context {
       copy(exprNaming = exprNaming)
   }
 
-  def compute(prevContext: Context, selectables: Seq[From], updateTable: Option[From]) = {
+  /**
+   * Derives a new [[Context]] based on [[prevContext]] with additional [[prefixedFroms]]
+   * and [[unPrefixedFroms]] added to the [[Context.fromNaming]] and [[Context.exprNaming]]
+   * tables
+   */
+  def compute(prevContext: Context, prefixedFroms: Seq[From], unPrefixedFroms: Option[From]) = {
 
     val prevSize = prevContext.fromNaming.size
-    val newFromNaming =
-      prevContext.fromNaming ++
-        selectables.filter(!prevContext.fromNaming.contains(_)).zipWithIndex.toMap.map {
-          case (r, i) => (r, r.fromRefPrefix(prevContext) + (i + prevSize))
+    val newFromNaming = Map.from(
+      prevContext.fromNaming.iterator ++
+        prefixedFroms.iterator.zipWithIndex.collect {
+          case (r, i) if !prevContext.fromNaming.contains(r) =>
+            (r, r.fromRefPrefix(prevContext) + (i + prevSize))
         } ++
-        updateTable.map(t => t -> t.fromRefPrefix(prevContext))
+        unPrefixedFroms.iterator.collect{case t if !prevContext.fromNaming.contains(t) =>
+          t -> t.fromRefPrefix(prevContext)
+        }
+    )
 
     val newExprNaming =
       prevContext.exprNaming ++
-        selectables
+        prefixedFroms
+          .iterator
           .flatMap { t =>
             t
-              .fromLhsMap(prevContext)
+              .fromColumnExprs(prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 

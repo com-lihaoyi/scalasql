@@ -11,7 +11,7 @@ class TableRef(val value: Table.Base) extends From {
   override def toString = s"TableRef(${Table.name(value)})"
 
   def fromRefPrefix(prevContext: Context) = prevContext.config.tableNameMapper(Table.name(value))
-  def fromLhsMap(prevContext: Context) = Map()
+  def fromColumnExprs(prevContext: Context) = Map()
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
@@ -20,7 +20,7 @@ class TableRef(val value: Table.Base) extends From {
 class SubqueryRef(val value: SelectBase, val qr: Queryable[_, _]) extends From {
   def fromRefPrefix(prevContext: Context): String = "subquery"
 
-  def fromLhsMap(prevContext: Context) = SelectBase.lhsMap(value, prevContext)
+  def fromColumnExprs(prevContext: Context) = SelectBase.lhsMap(value, prevContext)
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     val renderSql = SelectBase.renderer(value, prevContext)
@@ -30,7 +30,7 @@ class SubqueryRef(val value: SelectBase, val qr: Queryable[_, _]) extends From {
 class WithCteRef() extends From {
   def fromRefPrefix(prevContext: Context) = "cte"
 
-  def fromLhsMap(prevContext: Context) = Map()
+  def fromColumnExprs(prevContext: Context) = Map()
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     name
