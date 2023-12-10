@@ -1,22 +1,11 @@
 package scalasql.dialects
 
 import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
-import scalasql.core.{Aggregatable, DbApi, JoinNullable, Queryable, Db, SqlStr, TypeMapper}
+import scalasql.core.{Aggregatable, Context, Db, DbApi, DialectTypeMappers, JoinNullable, Queryable, SqlStr, TypeMapper}
 import scalasql.{Sc, dialects, operations}
-import scalasql.query.{
-  CompoundSelect,
-  GroupBy,
-  InsertColumns,
-  InsertSelect,
-  Join,
-  Joinable,
-  OrderBy,
-  Query,
-  Table
-}
-import scalasql.core.Context
+import scalasql.query.{CompoundSelect, GroupBy, InsertColumns, InsertSelect, Join, Joinable, OrderBy, Query, Table}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.{BitwiseFunctionOps, PadOps, TrimOps}
+import scalasql.operations.{BitwiseFunctionOps, ConcatOps, PadOps, TrimOps}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
@@ -47,9 +36,12 @@ trait H2Dialect extends Dialect {
 
   implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
     new H2Dialect.SqlAggOps(v)
+
+  override implicit def DbApiOpsConv(db: => DbApi): H2Dialect.DbApiOps = new H2Dialect.DbApiOps(this)
 }
 
 object H2Dialect extends H2Dialect {
+  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
   class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       assert(

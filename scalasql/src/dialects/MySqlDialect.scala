@@ -1,36 +1,10 @@
 package scalasql.dialects
 
 import scalasql.{Sc, operations}
-import scalasql.query.{
-  AscDesc,
-  Column,
-  CompoundSelect,
-  GroupBy,
-  InsertColumns,
-  Join,
-  JoinOps,
-  Joinable,
-  LateralJoinOps,
-  Nulls,
-  OrderBy,
-  Query,
-  Table,
-  TableRef,
-  Update
-}
-import scalasql.core.{
-  Aggregatable,
-  DbApi,
-  JoinNullable,
-  Queryable,
-  Db,
-  SqlStr,
-  TypeMapper,
-  WithSqlExpr
-}
+import scalasql.query.{AscDesc, Column, CompoundSelect, GroupBy, InsertColumns, Join, JoinOps, Joinable, LateralJoinOps, Nulls, OrderBy, Query, Table, TableRef, Update}
+import scalasql.core.{Aggregatable, Context, Db, DbApi, DialectTypeMappers, JoinNullable, Queryable, SqlExprsToSql, SqlStr, TypeMapper, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.core.{Context, SqlExprsToSql}
-import scalasql.operations.PadOps
+import scalasql.operations.{ConcatOps, PadOps}
 import scalasql.renderer.JoinsToSql
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
@@ -104,9 +78,13 @@ trait MySqlDialect extends Dialect {
 
   implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
     new MySqlDialect.SqlAggOps(v)
+
+  override implicit def DbApiOpsConv(db: => DbApi): MySqlDialect.DbApiOps = new MySqlDialect.DbApiOps(this)
 }
 
 object MySqlDialect extends MySqlDialect {
+  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
+
   class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")

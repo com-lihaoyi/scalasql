@@ -21,5 +21,24 @@ trait SqliteDialectTests extends SqliteSuite {
       value = "xxHello"
     )
 
+    test("glob") - checker(
+      query = Db("*cop*").glob("roflcopter"),
+      sql = "SELECT GLOB(?, ?) AS res",
+      value = true
+    )
+
+
+    test("changes") - checker(
+      query = db.changes,
+      sql = "SELECT CHANGES() AS res",
+      value = 7
+    )
+
+    test("char") - checker(
+      query = db.char(108, 111, 108),
+      sql = "SELECT CHAR(?, ?, ?) AS res",
+      value = "lol"
+    )
+
   }
 }

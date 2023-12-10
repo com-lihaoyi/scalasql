@@ -1,11 +1,10 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, Queryable, Db, TypeMapper, WithSqlExpr}
+import scalasql.core.{Aggregatable, Db, DbApi, DialectTypeMappers, Queryable, SqlStr, TypeMapper, WithSqlExpr}
 import scalasql.operations
 import scalasql.query.{JoinOps, Joinable, LateralJoinOps, Select}
-import scalasql.core.SqlStr
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.{PadOps, TrimOps}
+import scalasql.operations.{ConcatOps, PadOps, TrimOps}
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
@@ -40,9 +39,13 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
       Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
     }
   }
+
+  override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps = new PostgresDialect.DbApiOps(this)
 }
 
 object PostgresDialect extends PostgresDialect {
+  class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) with ConcatOps
+
   class SqlAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")

@@ -31,5 +31,17 @@ trait H2DialectTests extends H2Suite {
       sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxxxxx" // H2 only uses first character of fill string
     )
+
+    test("concat") - checker(
+      query = db.concat("i ", "am", " cow", 1337),
+      sql = "SELECT CONCAT(?, ?, ?, ?) AS res",
+      value = "i am cow1337"
+    )
+
+    test("concatWs") - checker(
+      query = db.concatWs(" ", "i", "am", "cow", 1337),
+      sql = "SELECT CONCAT_WS(?, ?, ?, ?, ?) AS res",
+      value = "i am cow 1337"
+    )
   }
 }
