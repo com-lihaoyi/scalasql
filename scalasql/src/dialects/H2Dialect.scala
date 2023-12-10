@@ -89,7 +89,7 @@ object H2Dialect extends H2Dialect {
       )
       val sepRender = Option(sep).getOrElse(sql"''")
 
-      v.queryExpr(expr => implicit ctx => sql"LISTAGG($expr || '', $sepRender)")
+      v.aggregateExpr(expr => implicit ctx => sql"LISTAGG($expr || '', $sepRender)")
     }
   }
 

@@ -369,9 +369,9 @@ object Select {
     )(implicit ja: JoinAppend[Q, Q2, QF, RF]): Select[QF, RF] =
       selectToSimpleSelect().join0(prefix, other, on)
 
-    override def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
+    override def aggregateExpr[V: TypeMapper](f: Q => Context => SqlStr)(
         implicit qr: Queryable.Row[Db[V], V]
-    ): Db[V] = selectToSimpleSelect().queryExpr(f)
+    ): Db[V] = selectToSimpleSelect().aggregateExpr(f)
 
     override protected def expr: Q = selectToSimpleSelect().expr
   }

@@ -33,7 +33,7 @@ trait Queryable[-Q, R] {
    */
   def walkExprs(q: Q): Seq[Db[_]]
 
-  def walkLabelsAndExprs(q: Q): Seq[(List[String], Db[_])] = walkLabels(q).zip(walkExprs(q))
+  def walkLabelsAndExprs(q: Q): Queryable.Walked = walkLabels(q).zip(walkExprs(q))
 
   /**
    * Whether this query expects a single row to be returned, if so we can assert on
@@ -55,7 +55,7 @@ trait Queryable[-Q, R] {
 }
 
 object Queryable {
-
+  type Walked = Seq[(List[String], Db[_])]
   class ResultSetIterator(r: ResultSet) {
     var index = 0
     var nulls = 0

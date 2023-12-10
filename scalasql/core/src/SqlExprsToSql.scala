@@ -3,12 +3,12 @@ package scalasql.core
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 object SqlExprsToSql {
-  def apply(flattenedExpr: Seq[(List[String], Db[_])], exprPrefix: SqlStr, context: Context) = {
-    apply0(flattenedExpr, context, sql"SELECT " + exprPrefix)
+  def apply(walked: Queryable.Walked, exprPrefix: SqlStr, context: Context) = {
+    apply0(walked, context, sql"SELECT " + exprPrefix)
   }
 
-  def apply0(flattenedExpr: Seq[(List[String], Db[_])], context: Context, prefix: SqlStr) = {
-    ColumnNamer.flatten(flattenedExpr, context) match {
+  def apply0(walked: Queryable.Walked, context: Context, prefix: SqlStr) = {
+    ColumnNamer.selectColumnSql(walked, context) match {
       case Seq((prefix, singleExpr))
           if prefix == context.config.columnLabelDefault && singleExpr.isCompleteQuery =>
         singleExpr

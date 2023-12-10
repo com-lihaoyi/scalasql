@@ -47,8 +47,8 @@ object Returning {
       implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
       val prefix = Renderable.toSql(returnable)
-      val flattenedExpr = qr.walkLabelsAndExprs(returning)
-      val exprStr = SqlExprsToSql.apply0(flattenedExpr, implicitCtx, SqlStr.empty)
+      val walked = qr.walkLabelsAndExprs(returning)
+      val exprStr = SqlExprsToSql.apply0(walked, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"
 
       prefix + suffix

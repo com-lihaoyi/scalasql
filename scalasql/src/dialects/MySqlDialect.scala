@@ -131,7 +131,7 @@ object MySqlDialect extends MySqlDialect {
   class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
-      v.queryExpr(expr =>
+      v.aggregateExpr(expr =>
         implicit ctx => sql"GROUP_CONCAT(CONCAT($expr, '') SEPARATOR ${sepRender})"
       )
     }

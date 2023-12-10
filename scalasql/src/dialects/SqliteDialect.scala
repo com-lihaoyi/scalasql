@@ -171,7 +171,7 @@ object SqliteDialect extends SqliteDialect {
     /** TRUE if all values in a set are TRUE */
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
-      v.queryExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
+      v.aggregateExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
     }
   }
 

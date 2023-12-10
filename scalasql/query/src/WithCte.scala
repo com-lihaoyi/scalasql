@@ -97,7 +97,7 @@ object WithCte {
           .asInstanceOf[Queryable[Any, Any]]
           .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
 
-      val newExprNaming = ColumnNamer.flattenCte(walked, prevContext)
+      val newExprNaming = ColumnNamer.selectColumnReferences(walked, prevContext)
 
       val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))

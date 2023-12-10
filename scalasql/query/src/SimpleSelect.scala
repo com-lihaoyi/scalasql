@@ -50,7 +50,7 @@ class SimpleSelect[Q, R](
   def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
     this.copy(exprPrefix = Some(s), preserveAll = preserveAll)
 
-  def queryExpr[V: TypeMapper](
+  def aggregateExpr[V: TypeMapper](
       f: Q => Context => SqlStr
   )(implicit qr2: Queryable.Row[Db[V], V]): Db[V] = {
     Db[V] { implicit outerCtx: Context =>
@@ -213,7 +213,7 @@ class SimpleSelect[Q, R](
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
-    lazy val jsonQueryMap = ColumnNamer.flattenCte(flattenedExpr, prevContext).toMap
+    lazy val jsonQueryMap = ColumnNamer.selectColumnReferences(flattenedExpr, prevContext).toMap
 
     jsonQueryMap
   }
@@ -256,7 +256,7 @@ object SimpleSelect {
       query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
 
     lazy val exprsStrs = {
-      ColumnNamer.flatten(flattenedExpr, context).map { case (k, v) =>
+      ColumnNamer.selectColumnSql(flattenedExpr, context).map { case (k, v) =>
         sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
       }
     }

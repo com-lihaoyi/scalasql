@@ -9,13 +9,9 @@ import scalasql.core.SqlStr.Renderable
  * return values.
  */
 object ColumnNamer {
-  def isNormalCharacter(c: Char) =
-    (c >= 'a' && c <= 'z') ||
-      (c >= 'Z' && c <= 'Z') ||
-      c == '_'
+  def isNormalCharacter(c: Char) = (c >= 'a' && c <= 'z') || (c >= 'Z' && c <= 'Z') || c == '_'
 
   def getSuffixedName(
-      counter: collection.mutable.Map[String, Int],
       tokens: Seq[String],
       context: Context
   ) = {
@@ -24,38 +20,19 @@ object ColumnNamer {
         context.config.columnLabelDefault +: tokens
       else tokens
 
-    val name0 = prefixedTokens
+    prefixedTokens
       .map(context.config.tableNameMapper)
       .mkString(context.config.columnLabelDelimiter)
-
-    val updated = counter.updateWith(name0) {
-      case None => Some(1)
-      case Some(n) => Some(n + 1)
-    }
-
-    (Seq(name0) ++ updated.filter(_ != 1)).mkString(context.config.columnLabelDelimiter)
-
-  }
-  def flatten(x: Seq[(List[String], Db[_])], context: Context): Seq[(String, SqlStr)] = {
-    val counter = collection.mutable.Map.empty[String, Int]
-    x.map { case (k, v) =>
-      (getSuffixedName(counter, k, context), Renderable.toSql(v)(context))
-    }
   }
 
-  def flattenCte(
-      walked: Seq[(List[String], Db[_])],
-      prevContext: Context
-  ): Seq[(Db.Identity, SqlStr)] = {
-    val counter = collection.mutable.Map.empty[String, Int]
+  def selectColumnSql(walked: Queryable.Walked, ctx: Context): Seq[(String, SqlStr)] = {
+    walked.map { case (k, v) => (getSuffixedName(k, ctx), Renderable.toSql(v)(ctx)) }
+  }
+
+  def selectColumnReferences(walked: Queryable.Walked, ctx: Context): Seq[(Db.Identity, SqlStr)] = {
     walked.map { case (tokens, expr) =>
-      (
-        Db.identity(expr),
-        SqlStr.raw(
-          getSuffixedName(counter, tokens, prevContext),
-          Array(Db.identity(expr))
-        )
-      )
+      val dbId = Db.identity(expr)
+      (dbId, SqlStr.raw(getSuffixedName(tokens, ctx), Array(dbId)))
     }
   }
 }

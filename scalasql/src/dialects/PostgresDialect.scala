@@ -82,7 +82,7 @@ object PostgresDialect extends PostgresDialect {
   class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
     def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
-      v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
+      v.aggregateExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
   class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]

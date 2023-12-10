@@ -5,7 +5,7 @@ package scalasql.core
  * also could be a [[SelectProxy]]
  */
 trait Aggregatable[Q] extends WithSqlExpr[Q] {
-  def queryExpr[V: TypeMapper](f: Q => Context => SqlStr)(
+  def aggregateExpr[V: TypeMapper](f: Q => Context => SqlStr)(
       implicit qr: Queryable.Row[Db[V], V]
   ): Db[V]
 }
