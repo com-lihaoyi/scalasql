@@ -1,6 +1,6 @@
 package scalasql.dialects
 
-import scalasql.core.Db
+import scalasql.core.Expr
 import scalasql.utils.H2Suite
 import utest._
 
@@ -9,25 +9,25 @@ trait H2DialectTests extends H2Suite {
   def tests = Tests {
 
     test("ltrim2") - checker(
-      query = Db("xxHellox").ltrim("x"),
+      query = Expr("xxHellox").ltrim("x"),
       sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
-      query = Db("xxHellox").rtrim("x"),
+      query = Expr("xxHellox").rtrim("x"),
       sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 
     test("lpad") - checker(
-      query = Db("Hello").lpad(10, "xy"),
+      query = Expr("Hello").lpad(10, "xy"),
       sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xxxxxHello" // H2 only uses first character of fill string
     )
 
     test("rpad") - checker(
-      query = Db("Hello").rpad(10, "xy"),
+      query = Expr("Hello").rpad(10, "xy"),
       sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxxxxx" // H2 only uses first character of fill string
     )

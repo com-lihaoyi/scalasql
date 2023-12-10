@@ -7,7 +7,7 @@ import scalasql.core.{
   DialectTypeMappers,
   LiveSqlExprs,
   Queryable,
-  Db,
+  Expr,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -49,7 +49,7 @@ class CompoundSelect[Q, R](
     }
   }
 
-  override def filter(f: Q => Db[Boolean]): Select[Q, R] = {
+  override def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
     (lhs, compoundOps) match {
       case (s: SimpleSelect[Q, R], Nil) =>
         copy(Select.toSimpleFrom(s.filter(f)), compoundOps, orderBy, limit, offset)
@@ -57,7 +57,7 @@ class CompoundSelect[Q, R](
     }
   }
 
-  override def sortBy(f: Q => Db[_]) = {
+  override def sortBy(f: Q => Expr[_]) = {
     val newOrder = Seq(OrderBy(f(expr), None, None))
 
     if (limit.isEmpty && offset.isEmpty) copy(orderBy = newOrder ++ orderBy)
@@ -89,7 +89,7 @@ class CompoundSelect[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Db.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     SelectBase.lhsMap(lhs, prevContext)
   }
 }

@@ -3,7 +3,7 @@ package scalasql.dialects
 import scalasql.core.{
   Aggregatable,
   Context,
-  Db,
+  Expr,
   DbApi,
   DialectTypeMappers,
   Queryable,
@@ -31,18 +31,18 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
   class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
-  override implicit def DbStringOpsConv(v: Db[String]): SqliteDialect.DbStringOps[String] =
-    new SqliteDialect.DbStringOps(v)
+  override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps[String] =
+    new SqliteDialect.ExprStringOps(v)
 
-  override implicit def DbBlobOpsConv(
-      v: Db[geny.Bytes]
-  ): SqliteDialect.DbStringLikeOps[geny.Bytes] =
-    new SqliteDialect.DbStringLikeOps(v)
+  override implicit def ExprBlobOpsConv(
+      v: Expr[geny.Bytes]
+  ): SqliteDialect.ExprStringLikeOps[geny.Bytes] =
+    new SqliteDialect.ExprStringLikeOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new SqliteDialect.TableOps(t)
 
-  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
+  implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new SqliteDialect.AggExprOps(v)
 
   override implicit def DbApiOpsConv(db: => DbApi): SqliteDialect.DbApiOps =
@@ -59,7 +59,7 @@ object SqliteDialect extends SqliteDialect {
      * changes() SQL function is a wrapper around the sqlite3_changes64() C/C++
      * function and hence follows the same rules for counting changes.
      */
-    def changes: Db[Int] = Db { implicit ctx => sql"CHANGES()" }
+    def changes: Expr[Int] = Expr { implicit ctx => sql"CHANGES()" }
 
     /**
      * The total_changes() function returns the number of row changes caused by
@@ -67,13 +67,13 @@ object SqliteDialect extends SqliteDialect {
      * was opened. This function is a wrapper around the sqlite3_total_changes64()
      * C/C++ interface.
      */
-    def totalChanges: Db[Int] = Db { implicit ctx => sql"TOTAL_CHANGES()" }
+    def totalChanges: Expr[Int] = Expr { implicit ctx => sql"TOTAL_CHANGES()" }
 
     /**
      * The typeof(X) function returns a string that indicates the datatype of the
      * expression X: "null", "integer", "real", "text", or "blob".
      */
-    def typeOf(v: Db[_]): Db[String] = Db { implicit ctx => sql"TYPEOF($v)" }
+    def typeOf(v: Expr[_]): Expr[String] = Expr { implicit ctx => sql"TYPEOF($v)" }
 
     /**
      * The last_insert_rowid() function returns the ROWID of the last row insert
@@ -81,13 +81,13 @@ object SqliteDialect extends SqliteDialect {
      * last_insert_rowid() SQL function is a wrapper around the
      * sqlite3_last_insert_rowid() C/C++ interface function.
      */
-    def lastInsertRowId: Db[Int] = Db { implicit ctx => sql"LAST_INSERT_ROWID()" }
+    def lastInsertRowId: Expr[Int] = Expr { implicit ctx => sql"LAST_INSERT_ROWID()" }
 
     /**
      * The random() function returns a pseudo-random integer between
      * -9223372036854775808 and +9223372036854775807.
      */
-    def random: Db[Long] = Db { implicit ctx => sql"RANDOM()" }
+    def random: Expr[Long] = Expr { implicit ctx => sql"RANDOM()" }
 
     /**
      * The randomblob(N) function return an N-byte blob containing pseudo-random bytes.
@@ -99,13 +99,13 @@ object SqliteDialect extends SqliteDialect {
      * hex(randomblob(16))
      * lower(hex(randomblob(16)))
      */
-    def randomBlob(n: Db[Int]): Db[geny.Bytes] = Db { implicit ctx => sql"RANDOMBLOB($n)" }
+    def randomBlob(n: Expr[Int]): Expr[geny.Bytes] = Expr { implicit ctx => sql"RANDOMBLOB($n)" }
 
     /**
      * The char(X1,X2,...,XN) function returns a string composed of characters
      * having the unicode code point values of the given integers
      */
-    def char(values: Db[Int]*): Db[String] = Db { implicit ctx =>
+    def char(values: Expr[Int]*): Expr[String] = Expr { implicit ctx =>
       sql"CHAR(${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
     }
 
@@ -121,7 +121,7 @@ object SqliteDialect extends SqliteDialect {
      * 0.0 for numeric formats or an empty string for %s. See the built-in printf()
      * documentation for additional information.
      */
-    def format(template: Db[String], values: Db[_]*): Db[String] = Db { implicit ctx =>
+    def format(template: Expr[String], values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
       sql"FORMAT($template, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
     }
 
@@ -135,7 +135,7 @@ object SqliteDialect extends SqliteDialect {
      * "hex(12345678)" renders as "3132333435363738" not the binary representation of
      * the integer value "0000000000BC614E".
      */
-    def hex(value: Db[_]): Db[String] = Db { implicit ctx => sql"HEX($value)" }
+    def hex(value: Expr[_]): Expr[String] = Expr { implicit ctx => sql"HEX($value)" }
 
     /**
      * The unhex(X,Y) function returns a BLOB value which is the decoding of the
@@ -149,7 +149,7 @@ object SqliteDialect extends SqliteDialect {
      * digits. Hexadecimal digits in Y have no affect on the translation of X. Only
      * characters in Y that are not hexadecimal digits are ignored in X.
      */
-    def unhex(value: Db[String]): Db[geny.Bytes] = Db { implicit ctx => sql"UNHEX($value)" }
+    def unhex(value: Expr[String]): Expr[geny.Bytes] = Expr { implicit ctx => sql"UNHEX($value)" }
 
     /**
      * The unhex(X,Y) function returns a BLOB value which is the decoding of the
@@ -163,32 +163,32 @@ object SqliteDialect extends SqliteDialect {
      * digits. Hexadecimal digits in Y have no affect on the translation of X. Only
      * characters in Y that are not hexadecimal digits are ignored in X.
      */
-    def zeroBlob(n: Db[Int]): Db[geny.Bytes] = Db { implicit ctx => sql"ZEROBLOB($n)" }
+    def zeroBlob(n: Expr[Int]): Expr[geny.Bytes] = Expr { implicit ctx => sql"ZEROBLOB($n)" }
 
   }
-  class AggExprOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
+  class AggExprOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
 
     /** TRUE if all values in a set are TRUE */
-    def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
+    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.aggregateExpr(expr => implicit ctx => sql"GROUP_CONCAT($expr || '', $sepRender)")
     }
   }
 
-  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
-  class DbStringLikeOps[T](protected val v: Db[T])
-      extends operations.DbStringLikeOps(v)
+  class ExprStringOps[T](v: Expr[T]) extends ExprStringLikeOps(v) with operations.ExprStringOps[T]
+  class ExprStringLikeOps[T](protected val v: Expr[T])
+      extends operations.ExprStringLikeOps(v)
       with TrimOps {
-    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
-    def glob(x: Db[T]): Db[Boolean] = Db { implicit ctx => sql"GLOB($v, $x)" }
+    def indexOf(x: Expr[T]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
+    def glob(x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"GLOB($v, $x)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
 
-    protected override def joinableToSelect: Select[V[Db], V[Sc]] = {
+    protected override def joinableToSelect: Select[V[Expr], V[Sc]] = {
       val ref = Table.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Db]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
         false,
         Seq(ref),
@@ -221,7 +221,7 @@ object SqliteDialect extends SqliteDialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Db[_]],
+        where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -237,7 +237,7 @@ object SqliteDialect extends SqliteDialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Db[_]],
+      where: Seq[Expr[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(

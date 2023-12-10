@@ -5,7 +5,7 @@ import scalasql.core.{
   DialectTypeMappers,
   LiveSqlExprs,
   Queryable,
-  Db,
+  Expr,
   SqlExprsToSql,
   SqlStr,
   TypeMapper,
@@ -18,15 +18,15 @@ import scalasql.renderer.JoinsToSql
  * A SQL `UPDATE` query
  */
 trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
-  def filter(f: Q => Db[Boolean]): Update[Q, R]
-  def withFilter(f: Q => Db[Boolean]): Update[Q, R] = filter(f)
+  def filter(f: Q => Expr[Boolean]): Update[Q, R]
+  def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)
 
   def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
 
   def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
-      on: Option[(Q, Q2) => Db[Boolean]]
+      on: Option[(Q, Q2) => Expr[Boolean]]
   )(
       implicit ja: JoinAppend[Q, Q2, QF, RF]
   ): Update[QF, RF]
@@ -50,7 +50,7 @@ object Update {
       val table: TableRef,
       val set0: Seq[Column.Assignment[_]],
       val joins: Seq[Join],
-      val where: Seq[Db[_]]
+      val where: Seq[Expr[_]]
   )(implicit val qr: Queryable.Row[Q, R], dialect: DialectTypeMappers)
       extends Update[Q, R] {
 
@@ -60,18 +60,18 @@ object Update {
         table: TableRef = this.table,
         set0: Seq[Column.Assignment[_]] = this.set0,
         joins: Seq[Join] = this.joins,
-        where: Seq[Db[_]] = this.where
+        where: Seq[Expr[_]] = this.where
     )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): Update[Q, R] =
       new Impl(expr, table, set0, joins, where)
 
-    def filter(f: Q => Db[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
+    def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
     def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2, QF, RF](
         prefix: String,
         other: Joinable[Q2, R2],
-        on: Option[(Q, Q2) => Db[Boolean]]
+        on: Option[(Q, Q2) => Expr[Boolean]]
     )(
         implicit ja: JoinAppend[Q, Q2, QF, RF]
     ) = {
@@ -98,7 +98,7 @@ object Update {
       joins0: Seq[Join],
       table: TableRef,
       set0: Seq[Column.Assignment[_]],
-      where0: Seq[Db[_]],
+      where0: Seq[Expr[_]],
       prevContext: Context
   ) {
     lazy val froms = joins0.flatMap(_.from).map(_.from)

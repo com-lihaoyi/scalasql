@@ -1,11 +1,11 @@
 package scalasql.dialects
 
 import scalasql.dialects.Dialect
-import scalasql.core.Db
+import scalasql.core.Expr
 import scalasql.Sc
 import scalasql.query.{Column, Delete, Insert, Joinable, Select, SimpleSelect, Table, Update}
 
-class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Joinable[V[Db], V[Sc]] {
+class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Joinable[V[Expr], V[Sc]] {
 
   import dialect.{dialectSelf => _, _}
 
@@ -16,10 +16,10 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Join
 
   protected def joinableToFromExpr = {
     val (ref, expr) = toFromExpr0
-    (ref, expr.asInstanceOf[V[Db]])
+    (ref, expr.asInstanceOf[V[Expr]])
   }
 
-  protected def joinableToSelect: Select[V[Db], V[Sc]] = {
+  protected def joinableToSelect: Select[V[Expr], V[Sc]] = {
     val (ref, expr) = joinableToFromExpr
     new SimpleSelect(expr, None, false, Seq(ref), Nil, Nil, None)(
       t.containerQr,
@@ -36,7 +36,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Join
    * Constructs a `UPDATE` query with the given [[filter]] to select the
    * rows you want to delete
    */
-  def update(filter: V[Column] => Db[Boolean]): Update[V[Column], V[Sc]] = {
+  def update(filter: V[Column] => Expr[Boolean]): Update[V[Column], V[Sc]] = {
     val (ref, expr) = toFromExpr0
     new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table.metadata(t).vExpr(ref, dialect))))(
       t.containerQr2,
@@ -56,7 +56,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect) extends Join
    * Constructs a `DELETE` query with the given [[filter]] to select the
    * rows you want to delete
    */
-  def delete(filter: V[Column] => Db[Boolean]): Delete[V[Column]] = {
+  def delete(filter: V[Column] => Expr[Boolean]): Delete[V[Column]] = {
     val (ref, expr) = toFromExpr0
     new Delete.Impl(expr, filter(Table.metadata(t).vExpr(ref, dialect)), ref)
   }

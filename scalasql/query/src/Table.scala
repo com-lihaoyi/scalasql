@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{DialectTypeMappers, Sc, Queryable, Db}
+import scalasql.core.{DialectTypeMappers, Sc, Queryable, Expr}
 
 import scala.language.experimental.macros
 
@@ -17,14 +17,14 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
 
-  implicit def containerQr(implicit dialect: DialectTypeMappers): Queryable.Row[V[Db], V[Sc]] =
+  implicit def containerQr(implicit dialect: DialectTypeMappers): Queryable.Row[V[Expr], V[Sc]] =
     tableMetadata
       .queryable(
         tableMetadata.walkLabels0,
         dialect,
         new Table.Metadata.QueryableProxy(tableMetadata.queryables(dialect, _))
       )
-      .asInstanceOf[Queryable.Row[V[Db], V[Sc]]]
+      .asInstanceOf[Queryable.Row[V[Expr], V[Sc]]]
 
   protected def tableRef = new TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
@@ -73,7 +73,7 @@ object Table {
           () => Seq[String],
           DialectTypeMappers,
           Metadata.QueryableProxy
-      ) => Queryable[V[Db], V[Sc]],
+      ) => Queryable[V[Expr], V[Sc]],
       val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
   ) {
     def vExpr(t: TableRef, d: DialectTypeMappers) =
@@ -89,12 +89,12 @@ object Table {
   object Internal {
     class TableQueryable[Q, R <: scala.Product](
         walkLabels0: () => Seq[String],
-        walkExprs0: Q => Seq[Db[_]],
+        walkExprs0: Q => Seq[Expr[_]],
         construct0: Queryable.ResultSetIterator => R,
         deconstruct0: R => Q = ???
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0().map(List(_))
-      def walkExprs(q: Q): Seq[Db[_]] = walkExprs0(q)
+      def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
 
       def construct(args: Queryable.ResultSetIterator) = construct0(args)
 

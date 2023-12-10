@@ -1,8 +1,8 @@
 package scalasql.core
 
 /**
- * Models a set of live [[Db]] expressions which need to be rendered;
- * [[Db]] expressions not in this set can be skipped during rendering
+ * Models a set of live [[Expr]] expressions which need to be rendered;
+ * [[Expr]] expressions not in this set can be skipped during rendering
  * to improve the conciseness of the rendered SQL string.
  *
  * - `None` is used to indicate this is a top-level context and we want
@@ -19,12 +19,12 @@ package scalasql.core
  * columns end up being used in the application code after the query has
  * finished running, and thus have to preserve all of them
  */
-class LiveSqlExprs(values: Option[Set[Db.Identity]]) {
-  def map(f: Set[Db.Identity] => Set[Db.Identity]) = new LiveSqlExprs(values.map(f))
-  def isLive(e: Db.Identity) = values.fold(true)(_.contains(e))
+class LiveSqlExprs(values: Option[Set[Expr.Identity]]) {
+  def map(f: Set[Expr.Identity] => Set[Expr.Identity]) = new LiveSqlExprs(values.map(f))
+  def isLive(e: Expr.Identity) = values.fold(true)(_.contains(e))
 }
 
 object LiveSqlExprs {
-  def some(v: Set[Db.Identity]) = new LiveSqlExprs(Some(v))
+  def some(v: Set[Expr.Identity]) = new LiveSqlExprs(Some(v))
   def none = new LiveSqlExprs(None)
 }

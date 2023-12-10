@@ -28,7 +28,7 @@ object CheatSheetExample {
   def main(args: Array[String]): Unit = {
     val db: DbApi = ???
     import scalasql.SqliteDialect._
-    import scalasql.core.Db
+    import scalasql.core.Expr
 
     val str = "hello"
 
@@ -87,7 +87,7 @@ object CheatSheetExample {
     Foo.select.filter(_.myStr === "hello") // Seq[Foo[Sc]]
     // SELECT * FROM foo WHERE my_str = "hello"
 
-    Foo.select.filter(_.myStr === Db("hello")) // Seq[Foo[Sc]]
+    Foo.select.filter(_.myStr === Expr("hello")) // Seq[Foo[Sc]]
     // SELECT * FROM foo WHERE my_str = "hello"
 
     Foo.select.filter(_.myStr === "hello").single // Foo[Sc]

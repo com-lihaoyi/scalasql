@@ -12,11 +12,11 @@ trait SelectTests extends ScalaSqlSuite {
 
   def tests = Tests {
     test("constant") - checker(
-      query = Text { Db(1) + Db(2) },
+      query = Text { Expr(1) + Expr(2) },
       sql = "SELECT (? + ?) AS res",
       value = 3,
       docs = """
-        The most simple thing you can query in the database is an `Db`. These do not need
+        The most simple thing you can query in the database is an `Expr`. These do not need
         to be related to any database tables, and translate into raw `SELECT` calls without
         `FROM`.
       """
@@ -256,7 +256,7 @@ trait SelectTests extends ScalaSqlSuite {
       docs = """
         `SELECT` queries that return a single row and column can be used as SQL expressions
         in standard SQL databases. In ScalaSql, this is done by the `.toExpr` method,
-        which turns a `Select[T]` into an `Db[T]`. Note that if the `Select` returns more
+        which turns a `Select[T]` into an `Expr[T]`. Note that if the `Select` returns more
         than one row or column, the database may select a row arbitrarily or will throw
         an exception at runtime (depend on implenmentation)
       """
@@ -515,8 +515,8 @@ trait SelectTests extends ScalaSqlSuite {
         )
       ),
       docs = """
-        Queries can output arbitrarily nested tuples of `Db[T]` and `case class`
-        instances of `Foo[Db]`, which will be de-serialized into nested tuples
+        Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
+        instances of `Foo[Expr]`, which will be de-serialized into nested tuples
         of `T` and `Foo[Sc]`s. The `AS` aliases assigned to each column will contain
         the path of indices and field names used to populate the final returned values
       """

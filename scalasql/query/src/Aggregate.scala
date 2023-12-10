@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Queryable, Db, SqlStr, TypeMapper, Context}
+import scalasql.core.{Queryable, Expr, SqlStr, TypeMapper, Context}
 
 class Aggregate[Q, R](
     toSqlStr0: Context => SqlStr,

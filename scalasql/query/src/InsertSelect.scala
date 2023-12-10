@@ -1,19 +1,19 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectTypeMappers, Queryable, Db, SqlStr, WithSqlExpr}
+import scalasql.core.{Context, DialectTypeMappers, Queryable, Expr, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**
  * A SQL `INSERT SELECT` query
  */
-trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Db]] with Query[Int]
+trait InsertSelect[V[_[_]], C, R, R2] extends InsertReturnable[V[Expr]] with Query[Int]
 
 object InsertSelect {
   class Impl[V[_[_]], C, R, R2](insert: Insert[V, R], columns: C, select: Select[C, R2])(
       implicit dialect: DialectTypeMappers
   ) extends InsertSelect[V, C, R, R2] {
     import dialect.{dialectSelf => _, _}
-    protected def expr = WithSqlExpr.get(insert).asInstanceOf[V[Db]]
+    protected def expr = WithSqlExpr.get(insert).asInstanceOf[V[Expr]]
 
     def table = insert.table
 
@@ -35,7 +35,7 @@ object InsertSelect {
 
   class Renderer(
       select: Select[_, _],
-      exprs: Seq[Db[_]],
+      exprs: Seq[Expr[_]],
       prevContext: Context,
       tableName: String
   ) {

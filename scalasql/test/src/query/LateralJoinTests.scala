@@ -95,7 +95,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Db(true))
+          s <- ShippingInfo.select.filter { s => b.id `=` s.buyerId }.joinLateral(_ => Expr(true))
         } yield (b.name, s.shippingDate)
       },
       sql = """
@@ -119,7 +119,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
     test("leftJoin") - checker(
       query = Text {
         Buyer.select.leftJoinLateral(b => ShippingInfo.select.filter(b.id `=` _.buyerId))((_, _) =>
-          Db(true)
+          Expr(true)
         )
       },
       sql = """
@@ -165,7 +165,7 @@ trait LateralJoinTests extends ScalaSqlSuite {
       query = Text {
         for {
           b <- Buyer.select
-          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Db(true))
+          s <- ShippingInfo.select.filter(b.id `=` _.buyerId).leftJoinLateral(_ => Expr(true))
         } yield (b, s)
       },
       sql = """

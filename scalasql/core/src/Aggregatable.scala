@@ -6,6 +6,6 @@ package scalasql.core
  */
 trait Aggregatable[Q] extends WithSqlExpr[Q] {
   def aggregateExpr[V: TypeMapper](f: Q => Context => SqlStr)(
-      implicit qr: Queryable.Row[Db[V], V]
-  ): Db[V]
+      implicit qr: Queryable.Row[Expr[V], V]
+  ): Expr[V]
 }

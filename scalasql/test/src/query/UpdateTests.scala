@@ -115,7 +115,7 @@ trait UpdateTests extends ScalaSqlSuite {
         ),
         value = 1,
         docs = """
-          The values assigned to columns in `Table.update` can also be computed `Db[T]`s,
+          The values assigned to columns in `Table.update` can also be computed `Expr[T]`s,
           not just literal Scala constants. This example shows how to to update the name of
           the row for `James Bond` with it's existing name in uppercase
         """

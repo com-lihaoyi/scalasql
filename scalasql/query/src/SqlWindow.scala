@@ -1,20 +1,20 @@
 package scalasql.query
-import scalasql.core.{Db, SqlStr}
+import scalasql.core.{Expr, SqlStr}
 import scalasql.core.DialectTypeMappers
 import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Context
 
 case class SqlWindow[T](
-    e: Db[T],
-    partitionBy0: Option[Db[_]],
-    filter0: Option[Db[Boolean]],
+    e: Expr[T],
+    partitionBy0: Option[Expr[_]],
+    filter0: Option[Expr[Boolean]],
     orderBy: Seq[scalasql.query.OrderBy],
     frameStart0: Option[SqlStr],
     frameEnd0: Option[SqlStr],
     exclusions: Option[SqlStr]
 )(implicit dialect: DialectTypeMappers)
-    extends Db[T] {
+    extends Expr[T] {
   import dialect.{dialectSelf => _, _}
   protected def renderToSql0(implicit ctx: Context): SqlStr = {
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }
@@ -37,10 +37,10 @@ case class SqlWindow[T](
 
   }
 
-  def partitionBy(e: Db[_]) = this.copy(partitionBy0 = Some(e))
+  def partitionBy(e: Expr[_]) = this.copy(partitionBy0 = Some(e))
 
-  def filter(expr: Db[Boolean]) = copy(filter0 = Some(expr))
-  def sortBy(expr: Db[_]) = {
+  def filter(expr: Expr[Boolean]) = copy(filter0 = Some(expr))
+  def sortBy(expr: Expr[_]) = {
     val newOrder = Seq(OrderBy(expr, None, None))
 
     copy(orderBy = newOrder ++ orderBy)

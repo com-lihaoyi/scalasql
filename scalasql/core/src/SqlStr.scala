@@ -10,14 +10,14 @@ class SqlStr(
     private val queryParts: collection.IndexedSeq[String],
     private val params: collection.IndexedSeq[SqlStr.Interp],
     val isCompleteQuery: Boolean,
-    private val referencedExprs: collection.IndexedSeq[Db.Identity]
+    private val referencedExprs: collection.IndexedSeq[Expr.Identity]
 ) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
     new SqlStr(
       SqlStr.plusParts,
       Array[SqlStr.Interp](this, other),
       false,
-      Array.empty[Db.Identity]
+      Array.empty[Expr.Identity]
     )
   }
 
@@ -33,7 +33,7 @@ object SqlStr {
       val queryParts: collection.IndexedSeq[String],
       val params: collection.IndexedSeq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
-      val referencedExprs: collection.IndexedSeq[Db.Identity]
+      val referencedExprs: collection.IndexedSeq[Expr.Identity]
   ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
 
   /**
@@ -56,7 +56,7 @@ object SqlStr {
     // Implement this in a mutable style because`it's pretty performance sensitive
     val finalParts = collection.mutable.ArrayBuffer.empty[String]
     val finalArgs = collection.mutable.ArrayBuffer.empty[Interp.TypeInterp[_]]
-    val finalExprs = collection.mutable.ArrayBuffer.empty[Db.Identity]
+    val finalExprs = collection.mutable.ArrayBuffer.empty[Expr.Identity]
     // Equivalent to `finalParts.last`, cached locally for performance
     var lastFinalPart: String = null
 
@@ -109,7 +109,7 @@ object SqlStr {
    */
   implicit class SqlStringSyntax(sc: StringContext) {
     def sql(args: Interp*) =
-      new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Db.Identity])
+      new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Expr.Identity])
   }
 
   /**
@@ -126,7 +126,7 @@ object SqlStr {
    * Converts a raw `String` into a [[SqlStr]]. Note that this must be used
    * carefully to avoid SQL injection attacks.
    */
-  def raw(s: String, referencedExprs: Array[Db.Identity] = Array.empty) =
+  def raw(s: String, referencedExprs: Array[Expr.Identity] = Array.empty) =
     new SqlStr(Array(s), Array.empty[SqlStr.Interp], false, referencedExprs)
 
   trait Renderable {

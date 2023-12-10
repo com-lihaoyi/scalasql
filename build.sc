@@ -95,7 +95,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.core.generated
-           |import scalasql.core.{Queryable, Db}
+           |import scalasql.core.{Queryable, Expr}
            |trait QueryableRow{
            |  ${queryableRowDefs.mkString("\n")}
            |}
@@ -133,7 +133,7 @@ trait ScalaSql extends Common{
                  |
                  |""".stripMargin
           s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column] => Column[T$j]")})(
-             |    items: (${commaSep(j => s"Db[T$j]")})*
+             |    items: (${commaSep(j => s"Expr[T$j]")})*
              |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
         }
       }
@@ -173,7 +173,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.generated
-           |import scalasql.core.{Queryable, Db}
+           |import scalasql.core.{Queryable, Expr}
            |import scalasql.query.Column
            |trait Insert[V[_[_]], R]{
            |  ${defs(false).mkString("\n")}
@@ -182,7 +182,7 @@ trait ScalaSql extends Common{
            |  def newInsertValues[R](
            |        insert: scalasql.query.Insert[V, R],
            |        columns: Seq[Column[_]],
-           |        valuesLists: Seq[Seq[Db[_]]]
+           |        valuesLists: Seq[Seq[Expr[_]]]
            |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
            |  ${defs(true).mkString("\n")}
            |}

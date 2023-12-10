@@ -4,8 +4,7 @@ import scalasql.core.Sc
 import scala.language.experimental.macros
 
 object TableMacros {
-  type Db[T] = scalasql.core.Db[T]
-  def cast[T](x: Any): T = x.asInstanceOf[T]
+  type Expr[T] = scalasql.core.Expr[T]
   def applyImpl[V[_[_]]](
       c: scala.reflect.macros.blackbox.Context
   )(implicit caseClassType: c.WeakTypeTag[V[Any]]): c.Expr[Table.Metadata[V]] = {
@@ -50,19 +49,19 @@ object TableMacros {
 
     val queryables = for (param <- constructorParameters) yield {
       val tpe = subParam(param.info, typeOf[Sc[_]])
-      val tpe2 = subParam(param.info, typeOf[Db[_]])
+      val tpe2 = subParam(param.info, typeOf[TableMacros.Expr[_]])
       q"implicitly[_root_.scalasql.Queryable.Row[$tpe2, $tpe]]"
     }
 
     val constructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Sc[_]])
-      val tpe2 = subParam(param.info, typeOf[Db[_]])
+      val tpe2 = subParam(param.info, typeOf[TableMacros.Expr[_]])
       q"queryable[$tpe2, $tpe]($i).construct(args): _root_.scalasql.Sc[$tpe]"
     }
 
     val deconstructParams = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Sc[_]])
-      val tpe2 = subParam(param.info, typeOf[Db[_]])
+      val tpe2 = subParam(param.info, typeOf[TableMacros.Expr[_]])
       q"queryable[$tpe2, $tpe]($i).deconstruct(r.${TermName(param.name.toString)})"
     }
 
@@ -77,7 +76,7 @@ object TableMacros {
 
     val flattenExprs = for ((param, i) <- constructorParameters.zipWithIndex) yield {
       val tpe = subParam(param.info, typeOf[Sc[_]])
-      val tpe2 = subParam(param.info, typeOf[Db[_]])
+      val tpe2 = subParam(param.info, typeOf[TableMacros.Expr[_]])
       q"queryable[$tpe2, $tpe]($i).walkExprs(table.${TermName(param.name.toString)})"
     }
 
@@ -86,7 +85,7 @@ object TableMacros {
     val exprRef = TypeRef(
       pre = typeRef.pre,
       sym = typeRef.sym,
-      args = weakTypeOf[V[scalasql.core.Db]].typeArgs
+      args = weakTypeOf[V[TableMacros.Expr]].typeArgs
     )
     val idRef = TypeRef(
       pre = typeRef.pre,

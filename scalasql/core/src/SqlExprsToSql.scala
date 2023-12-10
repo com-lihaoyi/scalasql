@@ -8,9 +8,9 @@ object SqlExprsToSql {
   }
 
   def apply0(walked: Queryable.Walked, context: Context, prefix: SqlStr) = {
-    ColumnNamer.selectColumnSql(walked, context) match {
+    selectColumnSql(walked, context) match {
       case Seq((prefix, singleExpr))
-          if prefix == context.config.columnLabelDefault && singleExpr.isCompleteQuery =>
+          if prefix == context.config.renderColumnLabel(Nil) && singleExpr.isCompleteQuery =>
         singleExpr
 
       case flatQuery =>
@@ -25,8 +25,20 @@ object SqlExprsToSql {
     }
   }
 
-  def booleanExprs(prefix: SqlStr, exprs: Seq[Db[_]])(implicit ctx: Context) = {
-    SqlStr.optSeq(exprs.filter(!Db.isLiteralTrue(_))) { having =>
+
+  def selectColumnSql(walked: Queryable.Walked, ctx: Context): Seq[(String, SqlStr)] = {
+    walked.map { case (k, v) => (ctx.config.renderColumnLabel(k), Renderable.toSql(v)(ctx)) }
+  }
+
+  def selectColumnReferences(walked: Queryable.Walked, ctx: Context): Seq[(Expr.Identity, SqlStr)] = {
+    walked.map { case (tokens, expr) =>
+      val dbId = Expr.identity(expr)
+      (dbId, SqlStr.raw(ctx.config.renderColumnLabel(tokens), Array(dbId)))
+    }
+  }
+
+  def booleanExprs(prefix: SqlStr, exprs: Seq[Expr[_]])(implicit ctx: Context) = {
+    SqlStr.optSeq(exprs.filter(!Expr.isLiteralTrue(_))) { having =>
       prefix + SqlStr.join(having.map(Renderable.toSql(_)), sql" AND ")
     }
   }

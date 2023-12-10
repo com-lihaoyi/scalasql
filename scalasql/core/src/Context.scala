@@ -8,17 +8,17 @@ import scalasql.core.SqlStr.SqlStringSyntax
  *
  * @param fromNaming any [[From]]/`FROM` clauses that are in scope, and the aliases those
  *                   clauses are given
- * @param exprNaming any [[Db]]s/SQL-expressions that are present in [[fromNaming]], and
+ * @param exprNaming any [[Expr]]s/SQL-expressions that are present in [[fromNaming]], and
  *                   what those expressions are named in SQL
  * @param config The ScalaSql configuration
  */
 trait Context {
   def fromNaming: Map[Context.From, String]
-  def exprNaming: Map[Db.Identity, SqlStr]
+  def exprNaming: Map[Expr.Identity, SqlStr]
   def config: Config
 
   def withFromNaming(fromNaming: Map[Context.From, String]): Context
-  def withExprNaming(exprNaming: Map[Db.Identity, SqlStr]): Context
+  def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
 }
 
 object Context {
@@ -30,10 +30,10 @@ object Context {
     def fromRefPrefix(prevContext: Context): String
 
     /**
-     * A mapping of the [[Db]] expressions that this [[From]] produces along
+     * A mapping of the [[Expr]] expressions that this [[From]] produces along
      * with their rendered [[SqlStr]]s
      */
-    def fromLhsMap(prevContext: Context): Map[Db.Identity, SqlStr]
+    def fromLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr]
 
     /**
      * How this [[From]] can be rendered into a [[SqlStr]] for embedding into
@@ -47,12 +47,12 @@ object Context {
   }
   case class Impl(
       fromNaming: Map[From, String],
-      exprNaming: Map[Db.Identity, SqlStr],
+      exprNaming: Map[Expr.Identity, SqlStr],
       config: Config
   ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
-    def withExprNaming(exprNaming: Map[Db.Identity, SqlStr]): Context =
+    def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context =
       copy(exprNaming = exprNaming)
   }
 

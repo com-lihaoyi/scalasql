@@ -15,7 +15,7 @@ import scalasql.H2Dialect._
 
 ```
 This readme will use the H2 database for simplicity, but you can change the `Dialect`
-above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlDb,
+above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlExpr,
 Postgres, and MySql out of the box. The `Dialect` import provides the
 various operators and functions that may be unique to each specific database
 
@@ -65,7 +65,7 @@ supported databases, to see what kind of set up is necessary for each one
 * [MySql](scalasql/test/src/example/MySqlExample.scala)
 * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
 * [H2](scalasql/test/src/example/H2Example.scala)
-* [HsqlDb](scalasql/test/src/example/HsqlDbExample.scala)
+* [HsqlExpr](scalasql/test/src/example/HsqlExprExample.scala)
 * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 ### Modeling Your Schema
@@ -73,7 +73,7 @@ supported databases, to see what kind of set up is necessary for each one
 Next, you need to define your data model classes. In ScalaSql, your data model
 is defined using `case class`es with each field wrapped in the wrapper type
 parameter `T[_]`. This allows us to re-use the same case class to represent
-both database values (when `T` is `scalasql.Db`) as well as Scala values
+both database values (when `T` is `scalasql.Expr`) as well as Scala values
 (when `T` is `scalasql.Sc`).
 
 Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
@@ -153,27 +153,27 @@ Lastly, we will run the `world.sql` script to initialize the database, and
 we're ready to begin writing queries!
 
 ## Expressions
-The simplest thing you can query are `scalasql.Db`s. These represent the SQL
+The simplest thing you can query are `scalasql.Expr`s. These represent the SQL
 expressions that are part of a query, and can be evaluated even without being
 part of any database table.
 
-Here, we construct `Db`s to represent the SQL query `1 + 3`. We can use
+Here, we construct `Expr`s to represent the SQL query `1 + 3`. We can use
 `db.renderSql` to see the generated SQL code, and `db.run` to send the
 query to the database and return the output `4`
 ```scala
-val query = Db(1) + Db(3)
+val query = Expr(1) + Expr(3)
 db.renderSql(query) ==> "SELECT (? + ?) AS res"
 db.run(query) ==> 4
 
 ```
 In general, most primitive types that can be mapped to SQL can be converted
-to `scalasql.Db`s: `Int`s and other numeric types, `String`s, `Boolean`s,
-etc., each returning an `Db[T]` for the respective type `T`. Each type of
-`Db[T]` has a set of operations representing what operations the database
+to `scalasql.Expr`s: `Int`s and other numeric types, `String`s, `Boolean`s,
+etc., each returning an `Expr[T]` for the respective type `T`. Each type of
+`Expr[T]` has a set of operations representing what operations the database
 supports on that type of expression.
 
 You can check out the [ScalaSql Reference](reference.md#exprops) if you want a
-comprehensive list of built-in operations on various `Db[T]` types.
+comprehensive list of built-in operations on various `Expr[T]` types.
 
 
 ## Select
@@ -234,13 +234,13 @@ db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population =
 
 ```
 Note that we use `===` rather than `==` for the equality comparison. The
-function literal passed to `.filter` is given a `City[Db]` as its parameter,
+function literal passed to `.filter` is given a `City[Expr]` as its parameter,
 representing a `City` that is part of the database query, in contrast to the
-`City[Sc]`s that `db.run` returns , and so `_.name` is of type `Db[String]`
+`City[Sc]`s that `db.run` returns , and so `_.name` is of type `Expr[String]`
 rather than just `String` or `Sc[String]`. You can use your IDE's
-auto-complete to see what operations are available on `Db[String]`: typically
+auto-complete to see what operations are available on `Expr[String]`: typically
 they will represent SQL string functions rather than Scala string functions and
-take and return `Db[String]`s rather than plain Scala `String`s. Database
+take and return `Expr[String]`s rather than plain Scala `String`s. Database
 value equality is represented by the `===` operator.
 
 Note also the `.single` operator. This tells ScalaSql that you expect exactly
@@ -309,9 +309,9 @@ db.run(query).take(2) ==> Seq(
 )
 
 ```
-Again, all the operations within the query work on `Db`s: `c` is a `City[Db]`,
-`c.population` is an `Db[Int]`, `c.countryCode` is an `Db[String]`, and
-`===` and `>` and `&&` on `Db`s all return `Db[Boolean]`s that represent
+Again, all the operations within the query work on `Expr`s: `c` is a `City[Expr]`,
+`c.population` is an `Expr[Int]`, `c.countryCode` is an `Expr[String]`, and
+`===` and `>` and `&&` on `Expr`s all return `Expr[Boolean]`s that represent
 a SQL expression that can be sent to the Database as part of your query.
 
 You can also stack multiple separate filters together, as shown below:
@@ -335,10 +335,10 @@ db.run(query).take(2) ==> Seq(
 ```
 
 ### Lifting
-Conversion of simple primitive `T`s into `Db[T]`s happens implicitly. Below,
-`===` expects both left-hand and right-hand values to be `Db`s. `_.id` is
-already an `Db[Int]`, but `cityId` is a normal `Int` that is "lifted" into
-a `Db[Int]` automatically
+Conversion of simple primitive `T`s into `Expr[T]`s happens implicitly. Below,
+`===` expects both left-hand and right-hand values to be `Expr`s. `_.id` is
+already an `Expr[Int]`, but `cityId` is a normal `Int` that is "lifted" into
+a `Expr[Int]` automatically
 ```scala
 def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
@@ -352,10 +352,10 @@ an implicit `scalasql.TypeMapper[T]` in scope.
 but you can define `TypeMapper`s
 for your own types if you want to be able to use them to represent types in the database
 
-This implicit lifting can be done explicitly using the `Db(...)` syntax
+This implicit lifting can be done explicitly using the `Expr(...)` syntax
 as shown below
 ```scala
-def find(cityId: Int) = db.run(City.select.filter(_.id === Db(cityId)))
+def find(cityId: Int) = db.run(City.select.filter(_.id === Expr(cityId)))
 
 assert(find(3208) == List(City[Sc](3208, "Singapore", "SGP", "", 4017733)))
 assert(find(3209) == List(City[Sc](3209, "Bratislava", "SVK", "Bratislava", 448292)))
@@ -539,10 +539,10 @@ same set of types you can lift into queries.
 ### Nullable Columns
 
 Nullable SQL columns are modeled via `T[Option[V]]` fields in your `case class`,
-meaning `Db[Option[V]]` in your query and meaning `Sc[Option[V]]` (or just
-meaning `Option[V]`) in the returned data. `Db[Option[V]]` supports a similar
+meaning `Expr[Option[V]]` in your query and meaning `Sc[Option[V]]` (or just
+meaning `Option[V]`) in the returned data. `Expr[Option[V]]` supports a similar
 set of operations as `Option[V]`: `isDefined`, `isEmpty`, `map`, `flatMap`, `get`,
-`orElse`, etc., but returning `Db[V]`s rather than plain `V`s.
+`orElse`, etc., but returning `Expr[V]`s rather than plain `V`s.
 ```scala
 val query = Country.select
   .filter(_.capital.isEmpty)
@@ -664,10 +664,10 @@ db.run(query) ==> Seq(
 ```
 Note that when you use a left/right/outer join, the corresponding
 rows are provided to you as `scalasql.JoinNullable[T]` rather than plain `T`s, e.g.
-`cityOpt: scalasql.JoinNullable[City[Db]]` above. `JoinNullable[T]` can be checked
+`cityOpt: scalasql.JoinNullable[City[Expr]]` above. `JoinNullable[T]` can be checked
 for presence/absence using `.isEmpty` and specifying a specific column to check,
-and can be converted to an `Db[Option[T]]` by `.map`ing itt to a particular
-`Db[T]`.
+and can be converted to an `Expr[Option[T]]` by `.map`ing itt to a particular
+`Expr[T]`.
 
 
 ScalaSql also supports performing `JOIN`s via Scala's `for`-comprehension syntax and `.join`.
@@ -811,7 +811,7 @@ db.run(query) ==> List("Antarctica", "Bouvet Island", "China", "India")
 
 ## Window Functions
 ScalaSql supports window functions via the `.over` operator, which
-enables the `.partitionBy` and `.sortBy` operators on `Db[T]`. These
+enables the `.partitionBy` and `.sortBy` operators on `Expr[T]`. These
 translate into SQL's `OVER`/`PARTITION BY`/`ORDER BY` clauses
 ```scala
 val query = City.select
@@ -1114,7 +1114,7 @@ val query = City.insert.select(
   c => (c.name, c.countryCode, c.district, c.population),
   City.select
     .filter(_.name === "Singapore")
-    .map(c => (Db("New-") + c.name, c.countryCode, c.district, Db(0L)))
+    .map(c => (Expr("New-") + c.name, c.countryCode, c.district, Expr(0L)))
 )
 
 db.renderSql(query) ==> """
@@ -1281,16 +1281,16 @@ dbClient.transaction { implicit db =>
 
 ## Custom Expressions
 
-You can define custom SQL expressions via the `Db` constructor. This is
+You can define custom SQL expressions via the `Expr` constructor. This is
 useful for enclosing ScalaSql when you need to use some operator or syntax
 that your Database supports but ScalaSql does not have built in. This example
-shows how to define a custom `rawToHex` Scala function working on `Db[T]`s,
+shows how to define a custom `rawToHex` Scala function working on `Expr[T]`s,
 that translates down to the H2 database's `RAWTOHEX` SQL function, and finally
 using that in a query to return a string.
 ```scala
 import scalasql.core.SqlStr.SqlStringSyntax
 
-def rawToHex(v: Db[String]): Db[String] = Db { implicit ctx => sql"RAWTOHEX($v)" }
+def rawToHex(v: Expr[String]): Expr[String] = Expr { implicit ctx => sql"RAWTOHEX($v)" }
 
 val query = City.select.filter(_.countryCode === "SGP").map(c => rawToHex(c.name)).single
 
@@ -1301,12 +1301,12 @@ db.run(query) ==> "00530069006e006700610070006f00720065"
 
 ```
 Your custom Scala functions can either be standalone functions or extension
-methods. Most of the operators on `Db[T]` that ScalaSql comes bundled with
+methods. Most of the operators on `Expr[T]` that ScalaSql comes bundled with
 are extension methods, with a different set being made available for each database.
 
 Different databases have a huge range of functions available. ScalaSql comes
 with the most commonly-used functions built in, but it is expected that you will
-need to build up your own library of custom `Db[T]` functions to to access
+need to build up your own library of custom `Expr[T]` functions to to access
 less commonly used functions that are nonetheless still needed in your application
 
 ## Custom Type Mappings

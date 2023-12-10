@@ -4,7 +4,7 @@ import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
 import scalasql.core.{
   Aggregatable,
   Context,
-  Db,
+  Expr,
   DbApi,
   DialectTypeMappers,
   JoinNullable,
@@ -47,15 +47,15 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.DbStringOps[String] =
-    new H2Dialect.DbStringOps(v)
+  override implicit def ExprStringOpsConv(v: Expr[String]): H2Dialect.ExprStringOps[String] =
+    new H2Dialect.ExprStringOps(v)
 
-  override implicit def DbBlobOpsConv(v: Db[geny.Bytes]): H2Dialect.DbStringLikeOps[geny.Bytes] =
-    new H2Dialect.DbStringLikeOps(v)
+  override implicit def ExprBlobOpsConv(v: Expr[geny.Bytes]): H2Dialect.ExprStringLikeOps[geny.Bytes] =
+    new H2Dialect.ExprStringLikeOps(v)
 
-  override implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
-      v: Db[T]
-  ): H2Dialect.DbNumericOps[T] = new H2Dialect.DbNumericOps(v)
+  override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
+      v: Expr[T]
+  ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new H2Dialect.TableOps(t)
@@ -65,8 +65,8 @@ trait H2Dialect extends Dialect {
       new H2Dialect.Values(ts)
   }
 
-  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
-    new H2Dialect.DbAggOps(v)
+  implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
+    new H2Dialect.ExprAggOps(v)
 
   override implicit def DbApiOpsConv(db: => DbApi): H2Dialect.DbApiOps =
     new H2Dialect.DbApiOps(this)
@@ -80,8 +80,8 @@ object H2Dialect extends H2Dialect {
       with MathOps
       with HyperbolicMathOps
 
-  class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
-    def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
+  class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
+    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       assert(
         sep == null,
         "H2 database dialect does not support mkString separator due to a bug (?) where " +
@@ -93,25 +93,25 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
-  class DbStringLikeOps[T](protected val v: Db[T])
-      extends operations.DbStringLikeOps(v)
+  class ExprStringOps[T](v: Expr[T]) extends ExprStringLikeOps(v) with operations.ExprStringOps[T]
+  class ExprStringLikeOps[T](protected val v: Expr[T])
+      extends operations.ExprStringLikeOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
+    def indexOf(x: Expr[T]): Expr[Int] = Expr { implicit ctx => sql"INSTR($v, $x)" }
   }
 
-  class DbNumericOps[T: Numeric: TypeMapper](protected val v: Db[T])
-      extends operations.DbNumericOps[T](v)
+  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Expr[T])
+      extends operations.ExprNumericOps[T](v)
       with BitwiseFunctionOps[T] {
-    def power(y: Db[T]): Db[T] = Db { implicit ctx => sql"POWER($v, $y)" }
+    def power(y: Expr[T]): Expr[T] = Expr { implicit ctx => sql"POWER($v, $y)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
-    protected override def joinableToSelect: Select[V[Db], V[Sc]] = {
+    protected override def joinableToSelect: Select[V[Expr], V[Sc]] = {
       val ref = Table.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Db]],
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
         false,
         Seq(ref),
@@ -144,7 +144,7 @@ object H2Dialect extends H2Dialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Db[_]],
+        where: Seq[Expr[_]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -160,7 +160,7 @@ object H2Dialect extends H2Dialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Db[_]],
+      where: Seq[Expr[_]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(
@@ -173,7 +173,7 @@ object H2Dialect extends H2Dialect {
         groupBy0
       )
       with Select[Q, R] {
-    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Db[Boolean])(
+    override def outerJoin[Q2, R2](other: Joinable[Q2, R2])(on: (Q, Q2) => Expr[Boolean])(
         implicit joinQr: Queryable.Row[Q2, R2]
     ): scalasql.query.Select[(JoinNullable[Q], JoinNullable[Q2]), (Option[R], Option[R2])] = {
       leftJoin(other)(on)

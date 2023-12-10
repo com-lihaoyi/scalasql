@@ -2,7 +2,7 @@ package scalasql.dialects
 
 import scalasql.core.{
   Aggregatable,
-  Db,
+  Expr,
   DbApi,
   DialectTypeMappers,
   Queryable,
@@ -25,20 +25,20 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def StringType: TypeMapper[String] = new PostgresStringType
   class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
-  override implicit def DbStringOpsConv(v: Db[String]): PostgresDialect.DbStringOps[String] =
-    new PostgresDialect.DbStringOps(v)
+  override implicit def ExprStringOpsConv(v: Expr[String]): PostgresDialect.ExprStringOps[String] =
+    new PostgresDialect.ExprStringOps(v)
 
-  override implicit def DbBlobOpsConv(
-      v: Db[geny.Bytes]
-  ): PostgresDialect.DbStringLikeOps[geny.Bytes] =
-    new PostgresDialect.DbStringOps(v)
+  override implicit def ExprBlobOpsConv(
+      v: Expr[geny.Bytes]
+  ): PostgresDialect.ExprStringLikeOps[geny.Bytes] =
+    new PostgresDialect.ExprStringOps(v)
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
   ) = new LateralJoinOps(wrapped)
 
-  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T] =
-    new PostgresDialect.DbAggOps(v)
+  implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
+    new PostgresDialect.ExprAggOps(v)
 
   implicit class SelectDistinctOnConv[Q, R](r: Select[Q, R]) {
 
@@ -49,7 +49,7 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row” of each set is unpredictable unless ORDER BY is used to ensure that the desired
      * row appears first. For example:
      */
-    def distinctOn(f: Q => Db[_]): Select[Q, R] = {
+    def distinctOn(f: Q => Expr[_]): Select[Q, R] = {
       Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
     }
   }
@@ -69,29 +69,29 @@ object PostgresDialect extends PostgresDialect {
     /**
      * Formats arguments according to a format string. This function is similar to the C function sprintf.
      */
-    def format(template: Db[String], values: Db[_]*): Db[String] = Db { implicit ctx =>
+    def format(template: Expr[String], values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
       sql"FORMAT($template, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
     }
 
     /**
      * Returns a random value in the range 0.0 <= x < 1.0
      */
-    def random: Db[Double] = Db { implicit ctx => sql"RANDOM()" }
+    def random: Expr[Double] = Expr { implicit ctx => sql"RANDOM()" }
   }
 
-  class DbAggOps[T](v: Aggregatable[Db[T]]) extends scalasql.operations.DbAggOps[T](v) {
-    def mkString(sep: Db[String] = null)(implicit tm: TypeMapper[T]): Db[String] = {
+  class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
+    def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
       val sepRender = Option(sep).getOrElse(sql"''")
       v.aggregateExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
-  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
-  class DbStringLikeOps[T](protected val v: Db[T])
-      extends operations.DbStringLikeOps(v)
+  class ExprStringOps[T](v: Expr[T]) extends ExprStringLikeOps(v) with operations.ExprStringOps[T]
+  class ExprStringLikeOps[T](protected val v: Expr[T])
+      extends operations.ExprStringLikeOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
+    def indexOf(x: Expr[T]): Expr[Int] = Expr { implicit ctx => sql"POSITION($x IN $v)" }
 
-    def reverse: Db[T] = Db { implicit ctx => sql"REVERSE($v)" }
+    def reverse: Expr[T] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 }

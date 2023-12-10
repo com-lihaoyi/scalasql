@@ -1,15 +1,15 @@
 package scalasql.operations
-import scalasql.core.Db
+import scalasql.core.Expr
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait PadOps {
-  protected def v: Db[_]
+  protected def v: Expr[_]
 
-  def rpad(length: Db[Int], fill: Db[String]): Db[String] = Db { implicit ctx =>
+  def rpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
     sql"RPAD($v, $length, $fill)"
   }
 
-  def lpad(length: Db[Int], fill: Db[String]): Db[String] = Db { implicit ctx =>
+  def lpad(length: Expr[Int], fill: Expr[String]): Expr[String] = Expr { implicit ctx =>
     sql"LPAD($v, $length, $fill)"
   }
 }

@@ -1,12 +1,11 @@
 package scalasql.query
 
 import scalasql.core.{
-  ColumnNamer,
   Context,
   DialectTypeMappers,
   LiveSqlExprs,
   Queryable,
-  Db,
+  Expr,
   SqlExprsToSql,
   SqlStr,
   TypeMapper,
@@ -34,11 +33,11 @@ class WithCte[Q, R](
     new WithCte(lhs, lhsSubQuery, rhs.map(f))
   }
 
-  override def filter(f: Q => Db[Boolean]): Select[Q, R] = {
+  override def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
     new WithCte(rhs.filter(f), lhsSubQuery, rhs)
   }
 
-  override def sortBy(f: Q => Db[_]) = new WithCte(lhs, lhsSubQuery, rhs.sortBy(f))
+  override def sortBy(f: Q => Expr[_]) = new WithCte(lhs, lhsSubQuery, rhs.sortBy(f))
 
   override def drop(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.drop(n))
   override def take(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.take(n))
@@ -46,7 +45,7 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Db.Identity, SqlStr] = {
+  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     SelectBase.lhsMap(rhs, prevContext)
   }
 
@@ -97,7 +96,7 @@ object WithCte {
           .asInstanceOf[Queryable[Any, Any]]
           .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
 
-      val newExprNaming = ColumnNamer.selectColumnReferences(walked, prevContext)
+      val newExprNaming = SqlExprsToSql.selectColumnReferences(walked, prevContext)
 
       val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))

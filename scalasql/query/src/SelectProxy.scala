@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Aggregatable, Context, Queryable, Db, SqlStr, TypeMapper}
+import scalasql.core.{Aggregatable, Context, Queryable, Expr, SqlStr, TypeMapper}
 
 /**
  * A reference that aggregations for usage within [[Select.aggregate]], to allow
@@ -8,6 +8,6 @@ import scalasql.core.{Aggregatable, Context, Queryable, Db, SqlStr, TypeMapper}
  */
 class SelectProxy[Q](val expr: Q) extends Aggregatable[Q] {
   def aggregateExpr[V: TypeMapper](f: Q => Context => SqlStr)(
-      implicit qr: Queryable.Row[Db[V], V]
-  ): Db[V] = { Db[V] { implicit c => f(expr)(c) } }
+      implicit qr: Queryable.Row[Expr[V], V]
+  ): Expr[V] = { Expr[V] { implicit c => f(expr)(c) } }
 }

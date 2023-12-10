@@ -251,7 +251,7 @@ object DbApi {
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): Int = {
-      // Sqlite and HsqlDb for some reason blow up if you try to do DDL
+      // Sqlite and HsqlExpr for some reason blow up if you try to do DDL
       // like DROP TABLE or CREATE TABLE inside a prepared statement, so
       // fall back to vanilla `createStatement`
       if (variables.isEmpty) {

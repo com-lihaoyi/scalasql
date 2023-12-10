@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.core.Db
+import scalasql.core.Expr
 import utest._
 import utils.SqliteSuite
 
@@ -10,19 +10,19 @@ trait SqliteDialectTests extends SqliteSuite {
   def tests = Tests {
 
     test("ltrim2") - checker(
-      query = Db("xxHellox").ltrim("x"),
+      query = Expr("xxHellox").ltrim("x"),
       sql = "SELECT LTRIM(?, ?) AS res",
       value = "Hellox"
     )
 
     test("rtrim2") - checker(
-      query = Db("xxHellox").rtrim("x"),
+      query = Expr("xxHellox").rtrim("x"),
       sql = "SELECT RTRIM(?, ?) AS res",
       value = "xxHello"
     )
 
     test("glob") - checker(
-      query = Db("*cop*").glob("roflcopter"),
+      query = Expr("*cop*").glob("roflcopter"),
       sql = "SELECT GLOB(?, ?) AS res",
       value = true
     )

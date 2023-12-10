@@ -1,7 +1,7 @@
 package scalasql.dialects
 
 import scalasql._
-import scalasql.core.Db
+import scalasql.core.Expr
 import sourcecode.Text
 import utest._
 import utils.MySqlSuite
@@ -13,16 +13,16 @@ trait MySqlDialectTests extends MySqlSuite {
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("reverse") -
-      checker(query = Db("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
+      checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
 
     test("lpad") - checker(
-      query = Db("Hello").lpad(10, "xy"),
+      query = Expr("Hello").lpad(10, "xy"),
       sql = "SELECT LPAD(?, ?, ?) AS res",
       value = "xyxyxHello"
     )
 
     test("rpad") - checker(
-      query = Db("Hello").rpad(10, "xy"),
+      query = Expr("Hello").rpad(10, "xy"),
       sql = "SELECT RPAD(?, ?, ?) AS res",
       value = "Helloxyxyx"
     )

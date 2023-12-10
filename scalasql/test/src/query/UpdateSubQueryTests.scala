@@ -28,7 +28,7 @@ trait UpdateSubQueryTests extends ScalaSqlSuite {
         value = 6,
         docs = """
           You can use subqueries to compute the values you want to update, using
-          aggregates like `.maxBy` to convert the `Select[T]` into an `Db[T]`
+          aggregates like `.maxBy` to convert the `Select[T]` into an `Expr[T]`
         """
       )
 

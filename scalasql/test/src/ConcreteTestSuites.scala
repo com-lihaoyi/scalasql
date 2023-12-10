@@ -1,15 +1,15 @@
 package scalasql
 import scalasql.api.{TransactionTests, DbApiTests}
 import operations.{
-  DbBooleanOpsTests,
-  DbNumericOpsTests,
-  DbAggNumericOpsTests,
-  DbAggOpsTests,
-  DbOpsTests,
+  ExprBooleanOpsTests,
+  ExprNumericOpsTests,
+  ExprAggNumericOpsTests,
+  ExprAggOpsTests,
+  ExprOpsTests,
   DbApiOpsTests,
-  DbStringOpsTests,
-  DbBlobOpsTests,
-  DbMathOpsTests
+  ExprStringOpsTests,
+  ExprBlobOpsTests,
+  ExprMathOpsTests
 }
 import query.{
   InsertTests,
@@ -62,14 +62,14 @@ package postgres {
   object WithCteTests extends WithCteTests with PostgresSuite
 
   object DbApiOpsTests extends DbApiOpsTests with PostgresSuite
-  object DbOpsTests extends DbOpsTests with PostgresSuite
-  object DbBooleanOpsTests extends DbBooleanOpsTests with PostgresSuite
-  object DbNumericOpsTests extends DbNumericOpsTests with PostgresSuite
-  object DbSeqNumericOpsTests extends DbAggNumericOpsTests with PostgresSuite
-  object DbSeqOpsTests extends DbAggOpsTests with PostgresSuite
-  object DbStringOpsTests extends DbStringOpsTests with PostgresSuite
-  object DbBlobOpsTests extends DbBlobOpsTests with PostgresSuite
-  object DbMathOpsTests extends DbMathOpsTests with PostgresSuite
+  object ExprOpsTests extends ExprOpsTests with PostgresSuite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with PostgresSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with PostgresSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with PostgresSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with PostgresSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with PostgresSuite
+  object ExprMathOpsTests extends ExprMathOpsTests with PostgresSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
 
@@ -105,14 +105,14 @@ package hikari {
   object WithCteTests extends WithCteTests with HikariSuite
 
   object DbApiOpsTests extends DbApiOpsTests with HikariSuite
-  object DbOpsTests extends DbOpsTests with HikariSuite
-  object DbBooleanOpsTests extends DbBooleanOpsTests with HikariSuite
-  object DbNumericOpsTests extends DbNumericOpsTests with HikariSuite
-  object DbSeqNumericOpsTests extends DbAggNumericOpsTests with HikariSuite
-  object DbSeqOpsTests extends DbAggOpsTests with HikariSuite
-  object DbStringOpsTests extends DbStringOpsTests with HikariSuite
-  object DbBlobOpsTests extends DbBlobOpsTests with HikariSuite
-  object DbMathOpsTests extends DbMathOpsTests with HikariSuite
+  object ExprOpsTests extends ExprOpsTests with HikariSuite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with HikariSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with HikariSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with HikariSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with HikariSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with HikariSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with HikariSuite
+  object ExprMathOpsTests extends ExprMathOpsTests with HikariSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with HikariSuite
 
@@ -151,14 +151,14 @@ package mysql {
   object WithCteTests extends WithCteTests with MySqlSuite
 
   object DbApiOpsTests extends DbApiOpsTests with MySqlSuite
-  object DbOpsTests extends DbOpsTests with MySqlSuite
-  object DbBooleanOpsTests extends DbBooleanOpsTests with MySqlSuite
-  object DbNumericOpsTests extends DbNumericOpsTests with MySqlSuite
-  object DbSeqNumericOpsTests extends DbAggNumericOpsTests with MySqlSuite
-  object DbSeqOpsTests extends DbAggOpsTests with MySqlSuite
-  object DbStringOpsTests extends DbStringOpsTests with MySqlSuite
-  object DbBlobOpsTests extends DbBlobOpsTests with MySqlSuite
-  object DbMathOpsTests extends DbMathOpsTests with MySqlSuite
+  object ExprOpsTests extends ExprOpsTests with MySqlSuite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with MySqlSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with MySqlSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with MySqlSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with MySqlSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with MySqlSuite
+  object ExprMathOpsTests extends ExprMathOpsTests with MySqlSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
   object OptionalTests extends datatypes.OptionalTests with MySqlSuite
@@ -193,15 +193,15 @@ package sqlite {
   object WithCteTests extends WithCteTests with SqliteSuite
 
   object DbApiOpsTests extends DbApiOpsTests with SqliteSuite
-  object DbOpsTests extends DbOpsTests with SqliteSuite
-  object DbBooleanOpsTests extends DbBooleanOpsTests with SqliteSuite
-  object DbNumericOpsTests extends DbNumericOpsTests with SqliteSuite
-  object DbSeqNumericOpsTests extends DbAggNumericOpsTests with SqliteSuite
-  object DbSeqOpsTests extends DbAggOpsTests with SqliteSuite
-  object DbStringOpsTests extends DbStringOpsTests with SqliteSuite
-  object DbBlobOpsTests extends DbBlobOpsTests with SqliteSuite
+  object ExprOpsTests extends ExprOpsTests with SqliteSuite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with SqliteSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with SqliteSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with SqliteSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with SqliteSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with SqliteSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with SqliteSuite
   // Sqlite doesn't support all these math operations
-  // object DbMathOpsTests extends DbMathOpsTests with SqliteSuite
+  // object ExprMathOpsTests extends ExprMathOpsTests with SqliteSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
   object OptionalTests extends datatypes.OptionalTests with SqliteSuite
@@ -238,14 +238,14 @@ package h2 {
   object WithCteTests extends WithCteTests with H2Suite
 
   object DbApiOpsTests extends DbApiOpsTests with H2Suite
-  object DbOpsTests extends DbOpsTests with H2Suite
-  object DbBooleanOpsTests extends DbBooleanOpsTests with H2Suite
-  object DbNumericOpsTests extends DbNumericOpsTests with H2Suite
-  object DbSeqNumericOpsTests extends DbAggNumericOpsTests with H2Suite
-  object DbSeqOpsTests extends DbAggOpsTests with H2Suite
-  object DbStringOpsTests extends DbStringOpsTests with H2Suite
-  object DbBlobOpsTests extends DbBlobOpsTests with H2Suite
-  object DbMathOpsTests extends DbMathOpsTests with H2Suite
+  object ExprOpsTests extends ExprOpsTests with H2Suite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with H2Suite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with H2Suite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with H2Suite
+  object ExprSeqOpsTests extends ExprAggOpsTests with H2Suite
+  object ExprStringOpsTests extends ExprStringOpsTests with H2Suite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with H2Suite
+  object ExprMathOpsTests extends ExprMathOpsTests with H2Suite
 
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
   object OptionalTests extends datatypes.OptionalTests with H2Suite

@@ -31,7 +31,7 @@ trait OnConflictTests extends ScalaSqlSuite {
         docs = """
           ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
 
-          Note that H2 and HsqlDb do not support `onConflictIgnore` and `onConflictUpdate`, while
+          Note that H2 and HsqlExpr do not support `onConflictIgnore` and `onConflictUpdate`, while
           MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
         """
       )

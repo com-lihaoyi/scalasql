@@ -48,10 +48,10 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
   os.write.over(destPath, outputLines.mkString("\n"))
 }
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
-  def dropDbPrefix(s: String) = s.split('.').drop(2).mkString(".")
+  def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
   val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "out" / "recordedTests.json"))
   val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "out" / "recordedSuiteDescriptions.json"))
-    .map{case (k, v) => (dropDbPrefix(k), v)}
+    .map{case (k, v) => (dropExprPrefix(k), v)}
 
   val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
   val formattedScalaStrs = {
@@ -129,8 +129,8 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
     .groupBy(_.suiteName)
     .toSeq
     .sortBy(_._2.head.suiteLine)
-    .distinctBy { case (k, v) => dropDbPrefix(k)}
-    .map{case (k, vs) => (dropDbPrefix(k), vs.map(r => r.copy(suiteName = dropDbPrefix(r.suiteName))))}
+    .distinctBy { case (k, v) => dropExprPrefix(k)}
+    .map{case (k, vs) => (dropExprPrefix(k), vs.map(r => r.copy(suiteName = dropExprPrefix(r.suiteName))))}
 
   for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
     val seen = mutable.Set.empty[String]

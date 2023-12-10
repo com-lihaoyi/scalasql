@@ -4,8 +4,19 @@ package scalasql.core
  * Things you to do to configure ScalaSql
  */
 trait Config {
-  def columnLabelDefault = "res"
-  def columnLabelDelimiter = "_"
+  /**
+   * Render a sequence of tokens to a column label; used primarily for
+   * making the generated queries more easily human readable.
+   */
+  def renderColumnLabel(tokens: Seq[String]): String = {
+    val prefixedTokens =
+      if (tokens.isEmpty || !Config.isNormalCharacter(tokens.head.head)) "res" +: tokens
+      else tokens
+
+    prefixedTokens
+      .map(tableNameMapper)
+      .mkString("_")
+  }
 
   /**
    * Configures the underlying JDBC connection's `setFetchSize`
@@ -42,6 +53,7 @@ trait Config {
 }
 
 object Config {
+  def isNormalCharacter(c: Char) = (c >= 'a' && c <= 'z') || (c >= 'Z' && c <= 'Z') || c == '_'
   def camelToSnake(s: String) = {
     val chars = new collection.mutable.StringBuilder
     var lowercase = false

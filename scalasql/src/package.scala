@@ -32,8 +32,8 @@ package object scalasql {
   val Queryable = core.Queryable
   type Queryable[Q, R] = core.Queryable[Q, R]
 
-  val Db = core.Db
-  type Db[T] = core.Db[T]
+  val Expr = core.Expr
+  type Expr[T] = core.Expr[T]
 
   type TypeMapper[T] = core.TypeMapper[T]
 

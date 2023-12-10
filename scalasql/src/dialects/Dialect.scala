@@ -2,10 +2,10 @@ package scalasql.dialects
 
 import scalasql.operations.{CaseWhen, DbApiOps}
 import scalasql.query.SqlWindow
-import scalasql.core.Db.apply0
+import scalasql.core.Expr.apply0
 import scalasql.{Table, operations}
 import scalasql.core.Aggregatable
-import scalasql.core.{DbApi, DialectTypeMappers, JoinNullable, Queryable, Db, SqlStr, TypeMapper}
+import scalasql.core.{DbApi, DialectTypeMappers, JoinNullable, Queryable, Expr, SqlStr, TypeMapper}
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
@@ -148,7 +148,7 @@ trait Dialect extends DialectTypeMappers {
         case l: java.lang.Long => Instant.ofEpochMilli(l)
         // Sqlite sometimes also returns this
         case s: java.lang.String => java.sql.Timestamp.valueOf(s).toInstant
-        // H2 and HsqlDb return this
+        // H2 and HsqlExpr return this
         case o: java.time.OffsetDateTime => o.toInstant
         // MySql returns this
         case l: java.time.LocalDateTime =>
@@ -190,17 +190,17 @@ trait Dialect extends DialectTypeMappers {
     def put(r: PreparedStatement, idx: Int, v: T) = r.setObject(idx, v, java.sql.Types.OTHER)
   }
 
-  implicit def from(x: Int): Db[Int] = Db(x)
+  implicit def from(x: Int): Expr[Int] = Expr(x)
 
-  implicit def from(x: Long): Db[Long] = Db(x)
+  implicit def from(x: Long): Expr[Long] = Expr(x)
 
-  implicit def from(x: Boolean): Db[Boolean] = Db.apply0(x, x)
+  implicit def from(x: Boolean): Expr[Boolean] = Expr.apply0(x, x)
 
-  implicit def from(x: Double): Db[Double] = Db(x)
+  implicit def from(x: Double): Expr[Double] = Expr(x)
 
-  implicit def from(x: scala.math.BigDecimal): Db[scala.math.BigDecimal] = Db(x)
+  implicit def from(x: scala.math.BigDecimal): Expr[scala.math.BigDecimal] = Expr(x)
 
-  implicit def from(x: String): Db[String] = Db(x)
+  implicit def from(x: String): Expr[String] = Expr(x)
 
   implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
     new TypeMapper[Option[T]] {
@@ -217,52 +217,52 @@ trait Dialect extends DialectTypeMappers {
         }
       }
     }
-  implicit def DbBooleanOpsConv(v: Db[Boolean]): operations.DbBooleanOps =
-    new operations.DbBooleanOps(v)
-  implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
-      v: Db[T]
-  ): operations.DbNumericOps[T] = new operations.DbNumericOps(v)
+  implicit def ExprBooleanOpsConv(v: Expr[Boolean]): operations.ExprBooleanOps =
+    new operations.ExprBooleanOps(v)
+  implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
+      v: Expr[T]
+  ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
 
-  implicit def DbOpsConv(v: Db[_]): operations.DbOps = new operations.DbOps(v)
+  implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
 
-  implicit def DbTypedOpsConv[T: ClassTag](v: Db[T]): operations.DbTypedOps[T] =
-    new operations.DbTypedOps(v)
+  implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
+    new operations.ExprTypedOps(v)
 
-  implicit def DbOptionOpsConv[T: TypeMapper](v: Db[Option[T]]): operations.DbOptionOps[T] =
-    new operations.DbOptionOps(v)
+  implicit def ExprOptionOpsConv[T: TypeMapper](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
+    new operations.ExprOptionOps(v)
 
-  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Db[T]]): operations.DbOps =
-    new operations.DbOps(JoinNullable.toExpr(v))
+  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Expr[T]]): operations.ExprOps =
+    new operations.ExprOps(JoinNullable.toExpr(v))
 
   implicit def JoinNullableOptionOpsConv[T: TypeMapper](
-      v: JoinNullable[Db[T]]
-  ): operations.DbOptionOps[T] =
-    new operations.DbOptionOps(JoinNullable.toExpr(v))
+      v: JoinNullable[Expr[T]]
+  ): operations.ExprOptionOps[T] =
+    new operations.ExprOptionOps(JoinNullable.toExpr(v))
 
-  implicit def DbStringOpsConv(
-      v: Db[String]
-  ): operations.DbStringLikeOps[String] with operations.DbStringOps[String]
-  implicit def DbBlobOpsConv(v: Db[geny.Bytes]): operations.DbStringLikeOps[geny.Bytes]
+  implicit def ExprStringOpsConv(
+      v: Expr[String]
+  ): operations.ExprStringLikeOps[String] with operations.ExprStringOps[String]
+  implicit def ExprBlobOpsConv(v: Expr[geny.Bytes]): operations.ExprStringLikeOps[geny.Bytes]
 
-  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Db[V]])(
-      implicit qr: Queryable.Row[Db[V], V]
+  implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Expr[V]])(
+      implicit qr: Queryable.Row[Expr[V], V]
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
 
   implicit def AggOpsConv[T](v: Aggregatable[T])(
       implicit qr: Queryable.Row[T, _]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
-  implicit def DbAggOpsConv[T](v: Aggregatable[Db[T]]): operations.DbAggOps[T]
+  implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
   implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
   implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 
-  implicit class WindowExtensions[T](e: Db[T]) {
+  implicit class WindowExtensions[T](e: Expr[T]) {
     def over = new SqlWindow[T](e, None, None, Nil, None, None, None)
   }
   // This is necessary for `runSql` to work.
-  implicit def DbQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Db[T], T] = {
-    new Db.SqlQueryable[Db, T]()
+  implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Expr[T], T] = {
+    new Expr.SqlQueryable[Expr, T]()
   }
 }

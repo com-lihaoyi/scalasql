@@ -266,13 +266,13 @@ API rather than a SQL-like API:
 
 **ScalaSql**
 ```scala
-def songs = MusicDb.songs.filter(_.artistId === id)
+def songs = MusicExpr.songs.filter(_.artistId === id)
 
 val studentsWithAnAddress = students.filter(s => addresses.filter(a => s.addressId === a.id).nonEmpty)
 ```
 **Squeryl**
 ```scala
-def songs = from(MusicDb.songs)(s => where(s.artistId === id) select(s))
+def songs = from(MusicExpr.songs)(s => where(s.artistId === id) select(s))
 
 val studentsWithAnAddress = from(students)(s =>
   where(exists(from(addresses)((a) => where(s.addressId === a.id) select(a.id))))

@@ -1,5 +1,5 @@
 package scalasql.operations
-import scalasql.core.{Db, SqlStr}
+import scalasql.core.{Expr, SqlStr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait ConcatOps {
@@ -7,7 +7,7 @@ trait ConcatOps {
   /**
    * Concatenate all arguments. NULL arguments are ignored.
    */
-  def concat(values: Db[_]*): Db[String] = Db { implicit ctx =>
+  def concat(values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
     sql"CONCAT(${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
   }
 
@@ -15,7 +15,7 @@ trait ConcatOps {
    * Concatenate all but first arguments with separators. The first parameter is used
    * as a separator. NULL arguments are ignored.
    */
-  def concatWs(sep: Db[String], values: Db[_]*): Db[String] = Db { implicit ctx =>
+  def concatWs(sep: Expr[String], values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
     sql"CONCAT_WS($sep, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
   }
 }
