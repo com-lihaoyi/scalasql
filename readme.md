@@ -25,29 +25,31 @@ val dbClient = new scalasql.DbClient.Connection(
     override def logSql(sql: String, file: String, line: Int) = println(s"$file:$line $sql")
   }
 )
-val db: DbApi = dbClient.getAutoCommitClientConnection
 
-// Initialize database table schema and data
-db.updateRaw(os.read(os.Path("scalasql/test/resources/world-schema.sql", os.pwd)))
-db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
+dbClient.transaction{ db =>
 
-// Adding up population of all cities in China
-val populationSum = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
-// SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
-println(populationSum)
-// 175953614
+  // Initialize database table schema and data
+  db.updateRaw(os.read(os.Path("scalasql/test/resources/world-schema.sql", os.pwd)))
+  db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
 
-// Finding the 5-8th largest cities by population
-val fewLargestCities = db.run(
-  City.select
-      .sortBy(_.population).desc
-      .drop(5).take(3)
-      .map(c => (c.name, c.population))
-)
-// SELECT city0.name AS res__0, city0.population AS res__1
-// FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
-println(fewLargestCities)
-// Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México, 8591309))
+  // Adding up population of all cities in China
+  val populationSum = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
+  // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
+  println(populationSum)
+  // 175953614
+
+  // Finding the 5-8th largest cities by population
+  val fewLargestCities = db.run(
+    City.select
+            .sortBy(_.population).desc
+            .drop(5).take(3)
+            .map(c => (c.name, c.population))
+  )
+  // SELECT city0.name AS res__0, city0.population AS res__1
+  // FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
+  println(fewLargestCities)
+  // Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México, 8591309))
+}
 ```
 
 ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 

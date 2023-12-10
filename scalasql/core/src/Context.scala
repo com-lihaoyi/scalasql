@@ -7,6 +7,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
  * into a SQL string
  */
 trait Context {
+
   /**
    * Any [[From]]/`FROM` clauses that are in scope, and the aliases those clauses are given
    */
@@ -77,15 +78,15 @@ object Context {
           case (r, i) if !prevContext.fromNaming.contains(r) =>
             (r, r.fromRefPrefix(prevContext) + (i + prevSize))
         } ++
-        unPrefixedFroms.iterator.collect{case t if !prevContext.fromNaming.contains(t) =>
-          t -> t.fromRefPrefix(prevContext)
+        unPrefixedFroms.iterator.collect {
+          case t if !prevContext.fromNaming.contains(t) =>
+            t -> t.fromRefPrefix(prevContext)
         }
     )
 
     val newExprNaming =
       prevContext.exprNaming ++
-        prefixedFroms
-          .iterator
+        prefixedFroms.iterator
           .flatMap { t =>
             t
               .fromExprAliases(prevContext)
