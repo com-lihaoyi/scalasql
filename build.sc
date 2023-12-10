@@ -1,4 +1,4 @@
-import $file.buildutil.generateDocs
+import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
@@ -95,7 +95,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.core.generated
-           |import scalasql.core.{Queryable, Sql}
+           |import scalasql.core.{Queryable, Db}
            |trait QueryableRow{
            |  ${queryableRowDefs.mkString("\n")}
            |}
@@ -133,7 +133,7 @@ trait ScalaSql extends Common{
                  |
                  |""".stripMargin
           s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column] => Column[T$j]")})(
-             |    items: (${commaSep(j => s"Sql[T$j]")})*
+             |    items: (${commaSep(j => s"Db[T$j]")})*
              |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
         }
       }
@@ -173,7 +173,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.generated
-           |import scalasql.core.{Queryable, Sql}
+           |import scalasql.core.{Queryable, Db}
            |import scalasql.query.Column
            |trait Insert[V[_[_]], R]{
            |  ${defs(false).mkString("\n")}
@@ -182,7 +182,7 @@ trait ScalaSql extends Common{
            |  def newInsertValues[R](
            |        insert: scalasql.query.Insert[V, R],
            |        columns: Seq[Column[_]],
-           |        valuesLists: Seq[Seq[Sql[_]]]
+           |        valuesLists: Seq[Seq[Db[_]]]
            |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
            |  ${defs(true).mkString("\n")}
            |}
