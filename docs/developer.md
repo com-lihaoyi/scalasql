@@ -1,11 +1,16 @@
 
 # Developer Docs
 
-* Running all unit tests: `./mill -i -w "__.test"`
-* Running all unit tests on one database: `./mill -i -w "__.test scalasql.sqlite"`
+* Running all unit tests: `./mill -i -w "__.test"`. 
+
+* Running all unit tests on one database: `./mill -i -w "__.test scalasql.sqlite"`. This
+  is much faster than running all tests, and useful for quick iteration for changes that
+  are not database specific.
+
 * Re-generating docs: `./mill -i "__.test" + generateTutorial + generateReference`
     * Note that ScalaSql's reference docs are extracted from the test suite, and thus we need
       to make sure to run the test suite before re-generating them.
+
 * Fix all auto-generating and auto-formatting issues at once via
 ```
 ./mill -i -w  mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference

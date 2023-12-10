@@ -36,10 +36,10 @@ object Context {
     def fromRefPrefix(prevContext: Context): String
 
     /**
-     * A mapping of the [[Expr]] expressions that this [[From]] produces along
+     * A mapping of any aliased [[Expr]] that this [[From]] produces along
      * with their rendered [[SqlStr]]s
      */
-    def fromColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr]
+    def fromExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr]
 
     /**
      * How this [[From]] can be rendered into a [[SqlStr]] for embedding into
@@ -88,7 +88,7 @@ object Context {
           .iterator
           .flatMap { t =>
             t
-              .fromColumnExprs(prevContext)
+              .fromExprAliases(prevContext)
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 
