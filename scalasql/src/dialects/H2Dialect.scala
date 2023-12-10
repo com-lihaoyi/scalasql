@@ -47,8 +47,12 @@ trait H2Dialect extends Dialect {
     override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
-  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.DbStringOps =
+  override implicit def DbStringOpsConv(v: Db[String]): H2Dialect.DbStringOps[String] =
     new H2Dialect.DbStringOps(v)
+
+  override implicit def DbBlobOpsConv(v: Db[geny.Bytes]): H2Dialect.DbStringLikeOps[geny.Bytes] =
+    new H2Dialect.DbStringLikeOps(v)
+
   override implicit def DbNumericOpsConv[T: Numeric: TypeMapper](
       v: Db[T]
   ): H2Dialect.DbNumericOps[T] = new H2Dialect.DbNumericOps(v)
@@ -89,11 +93,12 @@ object H2Dialect extends H2Dialect {
     }
   }
 
-  class DbStringOps(protected val v: Db[String])
-      extends operations.DbStringOps(v)
+  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
+  class DbStringLikeOps[T](protected val v: Db[T])
+      extends operations.DbStringLikeOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
+    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
   }
 
   class DbNumericOps[T: Numeric: TypeMapper](protected val v: Db[T])

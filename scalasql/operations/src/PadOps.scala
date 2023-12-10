@@ -3,7 +3,7 @@ import scalasql.core.Db
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait PadOps {
-  protected def v: Db[String]
+  protected def v: Db[_]
 
   def rpad(length: Db[Int], fill: Db[String]): Db[String] = Db { implicit ctx =>
     sql"RPAD($v, $length, $fill)"

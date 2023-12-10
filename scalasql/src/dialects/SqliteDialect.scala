@@ -31,8 +31,13 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
   class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
-  override implicit def DbStringOpsConv(v: Db[String]): SqliteDialect.ExprStringOps =
-    new SqliteDialect.ExprStringOps(v)
+  override implicit def DbStringOpsConv(v: Db[String]): SqliteDialect.DbStringOps[String] =
+    new SqliteDialect.DbStringOps(v)
+
+  override implicit def DbBlobOpsConv(
+      v: Db[geny.Bytes]
+  ): SqliteDialect.DbStringLikeOps[geny.Bytes] =
+    new SqliteDialect.DbStringLikeOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new SqliteDialect.TableOps(t)
@@ -170,9 +175,12 @@ object SqliteDialect extends SqliteDialect {
     }
   }
 
-  class ExprStringOps(protected val v: Db[String]) extends operations.DbStringOps(v) with TrimOps {
-    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
-    def glob(x: Db[String]): Db[Boolean] = Db { implicit ctx => sql"GLOB($v, $x)" }
+  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
+  class DbStringLikeOps[T](protected val v: Db[T])
+      extends operations.DbStringLikeOps(v)
+      with TrimOps {
+    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"INSTR($v, $x)" }
+    def glob(x: Db[T]): Db[Boolean] = Db { implicit ctx => sql"GLOB($v, $x)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {

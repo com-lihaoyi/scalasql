@@ -8316,6 +8316,215 @@ Db("Hello").replace("ll", "rr")
 
 
 
+## DbBlobOps
+Operations that can be performed on `Db[Bytes]`
+### DbBlobOps.plus
+
+
+
+```scala
+Db(Bytes("hello")) + Db(Bytes("world"))
+```
+
+
+*
+    ```sql
+    SELECT (? || ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    Bytes("helloworld")
+    ```
+
+
+
+### DbBlobOps.like
+
+
+
+```scala
+Db(Bytes("hello")).like(Bytes("he%"))
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### DbBlobOps.length
+
+
+
+```scala
+Db(Bytes("hello")).length
+```
+
+
+*
+    ```sql
+    SELECT LENGTH(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    5
+    ```
+
+
+
+### DbBlobOps.octetLength
+
+
+
+```scala
+Db(Bytes("叉烧包")).octetLength
+```
+
+
+*
+    ```sql
+    SELECT OCTET_LENGTH(?) AS res
+    ```
+
+
+
+*
+    ```scala
+    9
+    ```
+
+
+
+### DbBlobOps.position
+
+
+
+```scala
+Db(Bytes("hello")).indexOf(Bytes("ll"))
+```
+
+
+*
+    ```sql
+    SELECT POSITION(? IN ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbBlobOps.substring
+
+
+
+```scala
+Db(Bytes("Hello")).substring(2, 2)
+```
+
+
+*
+    ```sql
+    SELECT SUBSTRING(?, ?, ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    Bytes("el")
+    ```
+
+
+
+### DbBlobOps.startsWith
+
+
+
+```scala
+Db(Bytes("Hello")).startsWith(Bytes("Hel"))
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE ? || '%') AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### DbBlobOps.endsWith
+
+
+
+```scala
+Db(Bytes("Hello")).endsWith(Bytes("llo"))
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE '%' || ?) AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
+### DbBlobOps.contains
+
+
+
+```scala
+Db(Bytes("Hello")).contains(Bytes("ll"))
+```
+
+
+*
+    ```sql
+    SELECT (? LIKE '%' || ? || '%') AS res
+    ```
+
+
+
+*
+    ```scala
+    true
+    ```
+
+
+
 ## DbMathOps
 Math operations; supported by H2/Postgres/MySql, not supported by Sqlite
 ### DbMathOps.power

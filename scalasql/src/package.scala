@@ -1,4 +1,20 @@
 package object scalasql {
+
+  /**
+   * Convenience alias for `geny.Bytes`
+   */
+  def Bytes(x: String): geny.Bytes = new geny.Bytes(x.getBytes("UTF-8"))
+
+  /**
+   * Convenience alias for `geny.Bytes`
+   */
+  def Bytes(x: Array[Byte]): geny.Bytes = new geny.Bytes(x)
+
+  /**
+   * Convenience alias for `geny.Bytes`
+   */
+  type Bytes = geny.Bytes
+
   type Sc[T] = T
 
   val Table = query.Table

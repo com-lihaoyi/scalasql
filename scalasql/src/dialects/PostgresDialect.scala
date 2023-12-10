@@ -25,7 +25,12 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def StringType: TypeMapper[String] = new PostgresStringType
   class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
-  override implicit def DbStringOpsConv(v: Db[String]): PostgresDialect.DbStringOps =
+  override implicit def DbStringOpsConv(v: Db[String]): PostgresDialect.DbStringOps[String] =
+    new PostgresDialect.DbStringOps(v)
+
+  override implicit def DbBlobOpsConv(
+      v: Db[geny.Bytes]
+  ): PostgresDialect.DbStringLikeOps[geny.Bytes] =
     new PostgresDialect.DbStringOps(v)
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
@@ -80,12 +85,13 @@ object PostgresDialect extends PostgresDialect {
       v.queryExpr(expr => implicit ctx => sql"STRING_AGG($expr || '', $sepRender)")
     }
   }
-  class DbStringOps(protected val v: Db[String])
-      extends operations.DbStringOps(v)
+  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
+  class DbStringLikeOps[T](protected val v: Db[T])
+      extends operations.DbStringLikeOps(v)
       with TrimOps
       with PadOps {
-    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
+    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
 
-    def reverse: Db[String] = Db { implicit ctx => sql"REVERSE($v)" }
+    def reverse: Db[T] = Db { implicit ctx => sql"REVERSE($v)" }
   }
 }

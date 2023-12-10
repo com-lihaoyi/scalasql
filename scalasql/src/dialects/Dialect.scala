@@ -239,7 +239,10 @@ trait Dialect extends DialectTypeMappers {
   ): operations.DbOptionOps[T] =
     new operations.DbOptionOps(JoinNullable.toExpr(v))
 
-  implicit def DbStringOpsConv(v: Db[String]): operations.DbStringOps
+  implicit def DbStringOpsConv(
+      v: Db[String]
+  ): operations.DbStringLikeOps[String] with operations.DbStringOps[String]
+  implicit def DbBlobOpsConv(v: Db[geny.Bytes]): operations.DbStringLikeOps[geny.Bytes]
 
   implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Db[V]])(
       implicit qr: Queryable.Row[Db[V], V]

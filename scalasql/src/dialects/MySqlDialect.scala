@@ -84,8 +84,11 @@ trait MySqlDialect extends Dialect {
   override implicit def DbTypedOpsConv[T: ClassTag](v: Db[T]): operations.DbTypedOps[T] =
     new MySqlDialect.DbTypedOps(v)
 
-  override implicit def DbStringOpsConv(v: Db[String]): MySqlDialect.DbStringOps =
+  override implicit def DbStringOpsConv(v: Db[String]): MySqlDialect.DbStringOps[String] =
     new MySqlDialect.DbStringOps(v)
+
+  override implicit def DbBlobOpsConv(v: Db[geny.Bytes]): MySqlDialect.DbStringLikeOps[geny.Bytes] =
+    new MySqlDialect.DbStringLikeOps(v)
 
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MySqlDialect.TableOps(t)
@@ -154,23 +157,26 @@ object MySqlDialect extends MySqlDialect {
 
   }
 
-  class DbStringOps(protected val v: Db[String]) extends operations.DbStringOps(v) with PadOps {
-    override def +(x: Db[String]): Db[String] = Db { implicit ctx => sql"CONCAT($v, $x)" }
+  class DbStringOps[T](v: Db[T]) extends DbStringLikeOps(v) with operations.DbStringOps[T]
+  class DbStringLikeOps[T](protected val v: Db[T])
+      extends operations.DbStringLikeOps(v)
+      with PadOps {
+    override def +(x: Db[T]): Db[T] = Db { implicit ctx => sql"CONCAT($v, $x)" }
 
-    override def startsWith(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
+    override def startsWith(other: Db[T]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT($other, '%'))"
     }
 
-    override def endsWith(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
+    override def endsWith(other: Db[T]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT('%', $other))"
     }
 
-    override def contains(other: Db[String]): Db[Boolean] = Db { implicit ctx =>
+    override def contains(other: Db[T]): Db[Boolean] = Db { implicit ctx =>
       sql"($v LIKE CONCAT('%', $other, '%'))"
     }
 
-    def indexOf(x: Db[String]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
-    def reverse: Db[String] = Db { implicit ctx => sql"REVERSE($v)" }
+    def indexOf(x: Db[T]): Db[Int] = Db { implicit ctx => sql"POSITION($x IN $v)" }
+    def reverse: Db[T] = Db { implicit ctx => sql"REVERSE($v)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {

@@ -3,7 +3,7 @@ import scalasql.core.Db
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait TrimOps {
-  protected def v: Db[String]
+  protected def v: Db[_]
 
   /**
    * Trim [[x]]s from the left hand side of the string [[v]]
