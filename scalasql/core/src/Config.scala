@@ -19,12 +19,14 @@ trait Config {
   }
 
   /**
-   * Configures the underlying JDBC connection's `setFetchSize`
+   * Configures the underlying JDBC connection's `setFetchSize`. Can be overriden
+   * on a per-query basis by passing `fetchSize = n` to `db.run`
    */
   def defaultFetchSize: Int = -1
 
   /**
-   * Configures the underlying JDBC connection's `setQueryTimeout`
+   * Configures the underlying JDBC connection's `setQueryTimeout`. Can be overriden
+   * on a per-query basis by passing `queryTimeoutSeconds = n` to `db.run`
    */
   def defaultQueryTimeoutSeconds: Int = -1
 
