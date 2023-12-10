@@ -44,7 +44,7 @@ object DbClient {
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      dialect.renderSql(query, config, castParams)
+      DbApi.renderSql(query, config, castParams)
     }
 
     def transaction[T](block: DbApi.Txn => T): T = {
@@ -74,7 +74,7 @@ object DbClient {
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      dialect.renderSql(query, config, castParams)
+      DbApi.renderSql(query, config, castParams)
     }
 
     private def withConnection[T](f: DbClient.Connection => T): T = {
