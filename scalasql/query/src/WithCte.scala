@@ -45,8 +45,8 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-  override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
-    SelectBase.columnExprs(rhs, prevContext)
+  override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+    SubqueryRef.Wrapped.exprAliases(rhs, prevContext)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
@@ -76,8 +76,8 @@ object WithCte {
       )(qr, dialect)
     }
 
-    override def selectRenderer(prevContext: Context): SelectBase.Renderer =
-      new SelectBase.Renderer {
+    override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
+      new SubqueryRef.Wrapped.Renderer {
         def render(liveExprs: LiveSqlExprs): SqlStr = {
           SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
         }
@@ -89,7 +89,7 @@ object WithCte {
   }
 
   class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
-      extends SelectBase.Renderer {
+      extends SubqueryRef.Wrapped.Renderer {
     def render(liveExprs: LiveSqlExprs) = {
       val walked =
         query.lhs.qr
@@ -105,7 +105,7 @@ object WithCte {
           case w: WithCte[Q, R] => SqlStr.empty
           case r => sql" "
         }) +
-          SelectBase
+          SubqueryRef.Wrapped
             .renderer(
               query.rhs match {
                 case w: WithCte[Q, R] => w.unprefixed
@@ -120,7 +120,7 @@ object WithCte {
       )
       val rhsReferenced = LiveSqlExprs.some(rhsSql.referencedExprs.toSet)
       val lhsSql =
-        SelectBase.renderer(query.lhs, prevContext).render(rhsReferenced)
+        SubqueryRef.Wrapped.renderer(query.lhs, prevContext).render(rhsReferenced)
 
       val cteColumns = SqlStr.join(
         newExprNaming.collect { case (exprId, name) if rhsReferenced.isLive(exprId) => name },

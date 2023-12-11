@@ -209,7 +209,7 @@ class SimpleSelect[Q, R](
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
@@ -247,7 +247,7 @@ object SimpleSelect {
   def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
     s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context)
-      extends SelectBase.Renderer {
+      extends SubqueryRef.Wrapped.Renderer {
     lazy val flattenedExpr = query.qr.walkLabelsAndExprs(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
     implicit lazy val context = Context.compute(prevContext, froms, None)

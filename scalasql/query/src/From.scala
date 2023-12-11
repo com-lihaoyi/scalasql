@@ -17,16 +17,37 @@ class TableRef(val value: Table.Base) extends From {
     SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
   }
 }
-class SubqueryRef(val value: SelectBase, val qr: Queryable[_, _]) extends From {
+
+/**
+ * Models a subquery: a `SELECT`, `VALUES`, nested `WITH`, etc.
+ */
+class SubqueryRef(val value: SubqueryRef.Wrapped) extends From {
   def fromRefPrefix(prevContext: Context): String = "subquery"
 
-  def fromExprAliases(prevContext: Context) = SelectBase.columnExprs(value, prevContext)
+  def fromExprAliases(prevContext: Context) = SubqueryRef.Wrapped.exprAliases(value, prevContext)
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
-    val renderSql = SelectBase.renderer(value, prevContext)
+    val renderSql = SubqueryRef.Wrapped.renderer(value, prevContext)
     sql"(${renderSql.render(liveExprs)}) $name"
   }
 }
+
+object SubqueryRef{
+
+  trait Wrapped {
+    protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr]
+    protected def selectRenderer(prevContext: Context): Wrapped.Renderer
+  }
+  object Wrapped {
+    def exprAliases(s: Wrapped, prevContext: Context) = s.selectExprAliases(prevContext)
+    def renderer(s: Wrapped, prevContext: Context) = s.selectRenderer(prevContext)
+
+    trait Renderer {
+      def render(liveExprs: LiveSqlExprs): SqlStr
+    }
+  }
+}
+
 class WithCteRef() extends From {
   def fromRefPrefix(prevContext: Context) = "cte"
 
@@ -36,3 +57,4 @@ class WithCteRef() extends From {
     name
   }
 }
+

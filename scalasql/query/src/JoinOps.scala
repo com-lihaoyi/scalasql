@@ -36,7 +36,7 @@ trait JoinOps[C[_, _], Q, R] extends WithSqlExpr[Q] {
     val isTrivialJoin = Joinable.isTrivial(other)
     val from =
       if (isTrivialJoin) otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head
-      else new SubqueryRef(otherSelect, otherSelect.qr)
+      else new SubqueryRef(otherSelect)
 
     val on2 = on.map(_(expr, otherSelect.expr))
     val otherJoin = Join(joinPrefix, Seq(Join.From(from, on2)))

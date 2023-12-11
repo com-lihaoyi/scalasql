@@ -41,10 +41,10 @@ trait Select[Q, R]
     with JoinOps[Select, Q, R]
     with Query[Seq[R]]
     with Query.DelegateQueryable[Q, Seq[R]]
-    with SelectBase {
+    with SubqueryRef.Wrapped {
 
   protected def dialect: DialectTypeMappers
-  protected def joinableToFromExpr = (new SubqueryRef(this, qr), expr)
+  protected def joinableToFromExpr = (new SubqueryRef(this), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
@@ -75,7 +75,7 @@ trait Select[Q, R]
   def distinct: Select[Q, R] = selectWithExprPrefix(true, ctx => sql"DISTINCT")
   protected def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R]
 
-  protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this, qr)
+  protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this)
 
   /**
    * Transforms the return value of this [[Select]] with the given function
@@ -337,11 +337,11 @@ object Select {
     override def drop(n: Int): Select[Q, R] = selectToSimpleSelect().drop(n)
     override def take(n: Int): Select[Q, R] = selectToSimpleSelect().take(n)
 
-    override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
-      SelectBase.renderer(selectToSimpleSelect(), prevContext)
+    override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
+      SubqueryRef.Wrapped.renderer(selectToSimpleSelect(), prevContext)
 
-    override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] =
-      SelectBase.columnExprs(selectToSimpleSelect(), prevContext)
+    override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] =
+      SubqueryRef.Wrapped.exprAliases(selectToSimpleSelect(), prevContext)
 
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R]
 

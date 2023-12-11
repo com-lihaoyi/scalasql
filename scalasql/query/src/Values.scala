@@ -23,15 +23,15 @@ class Values[Q, R](val ts: Seq[R])(
   assert(ts.nonEmpty, "`Values` clause does not support empty sequence")
 
   protected def selectToSimpleSelect() = this.subquery
-  val tableRef = new SubqueryRef(this, qr)
+  val tableRef = new SubqueryRef(this)
   protected def columnName(n: Int) = s"column${n + 1}"
 
   protected override val expr: Q = qr.deconstruct(ts.head)
 
-  override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
+  override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
-  override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     qr.walkExprs(expr)
       .zipWithIndex
       .map { case (e, i) => (Expr.identity(e), SqlStr.raw(columnName(i))) }
@@ -41,7 +41,7 @@ class Values[Q, R](val ts: Seq[R])(
 
 object Values {
   class Renderer[Q, R](v: Values[Q, R])(implicit qr: Queryable.Row[Q, R], ctx: Context)
-      extends SelectBase.Renderer {
+      extends SubqueryRef.Wrapped.Renderer {
     def wrapRow(t: R): SqlStr = sql"(" + SqlStr.join(
       qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep
