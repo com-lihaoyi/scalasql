@@ -19,7 +19,7 @@ The rough dataflow of how ScalaSql works is given by the following diagram:
            Q |                                       | R
              |                                       |
              v                                       |
-Queryable#{toSqlStr,walkSqlExprs}            Queryable#construct
+Queryable#{renderSql,walkExprs}            Queryable#construct
              |                                       ^
              |                                       |
       SqlStr |                                       | ResultSet

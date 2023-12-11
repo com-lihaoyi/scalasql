@@ -109,7 +109,7 @@ object DbApi {
 
   def unpackQueryable[R, Q](query: Q, qr: Queryable[Q, R], config: Config) = {
     val ctx = Context.Impl(Map(), Map(), config)
-    val flattened = SqlStr.flatten(qr.toSqlStr(query, ctx))
+    val flattened = SqlStr.flatten(qr.renderSql(query, ctx))
     flattened
   }
 

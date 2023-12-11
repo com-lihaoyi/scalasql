@@ -46,7 +46,7 @@ trait Queryable[-Q, R] {
    * Converts the given queryable value into a [[SqlStr]], that can then be executed
    * by the underlying SQL JDBC interface
    */
-  def toSqlStr(q: Q, ctx: Context): SqlStr
+  def renderSql(q: Q, ctx: Context): SqlStr
 
   /**
    * Construct a Scala return value from the [[Queryable.ResultSetIterator]] representing
@@ -87,7 +87,7 @@ object Queryable {
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 
-    def toSqlStr(q: Q, ctx: Context): SqlStr = {
+    def renderSql(q: Q, ctx: Context): SqlStr = {
       ExprsToSql.apply(this.walkLabelsAndExprs(q), ctx, sql"SELECT ")
     }
 
