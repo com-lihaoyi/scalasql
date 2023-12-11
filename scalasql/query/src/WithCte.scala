@@ -52,10 +52,6 @@ class WithCte[Q, R](
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
     Query.construct(rhs, args)
 
-  def joinFromExpr = {
-    val otherSelect = selectToSimpleSelect()
-    (new SubqueryRef(otherSelect), WithSqlExpr.get(otherSelect))
-  }
 }
 
 object WithCte {
