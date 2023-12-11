@@ -87,7 +87,7 @@ class CompoundSelect[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
 
-  override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectExprAliases(prevContext: Context) = {
     SubqueryRef.Wrapped.exprAliases(lhs, prevContext)
   }
 
@@ -101,7 +101,7 @@ object CompoundSelect {
     import query.dialect._
     lazy val renderer = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext)
+    lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext).toMap
     lazy val context = renderer.context
       .withExprNaming(renderer.context.exprNaming ++ lhsExprAliases)
 

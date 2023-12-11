@@ -12,7 +12,7 @@ class TableRef(val value: Table.Base) extends From {
 
   def fromRefPrefix(prevContext: Context) = prevContext.config.tableNameMapper(Table.name(value))
 
-  def fromExprAliases(prevContext: Context) = Map()
+  def fromExprAliases(prevContext: Context) = Nil
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
@@ -36,7 +36,7 @@ class SubqueryRef(val value: SubqueryRef.Wrapped) extends From {
 object SubqueryRef {
 
   trait Wrapped {
-    protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr]
+    protected def selectExprAliases(prevContext: Context): Seq[(Expr.Identity, SqlStr)]
     protected def selectRenderer(prevContext: Context): Wrapped.Renderer
   }
   object Wrapped {
@@ -53,7 +53,7 @@ class WithCteRef(walked: Queryable.Walked) extends From {
   def fromRefPrefix(prevContext: Context) = "cte"
 
   def fromExprAliases(prevContext: Context) = {
-    ExprsToSql.selectColumnReferences(walked, prevContext).toMap
+    ExprsToSql.selectColumnReferences(walked, prevContext)
   }
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {

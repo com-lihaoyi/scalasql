@@ -338,7 +338,7 @@ object Select {
     override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
       SubqueryRef.Wrapped.renderer(selectToSimpleSelect(), prevContext)
 
-    override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] =
+    override protected def selectExprAliases(prevContext: Context) =
       SubqueryRef.Wrapped.exprAliases(selectToSimpleSelect(), prevContext)
 
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R]

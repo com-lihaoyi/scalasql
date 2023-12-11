@@ -208,13 +208,8 @@ class SimpleSelect[Q, R](
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
-
-    lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
-
-    lazy val jsonQueryMap = ExprsToSql.selectColumnReferences(flattenedExpr, prevContext).toMap
-
-    jsonQueryMap
+  protected def selectExprAliases(prevContext: Context) = {
+    ExprsToSql.selectColumnReferences(qr.walkLabelsAndExprs(expr), prevContext)
   }
 
   protected def joinCopy[Q2, R2, Q3, R3](

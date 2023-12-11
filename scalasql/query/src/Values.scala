@@ -32,11 +32,10 @@ class Values[Q, R](val ts: Seq[R])(
   override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
-  override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectExprAliases(prevContext: Context) = {
     qr.walkExprs(expr)
       .zipWithIndex
       .map { case (e, i) => (Expr.identity(e), SqlStr.raw(columnName(i))) }
-      .toMap
   }
 
 }

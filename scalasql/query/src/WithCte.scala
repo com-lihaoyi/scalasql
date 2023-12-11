@@ -46,7 +46,7 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(walked, withPrefix, this, prevContext)
 
-  override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectExprAliases(prevContext: Context) = {
     SubqueryRef.Wrapped.exprAliases(rhs, prevContext)
   }
 

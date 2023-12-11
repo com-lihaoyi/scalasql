@@ -40,7 +40,7 @@ object Context {
      * A mapping of any aliased [[Expr]] that this [[From]] produces along
      * with their rendered [[SqlStr]]s
      */
-    def fromExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr]
+    def fromExprAliases(prevContext: Context): Seq[(Expr.Identity, SqlStr)]
 
     /**
      * How this [[From]] can be rendered into a [[SqlStr]] for embedding into
