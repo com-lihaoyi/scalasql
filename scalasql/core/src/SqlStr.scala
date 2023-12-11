@@ -8,7 +8,7 @@ package scalasql.core
  */
 class SqlStr(
     private val queryParts: Array[CharSequence],
-    private val params: Array[SqlStr.Interp],
+    private val interps: Array[SqlStr.Interp],
     val isCompleteQuery: Boolean,
     private val referencedExprs: Array[Expr.Identity]
 ) extends SqlStr.Renderable {
@@ -21,7 +21,7 @@ class SqlStr(
     )
   }
 
-  def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
+  def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, interps, v, referencedExprs)
   override def toString = SqlStr.flatten(this).renderSql(false)
 
   override protected def renderSql(ctx: Context): SqlStr = this
@@ -37,15 +37,15 @@ object SqlStr {
    * parallel arrays, allowing you to render it or otherwise make use of its data.
    */
   class Flattened(
-      val queryParts: Array[CharSequence],
-      val params0: Array[Interp],
-      isCompleteQuery: Boolean,
-      val referencedExprs: Array[Expr.Identity]
-  ) extends SqlStr(queryParts, params0, isCompleteQuery, referencedExprs) {
-    def paramsIterator = params0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
+                   val queryParts: Array[CharSequence],
+                   val interps0: Array[Interp],
+                   isCompleteQuery: Boolean,
+                   val referencedExprs: Array[Expr.Identity]
+  ) extends SqlStr(queryParts, interps0, isCompleteQuery, referencedExprs) {
+    def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
     def renderSql(castParams: Boolean) = {
       val queryStr = queryParts.iterator
-        .zipAll(paramsIterator, "", null)
+        .zipAll(interpsIterator, "", null)
         .map {
           case (part, null) => part
           case (part, param) =>
@@ -78,14 +78,14 @@ object SqlStr {
   def flatten(self: SqlStr): Flattened = {
     // Implement this in a mutable style because`it's pretty performance sensitive
     val finalParts = collection.mutable.ArrayBuilder.make[CharSequence]
-    val finalArgs = collection.mutable.ArrayBuilder.make[Interp]
+    val finalInterps = collection.mutable.ArrayBuilder.make[Interp]
     val finalExprs = collection.mutable.ArrayBuilder.make[Expr.Identity]
     // Equivalent to `finalParts.last`, cached locally for performance
     var lastFinalPart: StringBuilder = null
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       val queryParts = self.queryParts
-      val params = self.params
+      val params = self.interps
       finalExprs.addAll(self.referencedExprs)
       var boundary = true
       val parenthesize = !topLevel && self.isCompleteQuery
@@ -114,7 +114,7 @@ object SqlStr {
             rec(si.s, false)
             boundary = true
 
-          case s: Interp.TypeInterp[_] => finalArgs.addOne(s)
+          case s: Interp.TypeInterp[_] => finalInterps.addOne(s)
         }
         i += 1
       }
@@ -124,7 +124,7 @@ object SqlStr {
     }
 
     rec(self, true)
-    new Flattened(finalParts.result(), finalArgs.result(), self.isCompleteQuery, finalExprs.result())
+    new Flattened(finalParts.result(), finalInterps.result(), self.isCompleteQuery, finalExprs.result())
   }
 
   /**
@@ -149,7 +149,7 @@ object SqlStr {
     else {
       var lastFinalPart: StringBuilder = null
       val finalParts = collection.mutable.ArrayBuilder.make[CharSequence]
-      val finalArgs = collection.mutable.ArrayBuilder.make[Interp]
+      val finalInterps = collection.mutable.ArrayBuilder.make[Interp]
       val finalExprs = collection.mutable.ArrayBuilder.make[Expr.Identity]
       def handle(s: SqlStr) = {
         s.queryParts.length match{
@@ -172,7 +172,7 @@ object SqlStr {
             }
         }
 
-        finalArgs.addAll(s.params)
+        finalInterps.addAll(s.interps)
         finalExprs.addAll(s.referencedExprs)
       }
       handle(first.get)
@@ -183,7 +183,7 @@ object SqlStr {
 
       finalParts.addOne(lastFinalPart)
 
-      new SqlStr(finalParts.result(), finalArgs.result(), false, finalExprs.result())
+      new SqlStr(finalParts.result(), finalInterps.result(), false, finalExprs.result())
     }
   }
 
