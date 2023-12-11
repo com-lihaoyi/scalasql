@@ -4,7 +4,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   Expr,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   SqlStr,
   TypeMapper,
@@ -47,7 +47,7 @@ object Values {
       qr.walkExprs(qr.deconstruct(t)).map(i => sql"$i"),
       SqlStr.commaSep
     ) + sql")"
-    def render(liveExprs: LiveSqlExprs): SqlStr = {
+    def render(liveExprs: LiveExprs): SqlStr = {
       val rows = SqlStr.join(v.ts.map(wrapRow), SqlStr.commaSep)
       sql"VALUES $rows"
     }

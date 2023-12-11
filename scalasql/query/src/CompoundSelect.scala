@@ -5,7 +5,7 @@ import scalasql.renderer.JoinsToSql
 import scalasql.core.{
   Context,
   DialectTypeMappers,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   Expr,
   SqlStr,
@@ -101,7 +101,7 @@ object CompoundSelect {
     import query.dialect._
     lazy val renderer = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext).toMap
+    lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext)
     lazy val context = renderer.context
       .withExprNaming(renderer.context.exprNaming ++ lhsExprAliases)
 
@@ -116,32 +116,36 @@ object CompoundSelect {
 
     lazy val newReferencedExpressions = Seq(limitOpt, offsetOpt, sortOpt).flatMap(_.referencedExprs)
 
+    // For compound expressions that eliminate duplicate columns (i.e. UNION/INTERSECT/EXCEPT,
+    // everything except UNION ALL) we cannot eliminate dead columns as it affects whether
+    // columns are duplicates or not, and thus what final set of rows is returned
     lazy val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
-    def render(liveExprs: LiveSqlExprs) = {
-
+    def render(liveExprs: LiveExprs) = {
       val innerLiveExprs =
-        if (preserveAll) LiveSqlExprs.none
+        if (preserveAll) LiveExprs.none
         else liveExprs.map(_ ++ newReferencedExpressions)
 
       val lhsStr = renderer.render(innerLiveExprs)
-
+      val lhsExprIndices = lhsExprAliases.iterator.map(_._1).zipWithIndex.toMap
+      val innerLiveExprIndices = innerLiveExprs.values.map(_.flatMap(lhsExprIndices.get))
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
           lazy val rhsExprAliases = SubqueryRef.Wrapped.exprAliases(op.rhs, prevContext)
-          // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
-          // because the expressions in the CompoundSelect's lhsMap correspond to those
-          // belonging to the LHS SimpleSelect, but we need the corresponding expressions
-          // belonging to the RHS SimpleSelect `liveExprs` analysis to work
-          val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-            val strs = l.map(e => lhsExprAliases(e).toString)
+          // We match up the RHS SimpleSelect's exprAliases with the LHS SimpleSelect's
+          // exprAliases, because the expressions in the CompoundSelect's lhsMap correspond
+          // to those belonging to the LHS SimpleSelect, but we need the corresponding
+          // expressions belonging to the RHS SimpleSelect `liveExprs` analysis to work
+          val rhsInnerLiveExprs = rhsExprAliases
+            .iterator
+            .zipWithIndex
+            .collect {
+              case ((k, v), i) if innerLiveExprIndices.fold(true)(_(i)) => k
+            }
+            .toSet
 
-            rhsExprAliases.collect {
-              case (k, v) if strs.contains(v.toString) => k
-            }.toSet
-          }
-          sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(rhsInnerLiveExprs)}"
+          sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(new LiveExprs(Some(rhsInnerLiveExprs)))}"
         }
 
         SqlStr.join(compoundStrs)

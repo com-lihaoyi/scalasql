@@ -13,18 +13,18 @@ package scalasql.core
  *
  * Typically downstream parts of a SQL query (e.g. the outer `SELECT`) are
  * rendered before the upstream parts (e.g. `FROM (SELECT ...)` subqueries),
- * so the [[LiveSqlExprs]] from the downstream parts can be used to decide
+ * so the [[LiveExprs]] from the downstream parts can be used to decide
  * which columns to skip when rendering the upstream parts. The outermost
- * `SELECT` is rendered using [[LiveSqlExprs.none]] since we cannot know what
+ * `SELECT` is rendered using [[LiveExprs.none]] since we cannot know what
  * columns end up being used in the application code after the query has
  * finished running, and thus have to preserve all of them
  */
-class LiveSqlExprs(values: Option[Set[Expr.Identity]]) {
-  def map(f: Set[Expr.Identity] => Set[Expr.Identity]) = new LiveSqlExprs(values.map(f))
+class LiveExprs(val values: Option[Set[Expr.Identity]]) {
+  def map(f: Set[Expr.Identity] => Set[Expr.Identity]) = new LiveExprs(values.map(f))
   def isLive(e: Expr.Identity) = values.fold(true)(_.contains(e))
 }
 
-object LiveSqlExprs {
-  def some(v: Set[Expr.Identity]) = new LiveSqlExprs(Some(v))
-  def none = new LiveSqlExprs(None)
+object LiveExprs {
+  def some(v: Set[Expr.Identity]) = new LiveExprs(Some(v))
+  def none = new LiveExprs(None)
 }

@@ -5,7 +5,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   JoinNullable,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   Expr,
   ExprsToSql,
@@ -263,8 +263,8 @@ object SimpleSelect {
       sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 
-    def render(liveExprs0: LiveSqlExprs) = {
-      val liveExprs = if (query.preserveAll) LiveSqlExprs.none else liveExprs0
+    def render(liveExprs0: LiveExprs) = {
+      val liveExprs = if (query.preserveAll) LiveExprs.none else liveExprs0
       val exprStr = SqlStr.flatten(
         SqlStr.join(
           flattenedExpr.iterator.zip(exprsStrs).collect {
@@ -274,7 +274,7 @@ object SimpleSelect {
         )
       )
 
-      val innerLiveExprs = LiveSqlExprs.some(
+      val innerLiveExprs = LiveExprs.some(
         exprStr.referencedExprs.toSet ++
           filtersOpt.referencedExprs ++
           groupByOpt.referencedExprs ++

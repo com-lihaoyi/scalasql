@@ -5,7 +5,7 @@ import scalasql.core.{
   Context,
   DialectTypeMappers,
   JoinNullable,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   Expr,
   SqlStr,
@@ -188,7 +188,7 @@ trait Select[Q, R]
   protected def renderSql(ctx: Context): SqlStr = {
     val renderer = selectRenderer(ctx)
 
-    renderer.render(LiveSqlExprs.none).withCompleteQuery(true)
+    renderer.render(LiveExprs.none).withCompleteQuery(true)
   }
   protected override def queryIsSingleRow = false
 

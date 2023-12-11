@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{
   Context,
   DialectTypeMappers,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   Expr,
   ExprsToSql,
@@ -114,7 +114,7 @@ object Update {
 
     lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
-    lazy val liveExprs = LiveSqlExprs.some(
+    lazy val liveExprs = LiveExprs.some(
       sets.referencedExprs.toSet ++
         where.referencedExprs ++
         joinOns.flatten.flatten.flatMap(_.referencedExprs)

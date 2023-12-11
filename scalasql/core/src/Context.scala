@@ -49,7 +49,7 @@ object Context {
     def renderSql(
         name: SqlStr,
         prevContext: Context,
-        liveExprs: LiveSqlExprs
+        liveExprs: LiveExprs
     ): SqlStr
   }
 

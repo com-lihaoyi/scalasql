@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{
   Context,
   DialectTypeMappers,
-  LiveSqlExprs,
+  LiveExprs,
   Queryable,
   Expr,
   ExprsToSql,
@@ -83,7 +83,7 @@ object WithCte {
 
     override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
       new SubqueryRef.Wrapped.Renderer {
-        def render(liveExprs: LiveSqlExprs): SqlStr = {
+        def render(liveExprs: LiveExprs): SqlStr = {
           SqlStr.raw(prevContext.fromNaming(lhsSubQueryRef))
         }
       }
@@ -99,7 +99,7 @@ object WithCte {
       query: WithCte[Q, R],
       prevContext: Context
   ) extends SubqueryRef.Wrapped.Renderer {
-    def render(liveExprs: LiveSqlExprs) = {
+    def render(liveExprs: LiveExprs) = {
       val newExprNaming = ExprsToSql.selectColumnReferences(walked, prevContext)
       val newContext = Context.compute(prevContext, Seq(query.cteRef), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.cteRef))
@@ -119,7 +119,7 @@ object WithCte {
         .render(liveExprs)
 
       val rhsSql = SqlStr.flatten(leadingSpace + wrapped)
-      val rhsReferenced = LiveSqlExprs.some(rhsSql.referencedExprs.toSet)
+      val rhsReferenced = LiveExprs.some(rhsSql.referencedExprs.toSet)
       val lhsSql =
         SubqueryRef.Wrapped.renderer(query.lhs, prevContext).render(rhsReferenced)
 

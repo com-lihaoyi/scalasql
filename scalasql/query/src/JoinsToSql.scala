@@ -1,6 +1,6 @@
 package scalasql.renderer
 
-import scalasql.core.{Context, LiveSqlExprs, Queryable, Expr, SqlStr, TypeMapper}
+import scalasql.core.{Context, LiveExprs, Queryable, Expr, SqlStr, TypeMapper}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.query.{AscDesc, CompoundSelect, Join, Joinable, Nulls, Select, SimpleSelect}
 
@@ -27,7 +27,7 @@ object JoinsToSql {
       selectables: Seq[Context.From],
       prevContext: Context,
       namedFromsMap: Map[Context.From, String],
-      liveExprs: LiveSqlExprs
+      liveExprs: LiveExprs
   ) = {
     selectables.iterator.map { f =>
       (f, renderSingleFrom(prevContext, liveExprs, f, namedFromsMap))
@@ -36,7 +36,7 @@ object JoinsToSql {
 
   def renderSingleFrom(
       prevContext: Context,
-      liveExprs: LiveSqlExprs,
+      liveExprs: LiveExprs,
       f: Context.From,
       namedFromsMap: Map[Context.From, String]
   ): SqlStr = {
@@ -46,7 +46,7 @@ object JoinsToSql {
   def renderLateralJoins(
       prevContext: Context,
       from: Seq[Context.From],
-      innerLiveExprs: LiveSqlExprs,
+      innerLiveExprs: LiveExprs,
       joins0: Seq[Join],
       renderedJoinOns: Seq[Seq[Option[SqlStr.Flattened]]]
   ) = {

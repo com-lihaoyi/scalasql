@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, Expr, ExprsToSql, LiveSqlExprs, Queryable, SqlStr, WithSqlExpr}
+import scalasql.core.{Context, Expr, ExprsToSql, LiveExprs, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.Context.From
 import scalasql.core.SqlStr.SqlStringSyntax
 
@@ -14,7 +14,7 @@ class TableRef(val value: Table.Base) extends From {
 
   def fromExprAliases(prevContext: Context) = Nil
 
-  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
+  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
     SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
   }
 }
@@ -27,7 +27,7 @@ class SubqueryRef(val value: SubqueryRef.Wrapped) extends From {
 
   def fromExprAliases(prevContext: Context) = SubqueryRef.Wrapped.exprAliases(value, prevContext)
 
-  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
+  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
     val renderSql = SubqueryRef.Wrapped.renderer(value, prevContext)
     sql"(${renderSql.render(liveExprs)}) $name"
   }
@@ -44,7 +44,7 @@ object SubqueryRef {
     def renderer(s: Wrapped, prevContext: Context) = s.selectRenderer(prevContext)
 
     trait Renderer {
-      def render(liveExprs: LiveSqlExprs): SqlStr
+      def render(liveExprs: LiveExprs): SqlStr
     }
   }
 }
@@ -56,7 +56,7 @@ class WithCteRef(walked: Queryable.Walked) extends From {
     ExprsToSql.selectColumnReferences(walked, prevContext)
   }
 
-  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
+  def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
     name
   }
 }

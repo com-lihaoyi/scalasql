@@ -29,6 +29,7 @@ class SqlStr(
 
 object SqlStr {
   private val emptyIdentityArray = Array.empty[Expr.Identity]
+  private val emptyInterpArray = Array.empty[SqlStr.Interp]
   private val plusParts: IndexedSeq[String] = Array("", "", "")
 
   /**
@@ -147,8 +148,8 @@ object SqlStr {
    * Converts a raw `String` into a [[SqlStr]]. Note that this must be used
    * carefully to avoid SQL injection attacks.
    */
-  def raw(s: String, referencedExprs: Array[Expr.Identity] = Array.empty) =
-    new SqlStr(Array(s), Array.empty[SqlStr.Interp], false, referencedExprs)
+  def raw(s: String, referencedExprs: Array[Expr.Identity] = emptyIdentityArray) =
+    new SqlStr(Array(s), emptyInterpArray, false, referencedExprs)
 
   trait Renderable {
     protected def renderSql(ctx: Context): SqlStr
