@@ -1,13 +1,14 @@
 import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
+import $ivy.`com.goyeau::mill-scalafix::0.3.1`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
-
+import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
 val scalaVersions = Seq("2.13.12"/*, "3.3.1"*/)
 
-trait Common extends CrossScalaModule with PublishModule{
+trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
   def scalaVersion = crossScalaVersion
 
   def publishVersion = VcsVersion.vcsState().format()
@@ -25,6 +26,8 @@ trait Common extends CrossScalaModule with PublishModule{
       Developer("lihaoyi", "Li Haoyi", "https://github.com/lihaoyi")
     )
   )
+
+  def scalacOptions = Seq("-Wunused")
 }
 
 
@@ -41,7 +44,8 @@ trait ScalaSql extends Common{
   )
 
 
-  object test extends ScalaTests {
+  object test extends ScalaTests with ScalafixModule{
+    def scalacOptions = Seq("-Wunused")
     def ivyDeps = Agg(
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
       ivy"com.lihaoyi::mainargs:0.4.0",

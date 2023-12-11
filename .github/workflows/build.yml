@@ -51,6 +51,20 @@ jobs:
 
       - run: ./mill -i "__.test" + generateTutorial + generateReference && git diff --exit-code
 
+  check-scalafix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - run: ./mill -i __.fix && git diff --exit-code
+
   publish-sonatype:
     if: github.repository == 'com-lihaoyi/scalasql' && contains(github.ref, 'refs/tags/')
     needs: test
