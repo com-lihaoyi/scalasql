@@ -24,7 +24,7 @@ class WithCte[Q, R](
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select.Proxy[Q, R] {
 
-  override protected def expr = WithSqlExpr.get(Joinable.toSelect(rhs))
+  override protected def expr = Joinable.toFromExpr(rhs)._2
   private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, SqlStr.commaSep)
 
   protected def selectToSimpleSelect() = this.subquery

@@ -33,7 +33,7 @@ class CompoundSelect[Q, R](
       limit: Option[Int] = this.limit,
       offset: Option[Int] = this.offset
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
-  override protected def expr = WithSqlExpr.get(Joinable.toSelect(lhs))
+  override protected def expr = Joinable.toFromExpr(lhs)._2
 
   protected override def joinableToSelect = this
 
