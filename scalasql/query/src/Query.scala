@@ -57,6 +57,12 @@ object Query {
   def walkSqlExprs[R](q: Query[R]) = q.queryWalkExprs()
   def isSingleRow[R](q: Query[R]) = q.queryIsSingleRow
   def construct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
+
+  /**
+   * The default [[Queryable]] instance for any [[Query]]. Delegates the implementation
+   * of the [[Queryable]] methods to abstract methods on the [[Query]], to allow easy
+   * overrides and subclassing of [[Query]] classes
+   */
   class QueryQueryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkLabels()
@@ -68,6 +74,9 @@ object Query {
     override def construct(q: Q, args: Queryable.ResultSetIterator): R = q.queryConstruct(args)
   }
 
+  /**
+   * A [[Query]] that wraps another [[Query]] but sets [[queryIsSingleRow]] to `true`
+   */
   class Single[R](query: Query[Seq[R]]) extends Query.DelegateQuery[R] {
     protected def queryDelegate = query
     protected override def queryIsSingleRow: Boolean = true
