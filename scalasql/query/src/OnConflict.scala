@@ -18,12 +18,10 @@ object OnConflict {
       query: Query[R] with InsertReturnable[Q],
       columns: Seq[Column[_]],
       val table: TableRef
-  ) extends Query[R]
+  ) extends Query.DelegateQuery[R]
       with InsertReturnable[Q] {
     protected def expr = WithSqlExpr.get(query)
-    protected def queryWalkLabels() = Query.walkLabels(query)
-    protected def queryWalkExprs() = Query.walkSqlExprs(query)
-    protected def queryIsSingleRow = Query.isSingleRow(query)
+    protected def queryDelegate = query
     protected def renderSql(ctx: Context) = {
       val str = Renderable.renderSql(query)(ctx)
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)}) DO NOTHING"
@@ -40,13 +38,10 @@ object OnConflict {
       columns: Seq[Column[_]],
       updates: Seq[Column.Assignment[_]],
       val table: TableRef
-  ) extends Query[R]
+  ) extends Query.DelegateQuery[R]
       with InsertReturnable[Q] {
     protected def expr = WithSqlExpr.get(query)
-
-    protected def queryWalkLabels() = Query.walkLabels(query)
-    protected def queryWalkExprs() = Query.walkSqlExprs(query)
-    protected def queryIsSingleRow = Query.isSingleRow(query)
+    protected def queryDelegate = query
     protected def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderSql(query)

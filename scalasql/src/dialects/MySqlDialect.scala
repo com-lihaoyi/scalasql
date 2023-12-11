@@ -268,13 +268,9 @@ object MySqlDialect extends MySqlDialect {
       insert: OnConflictable[Q, R],
       updates: Seq[Column.Assignment[_]],
       table: TableRef
-  ) extends Query[R] {
-
+  ) extends Query.DelegateQuery[R] {
+    protected def queryDelegate = insert.query
     override def queryIsExecuteUpdate = true
-    protected def queryWalkLabels() = Query.walkLabels(insert.query)
-    protected def queryWalkExprs() = Query.walkSqlExprs(insert.query)
-
-    protected def queryIsSingleRow = Query.isSingleRow(insert.query)
 
     protected def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))

@@ -40,7 +40,7 @@ trait Queryable[-Q, R] {
    * Whether this query expects a single row to be returned, if so we can assert on
    * the number of rows and raise an error if 0 rows or 2+ rows are present
    */
-  def singleRow(q: Q): Boolean
+  def isSingleRow(q: Q): Boolean
 
   /**
    * Converts the given queryable value into a [[SqlStr]], that can then be executed
@@ -83,7 +83,7 @@ object Queryable {
    */
   trait Row[Q, R] extends Queryable[Q, R] {
     def isExecuteUpdate(q: Q): Boolean = false
-    def singleRow(q: Q): Boolean = true
+    def isSingleRow(q: Q): Boolean = true
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 

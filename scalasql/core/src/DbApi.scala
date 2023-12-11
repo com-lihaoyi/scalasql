@@ -189,7 +189,7 @@ object DbApi {
             fileName,
             lineNum
           )
-          if (qr.singleRow(query)) {
+          if (qr.isSingleRow(query)) {
             val results = res.take(2).toVector
             assert(
               results.size == 1,

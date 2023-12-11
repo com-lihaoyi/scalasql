@@ -152,8 +152,9 @@ class SimpleSelect[Q, R](
     new Aggregate[E, V](
       implicit ctx => copied.renderSql(ctx),
       r => Query.construct(copied, r).head,
-      selectProxyExpr
-    )(qr)
+      selectProxyExpr,
+      qr
+    )
   }
 
   def mapAggregate[Q2, R2](

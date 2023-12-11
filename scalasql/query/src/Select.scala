@@ -39,7 +39,8 @@ trait Select[Q, R]
     with Aggregatable[Q]
     with Joinable[Q, R]
     with JoinOps[Select, Q, R]
-    with Query.Multiple[R]
+    with Query[Seq[R]]
+    with Query.DelegateQueryable[Q, Seq[R]]
     with SelectBase {
 
   protected def dialect: DialectTypeMappers
@@ -191,8 +192,6 @@ trait Select[Q, R]
 
     renderer.render(LiveSqlExprs.none).withCompleteQuery(true)
   }
-  protected def queryWalkLabels() = qr.walkLabels(expr)
-  protected def queryWalkExprs() = qr.walkExprs(expr)
   protected override def queryIsSingleRow = false
 
   /**

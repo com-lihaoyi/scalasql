@@ -1,8 +1,7 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.Renderable
-import scalasql.core.{Queryable, SqlStr, Expr}
-import scalasql.core.Context
+import scalasql.core.{Context, Expr, Queryable, SqlStr, WithSqlExpr}
 
 /**
  * A SQL Query, either a [[Query.Multiple]] that returns multiple rows, or
@@ -25,6 +24,22 @@ object Query {
     protected override def queryIsExecuteUpdate = true
   }
 
+  trait DelegateQuery[R] extends scalasql.query.Query[R] {
+    protected def queryDelegate: Query[_]
+    protected def queryWalkLabels() = queryDelegate.queryWalkLabels()
+    protected def queryWalkExprs() = queryDelegate.queryWalkExprs()
+    protected override def queryIsSingleRow = queryDelegate.queryIsSingleRow
+    protected override def queryIsExecuteUpdate = queryDelegate.queryIsExecuteUpdate
+  }
+
+  trait DelegateQueryable[Q, R] extends scalasql.query.Query[R] with WithSqlExpr[Q] {
+    protected def qr: Queryable[Q, _]
+    protected def queryWalkLabels() = qr.walkLabels(expr)
+    protected def queryWalkExprs() = qr.walkExprs(expr)
+    protected override def queryIsSingleRow = qr.isSingleRow(expr)
+    protected override def queryIsExecuteUpdate = qr.isExecuteUpdate(expr)
+  }
+
   implicit def QueryQueryable[R]: Queryable[Query[R], R] = new QueryQueryable[Query[R], R]()
 
   def walkLabels[R](q: Query[R]) = q.queryWalkLabels()
@@ -35,21 +50,16 @@ object Query {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkLabels()
     override def walkExprs(q: Q) = q.queryWalkExprs()
-    override def singleRow(q: Q) = q.queryIsSingleRow
+    override def isSingleRow(q: Q) = q.queryIsSingleRow
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderSql(ctx)
 
     override def construct(q: Q, args: Queryable.ResultSetIterator): R = q.queryConstruct(args)
   }
 
-  trait Multiple[R] extends Query[Seq[R]]
-
-  class Single[R](query: Multiple[R]) extends Query[R] {
-    override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
-    protected def queryWalkLabels() = query.queryWalkLabels()
-    protected def queryWalkExprs() = query.queryWalkExprs()
-
-    protected def queryIsSingleRow: Boolean = true
+  class Single[R](query: Query[Seq[R]]) extends Query.DelegateQuery[R] {
+    protected def queryDelegate = query
+    protected override def queryIsSingleRow: Boolean = true
 
     protected def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
     protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
