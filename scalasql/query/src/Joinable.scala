@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, JoinNullable, Expr}
+import scalasql.core.{Context, Expr, JoinNullable, WithSqlExpr}
 
 /**
  * Something that can be joined; typically a [[Select]] or a [[Table]]
@@ -11,6 +11,14 @@ trait Joinable[Q, R] {
 
   protected def joinableToFromExpr: (Context.From, Q)
 
+  def joinFrom = {
+    val otherSelect = joinableToSelect
+    val otherFrom =
+      if (joinableIsTrivial) otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head
+      else new SubqueryRef(otherSelect)
+
+    (otherFrom, WithSqlExpr.get(otherSelect))
+  }
   /**
    * Version of `crossJoin` meant for usage in `for`-comprehensions
    */
