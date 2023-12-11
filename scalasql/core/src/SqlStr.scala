@@ -139,7 +139,52 @@ object SqlStr {
    * Joins a `Seq` of [[SqlStr]]s into a single [[SqlStr]] using the given [[sep]] separator
    */
   def join(strs: IterableOnce[SqlStr], sep: SqlStr = empty): SqlStr = {
-    strs.iterator.reduceOption(_ + sep + _).getOrElse(empty)
+    // Basically the same as `strs.iterator.reduceOption(_ + sep + _).getOrElse(empty)`,
+    // but implemented manually to improve performance since this is a hot path
+    val it = strs.iterator
+    val first = it.nextOption()
+    val firstIsEmpty = first.isEmpty
+    if (firstIsEmpty) empty
+    else if (!it.hasNext) first.get
+    else {
+      var lastFinalPart: StringBuilder = null
+      val finalParts = collection.mutable.ArrayBuilder.make[CharSequence]
+      val finalArgs = collection.mutable.ArrayBuilder.make[Interp]
+      val finalExprs = collection.mutable.ArrayBuilder.make[Expr.Identity]
+      def handle(s: SqlStr) = {
+        s.queryParts.length match{
+          case 0 => //donothing
+          case 1 =>
+            if (lastFinalPart == null) {
+              lastFinalPart = new StringBuilder(s.queryParts.last.toString)
+            } else {
+              lastFinalPart.append(s.queryParts.last)
+            }
+          case _ =>
+            if (lastFinalPart == null) {
+              finalParts.addAll(s.queryParts, 0, s.queryParts.length - 1)
+              lastFinalPart = new StringBuilder(s.queryParts.last.toString)
+            }else {
+              lastFinalPart.append(s.queryParts.head)
+              finalParts.addOne(lastFinalPart)
+              finalParts.addAll(s.queryParts, 1, s.queryParts.length - 2)
+              lastFinalPart = new StringBuilder(s.queryParts.last.toString)
+            }
+        }
+
+        finalArgs.addAll(s.params)
+        finalExprs.addAll(s.referencedExprs)
+      }
+      handle(first.get)
+      while(it.hasNext){
+        handle(sep)
+        handle(it.next())
+      }
+
+      finalParts.addOne(lastFinalPart)
+
+      new SqlStr(finalParts.result(), finalArgs.result(), false, finalExprs.result())
+    }
   }
 
   lazy val empty = sql""
