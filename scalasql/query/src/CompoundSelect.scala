@@ -35,7 +35,6 @@ class CompoundSelect[Q, R](
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
   override protected def expr = Joinable.toFromExpr(lhs)._2
 
-
   protected def selectToSimpleSelect() = this.subquery
 
   override def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {

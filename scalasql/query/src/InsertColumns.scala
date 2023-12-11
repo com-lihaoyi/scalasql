@@ -6,7 +6,9 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 /**
  * A SQL `INSERT VALUES` query
  */
-trait InsertColumns[V[_[_]], R] extends InsertReturnable[V[Column]] with Query.ExecuteUpdate[Int] {
+trait InsertColumns[V[_[_]], R]
+    extends Returning.InsertBase[V[Column]]
+    with Query.ExecuteUpdate[Int] {
   def columns: Seq[Column[_]]
   def valuesLists: Seq[Seq[Expr[_]]]
 }

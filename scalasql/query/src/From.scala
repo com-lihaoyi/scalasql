@@ -32,7 +32,7 @@ class SubqueryRef(val value: SubqueryRef.Wrapped) extends From {
   }
 }
 
-object SubqueryRef{
+object SubqueryRef {
 
   trait Wrapped {
     protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr]
@@ -57,4 +57,3 @@ class WithCteRef() extends From {
     name
   }
 }
-

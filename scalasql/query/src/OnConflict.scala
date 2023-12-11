@@ -6,7 +6,7 @@ import scalasql.core.{Context, Queryable, SqlStr, WithSqlExpr}
 /**
  * A query with a SQL `ON CONFLICT` clause, typically an `INSERT` or an `UPDATE`
  */
-class OnConflict[Q, R](query: Query[R] with InsertReturnable[Q], expr: Q, table: TableRef) {
+class OnConflict[Q, R](query: Query[R] with Returning.InsertBase[Q], expr: Q, table: TableRef) {
   def onConflictIgnore(c: (Q => Column[_])*) =
     new OnConflict.Ignore(query, c.map(_(expr)), table)
   def onConflictUpdate(c: (Q => Column[_])*)(c2: (Q => Column.Assignment[_])*) =
@@ -15,11 +15,11 @@ class OnConflict[Q, R](query: Query[R] with InsertReturnable[Q], expr: Q, table:
 
 object OnConflict {
   class Ignore[Q, R](
-      protected val query: Query[R] with InsertReturnable[Q],
+      protected val query: Query[R] with Returning.InsertBase[Q],
       columns: Seq[Column[_]],
       val table: TableRef
   ) extends Query.DelegateQuery[R]
-      with InsertReturnable[Q] {
+      with Returning.InsertBase[Q] {
     protected def expr = WithSqlExpr.get(query)
     protected def renderSql(ctx: Context) = {
       val str = Renderable.renderSql(query)(ctx)
@@ -33,12 +33,12 @@ object OnConflict {
   }
 
   class Update[Q, R](
-      protected val query: Query[R] with InsertReturnable[Q],
+      protected val query: Query[R] with Returning.InsertBase[Q],
       columns: Seq[Column[_]],
       updates: Seq[Column.Assignment[_]],
       val table: TableRef
   ) extends Query.DelegateQuery[R]
-      with InsertReturnable[Q] {
+      with Returning.InsertBase[Q] {
     protected def expr = WithSqlExpr.get(query)
     protected def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))

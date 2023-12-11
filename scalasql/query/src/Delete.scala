@@ -8,7 +8,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
 /**
  * A SQL `DELETE` query
  */
-trait Delete[Q] extends Query.ExecuteUpdate[Int] with Returnable[Q]
+trait Delete[Q] extends Query.ExecuteUpdate[Int] with Returning.Base[Q]
 
 object Delete {
   class Impl[Q](val expr: Q, filter: Expr[Boolean], val table: TableRef)(

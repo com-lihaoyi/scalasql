@@ -7,7 +7,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
  * A SQL `INSERT SELECT` query
  */
 trait InsertSelect[V[_[_]], C, R, R2]
-    extends InsertReturnable[V[Expr]]
+    extends Returning.InsertBase[V[Expr]]
     with Query.ExecuteUpdate[Int]
 
 object InsertSelect {
