@@ -85,14 +85,8 @@ object SqlStr {
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       val queryParts = self.queryParts
-      val params = self.interps
-      finalExprs.addAll(self.referencedExprs)
-      var boundary = true
-      val parenthesize = !topLevel && self.isCompleteQuery
-      if (parenthesize) addFinalPart("(")
-      boundary = true
 
-      def addFinalPart(s: CharSequence) = {
+      def addFinalPart(boundary: Boolean, s: CharSequence) = {
         if (boundary && lastFinalPart != null) {
           lastFinalPart.append(s)
         } else {
@@ -101,26 +95,41 @@ object SqlStr {
           finalParts.addOne(lastFinalPart)
         }
       }
+      queryParts.length match{
+        case 0 => // do nothing
+        case 1 =>
+          addFinalPart(true, queryParts.head)
+          finalExprs.addAll(self.referencedExprs)
+        case _ =>
+          val params = self.interps
+          finalExprs.addAll(self.referencedExprs)
+          var boundary = true
+          val parenthesize = !topLevel && self.isCompleteQuery
+          if (parenthesize) addFinalPart(boundary, "(")
+          boundary = true
 
-      var i = 0
-      val length = params.length
-      while (i < length) {
-        val p = queryParts(i)
-        val a = params(i)
-        addFinalPart(p)
-        boundary = false
-        a match {
-          case si: Interp.SqlStrInterp =>
-            rec(si.s, false)
-            boundary = true
 
-          case s: Interp.TypeInterp[_] => finalInterps.addOne(s)
-        }
-        i += 1
+          var i = 0
+          val length = params.length
+          while (i < length) {
+            val p = queryParts(i)
+            val a = params(i)
+            addFinalPart(boundary, p)
+            boundary = false
+            a match {
+              case si: Interp.SqlStrInterp =>
+                rec(si.s, false)
+                boundary = true
+
+              case s: Interp.TypeInterp[_] => finalInterps.addOne(s)
+            }
+            i += 1
+          }
+
+          addFinalPart(boundary, queryParts.last)
+          if (parenthesize) addFinalPart(boundary, ")")
       }
 
-      addFinalPart(queryParts.last)
-      if (parenthesize) addFinalPart(")")
     }
 
     rec(self, true)
