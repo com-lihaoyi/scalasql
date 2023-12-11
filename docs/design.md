@@ -93,9 +93,9 @@ than static methods that receive `Expr[T]` as parameters. This has two goals:
    ScalaSql aims to make user code "look like" normal Scala, and thus it follows
    that style
 
-2. To avoid namespace collisions: extension methods via `implicit class`es tend 
+2. To avoid namespace collisions: extension methods via `implicit class`es tend
    to cause fewer namespace collisions than imported static methods, as only the
-   name of the `implicit class` must be imported for all extension methods to 
+   name of the `implicit class` must be imported for all extension methods to
    be available. "static" methods that do not belong to any obvious type are provided
    as extension methods on the `DbApi` type that you use to make queries
 
@@ -106,11 +106,41 @@ However, there are some operations that do not map nicely to extension methods:
 `caseWhen`, `values`, etc. These are left as static methods that are brought into
 scope when you call `import scalasql.dialects.MyDialect._`.
 
+## Type Safety
+
+SQL code has types, and ScalaSql makes a best effort to model them in the Scala API
+that it exposes to users:
+
+* ScalaSql queries that compile successfully should be valid SQL queries running on
+  the database, and not fail at runtime due to some unsupported operation in the
+  underlying database
+
+* ScalaSql queries that fail to compile should indicate an issue in the underlying SQL,
+  and not fail to compile due to some limitation in the ScalaSql library
+
+* IDE autocomplete, error reporting, etc. should help guide you into what is supported
+  and unsupported by the ScalaSql API, and what is supported by your particular database
+  dialect
+
+As different databases expose different APIs, ScalaSql exposes different dialects for
+each database type that it supports, exposing different sets of extension methods on
+the `Expr[T]` types to account for the difference in supported operations. Queries that
+only work on one database or another should only compile successfully when using that
+database's dialect.
+
+ScalaSql's type safety is not 100%. Databases often have very different type systems-
+both different from each other and different from Scala - which makes 100% precise
+type-safety impossible. Nevertheless, ScalaSql's type safety should be precise enough
+that writing ScalaSql queries feels similar to writing normal Scala code, without
+the neither-here-nor-there feeling that is common when working with database query
+libraries.
+
+
 ## Internal APIs
 
 ScalaSql separates "internal" APIs used for implementation details from "external"
 APIs meant to be user facing by marking the internal APIs as `protected`. However,
-some "internal" APIs are also used by advanced users who wish to extend Mill, and thus 
+some "internal" APIs are also used by advanced users who wish to extend Mill, and thus
 cannot be restricted to the `scalasql` package: for these we provide same-named getter
 methods on the class's companion object, e.g. `Select.selectSimpleFrom`
 `Select.selectRenderer`, or `Select.selectLhsMap`. These allow the API to be exposed
@@ -125,7 +155,7 @@ implementation or advanced users.
 
 2. **Vanilla-Scala-Like Syntax and Semantics**: ScalaSql aims to look like normal
    operations on Scala collections, Scala tuples, Scala `case class`es. Naturally
-   there will be some differences, some incidental and some fundamental. But the 
+   there will be some differences, some incidental and some fundamental. But the
    hope is that any Scala programmer who picks up ScalaSql will be able to begin
    using it effectively leveraging all they already know about programming in Scala,
    without having to learn an entirely new DSL
@@ -166,13 +196,13 @@ implementation or advanced users.
 
 2. **Compile-time query generation**: like [ZIO-Quill](https://github.com/zio/zio-quill).
    Not because I don't want it: high runtime performance + compile-time logging of
-   queries is great!. But because compile-time query generation adds enough complexity 
+   queries is great!. But because compile-time query generation adds enough complexity
    that I wouldn't able to implement it in a reasonable timeframe and won't be able to
    maintain it effectively on a shoe-string time budget going forward.
 
-3. **Novel Database Designs**: Databases often have problems around un-predictable 
+3. **Novel Database Designs**: Databases often have problems around un-predictable
    query plans, limited options for defining indices, confusing performance characteristics,
-   and many other things. ScalaSql aims to fix none of these problems: it just aims to 
+   and many other things. ScalaSql aims to fix none of these problems: it just aims to
    provide a nicer way to define SQL queries in Scala code, and return the results
    as Scala values. Someone else can improve the databases themselves.
 
@@ -182,11 +212,11 @@ implementation or advanced users.
    to either extend the library to support or drop down to raw SQL.
 
 5. **ORM/ActiveRecord-esque Features**: Most Scala code is immutable by default, and works
-   by transforming immutable Scala collections of immutable values through pure functions. 
+   by transforming immutable Scala collections of immutable values through pure functions.
    ScalaSql aims to follow that style, rather than trying to emulate mutable objects. This
    should fit into the prevalent style of the enclosing Scala application, and avoid the
-   difficult edge cases that emerge when trying to emulate local mutable state via database 
-   queries 
+   difficult edge cases that emerge when trying to emulate local mutable state via database
+   queries
 
 6. **Schema management and migrations**: ScalaSql focuses primarily on writing queries
    to create, read, update, and delete rows from existing tables..
@@ -223,9 +253,9 @@ user-facing complexity and internal maintainability:
    between what's "supported" vs "not" is often not clear. For example, a `String` in Quill
    exposes all `java.lang.String` operations to dot-completion, even though only a few are
    valid translated to SQL, and even for those it is unclear what they are translated into:
-   jump-to-definition just takes you to `java.lang.String` sources. With ScalaSql, 
+   jump-to-definition just takes you to `java.lang.String` sources. With ScalaSql,
    dot-completion exposes a minimal subset of operations valid for translation to SQL, and
-   for any of them you can jump-to-definition to easily see the exact SQL string that it 
+   for any of them you can jump-to-definition to easily see the exact SQL string that it
    generates
 
 2. From a maintainers perspective, Quill's compile-time approach means it needs two
