@@ -40,7 +40,7 @@ object SqlStr {
       val params: collection.IndexedSeq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
       val referencedExprs: collection.IndexedSeq[Expr.Identity]
-  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs){
+  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs) {
     def renderSql(castParams: Boolean) = {
       val queryStr = queryParts.iterator
         .zipAll(params, "", null)

@@ -18,6 +18,13 @@ trait Query[R] extends Renderable {
 }
 
 object Query {
+  trait ExecuteUpdate[R] extends scalasql.query.Query[R] {
+    protected def queryWalkLabels() = Nil
+    protected def queryWalkExprs() = Nil
+    protected override def queryIsSingleRow = true
+    protected override def queryIsExecuteUpdate = true
+  }
+
   implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Queryable[Query[R], R]()
 
   def walkLabels[R](q: Query[R]) = q.queryWalkLabels()

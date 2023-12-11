@@ -3,7 +3,7 @@ package scalasql.query
 import scalasql.core.{Context, DialectTypeMappers, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
-trait InsertValues[V[_[_]], R] extends Query[Int] {
+trait InsertValues[V[_[_]], R] extends Query.ExecuteUpdate[Int] {
   def skipColumns(x: (V[Column] => Column[_])*): InsertValues[V, R]
 }
 object InsertValues {
@@ -14,13 +14,6 @@ object InsertValues {
       qr: Queryable.Row[V[Column], R],
       skippedColumns: Seq[Column[_]]
   ) extends InsertValues[V, R] {
-    protected def queryWalkLabels() = Nil
-
-    protected def queryWalkExprs() = Nil
-
-    override protected def queryIsSingleRow = true
-
-    protected override def queryIsExecuteUpdate = true
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(dialect.IntType)

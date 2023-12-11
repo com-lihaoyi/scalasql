@@ -120,7 +120,6 @@ object DbApi {
     flattened.renderSql(castParams)
   }
 
-
   /**
    * An interface to a SQL database *transaction*, allowing you to run queries,
    * create savepoints, or roll back the transaction.

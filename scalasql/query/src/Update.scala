@@ -17,7 +17,7 @@ import scalasql.renderer.JoinsToSql
 /**
  * A SQL `UPDATE` query
  */
-trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[Int] {
+trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query.ExecuteUpdate[Int] {
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
   def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)
 
@@ -32,10 +32,6 @@ trait Update[Q, R] extends JoinOps[Update, Q, R] with Returnable[Q] with Query[I
   ): Update[QF, RF]
 
   def qr: Queryable.Row[Q, R]
-  override def queryIsExecuteUpdate = true
-  override def queryIsSingleRow = false
-  protected def queryWalkLabels() = Nil
-  protected def queryWalkExprs() = Nil
 }
 
 object Update {

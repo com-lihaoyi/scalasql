@@ -6,7 +6,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 /**
  * A SQL `INSERT VALUES` query
  */
-trait InsertColumns[V[_[_]], R] extends InsertReturnable[V[Column]] with Query[Int] {
+trait InsertColumns[V[_[_]], R] extends InsertReturnable[V[Column]] with Query.ExecuteUpdate[Int] {
   def columns: Seq[Column[_]]
   def valuesLists: Seq[Seq[Expr[_]]]
 }
@@ -23,11 +23,6 @@ object InsertColumns {
 
     protected override def renderSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()
-
-    protected def queryWalkLabels() = Nil
-    protected def queryWalkExprs() = Nil
-    protected override def queryIsSingleRow = true
-    protected override def queryIsExecuteUpdate = true
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(IntType)

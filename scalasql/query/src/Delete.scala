@@ -8,17 +8,13 @@ import scalasql.core.SqlStr.SqlStringSyntax
 /**
  * A SQL `DELETE` query
  */
-trait Delete[Q] extends Query[Int] with Returnable[Q]
+trait Delete[Q] extends Query.ExecuteUpdate[Int] with Returnable[Q]
 
 object Delete {
   class Impl[Q](val expr: Q, filter: Expr[Boolean], val table: TableRef)(
       implicit dialect: DialectTypeMappers
   ) extends Delete[Q] {
     import dialect._
-    override def queryIsExecuteUpdate = true
-    protected def queryWalkLabels() = Nil
-    protected def queryWalkExprs() = Nil
-    protected def queryIsSingleRow = true
 
     protected def renderSql(ctx: Context) = new Renderer(table, filter, ctx).render()
 
