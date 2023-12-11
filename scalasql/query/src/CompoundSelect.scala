@@ -135,10 +135,10 @@ object CompoundSelect {
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
           // belonging to the RHS SimpleSelect `liveExprs` analysis to work
           val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-            val strs = l.map(e => SqlStr.flatten(lhsExprAliases(e)).queryParts.mkString("?"))
+            val strs = l.map(e => lhsExprAliases(e).toString)
 
             rhsExprAliases.collect {
-              case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
+              case (k, v) if strs.contains(v.toString) => k
             }.toSet
           }
           sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(rhsInnerLiveExprs)}"
