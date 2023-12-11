@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{Context, LiveSqlExprs, Queryable, Expr, SqlStr}
+import scalasql.core.{Context, Expr, ExprsToSql, LiveSqlExprs, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.Context.From
 import scalasql.core.SqlStr.SqlStringSyntax
 
@@ -11,6 +11,7 @@ class TableRef(val value: Table.Base) extends From {
   override def toString = s"TableRef(${Table.name(value)})"
 
   def fromRefPrefix(prevContext: Context) = prevContext.config.tableNameMapper(Table.name(value))
+
   def fromExprAliases(prevContext: Context) = Map()
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
@@ -48,10 +49,12 @@ object SubqueryRef {
   }
 }
 
-class WithCteRef() extends From {
+class WithCteRef(walked: Queryable.Walked) extends From {
   def fromRefPrefix(prevContext: Context) = "cte"
 
-  def fromExprAliases(prevContext: Context) = Map()
+  def fromExprAliases(prevContext: Context) = {
+    ExprsToSql.selectColumnReferences(walked, prevContext).toMap
+  }
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     name

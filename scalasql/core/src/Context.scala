@@ -89,7 +89,7 @@ object Context {
         prefixedFroms.iterator
           .flatMap { t =>
             t
-              .fromExprAliases(prevContext)
+              .fromExprAliases(prevContext.withFromNaming(newFromNaming))
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 

@@ -17,33 +17,34 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
  * A SQL `WITH` clause
  */
 class WithCte[Q, R](
+    walked: Queryable.Walked,
     val lhs: Select[_, _],
-    val lhsSubQuery: WithCteRef,
+    val cteRef: WithCteRef,
     val rhs: Select[Q, R],
     val withPrefix: SqlStr = sql"WITH "
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select.Proxy[Q, R] {
 
   override protected def expr = Joinable.toFromExpr(rhs)._2
-  private def unprefixed = new WithCte(lhs, lhsSubQuery, rhs, SqlStr.commaSep)
+  private def unprefixed = new WithCte(walked, lhs, cteRef, rhs, SqlStr.commaSep)
 
   protected def selectToSimpleSelect() = this.subquery
 
   override def map[Q2, R2](f: Q => Q2)(implicit qr2: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    new WithCte(lhs, lhsSubQuery, rhs.map(f))
+    new WithCte(walked, lhs, cteRef, rhs.map(f))
   }
 
   override def filter(f: Q => Expr[Boolean]): Select[Q, R] = {
-    new WithCte(rhs.filter(f), lhsSubQuery, rhs)
+    new WithCte(walked, rhs.filter(f), cteRef, rhs)
   }
 
-  override def sortBy(f: Q => Expr[_]) = new WithCte(lhs, lhsSubQuery, rhs.sortBy(f))
+  override def sortBy(f: Q => Expr[_]) = new WithCte(walked, lhs, cteRef, rhs.sortBy(f))
 
-  override def drop(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.drop(n))
-  override def take(n: Int) = new WithCte(lhs, lhsSubQuery, rhs.take(n))
+  override def drop(n: Int) = new WithCte(walked, lhs, cteRef, rhs.drop(n))
+  override def take(n: Int) = new WithCte(walked, lhs, cteRef, rhs.take(n))
 
   override protected def selectRenderer(prevContext: Context) =
-    new WithCte.Renderer(withPrefix, this, prevContext)
+    new WithCte.Renderer(walked, withPrefix, this, prevContext)
 
   override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     SubqueryRef.Wrapped.exprAliases(rhs, prevContext)
@@ -92,36 +93,32 @@ object WithCte {
     }
   }
 
-  class Renderer[Q, R](withPrefix: SqlStr, query: WithCte[Q, R], prevContext: Context)
-      extends SubqueryRef.Wrapped.Renderer {
+  class Renderer[Q, R](
+      walked: Queryable.Walked,
+      withPrefix: SqlStr,
+      query: WithCte[Q, R],
+      prevContext: Context
+  ) extends SubqueryRef.Wrapped.Renderer {
     def render(liveExprs: LiveSqlExprs) = {
-      val walked =
-        query.lhs.qr
-          .asInstanceOf[Queryable[Any, Any]]
-          .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
-
       val newExprNaming = ExprsToSql.selectColumnReferences(walked, prevContext)
+      val newContext = Context.compute(prevContext, Seq(query.cteRef), None)
+      val cteName = SqlStr.raw(newContext.fromNaming(query.cteRef))
+      val leadingSpace = query.rhs match {
+        case w: WithCte[Q, R] => SqlStr.empty
+        case r => sql" "
+      }
 
-      val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
-      val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))
-      val rhsSql = SqlStr.flatten(
-        (query.rhs match {
-          case w: WithCte[Q, R] => SqlStr.empty
-          case r => sql" "
-        }) +
-          SubqueryRef.Wrapped
-            .renderer(
-              query.rhs match {
-                case w: WithCte[Q, R] => w.unprefixed
-                case r => r
-              },
-              newContext.withExprNaming(
-                newContext.exprNaming ++
-                  newExprNaming.map { case (k, v) => (k, sql"$cteName.$v") }
-              )
-            )
-            .render(liveExprs)
-      )
+      val wrapped = SubqueryRef.Wrapped
+        .renderer(
+          query.rhs match {
+            case w: WithCte[Q, R] => w.unprefixed
+            case r => r
+          },
+          newContext
+        )
+        .render(liveExprs)
+
+      val rhsSql = SqlStr.flatten(leadingSpace + wrapped)
       val rhsReferenced = LiveSqlExprs.some(rhsSql.referencedExprs.toSet)
       val lhsSql =
         SubqueryRef.Wrapped.renderer(query.lhs, prevContext).render(rhsReferenced)
