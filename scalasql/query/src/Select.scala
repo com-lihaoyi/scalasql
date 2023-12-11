@@ -101,13 +101,15 @@ trait Select[Q, R]
   /**
    * Performs one or more aggregates in a single [[Select]]
    */
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V]
+  def aggregate[E, V](f: Aggregatable.Proxy[Q] => E)(
+      implicit qr: Queryable.Row[E, V]
+  ): Aggregate[E, V]
 
   /**
-   * Performs a `.map` which additionally provides a [[SelectProxy]] that allows you to perform aggregate
+   * Performs a `.map` which additionally provides a [[Aggregatable.Proxy]] that allows you to perform aggregate
    * functions.
    */
-  def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(
+  def mapAggregate[Q2, R2](f: (Q, Aggregatable.Proxy[Q]) => Q2)(
       implicit qr: Queryable.Row[Q2, R2]
   ): Select[Q2, R2]
 
@@ -116,7 +118,7 @@ trait Select[Q, R]
    * a function specifying the group-aggregate.
    */
   def groupBy[K, V, R2, R3](groupKey: Q => K)(
-      groupAggregate: SelectProxy[Q] => V
+      groupAggregate: Aggregatable.Proxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R2], qrv: Queryable.Row[V, R3]): Select[(K, V), (R2, R3)]
 
   /**
@@ -310,16 +312,16 @@ object Select {
 
     override def filter(f: Q => Expr[Boolean]): Select[Q, R] = selectToSimpleSelect().filter(f)
 
-    override def aggregate[E, V](f: SelectProxy[Q] => E)(
+    override def aggregate[E, V](f: Aggregatable.Proxy[Q] => E)(
         implicit qr: Queryable.Row[E, V]
     ): Aggregate[E, V] = selectToSimpleSelect().aggregate(f)
 
-    override def mapAggregate[Q2, R2](f: (Q, SelectProxy[Q]) => Q2)(
+    override def mapAggregate[Q2, R2](f: (Q, Aggregatable.Proxy[Q]) => Q2)(
         implicit qr: Queryable.Row[Q2, R2]
     ): Select[Q2, R2] = selectToSimpleSelect().mapAggregate(f)
 
     override def groupBy[K, V, R2, R3](groupKey: Q => K)(
-        groupAggregate: SelectProxy[Q] => V
+        groupAggregate: Aggregatable.Proxy[Q] => V
     )(implicit qrk: Queryable.Row[K, R2], qrv: Queryable.Row[V, R3]): Select[(K, V), (R2, R3)] =
       selectToSimpleSelect().groupBy(groupKey)(groupAggregate)
 

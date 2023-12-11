@@ -848,10 +848,10 @@ db.run(query) ==> Seq(
 ```
 
 You can also perform aggregates as part of your window function by using
-the `.mapAggregate` function; this provides a `SelectProxy[Q]` rather than
+the `.mapAggregate` function; this provides a `Aggregatable.Proxy[Q]` rather than
 a `Q`, letting you perform aggregates like `.sumBy` that you can then use
 as window functions via `.over`. You can reference normal columns by referencing
-the `.expr` member on each `SelectProxy`.
+the `.expr` member on each `Aggregatable.Proxy`.
 ```scala
 val query = City.select
   .mapAggregate((c, cs) =>

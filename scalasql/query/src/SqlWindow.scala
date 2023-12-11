@@ -20,7 +20,7 @@ case class SqlWindow[T](
     val partitionBySql = SqlStr.opt(partitionBy0) { p => sql"PARTITION BY $p" }
     val sortBySql = CompoundSelect.orderToSqlStr(orderBy, ctx)
     val overClause = SqlStr.join(
-      Seq(partitionBySql, sortBySql).filter(!SqlStr.flatten(_).queryParts.forall(_.isEmpty)),
+      Seq(partitionBySql, sortBySql).filter(!SqlStr.flatten(_).queryParts.forall(_.length == 0)),
       sql" "
     )
 

@@ -1,13 +1,14 @@
 package scalasql.query
 
 import scalasql.core.{
+  Aggregatable,
   Context,
   DialectTypeMappers,
+  Expr,
+  ExprsToSql,
   JoinNullable,
   LiveExprs,
   Queryable,
-  Expr,
-  ExprsToSql,
   SqlStr,
   TypeMapper
 }
@@ -140,30 +141,32 @@ class SimpleSelect[Q, R](
     joinCopy(other, Some(on), "FULL OUTER JOIN")((e, o) => (JoinNullable(e), JoinNullable(o)))
   }
 
-  def aggregate[E, V](f: SelectProxy[Q] => E)(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
-    val selectProxyExpr = f(new SelectProxy[Q](expr))
-    val copied = this.copy(expr = selectProxyExpr)
+  def aggregate[E, V](
+      f: Aggregatable.Proxy[Q] => E
+  )(implicit qr: Queryable.Row[E, V]): Aggregate[E, V] = {
+    val aggregateProxy = f(new Aggregatable.Proxy[Q](expr))
+    val copied = this.copy(expr = aggregateProxy)
     new Aggregate[E, V](
       implicit ctx => copied.renderSql(ctx),
       r => Query.construct(copied, r).head,
-      selectProxyExpr,
+      aggregateProxy,
       qr
     )
   }
 
   def mapAggregate[Q2, R2](
-      f: (Q, SelectProxy[Q]) => Q2
+      f: (Q, Aggregatable.Proxy[Q]) => Q2
   )(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] = {
-    val selectProxyExpr = f(expr, new SelectProxy[Q](expr))
-    this.copy(expr = selectProxyExpr)
+    val aggregateProxy = f(expr, new Aggregatable.Proxy[Q](expr))
+    this.copy(expr = aggregateProxy)
   }
 
   def groupBy[K, V, R1, R2](groupKey: Q => K)(
-      groupAggregate: SelectProxy[Q] => V
+      groupAggregate: Aggregatable.Proxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
     val groupKeyValue = groupKey(expr)
     val Seq(groupKeyExpr) = qrk.walkExprs(groupKeyValue)
-    val newExpr = (groupKeyValue, groupAggregate(new SelectProxy[Q](this.expr)))
+    val newExpr = (groupKeyValue, groupAggregate(new Aggregatable.Proxy[Q](this.expr)))
 
     // Weird hack to store the post-groupby `Select` as part of the `GroupBy`
     // object, because `.flatMap` sometimes need us to roll back any subsequent
