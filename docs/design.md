@@ -142,8 +142,8 @@ ScalaSql separates "internal" APIs used for implementation details from "externa
 APIs meant to be user facing by marking the internal APIs as `protected`. However,
 some "internal" APIs are also used by advanced users who wish to extend Mill, and thus
 cannot be restricted to the `scalasql` package: for these we provide same-named getter
-methods on the class's companion object, e.g. `Select.selectSimpleFrom`
-`Select.selectRenderer`, or `Select.selectLhsMap`. These allow the API to be exposed
+methods on the class's companion object, e.g. `Select.toSimpleFrom`
+`Select.renderer`, or `Select.exprAliases`. These allow the API to be exposed
 while still keep the external-facing method namespace clean, and preserving the
 separation between external APIs meant for common use from internal APIs meant for
 implementation or advanced users.

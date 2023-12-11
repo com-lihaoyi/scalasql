@@ -101,9 +101,9 @@ object CompoundSelect {
     import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsLhsMap = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext)
+    lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext)
     lazy val context = lhsToSqlQuery.context
-      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
+      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsExprAliases)
 
     lazy val sortOpt = SqlStr.flatten(orderToSqlStr(context))
 
@@ -129,15 +129,15 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-          lazy val rhsLhsMap = SubqueryRef.Wrapped.exprAliases(op.rhs, prevContext)
+          lazy val rhsExprAliases = SubqueryRef.Wrapped.exprAliases(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
           // belongong to the RHS SimpleSelect `liveExprs` analysis to work
           val rhsInnerLiveExprs = innerLiveExprs.map { l =>
-            val strs = l.map(e => SqlStr.flatten(lhsLhsMap(e)).queryParts.mkString("?"))
+            val strs = l.map(e => SqlStr.flatten(lhsExprAliases(e)).queryParts.mkString("?"))
 
-            rhsLhsMap.collect {
+            rhsExprAliases.collect {
               case (k, v) if strs.contains(SqlStr.flatten(v).queryParts.mkString("?")) => k
             }.toSet
           }
