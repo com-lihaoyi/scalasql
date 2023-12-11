@@ -20,7 +20,7 @@
   environment variable, e.g.
 
 ```
-SCALASQL_RUN_BENCHMARK=true ./mill -i -w __.test scalasql.sqlite.SubQueryTests.deeplyNested
+SCALASQL_RUN_BENCHMARK=5000 ./mill -i -w __.test scalasql.sqlite.SubQueryTests.deeplyNested
 ```
 
 * ScalaSql comprises 4 main submodules:

@@ -465,7 +465,7 @@ object DbApi {
     private def cast[T](t: Any): T = t.asInstanceOf[T]
 
     private def flattenParamPuts[T](flattened: SqlStr.Flattened) = {
-      flattened.params.map(v => (s, n) => v.mappedType.put(s, n, cast(v.value))).toSeq
+      flattened.paramsIterator.map(v => (s, n) => v.mappedType.put(s, n, cast(v.value))).toSeq
     }
 
     private def anySeqPuts(variables: Seq[Any]) = {

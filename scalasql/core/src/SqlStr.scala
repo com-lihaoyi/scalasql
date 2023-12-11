@@ -7,10 +7,10 @@ package scalasql.core
  * until [[SqlStr.flatten]] is called to convert it into a [[SqlStr.Flattened]]
  */
 class SqlStr(
-    private val queryParts: collection.IndexedSeq[CharSequence],
-    private val params: collection.IndexedSeq[SqlStr.Interp],
+    private val queryParts: Array[CharSequence],
+    private val params: Array[SqlStr.Interp],
     val isCompleteQuery: Boolean,
-    private val referencedExprs: collection.IndexedSeq[Expr.Identity]
+    private val referencedExprs: Array[Expr.Identity]
 ) extends SqlStr.Renderable {
   def +(other: SqlStr) = {
     new SqlStr(
@@ -30,21 +30,22 @@ class SqlStr(
 object SqlStr {
   private val emptyIdentityArray = Array.empty[Expr.Identity]
   private val emptyInterpArray = Array.empty[SqlStr.Interp]
-  private val plusParts: IndexedSeq[String] = Array("", "", "")
+  private val plusParts = Array[CharSequence]("", "", "")
 
   /**
    * Represents a [[SqlStr]] that has been flattened out into a single set of
    * parallel arrays, allowing you to render it or otherwise make use of its data.
    */
   class Flattened(
-      val queryParts: collection.IndexedSeq[CharSequence],
-      val params: collection.IndexedSeq[Interp.TypeInterp[_]],
+      val queryParts: Array[CharSequence],
+      val params0: Array[Interp],
       isCompleteQuery: Boolean,
-      val referencedExprs: collection.IndexedSeq[Expr.Identity]
-  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs) {
+      val referencedExprs: Array[Expr.Identity]
+  ) extends SqlStr(queryParts, params0, isCompleteQuery, referencedExprs) {
+    def paramsIterator = params0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
     def renderSql(castParams: Boolean) = {
       val queryStr = queryParts.iterator
-        .zipAll(params, "", null)
+        .zipAll(paramsIterator, "", null)
         .map {
           case (part, null) => part
           case (part, param) =>
@@ -76,28 +77,28 @@ object SqlStr {
    */
   def flatten(self: SqlStr): Flattened = {
     // Implement this in a mutable style because`it's pretty performance sensitive
-    val finalParts = collection.mutable.ArrayBuffer.empty[StringBuilder]
-    val finalArgs = collection.mutable.ArrayBuffer.empty[Interp.TypeInterp[_]]
-    val finalExprs = collection.mutable.ArrayBuffer.empty[Expr.Identity]
+    val finalParts = collection.mutable.ArrayBuilder.make[CharSequence]
+    val finalArgs = collection.mutable.ArrayBuilder.make[Interp]
+    val finalExprs = collection.mutable.ArrayBuilder.make[Expr.Identity]
     // Equivalent to `finalParts.last`, cached locally for performance
     var lastFinalPart: StringBuilder = null
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       val queryParts = self.queryParts
       val params = self.params
-      finalExprs.appendAll(self.referencedExprs)
+      finalExprs.addAll(self.referencedExprs)
       var boundary = true
       val parenthesize = !topLevel && self.isCompleteQuery
       if (parenthesize) addFinalPart("(")
       boundary = true
 
       def addFinalPart(s: CharSequence) = {
-        if (boundary && finalParts.nonEmpty) {
-          finalParts.last.append(s)
+        if (boundary && lastFinalPart != null) {
+          lastFinalPart.append(s)
         } else {
           lastFinalPart = new StringBuilder()
           lastFinalPart.append(s)
-          finalParts.append(lastFinalPart)
+          finalParts.addOne(lastFinalPart)
         }
       }
 
@@ -113,7 +114,7 @@ object SqlStr {
             rec(si.s, false)
             boundary = true
 
-          case s: Interp.TypeInterp[_] => finalArgs.append(s)
+          case s: Interp.TypeInterp[_] => finalArgs.addOne(s)
         }
         i += 1
       }
@@ -123,7 +124,7 @@ object SqlStr {
     }
 
     rec(self, true)
-    new Flattened(finalParts, finalArgs, self.isCompleteQuery, finalExprs)
+    new Flattened(finalParts.result(), finalArgs.result(), self.isCompleteQuery, finalExprs.result())
   }
 
   /**
@@ -131,7 +132,7 @@ object SqlStr {
    */
   implicit class SqlStringSyntax(sc: StringContext) {
     def sql(args: Interp*) =
-      new SqlStr(sc.parts.toIndexedSeq, args.toIndexedSeq, false, Array.empty[Expr.Identity])
+      new SqlStr(sc.parts.toArray, args.toArray, false, emptyIdentityArray)
   }
 
   /**
