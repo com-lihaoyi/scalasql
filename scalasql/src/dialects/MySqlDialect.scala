@@ -15,8 +15,7 @@ import scalasql.query.{
   OrderBy,
   Query,
   Table,
-  TableRef,
-  Update
+  TableRef
 }
 import scalasql.core.{
   Aggregatable,
@@ -32,10 +31,10 @@ import scalasql.core.{
   WithSqlExpr
 }
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
-import scalasql.operations.{ConcatOps, ExprNumericOps, MathOps, PadOps}
+import scalasql.operations.{ConcatOps, MathOps, PadOps}
 import scalasql.renderer.JoinsToSql
 
-import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import java.sql.PreparedStatement
 import java.time.{Instant, LocalDateTime}
 import java.util.UUID
 import scala.reflect.ClassTag

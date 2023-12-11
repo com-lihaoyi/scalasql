@@ -1,16 +1,7 @@
 package scalasql
 import scalasql._
 
-import java.sql.Date
-import java.time.{
-  Instant,
-  LocalDate,
-  LocalDateTime,
-  LocalTime,
-  OffsetDateTime,
-  OffsetTime,
-  ZonedDateTime
-}
+import java.time.LocalDate
 
 case class Product[T[_]](id: T[Int], kebabCaseName: T[String], name: T[String], price: T[Double])
 object Product extends Table[Product]

@@ -1,8 +1,5 @@
 package scalasql.operations
 
-import scalasql._
-import scalasql.core.Expr
-import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.utils.ScalaSqlSuite
 import utest._
 

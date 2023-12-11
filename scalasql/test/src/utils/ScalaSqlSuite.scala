@@ -1,10 +1,8 @@
 package scalasql.utils
 
-import scalasql.{DbClient, DbApi, dialects}
+import scalasql.DbApi
 import scalasql.dialects._
 import utest.TestSuite
-
-import java.sql.DriverManager
 
 abstract class ScalaSqlSuite(implicit val suiteLine: sourcecode.Line)
     extends TestSuite

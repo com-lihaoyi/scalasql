@@ -1,7 +1,4 @@
 package test.scalasql
-import scalasql.query.{AscDesc, CompoundSelect, Nulls, OrderBy}
-import scalasql.core.Context
-import scalasql.SqlStr
 import utest._
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}

@@ -1,7 +1,7 @@
 package scalasql.datatypes
 
 import scalasql.core.Expr
-import scalasql.{datatypes, _}
+import scalasql._
 import utest._
 import utils.ScalaSqlSuite
 import sourcecode.Text

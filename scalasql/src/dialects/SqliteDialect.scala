@@ -10,10 +10,10 @@ import scalasql.core.{
   SqlStr,
   TypeMapper
 }
-import scalasql.{Sc, dialects, operations}
-import scalasql.query.{AscDesc, CompoundSelect, GroupBy, Join, Nulls, OrderBy, Select, Table}
+import scalasql.{Sc, operations}
+import scalasql.query.{CompoundSelect, GroupBy, Join, OrderBy, Table}
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.{DbApiOps, TrimOps}
+import scalasql.operations.TrimOps
 
 import java.time.{Instant, LocalDate, LocalDateTime}
 

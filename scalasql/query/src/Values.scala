@@ -1,16 +1,7 @@
 package scalasql.query
 
-import scalasql.core.{
-  Context,
-  DialectTypeMappers,
-  Expr,
-  LiveExprs,
-  Queryable,
-  SqlStr,
-  TypeMapper,
-  WithSqlExpr
-}
-import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.core.{Context, DialectTypeMappers, Expr, LiveExprs, Queryable, SqlStr}
+import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
  * A SQL `VALUES` clause, used to treat a sequence of primitive [[T]]s as

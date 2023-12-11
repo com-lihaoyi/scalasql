@@ -1,6 +1,6 @@
 package scalasql.operations
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.core.{Expr, SqlStr}
+import scalasql.core.Expr
 
 trait MathOps {
 

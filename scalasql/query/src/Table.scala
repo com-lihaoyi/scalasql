@@ -2,8 +2,6 @@ package scalasql.query
 
 import scalasql.core.{DialectTypeMappers, Sc, Queryable, Expr}
 
-import scala.language.experimental.macros
-
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */

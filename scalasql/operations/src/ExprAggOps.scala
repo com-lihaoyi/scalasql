@@ -1,8 +1,7 @@
 package scalasql.operations
 
 import scalasql.core.Aggregatable
-import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.core.{Queryable, TypeMapper, Expr}
+import scalasql.core.{TypeMapper, Expr}
 
 abstract class ExprAggOps[T](v: Aggregatable[Expr[T]]) {
 

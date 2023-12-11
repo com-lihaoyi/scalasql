@@ -6,8 +6,6 @@ import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
 
-import java.time.LocalDate
-
 trait WindowFunctionTests extends ScalaSqlSuite {
   def description = "Window functions using `OVER`"
 

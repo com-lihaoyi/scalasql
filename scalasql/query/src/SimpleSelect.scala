@@ -1,7 +1,6 @@
 package scalasql.query
 
 import scalasql.core.{
-  Config,
   Context,
   DialectTypeMappers,
   JoinNullable,
@@ -10,14 +9,10 @@ import scalasql.core.{
   Expr,
   ExprsToSql,
   SqlStr,
-  TypeMapper,
-  WithSqlExpr
+  TypeMapper
 }
-import scalasql.renderer.JoinsToSql.joinsToSqlStr
-import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, join}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.renderer.JoinsToSql
-
-import scala.collection.mutable
 
 /**
  * A `SELECT` query, with `FROM`/`JOIN`/`WHERE`/`GROUP BY`

@@ -3,7 +3,6 @@ package example
 import geny.Generator
 import scalasql.{DbApi, Sc, Table}
 
-import java.sql.DriverManager
 import scalasql.SqliteDialect._
 import scalasql.core.SqlStr.SqlStringSyntax
 

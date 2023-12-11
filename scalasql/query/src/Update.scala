@@ -1,16 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{
-  Context,
-  DialectTypeMappers,
-  LiveExprs,
-  Queryable,
-  Expr,
-  ExprsToSql,
-  SqlStr,
-  TypeMapper,
-  WithSqlExpr
-}
+import scalasql.core.{Context, DialectTypeMappers, LiveExprs, Queryable, Expr, ExprsToSql, SqlStr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.renderer.JoinsToSql
 
@@ -53,7 +43,7 @@ object Update {
   )(implicit val qr: Queryable.Row[Q, R], dialect: DialectTypeMappers)
       extends Update[Q, R] {
 
-    import dialect.{dialectSelf => _, _}
+    import dialect.{dialectSelf => _}
     protected def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,

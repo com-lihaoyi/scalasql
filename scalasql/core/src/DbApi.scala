@@ -2,7 +2,7 @@ package scalasql.core
 
 import geny.Generator
 
-import java.sql.{PreparedStatement, ResultSet, Statement}
+import java.sql.{PreparedStatement, Statement}
 
 /**
  * An interface to the SQL database allowing you to run queries.

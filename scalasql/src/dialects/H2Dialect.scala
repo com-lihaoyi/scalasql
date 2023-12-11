@@ -1,6 +1,5 @@
 package scalasql.dialects
 
-import scalasql.dialects.MySqlDialect.CompoundSelectRenderer
 import scalasql.core.{
   Aggregatable,
   Context,
@@ -12,18 +11,8 @@ import scalasql.core.{
   SqlStr,
   TypeMapper
 }
-import scalasql.{Sc, dialects, operations}
-import scalasql.query.{
-  CompoundSelect,
-  GroupBy,
-  InsertColumns,
-  InsertSelect,
-  Join,
-  Joinable,
-  OrderBy,
-  Query,
-  Table
-}
+import scalasql.{Sc, operations}
+import scalasql.query.{CompoundSelect, GroupBy, Join, Joinable, OrderBy, Table}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.operations.{
   BitwiseFunctionOps,
@@ -34,7 +23,7 @@ import scalasql.operations.{
   TrimOps
 }
 
-import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import java.sql.PreparedStatement
 
 trait H2Dialect extends Dialect {
 

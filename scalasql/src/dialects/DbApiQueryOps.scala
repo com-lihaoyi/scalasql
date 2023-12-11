@@ -1,6 +1,5 @@
 package scalasql.dialects
 
-import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core._
 import scalasql.query.{Select, Values, WithCte, WithCteRef}
 

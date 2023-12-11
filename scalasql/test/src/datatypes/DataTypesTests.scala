@@ -1,20 +1,17 @@
 package scalasql.datatypes
 
-import scalasql.{datatypes, _}
+import scalasql._
 import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
 
-import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
   Instant,
   LocalDate,
   LocalDateTime,
   LocalTime,
   OffsetDateTime,
-  OffsetTime,
   ZoneId,
-  ZoneOffset,
   ZonedDateTime
 }
 

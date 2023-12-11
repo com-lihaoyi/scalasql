@@ -1,12 +1,9 @@
 package scalasql.utils
 
 import com.github.vertical_blank.sqlformatter.SqlFormatter
-import org.testcontainers.containers.{MySQLContainer, PostgreSQLContainer}
 import pprint.PPrinter
 import scalasql.query.SubqueryRef
-import scalasql.{Config, DbClient, Queryable, Expr, UtestFramework}
-
-import java.sql.Connection
+import scalasql.{DbClient, Queryable, Expr, UtestFramework}
 
 class TestChecker(
     val dbClient: DbClient,

@@ -2,11 +2,8 @@ package scalasql.dialects
 
 import scalasql._
 import scalasql.core.Expr
-import sourcecode.Text
 import utest._
 import utils.PostgresSuite
-
-import java.time.LocalDate
 
 trait PostgresDialectTests extends PostgresSuite {
   def description = "Operations specific to working with Postgres Databases"

@@ -2,7 +2,6 @@ package scalasql.dialects
 
 import scalasql._
 import scalasql.core.Expr
-import sourcecode.Text
 import utest._
 import utils.MySqlSuite
 

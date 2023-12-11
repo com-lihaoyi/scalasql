@@ -1,6 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{DialectTypeMappers, Queryable, Expr, SqlStr, WithSqlExpr}
+import scalasql.core.{DialectTypeMappers, Queryable, Expr, WithSqlExpr}
 
 /**
  * A SQL `INSERT` query

@@ -8,10 +8,9 @@ import scalasql.core.{
   Expr,
   ExprsToSql,
   SqlStr,
-  TypeMapper,
   WithSqlExpr
 }
-import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
+import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
  * A SQL `WITH` clause

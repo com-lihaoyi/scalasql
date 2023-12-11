@@ -8,7 +8,6 @@ import sourcecode.Text
 import utest._
 
 import java.time.LocalDate
-import scala.collection.mutable
 
 trait DbApiTests extends ScalaSqlSuite {
   def description = "Basic usage of `db.*` operations such as `db.run`"
