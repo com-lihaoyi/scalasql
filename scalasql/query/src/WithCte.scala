@@ -60,7 +60,6 @@ object WithCte {
       val qr: Queryable.Row[Q, R],
       protected val dialect: DialectTypeMappers
   ) extends Select.Proxy[Q, R] {
-//    override def joinableSelect = this
     override def joinableIsTrivial = true
     protected override def joinableToSelect = selectToSimpleSelect()
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R] = {
