@@ -44,7 +44,7 @@ trait Select[Q, R]
     with SubqueryRef.Wrapped {
 
   protected def dialect: DialectTypeMappers
-  protected def joinableToFromExpr = (new SubqueryRef(this), expr)
+  protected def joinableToFromExpr: (Context.From, Q) = (new SubqueryRef(this), expr)
   protected def newCompoundSelect[Q, R](
       lhs: SimpleSelect[Q, R],
       compoundOps: Seq[CompoundSelect.Op[Q, R]],
@@ -66,7 +66,6 @@ trait Select[Q, R]
     new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]
-  protected def joinableToSelect = this
 
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`

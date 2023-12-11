@@ -62,9 +62,4 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
     new Delete.Impl(expr, filter(Table.metadata(t).vExpr(ref, dialect)), ref)
   }
 
-  override def joinFromExpr = {
-    val (ref, expr) = toFromExpr0
-
-    (ref, expr.asInstanceOf[V[Expr]])
-  }
 }

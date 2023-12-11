@@ -9,7 +9,6 @@ trait Joinable[Q, R] {
 
   protected def joinableToFromExpr: (Context.From, Q)
 
-  def joinFromExpr: (Context.From, Q)
   /**
    * Version of `crossJoin` meant for usage in `for`-comprehensions
    */

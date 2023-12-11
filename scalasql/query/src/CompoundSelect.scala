@@ -35,7 +35,6 @@ class CompoundSelect[Q, R](
   )(implicit qr: Queryable.Row[Q, R]) = newCompoundSelect(lhs, compoundOps, orderBy, limit, offset)
   override protected def expr = Joinable.toFromExpr(lhs)._2
 
-  protected override def joinableToSelect = this
 
   protected def selectToSimpleSelect() = this.subquery
 
@@ -93,11 +92,6 @@ class CompoundSelect[Q, R](
     SubqueryRef.Wrapped.exprAliases(lhs, prevContext)
   }
 
-  override def joinFromExpr = {
-    val otherSelect = joinableToSelect
-    val otherFrom = new SubqueryRef(otherSelect)
-    (otherFrom, WithSqlExpr.get(otherSelect))
-  }
 }
 
 object CompoundSelect {

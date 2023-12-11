@@ -33,7 +33,6 @@ class SimpleSelect[Q, R](
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select[Q, R] {
-  protected override def joinableToSelect = this
 
   protected def copy[Q, R](
       expr: Q = this.expr,
@@ -233,7 +232,6 @@ class SimpleSelect[Q, R](
     Seq(qr.construct(args))
   }
 
-  override def joinFromExpr = (from.head, expr)
 }
 
 object SimpleSelect {

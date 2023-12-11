@@ -30,11 +30,6 @@ class Values[Q, R](val ts: Seq[R])(
       .toMap
   }
 
-  override def joinFromExpr = {
-    val otherSelect = joinableToSelect
-    val otherFrom = new SubqueryRef(otherSelect)
-    (otherFrom, WithSqlExpr.get(otherSelect))
-  }
 }
 
 object Values {
