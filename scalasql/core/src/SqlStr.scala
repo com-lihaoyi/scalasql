@@ -117,7 +117,7 @@ object SqlStr {
         i += 1
       }
 
-      addFinalPart(queryParts(queryParts.length - 1))
+      addFinalPart(queryParts.last)
       if (parenthesize) addFinalPart(")")
     }
 
