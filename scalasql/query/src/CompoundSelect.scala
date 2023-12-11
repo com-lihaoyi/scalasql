@@ -133,7 +133,7 @@ object CompoundSelect {
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions
-          // belongong to the RHS SimpleSelect `liveExprs` analysis to work
+          // belonging to the RHS SimpleSelect `liveExprs` analysis to work
           val rhsInnerLiveExprs = innerLiveExprs.map { l =>
             val strs = l.map(e => SqlStr.flatten(lhsExprAliases(e)).queryParts.mkString("?"))
 
