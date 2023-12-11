@@ -17,6 +17,10 @@ trait Query[R] extends Renderable {
 }
 
 object Query {
+
+  /**
+   * Configuration for a typical update [[Query]]
+   */
   trait ExecuteUpdate[R] extends scalasql.query.Query[R] {
     protected def queryWalkLabels() = Nil
     protected def queryWalkExprs() = Nil
@@ -24,6 +28,10 @@ object Query {
     protected override def queryIsExecuteUpdate = true
   }
 
+  /**
+   * Configuration for a [[Query]] that wraps another [[Query]], delegating
+   * most of the abstract methods to it
+   */
   trait DelegateQuery[R] extends scalasql.query.Query[R] {
     protected def queryDelegate: Query[_]
     protected def queryWalkLabels() = queryDelegate.queryWalkLabels()
@@ -32,6 +40,9 @@ object Query {
     protected override def queryIsExecuteUpdate = queryDelegate.queryIsExecuteUpdate
   }
 
+  /**
+   * Configuration for a [[Query]] that wraps an expr [[Q]] and [[Queryable]]
+   */
   trait DelegateQueryable[Q, R] extends scalasql.query.Query[R] with WithSqlExpr[Q] {
     protected def qr: Queryable[Q, _]
     protected def queryWalkLabels() = qr.walkLabels(expr)
