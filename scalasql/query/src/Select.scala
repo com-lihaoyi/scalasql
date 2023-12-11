@@ -340,8 +340,8 @@ object Select {
     override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
       SelectBase.renderer(selectToSimpleSelect(), prevContext)
 
-    override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] =
-      SelectBase.lhsMap(selectToSimpleSelect(), prevContext)
+    override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] =
+      SelectBase.columnExprs(selectToSimpleSelect(), prevContext)
 
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R]
 

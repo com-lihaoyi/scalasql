@@ -33,11 +33,11 @@ object Query {
    * most of the abstract methods to it
    */
   trait DelegateQuery[R] extends scalasql.query.Query[R] {
-    protected def queryDelegate: Query[_]
-    protected def queryWalkLabels() = queryDelegate.queryWalkLabels()
-    protected def queryWalkExprs() = queryDelegate.queryWalkExprs()
-    protected override def queryIsSingleRow = queryDelegate.queryIsSingleRow
-    protected override def queryIsExecuteUpdate = queryDelegate.queryIsExecuteUpdate
+    protected def query: Query[_]
+    protected def queryWalkLabels() = query.queryWalkLabels()
+    protected def queryWalkExprs() = query.queryWalkExprs()
+    protected override def queryIsSingleRow = query.queryIsSingleRow
+    protected override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
   }
 
   /**
@@ -77,8 +77,7 @@ object Query {
   /**
    * A [[Query]] that wraps another [[Query]] but sets [[queryIsSingleRow]] to `true`
    */
-  class Single[R](query: Query[Seq[R]]) extends Query.DelegateQuery[R] {
-    protected def queryDelegate = query
+  class Single[R](protected val query: Query[Seq[R]]) extends Query.DelegateQuery[R] {
     protected override def queryIsSingleRow: Boolean = true
 
     protected def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)

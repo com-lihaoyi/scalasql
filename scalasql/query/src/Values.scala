@@ -31,7 +31,7 @@ class Values[Q, R](val ts: Seq[R])(
   override protected def selectRenderer(prevContext: Context): SelectBase.Renderer =
     new Values.Renderer(this)(implicitly, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     qr.walkExprs(expr)
       .zipWithIndex
       .map { case (e, i) => (Expr.identity(e), SqlStr.raw(columnName(i))) }

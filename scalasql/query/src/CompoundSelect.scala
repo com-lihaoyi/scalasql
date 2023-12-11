@@ -89,8 +89,8 @@ class CompoundSelect[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new CompoundSelect.Renderer(this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
-    SelectBase.lhsMap(lhs, prevContext)
+  override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+    SelectBase.columnExprs(lhs, prevContext)
   }
 }
 
@@ -102,7 +102,7 @@ object CompoundSelect {
     import query.dialect._
     lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
 
-    lazy val lhsLhsMap = SelectBase.lhsMap(query.lhs, prevContext)
+    lazy val lhsLhsMap = SelectBase.columnExprs(query.lhs, prevContext)
     lazy val context = lhsToSqlQuery.context
       .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsLhsMap)
 
@@ -130,7 +130,7 @@ object CompoundSelect {
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
           val rhsToSqlQuery = SimpleSelect.getRenderer(op.rhs, prevContext)
-          lazy val rhsLhsMap = SelectBase.lhsMap(op.rhs, prevContext)
+          lazy val rhsLhsMap = SelectBase.columnExprs(op.rhs, prevContext)
           // We match up the RHS SimpleSelect's lhsMap with the LHS SimpleSelect's lhsMap,
           // because the expressions in the CompoundSelect's lhsMap correspond to those
           // belonging to the LHS SimpleSelect, but we need the corresponding expressions

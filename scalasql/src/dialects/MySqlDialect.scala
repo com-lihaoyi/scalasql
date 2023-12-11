@@ -269,7 +269,7 @@ object MySqlDialect extends MySqlDialect {
       updates: Seq[Column.Assignment[_]],
       table: TableRef
   ) extends Query.DelegateQuery[R] {
-    protected def queryDelegate = insert.query
+    protected def query = insert.query
     override def queryIsExecuteUpdate = true
 
     protected def renderSql(ctx: Context) = {

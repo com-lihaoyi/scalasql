@@ -45,8 +45,8 @@ class WithCte[Q, R](
   override protected def selectRenderer(prevContext: Context) =
     new WithCte.Renderer(withPrefix, this, prevContext)
 
-  override protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
-    SelectBase.lhsMap(rhs, prevContext)
+  override protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+    SelectBase.columnExprs(rhs, prevContext)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =

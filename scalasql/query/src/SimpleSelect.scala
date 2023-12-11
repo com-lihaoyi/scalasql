@@ -209,7 +209,7 @@ class SimpleSelect[Q, R](
   protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
     new SimpleSelect.Renderer(this, prevContext)
 
-  protected def selectLhsMap(prevContext: Context): Map[Expr.Identity, SqlStr] = {
+  protected def selectColumnExprs(prevContext: Context): Map[Expr.Identity, SqlStr] = {
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 

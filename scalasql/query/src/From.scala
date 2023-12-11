@@ -20,7 +20,7 @@ class TableRef(val value: Table.Base) extends From {
 class SubqueryRef(val value: SelectBase, val qr: Queryable[_, _]) extends From {
   def fromRefPrefix(prevContext: Context): String = "subquery"
 
-  def fromExprAliases(prevContext: Context) = SelectBase.lhsMap(value, prevContext)
+  def fromExprAliases(prevContext: Context) = SelectBase.columnExprs(value, prevContext)
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveSqlExprs) = {
     val renderSql = SelectBase.renderer(value, prevContext)
