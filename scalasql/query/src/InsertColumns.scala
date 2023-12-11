@@ -37,7 +37,7 @@ object InsertColumns {
       tableName: String
   ) {
 
-    implicit lazy val ctx: Context = prevContext.withExprNaming(Map()).withFromNaming(Map())
+    implicit lazy val ctx: Context = prevContext
     lazy val columns = SqlStr
       .join(columns0.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), SqlStr.commaSep)
     lazy val values = SqlStr.join(

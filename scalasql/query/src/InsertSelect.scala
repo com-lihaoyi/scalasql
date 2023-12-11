@@ -34,7 +34,7 @@ object InsertSelect {
       tableName: String
   ) {
 
-    implicit lazy val ctx: Context = prevContext.withExprNaming(Map()).withFromNaming(Map())
+    implicit lazy val ctx: Context = prevContext
 
     lazy val columns = SqlStr.join(
       exprs
