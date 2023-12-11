@@ -66,7 +66,6 @@ trait Select[Q, R]
     new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]
-  protected def joinableIsTrivial: Boolean = false
   protected def joinableToSelect = this
 
   /**

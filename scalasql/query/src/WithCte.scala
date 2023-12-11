@@ -72,7 +72,6 @@ object WithCte {
       (otherFrom, WithSqlExpr.get(otherSelect))
     }
 
-    override def joinableIsTrivial = true
     protected override def joinableToSelect = selectToSimpleSelect()
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R] = {
       Select.newSimpleSelect[Q, R](
