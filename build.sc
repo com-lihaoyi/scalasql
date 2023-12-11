@@ -85,7 +85,6 @@ trait ScalaSql extends Common{
            |    implicit
            |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
            |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
-           |  import scalasql.core.SqlStr.SqlStringSyntax
            |  new Queryable.Row.TupleNQueryable(
            |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
            |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
@@ -99,7 +98,7 @@ trait ScalaSql extends Common{
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.core.generated
-           |import scalasql.core.{Queryable, Expr}
+           |import scalasql.core.Queryable
            |trait QueryableRow{
            |  ${queryableRowDefs.mkString("\n")}
            |}
