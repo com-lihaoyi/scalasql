@@ -92,6 +92,12 @@ class CompoundSelect[Q, R](
   override protected def selectExprAliases(prevContext: Context): Map[Expr.Identity, SqlStr] = {
     SubqueryRef.Wrapped.exprAliases(lhs, prevContext)
   }
+
+  override def joinFromExpr = {
+    val otherSelect = joinableToSelect
+    val otherFrom = new SubqueryRef(otherSelect)
+    (otherFrom, WithSqlExpr.get(otherSelect))
+  }
 }
 
 object CompoundSelect {

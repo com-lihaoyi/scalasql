@@ -232,6 +232,8 @@ class SimpleSelect[Q, R](
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {
     Seq(qr.construct(args))
   }
+
+  override def joinFromExpr = (from.head, expr)
 }
 
 object SimpleSelect {

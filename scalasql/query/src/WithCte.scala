@@ -51,6 +51,11 @@ class WithCte[Q, R](
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] =
     Query.construct(rhs, args)
+
+  def joinFromExpr = {
+    val otherSelect = joinableToSelect
+    (new SubqueryRef(otherSelect), WithSqlExpr.get(otherSelect))
+  }
 }
 
 object WithCte {
@@ -60,6 +65,13 @@ object WithCte {
       val qr: Queryable.Row[Q, R],
       protected val dialect: DialectTypeMappers
   ) extends Select.Proxy[Q, R] {
+
+    def joinFromExpr = {
+      val otherSelect = joinableToSelect
+      val otherFrom = otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head
+      (otherFrom, WithSqlExpr.get(otherSelect))
+    }
+
     override def joinableIsTrivial = true
     protected override def joinableToSelect = selectToSimpleSelect()
     override protected def selectToSimpleSelect(): SimpleSelect[Q, R] = {

@@ -6,19 +6,10 @@ import scalasql.core.{Context, Expr, JoinNullable, WithSqlExpr}
  * Something that can be joined; typically a [[Select]] or a [[Table]]
  */
 trait Joinable[Q, R] {
-  protected def joinableToSelect: Select[Q, R]
-  protected def joinableIsTrivial: Boolean
 
   protected def joinableToFromExpr: (Context.From, Q)
 
-  def joinFrom = {
-    val otherSelect = joinableToSelect
-    val otherFrom =
-      if (joinableIsTrivial) otherSelect.asInstanceOf[SimpleSelect[_, _]].from.head
-      else new SubqueryRef(otherSelect)
-
-    (otherFrom, WithSqlExpr.get(otherSelect))
-  }
+  def joinFromExpr: (Context.From, Q)
   /**
    * Version of `crossJoin` meant for usage in `for`-comprehensions
    */
@@ -52,6 +43,4 @@ trait Joinable[Q, R] {
 }
 object Joinable {
   def toFromExpr[Q, R](x: Joinable[Q, R]) = x.joinableToFromExpr
-  def toSelect[Q, R](x: Joinable[Q, R]) = x.joinableToSelect
-  def isTrivial[Q, R](x: Joinable[Q, R]) = x.joinableIsTrivial
 }

@@ -1,14 +1,6 @@
 package scalasql.query
 
-import scalasql.core.{
-  Context,
-  DialectTypeMappers,
-  LiveSqlExprs,
-  Queryable,
-  Expr,
-  SqlStr,
-  TypeMapper
-}
+import scalasql.core.{Context, DialectTypeMappers, Expr, LiveSqlExprs, Queryable, SqlStr, TypeMapper, WithSqlExpr}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
 /**
@@ -36,6 +28,12 @@ class Values[Q, R](val ts: Seq[R])(
       .zipWithIndex
       .map { case (e, i) => (Expr.identity(e), SqlStr.raw(columnName(i))) }
       .toMap
+  }
+
+  override def joinFromExpr = {
+    val otherSelect = joinableToSelect
+    val otherFrom = new SubqueryRef(otherSelect)
+    (otherFrom, WithSqlExpr.get(otherSelect))
   }
 }
 

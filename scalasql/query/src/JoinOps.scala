@@ -32,7 +32,7 @@ trait JoinOps[C[_, _], Q, R] extends WithSqlExpr[Q] {
       on: Option[(Q, Q2) => Expr[Boolean]]
   ) = {
 
-    val (otherFrom, otherExpr) = other.joinFrom
+    val (otherFrom, otherExpr) = other.joinFromExpr
 
     val otherOn = on.map(_(expr, otherExpr))
     val otherJoin = Join(joinPrefix, Seq(Join.From(otherFrom, otherOn)))
