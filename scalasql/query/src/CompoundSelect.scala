@@ -137,13 +137,9 @@ object CompoundSelect {
           // exprAliases, because the expressions in the CompoundSelect's lhsMap correspond
           // to those belonging to the LHS SimpleSelect, but we need the corresponding
           // expressions belonging to the RHS SimpleSelect `liveExprs` analysis to work
-          val rhsInnerLiveExprs = rhsExprAliases
-            .iterator
-            .zipWithIndex
-            .collect {
-              case ((k, v), i) if innerLiveExprIndices.fold(true)(_(i)) => k
-            }
-            .toSet
+          val rhsInnerLiveExprs = rhsExprAliases.iterator.zipWithIndex.collect {
+            case ((k, v), i) if innerLiveExprIndices.fold(true)(_(i)) => k
+          }.toSet
 
           sql" ${SqlStr.raw(op.op)} ${rhsToSqlQuery.render(new LiveExprs(Some(rhsInnerLiveExprs)))}"
         }

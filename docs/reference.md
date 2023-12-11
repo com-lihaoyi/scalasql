@@ -4221,10 +4221,10 @@ Buyer.insert
     ```sql
     INSERT INTO buyer (name, date_of_birth)
     SELECT
-      buyer0.name AS res_0,
-      buyer0.date_of_birth AS res_1
-    FROM buyer buyer0
-    WHERE (buyer0.name <> ?)
+      buyer1.name AS res_0,
+      buyer1.date_of_birth AS res_1
+    FROM buyer buyer1
+    WHERE (buyer1.name <> ?)
     RETURNING buyer.id AS res
     ```
 

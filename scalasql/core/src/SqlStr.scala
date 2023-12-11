@@ -37,10 +37,10 @@ object SqlStr {
    * parallel arrays, allowing you to render it or otherwise make use of its data.
    */
   class Flattened(
-                   val queryParts: Array[CharSequence],
-                   val interps0: Array[Interp],
-                   isCompleteQuery: Boolean,
-                   val referencedExprs: Array[Expr.Identity]
+      val queryParts: Array[CharSequence],
+      val interps0: Array[Interp],
+      isCompleteQuery: Boolean,
+      val referencedExprs: Array[Expr.Identity]
   ) extends SqlStr(queryParts, interps0, isCompleteQuery, referencedExprs) {
     def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
     def renderSql(castParams: Boolean) = {
@@ -95,7 +95,7 @@ object SqlStr {
           finalParts.addOne(lastFinalPart)
         }
       }
-      queryParts.length match{
+      queryParts.length match {
         case 0 => // do nothing
         case 1 =>
           addFinalPart(true, queryParts.head)
@@ -107,7 +107,6 @@ object SqlStr {
           val parenthesize = !topLevel && self.isCompleteQuery
           if (parenthesize) addFinalPart(boundary, "(")
           boundary = true
-
 
           var i = 0
           val length = params.length
@@ -133,7 +132,12 @@ object SqlStr {
     }
 
     rec(self, true)
-    new Flattened(finalParts.result(), finalInterps.result(), self.isCompleteQuery, finalExprs.result())
+    new Flattened(
+      finalParts.result(),
+      finalInterps.result(),
+      self.isCompleteQuery,
+      finalExprs.result()
+    )
   }
 
   /**
@@ -161,8 +165,8 @@ object SqlStr {
       val finalInterps = collection.mutable.ArrayBuilder.make[Interp]
       val finalExprs = collection.mutable.ArrayBuilder.make[Expr.Identity]
       def handle(s: SqlStr) = {
-        s.queryParts.length match{
-          case 0 => //donothing
+        s.queryParts.length match {
+          case 0 => // donothing
           case 1 =>
             if (lastFinalPart == null) {
               lastFinalPart = new StringBuilder(s.queryParts.last.toString)
@@ -173,7 +177,7 @@ object SqlStr {
             if (lastFinalPart == null) {
               finalParts.addAll(s.queryParts, 0, s.queryParts.length - 1)
               lastFinalPart = new StringBuilder(s.queryParts.last.toString)
-            }else {
+            } else {
               lastFinalPart.append(s.queryParts.head)
               finalParts.addOne(lastFinalPart)
               finalParts.addAll(s.queryParts, 1, s.queryParts.length - 2)
@@ -185,7 +189,7 @@ object SqlStr {
         finalExprs.addAll(s.referencedExprs)
       }
       handle(first.get)
-      while(it.hasNext){
+      while (it.hasNext) {
         handle(sep)
         handle(it.next())
       }
