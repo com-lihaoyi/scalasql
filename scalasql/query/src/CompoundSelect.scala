@@ -99,11 +99,11 @@ object CompoundSelect {
   class Renderer[Q, R](query: CompoundSelect[Q, R], prevContext: Context)
       extends SubqueryRef.Wrapped.Renderer {
     import query.dialect._
-    lazy val lhsToSqlQuery = SimpleSelect.getRenderer(query.lhs, prevContext)
+    lazy val renderer = SimpleSelect.getRenderer(query.lhs, prevContext)
 
     lazy val lhsExprAliases = SubqueryRef.Wrapped.exprAliases(query.lhs, prevContext)
-    lazy val context = lhsToSqlQuery.context
-      .withExprNaming(lhsToSqlQuery.context.exprNaming ++ lhsExprAliases)
+    lazy val context = renderer.context
+      .withExprNaming(renderer.context.exprNaming ++ lhsExprAliases)
 
     lazy val sortOpt = SqlStr.flatten(orderToSqlStr(context))
 
@@ -124,7 +124,7 @@ object CompoundSelect {
         if (preserveAll) LiveSqlExprs.none
         else liveExprs.map(_ ++ newReferencedExpressions)
 
-      val lhsStr = lhsToSqlQuery.render(innerLiveExprs)
+      val lhsStr = renderer.render(innerLiveExprs)
 
       val compound = SqlStr.optSeq(query.compoundOps) { compoundOps =>
         val compoundStrs = compoundOps.map { op =>
