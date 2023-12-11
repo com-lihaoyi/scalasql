@@ -71,9 +71,9 @@ object Update {
     )(
         implicit ja: JoinAppend[Q, Q2, QF, RF]
     ) = {
-      val (otherJoin, otherSelect) = joinInfo(prefix, other, on)
+      val (otherJoin, otherExpr) = joinInfo(prefix, other, on)
       this.copy(
-        expr = ja.appendTuple(expr, WithSqlExpr.get(otherSelect)),
+        expr = ja.appendTuple(expr, otherExpr),
         joins = joins ++ otherJoin
       )(
         ja.qr,

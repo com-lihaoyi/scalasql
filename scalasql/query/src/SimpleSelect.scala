@@ -224,9 +224,9 @@ class SimpleSelect[Q, R](
       joinPrefix: String
   )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
 
-    val (otherJoin, otherSelect) = joinInfo(joinPrefix, other, on)
+    val (otherJoin, otherExpr) = joinInfo(joinPrefix, other, on)
 
-    joinCopy0(f(expr, WithSqlExpr.get(otherSelect)), otherJoin, Nil)(jqr)
+    joinCopy0(f(expr, otherExpr), otherJoin, Nil)(jqr)
   }
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {

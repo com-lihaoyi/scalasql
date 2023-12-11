@@ -41,7 +41,7 @@ trait JoinOps[C[_, _], Q, R] extends WithSqlExpr[Q] {
     val on2 = on.map(_(expr, otherSelect.expr))
     val otherJoin = Join(joinPrefix, Seq(Join.From(from, on2)))
 
-    (Seq(otherJoin), otherSelect)
+    (Seq(otherJoin), otherSelect.expr)
   }
 
 }
