@@ -25,13 +25,13 @@ object Query {
     protected override def queryIsExecuteUpdate = true
   }
 
-  implicit def QueryQueryable[R]: Queryable[Query[R], R] = new Queryable[Query[R], R]()
+  implicit def QueryQueryable[R]: Queryable[Query[R], R] = new QueryQueryable[Query[R], R]()
 
   def walkLabels[R](q: Query[R]) = q.queryWalkLabels()
   def walkSqlExprs[R](q: Query[R]) = q.queryWalkExprs()
   def isSingleRow[R](q: Query[R]) = q.queryIsSingleRow
   def construct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
-  class Queryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {
+  class QueryQueryable[Q <: Query[R], R]() extends scalasql.core.Queryable[Q, R] {
     override def isExecuteUpdate(q: Q) = q.queryIsExecuteUpdate
     override def walkLabels(q: Q) = q.queryWalkLabels()
     override def walkExprs(q: Q) = q.queryWalkExprs()
