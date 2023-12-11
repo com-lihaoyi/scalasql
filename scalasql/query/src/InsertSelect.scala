@@ -17,7 +17,7 @@ object InsertSelect {
 
     def table = insert.table
 
-    protected override def renderToSql(ctx: Context) =
+    protected override def renderSql(ctx: Context) =
       new Renderer(select, select.qr.walkExprs(columns), ctx, Table.name(table.value))
         .render()
 
@@ -49,7 +49,7 @@ object InsertSelect {
       SqlStr.commaSep
     )
 
-    lazy val selectSql = Renderable.toSql(select).withCompleteQuery(false)
+    lazy val selectSql = Renderable.renderSql(select).withCompleteQuery(false)
 
     lazy val tableNameStr = SqlStr.raw(ctx.config.tableNameMapper(tableName))
     def render() = sql"INSERT INTO $tableNameStr ($columns) $selectSql"

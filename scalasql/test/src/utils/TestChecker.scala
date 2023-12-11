@@ -57,6 +57,23 @@ class TestChecker(
       normalize: V => V = (x: V) => x,
       docs: String = ""
   )(implicit qr: Queryable[T, V], tp: utest.framework.TestPath) = {
+    if (sys.env.contains("SCALASQL_RUN_BENCHMARK")) {
+      for(i <- Range(0, 4)) {
+        var iterations = 0
+        val multiplier = 10
+        val duration = 5000
+        val end = System.currentTimeMillis() + duration
+        while (System.currentTimeMillis() < end) {
+          var i = 0
+          while(i < multiplier){
+            i += 1
+            dbClient.renderSql(query.value)
+          }
+          iterations += 1
+        }
+        println(s"${iterations * multiplier} iterations in ${duration}ms")
+      }
+    }
     val sqlResult = autoCommitConnection
       .renderSql(query.value)
 

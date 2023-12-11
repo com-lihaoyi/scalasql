@@ -6,7 +6,7 @@ import scalasql.core.{
   LiveSqlExprs,
   Queryable,
   Expr,
-  SqlExprsToSql,
+  ExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -85,7 +85,7 @@ object Update {
       )
     }
 
-    protected override def renderToSql(ctx: Context): SqlStr =
+    protected override def renderSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int = {
@@ -113,7 +113,7 @@ object Update {
     }
     lazy val sets = SqlStr.flatten(SqlStr.join(updateList, SqlStr.commaSep))
 
-    lazy val where = SqlStr.flatten(SqlExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
+    lazy val where = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", fromOns ++ where0))
 
     lazy val liveExprs = LiveSqlExprs.some(
       sets.referencedExprs.toSet ++
@@ -133,7 +133,7 @@ object Update {
 
     lazy val joinOns = joins0
       .drop(1)
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderSql(t)))))
 
     lazy val joins = optSeq(joins0.drop(1))(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
 

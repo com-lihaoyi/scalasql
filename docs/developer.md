@@ -16,6 +16,13 @@
 ./mill -i -w  mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference
 ```
 
+* You can run ad-hoc benchmarks using any test case via the `SCALASQL_RUN_BENCHMARK` 
+  environment variable, e.g.
+
+```
+SCALASQL_RUN_BENCHMARK=true ./mill -i -w __.test scalasql.sqlite.SubQueryTests.deeplyNested
+```
+
 * ScalaSql comprises 4 main submodules:
     * `scalasql.core`: the core functionality of evaluating `SqlStr` queries, but without any typed
       helpers to construct them

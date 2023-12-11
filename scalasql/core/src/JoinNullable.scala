@@ -1,7 +1,5 @@
 package scalasql.core
 
-import scalasql.core.{Queryable, Expr, TypeMapper}
-import scalasql.core.Context
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**

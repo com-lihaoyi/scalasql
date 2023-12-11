@@ -30,7 +30,7 @@ object Query {
     override def walkExprs(q: Q) = q.queryWalkExprs()
     override def singleRow(q: Q) = q.queryIsSingleRow
 
-    def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderToSql(ctx)
+    def toSqlStr(q: Q, ctx: Context): SqlStr = q.renderSql(ctx)
 
     override def construct(q: Q, args: Queryable.ResultSetIterator): R = q.queryConstruct(args)
   }
@@ -44,7 +44,7 @@ object Query {
 
     protected def queryIsSingleRow: Boolean = true
 
-    protected def renderToSql(ctx: Context): SqlStr = Renderable.toSql(query)(ctx)
+    protected def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
     protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
       query.queryConstruct(args).asInstanceOf[R]
   }

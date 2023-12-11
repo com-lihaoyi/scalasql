@@ -24,8 +24,8 @@ object OnConflict {
     protected def queryWalkLabels() = Query.walkLabels(query)
     protected def queryWalkExprs() = Query.walkSqlExprs(query)
     protected def queryIsSingleRow = Query.isSingleRow(query)
-    protected def renderToSql(ctx: Context) = {
-      val str = Renderable.toSql(query)(ctx)
+    protected def renderSql(ctx: Context) = {
+      val str = Renderable.renderSql(query)(ctx)
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)}) DO NOTHING"
     }
 
@@ -47,9 +47,9 @@ object OnConflict {
     protected def queryWalkLabels() = Query.walkLabels(query)
     protected def queryWalkExprs() = Query.walkSqlExprs(query)
     protected def queryIsSingleRow = Query.isSingleRow(query)
-    protected def renderToSql(ctx: Context) = {
+    protected def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
-      val str = Renderable.toSql(query)
+      val str = Renderable.renderSql(query)
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },

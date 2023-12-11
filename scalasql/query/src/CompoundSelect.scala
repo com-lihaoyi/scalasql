@@ -169,7 +169,7 @@ object CompoundSelect {
             case Nulls.First => sql" NULLS FIRST"
             case Nulls.Last => sql" NULLS LAST"
           }
-          Renderable.toSql(orderBy.expr)(newCtx) + ascDesc + nulls
+          Renderable.renderSql(orderBy.expr)(newCtx) + ascDesc + nulls
         },
         SqlStr.commaSep
       )

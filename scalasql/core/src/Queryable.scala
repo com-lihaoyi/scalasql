@@ -1,6 +1,7 @@
 package scalasql.core
 
-import scalasql.core.{Context, SqlExprsToSql}
+import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.core.{Context, ExprsToSql}
 
 import java.sql.ResultSet
 
@@ -87,7 +88,7 @@ object Queryable {
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 
     def toSqlStr(q: Q, ctx: Context): SqlStr = {
-      SqlExprsToSql(this.walkLabelsAndExprs(q), SqlStr.empty, ctx)
+      ExprsToSql.apply(this.walkLabelsAndExprs(q), ctx, sql"SELECT ")
     }
 
     def construct(q: Q, args: ResultSetIterator): R = construct(args)

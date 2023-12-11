@@ -7,7 +7,7 @@ package scalasql.core
  * until [[SqlStr.flatten]] is called to convert it into a [[SqlStr.Flattened]]
  */
 class SqlStr(
-    private val queryParts: collection.IndexedSeq[String],
+    private val queryParts: collection.IndexedSeq[CharSequence],
     private val params: collection.IndexedSeq[SqlStr.Interp],
     val isCompleteQuery: Boolean,
     private val referencedExprs: collection.IndexedSeq[Expr.Identity]
@@ -17,24 +17,45 @@ class SqlStr(
       SqlStr.plusParts,
       Array[SqlStr.Interp](this, other),
       false,
-      Array.empty[Expr.Identity]
+      SqlStr.emptyIdentityArray
     )
   }
 
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, params, v, referencedExprs)
-  override def toString = SqlStr.flatten(this).queryParts.mkString("?")
+  override def toString = SqlStr.flatten(this).renderSql(false)
 
-  override protected def renderToSql(ctx: Context): SqlStr = this
+  override protected def renderSql(ctx: Context): SqlStr = this
 }
 
 object SqlStr {
+  private val emptyIdentityArray = Array.empty[Expr.Identity]
   private val plusParts: IndexedSeq[String] = Array("", "", "")
+
+  /**
+   * Represents a [[SqlStr]] that has been flattened out into a single set of
+   * parallel arrays, allowing you to render it or otherwise make use of its data.
+   */
   class Flattened(
-      val queryParts: collection.IndexedSeq[String],
+      val queryParts: collection.IndexedSeq[CharSequence],
       val params: collection.IndexedSeq[Interp.TypeInterp[_]],
       isCompleteQuery: Boolean,
       val referencedExprs: collection.IndexedSeq[Expr.Identity]
-  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs)
+  ) extends SqlStr(queryParts, params, isCompleteQuery, referencedExprs){
+    def renderSql(castParams: Boolean) = {
+      val queryStr = queryParts.iterator
+        .zipAll(params, "", null)
+        .map {
+          case (part, null) => part
+          case (part, param) =>
+            val jdbcTypeString = param.mappedType.castTypeString
+            if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
+        }
+        .mkString
+
+      queryStr
+    }
+
+  }
 
   /**
    * Helper method turn an `Option[T]` into a [[SqlStr]], returning
@@ -54,11 +75,11 @@ object SqlStr {
    */
   def flatten(self: SqlStr): Flattened = {
     // Implement this in a mutable style because`it's pretty performance sensitive
-    val finalParts = collection.mutable.ArrayBuffer.empty[String]
+    val finalParts = collection.mutable.ArrayBuffer.empty[StringBuilder]
     val finalArgs = collection.mutable.ArrayBuffer.empty[Interp.TypeInterp[_]]
     val finalExprs = collection.mutable.ArrayBuffer.empty[Expr.Identity]
     // Equivalent to `finalParts.last`, cached locally for performance
-    var lastFinalPart: String = null
+    var lastFinalPart: StringBuilder = null
 
     def rec(self: SqlStr, topLevel: Boolean): Unit = {
       val queryParts = self.queryParts
@@ -69,13 +90,13 @@ object SqlStr {
       if (parenthesize) addFinalPart("(")
       boundary = true
 
-      def addFinalPart(s: String) = {
+      def addFinalPart(s: CharSequence) = {
         if (boundary && finalParts.nonEmpty) {
-          lastFinalPart = lastFinalPart + s
-          finalParts(finalParts.length - 1) = lastFinalPart
+          finalParts.last.append(s)
         } else {
-          finalParts.append(s)
-          lastFinalPart = s
+          lastFinalPart = new StringBuilder()
+          lastFinalPart.append(s)
+          finalParts.append(lastFinalPart)
         }
       }
 
@@ -130,11 +151,11 @@ object SqlStr {
     new SqlStr(Array(s), Array.empty[SqlStr.Interp], false, referencedExprs)
 
   trait Renderable {
-    protected def renderToSql(ctx: Context): SqlStr
+    protected def renderSql(ctx: Context): SqlStr
   }
 
   object Renderable {
-    def toSql(x: Renderable)(implicit ctx: Context) = x.renderToSql(ctx)
+    def renderSql(x: Renderable)(implicit ctx: Context) = x.renderSql(ctx)
   }
 
   /**
@@ -143,7 +164,7 @@ object SqlStr {
   sealed trait Interp
   object Interp {
     implicit def renderableInterp(t: Renderable)(implicit ctx: Context): Interp =
-      SqlStrInterp(Renderable.toSql(t)(ctx))
+      SqlStrInterp(Renderable.renderSql(t)(ctx))
 
     implicit def sqlStrInterp(s: SqlStr): Interp = SqlStrInterp(s)
 

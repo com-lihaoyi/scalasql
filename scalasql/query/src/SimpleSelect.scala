@@ -8,7 +8,7 @@ import scalasql.core.{
   LiveSqlExprs,
   Queryable,
   Expr,
-  SqlExprsToSql,
+  ExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -59,7 +59,7 @@ class SimpleSelect[Q, R](
 
           f(expr)(newCtx)
         })
-        .renderToSql(outerCtx)
+        .renderSql(outerCtx)
         .withCompleteQuery(true)
     }
   }
@@ -150,7 +150,7 @@ class SimpleSelect[Q, R](
     val selectProxyExpr = f(new SelectProxy[Q](expr))
     val copied = this.copy(expr = selectProxyExpr)
     new Aggregate[E, V](
-      implicit ctx => copied.renderToSql(ctx),
+      implicit ctx => copied.renderSql(ctx),
       r => Query.construct(copied, r).head,
       selectProxyExpr
     )(qr)
@@ -212,7 +212,7 @@ class SimpleSelect[Q, R](
 
     lazy val flattenedExpr = qr.walkLabelsAndExprs(expr)
 
-    lazy val jsonQueryMap = SqlExprsToSql.selectColumnReferences(flattenedExpr, prevContext).toMap
+    lazy val jsonQueryMap = ExprsToSql.selectColumnReferences(flattenedExpr, prevContext).toMap
 
     jsonQueryMap
   }
@@ -252,18 +252,18 @@ object SimpleSelect {
     implicit lazy val context = Context.compute(prevContext, froms, None)
 
     lazy val joinOns =
-      query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
+      query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderSql(t)))))
 
     lazy val exprsStrs = {
-      SqlExprsToSql.selectColumnSql(flattenedExpr, context).map { case (k, v) =>
+      ExprsToSql.selectColumnSql(flattenedExpr, context).map { case (k, v) =>
         sql"$v AS ${SqlStr.raw(context.config.tableNameMapper(k))}"
       }
     }
 
-    lazy val filtersOpt = SqlStr.flatten(SqlExprsToSql.booleanExprs(sql" WHERE ", query.where))
+    lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", query.where))
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
-      val havingOpt = SqlExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
+      val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
       sql" GROUP BY ${groupBy.key}${havingOpt}"
     })
 

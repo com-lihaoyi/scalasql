@@ -7,7 +7,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  protected final def renderToSql(ctx: Context): SqlStr = {
+  protected final def renderSql(ctx: Context): SqlStr = {
     ctx.exprNaming.get(this.exprIdentity).getOrElse(renderToSql0(ctx))
   }
 
@@ -39,9 +39,9 @@ object Expr {
 
   implicit def ExprQueryable[E[_] <: Expr[_], T](
       implicit mt: TypeMapper[T]
-  ): Queryable.Row[E[T], T] = new SqlQueryable[E, T]()
+  ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
 
-  class SqlQueryable[E[_] <: Expr[_], T](
+  class ExprQueryable[E[_] <: Expr[_], T](
       implicit tm: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
     def walkLabels() = Seq(Nil)

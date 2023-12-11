@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
-import scalasql.core.{Context, SqlExprsToSql, Queryable, SqlStr, TypeMapper, WithSqlExpr}
+import scalasql.core.{Context, ExprsToSql, Queryable, SqlStr, TypeMapper, WithSqlExpr}
 import scalasql.renderer.JoinsToSql
 
 /**
@@ -43,12 +43,12 @@ object Returning {
 
     override def queryIsSingleRow = false
 
-    protected override def renderToSql(ctx0: Context) = {
+    protected override def renderSql(ctx0: Context) = {
       implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
-      val prefix = Renderable.toSql(returnable)
+      val prefix = Renderable.renderSql(returnable)
       val walked = qr.walkLabelsAndExprs(returning)
-      val exprStr = SqlExprsToSql.apply0(walked, implicitCtx, SqlStr.empty)
+      val exprStr = ExprsToSql.apply(walked, implicitCtx, SqlStr.empty)
       val suffix = sql" RETURNING $exprStr"
 
       prefix + suffix

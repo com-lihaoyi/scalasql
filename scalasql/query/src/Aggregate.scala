@@ -13,7 +13,7 @@ class Aggregate[Q, R](
   protected def queryWalkLabels() = qr.walkLabels(expr)
   protected def queryWalkExprs() = qr.walkExprs(expr)
   protected def queryIsSingleRow: Boolean = true
-  protected def renderToSql(ctx: Context) = toSqlStr0(ctx)
+  protected def renderSql(ctx: Context) = toSqlStr0(ctx)
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): R = construct0(args)
 }

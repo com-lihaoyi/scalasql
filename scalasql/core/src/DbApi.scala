@@ -117,22 +117,9 @@ object DbApi {
       implicit qr: Queryable[Q, R]
   ): String = {
     val flattened = unpackQueryable(query, qr, config)
-    combineQueryString(flattened, castParams)
+    flattened.renderSql(castParams)
   }
 
-  def combineQueryString(flattened: SqlStr.Flattened, castParams: Boolean) = {
-    val queryStr = flattened.queryParts.iterator
-      .zipAll(flattened.params, "", null)
-      .map {
-        case (part, null) => part
-        case (part, param) =>
-          val jdbcTypeString = param.mappedType.castTypeString
-          if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
-      }
-      .mkString
-
-    queryStr
-  }
 
   /**
    * An interface to a SQL database *transaction*, allowing you to run queries,
@@ -273,7 +260,7 @@ object DbApi {
     ): Int = {
       val flattened = SqlStr.flatten(sql)
       runRawUpdate0(
-        combineQueryString(flattened, DialectConfig.castParams(dialect)),
+        flattened.renderSql(DialectConfig.castParams(dialect)),
         flattenParamPuts(flattened),
         fetchSize,
         queryTimeoutSeconds,
@@ -339,7 +326,7 @@ object DbApi {
         lineNum: sourcecode.Line
     ) = streamRaw0(
       construct,
-      combineQueryString(flattened, DialectConfig.castParams(dialect)),
+      flattened.renderSql(DialectConfig.castParams(dialect)),
       flattenParamPuts(flattened),
       fetchSize,
       queryTimeoutSeconds,

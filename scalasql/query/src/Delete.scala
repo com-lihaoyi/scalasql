@@ -20,7 +20,7 @@ object Delete {
     protected def queryWalkExprs() = Nil
     protected def queryIsSingleRow = true
 
-    protected def renderToSql(ctx: Context) = new Renderer(table, filter, ctx).render()
+    protected def renderSql(ctx: Context) = new Renderer(table, filter, ctx).render()
 
     protected def queryConstruct(args: Queryable.ResultSetIterator): Int = args.get(IntType)
   }

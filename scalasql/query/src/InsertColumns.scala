@@ -21,7 +21,7 @@ object InsertColumns {
     def table = insert.table
     protected def expr: V[Column] = WithSqlExpr.get(insert)
 
-    protected override def renderToSql(ctx: Context) =
+    protected override def renderSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()
 
     protected def queryWalkLabels() = Nil
@@ -46,7 +46,7 @@ object InsertColumns {
     lazy val values = SqlStr.join(
       valuesLists
         .map(values =>
-          sql"(" + SqlStr.join(values.map(Renderable.toSql(_)), SqlStr.commaSep) + sql")"
+          sql"(" + SqlStr.join(values.map(Renderable.renderSql(_)), SqlStr.commaSep) + sql")"
         ),
       SqlStr.commaSep
     )

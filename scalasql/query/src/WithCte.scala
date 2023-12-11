@@ -6,7 +6,7 @@ import scalasql.core.{
   LiveSqlExprs,
   Queryable,
   Expr,
-  SqlExprsToSql,
+  ExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -83,7 +83,7 @@ object WithCte {
         }
       }
 
-    override protected def renderToSql(ctx: Context): SqlStr = {
+    override protected def renderSql(ctx: Context): SqlStr = {
       SqlStr.raw(ctx.fromNaming(lhsSubQueryRef))
     }
   }
@@ -96,7 +96,7 @@ object WithCte {
           .asInstanceOf[Queryable[Any, Any]]
           .walkLabelsAndExprs(WithSqlExpr.get(query.lhs))
 
-      val newExprNaming = SqlExprsToSql.selectColumnReferences(walked, prevContext)
+      val newExprNaming = ExprsToSql.selectColumnReferences(walked, prevContext)
 
       val newContext = Context.compute(prevContext, Seq(query.lhsSubQuery), None)
       val cteName = SqlStr.raw(newContext.fromNaming(query.lhsSubQuery))

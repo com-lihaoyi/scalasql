@@ -2,13 +2,13 @@ package scalasql.core
 
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 
-object SqlExprsToSql {
-  def apply(walked: Queryable.Walked, exprPrefix: SqlStr, context: Context) = {
-    apply0(walked, context, sql"SELECT " + exprPrefix)
-  }
+object ExprsToSql {
 
-  def apply0(walked: Queryable.Walked, context: Context, prefix: SqlStr) = {
+  def apply(walked: Queryable.Walked, context: Context, prefix: SqlStr): SqlStr = {
     selectColumnSql(walked, context) match {
+      // Aggregate operators return expressions that are actually entire queries.
+      // We thus check to avoid redundantly wrapping them in another `SELECT`, and
+      // instead return them unchanged
       case Seq((prefix, singleExpr))
           if prefix == context.config.renderColumnLabel(Nil) && singleExpr.isCompleteQuery =>
         singleExpr
@@ -26,7 +26,7 @@ object SqlExprsToSql {
   }
 
   def selectColumnSql(walked: Queryable.Walked, ctx: Context): Seq[(String, SqlStr)] = {
-    walked.map { case (k, v) => (ctx.config.renderColumnLabel(k), Renderable.toSql(v)(ctx)) }
+    walked.map { case (k, v) => (ctx.config.renderColumnLabel(k), Renderable.renderSql(v)(ctx)) }
   }
 
   def selectColumnReferences(
@@ -41,7 +41,7 @@ object SqlExprsToSql {
 
   def booleanExprs(prefix: SqlStr, exprs: Seq[Expr[_]])(implicit ctx: Context) = {
     SqlStr.optSeq(exprs.filter(!Expr.isLiteralTrue(_))) { having =>
-      prefix + SqlStr.join(having.map(Renderable.toSql(_)), sql" AND ")
+      prefix + SqlStr.join(having.map(Renderable.renderSql(_)), sql" AND ")
     }
   }
 }

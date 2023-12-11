@@ -10,6 +10,10 @@ import java.time.{
   OffsetTime,
   OffsetDateTime
 }
+
+/**
+ * A default set of data type mappers that need to be present in any ScalaSql dialect
+ */
 trait DialectTypeMappers extends DialectConfig {
   implicit val dialectSelf: DialectTypeMappers
 

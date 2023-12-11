@@ -26,7 +26,7 @@ import scalasql.core.{
   DialectTypeMappers,
   JoinNullable,
   Queryable,
-  SqlExprsToSql,
+  ExprsToSql,
   SqlStr,
   TypeMapper,
   WithSqlExpr
@@ -232,7 +232,7 @@ object MySqlDialect extends MySqlDialect {
     )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectTypeMappers) =
       new Update(expr, table, set0, joins, where)
 
-    protected override def renderToSql(ctx: Context) = {
+    protected override def renderSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
     }
 
@@ -250,9 +250,9 @@ object MySqlDialect extends MySqlDialect {
       sql"$tableName.$colStr = ${assign.value}"
     }
 
-    lazy val whereAll = SqlExprsToSql.booleanExprs(sql" WHERE ", where0)
+    lazy val whereAll = ExprsToSql.booleanExprs(sql" WHERE ", where0)
     override lazy val joinOns = joins0
-      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.toSql(t)))))
+      .map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderSql(t)))))
 
     override lazy val joins = optSeq(joins0)(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
     override def render() = sql"UPDATE $tableName" + joins + sql" SET " + sets + whereAll
@@ -276,9 +276,9 @@ object MySqlDialect extends MySqlDialect {
 
     protected def queryIsSingleRow = Query.isSingleRow(insert.query)
 
-    protected def renderToSql(ctx: Context) = {
+    protected def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
-      val str = Renderable.toSql(insert.query)
+      val str = Renderable.renderSql(insert.query)
 
       val updatesStr = SqlStr.join(
         updates.map { case assign => SqlStr.raw(assign.column.name) + sql" = ${assign.value}" },
@@ -377,7 +377,7 @@ object MySqlDialect extends MySqlDialect {
       SqlStr.optSeq(query.orderBy) { orderBys =>
         val orderStr = SqlStr.join(
           orderBys.map { orderBy =>
-            val exprStr = Renderable.toSql(orderBy.expr)(newCtx)
+            val exprStr = Renderable.renderSql(orderBy.expr)(newCtx)
 
             (orderBy.ascDesc, orderBy.nulls) match {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
