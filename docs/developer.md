@@ -13,7 +13,7 @@
 
 * Fix all auto-generating and auto-formatting issues at once via
 ```
-./mill -i -w  mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference
+./mill -i -w __.fix + mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference
 ```
 
 * You can run ad-hoc benchmarks using any test case via the `SCALASQL_RUN_BENCHMARK` 
