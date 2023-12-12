@@ -16,14 +16,14 @@ class DbApiOps(dialect: DialectTypeMappers) {
    * with gaps. If there is no ORDER BY clause, then all rows are considered peers and
    * this function always returns 1.
    */
-  def rank(): Expr[Int] = Expr { implicit ctx => sql"RANK()" }
+  def rank(): Expr[Int] = Expr { _ => sql"RANK()" }
 
   /**
    * The number of the row within the current partition. Rows are numbered starting
    * from 1 in the order defined by the ORDER BY clause in the window definition, or
    * in arbitrary order otherwise.
    */
-  def rowNumber(): Expr[Int] = Expr { implicit ctx => sql"ROW_NUMBER()" }
+  def rowNumber(): Expr[Int] = Expr { _ => sql"ROW_NUMBER()" }
 
   /**
    * The number of the current row's peer group within its partition - the rank of the
@@ -31,7 +31,7 @@ class DbApiOps(dialect: DialectTypeMappers) {
    * by the ORDER BY clause in the window definition. If there is no ORDER BY clause,
    * then all rows are considered peers and this function always returns 1.
    */
-  def denseRank(): Expr[Int] = Expr { implicit ctx => sql"DENSE_RANK()" }
+  def denseRank(): Expr[Int] = Expr { _ => sql"DENSE_RANK()" }
 
   /**
    * Despite the name, this function always returns a value between 0.0 and 1.0 equal to
@@ -39,14 +39,14 @@ class DbApiOps(dialect: DialectTypeMappers) {
    * function rank() and partition-rows is the total number of rows in the partition. If
    * the partition contains only one row, this function returns 0.0.
    */
-  def percentRank(): Expr[Double] = Expr { implicit ctx => sql"PERCENT_RANK()" }
+  def percentRank(): Expr[Double] = Expr { _ => sql"PERCENT_RANK()" }
 
   /**
    * The cumulative distribution. Calculated as row-number/partition-rows, where row-number
    * is the value returned by row_number() for the last peer in the group and partition-rows
    * the number of rows in the partition.
    */
-  def cumeDist(): Expr[Double] = Expr { implicit ctx => sql"CUME_DIST()" }
+  def cumeDist(): Expr[Double] = Expr { _ => sql"CUME_DIST()" }
 
   /**
    * Argument N is handled as an integer. This function divides the partition into N groups
@@ -55,7 +55,7 @@ class DbApiOps(dialect: DialectTypeMappers) {
    * groups occur first. This function returns the integer value assigned to the group that
    * the current row is a part of.
    */
-  def ntile(n: Int): Expr[Int] = Expr { implicit ctx => sql"NTILE($n)" }
+  def ntile(n: Int): Expr[Int] = Expr { _ => sql"NTILE($n)" }
 
   private def lagLead[T](prefix: SqlStr, e: Expr[T], offset: Int, default: Expr[T]): Expr[T] =
     Expr { implicit ctx =>

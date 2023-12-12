@@ -56,6 +56,6 @@ trait MathOps {
   }
 
   /** Returns the value of Pi */
-  def pi: Expr[Double] = Expr { implicit ctx => sql"PI()" }
+  def pi: Expr[Double] = Expr { _ => sql"PI()" }
 
 }

@@ -27,7 +27,7 @@ trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
     )
   )
 
-  def scalacOptions = Seq("-Wunused:imports")
+  def scalacOptions = Seq("-Xlint:unused")
 }
 
 
@@ -45,7 +45,7 @@ trait ScalaSql extends Common{
 
 
   object test extends ScalaTests with ScalafixModule{
-    def scalacOptions = Seq("-Wunused:imports")
+    def scalacOptions = Seq("-Xlint:unused")
     def ivyDeps = Agg(
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
       ivy"com.lihaoyi::mainargs:0.4.0",

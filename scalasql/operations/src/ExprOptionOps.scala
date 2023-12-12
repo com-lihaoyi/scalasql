@@ -35,6 +35,6 @@ class ExprOptionOps[T: TypeMapper](v: Expr[Option[T]])(implicit dialect: Dialect
 
   def filter(other: Expr[T] => Expr[Boolean]): Expr[Option[T]] = new CaseWhen.Else[Option[T]](
     Seq(other(Expr[T] { implicit ctx: Context => sql"$v" }) -> v),
-    Expr { implicit ctx => sql"NULL" }
+    Expr { _ => sql"NULL" }
   )
 }

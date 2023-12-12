@@ -126,7 +126,7 @@ object MySqlDialect extends MySqlDialect {
     /**
      * Returns a random value in the range 0.0 <= x < 1.0
      */
-    def rand: Expr[Double] = Expr { implicit ctx => sql"RAND()" }
+    def rand: Expr[Double] = Expr { _ => sql"RAND()" }
   }
 
   class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {

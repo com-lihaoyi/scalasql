@@ -3,6 +3,8 @@ import scalasql.core.Expr
 import utest._
 import utils.SqliteSuite
 
+import scala.annotation.unused
+
 /**
  * Tests for all the aggregate operators that we provide by default
  */
@@ -21,7 +23,7 @@ object FailureTests extends SqliteSuite {
       val ex = intercept[Exception] { Expr(1).toString }
       assert(ex.getMessage.contains("Expr#toString is not defined"))
 
-      val s: String = Expr.toString(Expr(1))
+      @unused val s: String = Expr.toString(Expr(1))
     }
 
   }

@@ -76,7 +76,7 @@ object PostgresDialect extends PostgresDialect {
     /**
      * Returns a random value in the range 0.0 <= x < 1.0
      */
-    def random: Expr[Double] = Expr { implicit ctx => sql"RANDOM()" }
+    def random: Expr[Double] = Expr { _ => sql"RANDOM()" }
   }
 
   class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {

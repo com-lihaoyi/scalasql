@@ -1330,7 +1330,7 @@ object WorldSqlTests extends TestSuite {
         // is rolled back and all changes are undoned (as seen below)
         dbClient.transaction { implicit db =>
           try {
-            db.savepoint { implicit sp =>
+            db.savepoint { _ =>
               db.run(City.delete(_.countryCode === "SGP"))
 
               db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()

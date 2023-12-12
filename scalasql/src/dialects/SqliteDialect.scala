@@ -59,7 +59,7 @@ object SqliteDialect extends SqliteDialect {
      * changes() SQL function is a wrapper around the sqlite3_changes64() C/C++
      * function and hence follows the same rules for counting changes.
      */
-    def changes: Expr[Int] = Expr { implicit ctx => sql"CHANGES()" }
+    def changes: Expr[Int] = Expr { _ => sql"CHANGES()" }
 
     /**
      * The total_changes() function returns the number of row changes caused by
@@ -67,7 +67,7 @@ object SqliteDialect extends SqliteDialect {
      * was opened. This function is a wrapper around the sqlite3_total_changes64()
      * C/C++ interface.
      */
-    def totalChanges: Expr[Int] = Expr { implicit ctx => sql"TOTAL_CHANGES()" }
+    def totalChanges: Expr[Int] = Expr { _ => sql"TOTAL_CHANGES()" }
 
     /**
      * The typeof(X) function returns a string that indicates the datatype of the
@@ -81,13 +81,13 @@ object SqliteDialect extends SqliteDialect {
      * last_insert_rowid() SQL function is a wrapper around the
      * sqlite3_last_insert_rowid() C/C++ interface function.
      */
-    def lastInsertRowId: Expr[Int] = Expr { implicit ctx => sql"LAST_INSERT_ROWID()" }
+    def lastInsertRowId: Expr[Int] = Expr { _ => sql"LAST_INSERT_ROWID()" }
 
     /**
      * The random() function returns a pseudo-random integer between
      * -9223372036854775808 and +9223372036854775807.
      */
-    def random: Expr[Long] = Expr { implicit ctx => sql"RANDOM()" }
+    def random: Expr[Long] = Expr { _ => sql"RANDOM()" }
 
     /**
      * The randomblob(N) function return an N-byte blob containing pseudo-random bytes.
