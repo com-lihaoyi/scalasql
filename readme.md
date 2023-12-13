@@ -41,9 +41,9 @@ dbClient.transaction{ db =>
   // Finding the 5-8th largest cities by population
   val fewLargestCities = db.run(
     City.select
-            .sortBy(_.population).desc
-            .drop(5).take(3)
-            .map(c => (c.name, c.population))
+        .sortBy(_.population).desc
+        .drop(5).take(3)
+        .map(c => (c.name, c.population))
   )
   // SELECT city0.name AS res__0, city0.population AS res__1
   // FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
