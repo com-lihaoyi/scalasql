@@ -26,7 +26,7 @@ SCALASQL_RUN_BENCHMARK=5000 ./mill -i -w __.test scalasql.sqlite.SubQueryTests.d
 * ScalaSql comprises 4 main submodules:
     * `scalasql.core`: the core functionality of evaluating `SqlStr` queries, but without any typed
       helpers to construct them
-    * `scalasql.operations`: extension methods on `Sql[T]` values representing operations on typed
+    * `scalasql.operations`: extension methods on `Expr[T]` values representing operations on typed
       SQL expressions, like `LOWER(str)` or `a || b`/`CONCAT(a, b)`
     * `scalasql.query`: builders for entire SQL queries, `INSERT`, `SELECT`, `UPDATE`, `DELETE`.
     * `scalasql`: the main user-facing ScalaSql module, contains the `package object` defining
