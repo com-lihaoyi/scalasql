@@ -21,7 +21,7 @@ object City extends Table[City]
 val dbClient = new scalasql.DbClient.Connection(
   connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
   config = new Config {
-    override def nameMapper(v: String) = v.toLowerCase() // Override default snake_case mapping
+    override def nameMapper(v: String) = v.toLowerCase() // Override default snake_case mapper
     override def logSql(sql: String, file: String, line: Int) = println(s"$file:$line $sql")
   }
 )
@@ -33,9 +33,9 @@ dbClient.transaction{ db =>
   db.updateRaw(os.read(os.Path("scalasql/test/resources/world-data.sql", os.pwd)))
 
   // Adding up population of all cities in China
-  val populationSum = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
+  val citiesPop = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
   // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
-  println(populationSum)
+  println(citiesPop)
   // 175953614
 
   // Finding the 5-8th largest cities by population
