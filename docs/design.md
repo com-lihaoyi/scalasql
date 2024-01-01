@@ -304,6 +304,13 @@ ScalaSql aims to do without these two things:
    increased performance from the optimized database queries. For the rare scenarios where
    this is not true, the developer can fall back to raw SQL queries.
 
+ScalaSql does not rule out asynchronous APIs, or other IO-monad-like execution models. However,
+it leaves such concerns up to the user, and out of the core library: ScalaSql focuses on
+translating query data structures to SQL strings, and SQL ResultSets to Scala data structures.
+If anyone wants to move their database calls to a thread pool, use asynchronous database drivers,
+or wrap things in IO monads or reactive streams, they are free to do so without the core ScalaSql
+library needing to be involved.
+
 ### Squeryl
 
 ScalaSql uses a different DSL design from Squeryl, focusing on a Scala-collection-like
@@ -343,7 +350,7 @@ Scala-collections-like DSL:
 ```scala
 val programmers = db.run(
    Programmer.select
-     .join(Company)(_.companyId == _.id)
+     .join(Company)(_.companyId === _.id)
      .filter{case (p, c) => !p.isDeleted}
      .sortBy{case (p, c) => p.createdAt}
      .take(10)
@@ -365,6 +372,13 @@ val programmers = DB.readOnly { implicit session =>
   }.map(Programmer(p, c)).list.apply()
 }
 ```
+
+In general, ScalikeJDBC ends up defining a kind of "inner platform" language, within the host
+Scala language: ScalikeJDBC variables are defined separately using `.syntax` calls, bound
+using `Foo as f` calls, and then manipulated as part of the query using things like `.where.eq`. 
+While ScalaSql does also work with wrapped `Expr[T]` types rather than raw `T`s and triple `===`
+instead of double `==`, it remains much closer to "normal" Scala code. This means that it should
+be much easier to pick up for anyone who knows Scala and has familiarity with Scala collections
 
 ### Doobie
 
