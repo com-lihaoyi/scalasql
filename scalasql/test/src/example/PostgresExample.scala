@@ -3,7 +3,6 @@ package scalasql.example
 import org.testcontainers.containers.PostgreSQLContainer
 import scalasql.Table
 
-import java.sql.DriverManager
 import scalasql.PostgresDialect._
 object PostgresExample {
 
@@ -24,8 +23,14 @@ object PostgresExample {
     pg
   }
 
-  lazy val postgresClient = new scalasql.DbClient.Connection(
-    DriverManager.getConnection(postgres.getJdbcUrl, postgres.getUsername, postgres.getPassword),
+  val dataSource = new org.postgresql.ds.PGSimpleDataSource
+  dataSource.setURL(postgres.getJdbcUrl)
+  dataSource.setDatabaseName(postgres.getDatabaseName);
+  dataSource.setUser(postgres.getUsername);
+  dataSource.setPassword(postgres.getPassword);
+
+  lazy val postgresClient = new scalasql.DbClient.DataSource(
+    dataSource,
     config = new scalasql.Config {}
   )
 

@@ -1,6 +1,5 @@
 package scalasql.example
 
-import java.sql.DriverManager
 import org.testcontainers.containers.MySQLContainer
 import scalasql.Table
 import scalasql.MySqlDialect._
@@ -24,12 +23,14 @@ object MySqlExample {
     mysql
   }
 
-  lazy val mysqlClient = new scalasql.DbClient.Connection(
-    DriverManager.getConnection(
-      mysql.getJdbcUrl + "?allowMultiQueries=true",
-      mysql.getUsername,
-      mysql.getPassword
-    ),
+  val dataSource = new com.mysql.cj.jdbc.MysqlDataSource
+  dataSource.setURL(mysql.getJdbcUrl + "?allowMultiQueries=true")
+  dataSource.setDatabaseName(mysql.getDatabaseName);
+  dataSource.setUser(mysql.getUsername);
+  dataSource.setPassword(mysql.getPassword);
+
+  lazy val mysqlClient = new scalasql.DbClient.DataSource(
+    dataSource,
     config = new scalasql.Config {}
   )
 

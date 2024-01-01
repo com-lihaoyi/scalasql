@@ -18,9 +18,11 @@ case class City[T[_]](
 object City extends Table[City]
 
 // Connect to your database (example uses in-memory sqlite, org.xerial:sqlite-jdbc:3.43.0.0)
-val dbClient = new scalasql.DbClient.Connection(
-  connection = java.sql.DriverManager.getConnection("jdbc:sqlite::memory:"),
-  config = new Config {
+val dataSource = new org.sqlite.SQLiteDataSource()
+dataSource.setUrl(s"jdbc:sqlite:file.db")
+lazy val dbClient = new scalasql.DbClient.DataSource(
+  dataSource,
+  config = new scalasql.Config {
     override def nameMapper(v: String) = v.toLowerCase() // Override default snake_case mapper
     override def logSql(sql: String, file: String, line: Int) = println(s"$file:$line $sql")
   }

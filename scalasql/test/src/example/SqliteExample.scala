@@ -2,7 +2,6 @@ package scalasql.example
 
 import scalasql.Table
 
-import java.sql.DriverManager
 import scalasql.SqliteDialect._
 object SqliteExample {
 
@@ -16,8 +15,11 @@ object SqliteExample {
   object ExampleProduct extends Table[ExampleProduct]
 
   // The example Sqlite JDBC client comes from the library `org.xerial:sqlite-jdbc:3.43.0.0`
-  lazy val sqliteClient = new scalasql.DbClient.Connection(
-    DriverManager.getConnection("jdbc:sqlite::memory:"),
+  val dataSource = new org.sqlite.SQLiteDataSource()
+  val tmpDb = java.nio.file.Files.createTempDirectory("sqlite")
+  dataSource.setUrl(s"jdbc:sqlite:$tmpDb/file.db")
+  lazy val sqliteClient = new scalasql.DbClient.DataSource(
+    dataSource,
     config = new scalasql.Config {}
   )
 
