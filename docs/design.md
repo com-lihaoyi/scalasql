@@ -265,6 +265,21 @@ user-facing complexity and internal maintainability:
    mostly via vanilla classes and methods that should be familiar even to those without
    deep expertise in the Scala language
 
+Problem (1) in particular seems fundamental: Quill is similar to Scala.js, compiling the Scala
+language to a different platform directly at compile time, without boxing or wrapper types. But
+there is one major difference: Scala.js supports the full Scala language and a huge fraction of
+the Scala ecosystem compiled to Javascript, while Quill supports a tiny subset the Scala language
+and none of the Scala ecosystem compiled to SQL. Given how different SQL semantics are from Scala,
+it seems to me that significantly increasing the fraction of the Scala language/ecosystem that
+can be directly compiled to SQL is impossible.
+
+ScalaSql thus aims to bring the difference between Scala and SQL front-and-center, rather than
+trying to blur the lines like Quill does. ScalaSql makes you work with `Expr[T]` types in your
+queries different from raw `T`s, and it provides each `Expr[T]` type with its own set of extension
+methods different from those available on the underlying `T` type. This makes it crystal clear
+exactly what operations ScalaSql supports and how they are implemented, which is something that
+is un-attainable via Quill's approach of direct compilation of Scala to SQL.
+
 ### SLICK
 
 SlICK invests in two major areas that ScalaSql does not: the DBIO Monad for managing
@@ -337,6 +352,7 @@ val programmers = db.run(
 
 **ScalikeJDBC**
 ```scala
+val (p, c) = (Programmer.syntax("p"), Company.syntax("c"))
 val programmers = DB.readOnly { implicit session =>
   withSQL {
     select
