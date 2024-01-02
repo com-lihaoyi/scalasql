@@ -241,6 +241,14 @@ and SQL ResultSets back to Scala data types. It does not provide more sophistica
 asynchronous, monadic, or compile-time operations, nor does it provide the "ORM/ActiveRecord"
 style of emulating mutable objects via database operations.
 
+As a result of its simplicity, ScalaSql is able to cover much more SQL functionality than
+most other query libraries in the Scala ecosystem: window functions, common table expressions,
+returning/on-conflict handling, transaction rollbacks and savepoints. These are things
+that libraries like Quill, SLICK, etc. typically do not model and expose to users. ScalaSql
+exposing a much more complete facade for SQL database functionality simplifies the user
+experience, as it reduces the frequency a user would need unsupported features and have to
+drop down to raw SQL as a workaround
+
 ### Quill
 
 Quill focuses a lot on compile-time query generation, while ScalaSql does not.
