@@ -303,8 +303,9 @@ ScalaSql aims to do without these two things:
 
 1. We assume that most applications are not ultra-high-concurrency, and blocking database
    operations are fine. If slow languages with blocking operations are enough for
-   ultra-large-scale systems like Dropbox (Python), Github (Ruby), or Instagram (Youtube),
-   they should be enough for the vast majority of systems a developer may want to build.
+   ultra-large-scale systems like Dropbox (Python), Instagram (Python), Youtube (Python),
+   Github (Ruby), and Stripe (Ruby), they should be enough for the vast majority of systems
+   a developer may want to build.
 
 2. We assume that most queries are relatively simple, most database query optimizers do
    a reasonable job, and the increased _predictability_ and _simplicity_ of not doing
