@@ -78,9 +78,7 @@ object TableMacros:
 
     def construct(queryable: Expr[Metadata.QueryableProxy], args: Expr[ResultSetIterator]) =
       val ownerType = TypeTree.of[V[Sc]]
-      val ownerTypeArgs = ownerType.tpe.typeArgs // TODO incorrect corret for some reason
       val constructor = ownerType.tpe.classSymbol.get.primaryConstructor
-      val constructorTypeParameters = constructor.paramSymss(0)
       val constructorParameters = constructor.paramSymss(1)
 
       val params = for (param, i) <- constructorParameters.zipWithIndex yield
@@ -92,7 +90,7 @@ object TableMacros:
             '{ $queryable.apply[t2, t1]($iExpr).construct($args) : Sc[t1] }.asTerm
       
       val baseConstructorTerm = Select(New(ownerType), constructor)
-      val typeAppliedConstructorTerm = TypeApply(baseConstructorTerm, ownerTypeArgs.map(t => TypeTree.ref(t.typeSymbol)))
+      val typeAppliedConstructorTerm = TypeApply(baseConstructorTerm, List(TypeTree.of[Sc]))
       Apply(typeAppliedConstructorTerm, params).asExprOf[V[Sc]]
 
     val queryablesExpr = '{
