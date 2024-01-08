@@ -93,6 +93,24 @@ object TableMacros:
       val typeAppliedConstructorTerm = TypeApply(baseConstructorTerm, List(TypeTree.of[Sc]))
       Apply(typeAppliedConstructorTerm, params).asExprOf[V[Sc]]
 
+    def deconstruct(queryable: Expr[Metadata.QueryableProxy], table: Expr[V[Sc]]) =
+      val ownerType = TypeTree.of[V[SqlExpr]]
+      val constructor = ownerType.tpe.classSymbol.get.primaryConstructor
+      val constructorParameters = constructor.paramSymss(1)
+
+      val params = for (param, i) <- constructorParameters.zipWithIndex yield
+        val iExpr = Expr(i)
+        val tpe = subParam[Sc](param.typeRef)
+        val tpe2 = subParam[SqlExpr](param.typeRef)
+        (tpe.asType, tpe2.asType) match
+          case ('[t1], '[t2]) =>
+            val r = Select(table.asTerm, classSymbol.fieldMember(param.name)).asExprOf[t1]
+            '{ $queryable.apply[t2, t1]($iExpr).deconstruct($r) }.asTerm
+
+      val baseConstructorTerm = Select(New(ownerType), constructor)
+      val typeAppliedConstructorTerm = TypeApply(baseConstructorTerm, List(TypeTree.of[SqlExpr]))
+      Apply(typeAppliedConstructorTerm, params).asExprOf[V[SqlExpr]]
+
     val queryablesExpr = '{
       (dialect: DialectTypeMappers, i: Int) =>
         import dialect.given
@@ -108,7 +126,7 @@ object TableMacros:
           walkLabels0,
           walkExprs0 = (table: V[SqlExpr]) => ${ flattenExprs('queryable, 'table) },
           construct0 = (args: ResultSetIterator) => ${ construct('queryable, 'args) },
-          deconstruct0 = ??? // TODO
+          deconstruct0 = (r: V[Sc]) => ${ deconstruct('queryable, 'r) }
         )
     }
 
