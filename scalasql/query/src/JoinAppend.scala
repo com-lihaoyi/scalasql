@@ -17,7 +17,7 @@ trait JoinAppendLowPriority {
   implicit def default[Q, R, Q2, R2](
       implicit qr0: Queryable.Row[Q, R],
       qr20: Queryable.Row[Q2, R2]
-  ) = new JoinAppend[Q, Q2, (Q, Q2), (R, R2)] {
+  ): JoinAppend[Q, Q2, (Q, Q2), (R, R2)] = new JoinAppend[Q, Q2, (Q, Q2), (R, R2)] {
     override def appendTuple(t: Q, v: Q2): (Q, Q2) = (t, v)
 
     def qr: Queryable.Row[(Q, Q2), (R, R2)] = Queryable.Row.Tuple2Queryable

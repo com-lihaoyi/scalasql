@@ -69,7 +69,7 @@ object Query {
     override def walkExprs(q: Q) = q.queryWalkExprs()
     override def isSingleRow(q: Q) = q.queryIsSingleRow
 
-    def renderSql(q: Q, ctx: Context): SqlStr = q.renderSql(ctx)
+    def renderSql(q: Q, ctx: Context): SqlStr = Renderable.renderSql(q)(ctx)
 
     override def construct(q: Q, args: Queryable.ResultSetIterator): R = q.queryConstruct(args)
   }

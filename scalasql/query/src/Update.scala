@@ -91,7 +91,7 @@ object Update {
       prevContext: Context
   ) {
     lazy val froms = joins0.flatMap(_.from).map(_.from)
-    implicit lazy val implicitCtx = Context.compute(prevContext, froms, Some(table))
+    implicit lazy val implicitCtx: Context = Context.compute(prevContext, froms, Some(table))
 
     lazy val tableName =
       SqlStr.raw(implicitCtx.config.tableNameMapper(Table.name(table.value)))

@@ -85,7 +85,7 @@ object Table {
   }
 
   object Internal {
-    class TableQueryable[Q, R <: scala.Product](
+    class TableQueryable[Q, R](
         walkLabels0: () => Seq[String],
         walkExprs0: Q => Seq[Expr[_]],
         construct0: Queryable.ResultSetIterator => R,
