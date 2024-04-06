@@ -126,6 +126,10 @@ ivy"com.lihaoyi::scalasql:0.1.0"
 
 ## Changelog
 
+### 0.1.1
+
+* Fix invalid version of scala-reflect dependency
+
 ### 0.1.0
 
 * First release!

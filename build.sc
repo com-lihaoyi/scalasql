@@ -72,7 +72,7 @@ trait ScalaSql extends Common{
       ivy"com.lihaoyi::sourcecode:0.3.1",
       ivy"com.lihaoyi::pprint:0.8.1",
     ) ++ Option.when(scalaVersion().startsWith("2."))(
-      ivy"org.scala-lang:scala-reflect:$scalaVersion"
+      ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
     )
 
     def generatedSources = T {
