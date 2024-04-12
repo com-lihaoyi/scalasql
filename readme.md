@@ -69,7 +69,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.0"
+ivy"com.lihaoyi::scalasql:0.1.2"
 ```
 
 ## Documentation
@@ -125,6 +125,10 @@ ivy"com.lihaoyi::scalasql:0.1.0"
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+### 0.1.2
+
+* Support `.getGeneratedKeys[R]` [#9](https://github.com/com-lihaoyi/scalasql/pull/9)
 
 ### 0.1.1
 
