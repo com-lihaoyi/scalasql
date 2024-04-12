@@ -20,7 +20,17 @@ object Returning {
     def table: TableRef
   }
 
-  trait InsertBase[Q] extends Base[Q]
+  trait InsertBase[Q] extends Base[Q] {
+
+    /**
+     * Makes this `INSERT` query call `JdbcStatement.getGeneratedKeys` when it is executed,
+     * returning a `Seq[R]` where `R` is a Scala type compatible with the auto-generated
+     * primary key type (typically something like `Int` or `Long`)
+     */
+    def getGeneratedKeys[R](implicit qr: Queryable.Row[_, R]): GetGeneratedKeys[Q, R] = {
+      new GetGeneratedKeys.Impl(this)
+    }
+  }
 
   class InsertImpl[Q, R](returnable: InsertBase[_], returning: Q)(
       implicit qr: Queryable.Row[Q, R]

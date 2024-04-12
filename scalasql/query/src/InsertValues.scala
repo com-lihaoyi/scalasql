@@ -1,9 +1,9 @@
 package scalasql.query
 
-import scalasql.core.{Context, DialectTypeMappers, Queryable, SqlStr, WithSqlExpr}
+import scalasql.core.{Context, DialectTypeMappers, Expr, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
-trait InsertValues[V[_[_]], R] extends Query.ExecuteUpdate[Int] {
+trait InsertValues[V[_[_]], R] extends Returning.InsertBase[V[Expr]] with Query.ExecuteUpdate[Int] {
   def skipColumns(x: (V[Column] => Column[_])*): InsertValues[V, R]
 }
 object InsertValues {
@@ -15,6 +15,8 @@ object InsertValues {
       skippedColumns: Seq[Column[_]]
   ) extends InsertValues[V, R] {
 
+    def table = insert.table
+    protected def expr = WithSqlExpr.get(insert).asInstanceOf[V[Expr]]
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(dialect.IntType)
 

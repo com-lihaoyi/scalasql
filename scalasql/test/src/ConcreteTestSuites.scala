@@ -27,6 +27,7 @@ import query.{
   ValuesTests,
   LateralJoinTests,
   WindowFunctionTests,
+  GetGeneratedKeysTests,
   WithCteTests
 }
 import scalasql.dialects.{
@@ -57,6 +58,7 @@ package postgres {
   object ValuesTests extends ValuesTests with PostgresSuite
   object LateralJoinTests extends LateralJoinTests with PostgresSuite
   object WindowFunctionTests extends WindowFunctionTests with PostgresSuite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object WithCteTests extends WithCteTests with PostgresSuite
@@ -100,6 +102,7 @@ package hikari {
   object ValuesTests extends ValuesTests with HikariSuite
   object LateralJoinTests extends LateralJoinTests with HikariSuite
   object WindowFunctionTests extends WindowFunctionTests with HikariSuite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
   object WithCteTests extends WithCteTests with HikariSuite
@@ -146,6 +149,7 @@ package mysql {
   object ValuesTests extends ValuesTests with MySqlSuite
   object LateralJoinTests extends LateralJoinTests with MySqlSuite
   object WindowFunctionTests extends WindowFunctionTests with MySqlSuite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with MySqlSuite
 
   object SubQueryTests extends SubQueryTests with MySqlSuite
   object WithCteTests extends WithCteTests with MySqlSuite
@@ -188,6 +192,8 @@ package sqlite {
   // Sqlite does not support lateral joins
   // object LateralJoinTests extends LateralJoinTests with SqliteSuite
   object WindowFunctionTests extends WindowFunctionTests with SqliteSuite
+  // Sqlite does not support getGeneratedKeys https://github.com/xerial/sqlite-jdbc/issues/980
+  // object GetGeneratedKeysTests extends GetGeneratedKeysTests with SqliteSuite
 
   object SubQueryTests extends SubQueryTests with SqliteSuite
   object WithCteTests extends WithCteTests with SqliteSuite
@@ -233,6 +239,7 @@ package h2 {
   // H2 does not support lateral joins
   // object LateralJoinTests extends LateralJoinTests with H2Suite
   object WindowFunctionTests extends WindowFunctionTests with H2Suite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with H2Suite
 
   object SubQueryTests extends SubQueryTests with H2Suite
   object WithCteTests extends WithCteTests with H2Suite
