@@ -124,34 +124,35 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
     test("updateGetGeneratedKeysSql") - {
-      if (!this.isInstanceOf[SqliteSuite]) checker.recorded(
-        """
+      if (!this.isInstanceOf[SqliteSuite])
+        checker.recorded(
+          """
         Allows you to fetch the primary keys that were auto-generated for an INSERT
         defined as a `SqlStr`.
         Note: not supported by Sqlite https://github.com/xerial/sqlite-jdbc/issues/980
         """,
-        Text {
+          Text {
 
-          dbClient.transaction { db =>
-            val newName = "Moo Moo Cow"
-            val newDateOfBirth = LocalDate.parse("2000-01-01")
-            val generatedIds = db
-              .updateGetGeneratedKeysSql[Int](
-                sql"INSERT INTO buyer (name, date_of_birth) VALUES ($newName, $newDateOfBirth), ($newName, $newDateOfBirth)"
+            dbClient.transaction { db =>
+              val newName = "Moo Moo Cow"
+              val newDateOfBirth = LocalDate.parse("2000-01-01")
+              val generatedIds = db
+                .updateGetGeneratedKeysSql[Int](
+                  sql"INSERT INTO buyer (name, date_of_birth) VALUES ($newName, $newDateOfBirth), ($newName, $newDateOfBirth)"
+                )
+
+              assert(generatedIds == Seq(4, 5))
+
+              db.run(Buyer.select) ==> List(
+                Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+                Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+                Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+                Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
+                Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
               )
-
-            assert(generatedIds == Seq(4, 5))
-
-            db.run(Buyer.select) ==> List(
-              Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
-              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
-              Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-              Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
-              Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
-            )
+            }
           }
-        }
-      )
+        )
     }
 
     test("runRaw") - checker.recorded(
@@ -190,33 +191,36 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
     test("updateGetGeneratedKeysRaw") - {
-      if (!this.isInstanceOf[SqliteSuite]) checker.recorded(
-        """
+      if (!this.isInstanceOf[SqliteSuite])
+        checker.recorded(
+          """
         Allows you to fetch the primary keys that were auto-generated for an INSERT
         defined using a raw `java.lang.String` and variables.
         Note: not supported by Sqlite https://github.com/xerial/sqlite-jdbc/issues/980
         """,
-        Text {
-          dbClient.transaction { db =>
-            val generatedKeys = db.updateGetGeneratedKeysRaw[Int](
-              "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?), (?, ?)",
-              Seq(
-                "Moo Moo Cow", LocalDate.parse("2000-01-01"),
-                "Moo Moo Cow", LocalDate.parse("2000-01-01")
+          Text {
+            dbClient.transaction { db =>
+              val generatedKeys = db.updateGetGeneratedKeysRaw[Int](
+                "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?), (?, ?)",
+                Seq(
+                  "Moo Moo Cow",
+                  LocalDate.parse("2000-01-01"),
+                  "Moo Moo Cow",
+                  LocalDate.parse("2000-01-01")
+                )
               )
-            )
-            assert(generatedKeys == Seq(4, 5))
+              assert(generatedKeys == Seq(4, 5))
 
-            db.run(Buyer.select) ==> List(
-              Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
-              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
-              Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
-              Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
-              Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
-            )
+              db.run(Buyer.select) ==> List(
+                Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+                Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+                Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+                Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
+                Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+              )
+            }
           }
-        }
-      )
+        )
     }
 
     test("stream") - checker.recorded(

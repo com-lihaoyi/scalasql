@@ -20,7 +20,8 @@ object Returning {
     def table: TableRef
   }
 
-  trait InsertBase[Q] extends Base[Q]{
+  trait InsertBase[Q] extends Base[Q] {
+
     /**
      * Makes this `INSERT` query call `JdbcStatement.getGeneratedKeys` when it is executed,
      * returning a `Seq[R]` where `R` is a Scala type compatible with the auto-generated

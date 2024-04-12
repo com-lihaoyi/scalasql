@@ -13,7 +13,8 @@ trait GetGeneratedKeys[Q, R] extends Query[Seq[R]] {
 
 object GetGeneratedKeys {
 
-  class Impl[Q, R](base: Returning.InsertBase[Q])(implicit qr: Queryable.Row[_, R]) extends GetGeneratedKeys[Q, R]{
+  class Impl[Q, R](base: Returning.InsertBase[Q])(implicit qr: Queryable.Row[_, R])
+      extends GetGeneratedKeys[Q, R] {
 
     def expr = WithSqlExpr.get(base)
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Seq[R] = {

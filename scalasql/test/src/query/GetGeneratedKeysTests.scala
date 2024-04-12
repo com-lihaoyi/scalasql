@@ -7,7 +7,8 @@ import utest._
 import java.time.LocalDate
 
 trait GetGeneratedKeysTests extends ScalaSqlSuite {
-  def description = "`INSERT` operations with `.getGeneratedKeys`. Not supported by Sqlite (see https://github.com/xerial/sqlite-jdbc/issues/980)"
+  def description =
+    "`INSERT` operations with `.getGeneratedKeys`. Not supported by Sqlite (see https://github.com/xerial/sqlite-jdbc/issues/980)"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
     test("single") {
