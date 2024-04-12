@@ -1,60 +1,38 @@
 package scalasql
 
-import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, SQLException}
+import java.sql.DriverManager
+import scalasql.H2Dialect._
+object Main {
 
-object Main extends App {
-  var connection: Connection = null
-  var preparedStatement: PreparedStatement = null
-  var resultSet: ResultSet = null
+  case class Example[T[_]](bytes: T[geny.Bytes])
 
-  try {
-    // 1. Connect to the database
-    connection = DriverManager.getConnection("jdbc:h2:~/test", "username", "password")
+  object Example extends Table[Example]
 
-    // 2. Create the table if it doesn't exist
-    val createTableSql =
+  // The example H2 database comes from the library `com.h2database:h2:2.2.224`
+  val conn = DriverManager.getConnection("jdbc:h2:mem:mydb")
+
+  def main(args: Array[String]): Unit = {
+    conn
+      .createStatement()
+      .executeUpdate(
+        """
+      CREATE TABLE data_types (
+          my_var_binary VARBINARY(256)
+      );
       """
-        |CREATE TABLE IF NOT EXISTS MY_TABLE (
-        |    ID INT AUTO_INCREMENT PRIMARY KEY,
-        |    COLUMN1 VARCHAR(255),
-        |    COLUMN2 VARCHAR(255)
-        |)
-        |""".stripMargin
-    preparedStatement = connection.prepareStatement(createTableSql)
-    preparedStatement.execute()
+      )
 
-    // 3. Prepare a statement with generated keys option
-    val insertSql = "INSERT INTO MY_TABLE (COLUMN1, COLUMN2) VALUES (?, ?)"
-    preparedStatement = connection.prepareStatement(insertSql, java.sql.Statement.RETURN_GENERATED_KEYS)
+    val prepared = conn.prepareStatement("INSERT INTO data_types (my_var_binary) VALUES (?)")
+    prepared.setBytes(1, Array[Byte](1, 2, 3, 4))
+    prepared.executeUpdate()
 
-    // 4. Set values for placeholders
-    preparedStatement.setString(1, "value1")
-    preparedStatement.setString(2, "value2")
+    val results = conn
+      .createStatement()
+      .executeQuery(
+        "SELECT data_types0.my_var_binary AS my_var_binary FROM data_types data_types0"
+      )
 
-    // 5. Execute the insert statement
-    val affectedRows = preparedStatement.executeUpdate()
-
-    if (affectedRows == 0) {
-      println("Insertion failed, no rows affected.")
-    } else {
-      // 6. Retrieve generated keys
-      resultSet = preparedStatement.getGeneratedKeys()
-      if (resultSet.next()) {
-        println("Generated Key: " + resultSet.getLong(1))
-      } else {
-        println("No generated keys were retrieved.")
-      }
-    }
-  } catch {
-    case e: SQLException => e.printStackTrace()
-  } finally {
-    // 7. Close resources
-    try {
-      if (resultSet != null) resultSet.close()
-      if (preparedStatement != null) preparedStatement.close()
-      if (connection != null) connection.close()
-    } catch {
-      case e: SQLException => e.printStackTrace()
-    }
+    results.next()
+    pprint.log(results.getBytes(1))
   }
 }
