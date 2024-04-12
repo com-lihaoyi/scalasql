@@ -11,7 +11,7 @@ trait Query[R] extends Renderable {
   protected def queryWalkLabels(): Seq[List[String]]
   protected def queryWalkExprs(): Seq[Expr[_]]
   protected def queryIsSingleRow: Boolean
-  protected def queryGetGeneratedKeys: Boolean = false
+  protected def queryGetGeneratedKeys: Option[Queryable.Row[_, _]] = None
   protected def queryIsExecuteUpdate: Boolean = false
 
   protected def queryConstruct(args: Queryable.ResultSetIterator): R

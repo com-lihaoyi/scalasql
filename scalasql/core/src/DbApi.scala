@@ -164,7 +164,7 @@ object DbApi {
     def rollback(): Unit
   }
 
-  // Call hierechy the various DbApi.Impl methods, both public and private:
+  // Call hierarchy the various DbApi.Impl methods, both public and private:
   //
   //                                      run
   //                                       |
@@ -196,7 +196,8 @@ object DbApi {
     ): R = {
 
       val flattened = unpackQueryable(query, qr, config)
-      if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
+      if (qr.isGetGeneratedKeys(query).nonEmpty) updateGetGeneratedKeysSql(flattened)(qr.isGetGeneratedKeys(query).get, fileName, lineNum).asInstanceOf[R]
+      else if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
       else {
         try {
           val res = stream(query, fetchSize, queryTimeoutSeconds)(

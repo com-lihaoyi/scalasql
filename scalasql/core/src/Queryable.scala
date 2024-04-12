@@ -17,7 +17,7 @@ trait Queryable[-Q, R] {
    * Whether this queryable value is executed using `java.sql.Statement.getGeneratedKeys`
    * instead of `.executeQuery`.
    */
-  def isGetGeneratedKeys(q: Q): Boolean
+  def isGetGeneratedKeys(q: Q): Option[Queryable.Row[_, _]]
 
   /**
    * Whether this queryable value is executed using `java.sql.Statement.executeUpdate`
@@ -88,7 +88,7 @@ object Queryable {
    *   available, there is no `Queryable.Row[Select[Q]]`, as `Select[Q]` returns multiple rows
    */
   trait Row[Q, R] extends Queryable[Q, R] {
-    def isGetGeneratedKeys(q: Q): Boolean = false
+    def isGetGeneratedKeys(q: Q): Option[Queryable.Row[_, _]] = None
     def isExecuteUpdate(q: Q): Boolean = false
     def isSingleRow(q: Q): Boolean = true
     def walkLabels(): Seq[List[String]]
