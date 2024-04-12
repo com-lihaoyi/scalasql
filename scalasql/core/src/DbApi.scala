@@ -103,6 +103,21 @@ trait DbApi extends AutoCloseable {
       queryTimeoutSeconds: Int = -1
   )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int
 
+  def updateGetGeneratedKeysSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+    implicit qr: Queryable.Row[_, R],
+    fileName: sourcecode.FileName,
+    lineNum: sourcecode.Line
+  ): IndexedSeq[R]
+
+  def updateGetGeneratedKeysRaw[R](
+      sql: String,
+      variables: Seq[Any] = Nil,
+      fetchSize: Int = -1,
+      queryTimeoutSeconds: Int = -1
+  )(implicit qr: Queryable.Row[_, R],
+    fileName: sourcecode.FileName,
+    lineNum: sourcecode.Line
+  ): IndexedSeq[R]
 }
 
 object DbApi {
@@ -268,6 +283,23 @@ object DbApi {
       )
     }
 
+    def updateGetGeneratedKeysSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable.Row[_, R],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): IndexedSeq[R] = {
+      val flattened = SqlStr.flatten(sql)
+      runRawUpdateGetGeneratedKeys0(
+        flattened.renderSql(DialectConfig.castParams(dialect)),
+        flattenParamPuts(flattened),
+        fetchSize,
+        queryTimeoutSeconds,
+        fileName,
+        lineNum,
+        qr
+      )
+    }
+
     def runRaw[R](
         sql: String,
         variables: Seq[Any] = Nil,
@@ -314,6 +346,24 @@ object DbApi {
       queryTimeoutSeconds,
       fileName,
       lineNum
+    )
+
+    def updateGetGeneratedKeysRaw[R](
+        sql: String,
+        variables: Seq[Any] = Nil,
+        fetchSize: Int = -1,
+        queryTimeoutSeconds: Int = -1
+    )(implicit qr: Queryable.Row[_, R],
+      fileName: sourcecode.FileName,
+      lineNum: sourcecode.Line
+    ): IndexedSeq[R] = runRawUpdateGetGeneratedKeys0(
+      sql,
+      anySeqPuts(variables),
+      fetchSize,
+      queryTimeoutSeconds,
+      fileName,
+      lineNum,
+      qr
     )
 
     def streamFlattened0[R](
@@ -397,6 +447,36 @@ object DbApi {
           fileName,
           lineNum
         )(_.executeUpdate())
+      }
+    }
+
+    def runRawUpdateGetGeneratedKeys0[R](
+        sql: String,
+        variables: Seq[(PreparedStatement, Int) => Unit],
+        fetchSize: Int,
+        queryTimeoutSeconds: Int,
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line,
+        qr: Queryable.Row[_, R]
+    ): IndexedSeq[R] = {
+      val statement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+      for ((v, i) <- variables.iterator.zipWithIndex) v(statement, i + 1)
+      configureRunCloseStatement(
+        statement,
+        fetchSize,
+        queryTimeoutSeconds,
+        sql,
+        fileName,
+        lineNum
+      ){ stmt =>
+        stmt.executeUpdate()
+        val resultSet = stmt.getGeneratedKeys
+        val output = Vector.newBuilder[R]
+        while (resultSet.next()) {
+          val rowRes = qr.construct(new Queryable.ResultSetIterator(resultSet))
+          output.addOne(rowRes)
+        }
+        output.result()
       }
     }
 

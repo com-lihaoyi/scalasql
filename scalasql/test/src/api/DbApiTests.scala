@@ -123,6 +123,32 @@ trait DbApiTests extends ScalaSqlSuite {
         }
       }
     )
+    test("updateGetGeneratedKeysSql") - checker.recorded(
+      """
+      ???
+      """,
+      Text {
+
+        dbClient.transaction { db =>
+          val newName = "Moo Moo Cow"
+          val newDateOfBirth = LocalDate.parse("2000-01-01")
+          val generatedIds = db
+            .updateGetGeneratedKeysSql[Int](
+              sql"INSERT INTO buyer (name, date_of_birth) VALUES ($newName, $newDateOfBirth), ($newName, $newDateOfBirth)"
+            )
+
+          assert(generatedIds == Seq(4, 5))
+
+          db.run(Buyer.select) ==> List(
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
+            Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
+          )
+        }
+      }
+    )
 
     test("runRaw") - checker.recorded(
       """
@@ -155,6 +181,31 @@ trait DbApiTests extends ScalaSqlSuite {
             Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
             Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
             Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
+          )
+        }
+      }
+    )
+    test("updateGetGeneratedKeysRaw") - checker.recorded(
+      """
+      ???
+      """,
+      Text {
+        dbClient.transaction { db =>
+          val generatedKeys = db.updateGetGeneratedKeysRaw[Int](
+            "INSERT INTO buyer (name, date_of_birth) VALUES (?, ?), (?, ?)",
+            Seq(
+              "Moo Moo Cow", LocalDate.parse("2000-01-01"),
+              "Moo Moo Cow", LocalDate.parse("2000-01-01")
+            )
+          )
+          assert(generatedKeys == Seq(4, 5))
+
+          db.run(Buyer.select) ==> List(
+            Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+            Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09")),
+            Buyer[Sc](4, "Moo Moo Cow", LocalDate.parse("2000-01-01")),
+            Buyer[Sc](5, "Moo Moo Cow", LocalDate.parse("2000-01-01"))
           )
         }
       }
