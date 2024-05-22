@@ -6,7 +6,8 @@ import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
-val scalaVersions = Seq("2.13.12"/*, "3.3.1"*/)
+val scala3Version = "3.3.3"
+val scalaVersions = Seq("2.13.12", scala3Version)
 
 trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
   def scalaVersion = crossScalaVersion
@@ -27,7 +28,7 @@ trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
     )
   )
 
-  def scalacOptions = Seq("-Xlint:unused")
+  def scalacOptions = T(if (scalaVersion() == scala3Version) Seq() else Seq("-Xlint:unused"))
 }
 
 
