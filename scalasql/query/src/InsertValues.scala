@@ -20,7 +20,7 @@ object InsertValues {
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(dialect.IntType)
 
-    override protected def renderSql(ctx: Context): SqlStr = {
+    override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       new Renderer(
         Table.name(insert.table.value),
         Table.labels(insert.table.value),

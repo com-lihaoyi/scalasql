@@ -24,7 +24,7 @@ class SqlStr(
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, interps, v, referencedExprs)
   override def toString = SqlStr.flatten(this).renderSql(false)
 
-  override protected def renderSql(ctx: Context): SqlStr = this
+  override private[scalasql] def renderSql(ctx: Context): SqlStr = this
 }
 
 object SqlStr {
@@ -211,7 +211,7 @@ object SqlStr {
     new SqlStr(Array(s), emptyInterpArray, false, referencedExprs)
 
   trait Renderable {
-    protected def renderSql(ctx: Context): SqlStr
+    private[scalasql] def renderSql(ctx: Context): SqlStr
   }
 
   object Renderable {

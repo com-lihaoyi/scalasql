@@ -21,7 +21,7 @@ object OnConflict {
   ) extends Query.DelegateQuery[R]
       with Returning.InsertBase[Q] {
     protected def expr = WithSqlExpr.get(query)
-    protected def renderSql(ctx: Context) = {
+    private[scalasql] def renderSql(ctx: Context) = {
       val str = Renderable.renderSql(query)(ctx)
       str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)}) DO NOTHING"
     }
@@ -40,7 +40,7 @@ object OnConflict {
   ) extends Query.DelegateQuery[R]
       with Returning.InsertBase[Q] {
     protected def expr = WithSqlExpr.get(query)
-    protected def renderSql(ctx: Context) = {
+    private[scalasql] def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderSql(query)
       val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(c.name)), SqlStr.commaSep)

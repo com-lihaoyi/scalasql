@@ -74,7 +74,7 @@ object Update {
       )
     }
 
-    protected override def renderSql(ctx: Context): SqlStr =
+    private[scalasql] override def renderSql(ctx: Context): SqlStr =
       new Renderer(joins, table, set0, where, ctx).render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int = {

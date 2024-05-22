@@ -7,7 +7,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
  * a Scala value of a particular type [[T]]
  */
 trait Expr[T] extends SqlStr.Renderable {
-  protected final def renderSql(ctx: Context): SqlStr = {
+  private[scalasql] final def renderSql(ctx: Context): SqlStr = {
     ctx.exprNaming.get(this.exprIdentity).getOrElse(renderToSql0(ctx))
   }
 

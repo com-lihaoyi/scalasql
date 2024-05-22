@@ -231,7 +231,7 @@ object MySqlDialect extends MySqlDialect {
     )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectTypeMappers) =
       new Update(expr, table, set0, joins, where)
 
-    protected override def renderSql(ctx: Context) = {
+    private[scalasql] override def renderSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
     }
 
@@ -271,7 +271,7 @@ object MySqlDialect extends MySqlDialect {
     protected def query = insert.query
     override def queryIsExecuteUpdate = true
 
-    protected def renderSql(ctx: Context) = {
+    private[scalasql] def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderSql(insert.query)
 

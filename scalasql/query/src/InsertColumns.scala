@@ -23,7 +23,7 @@ object InsertColumns {
     def table = insert.table
     protected def expr: V[Column] = WithSqlExpr.get(insert)
 
-    protected override def renderSql(ctx: Context) =
+    private[scalasql] override def renderSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =

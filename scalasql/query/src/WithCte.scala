@@ -87,7 +87,7 @@ object WithCte {
         }
       }
 
-    override protected def renderSql(ctx: Context): SqlStr = {
+    override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       SqlStr.raw(ctx.fromNaming(lhsSubQueryRef))
     }
   }

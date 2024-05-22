@@ -16,7 +16,7 @@ object Delete {
   ) extends Delete[Q] {
     import dialect._
 
-    protected def renderSql(ctx: Context) = new Renderer(table, filter, ctx).render()
+    private[scalasql] def renderSql(ctx: Context) = new Renderer(table, filter, ctx).render()
 
     protected def queryConstruct(args: Queryable.ResultSetIterator): Int = args.get(IntType)
   }

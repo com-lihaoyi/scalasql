@@ -82,7 +82,7 @@ object Query {
   class Single[R](protected val query: Query[Seq[R]]) extends Query.DelegateQuery[R] {
     protected override def queryIsSingleRow: Boolean = true
 
-    protected def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
+    private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
     protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
       query.queryConstruct(args).asInstanceOf[R]
   }

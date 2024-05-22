@@ -53,7 +53,7 @@ object Returning {
 
     override def queryIsSingleRow = false
 
-    protected override def renderSql(ctx0: Context) = {
+    private[scalasql] override def renderSql(ctx0: Context) = {
       implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
 
       val prefix = Renderable.renderSql(returnable)

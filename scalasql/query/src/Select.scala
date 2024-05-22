@@ -187,7 +187,7 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  protected def renderSql(ctx: Context): SqlStr = {
+  private[scalasql] def renderSql(ctx: Context): SqlStr = {
     val renderer = selectRenderer(ctx)
 
     renderer.render(LiveExprs.none).withCompleteQuery(true)

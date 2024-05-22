@@ -26,7 +26,7 @@ object GetGeneratedKeys {
     protected override def queryIsSingleRow = false
     protected override def queryIsExecuteUpdate = true
 
-    override protected def renderSql(ctx: Context): SqlStr = Renderable.renderSql(base)(ctx)
+    override private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(base)(ctx)
 
     override protected def queryGetGeneratedKeys: Option[Queryable.Row[_, _]] = Some(qr)
   }

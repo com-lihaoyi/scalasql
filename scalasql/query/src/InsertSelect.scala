@@ -19,7 +19,7 @@ object InsertSelect {
 
     def table = insert.table
 
-    protected override def renderSql(ctx: Context) =
+    private[scalasql] override def renderSql(ctx: Context) =
       new Renderer(select, select.qr.walkExprs(columns), ctx, Table.name(table.value))
         .render()
 
