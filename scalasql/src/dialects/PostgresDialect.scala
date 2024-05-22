@@ -35,7 +35,7 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
   implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
-  ) = new LateralJoinOps(wrapped)
+  ): LateralJoinOps[C, Q, R] = new LateralJoinOps(wrapped)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new PostgresDialect.ExprAggOps(v)

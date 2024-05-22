@@ -243,7 +243,7 @@ object SimpleSelect {
       extends SubqueryRef.Wrapped.Renderer {
     lazy val flattenedExpr = query.qr.walkLabelsAndExprs(query.expr)
     lazy val froms = query.from ++ query.joins.flatMap(_.from.map(_.from))
-    implicit lazy val context = Context.compute(prevContext, froms, None)
+    implicit lazy val context: Context = Context.compute(prevContext, froms, None)
 
     lazy val joinOns =
       query.joins.map(_.from.map(_.on.map(t => SqlStr.flatten(Renderable.renderSql(t)))))
