@@ -67,6 +67,9 @@ trait ScalaSql extends Common{
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
   }
 
+  private def indent(code: Iterable[String]): String =
+    code.map(_.split("\n").map("  " + _).mkString("\n")).mkString("\n")
+
   object core extends Common with CrossValue {
     def ivyDeps = Agg(
       ivy"com.lihaoyi::geny:1.0.0",
@@ -101,7 +104,7 @@ trait ScalaSql extends Common{
         s"""package scalasql.core.generated
            |import scalasql.core.Queryable
            |trait QueryableRow{
-           |  ${queryableRowDefs.mkString("\n")}
+           |${indent(queryableRowDefs)}
            |}
            |""".stripMargin
       )
@@ -180,7 +183,7 @@ trait ScalaSql extends Common{
            |import scalasql.core.{Queryable, Expr}
            |import scalasql.query.Column
            |trait Insert[V[_[_]], R]{
-           |  ${defs(false).mkString("\n")}
+           |${indent(defs(false))}
            |}
            |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
            |  def newInsertValues[R](
@@ -188,15 +191,15 @@ trait ScalaSql extends Common{
            |        columns: Seq[Column[_]],
            |        valuesLists: Seq[Seq[Expr[_]]]
            |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
-           |  ${defs(true).mkString("\n")}
+           |${indent(defs(true))}
            |}
            |
            |trait QueryableRow{
-           |  ${queryableRowDefs.mkString("\n")}
+           |${indent(queryableRowDefs)}
            |}
            |
            |trait JoinAppend extends scalasql.query.JoinAppendLowPriority{
-           |  ${joinAppendDefs.mkString("\n")}
+           |${indent(joinAppendDefs)}
            |}
            |""".stripMargin
       )
