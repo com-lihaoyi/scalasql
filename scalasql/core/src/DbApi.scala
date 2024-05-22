@@ -202,22 +202,20 @@ object DbApi {
           .asInstanceOf[R]
       else if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
       else {
-        try {
-          val res = stream(query, fetchSize, queryTimeoutSeconds)(
-            qr.asInstanceOf[Queryable[Q, Seq[_]]],
-            fileName,
-            lineNum
+        val res = stream(query, fetchSize, queryTimeoutSeconds)(
+          qr.asInstanceOf[Queryable[Q, Seq[_]]],
+          fileName,
+          lineNum
+        )
+        if (qr.isSingleRow(query)) {
+          val results = res.take(2).toVector
+          assert(
+            results.size == 1,
+            s"Single row query must return 1 result, not ${results.size}"
           )
-          if (qr.isSingleRow(query)) {
-            val results = res.take(2).toVector
-            assert(
-              results.size == 1,
-              s"Single row query must return 1 result, not ${results.size}"
-            )
-            results.head.asInstanceOf[R]
-          } else {
-            res.toVector.asInstanceOf[R]
-          }
+          results.head.asInstanceOf[R]
+        } else {
+          res.toVector.asInstanceOf[R]
         }
       }
     }
