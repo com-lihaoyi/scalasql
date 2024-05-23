@@ -5,27 +5,21 @@ import scala.compiletime.summonInline
 import scala.quoted.*
 
 object TableMacros {
-  private trait Internal[+A]
-
   def applyImpl[V[_[_]] <: Product](using Quotes, Type[V]): Expr[Table.Metadata[V]] = {
     import quotes.reflect.*
 
-    val caseClassType = TypeRepr.of[V[Internal]]
-    val caseClassTypeSym = caseClassType.typeSymbol
+    val caseClassType = TypeRepr.of[V]
+    val constructor = caseClassType.typeSymbol.primaryConstructor
+    val constructorTypeParams = constructor.paramSymss(0)
+    val constructorValueParams = constructor.paramSymss(1)
 
-    // TODO
-    // val constructor = caseClassTypeSym.primaryConstructor
-    // val constructParameters = constructor.paramSymss.head
-    val constructParameters = caseClassTypeSym.caseFields
-
-    def paramType(param: Symbol): TypeRepr = caseClassType.select(param).widen
+    def paramType(param: Symbol): TypeRepr = caseClassType.memberType(param)
 
     def isTypeParamType(param: Symbol): Boolean =
-      // TODO - is this equivalent to what's in scala 2?
-      !(paramType(param) <:< TypeRepr.of[Internal[Any]])
+      paramType(param).typeSymbol.toString != constructorTypeParams.head.toString
 
     def subParam(paramInfo: TypeRepr, tpe: TypeRepr): TypeRepr =
-      paramInfo.substituteTypes(List(TypeRepr.of[Internal].typeSymbol), List(tpe))
+      paramInfo.substituteTypes(List(constructorTypeParams.head), List(tpe))
 
     val queryables = '{ (dialect: DialectTypeMappers, n: Int) =>
       {
@@ -33,7 +27,7 @@ object TableMacros {
         given d: DialectTypeMappers = dialect
 
         ${
-          Expr.ofList(constructParameters.map { param =>
+          Expr.ofList(constructorValueParams.map { param =>
             val paramTpe = paramType(param)
             val tpe = subParam(paramTpe, TypeRepr.of[Sc])
             val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr])
@@ -47,7 +41,7 @@ object TableMacros {
 
     val walkLabels0 = '{ () =>
       ${
-        Expr.ofList(constructParameters.map { param =>
+        Expr.ofList(constructorValueParams.map { param =>
           if (isTypeParamType(param))
             paramType(param) match {
               case AppliedType(tpeCtor, _) =>
@@ -72,16 +66,16 @@ object TableMacros {
           walkLabels0,
           (table: V[SqlExpr]) =>
             ${
-              Expr.ofList(constructParameters.zipWithIndex.map { case (param, i) =>
+              Expr.ofList(constructorValueParams.zipWithIndex.map { case (param, i) =>
                 val paramTpe = paramType(param)
                 val tpe = subParam(paramTpe, TypeRepr.of[Sc])
                 val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr])
                 (tpe.asType, tpe2.asType) match {
                   case ('[t], '[t2]) =>
                     '{
-                      queryable[t2, t](${ Expr(i) }).walkExprs(${
-                        Select('table.asTerm, param).asExprOf[t2]
-                      })
+                      queryable[t2, t](${ Expr(i) }).walkExprs(
+                        ${ Select.unique('table.asTerm, param.name).asExprOf[t2] }
+                      )
                     }
                 }
               })
@@ -93,7 +87,7 @@ object TableMacros {
                   Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
                   List(TypeTree.of[Sc])
                 ),
-                constructParameters.zipWithIndex.map { case (param, i) =>
+                constructorValueParams.zipWithIndex.map { case (param, i) =>
                   val paramTpe = paramType(param)
                   val tpe = subParam(paramTpe, TypeRepr.of[Sc]).asType
                   val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr]).asType
@@ -111,7 +105,7 @@ object TableMacros {
                   Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
                   List(TypeTree.of[SqlExpr])
                 ),
-                constructParameters.zipWithIndex.map { case (param, i) =>
+                constructorValueParams.zipWithIndex.map { case (param, i) =>
                   val paramTpe = paramType(param)
                   val tpe = subParam(paramTpe, TypeRepr.of[Sc]).asType
                   val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr]).asType
@@ -119,9 +113,9 @@ object TableMacros {
                   (tpe, tpe2) match {
                     case ('[t], '[t2]) =>
                       '{
-                        queryable[t2, t](${ Expr(i) }).deconstruct(${
-                          Select('r.asTerm, param).asExprOf[t]
-                        })
+                        queryable[t2, t](${ Expr(i) }).deconstruct(
+                          ${ Select.unique('r.asTerm, param.name).asExprOf[t] }
+                        )
                       }.asTerm
                   }
                 }
@@ -142,7 +136,7 @@ object TableMacros {
                 Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
                 List(TypeTree.of[Column])
               ),
-              constructParameters.map { param =>
+              constructorValueParams.map { param =>
                 val paramTpe = paramType(param)
 
                 if (isTypeParamType(param))
