@@ -12,7 +12,7 @@ class TableRef(val value: Table.Base) extends From {
 
   def fromRefPrefix(prevContext: Context) = prevContext.config.tableNameMapper(Table.name(value))
 
-  def fromExprAliases(prevContext: Context) = Nil
+  def fromExprAliases(prevContext: Context): Seq[(Expr.Identity, SqlStr)] = Nil
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
     SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name

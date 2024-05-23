@@ -37,15 +37,15 @@ object Expr {
   def identity[T](e: Expr[T]): Identity = e.exprIdentity
   class Identity()
 
-  implicit def ExprQueryable[E[_] <: Expr[_], T](
+  implicit def ExprQueryable[E[_] <: Expr[?], T](
       implicit mt: TypeMapper[T]
   ): Queryable.Row[E[T], T] = new ExprQueryable[E, T]()
 
-  class ExprQueryable[E[_] <: Expr[_], T](
+  class ExprQueryable[E[_] <: Expr[?], T](
       implicit tm: TypeMapper[T]
   ) extends Queryable.Row[E[T], T] {
-    def walkLabels() = Seq(Nil)
-    def walkExprs(q: E[T]) = Seq(q)
+    def walkLabels(): Seq[List[String]] = Seq(Nil)
+    def walkExprs(q: E[T]): Seq[Expr[?]] = Seq(q)
 
     override def construct(args: Queryable.ResultSetIterator): T = args.get(tm)
 

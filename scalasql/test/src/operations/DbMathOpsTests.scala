@@ -5,7 +5,7 @@ import scalasql.utils.ScalaSqlSuite
 import utest._
 
 trait ExprMathOpsTests extends ScalaSqlSuite {
-  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps with MathOps = ???
+  override implicit def DbApiOpsConv(db: => DbApi): DbApiOps & MathOps = ???
   def description = "Math operations; supported by H2/Postgres/MySql, not supported by Sqlite"
   def tests = Tests {
 

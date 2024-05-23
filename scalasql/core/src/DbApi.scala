@@ -27,7 +27,7 @@ trait DbApi extends AutoCloseable {
    * Runs the given [[SqlStr]] of the form `sql"..."` and returns a value of type [[R]]
    */
   def runSql[R](query: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): IndexedSeq[R]
@@ -48,7 +48,7 @@ trait DbApi extends AutoCloseable {
    * arbitrary [[SqlStr]] of the form `sql"..."` and  streams the results back to you
    */
   def streamSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): Generator[R]
@@ -63,7 +63,7 @@ trait DbApi extends AutoCloseable {
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
   )(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): IndexedSeq[R]
@@ -78,7 +78,7 @@ trait DbApi extends AutoCloseable {
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
   )(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): Generator[R]
@@ -104,7 +104,7 @@ trait DbApi extends AutoCloseable {
   )(implicit fileName: sourcecode.FileName, lineNum: sourcecode.Line): Int
 
   def updateGetGeneratedKeysSql[R](sql: SqlStr, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): IndexedSeq[R]
@@ -115,7 +115,7 @@ trait DbApi extends AutoCloseable {
       fetchSize: Int = -1,
       queryTimeoutSeconds: Int = -1
   )(
-      implicit qr: Queryable.Row[_, R],
+      implicit qr: Queryable.Row[?, R],
       fileName: sourcecode.FileName,
       lineNum: sourcecode.Line
   ): IndexedSeq[R]
@@ -203,7 +203,7 @@ object DbApi {
       else if (qr.isExecuteUpdate(query)) updateSql(flattened).asInstanceOf[R]
       else {
         val res = stream(query, fetchSize, queryTimeoutSeconds)(
-          qr.asInstanceOf[Queryable[Q, Seq[_]]],
+          qr.asInstanceOf[Queryable[Q, Seq[?]]],
           fileName,
           lineNum
         )
@@ -246,7 +246,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): IndexedSeq[R] = streamSql(sql, fetchSize, queryTimeoutSeconds).toVector
@@ -256,7 +256,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): Generator[R] = {
@@ -290,7 +290,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): IndexedSeq[R] = {
@@ -312,7 +312,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): IndexedSeq[R] = {
@@ -325,7 +325,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): Generator[R] = {
@@ -360,7 +360,7 @@ object DbApi {
         fetchSize: Int = -1,
         queryTimeoutSeconds: Int = -1
     )(
-        implicit qr: Queryable.Row[_, R],
+        implicit qr: Queryable.Row[?, R],
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): IndexedSeq[R] = runRawUpdateGetGeneratedKeys0(
@@ -464,7 +464,7 @@ object DbApi {
         queryTimeoutSeconds: Int,
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line,
-        qr: Queryable.Row[_, R]
+        qr: Queryable.Row[?, R]
     ): IndexedSeq[R] = {
       val statement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
       for ((v, i) <- variables.iterator.zipWithIndex) v(statement, i + 1)

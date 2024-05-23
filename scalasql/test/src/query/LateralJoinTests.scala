@@ -8,7 +8,7 @@ import utils.ScalaSqlSuite
 import java.time.LocalDate
 
 trait LateralJoinTests extends ScalaSqlSuite {
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] & Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
   ): LateralJoinOps[C, Q, R]
   def description = """

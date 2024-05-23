@@ -9,9 +9,9 @@ import scalasql.core.{Context, Expr, Queryable, SqlStr, WithSqlExpr}
  */
 trait Query[R] extends Renderable {
   protected def queryWalkLabels(): Seq[List[String]]
-  protected def queryWalkExprs(): Seq[Expr[_]]
+  protected def queryWalkExprs(): Seq[Expr[?]]
   protected def queryIsSingleRow: Boolean
-  protected def queryGetGeneratedKeys: Option[Queryable.Row[_, _]] = None
+  protected def queryGetGeneratedKeys: Option[Queryable.Row[?, ?]] = None
   protected def queryIsExecuteUpdate: Boolean = false
 
   protected def queryConstruct(args: Queryable.ResultSetIterator): R
@@ -23,8 +23,8 @@ object Query {
    * Configuration for a typical update [[Query]]
    */
   trait ExecuteUpdate[R] extends scalasql.query.Query[R] {
-    protected def queryWalkLabels() = Nil
-    protected def queryWalkExprs() = Nil
+    protected def queryWalkLabels(): Seq[List[String]] = Nil
+    protected def queryWalkExprs(): Seq[Expr[?]] = Nil
     protected override def queryIsSingleRow = true
     protected override def queryIsExecuteUpdate = true
   }
@@ -34,7 +34,7 @@ object Query {
    * most of the abstract methods to it
    */
   trait DelegateQuery[R] extends scalasql.query.Query[R] {
-    protected def query: Query[_]
+    protected def query: Query[?]
     protected def queryWalkLabels() = query.queryWalkLabels()
     protected def queryWalkExprs() = query.queryWalkExprs()
     protected override def queryIsSingleRow = query.queryIsSingleRow
@@ -45,7 +45,7 @@ object Query {
    * Configuration for a [[Query]] that wraps an expr [[Q]] and [[Queryable]]
    */
   trait DelegateQueryable[Q, R] extends scalasql.query.Query[R] with WithSqlExpr[Q] {
-    protected def qr: Queryable[Q, _]
+    protected def qr: Queryable[Q, ?]
     protected def queryWalkLabels() = qr.walkLabels(expr)
     protected def queryWalkExprs() = qr.walkExprs(expr)
     protected override def queryIsSingleRow = qr.isSingleRow(expr)

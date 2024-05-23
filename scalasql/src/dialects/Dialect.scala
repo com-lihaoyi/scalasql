@@ -222,7 +222,7 @@ trait Dialect extends DialectTypeMappers {
       v: Expr[T]
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
 
-  implicit def ExprOpsConv(v: Expr[_]): operations.ExprOps = new operations.ExprOps(v)
+  implicit def ExprOpsConv(v: Expr[?]): operations.ExprOps = new operations.ExprOps(v)
 
   implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
     new operations.ExprTypedOps(v)
@@ -240,7 +240,7 @@ trait Dialect extends DialectTypeMappers {
 
   implicit def ExprStringOpsConv(
       v: Expr[String]
-  ): operations.ExprStringLikeOps[String] with operations.ExprStringOps[String]
+  ): operations.ExprStringLikeOps[String] & operations.ExprStringOps[String]
   implicit def ExprBlobOpsConv(v: Expr[geny.Bytes]): operations.ExprStringLikeOps[geny.Bytes]
 
   implicit def AggNumericOpsConv[V: Numeric: TypeMapper](v: Aggregatable[Expr[V]])(
@@ -248,7 +248,7 @@ trait Dialect extends DialectTypeMappers {
   ): operations.AggNumericOps[V] = new operations.AggNumericOps(v)
 
   implicit def AggOpsConv[T](v: Aggregatable[T])(
-      implicit qr: Queryable.Row[T, _]
+      implicit qr: Queryable.Row[T, ?]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T]

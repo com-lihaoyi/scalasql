@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql.core.SqlStr.Renderable
-import scalasql.core.{Context, Queryable, SqlStr, WithSqlExpr}
+import scalasql.core.{Context, Expr, Queryable, SqlStr, WithSqlExpr}
 
 /**
  * Represents an [[Insert]] query that you want to call `JdbcStatement.getGeneratedKeys`
@@ -13,7 +13,7 @@ trait GetGeneratedKeys[Q, R] extends Query[Seq[R]] {
 
 object GetGeneratedKeys {
 
-  class Impl[Q, R](base: Returning.InsertBase[Q])(implicit qr: Queryable.Row[_, R])
+  class Impl[Q, R](base: Returning.InsertBase[Q])(implicit qr: Queryable.Row[?, R])
       extends GetGeneratedKeys[Q, R] {
 
     def expr = WithSqlExpr.get(base)
@@ -21,13 +21,13 @@ object GetGeneratedKeys {
       Seq(qr.construct(args))
     }
 
-    protected def queryWalkLabels() = Nil
-    protected def queryWalkExprs() = Nil
+    protected def queryWalkLabels(): Seq[List[String]] = Nil
+    protected def queryWalkExprs(): Seq[Expr[?]] = Nil
     protected override def queryIsSingleRow = false
     protected override def queryIsExecuteUpdate = true
 
     override private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(base)(ctx)
 
-    override protected def queryGetGeneratedKeys: Option[Queryable.Row[_, _]] = Some(qr)
+    override protected def queryGetGeneratedKeys: Option[Queryable.Row[?, ?]] = Some(qr)
   }
 }

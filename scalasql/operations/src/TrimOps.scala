@@ -3,7 +3,7 @@ import scalasql.core.Expr
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait TrimOps {
-  protected def v: Expr[_]
+  protected def v: Expr[?]
 
   /**
    * Trim [[x]]s from the left hand side of the string [[v]]

@@ -28,8 +28,8 @@ object InsertSelect {
   }
 
   class Renderer(
-      select: Select[_, _],
-      exprs: Seq[Expr[_]],
+      select: Select[?, ?],
+      exprs: Seq[Expr[?]],
       prevContext: Context,
       tableName: String
   ) {
@@ -38,7 +38,7 @@ object InsertSelect {
 
     lazy val columns = SqlStr.join(
       exprs
-        .map(_.asInstanceOf[Column[_]])
+        .map(_.asInstanceOf[Column[?]])
         .map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
       SqlStr.commaSep
     )

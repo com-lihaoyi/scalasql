@@ -42,7 +42,7 @@ object SqlStr {
       isCompleteQuery: Boolean,
       val referencedExprs: Array[Expr.Identity]
   ) extends SqlStr(queryParts, interps0, isCompleteQuery, referencedExprs) {
-    def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
+    def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[?]])
     def renderSql(castParams: Boolean) = {
       val queryStr = queryParts.iterator
         .zipAll(interpsIterator, "", null)

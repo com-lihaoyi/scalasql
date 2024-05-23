@@ -65,7 +65,7 @@ object Table {
   }
 
   class Metadata[V[_[_]]](
-      val queryables: (DialectTypeMappers, Int) => Queryable.Row[_, _],
+      val queryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
       val walkLabels0: () => Seq[String],
       val queryable: (
           () => Seq[String],
@@ -79,7 +79,7 @@ object Table {
   }
 
   object Metadata extends scalasql.query.TableMacros {
-    class QueryableProxy(queryables: Int => Queryable.Row[_, _]) {
+    class QueryableProxy(queryables: Int => Queryable.Row[?, ?]) {
       def apply[T, V](n: Int): Queryable.Row[T, V] = queryables(n).asInstanceOf[Queryable.Row[T, V]]
     }
   }
@@ -87,12 +87,12 @@ object Table {
   object Internal {
     class TableQueryable[Q, R <: scala.Product](
         walkLabels0: () => Seq[String],
-        walkExprs0: Q => Seq[Expr[_]],
+        walkExprs0: Q => Seq[Expr[?]],
         construct0: Queryable.ResultSetIterator => R,
         deconstruct0: R => Q = ???
     ) extends Queryable.Row[Q, R] {
       def walkLabels(): Seq[List[String]] = walkLabels0().map(List(_))
-      def walkExprs(q: Q): Seq[Expr[_]] = walkExprs0(q)
+      def walkExprs(q: Q): Seq[Expr[?]] = walkExprs0(q)
 
       def construct(args: Queryable.ResultSetIterator) = construct0(args)
 

@@ -9,7 +9,7 @@ import utils.ScalaSqlSuite
 import java.time.LocalDate
 
 trait OnConflictTests extends ScalaSqlSuite {
-  this: OnConflictOps with ReturningDialect =>
+  this: OnConflictOps & ReturningDialect =>
   def description = "Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {

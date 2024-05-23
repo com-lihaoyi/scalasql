@@ -10,7 +10,7 @@ trait Insert[V[_[_]], R] extends WithSqlExpr[V[Column]] with scalasql.generated.
   def qr: Queryable[V[Column], R]
   def select[C, R2](columns: V[Expr] => C, select: Select[C, R2]): InsertSelect[V, C, R, R2]
 
-  def columns(f: (V[Column] => Column.Assignment[_])*): InsertColumns[V, R]
+  def columns(f: (V[Column] => Column.Assignment[?])*): InsertColumns[V, R]
   def values(f: R*): InsertValues[V, R]
 
   def batched[T1](f1: V[Column] => Column[T1])(items: Expr[T1]*): InsertColumns[V, R]
@@ -32,9 +32,9 @@ object Insert {
 
     def newInsertValues[R](
         insert: Insert[V, R],
-        columns: Seq[Column[_]],
-        valuesLists: Seq[Seq[Expr[_]]]
-    )(implicit qr: Queryable[V[Column], R]) = {
+        columns: Seq[Column[?]],
+        valuesLists: Seq[Seq[Expr[?]]]
+    )(implicit qr: Queryable[V[Column], R]): InsertColumns[V, R] = {
       new InsertColumns.Impl(insert, columns, valuesLists)
     }
 
@@ -42,7 +42,7 @@ object Insert {
       newInsertSelect(this, columns(expr.asInstanceOf[V[Expr]]), select)
     }
 
-    def columns(f: (V[Column] => Column.Assignment[_])*): InsertColumns[V, R] = {
+    def columns(f: (V[Column] => Column.Assignment[?])*): InsertColumns[V, R] = {
       val kvs = f.map(_(expr))
       newInsertValues(this, columns = kvs.map(_.column), valuesLists = Seq(kvs.map(_.value)))
     }

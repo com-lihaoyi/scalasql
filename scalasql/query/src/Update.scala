@@ -14,7 +14,7 @@ trait Update[Q, R]
   def filter(f: Q => Expr[Boolean]): Update[Q, R]
   def withFilter(f: Q => Expr[Boolean]): Update[Q, R] = filter(f)
 
-  def set(f: (Q => Column.Assignment[_])*): Update[Q, R]
+  def set(f: (Q => Column.Assignment[?])*): Update[Q, R]
 
   def join0[Q2, R2, QF, RF](
       prefix: String,
@@ -37,9 +37,9 @@ object Update {
   class Impl[Q, R](
       val expr: Q,
       val table: TableRef,
-      val set0: Seq[Column.Assignment[_]],
+      val set0: Seq[Column.Assignment[?]],
       val joins: Seq[Join],
-      val where: Seq[Expr[_]]
+      val where: Seq[Expr[?]]
   )(implicit val qr: Queryable.Row[Q, R], dialect: DialectTypeMappers)
       extends Update[Q, R] {
 
@@ -47,15 +47,15 @@ object Update {
     protected def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
-        set0: Seq[Column.Assignment[_]] = this.set0,
+        set0: Seq[Column.Assignment[?]] = this.set0,
         joins: Seq[Join] = this.joins,
-        where: Seq[Expr[_]] = this.where
+        where: Seq[Expr[?]] = this.where
     )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): Update[Q, R] =
       new Impl(expr, table, set0, joins, where)
 
     def filter(f: Q => Expr[Boolean]) = { this.copy(where = where ++ Seq(f(expr))) }
 
-    def set(f: (Q => Column.Assignment[_])*) = { this.copy(set0 = f.map(_(expr))) }
+    def set(f: (Q => Column.Assignment[?])*) = { this.copy(set0 = f.map(_(expr))) }
 
     def join0[Q2, R2, QF, RF](
         prefix: String,
@@ -86,8 +86,8 @@ object Update {
   class Renderer(
       joins0: Seq[Join],
       table: TableRef,
-      set0: Seq[Column.Assignment[_]],
-      where0: Seq[Expr[_]],
+      set0: Seq[Column.Assignment[?]],
+      where0: Seq[Expr[?]],
       prevContext: Context
   ) {
     lazy val froms = joins0.flatMap(_.from).map(_.from)

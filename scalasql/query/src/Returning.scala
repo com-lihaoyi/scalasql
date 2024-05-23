@@ -27,23 +27,23 @@ object Returning {
      * returning a `Seq[R]` where `R` is a Scala type compatible with the auto-generated
      * primary key type (typically something like `Int` or `Long`)
      */
-    def getGeneratedKeys[R](implicit qr: Queryable.Row[_, R]): GetGeneratedKeys[Q, R] = {
+    def getGeneratedKeys[R](implicit qr: Queryable.Row[?, R]): GetGeneratedKeys[Q, R] = {
       new GetGeneratedKeys.Impl(this)
     }
   }
 
-  class InsertImpl[Q, R](returnable: InsertBase[_], returning: Q)(
+  class InsertImpl[Q, R](returnable: InsertBase[?], returning: Q)(
       implicit qr: Queryable.Row[Q, R]
   ) extends Returning.Impl0[Q, R](qr, returnable, returning)
       with Returning[Q, R] {}
 
-  class Impl[Q, R](returnable: Base[_], returning: Q)(implicit qr: Queryable.Row[Q, R])
+  class Impl[Q, R](returnable: Base[?], returning: Q)(implicit qr: Queryable.Row[Q, R])
       extends Impl0[Q, R](qr, returnable, returning)
       with Returning[Q, R]
 
   class Impl0[Q, R](
       protected val qr: Queryable.Row[Q, R],
-      returnable: Base[_],
+      returnable: Base[?],
       protected val expr: Q
   ) extends Returning[Q, R] {
 

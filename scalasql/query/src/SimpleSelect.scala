@@ -25,7 +25,7 @@ class SimpleSelect[Q, R](
     val preserveAll: Boolean,
     val from: Seq[Context.From],
     val joins: Seq[Join],
-    val where: Seq[Expr[_]],
+    val where: Seq[Expr[?]],
     val groupBy0: Option[GroupBy]
 )(implicit val qr: Queryable.Row[Q, R], protected val dialect: DialectTypeMappers)
     extends Select[Q, R] {
@@ -36,7 +36,7 @@ class SimpleSelect[Q, R](
       preserveAll: Boolean = this.preserveAll,
       from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
-      where: Seq[Expr[_]] = this.where,
+      where: Seq[Expr[?]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
     newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
@@ -186,24 +186,24 @@ class SimpleSelect[Q, R](
     res
   }
 
-  def sortBy(f: Q => Expr[_]) = {
+  def sortBy(f: Q => Expr[?]): Select[Q, R] = {
     newCompoundSelect(this, Nil, Seq(OrderBy(f(expr), None, None)), None, None)
   }
 
-  def asc = throw new Exception(".asc must follow .sortBy")
-  def desc = throw new Exception(".desc must follow .sortBy")
-  def nullsFirst = throw new Exception(".nullsFirst must follow .sortBy")
-  def nullsLast = throw new Exception(".nullsLast must follow .sortBy")
+  def asc: Select[Q, R] = throw new Exception(".asc must follow .sortBy")
+  def desc: Select[Q, R] = throw new Exception(".desc must follow .sortBy")
+  def nullsFirst: Select[Q, R] = throw new Exception(".nullsFirst must follow .sortBy")
+  def nullsLast: Select[Q, R] = throw new Exception(".nullsLast must follow .sortBy")
 
   def compound0(op: String, other: Select[Q, R]) = {
     val op2 = CompoundSelect.Op(op, Select.toSimpleFrom(other))
     newCompoundSelect(this, Seq(op2), Nil, None, None)
   }
 
-  def drop(n: Int) = newCompoundSelect(this, Nil, Nil, None, Some(n))
-  def take(n: Int) = newCompoundSelect(this, Nil, Nil, Some(n), None)
+  def drop(n: Int): Select[Q, R] = newCompoundSelect(this, Nil, Nil, None, Some(n))
+  def take(n: Int): Select[Q, R] = newCompoundSelect(this, Nil, Nil, Some(n), None)
 
-  protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[_, _] =
+  protected def selectRenderer(prevContext: Context): SimpleSelect.Renderer[?, ?] =
     new SimpleSelect.Renderer(this, prevContext)
 
   protected def selectExprAliases(prevContext: Context) = {
@@ -237,7 +237,7 @@ object SimpleSelect {
   )(f: (Q, Q2) => Q3)(implicit jqr: Queryable.Row[Q3, R3]) = {
     self.joinCopy(other, on, joinPrefix)(f)
   }
-  def getRenderer(s: SimpleSelect[_, _], prevContext: Context): SimpleSelect.Renderer[_, _] =
+  def getRenderer(s: SimpleSelect[?, ?], prevContext: Context): SimpleSelect.Renderer[?, ?] =
     s.selectRenderer(prevContext)
   class Renderer[Q, R](query: SimpleSelect[Q, R], prevContext: Context)
       extends SubqueryRef.Wrapped.Renderer {
