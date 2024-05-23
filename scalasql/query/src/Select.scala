@@ -70,7 +70,7 @@ trait Select[Q, R]
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
    */
-  def distinct: Select[Q, R] = selectWithExprPrefix(true, ctx => sql"DISTINCT")
+  def distinct: Select[Q, R] = selectWithExprPrefix(true, _ => sql"DISTINCT")
   protected def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R]
 
   protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this)

@@ -1,12 +1,12 @@
 import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
-import $ivy.`com.goyeau::mill-scalafix::0.3.1`
+import $ivy.`com.goyeau::mill-scalafix::0.4.0`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
-val scalaVersions = Seq("2.13.14", "3.4.2")
+val scalaVersions = Seq("2.13.12", "3.4.2")
 
 trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
   def scalaVersion = crossScalaVersion
