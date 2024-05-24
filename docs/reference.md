@@ -440,7 +440,7 @@ dbClient.transaction { implicit db =>
   db.run(Purchase.delete(_.id <= 3)) ==> 3
   db.run(Purchase.select.size) ==> 4
 
-  db.savepoint { sp =>
+  db.savepoint { _ =>
     db.run(Purchase.delete(_ => true)) ==> 4
     db.run(Purchase.select.size) ==> 0
   }
@@ -499,7 +499,7 @@ dbClient.transaction { implicit db =>
   db.run(Purchase.select.size) ==> 4
 
   try {
-    db.savepoint { sp =>
+    db.savepoint { _ =>
       db.run(Purchase.delete(_ => true)) ==> 4
       db.run(Purchase.select.size) ==> 0
       throw new FooException
@@ -533,11 +533,11 @@ dbClient.transaction { implicit db =>
   db.run(Purchase.delete(_.id <= 2)) ==> 2
   db.run(Purchase.select.size) ==> 5
 
-  db.savepoint { sp1 =>
+  db.savepoint { _ =>
     db.run(Purchase.delete(_.id <= 4)) ==> 2
     db.run(Purchase.select.size) ==> 3
 
-    db.savepoint { sp2 =>
+    db.savepoint { _ =>
       db.run(Purchase.delete(_.id <= 6)) ==> 2
       db.run(Purchase.select.size) ==> 1
     }
