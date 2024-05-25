@@ -45,23 +45,23 @@ class CompoundSelect[Q, R](
     }
   }
 
-  override def sortBy(f: Q => Expr[_]) = {
+  override def sortBy(f: Q => Expr[?]) = {
     val newOrder = Seq(OrderBy(f(expr), None, None))
 
     if (limit.isEmpty && offset.isEmpty) copy(orderBy = newOrder ++ orderBy)
     else newCompoundSelect(selectToSimpleSelect(), compoundOps, newOrder, None, None)
   }
 
-  override def asc =
+  override def asc: Select[Q, R] =
     copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Asc))) ++ orderBy.drop(1))
 
-  override def desc =
+  override def desc: Select[Q, R] =
     copy(orderBy = orderBy.take(1).map(_.copy(ascDesc = Some(AscDesc.Desc))) ++ orderBy.drop(1))
 
-  override def nullsFirst =
+  override def nullsFirst: Select[Q, R] =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.First))) ++ orderBy.drop(1))
 
-  override def nullsLast =
+  override def nullsLast: Select[Q, R] =
     copy(orderBy = orderBy.take(1).map(_.copy(nulls = Some(Nulls.Last))) ++ orderBy.drop(1))
 
   override def compound0(op: String, other: Select[Q, R]) = {
@@ -71,10 +71,11 @@ class CompoundSelect[Q, R](
     else newCompoundSelect(selectToSimpleSelect(), Seq(op2), Nil, None, None)
   }
 
-  override def drop(n: Int) = copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
-  override def take(n: Int) = copy(limit = Some(limit.fold(n)(math.min(_, n))))
+  override def drop(n: Int): Select[Q, R] =
+    copy(offset = Some(offset.getOrElse(0) + n), limit = limit.map(_ - n))
+  override def take(n: Int): Select[Q, R] = copy(limit = Some(limit.fold(n)(math.min(_, n))))
 
-  override protected def selectRenderer(prevContext: Context) =
+  override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
     new CompoundSelect.Renderer(this, prevContext)
 
   override protected def selectExprAliases(prevContext: Context) = {

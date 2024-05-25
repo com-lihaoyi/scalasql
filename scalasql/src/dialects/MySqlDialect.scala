@@ -14,8 +14,10 @@ import scalasql.query.{
   Nulls,
   OrderBy,
   Query,
+  SubqueryRef,
   Table,
-  TableRef
+  TableRef,
+  Values
 }
 import scalasql.core.{
   Aggregatable,
@@ -100,13 +102,13 @@ trait MySqlDialect extends Dialect {
     new MySqlDialect.OnConflictable[V[Column], Int](query, WithSqlExpr.get(query), query.table)
 
   override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
-    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) =
+    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]): Values[Q, R] =
       new MySqlDialect.Values(ts)
   }
 
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] & Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
-  ) = new LateralJoinOps(wrapped)
+  ): LateralJoinOps[C, Q, R] = new LateralJoinOps(wrapped)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new MySqlDialect.ExprAggOps(v)
@@ -216,22 +218,22 @@ object MySqlDialect extends MySqlDialect {
   class Update[Q, R](
       expr: Q,
       table: TableRef,
-      set0: Seq[Column.Assignment[_]],
+      set0: Seq[Column.Assignment[?]],
       joins: Seq[Join],
-      where: Seq[Expr[_]]
+      where: Seq[Expr[?]]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.Update.Impl[Q, R](expr, table, set0, joins, where) {
 
     protected override def copy[Q, R](
         expr: Q = this.expr,
         table: TableRef = this.table,
-        set0: Seq[Column.Assignment[_]] = this.set0,
+        set0: Seq[Column.Assignment[?]] = this.set0,
         joins: Seq[Join] = this.joins,
-        where: Seq[Expr[_]] = this.where
-    )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectTypeMappers) =
+        where: Seq[Expr[?]] = this.where
+    )(implicit qr: Queryable.Row[Q, R], dialect: scalasql.core.DialectTypeMappers): Update[Q, R] =
       new Update(expr, table, set0, joins, where)
 
-    protected override def renderSql(ctx: Context) = {
+    private[scalasql] override def renderSql(ctx: Context) = {
       new UpdateRenderer(this.joins, this.table, this.set0, this.where, ctx).render()
     }
 
@@ -240,8 +242,8 @@ object MySqlDialect extends MySqlDialect {
   class UpdateRenderer(
       joins0: Seq[Join],
       table: TableRef,
-      set0: Seq[Column.Assignment[_]],
-      where0: Seq[Expr[_]],
+      set0: Seq[Column.Assignment[?]],
+      where0: Seq[Expr[?]],
       prevContext: Context
   ) extends scalasql.query.Update.Renderer(joins0, table, set0, where0, prevContext) {
     override lazy val updateList = set0.map { case assign =>
@@ -259,19 +261,19 @@ object MySqlDialect extends MySqlDialect {
 
   class OnConflictable[Q, R](val query: Query[R], expr: Q, table: TableRef) {
 
-    def onConflictUpdate(c2: Q => Column.Assignment[_]*): OnConflictUpdate[Q, R] =
+    def onConflictUpdate(c2: Q => Column.Assignment[?]*): OnConflictUpdate[Q, R] =
       new OnConflictUpdate(this, c2.map(_(expr)), table)
   }
 
   class OnConflictUpdate[Q, R](
       insert: OnConflictable[Q, R],
-      updates: Seq[Column.Assignment[_]],
+      updates: Seq[Column.Assignment[?]],
       table: TableRef
   ) extends Query.DelegateQuery[R] {
-    protected def query = insert.query
+    protected def query: Query[?] = insert.query
     override def queryIsExecuteUpdate = true
 
-    protected def renderSql(ctx: Context) = {
+    private[scalasql] def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderSql(insert.query)
 
@@ -307,7 +309,7 @@ object MySqlDialect extends MySqlDialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Expr[_]],
+        where: Seq[Expr[?]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -323,7 +325,7 @@ object MySqlDialect extends MySqlDialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(
@@ -356,7 +358,7 @@ object MySqlDialect extends MySqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    protected override def selectRenderer(prevContext: Context) =
+    protected override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
       new CompoundSelectRenderer(this, prevContext)
   }
 
@@ -395,7 +397,7 @@ object MySqlDialect extends MySqlDialect {
 
   class Values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.Values[Q, R](ts) {
-    override protected def selectRenderer(prevContext: Context) =
+    override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
       new ValuesRenderer[Q, R](this)(implicitly, prevContext)
     override protected def columnName(n: Int) = s"column_$n"
   }

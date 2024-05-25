@@ -1,12 +1,12 @@
 import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
-import $ivy.`com.goyeau::mill-scalafix::0.3.1`
+import $ivy.`com.goyeau::mill-scalafix::0.4.0`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
-val scalaVersions = Seq("2.13.12"/*, "3.3.1"*/)
+val scalaVersions = Seq("2.13.12", "3.4.2")
 
 trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
   def scalaVersion = crossScalaVersion
@@ -27,12 +27,15 @@ trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
     )
   )
 
-  def scalacOptions = Seq("-Xlint:unused")
+  def scalacOptions = T {
+    Seq("-Wunused:privates,locals,explicits,implicits,params") ++
+      Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
+  }
 }
 
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends Common{
+trait ScalaSql extends Common{ common =>
   def moduleDeps = Seq(query, operations)
   def ivyDeps = Agg(
     ivy"org.apache.logging.log4j:log4j-api:2.20.0",
@@ -45,7 +48,7 @@ trait ScalaSql extends Common{
 
 
   object test extends ScalaTests with ScalafixModule{
-    def scalacOptions = Seq("-Xlint:unused")
+    def scalacOptions = common.scalacOptions
     def ivyDeps = Agg(
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
       ivy"com.lihaoyi::mainargs:0.4.0",
@@ -65,6 +68,9 @@ trait ScalaSql extends Common{
 
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
   }
+
+  private def indent(code: Iterable[String]): String =
+    code.map(_.split("\n").map("  " + _).mkString("\n")).mkString("\n")
 
   object core extends Common with CrossValue {
     def ivyDeps = Agg(
@@ -100,7 +106,7 @@ trait ScalaSql extends Common{
         s"""package scalasql.core.generated
            |import scalasql.core.Queryable
            |trait QueryableRow{
-           |  ${queryableRowDefs.mkString("\n")}
+           |${indent(queryableRowDefs)}
            |}
            |""".stripMargin
       )
@@ -147,7 +153,6 @@ trait ScalaSql extends Common{
            |    implicit
            |    ${commaSep(j => s"q$j: Queryable.Row[Q$j, R$j]")}
            |): Queryable.Row[(${commaSep(j => s"Q$j")}), (${commaSep(j => s"R$j")})] = {
-           |  import scalasql.core.SqlStr.SqlStringSyntax
            |  new Queryable.Row.TupleNQueryable(
            |    Seq(${commaSep(j => s"q$j.walkLabels()")}),
            |    t => Seq(${commaSep(j => s"q$j.walkExprs(t._$j)")}),
@@ -166,7 +171,7 @@ trait ScalaSql extends Common{
         s"""
            |implicit def append$i[$commaSepQ, QA, $commaSepR, RA](
            |      implicit qr0: Queryable.Row[($commaSepQ, QA), ($commaSepR, RA)],
-           |      qr20: Queryable.Row[QA, RA]): $joinAppendType = new $joinAppendType {
+           |      @annotation.nowarn("msg=never used") qr20: Queryable.Row[QA, RA]): $joinAppendType = new $joinAppendType {
            |    override def appendTuple(t: ($commaSepQ), v: QA): ($commaSepQ, QA) = (${commaSep(j => s"t._$j")}, v)
            |
            |    def qr: Queryable.Row[($commaSepQ, QA), ($commaSepR, RA)] = qr0
@@ -179,23 +184,23 @@ trait ScalaSql extends Common{
            |import scalasql.core.{Queryable, Expr}
            |import scalasql.query.Column
            |trait Insert[V[_[_]], R]{
-           |  ${defs(false).mkString("\n")}
+           |${indent(defs(false))}
            |}
            |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
            |  def newInsertValues[R](
            |        insert: scalasql.query.Insert[V, R],
-           |        columns: Seq[Column[_]],
-           |        valuesLists: Seq[Seq[Expr[_]]]
+           |        columns: Seq[Column[?]],
+           |        valuesLists: Seq[Seq[Expr[?]]]
            |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
-           |  ${defs(true).mkString("\n")}
+           |${indent(defs(true))}
            |}
            |
            |trait QueryableRow{
-           |  ${queryableRowDefs.mkString("\n")}
+           |${indent(queryableRowDefs)}
            |}
            |
            |trait JoinAppend extends scalasql.query.JoinAppendLowPriority{
-           |  ${joinAppendDefs.mkString("\n")}
+           |${indent(joinAppendDefs)}
            |}
            |""".stripMargin
       )

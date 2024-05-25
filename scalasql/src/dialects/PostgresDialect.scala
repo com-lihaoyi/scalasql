@@ -33,9 +33,9 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   ): PostgresDialect.ExprStringLikeOps[geny.Bytes] =
     new PostgresDialect.ExprStringOps(v)
 
-  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+  implicit def LateralJoinOpsConv[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] & Joinable[Q, R])(
       implicit qr: Queryable.Row[Q, R]
-  ) = new LateralJoinOps(wrapped)
+  ): LateralJoinOps[C, Q, R] = new LateralJoinOps(wrapped)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new PostgresDialect.ExprAggOps(v)
@@ -49,7 +49,7 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row” of each set is unpredictable unless ORDER BY is used to ensure that the desired
      * row appears first. For example:
      */
-    def distinctOn(f: Q => Expr[_]): Select[Q, R] = {
+    def distinctOn(f: Q => Expr[?]): Select[Q, R] = {
       Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
     }
   }
@@ -69,7 +69,7 @@ object PostgresDialect extends PostgresDialect {
     /**
      * Formats arguments according to a format string. This function is similar to the C function sprintf.
      */
-    def format(template: Expr[String], values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
+    def format(template: Expr[String], values: Expr[?]*): Expr[String] = Expr { implicit ctx =>
       sql"FORMAT($template, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
     }
 

@@ -24,7 +24,7 @@ class SqlStr(
   def withCompleteQuery(v: Boolean) = new SqlStr(queryParts, interps, v, referencedExprs)
   override def toString = SqlStr.flatten(this).renderSql(false)
 
-  override protected def renderSql(ctx: Context): SqlStr = this
+  override private[scalasql] def renderSql(ctx: Context): SqlStr = this
 }
 
 object SqlStr {
@@ -42,7 +42,7 @@ object SqlStr {
       isCompleteQuery: Boolean,
       val referencedExprs: Array[Expr.Identity]
   ) extends SqlStr(queryParts, interps0, isCompleteQuery, referencedExprs) {
-    def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[_]])
+    def interpsIterator = interps0.iterator.map(_.asInstanceOf[Interp.TypeInterp[?]])
     def renderSql(castParams: Boolean) = {
       val queryStr = queryParts.iterator
         .zipAll(interpsIterator, "", null)
@@ -50,7 +50,7 @@ object SqlStr {
           case (part, null) => part
           case (part, param) =>
             val jdbcTypeString = param.mappedType.castTypeString
-            if (castParams) part + s"CAST(? AS $jdbcTypeString)" else part + "?"
+            if (castParams) part.toString + s"CAST(? AS $jdbcTypeString)" else part.toString + "?"
         }
         .mkString
 
@@ -211,7 +211,7 @@ object SqlStr {
     new SqlStr(Array(s), emptyInterpArray, false, referencedExprs)
 
   trait Renderable {
-    protected def renderSql(ctx: Context): SqlStr
+    private[scalasql] def renderSql(ctx: Context): SqlStr
   }
 
   object Renderable {

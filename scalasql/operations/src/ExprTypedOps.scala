@@ -7,7 +7,7 @@ import scala.reflect.ClassTag
 
 class ExprTypedOps[T: ClassTag](v: Expr[T]) {
 
-  protected def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[_]]
+  protected def isNullable[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass == classOf[Option[?]]
 
   /**
    * Scala-style Equals to, returns `true` if both values are `NULL`.

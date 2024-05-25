@@ -1,6 +1,16 @@
 package scalasql.core
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import java.time.{
+  LocalDate,
+  LocalTime,
+  LocalDateTime,
+  ZonedDateTime,
+  Instant,
+  OffsetTime,
+  OffsetDateTime
+}
+import java.util.UUID
 
 // What Quill does
 // https://github.com/zio/zio-quill/blob/43ee1dab4f717d7e6683aa24c391740f3d17df50/quill-jdbc/src/main/scala/io/getquill/context/jdbc/Encoders.scala#L104
@@ -41,4 +51,72 @@ trait TypeMapper[T] {
    * How to insert a value of type [[T]] into a `PreparedStatement`
    */
   def put(r: PreparedStatement, idx: Int, v: T): Unit
+}
+
+object TypeMapper {
+
+  /**
+   * These definitions are workarounds for a bug in the Scala 3 compiler
+   * https://github.com/scala/scala3/issues/19436
+   *
+   * The `TableMacros` definition in Scala 3 could ideally just `import dialect.*` to get the
+   * `TypeMapper` instances in scope, but it triggers a crash similar to the one in the bug report.
+   *
+   * Instead, the macro declares a local `given d: DialectTypeMappers = dialect` and relies on these
+   * implicits to summon the necessary instances.
+   */
+  implicit def stringFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[String] =
+    d.StringType
+  implicit def byteFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Byte] =
+    d.ByteType
+  implicit def shortFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Short] =
+    d.ShortType
+  implicit def intFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Int] =
+    d.IntType
+  implicit def longFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Long] =
+    d.LongType
+
+  implicit def doubleFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Double] =
+    d.DoubleType
+  implicit def bigDecimalFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[scala.math.BigDecimal] = d.BigDecimalType
+  implicit def booleanFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Boolean] =
+    d.BooleanType
+  implicit def uuidFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[UUID] =
+    d.UuidType
+  implicit def bytesFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[geny.Bytes] =
+    d.BytesType
+  implicit def localDateFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[LocalDate] = d.LocalDateType
+  implicit def localTimeFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[LocalTime] = d.LocalTimeType
+
+  implicit def localDateTimeFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[LocalDateTime] = d.LocalDateTimeType
+
+  implicit def zonedDateTimeFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[ZonedDateTime] = d.ZonedDateTimeType
+  implicit def instantFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Instant] =
+    d.InstantType
+
+  implicit def offsetTimeFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[OffsetTime] = d.OffsetTimeType
+
+  implicit def offsetDateTimeFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[OffsetDateTime] = d.OffsetDateTimeType
+  implicit def enumTypeFromDialectTypeMappers[T <: Enumeration#Value](
+      implicit d: DialectTypeMappers,
+      constructor: String => T
+  ): TypeMapper[T] = d.EnumType[T]
+  implicit def optionTypeFromDialectTypeMappers[T](
+      implicit d: DialectTypeMappers,
+      inner: TypeMapper[T]
+  ): TypeMapper[Option[T]] = d.OptionType[T]
 }

@@ -60,7 +60,7 @@ trait Select[Q, R]
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
     new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
@@ -70,7 +70,7 @@ trait Select[Q, R]
   /**
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
    */
-  def distinct: Select[Q, R] = selectWithExprPrefix(true, ctx => sql"DISTINCT")
+  def distinct: Select[Q, R] = selectWithExprPrefix(true, _ => sql"DISTINCT")
   protected def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R]
 
   protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this)
@@ -127,7 +127,7 @@ trait Select[Q, R]
    * call to [[sortBy]] taking priority. Can be followed by [[asc]], [[desc]], [[nullsFirst]]
    * or [[nullsLast]] to configure the sort order
    */
-  def sortBy(f: Q => Expr[_]): Select[Q, R]
+  def sortBy(f: Q => Expr[?]): Select[Q, R]
 
   /**
    * Combined with [[sortBy]] to make the sort order ascending, translates into SQL `ASC`
@@ -187,7 +187,7 @@ trait Select[Q, R]
    */
   def take(n: Int): Select[Q, R]
 
-  protected def renderSql(ctx: Context): SqlStr = {
+  private[scalasql] def renderSql(ctx: Context): SqlStr = {
     val renderer = selectRenderer(ctx)
 
     renderer.render(LiveExprs.none).withCompleteQuery(true)
@@ -281,7 +281,7 @@ object Select {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
     lhs.newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
@@ -325,7 +325,7 @@ object Select {
     )(implicit qrk: Queryable.Row[K, R2], qrv: Queryable.Row[V, R3]): Select[(K, V), (R2, R3)] =
       selectToSimpleSelect().groupBy(groupKey)(groupAggregate)
 
-    override def sortBy(f: Q => Expr[_]): Select[Q, R] = selectToSimpleSelect().sortBy(f)
+    override def sortBy(f: Q => Expr[?]): Select[Q, R] = selectToSimpleSelect().sortBy(f)
     override def asc: Select[Q, R] = selectToSimpleSelect().asc
     override def desc: Select[Q, R] = selectToSimpleSelect().desc
     override def nullsFirst: Select[Q, R] = selectToSimpleSelect().nullsFirst

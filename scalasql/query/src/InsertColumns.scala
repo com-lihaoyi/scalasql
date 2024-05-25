@@ -9,21 +9,21 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 trait InsertColumns[V[_[_]], R]
     extends Returning.InsertBase[V[Column]]
     with Query.ExecuteUpdate[Int] {
-  def columns: Seq[Column[_]]
-  def valuesLists: Seq[Seq[Expr[_]]]
+  def columns: Seq[Column[?]]
+  def valuesLists: Seq[Seq[Expr[?]]]
 }
 object InsertColumns {
   class Impl[V[_[_]], R](
       insert: Insert[V, R],
-      val columns: Seq[Column[_]],
-      val valuesLists: Seq[Seq[Expr[_]]]
+      val columns: Seq[Column[?]],
+      val valuesLists: Seq[Seq[Expr[?]]]
   )(implicit val qr: Queryable[V[Column], R], dialect: DialectTypeMappers)
       extends InsertColumns[V, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table
     protected def expr: V[Column] = WithSqlExpr.get(insert)
 
-    protected override def renderSql(ctx: Context) =
+    private[scalasql] override def renderSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
@@ -31,9 +31,9 @@ object InsertColumns {
   }
 
   class Renderer(
-      columns0: Seq[Column[_]],
+      columns0: Seq[Column[?]],
       prevContext: Context,
-      valuesLists: Seq[Seq[Expr[_]]],
+      valuesLists: Seq[Seq[Expr[?]]],
       tableName: String
   ) {
 

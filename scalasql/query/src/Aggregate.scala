@@ -10,7 +10,7 @@ class Aggregate[Q, R](
 ) extends Query.DelegateQueryable[Q, R] {
 
   protected override def queryIsSingleRow: Boolean = true
-  protected def renderSql(ctx: Context) = toSqlStr0(ctx)
+  private[scalasql] def renderSql(ctx: Context) = toSqlStr0(ctx)
 
   override protected def queryConstruct(args: Queryable.ResultSetIterator): R = construct0(args)
 }

@@ -4,7 +4,7 @@ import scalasql.core.{Context, DialectTypeMappers, Expr, Queryable, SqlStr, With
 import scalasql.core.SqlStr.SqlStringSyntax
 
 trait InsertValues[V[_[_]], R] extends Returning.InsertBase[V[Expr]] with Query.ExecuteUpdate[Int] {
-  def skipColumns(x: (V[Column] => Column[_])*): InsertValues[V, R]
+  def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R]
 }
 object InsertValues {
   class Impl[V[_[_]], R](
@@ -12,7 +12,7 @@ object InsertValues {
       values: Seq[R],
       dialect: DialectTypeMappers,
       qr: Queryable.Row[V[Column], R],
-      skippedColumns: Seq[Column[_]]
+      skippedColumns: Seq[Column[?]]
   ) extends InsertValues[V, R] {
 
     def table = insert.table
@@ -20,7 +20,7 @@ object InsertValues {
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(dialect.IntType)
 
-    override protected def renderSql(ctx: Context): SqlStr = {
+    override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       new Renderer(
         Table.name(insert.table.value),
         Table.labels(insert.table.value),
@@ -30,7 +30,7 @@ object InsertValues {
       )(ctx).render()
     }
 
-    override def skipColumns(x: (V[Column] => Column[_])*) = {
+    override def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R] = {
 
       new Impl(
         insert,
@@ -46,7 +46,7 @@ object InsertValues {
       columnsList0: Seq[String],
       valuesList: Seq[R],
       qr: Queryable.Row[Q, R],
-      skippedColumns: Seq[Column[_]]
+      skippedColumns: Seq[Column[?]]
   )(implicit ctx: Context) {
 
     lazy val skippedColumnsNames = skippedColumns.map(_.name).toSet

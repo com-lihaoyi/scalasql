@@ -17,7 +17,7 @@ trait Queryable[-Q, R] {
    * Whether this queryable value is executed using `java.sql.Statement.getGeneratedKeys`
    * instead of `.executeQuery`.
    */
-  def isGetGeneratedKeys(q: Q): Option[Queryable.Row[_, _]]
+  def isGetGeneratedKeys(q: Q): Option[Queryable.Row[?, ?]]
 
   /**
    * Whether this queryable value is executed using `java.sql.Statement.executeUpdate`
@@ -38,7 +38,7 @@ trait Queryable[-Q, R] {
    * Returns a sequence of expressions created by this queryable value. Used to generate
    * the column list `SELECT` clauses, both for nested and top level `SELECT`s
    */
-  def walkExprs(q: Q): Seq[Expr[_]]
+  def walkExprs(q: Q): Seq[Expr[?]]
 
   def walkLabelsAndExprs(q: Q): Queryable.Walked = walkLabels(q).zip(walkExprs(q))
 
@@ -62,7 +62,7 @@ trait Queryable[-Q, R] {
 }
 
 object Queryable {
-  type Walked = Seq[(List[String], Expr[_])]
+  type Walked = Seq[(List[String], Expr[?])]
   class ResultSetIterator(r: ResultSet) {
     var index = 0
     var nulls = 0
@@ -88,7 +88,7 @@ object Queryable {
    *   available, there is no `Queryable.Row[Select[Q]]`, as `Select[Q]` returns multiple rows
    */
   trait Row[Q, R] extends Queryable[Q, R] {
-    def isGetGeneratedKeys(q: Q): Option[Queryable.Row[_, _]] = None
+    def isGetGeneratedKeys(q: Q): Option[Queryable.Row[?, ?]] = None
     def isExecuteUpdate(q: Q): Boolean = false
     def isSingleRow(q: Q): Boolean = true
     def walkLabels(): Seq[List[String]]
@@ -112,18 +112,18 @@ object Queryable {
   object Row extends scalasql.core.generated.QueryableRow {
     private[scalasql] class TupleNQueryable[Q, R <: scala.Product](
         val walkLabels0: Seq[Seq[List[String]]],
-        val walkExprs0: Q => Seq[Seq[Expr[_]]],
+        val walkExprs0: Q => Seq[Seq[Expr[?]]],
         construct0: ResultSetIterator => R,
         deconstruct0: R => Q
     ) extends Queryable.Row[Q, R] {
-      def walkExprs(q: Q) = {
+      def walkExprs(q: Q): Seq[Expr[?]] = {
         walkExprs0(q).iterator.zipWithIndex
           .map { case (v, i) => (i.toString, v) }
           .flatMap { case (prefix, vs0) => vs0 }
           .toIndexedSeq
       }
 
-      def walkLabels() = {
+      def walkLabels(): Seq[List[String]] = {
         walkLabels0.iterator.zipWithIndex
           .map { case (v, i) => (i.toString, v) }
           .flatMap { case (prefix, vs0) => vs0.map { k => prefix +: k } }

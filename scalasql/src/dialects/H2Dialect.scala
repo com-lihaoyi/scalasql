@@ -12,7 +12,7 @@ import scalasql.core.{
   TypeMapper
 }
 import scalasql.{Sc, operations}
-import scalasql.query.{CompoundSelect, GroupBy, Join, Joinable, OrderBy, Table}
+import scalasql.query.{CompoundSelect, GroupBy, Join, Joinable, OrderBy, Table, Values}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.operations.{
   BitwiseFunctionOps,
@@ -52,7 +52,7 @@ trait H2Dialect extends Dialect {
     new H2Dialect.TableOps(t)
 
   override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
-    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]) =
+    override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]): Values[Q, R] =
       new H2Dialect.Values(ts)
   }
 
@@ -135,7 +135,7 @@ object H2Dialect extends H2Dialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Expr[_]],
+        where: Seq[Expr[?]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -151,7 +151,7 @@ object H2Dialect extends H2Dialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(

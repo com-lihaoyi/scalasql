@@ -7,7 +7,7 @@ import scalasql.core.Context
 
 case class SqlWindow[T](
     e: Expr[T],
-    partitionBy0: Option[Expr[_]],
+    partitionBy0: Option[Expr[?]],
     filter0: Option[Expr[Boolean]],
     orderBy: Seq[scalasql.query.OrderBy],
     frameStart0: Option[SqlStr],
@@ -37,10 +37,10 @@ case class SqlWindow[T](
 
   }
 
-  def partitionBy(e: Expr[_]) = this.copy(partitionBy0 = Some(e))
+  def partitionBy(e: Expr[?]) = this.copy(partitionBy0 = Some(e))
 
   def filter(expr: Expr[Boolean]) = copy(filter0 = Some(expr))
-  def sortBy(expr: Expr[_]) = {
+  def sortBy(expr: Expr[?]) = {
     val newOrder = Seq(OrderBy(expr, None, None))
 
     copy(orderBy = newOrder ++ orderBy)

@@ -7,7 +7,7 @@ import scalasql.core.{JoinNullable, Queryable, Expr, WithSqlExpr}
  * allow for `JOIN` clauses to access the results of earlier `JOIN` and `FROM` clauses.
  * Only supported by Postgres and MySql
  */
-class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] with Joinable[Q, R])(
+class LateralJoinOps[C[_, _], Q, R](wrapped: JoinOps[C, Q, R] & Joinable[Q, R])(
     implicit qr: Queryable.Row[Q, R]
 ) {
 

@@ -5,11 +5,11 @@ import scalasql.core.{Queryable, TypeMapper, Expr}
 import scalasql.core.Aggregatable
 import scalasql.core.SqlStr.SqlStringSyntax
 
-class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, _], dialect: DialectTypeMappers) {
+class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, ?], dialect: DialectTypeMappers) {
   import dialect._
 
   /** Counts the rows */
-  def size: Expr[Int] = v.aggregateExpr(expr => _ => sql"COUNT(1)")
+  def size: Expr[Int] = v.aggregateExpr(_ => _ => sql"COUNT(1)")
 
   /** Computes the sum of column values */
   def sumBy[V: Numeric: TypeMapper](f: T => Expr[V])(

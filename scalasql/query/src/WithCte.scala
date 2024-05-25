@@ -17,7 +17,7 @@ import scalasql.core.SqlStr.SqlStringSyntax
  */
 class WithCte[Q, R](
     walked: Queryable.Walked,
-    val lhs: Select[_, _],
+    val lhs: Select[?, ?],
     val cteRef: WithCteRef,
     val rhs: Select[Q, R],
     val withPrefix: SqlStr = sql"WITH "
@@ -37,12 +37,13 @@ class WithCte[Q, R](
     new WithCte(walked, rhs.filter(f), cteRef, rhs)
   }
 
-  override def sortBy(f: Q => Expr[_]) = new WithCte(walked, lhs, cteRef, rhs.sortBy(f))
+  override def sortBy(f: Q => Expr[?]): Select[Q, R] =
+    new WithCte(walked, lhs, cteRef, rhs.sortBy(f))
 
-  override def drop(n: Int) = new WithCte(walked, lhs, cteRef, rhs.drop(n))
-  override def take(n: Int) = new WithCte(walked, lhs, cteRef, rhs.take(n))
+  override def drop(n: Int): Select[Q, R] = new WithCte(walked, lhs, cteRef, rhs.drop(n))
+  override def take(n: Int): Select[Q, R] = new WithCte(walked, lhs, cteRef, rhs.take(n))
 
-  override protected def selectRenderer(prevContext: Context) =
+  override protected def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
     new WithCte.Renderer(walked, withPrefix, this, prevContext)
 
   override protected def selectExprAliases(prevContext: Context) = {
@@ -62,7 +63,7 @@ object WithCte {
       protected val dialect: DialectTypeMappers
   ) extends Select.Proxy[Q, R] {
 
-    override def joinableToFromExpr = {
+    override def joinableToFromExpr: (Context.From, Q) = {
       val otherFrom = lhsSubQueryRef
       (otherFrom, WithSqlExpr.get(lhs))
     }
@@ -87,7 +88,7 @@ object WithCte {
         }
       }
 
-    override protected def renderSql(ctx: Context): SqlStr = {
+    override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       SqlStr.raw(ctx.fromNaming(lhsSubQueryRef))
     }
   }

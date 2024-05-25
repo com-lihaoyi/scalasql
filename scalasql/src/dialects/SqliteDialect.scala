@@ -11,7 +11,7 @@ import scalasql.core.{
   TypeMapper
 }
 import scalasql.{Sc, operations}
-import scalasql.query.{CompoundSelect, GroupBy, Join, OrderBy, Table}
+import scalasql.query.{CompoundSelect, GroupBy, Join, OrderBy, SubqueryRef, Table}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.operations.TrimOps
 
@@ -73,7 +73,7 @@ object SqliteDialect extends SqliteDialect {
      * The typeof(X) function returns a string that indicates the datatype of the
      * expression X: "null", "integer", "real", "text", or "blob".
      */
-    def typeOf(v: Expr[_]): Expr[String] = Expr { implicit ctx => sql"TYPEOF($v)" }
+    def typeOf(v: Expr[?]): Expr[String] = Expr { implicit ctx => sql"TYPEOF($v)" }
 
     /**
      * The last_insert_rowid() function returns the ROWID of the last row insert
@@ -121,7 +121,7 @@ object SqliteDialect extends SqliteDialect {
      * 0.0 for numeric formats or an empty string for %s. See the built-in printf()
      * documentation for additional information.
      */
-    def format(template: Expr[String], values: Expr[_]*): Expr[String] = Expr { implicit ctx =>
+    def format(template: Expr[String], values: Expr[?]*): Expr[String] = Expr { implicit ctx =>
       sql"FORMAT($template, ${SqlStr.join(values.map(v => sql"$v"), SqlStr.commaSep)})"
     }
 
@@ -135,7 +135,7 @@ object SqliteDialect extends SqliteDialect {
      * "hex(12345678)" renders as "3132333435363738" not the binary representation of
      * the integer value "0000000000BC614E".
      */
-    def hex(value: Expr[_]): Expr[String] = Expr { implicit ctx => sql"HEX($value)" }
+    def hex(value: Expr[?]): Expr[String] = Expr { implicit ctx => sql"HEX($value)" }
 
     /**
      * The unhex(X,Y) function returns a BLOB value which is the decoding of the
@@ -221,7 +221,7 @@ object SqliteDialect extends SqliteDialect {
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
-        where: Seq[Expr[_]],
+        where: Seq[Expr[?]],
         groupBy0: Option[GroupBy]
     )(
         implicit qr: Queryable.Row[Q, R],
@@ -237,7 +237,7 @@ object SqliteDialect extends SqliteDialect {
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
-      where: Seq[Expr[_]],
+      where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.SimpleSelect(
@@ -260,7 +260,7 @@ object SqliteDialect extends SqliteDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
-    protected override def selectRenderer(prevContext: Context) = {
+    protected override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer = {
       new CompoundSelectRenderer(this, prevContext)
     }
   }
