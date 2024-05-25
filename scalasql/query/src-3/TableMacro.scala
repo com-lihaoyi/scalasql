@@ -21,6 +21,26 @@ object TableMacros {
     def subParam(paramInfo: TypeRepr, tpe: TypeRepr): TypeRepr =
       paramInfo.substituteTypes(List(constructorTypeParams.head), List(tpe))
 
+    def paramTypes(param: Symbol): (TypeRepr, Type[?], Type[?]) = {
+      val paramTpe = paramType(param)
+      val scTpe = subParam(paramTpe, TypeRepr.of[Sc]).asType
+      val exprTpe = subParam(paramTpe, TypeRepr.of[SqlExpr]).asType
+      (paramTpe, scTpe, exprTpe)
+    }
+
+    def constructV[F[_]: Type](
+        paramTerm: (Symbol, Int) => (TypeRepr, Type[?], Type[?]) => Term
+    ): Expr[V[F]] =
+      Apply(
+        TypeApply(
+          Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
+          List(TypeTree.of[F])
+        ),
+        constructorValueParams.zipWithIndex.map { case (param, i) =>
+          paramTerm(param, i).tupled(paramTypes(param))
+        }
+      ).asExprOf[V[F]]
+
     val queryables = '{ (dialect: DialectTypeMappers, n: Int) =>
       {
         @annotation.nowarn("msg=unused")
@@ -82,44 +102,19 @@ object TableMacros {
             }.flatten,
           construct0 = (args: Queryable.ResultSetIterator) =>
             ${
-              Apply(
-                TypeApply(
-                  Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
-                  List(TypeTree.of[Sc])
-                ),
-                constructorValueParams.zipWithIndex.map { case (param, i) =>
-                  val paramTpe = paramType(param)
-                  val tpe = subParam(paramTpe, TypeRepr.of[Sc]).asType
-                  val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr]).asType
-
-                  (tpe, tpe2) match {
-                    case ('[t], '[t2]) => '{ queryable[t2, t](${ Expr(i) }).construct(args) }.asTerm
-                  }
-                }
-              ).asExprOf[V[Sc]]
+              constructV[Sc]((_, i) => { case (_, '[t], '[t2]) =>
+                '{ queryable[t2, t](${ Expr(i) }).construct(args) }.asTerm
+              })
             },
           deconstruct0 = (r: V[Sc]) =>
             ${
-              Apply(
-                TypeApply(
-                  Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
-                  List(TypeTree.of[SqlExpr])
-                ),
-                constructorValueParams.zipWithIndex.map { case (param, i) =>
-                  val paramTpe = paramType(param)
-                  val tpe = subParam(paramTpe, TypeRepr.of[Sc]).asType
-                  val tpe2 = subParam(paramTpe, TypeRepr.of[SqlExpr]).asType
-
-                  (tpe, tpe2) match {
-                    case ('[t], '[t2]) =>
-                      '{
-                        queryable[t2, t](${ Expr(i) }).deconstruct(
-                          ${ Select.unique('r.asTerm, param.name).asExprOf[t] }
-                        )
-                      }.asTerm
-                  }
-                }
-              ).asExprOf[V[SqlExpr]]
+              constructV[SqlExpr]((param, i) => { case (_, '[t], '[t2]) =>
+                '{
+                  queryable[t2, t](${ Expr(i) }).deconstruct(
+                    ${ Select.unique('r.asTerm, param.name).asExprOf[t] }
+                  )
+                }.asTerm
+              })
             }
         )
     }
@@ -131,37 +126,29 @@ object TableMacros {
           given d: DialectTypeMappers = dialect
 
           ${
-            Apply(
-              TypeApply(
-                Select.unique(New(TypeIdent(TypeRepr.of[V].typeSymbol)), "<init>"),
-                List(TypeTree.of[Column])
-              ),
-              constructorValueParams.map { param =>
-                val paramTpe = paramType(param)
-
-                if (isTypeParamType(param))
-                  paramTpe match {
-                    case AppliedType(tpeCtor, _) =>
-                      tpeCtor.asType match {
-                        case '[
-                            type t[_[_]]; t] =>
-                          '{
-                            summonInline[Table.ImplicitMetadata[t]].value.vExpr(tableRef, dialect)
-                          }.asTerm
-                      }
-                  }
-                else
-                  paramTpe.typeArgs.head.asType match {
-                    case '[t] =>
-                      '{
-                        new Column[t](
-                          tableRef,
-                          Table.columnNameOverride(tableRef.value)(${ Expr(param.name) })
-                        )(using summonInline[TypeMapper[t]])
-                      }.asTerm
-                  }
-              }
-            ).asExprOf[V[Column]]
+            constructV[Column]((param, _) => { case (paramTpe, _, _) =>
+              if (isTypeParamType(param))
+                paramTpe match {
+                  case AppliedType(tpeCtor, _) =>
+                    tpeCtor.asType match {
+                      case '[
+                          type t[_[_]]; t] =>
+                        '{
+                          summonInline[Table.ImplicitMetadata[t]].value.vExpr(tableRef, dialect)
+                        }.asTerm
+                    }
+                }
+              else
+                paramTpe.typeArgs.head.asType match {
+                  case '[t] =>
+                    '{
+                      new Column[t](
+                        tableRef,
+                        Table.columnNameOverride(tableRef.value)(${ Expr(param.name) })
+                      )(using summonInline[TypeMapper[t]])
+                    }.asTerm
+                }
+            })
           }
         }
     }
