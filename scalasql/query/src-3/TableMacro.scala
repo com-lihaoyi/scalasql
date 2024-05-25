@@ -41,6 +41,18 @@ object TableMacros {
         }
       ).asExprOf[V[F]]
 
+    def fromImplicitMetadata[O](paramTpe: TypeRepr)(
+        f: [T[_[_]]] => Expr[Table.Metadata[T]] => Type[T] ?=> O
+    ): O =
+      paramTpe match {
+        case AppliedType(tpeCtor, _) =>
+          tpeCtor.asType match {
+            case '[
+                type t[_[_]]; t] =>
+              f[t]('{ summonInline[Table.ImplicitMetadata[t]].value })
+          }
+      }
+
     val queryables = '{ (dialect: DialectTypeMappers, n: Int) =>
       {
         given DialectTypeMappers = dialect
@@ -63,15 +75,9 @@ object TableMacros {
       ${
         Expr.ofList(constructorValueParams.map { param =>
           if (isTypeParamType(param))
-            paramType(param) match {
-              case AppliedType(tpeCtor, _) =>
-                tpeCtor.asType match {
-                  case '[
-                      type t[_[_]]; t] =>
-                    '{ summonInline[Table.ImplicitMetadata[t]].value.walkLabels0() }
-                }
-            }
-          else '{ Seq(${ Expr(param.name) }) }
+            fromImplicitMetadata(paramType(param))([T[_[_]]] => t => '{ $t.walkLabels0() })
+          else
+            '{ Seq(${ Expr(param.name) }) }
         })
       }.flatten
     }
@@ -128,16 +134,9 @@ object TableMacros {
           ${
             constructV[Column]((param, _) => { case (paramTpe, _, _) =>
               if (isTypeParamType(param))
-                paramTpe match {
-                  case AppliedType(tpeCtor, _) =>
-                    tpeCtor.asType match {
-                      case '[
-                          type t[_[_]]; t] =>
-                        '{
-                          summonInline[Table.ImplicitMetadata[t]].value.vExpr(tableRef, dialect)
-                        }.asTerm
-                    }
-                }
+                fromImplicitMetadata(paramTpe)(
+                  [T[_[_]]] => t => '{ $t.vExpr(tableRef, dialect) }.asTerm
+                )
               else
                 paramTpe.typeArgs.head.asType match {
                   case '[t] =>
