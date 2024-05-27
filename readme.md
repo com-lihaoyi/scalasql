@@ -72,6 +72,8 @@ To get started with ScalaSql, add it to your `build.sc` file as follows:
 ivy"com.lihaoyi::scalasql:0.1.3"
 ```
 
+ScalaSql supports Scala 2.13.x and >=3.4.2
+
 ## Documentation
 
 * ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with
@@ -144,7 +146,6 @@ ivy"com.lihaoyi::scalasql:0.1.3"
 
 # TODO
 
-* Scala 3 support
 * JSON columns
 * Add datetime functions
 * Make `implicit ctx =>` for defining `sql"..."` snippets optional
