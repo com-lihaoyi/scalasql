@@ -43,7 +43,7 @@ trait ScalaSql extends Common{ common =>
     ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
 
   ) ++ Option.when(scalaVersion().startsWith("2."))(
-    ivy"org.scala-lang:scala-reflect:$scalaVersion"
+    ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
 
 
