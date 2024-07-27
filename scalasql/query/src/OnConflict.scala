@@ -23,7 +23,11 @@ object OnConflict {
     protected def expr = WithSqlExpr.get(query)
     private[scalasql] def renderSql(ctx: Context) = {
       val str = Renderable.renderSql(query)(ctx)
-      str + sql" ON CONFLICT (${SqlStr.join(columns.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), SqlStr.commaSep)}) DO NOTHING"
+      val columnsStr = SqlStr.join(
+        columns.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
+        SqlStr.commaSep
+      )
+      str + sql" ON CONFLICT ($columnsStr) DO NOTHING"
     }
 
     protected override def queryIsExecuteUpdate = true
