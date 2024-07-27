@@ -69,7 +69,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.4"
+ivy"com.lihaoyi::scalasql:0.1.5"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.4.2
@@ -127,6 +127,11 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+
+### 0.1.5
+
+*Properly pass ON CONFLICT column names through `columnNameMapper` [#19](https://github.com/com-lihaoyi/scalasql/pull/19)
 
 ### 0.1.4
 
