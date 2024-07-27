@@ -43,9 +43,14 @@ object OnConflict {
     private[scalasql] def renderSql(ctx: Context) = {
       implicit val implicitCtx = Context.compute(ctx, Nil, Some(table))
       val str = Renderable.renderSql(query)
-      val columnsStr = SqlStr.join(columns.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))), SqlStr.commaSep)
+      val columnsStr = SqlStr.join(
+        columns.map(c => SqlStr.raw(ctx.config.columnNameMapper(c.name))),
+        SqlStr.commaSep
+      )
       val updatesStr = SqlStr.join(
-        updates.map { case assign => SqlStr.raw(ctx.config.columnNameMapper(assign.column.name)) + sql" = ${assign.value}" },
+        updates.map { case assign =>
+          SqlStr.raw(ctx.config.columnNameMapper(assign.column.name)) + sql" = ${assign.value}"
+        },
         SqlStr.commaSep
       )
       str + sql" ON CONFLICT (${columnsStr}) DO UPDATE SET $updatesStr"
