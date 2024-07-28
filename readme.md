@@ -37,6 +37,7 @@ dbClient.transaction{ db =>
   // Adding up population of all cities in China
   val citiesPop = db.run(City.select.filter(_.countryCode === "CHN").map(_.population).sum)
   // SELECT SUM(city0.population) AS res FROM city city0 WHERE city0.countrycode = ?
+
   println(citiesPop)
   // 175953614
 
@@ -49,6 +50,7 @@ dbClient.transaction{ db =>
   )
   // SELECT city0.name AS res__0, city0.population AS res__1
   // FROM city city0 ORDER BY res__1 DESC LIMIT ? OFFSET ?
+
   println(fewLargestCities)
   // Seq((Karachi, 9269265), (Istanbul, 8787958), (Ciudad de México, 8591309))
 }
