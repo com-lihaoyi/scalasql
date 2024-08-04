@@ -56,8 +56,8 @@ dbClient.transaction{ db =>
 }
 ```
 
-ScalaSql supports PostgreSQL, MySQL, Sqlite, and H2 databases. Support for additional 
-databases can be easily added.
+ScalaSql supports database connections to PostgreSQL, MySQL, Sqlite, and H2 databases. 
+Support for additional databases can be easily added.
 
 ScalaSql is a relatively new library, so please try it out, but be aware you may hit bugs
 or missing features! Please open [Discussions](https://github.com/com-lihaoyi/scalasql/discussions)
