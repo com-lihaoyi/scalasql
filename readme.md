@@ -78,8 +78,8 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
 
 ## Documentation
 
-* ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql with
-  a variety of supported databases and perform simple DDL and 
+* ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql to
+  connect your Scala code to a variety of supported databases and perform simple DDL and 
   `SELECT`/`INSERT`/`UPDATE`/`DELETE` operations:
     * [Postgres](scalasql/test/src/example/PostgresExample.scala)
     * [MySql](scalasql/test/src/example/MySqlExample.scala)
