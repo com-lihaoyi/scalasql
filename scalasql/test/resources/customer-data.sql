@@ -25,3 +25,8 @@ INSERT INTO purchase (shipping_info_id, product_id, count, total) VALUES
 (2, 5, 10, 10000.00),
 (3, 1, 5, 44.4),
 (3, 6, 13, 1.30);
+
+INSERT INTO otherschema.invoice (total, vendor_name) VALUES
+(150.4, 'Siemens'),
+(213.3, 'Samsung'),
+(407.2, 'Shell');
