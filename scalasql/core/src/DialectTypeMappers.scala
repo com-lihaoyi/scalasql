@@ -28,6 +28,7 @@ trait DialectTypeMappers extends DialectConfig {
   implicit def BooleanType: TypeMapper[Boolean]
   implicit def UuidType: TypeMapper[UUID]
   implicit def BytesType: TypeMapper[geny.Bytes]
+  implicit def UtilDateType: TypeMapper[java.util.Date]
   implicit def LocalDateType: TypeMapper[LocalDate]
   implicit def LocalTimeType: TypeMapper[LocalTime]
 
