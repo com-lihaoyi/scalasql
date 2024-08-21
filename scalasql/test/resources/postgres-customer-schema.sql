@@ -70,8 +70,6 @@ CREATE TABLE opt_cols(
     my_int2 INTEGER
 );
 
-
-
 CREATE TABLE nested(
     foo_id INTEGER,
     my_boolean BOOLEAN

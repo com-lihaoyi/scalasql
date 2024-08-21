@@ -31,7 +31,7 @@ trait H2Suite extends ScalaSqlSuite with H2Dialect {
   val checker = new TestChecker(
     scalasql.example.H2Example.h2Client,
     "h2-customer-schema.sql",
-    "customer-data.sql",
+    "customer-data-plus-schema.sql",
     getClass.getName,
     suiteLine.value,
     description
@@ -44,7 +44,7 @@ trait PostgresSuite extends ScalaSqlSuite with PostgresDialect {
   val checker = new TestChecker(
     scalasql.example.PostgresExample.postgresClient,
     "postgres-customer-schema.sql",
-    "customer-data.sql",
+    "customer-data-plus-schema.sql",
     getClass.getName,
     suiteLine.value,
     description
@@ -57,7 +57,7 @@ trait HikariSuite extends ScalaSqlSuite with PostgresDialect {
   val checker = new TestChecker(
     scalasql.example.HikariCpExample.hikariClient,
     "postgres-customer-schema.sql",
-    "customer-data.sql",
+    "customer-data-plus-schema.sql",
     getClass.getName,
     suiteLine.value,
     description
