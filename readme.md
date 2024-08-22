@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.5"
+ivy"com.lihaoyi::scalasql:0.1.6"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.4.2
@@ -130,10 +130,13 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
 
 ## Changelog
 
+### 0.1.6
+
+* Add support for non-default database schemas in Postgres [#23](https://github.com/com-lihaoyi/scalasql/pull/23)
 
 ### 0.1.5
 
-*Properly pass ON CONFLICT column names through `columnNameMapper` [#19](https://github.com/com-lihaoyi/scalasql/pull/19)
+* Properly pass ON CONFLICT column names through `columnNameMapper` [#19](https://github.com/com-lihaoyi/scalasql/pull/19)
 
 ### 0.1.4
 
