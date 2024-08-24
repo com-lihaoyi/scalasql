@@ -67,6 +67,9 @@ trait MySqlDialect extends Dialect {
   override implicit def InstantType: TypeMapper[Instant] = new MySqlInstantType
   class MySqlInstantType extends InstantType { override def castTypeString = "DATETIME" }
 
+  override implicit def UtilDateType: TypeMapper[java.util.Date] = new MySqlUtilDateType
+  class MySqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME" }
+
   override implicit def UuidType: TypeMapper[UUID] = new MySqlUuidType
 
   class MySqlUuidType extends UuidType {
