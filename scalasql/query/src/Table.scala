@@ -11,6 +11,8 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected[scalasql] def tableName = name.value
 
+  protected[scalasql] def schemaName = ""
+
   protected implicit def tableSelf: Table[V] = this
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
@@ -54,6 +56,7 @@ object Table {
      * Can be overriden to configure the table names
      */
     protected[scalasql] def tableName: String
+    protected[scalasql] def schemaName: String
     protected[scalasql] def tableLabels: Seq[String]
 
     /**

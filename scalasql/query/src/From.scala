@@ -15,7 +15,11 @@ class TableRef(val value: Table.Base) extends From {
   def fromExprAliases(prevContext: Context): Seq[(Expr.Identity, SqlStr)] = Nil
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
-    SqlStr.raw(prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
+    val schemaStr = value.schemaName match {
+      case "" => ""
+      case str => s"$str."
+    }
+    SqlStr.raw(schemaStr + prevContext.config.tableNameMapper(Table.name(value))) + sql" " + name
   }
 }
 

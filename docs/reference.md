@@ -6199,6 +6199,37 @@ Buyer.select
 
 
 
+## Schema
+Additional tests to ensure schema mapping produces valid SQL
+### Schema.schema
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.select
+```
+
+
+*
+    ```sql
+    SELECT invoice0.id AS id, invoice0.total AS total, invoice0.vendor_name AS vendor_name
+    FROM otherschema.invoice invoice0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Invoice[Sc](id = 1, total = 150.4, vendor_name = "Siemens"),
+      Invoice[Sc](id = 2, total = 213.3, vendor_name = "Samsung"),
+      Invoice[Sc](id = 3, total = 407.2, vendor_name = "Shell")
+    )
+    ```
+
+
+
 ## SubQuery
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
