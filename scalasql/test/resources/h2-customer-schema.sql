@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS non_round_trip_types CASCADE;
 DROP TABLE IF EXISTS opt_cols CASCADE;
 DROP TABLE IF EXISTS nested CASCADE;
 DROP TABLE IF EXISTS enclosing CASCADE;
+DROP TABLE IF EXISTS invoice CASCADE;
+DROP SCHEMA IF EXISTS otherschema CASCADE;
 
 CREATE TABLE buyer (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -76,4 +78,12 @@ CREATE TABLE enclosing(
     my_string VARCHAR(256),
     foo_id INTEGER,
     my_boolean BOOLEAN
+);
+
+CREATE SCHEMA otherschema;
+
+CREATE TABLE otherschema.invoice(
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    total DECIMAL(20, 2),
+    vendor_name VARCHAR(256)
 );
