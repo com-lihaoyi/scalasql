@@ -31,6 +31,9 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def InstantType: TypeMapper[Instant] = new SqliteInstantType
   class SqliteInstantType extends InstantType { override def castTypeString = "VARCHAR" }
 
+  override implicit def UtilDateType: TypeMapper[java.util.Date] = new SqliteUtilDateType
+  class SqliteUtilDateType extends UtilDateType { override def castTypeString = "VARCHAR" }
+
   override implicit def ExprStringOpsConv(v: Expr[String]): SqliteDialect.ExprStringOps[String] =
     new SqliteDialect.ExprStringOps(v)
 

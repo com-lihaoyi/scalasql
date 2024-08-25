@@ -52,6 +52,7 @@ CREATE TABLE data_types (
     my_local_date DATE,
     my_local_time TIME,
     my_local_date_time TIMESTAMP,
+    my_util_date TIMESTAMP,
     my_instant TIMESTAMP WITH TIME ZONE,
     my_var_binary BYTEA,
     my_uuid UUID,
@@ -81,6 +82,7 @@ CREATE TABLE enclosing(
     foo_id INTEGER,
     my_boolean BOOLEAN
 );
+
 
 CREATE SCHEMA otherschema;
 

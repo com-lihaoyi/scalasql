@@ -119,6 +119,16 @@ trait ExprOpsTests extends ScalaSqlSuite {
         value = java.time.LocalDateTime.parse("2023-11-12T03:22:41")
       )
 
+      test("utildate") - checker(
+        query = Expr("2023-11-12 03:22:41").cast[java.util.Date],
+        sqls = Seq(
+          "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS TIMESTAMP) AS res",
+          "SELECT CAST(? AS VARCHAR) AS res"
+        ),
+        value = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-11-12 03:22:41")
+      )
+
       test("instant") - checker(
         query = Expr("2007-12-03 10:15:30.00").cast[java.time.Instant],
         sqls = Seq(

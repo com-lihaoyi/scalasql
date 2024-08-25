@@ -50,6 +50,7 @@ CREATE TABLE data_types (
     my_local_date DATE,
     my_local_time TIME,
     my_local_date_time TIMESTAMP,
+    my_util_date TIMESTAMP,
     my_instant DATETIME,
     my_var_binary VARBINARY(256),
     my_uuid CHAR(36),

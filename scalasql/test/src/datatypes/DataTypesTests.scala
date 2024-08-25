@@ -14,6 +14,8 @@ import java.time.{
   ZoneId,
   ZonedDateTime
 }
+import java.util.Date
+import java.text.SimpleDateFormat
 
 import _root_.test.scalasql.WorldSqlTests.ArrowAssert
 
@@ -56,6 +58,7 @@ trait DataTypesTests extends ScalaSqlSuite {
             myLocalDate: T[LocalDate],
             myLocalTime: T[LocalTime],
             myLocalDateTime: T[LocalDateTime],
+            myUtilDate: T[Date],
             myInstant: T[Instant],
             myVarBinary: T[geny.Bytes],
             myUUID: T[java.util.UUID],
@@ -74,6 +77,8 @@ trait DataTypesTests extends ScalaSqlSuite {
           myLocalDate = LocalDate.parse("2023-12-20"),
           myLocalTime = LocalTime.parse("10:15:30"),
           myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
+          myUtilDate =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2011-12-03T10:15:30.000"),
           myInstant = Instant.parse("2011-12-03T10:15:30Z"),
           myVarBinary = new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8)),
           myUUID = new java.util.UUID(1234567890L, 9876543210L),
@@ -91,6 +96,7 @@ trait DataTypesTests extends ScalaSqlSuite {
             _.myLocalDate := value.myLocalDate,
             _.myLocalTime := value.myLocalTime,
             _.myLocalDateTime := value.myLocalDateTime,
+            _.myUtilDate := value.myUtilDate,
             _.myInstant := value.myInstant,
             _.myVarBinary := value.myVarBinary,
             _.myUUID := value.myUUID,

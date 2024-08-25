@@ -107,6 +107,14 @@ trait Dialect extends DialectTypeMappers {
     def put(r: PreparedStatement, idx: Int, v: geny.Bytes) = r.setBytes(idx, v.array)
   }
 
+  implicit def UtilDateType: TypeMapper[java.util.Date] = new UtilDateType
+  class UtilDateType extends TypeMapper[java.util.Date] {
+    def jdbcType = JDBCType.TIMESTAMP
+    def get(r: ResultSet, idx: Int) = new java.util.Date(r.getTimestamp(idx).getTime)
+    def put(r: PreparedStatement, idx: Int, v: java.util.Date) =
+      r.setTimestamp(idx, new java.sql.Timestamp(v.getTime))
+  }
+
   implicit def LocalDateType: TypeMapper[LocalDate] = new LocalDateType
   class LocalDateType extends TypeMapper[LocalDate] {
     def jdbcType = JDBCType.DATE

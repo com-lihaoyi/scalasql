@@ -87,6 +87,9 @@ object TypeMapper {
     d.UuidType
   implicit def bytesFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[geny.Bytes] =
     d.BytesType
+  implicit def utilDateFromDialectTypeMappers(
+      implicit d: DialectTypeMappers
+  ): TypeMapper[java.util.Date] = d.UtilDateType
   implicit def localDateFromDialectTypeMappers(
       implicit d: DialectTypeMappers
   ): TypeMapper[LocalDate] = d.LocalDateType
