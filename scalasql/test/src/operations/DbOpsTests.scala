@@ -129,7 +129,6 @@ trait ExprOpsTests extends ScalaSqlSuite {
         value = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2023-11-12 03:22:41")
       )
 
-
       test("instant") - checker(
         query = Expr("2007-12-03 10:15:30.00").cast[java.time.Instant],
         sqls = Seq(
