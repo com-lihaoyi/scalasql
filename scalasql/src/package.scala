@@ -36,6 +36,7 @@ package object scalasql {
   type Expr[T] = core.Expr[T]
 
   type TypeMapper[T] = core.TypeMapper[T]
+  val TypeMapper = core.TypeMapper
 
   val Config = core.Config
   type Config = core.Config

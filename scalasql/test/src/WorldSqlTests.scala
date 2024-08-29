@@ -1420,8 +1420,50 @@ object WorldSqlTests extends TestSuite {
       SqlStr.Interp.TypeInterp[CityId](CityId(1337))
       // +DOCS
 
-      case class City2[T[_]](
+      case class City[T[_]](
           id: T[CityId],
+          name: T[String],
+          countryCode: T[String],
+          district: T[String],
+          population: T[Long]
+      )
+
+      object City extends Table[City]() {
+        override def tableName: String = "city"
+      }
+      db.run(
+        City.insert.columns(
+          _.id := CityId(313373),
+          _.name := "test",
+          _.countryCode := "XYZ",
+          _.district := "district",
+          _.population := 1000000
+        )
+      )
+
+      db.run(City.select.filter(_.id === 313373).single) ==>
+        City[Sc](CityId(313373), "test", "XYZ", "district", 1000000)
+      // -DOCS
+
+      // You can also use `TypeMapper#bimap` for the common case where you want the
+      // new `TypeMapper` to behave the same as an existing `TypeMapper`, just with
+      // conversion functions to convert back and forth between the old type and new type:
+
+      case class CityId2(value: Int)
+
+      object CityId2 {
+        implicit def tm: TypeMapper[CityId2] = TypeMapper[Int].bimap[CityId2](
+          city => city.value,
+          int => CityId2(int)
+        )
+      }
+
+      // -DOCS
+      // Note sure why this is required, probably a Scalac bug
+      SqlStr.Interp.TypeInterp[CityId2](CityId2(1337))
+      // +DOCS
+      case class City2[T[_]](
+          id: T[CityId2],
           name: T[String],
           countryCode: T[String],
           district: T[String],
@@ -1433,7 +1475,7 @@ object WorldSqlTests extends TestSuite {
       }
       db.run(
         City2.insert.columns(
-          _.id := CityId(31337),
+          _.id := CityId2(31337),
           _.name := "test",
           _.countryCode := "XYZ",
           _.district := "district",
@@ -1442,8 +1484,7 @@ object WorldSqlTests extends TestSuite {
       )
 
       db.run(City2.select.filter(_.id === 31337).single) ==>
-        City2[Sc](CityId(31337), "test", "XYZ", "district", 1000000)
-      // -DOCS
+        City2[Sc](CityId2(31337), "test", "XYZ", "district", 1000000)
     }
     test("customTableColumnNames") {
       // +DOCS
