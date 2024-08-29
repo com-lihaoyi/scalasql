@@ -1433,7 +1433,7 @@ object WorldSqlTests extends TestSuite {
       }
       db.run(
         City.insert.columns(
-          _.id := CityId(31337),
+          _.id := CityId(313373),
           _.name := "test",
           _.countryCode := "XYZ",
           _.district := "district",
@@ -1441,8 +1441,8 @@ object WorldSqlTests extends TestSuite {
         )
       )
 
-      db.run(City.select.filter(_.id === 31337).single) ==>
-        City[Sc](CityId(31337), "test", "XYZ", "district", 1000000)
+      db.run(City.select.filter(_.id === 313373).single) ==>
+        City[Sc](CityId(313373), "test", "XYZ", "district", 1000000)
       // -DOCS
 
       // You can also use `TypeMapper#bimap` for the common case where you want the
