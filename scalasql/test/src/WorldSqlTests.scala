@@ -1452,7 +1452,7 @@ object WorldSqlTests extends TestSuite {
       case class CityId2(value: Int)
 
       object CityId2 {
-        implicit def tm: TypeMapper[CityId2] = implicitly[TypeMapper[Int]].bimap[CityId2](
+        implicit def tm: TypeMapper[CityId2] = TypeMapper[Int].bimap[CityId2](
           city => city.value,
           int => CityId2(int)
         )

@@ -65,6 +65,7 @@ trait TypeMapper[T] { outer =>
 }
 
 object TypeMapper {
+  def apply[T](implicit t: TypeMapper[T]): TypeMapper[T] = t
 
   /**
    * These definitions are workarounds for a bug in the Scala 3 compiler
