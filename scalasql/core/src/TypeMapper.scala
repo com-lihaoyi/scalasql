@@ -29,7 +29,7 @@ import java.util.UUID
  * Defaults are provided for most common Scala primitives, but you can also provide
  * your own by defining an `implicit val foo: TypeMapper[T]`
  */
-trait TypeMapper[T] {
+trait TypeMapper[T] {outer =>
 
   /**
    * The JDBC type of this type. Used for `setNull` which needs to know the
@@ -51,6 +51,17 @@ trait TypeMapper[T] {
    * How to insert a value of type [[T]] into a `PreparedStatement`
    */
   def put(r: PreparedStatement, idx: Int, v: T): Unit
+
+  /**
+   * Create a new `TypeMapper[V]` based on this `TypeMapper[T]` given the
+   * two conversion functions `f: V => T`, `g: T => V` 
+   */
+  def bimap[V](f: V => T, g: T => V): TypeMapper[V] = new TypeMapper[V]{
+    def jdbcType: JDBCType = outer.jdbcType
+    override def castTypeString: String = outer.castTypeString
+    def get(r: ResultSet, idx: Int): V = g(outer.get(r, idx))
+    def put(r: PreparedStatement, idx: Int, v: V): Unit = outer.put(r, idx, f(v)) 
+  }
 }
 
 object TypeMapper {
