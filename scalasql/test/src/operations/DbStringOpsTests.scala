@@ -10,7 +10,11 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),
-      sqls = Seq("SELECT (? || ?) AS res", "SELECT CONCAT(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT (? || ?) AS res",
+        "SELECT CONCAT(?, ?) AS res",
+        "SELECT (? + ?) AS res"
+      ),
       value = "helloworld"
     )
 
@@ -73,7 +77,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").startsWith("Hel"),
       sqls = Seq(
         "SELECT (? LIKE ? || '%') AS res",
-        "SELECT (? LIKE CONCAT(?, '%')) AS res"
+        "SELECT (? LIKE CONCAT(?, '%')) AS res",
+        "SELECT (? LIKE ? + '%') AS res"
       ),
       value = true
     )
@@ -82,7 +87,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").endsWith("llo"),
       sqls = Seq(
         "SELECT (? LIKE '%' || ?) AS res",
-        "SELECT (? LIKE CONCAT('%', ?)) AS res"
+        "SELECT (? LIKE CONCAT('%', ?)) AS res",
+        "SELECT (? LIKE '%' + ?) AS res"
       ),
       value = true
     )
@@ -91,7 +97,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").contains("ll"),
       sqls = Seq(
         "SELECT (? LIKE '%' || ? || '%') AS res",
-        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res"
+        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res",
+        "SELECT (? LIKE '%' + ? + '%') AS res"
       ),
       value = true
     )
