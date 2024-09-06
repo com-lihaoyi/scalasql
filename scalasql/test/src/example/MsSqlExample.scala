@@ -18,6 +18,7 @@ object MsSqlExample {
     println("Initializing MsSql")
     val mssql = new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
     mssql.acceptLicense()
+    mssql.addEnv("MSSQL_COLLATION", "Latin1_General_100_CI_AS_SC_UTF8")
     mssql.start()
     mssql
   }
