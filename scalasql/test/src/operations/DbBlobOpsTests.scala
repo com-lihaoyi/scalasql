@@ -32,7 +32,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
 
     test("octetLength") - checker(
       query = Expr(Bytes("叉烧包")).octetLength,
-      sql = "SELECT OCTET_LENGTH(?) AS res",
+      sqls = Seq("SELECT OCTET_LENGTH(?) AS res", "SELECT DATALENGTH(?) AS res"),
       value = 9,
       moreValues = Seq(6) // Not sure why HsqlExpr returns different value here ???
     )
