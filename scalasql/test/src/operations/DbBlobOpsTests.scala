@@ -10,7 +10,11 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr(Bytes("hello")) + Expr(Bytes("world")),
-      sqls = Seq("SELECT (? || ?) AS res", "SELECT CONCAT(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT (? || ?) AS res",
+        "SELECT CONCAT(?, ?) AS res",
+        "SELECT (? + ?) AS res"
+      ),
       value = Bytes("helloworld")
     )
 
@@ -62,7 +66,8 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       query = Expr(Bytes("Hello")).startsWith(Bytes("Hel")),
       sqls = Seq(
         "SELECT (? LIKE ? || '%') AS res",
-        "SELECT (? LIKE CONCAT(?, '%')) AS res"
+        "SELECT (? LIKE CONCAT(?, '%')) AS res",
+        "SELECT (? LIKE ? + '%') AS res"
       ),
       value = true
     )
@@ -71,7 +76,8 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       query = Expr(Bytes("Hello")).endsWith(Bytes("llo")),
       sqls = Seq(
         "SELECT (? LIKE '%' || ?) AS res",
-        "SELECT (? LIKE CONCAT('%', ?)) AS res"
+        "SELECT (? LIKE CONCAT('%', ?)) AS res",
+        "SELECT (? LIKE '%' + ?) AS res"
       ),
       value = true
     )
@@ -80,7 +86,8 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       query = Expr(Bytes("Hello")).contains(Bytes("ll")),
       sqls = Seq(
         "SELECT (? LIKE '%' || ? || '%') AS res",
-        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res"
+        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res",
+        "SELECT (? LIKE '%' + ? + '%') AS res"
       ),
       value = true
     )

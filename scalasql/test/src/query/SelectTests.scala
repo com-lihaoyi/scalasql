@@ -551,6 +551,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price <= ?) THEN CONCAT(product0.name, ?)
               END AS res
             FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price <= ?) THEN (product0.name + ?)
+              END AS res
+            FROM product product0
           """
         ),
         value = Seq(
@@ -592,6 +601,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 ELSE CONCAT(product0.name, ?)
+              END AS res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                ELSE (product0.name + ?)
               END AS res
             FROM product product0
           """
