@@ -55,4 +55,7 @@ package object scalasql {
 
   val SqliteDialect = dialects.SqliteDialect
   type SqliteDialect = dialects.SqliteDialect
+
+  val MsSqlDialect = dialects.MsSqlDialect
+  type MsSqlDialect = dialects.MsSqlDialect
 }
