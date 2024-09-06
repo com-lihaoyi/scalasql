@@ -5,6 +5,8 @@ import scalasql.operations
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
+import java.time.{Instant, LocalDateTime, OffsetDateTime}
+
 trait MsSqlDialect extends Dialect {
   override def castParams = false
 
@@ -16,6 +18,25 @@ trait MsSqlDialect extends Dialect {
 
   override implicit def StringType: TypeMapper[String] = new MsSqlStringType
   class MsSqlStringType extends StringType { override def castTypeString = "VARCHAR" }
+
+  override implicit def BooleanType: TypeMapper[Boolean] = new BooleanType
+  class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
+
+  override implicit def UtilDateType: TypeMapper[java.util.Date] = new MsSqlUtilDateType
+  class MsSqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME2" }
+
+  override implicit def LocalDateTimeType: TypeMapper[LocalDateTime] = new MsSqlLocalDateTimeType
+  class MsSqlLocalDateTimeType extends LocalDateTimeType {
+    override def castTypeString = "DATETIME2"
+  }
+
+  override implicit def InstantType: TypeMapper[Instant] = new MsSqlInstantType
+  class MsSqlInstantType extends InstantType { override def castTypeString = "DATETIME2" }
+
+  override implicit def OffsetDateTimeType: TypeMapper[OffsetDateTime] = new MsSqlOffsetDateTimeType
+  class MsSqlOffsetDateTimeType extends OffsetDateTimeType {
+    override def castTypeString = "DATETIMEOFFSET"
+  }
 
   override implicit def ExprStringOpsConv(v: Expr[String]): MsSqlDialect.ExprStringOps[String] =
     new MsSqlDialect.ExprStringOps(v)
