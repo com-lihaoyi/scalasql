@@ -26,7 +26,7 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
 
     test("length") - checker(
       query = Expr("hello").length,
-      sql = "SELECT LENGTH(?) AS res",
+      sqls = Seq("SELECT LENGTH(?) AS res", "SELECT LEN(?) AS res"),
       value = 5
     )
 
@@ -39,7 +39,11 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
 
     test("position") - checker(
       query = Expr("hello").indexOf("ll"),
-      sqls = Seq("SELECT POSITION(? IN ?) AS res", "SELECT INSTR(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT POSITION(? IN ?) AS res",
+        "SELECT INSTR(?, ?) AS res",
+        "SELECT CHARINDEX(?, ?) AS res"
+      ),
       value = 3
     )
 
