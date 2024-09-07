@@ -26,7 +26,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
 
     test("length") - checker(
       query = Expr(Bytes("hello")).length,
-      sql = "SELECT LENGTH(?) AS res",
+      sqls = Seq("SELECT LENGTH(?) AS res", "SELECT LEN(?) AS res"),
       value = 5
     )
 
@@ -39,7 +39,11 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
 
     test("position") - checker(
       query = Expr(Bytes("hello")).indexOf(Bytes("ll")),
-      sqls = Seq("SELECT POSITION(? IN ?) AS res", "SELECT INSTR(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT POSITION(? IN ?) AS res",
+        "SELECT INSTR(?, ?) AS res",
+        "SELECT CHARINDEX(?, ?) AS res"
+      ),
       value = 3
     )
     // Not supported by postgres
