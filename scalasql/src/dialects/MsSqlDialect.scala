@@ -57,7 +57,13 @@ object MsSqlDialect extends MsSqlDialect {
   class DbApiOps(dialect: DialectTypeMappers)
       extends scalasql.operations.DbApiOps(dialect)
       with ConcatOps
-      with MathOps
+      with MathOps {
+        override def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG($v)" }
+
+        override def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+          sql"ATN2($v, $y)"
+        }
+      }
 
   class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
     def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
