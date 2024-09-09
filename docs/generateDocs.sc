@@ -25,7 +25,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
         case ("", _) => outputLines.append("")
 
         case (s"// +INCLUDE $rest", _) =>
-          os.read.lines(os.pwd / os.SubPath(rest)).foreach(outputLines.append)
+          os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).foreach(outputLines.append)
 
         case (s"//$rest", false) => outputLines.append(rest.stripPrefix(" "))
 

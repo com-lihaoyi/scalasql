@@ -212,13 +212,13 @@ trait ScalaSql extends Common{ common =>
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial() = T.command {
   generateDocs.generateTutorial(
-    os.pwd / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
-    os.pwd / "docs" / "tutorial.md"
+    T.workspace / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
+    T.workspace / "docs" / "tutorial.md"
   )
 }
 def generateReference() = T.command {
   generateDocs.generateReference(
-    os.pwd / "docs" / "reference.md",
+    T.workspace / "docs" / "reference.md",
     (sources, config) =>
       mill.scalalib.scalafmt.ScalafmtWorkerModule
         .worker()
