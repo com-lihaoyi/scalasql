@@ -67,6 +67,7 @@ trait ScalaSql extends Common{ common =>
     def testFramework = "scalasql.UtestFramework"
 
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
+    def forkEnv = Map("MILL_WORKSPACE_ROOT" -> T.workspace)
   }
 
   private def indent(code: Iterable[String]): String =

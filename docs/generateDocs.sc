@@ -49,7 +49,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
 }
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
-  val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "out" / "recordedTests.json"))
+  val records = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTests.json"))
   val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "out" / "recordedSuiteDescriptions.json"))
     .map{case (k, v) => (dropExprPrefix(k), v)}
 
