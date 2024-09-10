@@ -412,6 +412,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
         ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
+        ),
         docs = """
           `.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
         """
@@ -440,6 +448,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
         )
       )
       test("ascNullsLast") - checker(
@@ -466,6 +482,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(3), None),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
         )
       )
       test("ascNullsFirst") - checker(
@@ -487,6 +511,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
         )
       )
       test("descNullsLast") - checker(
@@ -508,6 +540,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4))
+          )
         )
       )
       test("descNullsFirst") - checker(
@@ -534,6 +574,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(3), None),
           OptCols[Sc](Some(1), Some(2))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2))
+          )
         )
       )
     }
