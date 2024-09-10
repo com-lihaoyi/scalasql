@@ -45,6 +45,10 @@ trait MsSqlDialect extends Dialect {
   ): MsSqlDialect.ExprStringLikeOps[geny.Bytes] =
     new MsSqlDialect.ExprStringLikeOps(v)
 
+  override implicit def ExprNumericOpsConv[T: Numeric: TypeMapper](
+      v: Expr[T]
+  ): MsSqlDialect.ExprNumericOps[T] = new MsSqlDialect.ExprNumericOps(v)
+
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MsSqlDialect.TableOps(t)
 
@@ -99,6 +103,15 @@ object MsSqlDialect extends MsSqlDialect {
 
     def indexOf(x: Expr[T]): Expr[Int] = Expr { implicit ctx => sql"CHARINDEX($x, $v)" }
     def reverse: Expr[T] = Expr { implicit ctx => sql"REVERSE($v)" }
+  }
+
+  class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Expr[T])
+      extends operations.ExprNumericOps[T](v) {
+    override def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v % $x" }
+
+    override def mod[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v % $x" }
+
+    override def ceil: Expr[T] = Expr { implicit ctx => sql"CEILING($v)" }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
