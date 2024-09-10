@@ -7,6 +7,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime}
+import scalasql.core.LiveExprs
 
 trait MsSqlDialect extends Dialect {
   protected def dialectCastParams = false
@@ -166,7 +167,11 @@ object MsSqlDialect extends MsSqlDialect {
         where,
         groupBy0
       )
-      with Select[Q, R]
+      with Select[Q, R] {
+        override def take(n: Int): scalasql.query.Select[Q,R] = throw new Exception(".take must follow .sortBy")
+
+        override def drop(n: Int): scalasql.query.Select[Q,R] = throw new Exception(".drop must follow .sortBy")
+      }
 
   class CompoundSelect[Q, R](
       lhs: scalasql.query.SimpleSelect[Q, R],
@@ -177,6 +182,11 @@ object MsSqlDialect extends MsSqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
+    override def take(n: Int): scalasql.query.Select[Q, R] = copy(
+      limit = Some(limit.fold(n)(math.min(_, n))),
+      offset = offset.orElse(Some(0))
+    )
+
     protected override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
       new CompoundSelectRenderer(this, prevContext)
   }
@@ -185,9 +195,22 @@ object MsSqlDialect extends MsSqlDialect {
       query: scalasql.query.CompoundSelect[Q, R],
       prevContext: Context
   ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
+    override lazy val limitOpt = SqlStr.flatten(SqlStr.opt(query.limit) { limit =>
+      sql" FETCH FIRST $limit ROWS ONLY"
+    })
 
-    override lazy val limitOpt = SqlStr
-      .flatten(CompoundSelectRendererForceLimit.limitToSqlStr(query.limit, query.offset))
+    override lazy val offsetOpt = SqlStr.flatten(
+      SqlStr.opt(query.offset.orElse(Option.when(query.limit.nonEmpty)(0))) { offset =>
+        sql" OFFSET $offset ROWS"
+      }
+    )
+
+    override def render(liveExprs: LiveExprs): SqlStr = {
+      prerender(liveExprs) match {
+        case (lhsStr, compound, sortOpt, limitOpt, offsetOpt) =>
+          lhsStr + compound + sortOpt + offsetOpt + limitOpt
+      }
+    }
 
     override def orderToSqlStr(newCtx: Context) = {
       SqlStr.optSeq(query.orderBy) { orderBys =>

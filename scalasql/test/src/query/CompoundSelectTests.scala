@@ -50,7 +50,10 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+        sqls = Seq(
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Cookie", "Socks"),
         docs = """
           ScalaSql also supports various combinations of `.take` and `.drop`, translating to SQL
@@ -61,14 +64,18 @@ trait CompoundSelectTests extends ScalaSqlSuite {
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2) },
         sqls = Seq(
           "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ?",
-          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?"
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS"
         ),
         value = Seq("Face Mask", "Skate Board", "Guitar", "Camera")
       )
 
       test("sortLimitTwiceHigher") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(3) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+        sqls = Seq(
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Cookie", "Socks"),
         docs = """
           Note that `.drop` and `.take` follow Scala collections' semantics, so calling e.g. `.take`
@@ -79,48 +86,68 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
       test("sortLimitTwiceLower") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).take(1) },
-        sql = "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+        sqls = Seq(
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Cookie")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
-        sql =
+        sqls = Seq(
           "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffsetTwice") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).drop(2).take(1) },
-        sql =
+        sqls = Seq(
           "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Guitar")
       )
 
       test("sortOffsetLimit") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).drop(2).take(2) },
-        sql =
+        sqls = Seq(
           "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Face Mask", "Skate Board")
       )
 
       test("sortLimitOffset") - checker(
         query = Text { Product.select.sortBy(_.price).map(_.name).take(2).drop(1) },
-        sql =
+        sqls = Seq(
           "SELECT product0.name AS res FROM product product0 ORDER BY product0.price LIMIT ? OFFSET ?",
+          "SELECT product0.name AS res FROM product product0 ORDER BY product0.price OFFSET ? ROWS FETCH FIRST ? ROWS ONLY"
+        ),
         value = Seq("Socks")
       )
     }
 
     test("distinct") - checker(
       query = Text { Purchase.select.sortBy(_.total).desc.take(3).map(_.shippingInfoId).distinct },
-      sql = """
-        SELECT DISTINCT subquery0.res AS res
-        FROM (SELECT purchase0.shipping_info_id AS res
-          FROM purchase purchase0
-          ORDER BY purchase0.total DESC
-          LIMIT ?) subquery0
-      """,
+      sqls = Seq(
+        """
+          SELECT DISTINCT subquery0.res AS res
+          FROM (SELECT purchase0.shipping_info_id AS res
+            FROM purchase purchase0
+            ORDER BY purchase0.total DESC
+            LIMIT ?) subquery0
+        """,
+        """
+          SELECT DISTINCT subquery0.res AS res
+          FROM (SELECT purchase0.shipping_info_id AS res
+            FROM purchase purchase0
+            ORDER BY purchase0.total DESC
+            OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) subquery0
+        """
+      ),
       value = Seq(1, 2),
       normalize = (x: Seq[Int]) => x.sorted,
       docs = """
@@ -134,15 +161,26 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           Product.crossJoin().filter(_.id === p.productId).map(_.name)
         }
       },
-      sql = """
-        SELECT product1.name AS res
-        FROM (SELECT purchase0.product_id AS product_id, purchase0.total AS total
-          FROM purchase purchase0
-          ORDER BY total DESC
-          LIMIT ?) subquery0
-        CROSS JOIN product product1
-        WHERE (product1.id = subquery0.product_id)
-      """,
+      sqls = Seq(
+        """
+          SELECT product1.name AS res
+          FROM (SELECT purchase0.product_id AS product_id, purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            LIMIT ?) subquery0
+          CROSS JOIN product product1
+          WHERE (product1.id = subquery0.product_id)
+        """,
+        """
+          SELECT product1.name AS res
+          FROM (SELECT purchase0.product_id AS product_id, purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) subquery0
+          CROSS JOIN product product1
+          WHERE (product1.id = subquery0.product_id)
+        """
+      ),
       value = Seq("Camera", "Face Mask", "Guitar"),
       normalize = (x: Seq[String]) => x.sorted,
       docs = """
@@ -155,13 +193,22 @@ trait CompoundSelectTests extends ScalaSqlSuite {
 
     test("sumBy") - checker(
       query = Text { Purchase.select.sortBy(_.total).desc.take(3).sumBy(_.total) },
-      sql = """
-        SELECT SUM(subquery0.total) AS res
-        FROM (SELECT purchase0.total AS total
-          FROM purchase purchase0
-          ORDER BY total DESC
-          LIMIT ?) subquery0
-      """,
+      sqls = Seq(
+        """
+          SELECT SUM(subquery0.total) AS res
+          FROM (SELECT purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            LIMIT ?) subquery0
+        """,
+        """
+          SELECT SUM(subquery0.total) AS res
+          FROM (SELECT purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) subquery0
+        """
+      ),
       value = 11788.0,
       normalize = (x: Double) => x.round.toDouble
     )
@@ -174,13 +221,22 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .take(3)
           .aggregate(p => (p.sumBy(_.total), p.avgBy(_.total)))
       },
-      sql = """
-        SELECT SUM(subquery0.total) AS res_0, AVG(subquery0.total) AS res_1
-        FROM (SELECT purchase0.total AS total
-          FROM purchase purchase0
-          ORDER BY total DESC
-          LIMIT ?) subquery0
-      """,
+      sqls = Seq(
+        """
+          SELECT SUM(subquery0.total) AS res_0, AVG(subquery0.total) AS res_1
+          FROM (SELECT purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            LIMIT ?) subquery0
+        """,
+        """
+          SELECT SUM(subquery0.total) AS res_0, AVG(subquery0.total) AS res_1
+          FROM (SELECT purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY total DESC
+            OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) subquery0
+        """
+      ),
       value = (11788.0, 3929.0),
       normalize = (x: (Double, Double)) => (x._1.round.toDouble, x._2.round.toDouble)
     )
@@ -325,19 +381,34 @@ trait CompoundSelectTests extends ScalaSqlSuite {
           .drop(4)
           .take(4)
       },
-      sql = """
-        SELECT LOWER(product0.name) AS res
-        FROM product product0
-        UNION ALL
-        SELECT LOWER(buyer0.name) AS res
-        FROM buyer buyer0
-        UNION
-        SELECT LOWER(product0.kebab_case_name) AS res
-        FROM product product0
-        ORDER BY res
-        LIMIT ?
-        OFFSET ?
-      """,
+      sqls = Seq(
+        """
+          SELECT LOWER(product0.name) AS res
+          FROM product product0
+          UNION ALL
+          SELECT LOWER(buyer0.name) AS res
+          FROM buyer buyer0
+          UNION
+          SELECT LOWER(product0.kebab_case_name) AS res
+          FROM product product0
+          ORDER BY res
+          LIMIT ?
+          OFFSET ?
+        """,
+        """
+          SELECT LOWER(product0.name) AS res
+          FROM product product0
+          UNION ALL
+          SELECT LOWER(buyer0.name) AS res
+          FROM buyer buyer0
+          UNION
+          SELECT LOWER(product0.kebab_case_name) AS res
+          FROM product product0
+          ORDER BY res
+          OFFSET ? ROWS
+          FETCH FIRST ? ROWS ONLY
+        """
+      ),
       value = Seq("guitar", "james bond", "li haoyi", "skate board")
     )
   }
