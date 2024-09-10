@@ -19,15 +19,28 @@ trait SubQueryTests extends ScalaSqlSuite {
           .join(Product.select.sortBy(_.price).desc.take(1))(_.productId `=` _.id)
           .map { case (purchase, product) => purchase.total }
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT purchase0.total AS res
         FROM purchase purchase0
         JOIN (SELECT product1.id AS id, product1.price AS price
           FROM product product1
           ORDER BY price DESC
-          LIMIT ?) subquery1
+          OFFSET ? ROWS
+          FETCH FIRST ? ROWS ONLY) subquery1
         ON (purchase0.product_id = subquery1.id)
-      """,
+        """,
+        """
+        SELECT purchase0.total AS res
+        FROM purchase purchase0
+        JOIN (SELECT product1.id AS id, product1.price AS price
+          FROM product product1
+          ORDER BY price DESC
+          OFFSET ? ROWS
+          FETCH FIRST ? ROWS ONLY) subquery1
+        ON (purchase0.product_id = subquery1.id)
+        """
+      ),
       value = Seq(10000.0),
       docs = """
         A ScalaSql `.join` referencing a `.select` translates straightforwardly
@@ -41,14 +54,25 @@ trait SubQueryTests extends ScalaSqlSuite {
           case (product, purchase) => purchase.total
         }
       },
-      sql = """
-        SELECT purchase1.total AS res
-        FROM (SELECT product0.id AS id, product0.price AS price
-          FROM product product0
-          ORDER BY price DESC
-          LIMIT ?) subquery0
-        JOIN purchase purchase1 ON (subquery0.id = purchase1.product_id)
-      """,
+      sqls = Seq(
+        """
+          SELECT purchase1.total AS res
+          FROM (SELECT product0.id AS id, product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            LIMIT ?) subquery0
+          JOIN purchase purchase1 ON (subquery0.id = purchase1.product_id)
+        """,
+        """
+          SELECT purchase1.total AS res
+          FROM (SELECT product0.id AS id, product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery0
+          JOIN purchase purchase1 ON (subquery0.id = purchase1.product_id)
+        """
+      ),
       value = Seq(10000.0),
       docs = """
         Some sequences of operations cannot be expressed as a single SQL query,
@@ -68,25 +92,48 @@ trait SubQueryTests extends ScalaSqlSuite {
           .join(Purchase.select.sortBy(_.count).desc.take(3))(_.id `=` _.productId)
           .map { case (product, purchase) => (product.name, purchase.count) }
       },
-      sql = """
-        SELECT
-          subquery0.name AS res_0,
-          subquery1.count AS res_1
-        FROM (SELECT
-            product0.id AS id,
-            product0.name AS name,
-            product0.price AS price
-          FROM product product0
-          ORDER BY price DESC
-          LIMIT ?) subquery0
-        JOIN (SELECT
-            purchase1.product_id AS product_id,
-            purchase1.count AS count
-          FROM purchase purchase1
-          ORDER BY count DESC
-          LIMIT ?) subquery1
-        ON (subquery0.id = subquery1.product_id)
-      """,
+      sqls = Seq(
+        """
+          SELECT
+            subquery0.name AS res_0,
+            subquery1.count AS res_1
+          FROM (SELECT
+              product0.id AS id,
+              product0.name AS name,
+              product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            LIMIT ?) subquery0
+          JOIN (SELECT
+              purchase1.product_id AS product_id,
+              purchase1.count AS count
+            FROM purchase purchase1
+            ORDER BY count DESC
+            LIMIT ?) subquery1
+          ON (subquery0.id = subquery1.product_id)
+        """,
+        """
+          SELECT
+            subquery0.name AS res_0,
+            subquery1.count AS res_1
+          FROM (SELECT
+              product0.id AS id,
+              product0.name AS name,
+              product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery0
+          JOIN (SELECT
+              purchase1.product_id AS product_id,
+              purchase1.count AS count
+            FROM purchase purchase1
+            ORDER BY count DESC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery1
+          ON (subquery0.id = subquery1.product_id)
+        """
+      ),
       value = Seq(("Camera", 10)),
       docs = """
         This example shows a ScalaSql query that results in a subquery in both
@@ -98,17 +145,32 @@ trait SubQueryTests extends ScalaSqlSuite {
       query = Text {
         Product.select.sortBy(_.price).desc.take(4).sortBy(_.price).asc.take(2).map(_.name)
       },
-      sql = """
-        SELECT subquery0.name AS res
-        FROM (SELECT
-            product0.name AS name,
-            product0.price AS price
-          FROM product product0
-          ORDER BY price DESC
-          LIMIT ?) subquery0
-        ORDER BY subquery0.price ASC
-        LIMIT ?
-      """,
+      sqls = Seq(
+        """
+          SELECT subquery0.name AS res
+          FROM (SELECT
+              product0.name AS name,
+              product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            LIMIT ?) subquery0
+          ORDER BY subquery0.price ASC
+          LIMIT ?
+        """,
+        """
+          SELECT subquery0.name AS res
+          FROM (SELECT
+              product0.name AS name,
+              product0.price AS price
+            FROM product product0
+            ORDER BY price DESC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery0
+          ORDER BY subquery0.price ASC
+          OFFSET ? ROWS
+          FETCH FIRST ? ROWS ONLY
+        """
+      ),
       value = Seq("Face Mask", "Skate Board"),
       docs = """
         Performing multiple sorts with `.take`s in between is also something
@@ -121,17 +183,31 @@ trait SubQueryTests extends ScalaSqlSuite {
       query = Text {
         Purchase.select.sortBy(_.count).take(5).groupBy(_.productId)(_.sumBy(_.total))
       },
-      sql = """
-        SELECT subquery0.product_id AS res_0, SUM(subquery0.total) AS res_1
-        FROM (SELECT
-            purchase0.product_id AS product_id,
-            purchase0.count AS count,
-            purchase0.total AS total
-          FROM purchase purchase0
-          ORDER BY count
-          LIMIT ?) subquery0
-        GROUP BY subquery0.product_id
-      """,
+      sqls = Seq(
+        """
+          SELECT subquery0.product_id AS res_0, SUM(subquery0.total) AS res_1
+          FROM (SELECT
+              purchase0.product_id AS product_id,
+              purchase0.count AS count,
+              purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY count
+            LIMIT ?) subquery0
+          GROUP BY subquery0.product_id
+        """,
+        """
+          SELECT subquery0.product_id AS res_0, SUM(subquery0.total) AS res_1
+          FROM (SELECT
+              purchase0.product_id AS product_id,
+              purchase0.count AS count,
+              purchase0.total AS total
+            FROM purchase purchase0
+            ORDER BY count
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery0
+          GROUP BY subquery0.product_id
+        """
+      ),
       value = Seq((1, 44.4), (2, 900.0), (3, 15.7), (4, 493.8), (5, 10000.0)),
       normalize = (x: Seq[(Int, Double)]) => x.sorted
     )
@@ -241,16 +317,25 @@ trait SubQueryTests extends ScalaSqlSuite {
           .take(2)
           .unionAll(Product.select.map(_.kebabCaseName.toLowerCase))
       },
-      sql = """
-        SELECT subquery0.res AS res
-        FROM (SELECT
-            LOWER(buyer0.name) AS res
+      sqls = Seq(
+        """
+          SELECT subquery0.res AS res
+          FROM (SELECT
+              LOWER(buyer0.name) AS res
+            FROM buyer buyer0
+            LIMIT ?) subquery0
+          UNION ALL
+          SELECT LOWER(product0.kebab_case_name) AS res
+          FROM product product0
+        """,
+        """
+          SELECT TOP(?) LOWER(buyer0.name) AS res
           FROM buyer buyer0
-          LIMIT ?) subquery0
-        UNION ALL
-        SELECT LOWER(product0.kebab_case_name) AS res
-        FROM product product0
-      """,
+          UNION ALL
+          SELECT LOWER(product0.kebab_case_name) AS res
+          FROM product product0
+        """
+      ),
       value =
         Seq("james bond", "叉烧包", "face-mask", "guitar", "socks", "skate-board", "camera", "cookie")
     )
@@ -261,16 +346,25 @@ trait SubQueryTests extends ScalaSqlSuite {
           .map(_.name.toLowerCase)
           .unionAll(Product.select.map(_.kebabCaseName.toLowerCase).take(2))
       },
-      sql = """
-        SELECT LOWER(buyer0.name) AS res
-        FROM buyer buyer0
-        UNION ALL
-        SELECT subquery0.res AS res
-        FROM (SELECT
-            LOWER(product0.kebab_case_name) AS res
+      sqls = Seq(
+        """
+          SELECT LOWER(buyer0.name) AS res
+          FROM buyer buyer0
+          UNION ALL
+          SELECT subquery0.res AS res
+          FROM (SELECT
+              LOWER(product0.kebab_case_name) AS res
+            FROM product product0
+            LIMIT ?) subquery0
+        """,
+        """
+          SELECT LOWER(buyer0.name) AS res
+          FROM buyer buyer0
+          UNION ALL
+          SELECT TOP(?) LOWER(product0.kebab_case_name) AS res
           FROM product product0
-          LIMIT ?) subquery0
-      """,
+        """
+      ),
       value = Seq("james bond", "叉烧包", "li haoyi", "face-mask", "guitar")
     )
 
@@ -351,26 +445,51 @@ trait SubQueryTests extends ScalaSqlSuite {
               .toExpr
         }
       },
-      sql = """
-      SELECT
-        buyer0.name AS res_0,
-        (SELECT
-          (SELECT
-            (SELECT product3.price AS res
-            FROM product product3
-            WHERE (product3.id = purchase2.product_id)
+      sqls = Seq(
+        """
+          SELECT
+            buyer0.name AS res_0,
+            (SELECT
+              (SELECT
+                (SELECT product3.price AS res
+                FROM product product3
+                WHERE (product3.id = purchase2.product_id)
+                ORDER BY res DESC
+                LIMIT ?) AS res
+              FROM purchase purchase2
+              WHERE (purchase2.shipping_info_id = shipping_info1.id)
+              ORDER BY res DESC
+              LIMIT ?) AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id)
             ORDER BY res DESC
-            LIMIT ?) AS res
-          FROM purchase purchase2
-          WHERE (purchase2.shipping_info_id = shipping_info1.id)
-          ORDER BY res DESC
-          LIMIT ?) AS res
-        FROM shipping_info shipping_info1
-        WHERE (shipping_info1.buyer_id = buyer0.id)
-        ORDER BY res DESC
-        LIMIT ?) AS res_1
-      FROM buyer buyer0
-      """,
+            LIMIT ?) AS res_1
+          FROM buyer buyer0
+        """,
+        """
+          SELECT
+            buyer0.name AS res_0,
+            (SELECT
+              (SELECT
+                (SELECT product3.price AS res
+                FROM product product3
+                WHERE (product3.id = purchase2.product_id)
+                ORDER BY res DESC
+                OFFSET ? ROWS
+                FETCH FIRST ? ROWS ONLY) AS res
+              FROM purchase purchase2
+              WHERE (purchase2.shipping_info_id = shipping_info1.id)
+              ORDER BY res DESC
+              OFFSET ? ROWS
+              FETCH FIRST ? ROWS ONLY) AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id)
+            ORDER BY res DESC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) AS res_1
+          FROM buyer buyer0
+        """
+      ),
       value = Seq(
         ("James Bond", 1000.0),
         ("叉烧包", 300.0),
