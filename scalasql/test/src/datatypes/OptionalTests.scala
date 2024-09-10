@@ -399,6 +399,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int
           """
         ),
         value = Seq(
@@ -423,6 +428,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int
           """
         ),
         value = Seq(
@@ -444,6 +454,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int ASC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int ASC
           """
         ),
         value = Seq(
@@ -507,6 +522,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int DESC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int DESC
           """
         ),
         value = Seq(

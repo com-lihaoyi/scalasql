@@ -1,8 +1,9 @@
 package scalasql.dialects
 
-import scalasql.core.{Aggregatable, DbApi, DialectTypeMappers, Expr, TypeMapper}
-import scalasql.operations
-import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.query.{AscDesc, GroupBy, Join, Nulls, OrderBy, SubqueryRef, Table}
+import scalasql.core.{Aggregatable, Context, DbApi, DialectTypeMappers, Expr, Queryable, TypeMapper, SqlStr}
+import scalasql.{Sc, operations}
+import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime}
@@ -42,6 +43,9 @@ trait MsSqlDialect extends Dialect {
       v: Expr[geny.Bytes]
   ): MsSqlDialect.ExprStringLikeOps[geny.Bytes] =
     new MsSqlDialect.ExprStringLikeOps(v)
+
+  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
+    new MsSqlDialect.TableOps(t)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new MsSqlDialect.ExprAggOps(v)
@@ -94,5 +98,119 @@ object MsSqlDialect extends MsSqlDialect {
 
     def indexOf(x: Expr[T]): Expr[Int] = Expr { implicit ctx => sql"CHARINDEX($x, $v)" }
     def reverse: Expr[T] = Expr { implicit ctx => sql"REVERSE($v)" }
+  }
+
+  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
+
+    protected override def joinableToSelect: Select[V[Expr], V[Sc]] = {
+      val ref = Table.ref(t)
+      new SimpleSelect(
+        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        None,
+        false,
+        Seq(ref),
+        Nil,
+        Nil,
+        None
+      )(
+        t.containerQr
+      )
+    }
+  }
+
+  trait Select[Q, R] extends scalasql.query.Select[Q, R] {
+    override def newCompoundSelect[Q, R](
+        lhs: scalasql.query.SimpleSelect[Q, R],
+        compoundOps: Seq[scalasql.query.CompoundSelect.Op[Q, R]],
+        orderBy: Seq[OrderBy],
+        limit: Option[Int],
+        offset: Option[Int]
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectTypeMappers
+    ): scalasql.query.CompoundSelect[Q, R] = {
+      new CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+    }
+
+    override def newSimpleSelect[Q, R](
+        expr: Q,
+        exprPrefix: Option[Context => SqlStr],
+        preserveAll: Boolean,
+        from: Seq[Context.From],
+        joins: Seq[Join],
+        where: Seq[Expr[?]],
+        groupBy0: Option[GroupBy]
+    )(
+        implicit qr: Queryable.Row[Q, R],
+        dialect: scalasql.core.DialectTypeMappers
+    ): scalasql.query.SimpleSelect[Q, R] = {
+      new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+    }
+  }
+
+  class SimpleSelect[Q, R](
+      expr: Q,
+      exprPrefix: Option[Context => SqlStr],
+      preserveAll: Boolean,
+      from: Seq[Context.From],
+      joins: Seq[Join],
+      where: Seq[Expr[?]],
+      groupBy0: Option[GroupBy]
+  )(implicit qr: Queryable.Row[Q, R])
+      extends scalasql.query.SimpleSelect(
+        expr,
+        exprPrefix,
+        preserveAll,
+        from,
+        joins,
+        where,
+        groupBy0
+      )
+      with Select[Q, R]
+
+  class CompoundSelect[Q, R](
+      lhs: scalasql.query.SimpleSelect[Q, R],
+      compoundOps: Seq[scalasql.query.CompoundSelect.Op[Q, R]],
+      orderBy: Seq[OrderBy],
+      limit: Option[Int],
+      offset: Option[Int]
+  )(implicit qr: Queryable.Row[Q, R])
+      extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
+      with Select[Q, R] {
+    protected override def selectRenderer(prevContext: Context): SubqueryRef.Wrapped.Renderer =
+      new CompoundSelectRenderer(this, prevContext)
+  }
+
+  class CompoundSelectRenderer[Q, R](
+      query: scalasql.query.CompoundSelect[Q, R],
+      prevContext: Context
+  ) extends scalasql.query.CompoundSelect.Renderer(query, prevContext) {
+
+    override lazy val limitOpt = SqlStr
+      .flatten(CompoundSelectRendererForceLimit.limitToSqlStr(query.limit, query.offset))
+
+    override def orderToSqlStr(newCtx: Context) = {
+      SqlStr.optSeq(query.orderBy) { orderBys =>
+        val orderStr = SqlStr.join(
+          orderBys.map { orderBy =>
+            val exprStr = Renderable.renderSql(orderBy.expr)(newCtx)
+
+            (orderBy.ascDesc, orderBy.nulls) match {
+              case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
+              case (Some(AscDesc.Desc), Some(Nulls.First)) =>
+                sql"IIF($exprStr IS NULL, 0, 1), $exprStr DESC"
+              case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"IIF($exprStr IS NULL, 1, 0), $exprStr ASC"
+              case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
+              case (None, None) => exprStr
+              case (None, Some(Nulls.First)) => sql"IIF($exprStr IS NULL, 0, 1), $exprStr"
+              case (None, Some(Nulls.Last)) => sql"IIF($exprStr IS NULL, 1, 0), $exprStr"
+            }
+          },
+          SqlStr.commaSep
+        )
+
+        sql" ORDER BY $orderStr"
+      }
+    }
   }
 }
