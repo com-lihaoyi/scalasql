@@ -168,7 +168,9 @@ object MsSqlDialect extends MsSqlDialect {
         groupBy0
       )
       with Select[Q, R] {
-        override def take(n: Int): scalasql.query.Select[Q,R] = throw new Exception(".take must follow .sortBy")
+        override def take(n: Int): scalasql.query.Select[Q,R] = {
+          selectWithExprPrefix(true, _ => sql"TOP($n)")
+        }
 
         override def drop(n: Int): scalasql.query.Select[Q,R] = throw new Exception(".drop must follow .sortBy")
       }
