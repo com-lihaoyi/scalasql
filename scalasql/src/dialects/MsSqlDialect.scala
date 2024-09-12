@@ -1,7 +1,16 @@
 package scalasql.dialects
 
 import scalasql.query.{AscDesc, GroupBy, Join, Nulls, OrderBy, SubqueryRef, Table}
-import scalasql.core.{Aggregatable, Context, DbApi, DialectTypeMappers, Expr, Queryable, TypeMapper, SqlStr}
+import scalasql.core.{
+  Aggregatable,
+  Context,
+  DbApi,
+  DialectTypeMappers,
+  Expr,
+  Queryable,
+  TypeMapper,
+  SqlStr
+}
 import scalasql.{Sc, operations}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
@@ -64,12 +73,12 @@ object MsSqlDialect extends MsSqlDialect {
       extends scalasql.operations.DbApiOps(dialect)
       with ConcatOps
       with MathOps {
-        override def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG($v)" }
+    override def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG($v)" }
 
-        override def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
-          sql"ATN2($v, $y)"
-        }
-      }
+    override def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+      sql"ATN2($v, $y)"
+    }
+  }
 
   class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
     def mkString(sep: Expr[String] = null)(implicit tm: TypeMapper[T]): Expr[String] = {
@@ -181,12 +190,14 @@ object MsSqlDialect extends MsSqlDialect {
         groupBy0
       )
       with Select[Q, R] {
-        override def take(n: Int): scalasql.query.Select[Q,R] = {
-          selectWithExprPrefix(true, _ => sql"TOP($n)")
-        }
+    override def take(n: Int): scalasql.query.Select[Q, R] = {
+      selectWithExprPrefix(true, _ => sql"TOP($n)")
+    }
 
-        override def drop(n: Int): scalasql.query.Select[Q,R] = throw new Exception(".drop must follow .sortBy")
-      }
+    override def drop(n: Int): scalasql.query.Select[Q, R] = throw new Exception(
+      ".drop must follow .sortBy"
+    )
+  }
 
   class CompoundSelect[Q, R](
       lhs: scalasql.query.SimpleSelect[Q, R],
@@ -237,7 +248,8 @@ object MsSqlDialect extends MsSqlDialect {
               case (Some(AscDesc.Asc), None | Some(Nulls.First)) => sql"$exprStr ASC"
               case (Some(AscDesc.Desc), Some(Nulls.First)) =>
                 sql"IIF($exprStr IS NULL, 0, 1), $exprStr DESC"
-              case (Some(AscDesc.Asc), Some(Nulls.Last)) => sql"IIF($exprStr IS NULL, 1, 0), $exprStr ASC"
+              case (Some(AscDesc.Asc), Some(Nulls.Last)) =>
+                sql"IIF($exprStr IS NULL, 1, 0), $exprStr ASC"
               case (Some(AscDesc.Desc), None | Some(Nulls.Last)) => sql"$exprStr DESC"
               case (None, None) => exprStr
               case (None, Some(Nulls.First)) => sql"IIF($exprStr IS NULL, 0, 1), $exprStr"
