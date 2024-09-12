@@ -3,6 +3,7 @@ package scalasql.example
 import org.testcontainers.containers.MSSQLServerContainer
 import scalasql.Table
 import scalasql.MsSqlDialect._
+import scala.util.control.Breaks.{break, breakable}
 
 object MsSqlExample {
   case class ExampleProduct[T[_]](
@@ -20,6 +21,13 @@ object MsSqlExample {
     mssql.acceptLicense()
     mssql.addEnv("MSSQL_COLLATION", "Latin1_General_100_CI_AS_SC_UTF8")
     mssql.start()
+
+    breakable {
+      while (true) {
+        if (mssql.getLogs().contains("The default collation was successfully changed.")) break()
+      }
+    }
+
     mssql
   }
 
