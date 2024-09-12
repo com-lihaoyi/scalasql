@@ -26,8 +26,7 @@ trait SubQueryTests extends ScalaSqlSuite {
         JOIN (SELECT product1.id AS id, product1.price AS price
           FROM product product1
           ORDER BY price DESC
-          OFFSET ? ROWS
-          FETCH FIRST ? ROWS ONLY) subquery1
+          LIMIT ?) subquery1
         ON (purchase0.product_id = subquery1.id)
         """,
         """
