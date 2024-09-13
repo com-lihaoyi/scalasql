@@ -87,7 +87,8 @@ object TypeMapper {
     d.IntType
   implicit def longFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Long] =
     d.LongType
-
+  implicit def floatFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Float] =
+    d.FloatType
   implicit def doubleFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Double] =
     d.DoubleType
   implicit def bigDecimalFromDialectTypeMappers(
