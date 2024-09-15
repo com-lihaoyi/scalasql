@@ -214,8 +214,9 @@ object DbApi {
             s"Single row query must return 1 result, not ${results.size}"
           )
           results.head.asInstanceOf[R]
-        } else 
+        } else {
           res.toVector.asInstanceOf[R]
+        }
       }
     }
   
