@@ -62,6 +62,13 @@ trait Dialect extends DialectTypeMappers {
     def put(r: PreparedStatement, idx: Int, v: Long) = r.setLong(idx, v)
   }
 
+  implicit def FloatType: TypeMapper[Float] = new FloatType
+  class FloatType extends TypeMapper[Float] {
+    def jdbcType = JDBCType.FLOAT
+    def get(r: ResultSet, idx: Int) = r.getFloat(idx)
+    def put(r: PreparedStatement, idx: Int, v: Float) = r.setDouble(idx, v)
+  }
+  
   implicit def DoubleType: TypeMapper[Double] = new DoubleType
   class DoubleType extends TypeMapper[Double] {
     def jdbcType = JDBCType.DOUBLE
