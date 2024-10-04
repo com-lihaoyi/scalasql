@@ -25,7 +25,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
         case ("", _) => outputLines.append("")
 
         case (s"// +INCLUDE $rest", _) =>
-          os.read.lines(os.pwd / os.SubPath(rest)).foreach(outputLines.append)
+          os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).foreach(outputLines.append)
 
         case (s"//$rest", false) => outputLines.append(rest.stripPrefix(" "))
 
@@ -49,14 +49,14 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
 }
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
-  val records = upickle.default.read[Seq[Record]](os.read.stream(os.pwd / "out" / "recordedTests.json"))
-  val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(os.pwd / "out" / "recordedSuiteDescriptions.json"))
+  val records = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTests.json"))
+  val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedSuiteDescriptions.json"))
     .map{case (k, v) => (dropExprPrefix(k), v)}
 
   val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
   val formattedScalaStrs = {
     val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
-    scalafmtCallback(tmps, os.pwd / ".scalafmt.conf")
+    scalafmtCallback(tmps, mill.api.WorkspaceRoot.workspaceRoot / ".scalafmt.conf")
 
     tmps.map(os.read(_).trim)
   }

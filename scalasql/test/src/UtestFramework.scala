@@ -26,12 +26,13 @@ class UtestFramework extends utest.runner.Framework {
   }
   override def teardown() = {
     println("Tearing down CustomFramework " + recordedTests.size)
+    val workspaceRoot = os.Path(sys.env("MILL_WORKSPACE_ROOT"))
     os.write.over(
-      os.pwd / "out" / "recordedTests.json",
+      workspaceRoot / "out" / "recordedTests.json",
       upickle.default.write(UtestFramework.recordedTests, indent = 4)
     )
     os.write.over(
-      os.pwd / "out" / "recordedSuiteDescriptions.json",
+      workspaceRoot / "out" / "recordedSuiteDescriptions.json",
       upickle.default.write(UtestFramework.recordedSuiteDescriptions, indent = 4)
     )
     recordedTests.clear()

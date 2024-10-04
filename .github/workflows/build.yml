@@ -2,6 +2,10 @@ name: ci
 
 on:
   push:
+    branches:
+      - master
+    tags:
+      - '*'
   pull_request:
     branches:
       - main
@@ -49,7 +53,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./mill -i "__.test" + generateTutorial + generateReference && git diff --exit-code
+      - run: ./mill -i "__.test" && ./mill -i generateTutorial + generateReference && git diff --exit-code
 
   check-scalafix:
     runs-on: ubuntu-latest
