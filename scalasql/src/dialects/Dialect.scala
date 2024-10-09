@@ -169,6 +169,7 @@ trait Dialect extends DialectTypeMappers {
           l.toInstant(ZoneId.systemDefault().getRules().getOffset(Instant.now()))
         // Everyone seems to return this sometimes
         case l: java.sql.Timestamp => l.toInstant()
+        case null => null
       }
     }
 
