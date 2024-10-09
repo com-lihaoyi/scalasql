@@ -236,15 +236,28 @@ trait SelectTests extends ScalaSqlSuite {
           )
         )
       },
-      sql = """
-        SELECT
-          product0.name AS res_0,
-          (SELECT purchase1.total AS res
-            FROM purchase purchase1
-            WHERE (purchase1.product_id = product0.id)
-            ORDER BY res DESC
-            LIMIT ?) AS res_1
-        FROM product product0""",
+      sqls = Seq(
+        """
+          SELECT
+            product0.name AS res_0,
+            (SELECT purchase1.total AS res
+              FROM purchase purchase1
+              WHERE (purchase1.product_id = product0.id)
+              ORDER BY res DESC
+              LIMIT ?) AS res_1
+          FROM product product0
+        """,
+        """
+          SELECT
+            product0.name AS res_0,
+            (SELECT purchase1.total AS res
+              FROM purchase purchase1
+              WHERE (purchase1.product_id = product0.id)
+              ORDER BY res DESC
+              OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) AS res_1
+          FROM product product0
+        """
+      ),
       value = Seq(
         ("Face Mask", 888.0),
         ("Guitar", 900.0),
@@ -551,6 +564,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price <= ?) THEN CONCAT(product0.name, ?)
               END AS res
             FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price <= ?) THEN (product0.name + ?)
+              END AS res
+            FROM product product0
           """
         ),
         value = Seq(
@@ -592,6 +614,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 ELSE CONCAT(product0.name, ?)
+              END AS res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                ELSE (product0.name + ?)
               END AS res
             FROM product product0
           """
