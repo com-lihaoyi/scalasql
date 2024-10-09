@@ -56,7 +56,7 @@ trait Config {
 }
 
 object Config {
-  def isNormalCharacter(c: Char) = (c >= 'a' && c <= 'z') || (c >= 'Z' && c <= 'Z') || c == '_'
+  def isNormalCharacter(c: Char) = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
   def camelToSnake(s: String) = {
     val chars = new collection.mutable.StringBuilder
     var lowercase = false
