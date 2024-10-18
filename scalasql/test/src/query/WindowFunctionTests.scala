@@ -1,7 +1,7 @@
 package scalasql.query
 
 import scalasql._
-import scalasql.MySqlDialect
+import scalasql.{MsSqlDialect, MySqlDialect}
 import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
@@ -471,8 +471,8 @@ trait WindowFunctionTests extends ScalaSqlSuite {
       )
     }
     test("frames") - {
-      // MySql doesn't support `.exclude`
-      if (!this.isInstanceOf[MySqlDialect])
+      // MySql and Microsoft SQL don't support `.exclude`
+      if (!(this.isInstanceOf[MySqlDialect] | this.isInstanceOf[MsSqlDialect]))
         checker(
           query = Text {
             Purchase.select.mapAggregate((p, ps) =>
