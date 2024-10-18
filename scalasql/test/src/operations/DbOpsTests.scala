@@ -76,6 +76,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr(1234.1234).cast[Int],
         sqls = Seq(
           "SELECT CAST(? AS INTEGER) AS res",
+          "SELECT CAST(? AS INT) AS res",
           "SELECT CAST(? AS SIGNED) AS res"
         ),
         value = 1234
@@ -113,6 +114,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2023-11-12 03:22:41").cast[java.time.LocalDateTime],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
@@ -123,6 +125,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2023-11-12 03:22:41").cast[java.util.Date],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
@@ -133,6 +136,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2007-12-03 10:15:30.00").cast[java.time.Instant],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
