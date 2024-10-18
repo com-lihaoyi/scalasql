@@ -112,7 +112,7 @@ object CompoundSelect {
     // columns are duplicates or not, and thus what final set of rows is returned
     lazy val preserveAll = query.compoundOps.exists(_.op != "UNION ALL")
 
-    def render(liveExprs: LiveExprs) = {
+    protected def prerender(liveExprs: LiveExprs) = {
       val innerLiveExprs =
         if (preserveAll) LiveExprs.none
         else liveExprs.map(_ ++ newReferencedExpressions)
@@ -138,7 +138,14 @@ object CompoundSelect {
         SqlStr.join(compoundStrs)
       }
 
-      lhsStr + compound + sortOpt + limitOpt + offsetOpt
+      (lhsStr, compound, sortOpt, limitOpt, offsetOpt)
+    }
+
+    def render(liveExprs: LiveExprs) = {
+      prerender(liveExprs) match {
+        case (lhsStr, compound, sortOpt, limitOpt, offsetOpt) =>
+          lhsStr + compound + sortOpt + limitOpt + offsetOpt
+      }
     }
     def orderToSqlStr(newCtx: Context) =
       CompoundSelect.orderToSqlStr(query.orderBy, newCtx, gap = true)

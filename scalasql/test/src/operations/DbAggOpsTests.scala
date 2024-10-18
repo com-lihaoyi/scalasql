@@ -100,7 +100,8 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
           "SELECT STRING_AGG(buyer0.name || '', '') AS res FROM buyer buyer0",
           "SELECT GROUP_CONCAT(buyer0.name || '', '') AS res FROM buyer buyer0",
           "SELECT LISTAGG(buyer0.name || '', '') AS res FROM buyer buyer0",
-          "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR '') AS res FROM buyer buyer0"
+          "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR '') AS res FROM buyer buyer0",
+          "SELECT STRING_AGG(buyer0.name + '', '') AS res FROM buyer buyer0"
         ),
         value = "James Bond叉烧包Li Haoyi"
       )
@@ -112,7 +113,8 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
             sqls = Seq(
               "SELECT STRING_AGG(buyer0.name || '', ?) AS res FROM buyer buyer0",
               "SELECT GROUP_CONCAT(buyer0.name || '', ?) AS res FROM buyer buyer0",
-              "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR ?) AS res FROM buyer buyer0"
+              "SELECT GROUP_CONCAT(CONCAT(buyer0.name, '') SEPARATOR ?) AS res FROM buyer buyer0",
+              "SELECT STRING_AGG(buyer0.name + '', ?) AS res FROM buyer buyer0"
             ),
             value = "James Bond, 叉烧包, Li Haoyi"
           )
