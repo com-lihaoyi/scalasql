@@ -527,6 +527,31 @@ trait SelectTests extends ScalaSqlSuite {
           )
         )
       ),
+      moreValues = Seq[Seq[(Int, (Buyer[Sc], (Int, ShippingInfo[Sc])))]](
+        Seq(
+          (
+            1,
+            (
+              Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+              (2, ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
+            )
+          ),
+          (
+            2,
+            (
+              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+              (3, ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
+            )
+          ),
+          (
+            2,
+            (
+              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+              (1, ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
+            )
+          )
+        )
+      ),
       docs = """
         Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
         instances of `Foo[Expr]`, which will be de-serialized into nested tuples
