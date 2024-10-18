@@ -1,9 +1,11 @@
 package scalasql.example
 
 import org.testcontainers.containers.MSSQLServerContainer
+import org.testcontainers.containers.output.WaitingConsumer
+import org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT
 import scalasql.Table
 import scalasql.MsSqlDialect._
-import scala.util.control.Breaks.{break, breakable}
+import java.util.concurrent.TimeUnit
 
 object MsSqlExample {
   case class ExampleProduct[T[_]](
@@ -22,11 +24,13 @@ object MsSqlExample {
     mssql.addEnv("MSSQL_COLLATION", "Latin1_General_100_CI_AS_SC_UTF8")
     mssql.start()
 
-    breakable {
-      while (true) {
-        if (mssql.getLogs().contains("The default collation was successfully changed.")) break()
-      }
-    }
+    val consumer = new WaitingConsumer()
+    mssql.followOutput(consumer, STDOUT)
+    consumer.waitUntil(
+      frame => frame.getUtf8String().contains("The default collation was successfully changed."),
+      60,
+      TimeUnit.SECONDS
+    )
 
     mssql
   }
