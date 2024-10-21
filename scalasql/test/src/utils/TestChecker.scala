@@ -19,10 +19,10 @@ class TestChecker(
   val autoCommitConnection = dbClient.getAutoCommitClientConnection
   def reset() = {
     autoCommitConnection.updateRaw(
-      os.read(os.Path(sys.env("MILL_TEST_RESOURCE_FOLDER")) / testSchemaFileName)
+      os.read(os.Path(sys.env("MILL_TEST_RESOURCE_DIR")) / testSchemaFileName)
     )
     autoCommitConnection.updateRaw(
-      os.read(os.Path(sys.env("MILL_TEST_RESOURCE_FOLDER")) / testDataFileName)
+      os.read(os.Path(sys.env("MILL_TEST_RESOURCE_DIR")) / testDataFileName)
     )
   }
 
