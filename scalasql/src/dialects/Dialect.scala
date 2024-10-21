@@ -263,7 +263,7 @@ trait Dialect extends DialectTypeMappers {
 
       def put(r: PreparedStatement, idx: Int, v: Option[T]): Unit = {
         v match {
-          case None => r.setNull(idx, jdbcType.getVendorTypeNumber)
+          case None => r.setNull(idx, JDBCType.NULL.getVendorTypeNumber)
           case Some(value) => inner.put(r, idx, value)
         }
       }

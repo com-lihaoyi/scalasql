@@ -10159,6 +10159,86 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 
 
+### Optional.sorting.roundTripOptionalValues
+
+This example demonstrates a range of different data types being written
+as options, both with Some(v) and None values
+
+```scala
+object MyEnum extends Enumeration {
+  val foo, bar, baz = Value
+
+  implicit def make: String => Value = withName
+}
+case class OptDataTypes[T[_]](
+    myTinyInt: T[Option[Byte]],
+    mySmallInt: T[Option[Short]],
+    myInt: T[Option[Int]],
+    myBigInt: T[Option[Long]],
+    myDouble: T[Option[Double]],
+    myBoolean: T[Option[Boolean]],
+    myLocalDate: T[Option[LocalDate]],
+    myLocalTime: T[Option[LocalTime]],
+    myLocalDateTime: T[Option[LocalDateTime]],
+    myUtilDate: T[Option[Date]],
+    myInstant: T[Option[Instant]],
+    myVarBinary: T[Option[geny.Bytes]],
+    myUUID: T[Option[java.util.UUID]],
+    myEnum: T[Option[MyEnum.Value]]
+)
+
+object OptDataTypes extends Table[OptDataTypes] {
+  override def tableName: String = "data_types"
+}
+
+val rowSome = OptDataTypes[Sc](
+  myTinyInt = Some(123.toByte),
+  mySmallInt = Some(12345.toShort),
+  myInt = Some(12345678),
+  myBigInt = Some(12345678901L),
+  myDouble = Some(3.14),
+  myBoolean = Some(true),
+  myLocalDate = Some(LocalDate.parse("2023-12-20")),
+  myLocalTime = Some(LocalTime.parse("10:15:30")),
+  myLocalDateTime = Some(LocalDateTime.parse("2011-12-03T10:15:30")),
+  myUtilDate = Some(
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2011-12-03T10:15:30.000")
+  ),
+  myInstant = Some(Instant.parse("2011-12-03T10:15:30Z")),
+  myVarBinary = Some(new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8))),
+  myUUID = Some(new java.util.UUID(1234567890L, 9876543210L)),
+  myEnum = Some(MyEnum.bar)
+)
+
+val rowNone = OptDataTypes[Sc](
+  myTinyInt = None,
+  mySmallInt = None,
+  myInt = None,
+  myBigInt = None,
+  myDouble = None,
+  myBoolean = None,
+  myLocalDate = None,
+  myLocalTime = None,
+  myLocalDateTime = None,
+  myUtilDate = None,
+  myInstant = None,
+  myVarBinary = None,
+  myUUID = None,
+  myEnum = None
+)
+
+db.run(
+  OptDataTypes.insert.values(rowSome, rowNone)
+) ==> 2
+
+db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
+```
+
+
+
+
+
+
 ## PostgresDialect
 Operations specific to working with Postgres Databases
 ### PostgresDialect.distinctOn
