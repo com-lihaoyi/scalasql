@@ -1,7 +1,7 @@
 import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
-import $ivy.`com.goyeau::mill-scalafix::0.4.0`
+import $ivy.`com.goyeau::mill-scalafix::0.4.2`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
