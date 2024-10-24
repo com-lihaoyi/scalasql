@@ -1,7 +1,7 @@
 import $file.docs.generateDocs
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $ivy.`com.github.lolgab::mill-mima::0.1.0`
-import $ivy.`com.goyeau::mill-scalafix::0.4.0`
+import $ivy.`com.goyeau::mill-scalafix::0.4.2`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
@@ -67,6 +67,7 @@ trait ScalaSql extends Common{ common =>
     def testFramework = "scalasql.UtestFramework"
 
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
+    def forkEnv = Map("MILL_WORKSPACE_ROOT" -> T.workspace.toString())
   }
 
   private def indent(code: Iterable[String]): String =
@@ -212,13 +213,13 @@ trait ScalaSql extends Common{ common =>
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial() = T.command {
   generateDocs.generateTutorial(
-    os.pwd / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
-    os.pwd / "docs" / "tutorial.md"
+    T.workspace / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
+    T.workspace / "docs" / "tutorial.md"
   )
 }
 def generateReference() = T.command {
   generateDocs.generateReference(
-    os.pwd / "docs" / "reference.md",
+    T.workspace / "docs" / "reference.md",
     (sources, config) =>
       mill.scalalib.scalafmt.ScalafmtWorkerModule
         .worker()
