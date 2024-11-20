@@ -73,6 +73,7 @@ object WithCte {
         lhs,
         expr = WithSqlExpr.get(lhs),
         exprPrefix = None,
+        exprSuffix = None,
         preserveAll = false,
         from = Seq(lhsSubQueryRef),
         joins = Nil,

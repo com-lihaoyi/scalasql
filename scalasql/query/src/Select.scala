@@ -57,13 +57,14 @@ trait Select[Q, R]
   protected def newSimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
+      exprSuffix: Option[Context => SqlStr],
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
-    new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+    new SimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
 
   def qr: Queryable.Row[Q, R]
 
@@ -71,7 +72,9 @@ trait Select[Q, R]
    * Causes this [[Select]] to ignore duplicate rows, translates into SQL `SELECT DISTINCT`
    */
   def distinct: Select[Q, R] = selectWithExprPrefix(true, _ => sql"DISTINCT")
+
   protected def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R]
+  protected def selectWithExprSuffix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R]
 
   protected def subqueryRef(implicit qr: Queryable.Row[Q, R]) = new SubqueryRef(this)
 
@@ -227,7 +230,7 @@ trait Select[Q, R]
    * in this [[Select]]
    */
   def subquery: SimpleSelect[Q, R] = {
-    newSimpleSelect(expr, None, false, Seq(subqueryRef(qr)), Nil, Nil, None)(qr, dialect)
+    newSimpleSelect(expr, None, None, false, Seq(subqueryRef(qr)), Nil, Nil, None)(qr, dialect)
   }
 
   /**
@@ -278,18 +281,22 @@ object Select {
       lhs: Select[Q, R],
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
+      exprSuffix: Option[Context => SqlStr],
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
       where: Seq[Expr[?]],
       groupBy0: Option[GroupBy]
   )(implicit qr: Queryable.Row[Q, R], dialect: DialectTypeMappers): SimpleSelect[Q, R] =
-    lhs.newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+    lhs.newSimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
 
   def toSimpleFrom[Q, R](s: Select[Q, R]) = s.selectToSimpleSelect()
 
   def withExprPrefix[Q, R](s: Select[Q, R], preserveAll: Boolean, str: Context => SqlStr) =
     s.selectWithExprPrefix(preserveAll, str)
+
+  def withExprSuffix[Q, R](s: Select[Q, R], preserveAll: Boolean, str: Context => SqlStr) =
+    s.selectWithExprSuffix(preserveAll, str)
 
   implicit class ExprSelectOps[T](s: Select[Expr[T], T]) {
     def sorted(implicit tm: TypeMapper[T]): Select[Expr[T], T] = s.sortBy(identity)
@@ -302,6 +309,12 @@ object Select {
         s: Context => SqlStr
     ): Select[Q, R] =
       selectToSimpleSelect().selectWithExprPrefix(preserveAll, s)
+
+    override protected def selectWithExprSuffix(
+        preserveAll: Boolean,
+        s: Context => SqlStr
+    ): Select[Q, R] =
+      selectToSimpleSelect().selectWithExprSuffix(preserveAll, s)
 
     override def map[Q2, R2](f: Q => Q2)(implicit qr: Queryable.Row[Q2, R2]): Select[Q2, R2] =
       selectToSimpleSelect().map(f)
