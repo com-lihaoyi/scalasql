@@ -10243,7 +10243,7 @@ db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
 Operations specific to working with Postgres Databases
 ### PostgresDialect.distinctOn
 
-ScalaSql's Postgres dialect provides teh `.distinctOn` operator, which translates
+ScalaSql's Postgres dialect provides the `.distinctOn` operator, which translates
 into a SQL `DISTINCT ON` clause
 
 ```scala
@@ -10271,6 +10271,38 @@ Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
       Purchase[Sc](6, 3, 1, 5, 44.4),
       Purchase[Sc](4, 2, 4, 4, 493.8),
       Purchase[Sc](2, 1, 2, 3, 900.0)
+    )
+    ```
+
+
+
+### PostgresDialect.forUpdate
+
+ScalaSql's Postgres dialect provides the `.forUpdate` operator, which translates
+into a SQL `SELECT ... FOR UPDATE` clause
+
+```scala
+Invoice.select.filter(_.id === 1).forUpdate
+```
+
+
+*
+    ```sql
+    SELECT
+      invoice0.id AS id,
+      invoice0.total AS total,
+      invoice0.vendor_name AS vendor_name
+    FROM otherschema.invoice invoice0
+    WHERE (invoice0.id = ?)
+    FOR UPDATE
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Invoice[Sc](1, 150.4, "Siemens")
     )
     ```
 
@@ -10480,6 +10512,38 @@ db.random
 
 ## MySqlDialect
 Operations specific to working with MySql Databases
+### MySqlDialect.forUpdate
+
+ScalaSql's MySql dialect provides the `.forUpdate` operator, which translates
+into a SQL `SELECT ... FOR UPDATE` clause
+
+```scala
+Buyer.select.filter(_.id === 1).forUpdate
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.id AS id,
+      buyer0.name AS name,
+      buyer0.date_of_birth AS date_of_birth
+    FROM buyer buyer0
+    WHERE (buyer0.id = ?)
+    FOR UPDATE
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
+    )
+    ```
+
+
+
 ### MySqlDialect.reverse
 
 

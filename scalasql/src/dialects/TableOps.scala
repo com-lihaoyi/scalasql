@@ -22,7 +22,7 @@ class TableOps[V[_[_]]](val t: Table[V])(implicit dialect: Dialect)
 
   protected def joinableToSelect: Select[V[Expr], V[Sc]] = {
     val (ref, expr) = joinableToFromExpr
-    new SimpleSelect(expr, None, false, Seq(ref), Nil, Nil, None)(
+    new SimpleSelect(expr, None, None, false, Seq(ref), Nil, Nil, None)(
       t.containerQr,
       dialect
     )

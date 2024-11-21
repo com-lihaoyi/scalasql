@@ -104,6 +104,7 @@ object H2Dialect extends H2Dialect {
       new SimpleSelect(
         Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
         None,
+        None,
         false,
         Seq(ref),
         Nil,
@@ -132,6 +133,7 @@ object H2Dialect extends H2Dialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
+        exprSuffix: Option[Context => SqlStr],
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
@@ -141,13 +143,14 @@ object H2Dialect extends H2Dialect {
         implicit qr: Queryable.Row[Q, R],
         dialect: scalasql.core.DialectTypeMappers
     ): scalasql.query.SimpleSelect[Q, R] = {
-      new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+      new SimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
     }
   }
 
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
+      exprSuffix: Option[Context => SqlStr],
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
@@ -157,6 +160,7 @@ object H2Dialect extends H2Dialect {
       extends scalasql.query.SimpleSelect(
         expr,
         exprPrefix,
+        exprSuffix,
         preserveAll,
         from,
         joins,

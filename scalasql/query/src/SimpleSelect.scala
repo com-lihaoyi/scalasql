@@ -22,6 +22,7 @@ import scalasql.renderer.JoinsToSql
 class SimpleSelect[Q, R](
     val expr: Q,
     val exprPrefix: Option[Context => SqlStr],
+    val exprSuffix: Option[Context => SqlStr],
     val preserveAll: Boolean,
     val from: Seq[Context.From],
     val joins: Seq[Join],
@@ -33,16 +34,20 @@ class SimpleSelect[Q, R](
   protected def copy[Q, R](
       expr: Q = this.expr,
       exprPrefix: Option[Context => SqlStr] = this.exprPrefix,
+      exprSuffix: Option[Context => SqlStr] = this.exprSuffix,
       preserveAll: Boolean = this.preserveAll,
       from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
       where: Seq[Expr[?]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
-    newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+    newSimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
 
   def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
     this.copy(exprPrefix = Some(s), preserveAll = preserveAll)
+
+  def selectWithExprSuffix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
+    this.copy(exprSuffix = Some(s), preserveAll = preserveAll)
 
   def aggregateExpr[V: TypeMapper](
       f: Q => Context => SqlStr
@@ -111,6 +116,7 @@ class SimpleSelect[Q, R](
       copy(
         expr = newExpr,
         exprPrefix = exprPrefix,
+        exprSuffix = exprSuffix,
         joins = joins ++ newJoins,
         where = where ++ newWheres
       )
@@ -178,6 +184,7 @@ class SimpleSelect[Q, R](
         copy(
           expr = newExpr,
           exprPrefix = exprPrefix,
+          exprSuffix = exprSuffix,
           from = Seq(this.subqueryRef),
           joins = Nil,
           where = Nil,
@@ -287,11 +294,12 @@ object SimpleSelect {
       )
 
       lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => p(context) + sql" " }
+      lazy val exprSuffix = SqlStr.opt(query.exprSuffix) { p => p(context) }
 
       val tables = SqlStr
         .join(query.from.map(renderedFroms(_)), SqlStr.commaSep)
 
-      sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+      sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt + exprSuffix
     }
 
   }
