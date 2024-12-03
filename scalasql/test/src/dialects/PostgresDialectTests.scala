@@ -27,8 +27,28 @@ trait PostgresDialectTests extends PostgresSuite {
         Purchase[Sc](2, 1, 2, 3, 900.0)
       ),
       docs = """
-        ScalaSql's Postgres dialect provides teh `.distinctOn` operator, which translates
+        ScalaSql's Postgres dialect provides the `.distinctOn` operator, which translates
         into a SQL `DISTINCT ON` clause
+      """
+    )
+
+    test("forUpdate") - checker(
+      query = Invoice.select.filter(_.id === 1).forUpdate,
+      sql = """
+        SELECT
+          invoice0.id AS id,
+          invoice0.total AS total,
+          invoice0.vendor_name AS vendor_name
+        FROM otherschema.invoice invoice0
+        WHERE (invoice0.id = ?)
+        FOR UPDATE
+      """,
+      value = Seq(
+        Invoice[Sc](1, 150.4, "Siemens")
+      ),
+      docs = """
+        ScalaSql's Postgres dialect provides the `.forUpdate` operator, which translates
+        into a SQL `SELECT ... FOR UPDATE` clause
       """
     )
 

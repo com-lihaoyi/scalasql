@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.8"
+ivy"com.lihaoyi::scalasql:0.1.12"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.4.2
@@ -129,6 +129,24 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+### 0.1.12
+
+* Add `SELECT FOR UPDATE` support for Postgres and MySQL [#45](https://github.com/com-lihaoyi/scalasql/pull/45)
+
+### 0.1.11
+
+* Support null value passthrough for all `TypeMappers` [#39](https://github.com/com-lihaoyi/scalasql/pull/39)
+* Fix optional null values failing to put [#42](https://github.com/com-lihaoyi/scalasql/pull/42)
+
+### 0.1.10
+
+* Fix a typo in isNormalCharacter [#37](https://github.com/com-lihaoyi/scalasql/pull/37)
+* Instant type mapper now allows NULL values [#38](https://github.com/com-lihaoyi/scalasql/pull/38)
+
+### 0.1.9
+
+* Add support for Float data type [#32](https://github.com/com-lihaoyi/scalasql/pull/32)
 
 ### 0.1.8
 

@@ -23,6 +23,7 @@ trait DialectTypeMappers extends DialectConfig {
   implicit def IntType: TypeMapper[Int]
   implicit def LongType: TypeMapper[Long]
 
+  implicit def FloatType: TypeMapper[Float]
   implicit def DoubleType: TypeMapper[Double]
   implicit def BigDecimalType: TypeMapper[scala.math.BigDecimal]
   implicit def BooleanType: TypeMapper[Boolean]

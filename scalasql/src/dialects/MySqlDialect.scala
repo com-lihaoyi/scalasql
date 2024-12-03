@@ -40,6 +40,7 @@ import java.sql.PreparedStatement
 import java.time.{Instant, LocalDateTime}
 import java.util.UUID
 import scala.reflect.ClassTag
+import scalasql.query.Select
 
 trait MySqlDialect extends Dialect {
   protected def dialectCastParams = false
@@ -115,6 +116,38 @@ trait MySqlDialect extends Dialect {
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
     new MySqlDialect.ExprAggOps(v)
+
+  implicit class SelectForUpdateConv[Q, R](r: Select[Q, R]) {
+
+    /**
+     * SELECT .. FOR UPDATE acquires an exclusive lock, blocking other transactions from
+     * modifying or locking the selected rows, which is for managing concurrent transactions
+     * and ensuring data consistency in multi-step operations.
+     */
+    def forUpdate: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE")
+
+    /**
+     * SELECT ... FOR SHARE: Locks the selected rows for reading, allowing other transactions
+     * to read but not modify the locked rows
+     */
+    def forShare: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR SHARE")
+
+    /**
+     * SELECT ... FOR UPDATE NOWAIT: Immediately returns an error if the selected rows are
+     * already locked, instead of waiting
+     */
+    def forUpdateNoWait: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE NOWAIT")
+
+    /**
+     * SELECT ... FOR UPDATE SKIP LOCKED: Skips any rows that are already locked by other
+     * transactions, instead of waiting
+     */
+    def forUpdateSkipLocked: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE SKIP LOCKED")
+  }
 
   override implicit def DbApiOpsConv(db: => DbApi): MySqlDialect.DbApiOps =
     new MySqlDialect.DbApiOps(this)
@@ -206,6 +239,7 @@ object MySqlDialect extends MySqlDialect {
       val ref = Table.ref(t)
       new SimpleSelect(
         Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        None,
         None,
         false,
         Seq(ref),
@@ -309,6 +343,7 @@ object MySqlDialect extends MySqlDialect {
     override def newSimpleSelect[Q, R](
         expr: Q,
         exprPrefix: Option[Context => SqlStr],
+        exprSuffix: Option[Context => SqlStr],
         preserveAll: Boolean,
         from: Seq[Context.From],
         joins: Seq[Join],
@@ -318,13 +353,14 @@ object MySqlDialect extends MySqlDialect {
         implicit qr: Queryable.Row[Q, R],
         dialect: scalasql.core.DialectTypeMappers
     ): scalasql.query.SimpleSelect[Q, R] = {
-      new SimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+      new SimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
     }
   }
 
   class SimpleSelect[Q, R](
       expr: Q,
       exprPrefix: Option[Context => SqlStr],
+      exprSuffix: Option[Context => SqlStr],
       preserveAll: Boolean,
       from: Seq[Context.From],
       joins: Seq[Join],
@@ -334,6 +370,7 @@ object MySqlDialect extends MySqlDialect {
       extends scalasql.query.SimpleSelect(
         expr,
         exprPrefix,
+        exprSuffix,
         preserveAll,
         from,
         joins,

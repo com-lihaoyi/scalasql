@@ -32,8 +32,7 @@ import java.util.UUID
 trait TypeMapper[T] { outer =>
 
   /**
-   * The JDBC type of this type. Used for `setNull` which needs to know the
-   * `java.sql.Types` integer ID of the type to set it properly
+   * The JDBC type of this type.
    */
   def jdbcType: JDBCType
 
@@ -87,7 +86,8 @@ object TypeMapper {
     d.IntType
   implicit def longFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Long] =
     d.LongType
-
+  implicit def floatFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Float] =
+    d.FloatType
   implicit def doubleFromDialectTypeMappers(implicit d: DialectTypeMappers): TypeMapper[Double] =
     d.DoubleType
   implicit def bigDecimalFromDialectTypeMappers(

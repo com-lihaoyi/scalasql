@@ -134,8 +134,8 @@ val dbClient = new DbClient.Connection(
 )
 
 val db = dbClient.getAutoCommitClientConnection
-db.updateRaw(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-schema.sql"))
-db.updateRaw(os.read(os.pwd / "scalasql" / "test" / "resources" / "world-data.sql"))
+db.updateRaw(os.read(os.Path(sys.env("MILL_TEST_RESOURCE_DIR")) / "world-schema.sql"))
+db.updateRaw(os.read(os.Path(sys.env("MILL_TEST_RESOURCE_DIR")) / "world-data.sql"))
 
 ```
 We use `dbClient.getAutoCommitClientConnection` in order to create a client that
