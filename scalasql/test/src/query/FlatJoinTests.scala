@@ -267,22 +267,42 @@ trait FlatJoinTests extends ScalaSqlSuite {
           si <- ShippingInfo.select.sortBy(_.id).asc.take(1).crossJoin()
         } yield (b.name, si.shippingDate)
       },
-      sql = """
-        SELECT
-          subquery0.name AS res_0,
-          subquery1.shipping_date AS res_1
-        FROM
-          (SELECT buyer0.id AS id, buyer0.name AS name
-          FROM buyer buyer0
-          ORDER BY id ASC
-          LIMIT ?) subquery0
-        CROSS JOIN (SELECT
-            shipping_info1.id AS id,
-            shipping_info1.shipping_date AS shipping_date
-          FROM shipping_info shipping_info1
-          ORDER BY id ASC
-          LIMIT ?) subquery1
-      """,
+      sqls = Seq(
+        """
+          SELECT
+            subquery0.name AS res_0,
+            subquery1.shipping_date AS res_1
+          FROM
+            (SELECT buyer0.id AS id, buyer0.name AS name
+            FROM buyer buyer0
+            ORDER BY id ASC
+            LIMIT ?) subquery0
+          CROSS JOIN (SELECT
+              shipping_info1.id AS id,
+              shipping_info1.shipping_date AS shipping_date
+            FROM shipping_info shipping_info1
+            ORDER BY id ASC
+            LIMIT ?) subquery1
+        """,
+        """
+          SELECT
+            subquery0.name AS res_0,
+            subquery1.shipping_date AS res_1
+          FROM
+            (SELECT buyer0.id AS id, buyer0.name AS name
+            FROM buyer buyer0
+            ORDER BY id ASC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery0
+          CROSS JOIN (SELECT
+              shipping_info1.id AS id,
+              shipping_info1.shipping_date AS shipping_date
+            FROM shipping_info shipping_info1
+            ORDER BY id ASC
+            OFFSET ? ROWS
+            FETCH FIRST ? ROWS ONLY) subquery1
+        """
+      ),
       value = Seq(
         ("James Bond", LocalDate.parse("2010-02-03"))
       ),
