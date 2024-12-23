@@ -576,7 +576,8 @@ trait SelectTests extends ScalaSqlSuite {
         Buyer.select
           .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT
           buyer0.name AS res_0,
           (EXISTS (SELECT
@@ -585,6 +586,16 @@ trait SelectTests extends ScalaSqlSuite {
             WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
       """,
+      """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN EXISTS (SELECT
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id)) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+      """
+      ),
       value = Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false)),
       docs = """
         ScalaSql's `.nonEmpty` and `.isEmpty` translates to SQL's `EXISTS` and `NOT EXISTS` syntax
@@ -596,7 +607,8 @@ trait SelectTests extends ScalaSqlSuite {
         Buyer.select
           .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT
           buyer0.name AS res_0,
           (NOT EXISTS (SELECT
@@ -605,6 +617,16 @@ trait SelectTests extends ScalaSqlSuite {
             WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
       """,
+      """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN EXISTS (SELECT
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id)) THEN 0 ELSE 1 END AS res_1
+        FROM buyer buyer0
+      """
+      ),
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     )
 
