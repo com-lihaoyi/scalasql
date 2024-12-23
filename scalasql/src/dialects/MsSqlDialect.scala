@@ -201,6 +201,11 @@ object MsSqlDialect extends MsSqlDialect {
     override def drop(n: Int): scalasql.query.Select[Q, R] = throw new Exception(
       ".drop must follow .sortBy"
     )
+
+    override def nonEmpty: Expr[Boolean] = Expr { implicit ctx => sql"CASE WHEN EXISTS $this THEN 1 ELSE 0 END" }
+
+    override def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"CASE WHEN EXISTS $this THEN 0 ELSE 1 END" }
+
   }
 
   class CompoundSelect[Q, R](
