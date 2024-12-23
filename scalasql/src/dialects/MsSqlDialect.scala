@@ -102,15 +102,15 @@ object MsSqlDialect extends MsSqlDialect {
     }
 
     override def startsWith(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE $other + '%' THEN 1 ELSE 0 END"
+      sql"CASE WHEN $v LIKE CAST($other AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END"
     }
 
     override def endsWith(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE '%' + $other THEN 1 ELSE 0 END"
+      sql"CASE WHEN $v LIKE '%' + CAST($other AS VARCHAR(MAX)) THEN 1 ELSE 0 END"
     }
 
     override def contains(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE '%' + $other + '%' THEN 1 ELSE 0 END"
+      sql"CASE WHEN $v LIKE '%' + CAST($other AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END"
     }
 
     override def length: Expr[Int] = Expr { implicit ctx => sql"LEN($v)" }
