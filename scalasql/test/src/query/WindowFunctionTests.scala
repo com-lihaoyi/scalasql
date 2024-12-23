@@ -334,34 +334,38 @@ trait WindowFunctionTests extends ScalaSqlSuite {
         normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
       )
 
-      test("nthValue") - checker(
-        query = Text {
-          Purchase.select.map(p =>
-            (
-              p.shippingInfoId,
-              p.total,
-              db.nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
-            )
+      test("nthValue") - {
+        // Microsoft SQL don't support `.nthValue`
+        if (!this.isInstanceOf[MsSqlDialect])
+          checker(
+            query = Text {
+              Purchase.select.map(p =>
+                (
+                  p.shippingInfoId,
+                  p.total,
+                  db.nthValue(p.total, 2).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+                )
+              )
+            },
+            sql = """
+            SELECT
+              purchase0.shipping_info_id AS res_0,
+              purchase0.total AS res_1,
+              NTH_VALUE(purchase0.total, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
+            FROM purchase purchase0
+          """,
+            value = Seq[(Int, Double, Double)](
+              (1, 15.7, 0.0),
+              (1, 888.0, 888.0),
+              (1, 900.0, 888.0),
+              (2, 493.8, 0.0),
+              (2, 10000.0, 10000.0),
+              (3, 1.3, 0.0),
+              (3, 44.4, 44.4)
+            ),
+            normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
           )
-        },
-        sql = """
-          SELECT
-            purchase0.shipping_info_id AS res_0,
-            purchase0.total AS res_1,
-            NTH_VALUE(purchase0.total, ?) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
-          FROM purchase purchase0
-        """,
-        value = Seq[(Int, Double, Double)](
-          (1, 15.7, 0.0),
-          (1, 888.0, 888.0),
-          (1, 900.0, 888.0),
-          (2, 493.8, 0.0),
-          (2, 10000.0, 10000.0),
-          (3, 1.3, 0.0),
-          (3, 44.4, 44.4)
-        ),
-        normalize = (x: Seq[(Int, Double, Double)]) => x.sorted
-      )
+      }
     }
     test("aggregate") {
 
@@ -522,8 +526,8 @@ trait WindowFunctionTests extends ScalaSqlSuite {
     }
 
     test("filter") - {
-      // MySql doesn't support FILTER
-      if (!this.isInstanceOf[MySqlDialect])
+      // MySql and Microsoft SQL don't support FILTER
+      if (!(this.isInstanceOf[MySqlDialect] | this.isInstanceOf[MsSqlDialect]))
         checker(
           query = Text {
             Purchase.select.mapAggregate((p, ps) =>
