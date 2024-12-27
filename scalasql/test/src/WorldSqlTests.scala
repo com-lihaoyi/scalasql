@@ -205,6 +205,54 @@ object WorldSqlTests extends TestSuite {
       // -DOCS
     }
 
+    test("groupByMultipleFields") {
+      val query = City.select.groupBy { t => (t.id, t.countryCode) }(_.sumBy(_.population))
+
+      db.renderSql(query) ==> """
+      SELECT 
+        city0.id AS res_0_0, 
+        city0.countrycode AS res_0_1, 
+        SUM(city0.population) AS res_1 
+      FROM 
+        city city0 
+      GROUP BY 
+        city0.id, 
+        city0.countrycode
+      """
+
+      db.run(query).take(3) ==> Seq(
+        ((1, "AFG"), 1780000),
+        ((2, "AFG"), 237500),
+        ((3, "AFG"), 186800)
+      )
+    }
+
+    test("groupByMultipleFieldsWithFilter") {
+      val query = City.select
+        .groupBy { t => (t.id, t.countryCode) }(_.sumBy(_.population))
+        .filter(_._2 > 1000000)
+        .filter(_._2 < 2000000)
+
+      db.renderSql(query) ==> """
+      SELECT 
+        city0.id AS res_0_0, 
+        city0.countrycode AS res_0_1, 
+        SUM(city0.population) AS res_1 
+      FROM 
+        city city0 
+      GROUP BY 
+        city0.id, 
+        city0.countrycode
+      HAVING (SUM(city0.population) > ?) AND (SUM(city0.population) < ?)
+      """
+
+      db.run(query).take(3) ==> Seq(
+        ((1, "AFG"), 1780000),
+        ((70, "ARG"), 1266461),
+        ((71, "ARG"), 1157507)
+      )
+    }
+
     test("filter") {
 
       test("singleName") {
