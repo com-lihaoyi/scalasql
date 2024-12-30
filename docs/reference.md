@@ -1108,6 +1108,81 @@ Purchase.select
 
 
 
+### Select.groupBy.multipleKeys
+
+
+
+```scala
+Purchase.select.groupBy(x => (x.shippingInfoId, x.productId))(_.sumBy(_.total))
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0_0,
+      purchase0.product_id AS res_0_1,
+      SUM(purchase0.total) AS res_1
+    FROM 
+      purchase purchase0
+    GROUP BY
+      purchase0.shipping_info_id,
+      purchase0.product_id
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ((1, 1), 888.0),
+      ((1, 2), 900.0),
+      ((1, 3), 15.7),
+      ((2, 4), 493.8),
+      ((2, 5), 10000.0),
+      ((3, 1), 44.4),
+      ((3, 6), 1.3)
+    )
+    ```
+
+
+
+### Select.groupBy.multipleKeysHaving
+
+
+
+```scala
+Purchase.select
+  .groupBy(x => (x.shippingInfoId, x.productId))(_.sumBy(_.total))
+  .filter(_._2 > 10)
+  .filter(_._2 < 100)
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0_0,
+      purchase0.product_id AS res_0_1,
+      SUM(purchase0.total) AS res_1
+    FROM 
+      purchase purchase0
+    GROUP BY
+      purchase0.shipping_info_id,
+      purchase0.product_id
+    HAVING 
+      (SUM(purchase0.total) > ?) AND (SUM(purchase0.total) < ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq(((1, 3), 15.7), ((3, 1), 44.4))
+    ```
+
+
+
 ### Select.distinct.nondistinct
 
 Normal queries can allow duplicates in the returned row values, as seen below.

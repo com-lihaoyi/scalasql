@@ -170,14 +170,14 @@ class SimpleSelect[Q, R](
   def groupBy[K, V, R1, R2](groupKey: Q => K)(
       groupAggregate: Aggregatable.Proxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
-    val groupKeyValue = groupKey(expr)
-    val Seq(groupKeyExpr) = qrk.walkExprs(groupKeyValue)
-    val newExpr = (groupKeyValue, groupAggregate(new Aggregatable.Proxy[Q](this.expr)))
+    val groupKeysValue = groupKey(expr)
+    val groupKeysExpr = qrk.walkExprs(groupKeysValue)
+    val newExpr = (groupKeysValue, groupAggregate(new Aggregatable.Proxy[Q](this.expr)))
 
     // Weird hack to store the post-groupby `Select` as part of the `GroupBy`
     // object, because `.flatMap` sometimes need us to roll back any subsequent
     // `.map`s (???)
-    lazy val groupByOpt: Option[GroupBy] = Some(GroupBy(groupKeyExpr, () => res, Nil))
+    lazy val groupByOpt: Option[GroupBy] = Some(GroupBy(groupKeysExpr, () => res, Nil))
     lazy val res =
       if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
       else
@@ -265,7 +265,9 @@ object SimpleSelect {
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
-      sql" GROUP BY ${groupBy.key}${havingOpt}"
+      val groupByJoined =
+        SqlStr.join(groupBy.keys.map(x => Renderable.renderSql(x)(context)), SqlStr.commaSep)
+      sql" GROUP BY ${groupByJoined}${havingOpt}"
     })
 
     def render(liveExprs0: LiveExprs) = {
