@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.13"
+ivy"com.lihaoyi::scalasql:0.1.14"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.4.2
@@ -130,12 +130,9 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
 
 ## Changelog
 
-### 0.1.13
+### 0.1.14
 
 * Remove uneeded Numeric constraint from ordering-related functions [#47](https://github.com/com-lihaoyi/scalasql/pull/47)
-
-### 0.1.12
-
 * Add `SELECT FOR UPDATE` support for Postgres and MySQL [#45](https://github.com/com-lihaoyi/scalasql/pull/45)
 
 ### 0.1.11
