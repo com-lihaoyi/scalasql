@@ -24,7 +24,7 @@ object InsertColumns {
     protected def expr: V[Column] = WithSqlExpr.get(insert)
 
     private[scalasql] override def renderSql(ctx: Context) =
-      new Renderer(columns, ctx, valuesLists, Table.name(table.value)).render()
+      new Renderer(columns, ctx, valuesLists, Table.resolve(table.value)(ctx)).render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(IntType)
@@ -48,7 +48,7 @@ object InsertColumns {
       SqlStr.commaSep
     )
     def render() = {
-      sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) VALUES $values"
+      sql"INSERT INTO ${SqlStr.raw(tableName)} ($columns) VALUES $values"
     }
   }
 }

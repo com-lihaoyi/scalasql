@@ -22,7 +22,7 @@ object InsertValues {
 
     override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       new Renderer(
-        Table.name(insert.table.value),
+        Table.resolve(insert.table.value)(ctx),
         Table.labels(insert.table.value),
         values,
         qr,
@@ -75,7 +75,7 @@ object InsertValues {
     lazy val values = SqlStr.join(valuesSqls, SqlStr.commaSep)
 
     def render() = {
-      sql"INSERT INTO ${SqlStr.raw(ctx.config.tableNameMapper(tableName))} ($columns) VALUES $values"
+      sql"INSERT INTO ${SqlStr.raw(tableName)} ($columns) VALUES $values"
     }
   }
 }
