@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql._
+import scalasql.core.JoinNullable
 import sourcecode.Text
 import utest._
 import utils.ScalaSqlSuite
@@ -111,6 +112,23 @@ trait SchemaTests extends ScalaSqlSuite {
             FROM
               otherschema.invoice invoice0""",
           value = 4,
+          docs = """
+            If your table belongs to a schema other than the default schema of your database,
+            you can specify this in your table definition with table.schemaName
+          """
+        )
+      }
+      test("join") {
+        checker(
+          query = Text {
+            Invoice.select.join(Invoice)(_.id `=` _.id).map(_._1.id)
+          },
+          sql = """SELECT
+              invoice0.id AS res
+            FROM
+              otherschema.invoice invoice0
+            JOIN otherschema.invoice invoice1 ON (invoice0.id = invoice1.id)""",
+          value = Seq(2, 3, 4, 5, 6, 7, 8, 9),
           docs = """
             If your table belongs to a schema other than the default schema of your database,
             you can specify this in your table definition with table.schemaName
