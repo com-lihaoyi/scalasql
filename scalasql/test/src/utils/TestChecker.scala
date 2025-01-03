@@ -2,6 +2,7 @@ package scalasql.utils
 
 import com.github.vertical_blank.sqlformatter.SqlFormatter
 import pprint.PPrinter
+import scalasql.core.SqlStr
 import scalasql.query.SubqueryRef
 import scalasql.{DbClient, Queryable, Expr, UtestFramework}
 
@@ -46,6 +47,7 @@ class TestChecker(
     res
   }
   def apply[T, V](
+      preQuery: SqlStr = null,
       query: sourcecode.Text[T],
       sql: String = null,
       sqls: Seq[String] = Nil,
@@ -86,7 +88,10 @@ class TestChecker(
       assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
     }
 
-    val result = autoCommitConnection.run(query.value)
+    val result = dbClient.transaction{ db =>
+      Option(preQuery).foreach(q => db.updateSql(q))
+      db.run(query.value)
+    }
 
     val values = Option(value).map(_.value) ++ moreValues
     val normalized = normalize(result)

@@ -1,8 +1,9 @@
 package scalasql.query
 
 import scalasql._
+import scalasql.core.SqlStr.SqlStringSyntax
 import utest._
-import utils.ScalaSqlSuite
+import utils.{MsSqlSuite, ScalaSqlSuite}
 
 import java.time.LocalDate
 
@@ -13,6 +14,7 @@ trait InsertTests extends ScalaSqlSuite {
     test("single") {
       test("values") - {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert.values(
             Buyer[Sc](4, "test buyer", LocalDate.parse("2023-09-09"))
           ),
@@ -52,6 +54,7 @@ trait InsertTests extends ScalaSqlSuite {
 
       test("columns") - {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert.columns(
             _.name := "test buyer",
             _.dateOfBirth := LocalDate.parse("2023-09-09"),
@@ -90,6 +93,7 @@ trait InsertTests extends ScalaSqlSuite {
 
     test("conflict") - intercept[Exception] {
       checker(
+        preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
         query = Buyer.insert.columns(
           _.name := "test buyer",
           _.dateOfBirth := LocalDate.parse("2023-09-09"),
@@ -102,6 +106,7 @@ trait InsertTests extends ScalaSqlSuite {
     test("batch") {
       test("values") - {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert.values(
             Buyer[Sc](4, "test buyer A", LocalDate.parse("2001-04-07")),
             Buyer[Sc](5, "test buyer B", LocalDate.parse("2002-05-08")),
@@ -164,6 +169,7 @@ trait InsertTests extends ScalaSqlSuite {
     test("select") {
       test("caseclass") {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert.select(
             identity,
             Buyer.select
