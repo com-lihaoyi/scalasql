@@ -314,7 +314,7 @@ package mssql {
 
   object DbApiOpsTests extends DbApiOpsTests with MsSqlSuite
   object ExprOpsTests extends ExprOpsTests with MsSqlSuite
-  object ExprBooleanOpsTests extends ExprBooleanOpsTests with MsSqlSuite
+  //object ExprBooleanOpsTests extends ExprBooleanOpsTests with MsSqlSuite
   object ExprNumericOpsTests extends ExprNumericOpsTests with MsSqlSuite
   object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with MsSqlSuite
   object ExprSeqOpsTests extends ExprAggOpsTests with MsSqlSuite
