@@ -22,7 +22,7 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("hello").like("he%"),
       sqls = Seq(
         "SELECT (? LIKE ?) AS res",
-        "SELECT CASE WHEN ? LIKE ? THEN 1 ELSE 0 END AS res"
+        "SELECT CASE WHEN (? LIKE ?) THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -85,7 +85,7 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE ? || '%') AS res",
         "SELECT (? LIKE CONCAT(?, '%')) AS res",
-        "SELECT CASE WHEN ? LIKE CAST(? AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END AS res"
+        "SELECT CASE WHEN (? LIKE CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -95,7 +95,7 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE '%' || ?) AS res",
         "SELECT (? LIKE CONCAT('%', ?)) AS res",
-        "SELECT CASE WHEN ? LIKE '%' + CAST(? AS VARCHAR(MAX)) THEN 1 ELSE 0 END AS res",
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX))) THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -105,7 +105,7 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE '%' || ? || '%') AS res",
         "SELECT (? LIKE CONCAT('%', ?, '%')) AS res",
-        "SELECT CASE WHEN ? LIKE '%' + CAST(? AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END AS res",
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )

@@ -7,16 +7,18 @@ import scalasql.core.{
   DbApi,
   DialectTypeMappers,
   Expr,
+  ExprsToSql,
+  LiveExprs,
   Queryable,
-  TypeMapper,
-  SqlStr
+  SqlStr,
+  TypeMapper
 }
 import scalasql.{Sc, operations}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime}
-import scalasql.core.LiveExprs
+import java.sql.JDBCType
 
 trait MsSqlDialect extends Dialect {
   protected def dialectCastParams = false
@@ -66,6 +68,10 @@ trait MsSqlDialect extends Dialect {
 
   override implicit def DbApiOpsConv(db: => DbApi): MsSqlDialect.DbApiOps =
     new MsSqlDialect.DbApiOps(this)
+
+  override implicit def ExprQueryable[T](implicit mt: TypeMapper[T]): Queryable.Row[Expr[T], T] = {
+    new MsSqlDialect.ExprQueryable[Expr, T]()
+  }
 }
 
 object MsSqlDialect extends MsSqlDialect {
@@ -94,20 +100,16 @@ object MsSqlDialect extends MsSqlDialect {
 
     override def +(x: Expr[T]): Expr[T] = Expr { implicit ctx => sql"($v + $x)" }
 
-    override def like(x: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE $x THEN 1 ELSE 0 END"
-    }
-
     override def startsWith(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE CAST($other AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END"
+      sql"($v LIKE CAST($other AS VARCHAR(MAX)) + '%')"
     }
 
     override def endsWith(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE '%' + CAST($other AS VARCHAR(MAX)) THEN 1 ELSE 0 END"
+      sql"($v LIKE '%' + CAST($other AS VARCHAR(MAX)))"
     }
 
     override def contains(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
-      sql"CASE WHEN $v LIKE '%' + CAST($other AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END"
+      sql"($v LIKE '%' + CAST($other AS VARCHAR(MAX)) + '%')"
     }
 
     override def length: Expr[Int] = Expr { implicit ctx => sql"LEN($v)" }
@@ -206,10 +208,6 @@ object MsSqlDialect extends MsSqlDialect {
       ".drop must follow .sortBy"
     )
 
-    override def nonEmpty: Expr[Boolean] = Expr { implicit ctx => sql"CASE WHEN EXISTS $this THEN 1 ELSE 0 END" }
-
-    override def isEmpty: Expr[Boolean] = Expr { implicit ctx => sql"CASE WHEN EXISTS $this THEN 0 ELSE 1 END" }
-
   }
 
   class CompoundSelect[Q, R](
@@ -275,5 +273,14 @@ object MsSqlDialect extends MsSqlDialect {
         sql" ORDER BY $orderStr"
       }
     }
+  }
+
+  class ExprQueryable[E[_] <: Expr[?], T](
+      implicit tm: TypeMapper[T]
+  ) extends Expr.ExprQueryable[E, T] {
+    override def walkExprs(q: E[T]): Seq[Expr[_]] =
+      if (tm.jdbcType == JDBCType.BOOLEAN) {
+        Seq(Expr[Boolean] { implicit ctx: Context => sql"CASE WHEN $q THEN 1 ELSE 0 END" })
+      } else super.walkExprs(q)
   }
 }
