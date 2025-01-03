@@ -22,7 +22,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       query = Expr(Bytes("hello")).like(Bytes("he%")),
       sqls = Seq(
         "SELECT (? LIKE ?) AS res",
-        "SELECT CASE WHEN ? LIKE ? THEN 1 ELSE 0 END AS res",
+        "SELECT CASE WHEN (? LIKE ?) THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -74,7 +74,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE ? || '%') AS res",
         "SELECT (? LIKE CONCAT(?, '%')) AS res",
-        "SELECT CASE WHEN ? LIKE CAST(? AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END AS res"
+        "SELECT CASE WHEN (? LIKE CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -84,7 +84,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE '%' || ?) AS res",
         "SELECT (? LIKE CONCAT('%', ?)) AS res",
-        "SELECT CASE WHEN ? LIKE '%' + CAST(? AS VARCHAR(MAX)) THEN 1 ELSE 0 END AS res"
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX))) THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -94,7 +94,7 @@ trait ExprBlobOpsTests extends ScalaSqlSuite {
       sqls = Seq(
         "SELECT (? LIKE '%' || ? || '%') AS res",
         "SELECT (? LIKE CONCAT('%', ?, '%')) AS res",
-        "SELECT CASE WHEN ? LIKE '%' + CAST(? AS VARCHAR(MAX)) + '%' THEN 1 ELSE 0 END AS res"
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
