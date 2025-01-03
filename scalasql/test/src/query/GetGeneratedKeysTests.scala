@@ -1,7 +1,8 @@
 package scalasql.query
 
 import scalasql._
-import scalasql.utils.ScalaSqlSuite
+import scalasql.core.SqlStr.SqlStringSyntax
+import scalasql.utils.{MsSqlSuite, ScalaSqlSuite}
 import utest._
 
 import java.time.LocalDate
@@ -14,6 +15,7 @@ trait GetGeneratedKeysTests extends ScalaSqlSuite {
     test("single") {
       test("values") - {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert
             .values(
               Buyer[Sc](17, "test buyer", LocalDate.parse("2023-09-09"))
@@ -35,6 +37,7 @@ trait GetGeneratedKeysTests extends ScalaSqlSuite {
 
       test("columns") - {
         checker(
+          preQuery = Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,
           query = Buyer.insert
             .columns(
               _.name := "test buyer",
@@ -94,7 +97,8 @@ trait GetGeneratedKeysTests extends ScalaSqlSuite {
             INSERT INTO buyer (name, date_of_birth)
             VALUES (?, ?), (?, ?), (?, ?)
           """,
-          value = Seq(4, 5, 6),
+          //https://github.com/microsoft/mssql-jdbc/issues/245
+          value = if(this.isInstanceOf[MsSqlSuite]) Seq(6) else Seq(4, 5, 6),
           docs = """
             `getGeneratedKeys` can return multiple generated primary key values for
             a batch insert statement
@@ -133,7 +137,8 @@ trait GetGeneratedKeysTests extends ScalaSqlSuite {
             FROM buyer buyer0
             WHERE (buyer0.name <> ?)
           """,
-          value = Seq(4, 5),
+          //https://github.com/microsoft/mssql-jdbc/issues/245
+          value = if(this.isInstanceOf[MsSqlSuite]) Seq(5) else Seq(4, 5),
           docs = """
             `getGeneratedKeys` can return multiple generated primary key values for
             an `insert` based on a `select`
