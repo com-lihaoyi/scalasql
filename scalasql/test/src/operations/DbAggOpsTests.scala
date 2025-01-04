@@ -29,7 +29,10 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
 
       test("none") - checker(
         query = Purchase.select.filter(_ => false).sumByOpt(_.count),
-        sql = "SELECT SUM(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+        sqls = Seq(
+          "SELECT SUM(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+          "SELECT SUM(purchase0.count) AS res FROM purchase purchase0 WHERE 1 = ?"
+        ),
         value = Option.empty[Int]
       )
     }
@@ -49,7 +52,10 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
 
       test("none") - checker(
         query = Purchase.select.filter(_ => false).minByOpt(_.count),
-        sql = "SELECT MIN(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+        sqls = Seq(
+          "SELECT MIN(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+          "SELECT MIN(purchase0.count) AS res FROM purchase purchase0 WHERE 1 = ?"
+        ),
         value = Option.empty[Int]
       )
     }
@@ -69,7 +75,10 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
 
       test("none") - checker(
         query = Purchase.select.filter(_ => false).maxByOpt(_.count),
-        sql = "SELECT MAX(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+        sqls = Seq(
+          "SELECT MAX(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+          "SELECT MAX(purchase0.count) AS res FROM purchase purchase0 WHERE 1 = ?"
+        ),
         value = Option.empty[Int]
       )
     }
@@ -89,7 +98,10 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
 
       test("none") - checker(
         query = Purchase.select.filter(_ => false).avgByOpt(_.count),
-        sql = "SELECT AVG(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+        sqls = Seq(
+          "SELECT AVG(purchase0.count) AS res FROM purchase purchase0 WHERE ?",
+          "SELECT AVG(purchase0.count) AS res FROM purchase purchase0 WHERE 1 = ?"
+        ),
         value = Option.empty[Int]
       )
     }
