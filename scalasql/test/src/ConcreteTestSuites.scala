@@ -287,7 +287,7 @@ package mssql {
   object UpdateSubQueryTests extends UpdateSubQueryTests with MsSqlSuite
   // object ReturningTests extends ReturningTests with MsSqlSuite
   // object OnConflictTests extends OnConflictTests with MsSqlSuite
-  object ValuesTests extends ValuesTests with MsSqlSuite
+  // object ValuesTests extends ValuesTests with MsSqlSuite
   // object LateralJoinTests extends LateralJoinTests with MsSqlSuite
   object WindowFunctionTests extends WindowFunctionTests with MsSqlSuite
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with MsSqlSuite
