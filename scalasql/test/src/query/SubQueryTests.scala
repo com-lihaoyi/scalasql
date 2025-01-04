@@ -291,7 +291,8 @@ trait SubQueryTests extends ScalaSqlSuite {
       query = Text {
         Buyer.select.map(c => (c, ShippingInfo.select.filter(p => c.id `=` p.buyerId).size `=` 1))
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT
           buyer0.id AS res_0_id,
           buyer0.name AS res_0_name,
@@ -302,6 +303,18 @@ trait SubQueryTests extends ScalaSqlSuite {
             WHERE (buyer0.id = shipping_info1.buyer_id)) = ?) AS res_1
         FROM buyer buyer0
       """,
+      """
+        SELECT
+          buyer0.id AS res_0_id,
+          buyer0.name AS res_0_name,
+          buyer0.date_of_birth AS res_0_date_of_birth,
+          CASE WHEN ((SELECT
+            COUNT(1) AS res
+            FROM shipping_info shipping_info1
+            WHERE (buyer0.id = shipping_info1.buyer_id)) = ?) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+      """
+      ),
       value = Seq(
         (Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")), true),
         (Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")), false),
