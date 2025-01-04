@@ -18,7 +18,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime}
-import java.sql.JDBCType
+import java.sql.{JDBCType, PreparedStatement}
 
 trait MsSqlDialect extends Dialect {
   protected def dialectCastParams = false
@@ -48,6 +48,14 @@ trait MsSqlDialect extends Dialect {
   override implicit def OffsetDateTimeType: TypeMapper[OffsetDateTime] = new MsSqlOffsetDateTimeType
   class MsSqlOffsetDateTimeType extends OffsetDateTimeType {
     override def castTypeString = "DATETIMEOFFSET"
+  }
+
+  override implicit def EnumType[T <: Enumeration#Value](
+    implicit constructor: String => T
+  ): TypeMapper[T] = new MsSqlEnumType[T]
+
+  class MsSqlEnumType[T](implicit constructor: String => T) extends EnumType[T] {
+    override def put(r: PreparedStatement, idx: Int, v: T): Unit = r.setString(idx, v.toString)
   }
 
   override implicit def ExprStringOpsConv(v: Expr[String]): MsSqlDialect.ExprStringOps[String] =
