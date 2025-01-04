@@ -31,7 +31,8 @@ trait MsSqlDialect extends Dialect {
 
   override implicit def BooleanType: TypeMapper[Boolean] = new BooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
-  override implicit def from(x: Boolean): Expr[Boolean] = Expr { implicit ctx => sql"1 = $x" }
+  override implicit def from(x: Boolean): Expr[Boolean] = 
+    if(x) Expr.apply0(x,x) else Expr { implicit ctx => sql"1 = $x" }
 
   override implicit def UtilDateType: TypeMapper[java.util.Date] = new MsSqlUtilDateType
   class MsSqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME2" }
