@@ -295,12 +295,20 @@ trait JoinTests extends ScalaSqlSuite {
           .distinct
           .sortBy(_._1)
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT DISTINCT buyer0.name AS res_0, (shipping_info1.id IS NOT NULL) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res_0
       """,
+      """
+        SELECT DISTINCT buyer0.name AS res_0, CASE WHEN (shipping_info1.id IS NOT NULL) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        ORDER BY res_0
+      """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
@@ -318,13 +326,22 @@ trait JoinTests extends ScalaSqlSuite {
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
           .map { case (b, si) => (b.name, si.map(_.shippingDate) > b.dateOfBirth) }
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
+      """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+      """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
@@ -341,13 +358,22 @@ trait JoinTests extends ScalaSqlSuite {
             (b.name, JoinNullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth)
           }
       },
-      sql = """
+      sqls = Seq(
+      """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
       """,
+      """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+      """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
