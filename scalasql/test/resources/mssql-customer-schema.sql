@@ -58,9 +58,9 @@ CREATE TABLE data_types (
     my_boolean BIT,
     my_local_date DATE,
     my_local_time TIME,
-    my_local_date_time DATETIME,
-    my_util_date DATETIME,
-    my_instant DATETIME,
+    my_local_date_time DATETIME2,
+    my_util_date DATETIME2,
+    my_instant DATETIME2,
     my_var_binary VARBINARY(256),
     my_uuid UNIQUEIDENTIFIER,
     my_enum VARCHAR(256)
