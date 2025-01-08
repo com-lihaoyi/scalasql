@@ -34,8 +34,8 @@ trait MsSqlDialect extends Dialect {
 
   override implicit def BooleanType: TypeMapper[Boolean] = new BooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
-  override implicit def from(x: Boolean): Expr[Boolean] = 
-    if(x) Expr.apply0(x,x) else Expr { implicit ctx => sql"1 = $x" }
+  override implicit def from(x: Boolean): Expr[Boolean] =
+    if (x) Expr.apply0(x, x) else Expr { implicit ctx => sql"1 = $x" }
 
   override implicit def UtilDateType: TypeMapper[java.util.Date] = new MsSqlUtilDateType
   class MsSqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME2" }
@@ -54,7 +54,7 @@ trait MsSqlDialect extends Dialect {
   }
 
   override implicit def EnumType[T <: Enumeration#Value](
-    implicit constructor: String => T
+      implicit constructor: String => T
   ): TypeMapper[T] = new MsSqlEnumType[T]
 
   class MsSqlEnumType[T](implicit constructor: String => T) extends EnumType[T] {
