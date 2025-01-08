@@ -13,8 +13,8 @@ DROP TABLE IF EXISTS non_round_trip_types;
 DROP TABLE IF EXISTS opt_cols;
 DROP TABLE IF EXISTS nested;
 DROP TABLE IF EXISTS enclosing;
-DROP TABLE IF EXISTS invoice;
--- DROP SCHEMA IF EXISTS otherschema;
+DROP TABLE IF EXISTS otherschema.invoice;
+DROP SCHEMA IF EXISTS otherschema;
 
 CREATE TABLE buyer (
     id INT PRIMARY KEY IDENTITY(1, 1),
@@ -90,11 +90,13 @@ CREATE TABLE enclosing(
     my_boolean BIT
 );
 
+IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'otherschema'))
+BEGIN
+    EXEC ('CREATE SCHEMA otherschema')
+END;
 
--- CREATE SCHEMA otherschema;
-
--- CREATE TABLE otherschema.invoice(
---     id PRIMARY KEY IDENTITY(1, 1),
---     total DECIMAL(20, 2),
---     vendor_name VARCHAR(256)
--- );
+CREATE TABLE otherschema.invoice(
+    id INT PRIMARY KEY IDENTITY(1, 1),
+    total DECIMAL(20, 2),
+    vendor_name VARCHAR(256)
+);
