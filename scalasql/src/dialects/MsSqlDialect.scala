@@ -29,10 +29,13 @@ trait MsSqlDialect extends Dialect {
   override implicit def StringType: TypeMapper[String] = new MsSqlStringType
   class MsSqlStringType extends StringType { override def castTypeString = "VARCHAR" }
 
-  override implicit def BooleanType: TypeMapper[Boolean] = new BooleanType
+  override implicit def BooleanType: TypeMapper[Boolean] = new MsSqlBooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
   override implicit def from(x: Boolean): Expr[Boolean] =
     if (x) Expr.apply0(x, x) else Expr { _ => sql"1 = $x" }
+
+  override implicit def DoubleType: TypeMapper[Double] = new MsDoubleType
+  class MsDoubleType extends DoubleType { override def castTypeString = "FLOAT" }
 
   override implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
     new TypeMapper[Option[T]] {
