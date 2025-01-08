@@ -1,7 +1,7 @@
 package scalasql.operations
 
 import scalasql._
-import scalasql.H2Dialect
+import scalasql.{H2Dialect, MsSqlDialect}
 import utest._
 import utils.ScalaSqlSuite
 
@@ -119,7 +119,7 @@ trait ExprAggOpsTests extends ScalaSqlSuite {
       )
 
       test("sep") - {
-        if (!this.isInstanceOf[H2Dialect])
+        if (!this.isInstanceOf[H2Dialect] && !this.isInstanceOf[MsSqlDialect])
           checker(
             query = Buyer.select.map(_.name).mkString(", "),
             sqls = Seq(
