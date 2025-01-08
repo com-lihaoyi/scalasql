@@ -258,7 +258,7 @@ trait JoinTests extends ScalaSqlSuite {
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res_1
-        """,
+        """
       ),
       value = Seq[(String, Option[LocalDate])](
         ("Li Haoyi", None),
@@ -271,7 +271,7 @@ trait JoinTests extends ScalaSqlSuite {
           ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
           ("James Bond", Some(LocalDate.parse("2012-04-05"))),
           ("叉烧包", Some(LocalDate.parse("2012-05-06"))),
-          ("Li Haoyi", None),
+          ("Li Haoyi", None)
         )
       ),
       docs = """
@@ -290,18 +290,18 @@ trait JoinTests extends ScalaSqlSuite {
           .sortBy(_._1)
       },
       sqls = Seq(
-      """
+        """
         SELECT DISTINCT buyer0.name AS res_0, (shipping_info1.id IS NOT NULL) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res_0
-      """,
-      """
+        """,
+        """
         SELECT DISTINCT buyer0.name AS res_0, CASE WHEN (shipping_info1.id IS NOT NULL) THEN 1 ELSE 0 END AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res_0
-      """
+        """
       ),
       value = Seq(
         ("James Bond", true),
@@ -321,20 +321,20 @@ trait JoinTests extends ScalaSqlSuite {
           .map { case (b, si) => (b.name, si.map(_.shippingDate) > b.dateOfBirth) }
       },
       sqls = Seq(
-      """
+        """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """,
-      """
+        """,
+        """
         SELECT
           buyer0.name AS res_0,
           CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """
+        """
       ),
       value = Seq(
         ("James Bond", true),
@@ -353,20 +353,20 @@ trait JoinTests extends ScalaSqlSuite {
           }
       },
       sqls = Seq(
-      """
+        """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """,
-      """
+        """,
+        """
         SELECT
           buyer0.name AS res_0,
           CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """
+        """
       ),
       value = Seq(
         ("James Bond", true),

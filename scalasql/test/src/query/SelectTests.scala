@@ -420,7 +420,7 @@ trait SelectTests extends ScalaSqlSuite {
     )
 
     test("containsMultiple") - {
-      //Microsoft SQL Server does not support tuple IN
+      // Microsoft SQL Server does not support tuple IN
       if (!this.isInstanceOf[MsSqlDialect])
         checker(
           query = Text {

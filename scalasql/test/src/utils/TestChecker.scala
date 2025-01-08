@@ -88,7 +88,7 @@ class TestChecker(
       assert(matchedSql.nonEmpty, pprint.apply(SqlFormatter.format(sqlResult)))
     }
 
-    val result = dbClient.transaction{ db =>
+    val result = dbClient.transaction { db =>
       Option(preQuery).foreach(q => db.updateSql(q))
       db.run(query.value)
     }

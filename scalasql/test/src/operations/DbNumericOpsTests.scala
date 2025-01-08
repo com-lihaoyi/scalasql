@@ -39,7 +39,10 @@ trait ExprNumericOpsTests extends ScalaSqlSuite {
 
     test("between") - checker(
       query = Expr(4).between(Expr(2), Expr(6)),
-      sqls = Seq("SELECT ? BETWEEN ? AND ? AS res", "SELECT CASE WHEN ? BETWEEN ? AND ? THEN 1 ELSE 0 END AS res"),
+      sqls = Seq(
+        "SELECT ? BETWEEN ? AND ? AS res",
+        "SELECT CASE WHEN ? BETWEEN ? AND ? THEN 1 ELSE 0 END AS res"
+      ),
       value = true
     )
 

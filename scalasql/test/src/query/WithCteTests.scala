@@ -105,19 +105,19 @@ trait WithCteTests extends ScalaSqlSuite {
     )
 
     test("subquery") - {
-      //Microsoft SQL does not support CTEs in subqueries
-      if(!this.isInstanceOf[MsSqlDialect])
+      // Microsoft SQL does not support CTEs in subqueries
+      if (!this.isInstanceOf[MsSqlDialect])
         checker(
           query = Text {
             db.withCte(Buyer.select) { bs =>
-                db.withCte(ShippingInfo.select) { sis =>
-                  bs.join(sis)(_.id === _.buyerId)
-                }
-              }.join(
-                db.withCte(Product.select) { prs =>
-                  Purchase.select.join(prs)(_.productId === _.id)
-                }
-              )(_._2.id === _._1.shippingInfoId)
+              db.withCte(ShippingInfo.select) { sis =>
+                bs.join(sis)(_.id === _.buyerId)
+              }
+            }.join(
+              db.withCte(Product.select) { prs =>
+                Purchase.select.join(prs)(_.productId === _.id)
+              }
+            )(_._2.id === _._1.shippingInfoId)
               .map { case (b, s, (pu, pr)) => (b.name, pr.name) }
           },
           sql = """
