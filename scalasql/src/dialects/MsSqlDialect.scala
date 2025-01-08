@@ -18,7 +18,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime}
-import java.sql.{JDBCType, PreparedStatement}
+import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
 trait MsSqlDialect extends Dialect {
   protected def dialectCastParams = false
@@ -33,6 +33,22 @@ trait MsSqlDialect extends Dialect {
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
   override implicit def from(x: Boolean): Expr[Boolean] =
     if (x) Expr.apply0(x, x) else Expr { _ => sql"1 = $x" }
+
+  override implicit def OptionType[T](implicit inner: TypeMapper[T]): TypeMapper[Option[T]] =
+    new TypeMapper[Option[T]] {
+      def jdbcType: JDBCType = inner.jdbcType
+
+      def get(r: ResultSet, idx: Int): Option[T] = {
+        if (r.getObject(idx) == null) None else Some(inner.get(r, idx))
+      }
+
+      def put(r: PreparedStatement, idx: Int, v: Option[T]): Unit = {
+        v match {
+          case None => r.setObject(idx, null, inner.jdbcType)
+          case Some(value) => inner.put(r, idx, value)
+        }
+      }
+    }
 
   override implicit def UtilDateType: TypeMapper[java.util.Date] = new MsSqlUtilDateType
   class MsSqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME2" }
