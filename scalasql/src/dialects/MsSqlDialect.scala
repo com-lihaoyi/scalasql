@@ -17,7 +17,7 @@ import scalasql.{Sc, operations}
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
-import java.time.{Instant, LocalDateTime, OffsetDateTime}
+import java.time.{Instant, LocalDateTime, OffsetDateTime, ZoneId, ZonedDateTime}
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
 trait MsSqlDialect extends Dialect {
@@ -61,9 +61,32 @@ trait MsSqlDialect extends Dialect {
   override implicit def InstantType: TypeMapper[Instant] = new MsSqlInstantType
   class MsSqlInstantType extends InstantType { override def castTypeString = "DATETIME2" }
 
+  override implicit def ZonedDateTimeType: TypeMapper[ZonedDateTime] = new MsSqlZonedDateTimeType
+  class MsSqlZonedDateTimeType extends ZonedDateTimeType {
+    override def castTypeString = "DATETIMEOFFSET"
+    override def get(r: ResultSet, idx: Int) = {
+      val odt = r.getObject(idx, classOf[OffsetDateTime])
+      if (odt == null) null
+      else odt.toZonedDateTime
+    }
+
+    override def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = {
+      val odt = if (v == null) null else v.toOffsetDateTime
+      r.setObject(idx, odt)
+    }
+  }
+
   override implicit def OffsetDateTimeType: TypeMapper[OffsetDateTime] = new MsSqlOffsetDateTimeType
   class MsSqlOffsetDateTimeType extends OffsetDateTimeType {
     override def castTypeString = "DATETIMEOFFSET"
+
+    override def get(r: ResultSet, idx: Int) = {
+      r.getObject(idx, classOf[OffsetDateTime])
+    }
+
+    override def put(r: PreparedStatement, idx: Int, v: OffsetDateTime) = {
+      r.setObject(idx, v)
+    }
   }
 
   override implicit def EnumType[T <: Enumeration#Value](
