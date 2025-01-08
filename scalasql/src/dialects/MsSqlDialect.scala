@@ -35,7 +35,7 @@ trait MsSqlDialect extends Dialect {
   override implicit def BooleanType: TypeMapper[Boolean] = new BooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
   override implicit def from(x: Boolean): Expr[Boolean] =
-    if (x) Expr.apply0(x, x) else Expr { implicit ctx => sql"1 = $x" }
+    if (x) Expr.apply0(x, x) else Expr { _ => sql"1 = $x" }
 
   override implicit def UtilDateType: TypeMapper[java.util.Date] = new MsSqlUtilDateType
   class MsSqlUtilDateType extends UtilDateType { override def castTypeString = "DATETIME2" }
@@ -291,7 +291,7 @@ object MsSqlDialect extends MsSqlDialect {
   class ExprQueryable[E[_] <: Expr[?], T](
       implicit tm: TypeMapper[T]
   ) extends Expr.ExprQueryable[E, T] {
-    override def walkExprs(q: E[T]): Seq[Expr[_]] =
+    override def walkExprs(q: E[T]): Seq[Expr[?]] =
       if (tm.jdbcType == JDBCType.BOOLEAN) {
         Seq(Expr[Boolean] { implicit ctx: Context => sql"CASE WHEN $q THEN 1 ELSE 0 END" })
       } else super.walkExprs(q)
