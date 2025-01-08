@@ -251,34 +251,28 @@ trait JoinTests extends ScalaSqlSuite {
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
           .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
           .sortBy(_._2)
-          .nullsFirst
       },
       sqls = Seq(
         """
           SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-          ORDER BY res_1 NULLS FIRST
+          ORDER BY res_1
         """,
-        // MySQL doesn't support NULLS FIRST syntax and needs a workaround
-        """
-          SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
-          FROM buyer buyer0
-          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-          ORDER BY res_1 IS NULL DESC, res_1
-        """,
-        """
-          SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
-          FROM buyer buyer0
-          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-          ORDER BY IIF(res_1 IS NULL, 0, 1), res_1
-        """
       ),
       value = Seq[(String, Option[LocalDate])](
         ("Li Haoyi", None),
         ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
         ("James Bond", Some(LocalDate.parse("2012-04-05"))),
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
+      ),
+      moreValues = Seq(
+        Seq[(String, Option[LocalDate])](
+          ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
+          ("James Bond", Some(LocalDate.parse("2012-04-05"))),
+          ("叉烧包", Some(LocalDate.parse("2012-05-06"))),
+          ("Li Haoyi", None),
+        )
       ),
       docs = """
         `JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
