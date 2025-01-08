@@ -20,7 +20,7 @@ object InsertSelect {
     def table = insert.table
 
     private[scalasql] override def renderSql(ctx: Context) =
-      new Renderer(select, select.qr.walkExprs(columns), ctx, Table.name(table.value))
+      new Renderer(select, select.qr.walkExprs(columns), ctx, Table.resolve(table.value)(ctx))
         .render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
@@ -45,7 +45,7 @@ object InsertSelect {
 
     lazy val selectSql = Renderable.renderSql(select).withCompleteQuery(false)
 
-    lazy val tableNameStr = SqlStr.raw(ctx.config.tableNameMapper(tableName))
+    lazy val tableNameStr = SqlStr.raw(tableName)
     def render() = sql"INSERT INTO $tableNameStr ($columns) $selectSql"
   }
 }

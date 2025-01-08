@@ -6276,7 +6276,7 @@ Buyer.select
 
 ## Schema
 Additional tests to ensure schema mapping produces valid SQL
-### Schema.schema
+### Schema.schema.select
 
 If your table belongs to a schema other than the default schema of your database,
 you can specify this in your table definition with table.schemaName
@@ -6301,6 +6301,184 @@ Invoice.select
       Invoice[Sc](id = 2, total = 213.3, vendor_name = "Samsung"),
       Invoice[Sc](id = 3, total = 407.2, vendor_name = "Shell")
     )
+    ```
+
+
+
+### Schema.schema.insert.columns
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert.columns(
+  _.total := 200.3,
+  _.vendor_name := "Huawei"
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.insert.values
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert
+  .values(
+    Invoice[Sc](
+      id = 0,
+      total = 200.3,
+      vendor_name = "Huawei"
+    )
+  )
+  .skipColumns(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.update
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice
+  .update(_.id === 1)
+  .set(
+    _.total := 200.3,
+    _.vendor_name := "Huawei"
+  )
+```
+
+
+*
+    ```sql
+    UPDATE otherschema.invoice
+                SET
+                  total = ?,
+                  vendor_name = ?
+                WHERE
+                  (invoice.id = ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.delete
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.delete(_.id === 1)
+```
+
+
+*
+    ```sql
+    DELETE FROM otherschema.invoice WHERE (invoice.id = ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.insert into
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert.select(
+  i => (i.total, i.vendor_name),
+  Invoice.select.map(i => (i.total, i.vendor_name))
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO
+                  otherschema.invoice (total, vendor_name)
+                SELECT
+                  invoice0.total AS res_0,
+                  invoice0.vendor_name AS res_1
+                FROM
+                  otherschema.invoice invoice0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### Schema.schema.join
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.select.join(Invoice)(_.id `=` _.id).map(_._1.id)
+```
+
+
+*
+    ```sql
+    SELECT
+                  invoice0.id AS res
+                FROM
+                  otherschema.invoice invoice0
+                JOIN otherschema.invoice invoice1 ON (invoice0.id = invoice1.id)
+    ```
+
+
+
+*
+    ```scala
+    Seq(2, 3, 4, 5, 6, 7, 8, 9)
     ```
 
 
