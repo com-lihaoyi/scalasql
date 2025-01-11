@@ -13,6 +13,27 @@ trait OnConflictTests extends ScalaSqlSuite {
   def description = "Queries using `ON CONFLICT DO UPDATE` or `ON CONFLICT DO NOTHING`"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
+    
+    test("t") - {
+      checker(
+        query = Text {
+          Buyer.insert.values(Buyer[Sc](
+            id = 1,
+            name = "t",
+            dateOfBirth = LocalDate.now()
+          )).onConflictIgnore(_.id)
+        },
+        sql =
+          "INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING",
+        value = 0,
+        docs = """
+          ScalaSql's `.onConflictIgnore` translates into SQL's `ON CONFLICT DO NOTHING`
+
+          Note that H2 and HsqlExpr do not support `onConflictIgnore` and `onConflictUpdate`, while
+          MySql only supports `onConflictUpdate` but not `onConflictIgnore`.
+        """
+      )
+    }
 
     test("ignore") - {
       checker(
