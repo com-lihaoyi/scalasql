@@ -10,7 +10,7 @@ trait OnConflictOps {
     new OnConflict[V[Column], Int](query, WithSqlExpr.get(query), query.table)
 
   implicit def OnConflictableInsertValues[V[_[_]], R](
-    query: InsertValues[V, R]
+      query: InsertValues[V, R]
   ): OnConflict[V[Column], Int] =
     new OnConflict[V[Column], Int](query, WithSqlExpr.get(query), query.table)
 

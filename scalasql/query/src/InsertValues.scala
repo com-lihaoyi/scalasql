@@ -3,7 +3,9 @@ package scalasql.query
 import scalasql.core.{Context, DialectTypeMappers, Expr, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
-trait InsertValues[V[_[_]], R] extends Returning.InsertBase[V[Column]] with Query.ExecuteUpdate[Int] {
+trait InsertValues[V[_[_]], R]
+    extends Returning.InsertBase[V[Column]]
+    with Query.ExecuteUpdate[Int] {
   def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R]
 }
 object InsertValues {
