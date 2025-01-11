@@ -4556,6 +4556,37 @@ Buyer.insert
 
 
 
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
 ### OnConflict.ignore.returningEmpty
 
 
@@ -4588,6 +4619,40 @@ Buyer.insert
 
 
 
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[String]
+    ```
+
+
+
 ### OnConflict.ignore.returningOne
 
 
@@ -4597,7 +4662,7 @@ Buyer.insert
   .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 4 // This should cause a primary key conflict
+    _.id := 4
   )
   .onConflictIgnore(_.id)
   .returning(_.name)
@@ -4607,6 +4672,40 @@ Buyer.insert
 *
     ```sql
     INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    Seq("test buyer")
+    ```
+
+
+
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 5,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
     ON CONFLICT (id) DO NOTHING
     RETURNING buyer.name AS res
     ```
@@ -4651,6 +4750,37 @@ Buyer.insert
 
 ----
 
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(_.dateOfBirth := LocalDate.parse("2023-10-10"))
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET date_of_birth = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
 
 
 ```scala
@@ -4663,7 +4793,7 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2023-10-10")),
       Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
@@ -4702,6 +4832,37 @@ Buyer.insert
 
 ----
 
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 3,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
 
 
 ```scala
@@ -4716,7 +4877,7 @@ Buyer.select
     Seq(
       Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
       Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](3, "LI HAOYI", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -4752,6 +4913,42 @@ Buyer.insert
 *
     ```scala
     "JAMES BOND"
+    ```
+
+
+
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toLowerCase)
+  .returning(_.name)
+  .single
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO UPDATE
+    SET name = LOWER(buyer.name)
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    "james bond"
     ```
 
 
