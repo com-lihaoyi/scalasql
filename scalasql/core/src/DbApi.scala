@@ -522,8 +522,13 @@ object DbApi {
         if (savepointStack.lastOption.exists(_ eq savepoint)) {
           // Only release if this savepoint has not been rolled back,
           // directly or indirectly
-          // TODO - is this necessary? Not all jdbc drivers support releaseSavepoint (MsSql)
-          // connection.releaseSavepoint(savepoint)
+          try {
+            connection.releaseSavepoint(savepoint)
+          } catch {
+            case e: java.sql.SQLException =>
+              //Can happen if the JDBC driver does not support savepoint release (e.g. Microsoft SQL)
+              ()
+          }
         }
         res
       } catch {
