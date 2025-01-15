@@ -19,6 +19,7 @@ import java.time.{Instant, LocalDate, LocalDateTime}
 
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   protected def dialectCastParams = false
+  protected def supportSavepointRelease = true
 
   override implicit def LocalDateTimeType: TypeMapper[LocalDateTime] = new SqliteLocalDateTimeType
   class SqliteLocalDateTimeType extends LocalDateTimeType {

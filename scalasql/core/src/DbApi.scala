@@ -519,16 +519,13 @@ object DbApi {
 
       try {
         val res = block(new DbApi.SavepointImpl(savepoint, () => rollbackSavepoint(savepoint)))
-        if (savepointStack.lastOption.exists(_ eq savepoint)) {
+        if (
+          DialectConfig
+            .supportSavepointRelease(dialect) && savepointStack.lastOption.exists(_ eq savepoint)
+        ) {
           // Only release if this savepoint has not been rolled back,
           // directly or indirectly
-          try {
-            connection.releaseSavepoint(savepoint)
-          } catch {
-            case e: java.sql.SQLException =>
-              //Can happen if the JDBC driver does not support savepoint release (e.g. Microsoft SQL)
-              ()
-          }
+          connection.releaseSavepoint(savepoint)
         }
         res
       } catch {

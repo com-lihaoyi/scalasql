@@ -28,6 +28,7 @@ import java.sql.PreparedStatement
 trait H2Dialect extends Dialect {
 
   protected def dialectCastParams = true
+  protected def supportSavepointRelease = true
 
   override implicit def EnumType[T <: Enumeration#Value](
       implicit constructor: String => T

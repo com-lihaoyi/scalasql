@@ -22,6 +22,7 @@ import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
 trait MsSqlDialect extends Dialect {
   protected def dialectCastParams = false
+  protected def supportSavepointRelease = false
 
   override implicit def IntType: TypeMapper[Int] = new MsSqlIntType
   class MsSqlIntType extends IntType { override def castTypeString = "INT" }

@@ -44,6 +44,7 @@ import scalasql.query.Select
 
 trait MySqlDialect extends Dialect {
   protected def dialectCastParams = false
+  protected def supportSavepointRelease = true
 
   override implicit def ByteType: TypeMapper[Byte] = new MySqlByteType
   class MySqlByteType extends ByteType { override def castTypeString = "SIGNED" }
