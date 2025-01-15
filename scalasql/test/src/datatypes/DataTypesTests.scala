@@ -73,7 +73,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           myInt = 12345678,
           myBigInt = 12345678901L,
           myDouble = 3.14,
-          myBoolean = true,
+          myBoolean = false,
           myLocalDate = LocalDate.parse("2023-12-20"),
           myLocalTime = LocalTime.parse("10:15:30"),
           myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
