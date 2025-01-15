@@ -4,7 +4,7 @@ import scalasql._
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.Expr
 import utest._
-import utils.ScalaSqlSuite
+import utils.{MsSqlSuite, ScalaSqlSuite}
 
 trait ExprOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Expr[T]` for any `T`"
@@ -12,44 +12,128 @@ trait ExprOpsTests extends ScalaSqlSuite {
 
     test("numeric") {
       test("greaterThan") -
-        checker(query = Expr(6) > Expr(2), sql = "SELECT (? > ?) AS res", value = true)
+        checker(
+          query = Expr(6) > Expr(2),
+          sqls = Seq(
+            "SELECT (? > ?) AS res",
+            "SELECT CASE WHEN (? > ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
 
       test("lessThan") -
-        checker(query = Expr(6) < Expr(2), sql = "SELECT (? < ?) AS res", value = false)
+        checker(
+          query = Expr(6) < Expr(2),
+          sqls = Seq(
+            "SELECT (? < ?) AS res",
+            "SELECT CASE WHEN (? < ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = false
+        )
 
       test("greaterThanOrEquals") -
-        checker(query = Expr(6) >= Expr(2), sql = "SELECT (? >= ?) AS res", value = true)
+        checker(
+          query = Expr(6) >= Expr(2),
+          sqls = Seq(
+            "SELECT (? >= ?) AS res",
+            "SELECT CASE WHEN (? >= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
 
       test("lessThanOrEquals") -
-        checker(query = Expr(6) <= Expr(2), sql = "SELECT (? <= ?) AS res", value = false)
+        checker(
+          query = Expr(6) <= Expr(2),
+          sqls = Seq(
+            "SELECT (? <= ?) AS res",
+            "SELECT CASE WHEN (? <= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = false
+        )
     }
 
     test("string") {
       test("greaterThan") -
-        checker(query = Expr("A") > Expr("B"), sql = "SELECT (? > ?) AS res", value = false)
+        checker(
+          query = Expr("A") > Expr("B"),
+          sqls = Seq(
+            "SELECT (? > ?) AS res",
+            "SELECT CASE WHEN (? > ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = false
+        )
 
       test("lessThan") -
-        checker(query = Expr("A") < Expr("B"), sql = "SELECT (? < ?) AS res", value = true)
+        checker(
+          query = Expr("A") < Expr("B"),
+          sqls = Seq(
+            "SELECT (? < ?) AS res",
+            "SELECT CASE WHEN (? < ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
 
       test("greaterThanOrEquals") -
-        checker(query = Expr("A") >= Expr("B"), sql = "SELECT (? >= ?) AS res", value = false)
+        checker(
+          query = Expr("A") >= Expr("B"),
+          sqls = Seq(
+            "SELECT (? >= ?) AS res",
+            "SELECT CASE WHEN (? >= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = false
+        )
 
       test("lessThanOrEquals") -
-        checker(query = Expr("A") <= Expr("B"), sql = "SELECT (? <= ?) AS res", value = true)
+        checker(
+          query = Expr("A") <= Expr("B"),
+          sqls = Seq(
+            "SELECT (? <= ?) AS res",
+            "SELECT CASE WHEN (? <= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
     }
 
     test("boolean") {
       test("greaterThan") -
-        checker(query = Expr(true) > Expr(false), sql = "SELECT (? > ?) AS res", value = true)
+        checker(
+          query = Expr(true) > Expr(false),
+          sqls = Seq(
+            "SELECT (? > ?) AS res",
+            "SELECT CASE WHEN (? > ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
 
       test("lessThan") -
-        checker(query = Expr(true) < Expr(true), sql = "SELECT (? < ?) AS res", value = false)
+        checker(
+          query = Expr(true) < Expr(true),
+          sqls = Seq(
+            "SELECT (? < ?) AS res",
+            "SELECT CASE WHEN (? < ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = false
+        )
 
       test("greaterThanOrEquals") -
-        checker(query = Expr(true) >= Expr(true), sql = "SELECT (? >= ?) AS res", value = true)
+        checker(
+          query = Expr(true) >= Expr(true),
+          sqls = Seq(
+            "SELECT (? >= ?) AS res",
+            "SELECT CASE WHEN (? >= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
 
       test("lessThanOrEquals") -
-        checker(query = Expr(true) <= Expr(true), sql = "SELECT (? <= ?) AS res", value = true)
+        checker(
+          query = Expr(true) <= Expr(true),
+          sqls = Seq(
+            "SELECT (? <= ?) AS res",
+            "SELECT CASE WHEN (? <= ?) THEN 1 ELSE 0 END AS res"
+          ),
+          value = true
+        )
     }
 
     test("cast") {
@@ -76,6 +160,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr(1234.1234).cast[Int],
         sqls = Seq(
           "SELECT CAST(? AS INTEGER) AS res",
+          "SELECT CAST(? AS INT) AS res",
           "SELECT CAST(? AS SIGNED) AS res"
         ),
         value = 1234
@@ -97,7 +182,8 @@ trait ExprOpsTests extends ScalaSqlSuite {
           "SELECT CAST(? AS VARCHAR) AS res",
           "SELECT CAST(? AS CHAR) AS res"
         ),
-        value = "1234.5678"
+        value = "1234.5678",
+        moreValues = Seq("1234.57") // MsSQL rounds to 2 decimal places
       )
 
       test("localdate") - checker(
@@ -113,6 +199,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2023-11-12 03:22:41").cast[java.time.LocalDateTime],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
@@ -123,6 +210,7 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2023-11-12 03:22:41").cast[java.util.Date],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
@@ -133,18 +221,23 @@ trait ExprOpsTests extends ScalaSqlSuite {
         query = Expr("2007-12-03 10:15:30.00").cast[java.time.Instant],
         sqls = Seq(
           "SELECT CAST(? AS DATETIME) AS res",
+          "SELECT CAST(? AS DATETIME2) AS res",
           "SELECT CAST(? AS TIMESTAMP) AS res",
           "SELECT CAST(? AS VARCHAR) AS res"
         ),
         value = java.time.Instant.parse("2007-12-03T02:15:30.00Z")
       )
 
-      test("castNamed") - checker(
-        query = Expr(1234.5678).castNamed[String](sql"CHAR(3)"),
-        sql = "SELECT CAST(? AS CHAR(3)) AS res",
-        value = "123",
-        moreValues = Seq("1234.5678") // SQLITE doesn't truncate on cast
-      )
+      test("castNamed") - {
+        // Microsoft SQL throws "Arithmetic overflow error for type varchar"
+        if (!this.isInstanceOf[MsSqlSuite])
+          checker(
+            query = Expr(1234.5678).castNamed[String](sql"CHAR(3)"),
+            sql = "SELECT CAST(? AS CHAR(3)) AS res",
+            value = "123",
+            moreValues = Seq("1234.5678") // SQLITE doesn't truncate on cast
+          )
+      }
     }
   }
 }
