@@ -47,6 +47,8 @@ trait MySqlDialect extends Dialect {
 
   def escape(str: String) = s"`$str`"
 
+  def supportSavepointRelease = true
+
   override implicit def ByteType: TypeMapper[Byte] = new MySqlByteType
   class MySqlByteType extends ByteType { override def castTypeString = "SIGNED" }
 
@@ -157,6 +159,8 @@ trait MySqlDialect extends Dialect {
 }
 
 object MySqlDialect extends MySqlDialect {
+
+  override def supportSavepointRelease: Boolean = true
 
   class DbApiOps(dialect: DialectTypeMappers)
       extends scalasql.operations.DbApiOps(dialect)

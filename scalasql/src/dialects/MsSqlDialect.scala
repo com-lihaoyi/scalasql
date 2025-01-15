@@ -26,6 +26,8 @@ trait MsSqlDialect extends Dialect {
   override def escape(str: String): String =
     s"[$str]"
 
+  def supportSavepointRelease = false
+
   override implicit def IntType: TypeMapper[Int] = new MsSqlIntType
   class MsSqlIntType extends IntType { override def castTypeString = "INT" }
 

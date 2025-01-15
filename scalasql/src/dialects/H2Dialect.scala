@@ -31,6 +31,8 @@ trait H2Dialect extends Dialect {
 
   def escape(str: String) = s"\"${str.toUpperCase()}\""
 
+  def supportSavepointRelease = true
+
   override implicit def EnumType[T <: Enumeration#Value](
       implicit constructor: String => T
   ): TypeMapper[T] = new H2EnumType[T]
@@ -67,6 +69,9 @@ trait H2Dialect extends Dialect {
 }
 
 object H2Dialect extends H2Dialect {
+
+  override def supportSavepointRelease: Boolean = true
+
   class DbApiOps(dialect: DialectTypeMappers)
       extends scalasql.operations.DbApiOps(dialect)
       with ConcatOps
