@@ -55,8 +55,7 @@ object TableMacros {
 
     val queryables = '{ (dialect: DialectTypeMappers, n: Int) =>
       {
-        given DialectTypeMappers = dialect
-        lazy val _ = summon[DialectTypeMappers]
+        import dialect.*
 
         ${
           Expr.ofList(constructorValueParams.map { param =>
@@ -128,8 +127,7 @@ object TableMacros {
     val vExpr0 = '{
       (tableRef: TableRef, dialect: DialectTypeMappers, queryable: Table.Metadata.QueryableProxy) =>
         {
-          given DialectTypeMappers = dialect
-          lazy val _ = summon[DialectTypeMappers]
+          import dialect.*
 
           ${
             constructV[Column]((param, _) => { case (paramTpe, _, _) =>
