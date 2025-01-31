@@ -62,6 +62,13 @@ trait Dialect extends DialectTypeMappers {
     def put(r: PreparedStatement, idx: Int, v: Long) = r.setLong(idx, v)
   }
 
+  implicit def FloatType: TypeMapper[Float] = new FloatType
+  class FloatType extends TypeMapper[Float] {
+    def jdbcType = JDBCType.FLOAT
+    def get(r: ResultSet, idx: Int) = r.getFloat(idx)
+    def put(r: PreparedStatement, idx: Int, v: Float) = r.setFloat(idx, v)
+  }
+
   implicit def DoubleType: TypeMapper[Double] = new DoubleType
   class DoubleType extends TypeMapper[Double] {
     def jdbcType = JDBCType.DOUBLE
@@ -92,6 +99,7 @@ trait Dialect extends DialectTypeMappers {
       r.getObject(idx) match {
         case u: UUID => u
         case s: String => UUID.fromString(s)
+        case null => null
       }
     }
 
@@ -103,16 +111,29 @@ trait Dialect extends DialectTypeMappers {
   implicit def BytesType: TypeMapper[geny.Bytes] = new BytesType
   class BytesType extends TypeMapper[geny.Bytes] {
     def jdbcType = JDBCType.VARBINARY
-    def get(r: ResultSet, idx: Int) = new geny.Bytes(r.getBytes(idx))
-    def put(r: PreparedStatement, idx: Int, v: geny.Bytes) = r.setBytes(idx, v.array)
+    def get(r: ResultSet, idx: Int) = {
+      val bytes = r.getBytes(idx)
+      if (bytes == null) null
+      else new geny.Bytes(bytes)
+    }
+    def put(r: PreparedStatement, idx: Int, v: geny.Bytes) = {
+      val byteArray = if (v == null) null else v.array
+      r.setBytes(idx, byteArray)
+    }
   }
 
   implicit def UtilDateType: TypeMapper[java.util.Date] = new UtilDateType
   class UtilDateType extends TypeMapper[java.util.Date] {
     def jdbcType = JDBCType.TIMESTAMP
-    def get(r: ResultSet, idx: Int) = new java.util.Date(r.getTimestamp(idx).getTime)
-    def put(r: PreparedStatement, idx: Int, v: java.util.Date) =
-      r.setTimestamp(idx, new java.sql.Timestamp(v.getTime))
+    def get(r: ResultSet, idx: Int) = {
+      val ts = r.getTimestamp(idx)
+      if (ts == null) null
+      else new java.util.Date(ts.getTime)
+    }
+    def put(r: PreparedStatement, idx: Int, v: java.util.Date) = {
+      val time = if (v == null) null else new java.sql.Timestamp(v.getTime)
+      r.setTimestamp(idx, time)
+    }
   }
 
   implicit def LocalDateType: TypeMapper[LocalDate] = new LocalDateType
@@ -140,9 +161,15 @@ trait Dialect extends DialectTypeMappers {
   class ZonedDateTimeType extends TypeMapper[ZonedDateTime] {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     override def castTypeString = "TIMESTAMP WITH TIME ZONE"
-    def get(r: ResultSet, idx: Int) = r.getTimestamp(idx).toInstant.atZone(ZoneId.systemDefault())
-    def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = r
-      .setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
+    def get(r: ResultSet, idx: Int) = {
+      val ts = r.getTimestamp(idx)
+      if (ts == null) null
+      else ts.toInstant.atZone(ZoneId.systemDefault())
+    }
+    def put(r: PreparedStatement, idx: Int, v: ZonedDateTime) = {
+      val ts = if (v == null) null else java.sql.Timestamp.from(v.toInstant)
+      r.setTimestamp(idx, ts)
+    }
   }
 
   implicit def InstantType: TypeMapper[Instant] = new InstantType
@@ -162,11 +189,14 @@ trait Dialect extends DialectTypeMappers {
           l.toInstant(ZoneId.systemDefault().getRules().getOffset(Instant.now()))
         // Everyone seems to return this sometimes
         case l: java.sql.Timestamp => l.toInstant()
+        case null => null
       }
     }
 
-    def put(r: PreparedStatement, idx: Int, v: Instant) = r
-      .setTimestamp(idx, java.sql.Timestamp.from(v))
+    def put(r: PreparedStatement, idx: Int, v: Instant) = {
+      val ts = if (v == null) null else java.sql.Timestamp.from(v)
+      r.setTimestamp(idx, ts)
+    }
   }
 
   implicit def OffsetTimeType: TypeMapper[OffsetTime] = new OffsetTimeType
@@ -182,10 +212,13 @@ trait Dialect extends DialectTypeMappers {
     def jdbcType = JDBCType.TIMESTAMP_WITH_TIMEZONE
     override def castTypeString = "TIMESTAMP WITH TIME ZONE"
     def get(r: ResultSet, idx: Int) = {
-      r.getTimestamp(idx).toInstant.atOffset(OffsetDateTime.now().getOffset)
+      val ts = r.getTimestamp(idx)
+      if (ts == null) null
+      else ts.toInstant.atOffset(OffsetDateTime.now().getOffset)
     }
     def put(r: PreparedStatement, idx: Int, v: OffsetDateTime) = {
-      r.setTimestamp(idx, java.sql.Timestamp.from(v.toInstant))
+      val ts = if (v == null) null else java.sql.Timestamp.from(v.toInstant)
+      r.setTimestamp(idx, ts)
     }
   }
 
@@ -193,15 +226,26 @@ trait Dialect extends DialectTypeMappers {
     new EnumType[T]
   class EnumType[T](implicit constructor: String => T) extends TypeMapper[T] {
     def jdbcType: JDBCType = JDBCType.VARCHAR
-    def get(r: ResultSet, idx: Int): T = constructor(r.getString(idx))
-    def put(r: PreparedStatement, idx: Int, v: T) = r.setObject(idx, v, java.sql.Types.OTHER)
+    def get(r: ResultSet, idx: Int): T = {
+      val str = r.getString(idx)
+      if (str == null) null.asInstanceOf[T]
+      else constructor(str)
+    }
+    def put(r: PreparedStatement, idx: Int, v: T) =
+      r.setObject(idx, v, java.sql.Types.OTHER)
   }
+
+  implicit def from(x: Byte): Expr[Byte] = Expr(x)
+
+  implicit def from(x: Short): Expr[Short] = Expr(x)
 
   implicit def from(x: Int): Expr[Int] = Expr(x)
 
   implicit def from(x: Long): Expr[Long] = Expr(x)
 
   implicit def from(x: Boolean): Expr[Boolean] = Expr.apply0(x, x)
+
+  implicit def from(x: Float): Expr[Float] = Expr(x)
 
   implicit def from(x: Double): Expr[Double] = Expr(x)
 
@@ -219,7 +263,7 @@ trait Dialect extends DialectTypeMappers {
 
       def put(r: PreparedStatement, idx: Int, v: Option[T]): Unit = {
         v match {
-          case None => r.setNull(idx, jdbcType.getVendorTypeNumber)
+          case None => r.setNull(idx, JDBCType.NULL.getVendorTypeNumber)
           case Some(value) => inner.put(r, idx, value)
         }
       }

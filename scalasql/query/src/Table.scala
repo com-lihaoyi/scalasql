@@ -1,6 +1,7 @@
 package scalasql.query
 
 import scalasql.core.{DialectTypeMappers, Sc, Queryable, Expr}
+import scalasql.core.Context
 
 /**
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
@@ -49,6 +50,13 @@ object Table {
   def name(t: Table.Base) = t.tableName
   def labels(t: Table.Base) = t.tableLabels
   def columnNameOverride[V[_[_]]](t: Table.Base)(s: String) = t.tableColumnNameOverride(s)
+  def resolve(t: Table.Base)(implicit context: Context) = {
+    val mappedTableName = context.config.tableNameMapper(t.tableName)
+    t.schemaName match {
+      case "" => mappedTableName
+      case str => s"$str." + mappedTableName
+    }
+  }
   trait Base {
 
     /**

@@ -40,7 +40,7 @@ object Nulls {
 /**
  * Models a SQL `GROUP BY` clause
  */
-case class GroupBy(key: Expr[?], select: () => Select[?, ?], having: Seq[Expr[?]])
+case class GroupBy(keys: Seq[Expr[?]], select: () => Select[?, ?], having: Seq[Expr[?]])
 
 /**
  * Models a SQL `JOIN` clause

@@ -12,7 +12,7 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, ?], dialect: D
   def size: Expr[Int] = v.aggregateExpr(_ => _ => sql"COUNT(1)")
 
   /** Computes the sum of column values */
-  def sumBy[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def sumBy[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = v.aggregateExpr(expr => implicit ctx => sql"SUM(${f(expr)})")
 
@@ -22,32 +22,32 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, ?], dialect: D
   ): Expr[V] = v.aggregateExpr(expr => implicit ctx => sql"MIN(${f(expr)})")
 
   /** Finds the maximum value in a column */
-  def maxBy[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def maxBy[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = v.aggregateExpr(expr => implicit ctx => sql"MAX(${f(expr)})")
 
   /** Computes the average value of a column */
-  def avgBy[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def avgBy[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[V] = v.aggregateExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
 
   /** Computes the sum of column values */
-  def sumByOpt[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def sumByOpt[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[Option[V]] = v.aggregateExpr(expr => implicit ctx => sql"SUM(${f(expr)})")
 
   /** Finds the minimum value in a column */
-  def minByOpt[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def minByOpt[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[Option[V]] = v.aggregateExpr(expr => implicit ctx => sql"MIN(${f(expr)})")
 
   /** Finds the maximum value in a column */
-  def maxByOpt[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def maxByOpt[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[Option[V]] = v.aggregateExpr(expr => implicit ctx => sql"MAX(${f(expr)})")
 
   /** Computes the average value of a column */
-  def avgByOpt[V: Numeric: TypeMapper](f: T => Expr[V])(
+  def avgByOpt[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]
   ): Expr[Option[V]] = v.aggregateExpr(expr => implicit ctx => sql"AVG(${f(expr)})")
 

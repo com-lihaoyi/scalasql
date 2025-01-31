@@ -1108,6 +1108,81 @@ Purchase.select
 
 
 
+### Select.groupBy.multipleKeys
+
+
+
+```scala
+Purchase.select.groupBy(x => (x.shippingInfoId, x.productId))(_.sumBy(_.total))
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0_0,
+      purchase0.product_id AS res_0_1,
+      SUM(purchase0.total) AS res_1
+    FROM 
+      purchase purchase0
+    GROUP BY
+      purchase0.shipping_info_id,
+      purchase0.product_id
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ((1, 1), 888.0),
+      ((1, 2), 900.0),
+      ((1, 3), 15.7),
+      ((2, 4), 493.8),
+      ((2, 5), 10000.0),
+      ((3, 1), 44.4),
+      ((3, 6), 1.3)
+    )
+    ```
+
+
+
+### Select.groupBy.multipleKeysHaving
+
+
+
+```scala
+Purchase.select
+  .groupBy(x => (x.shippingInfoId, x.productId))(_.sumBy(_.total))
+  .filter(_._2 > 10)
+  .filter(_._2 < 100)
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0_0,
+      purchase0.product_id AS res_0_1,
+      SUM(purchase0.total) AS res_1
+    FROM 
+      purchase purchase0
+    GROUP BY
+      purchase0.shipping_info_id,
+      purchase0.product_id
+    HAVING 
+      (SUM(purchase0.total) > ?) AND (SUM(purchase0.total) < ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq(((1, 3), 15.7), ((3, 1), 44.4))
+    ```
+
+
+
 ### Select.distinct.nondistinct
 
 Normal queries can allow duplicates in the returned row values, as seen below.
@@ -4481,6 +4556,37 @@ Buyer.insert
 
 
 
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
 ### OnConflict.ignore.returningEmpty
 
 
@@ -4513,6 +4619,40 @@ Buyer.insert
 
 
 
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[String]
+    ```
+
+
+
 ### OnConflict.ignore.returningOne
 
 
@@ -4522,7 +4662,7 @@ Buyer.insert
   .columns(
     _.name := "test buyer",
     _.dateOfBirth := LocalDate.parse("2023-09-09"),
-    _.id := 4 // This should cause a primary key conflict
+    _.id := 4
   )
   .onConflictIgnore(_.id)
   .returning(_.name)
@@ -4532,6 +4672,40 @@ Buyer.insert
 *
     ```sql
     INSERT INTO buyer (name, date_of_birth, id) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO NOTHING
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    Seq("test buyer")
+    ```
+
+
+
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 5,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictIgnore(_.id)
+  .returning(_.name)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
     ON CONFLICT (id) DO NOTHING
     RETURNING buyer.name AS res
     ```
@@ -4576,6 +4750,37 @@ Buyer.insert
 
 ----
 
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(_.dateOfBirth := LocalDate.parse("2023-10-10"))
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET date_of_birth = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
 
 
 ```scala
@@ -4588,7 +4793,7 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2023-10-10")),
       Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
@@ -4627,6 +4832,37 @@ Buyer.insert
 
 ----
 
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 3,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
 
 
 ```scala
@@ -4641,7 +4877,7 @@ Buyer.select
     Seq(
       Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
       Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
-      Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+      Buyer[Sc](3, "LI HAOYI", LocalDate.parse("1965-08-09"))
     )
     ```
 
@@ -4677,6 +4913,42 @@ Buyer.insert
 *
     ```scala
     "JAMES BOND"
+    ```
+
+
+
+----
+
+with `insert.values`
+
+```scala
+Buyer.insert
+  .values(
+    Buyer[Sc](
+      id = 1,
+      name = "test buyer",
+      dateOfBirth = LocalDate.parse("2023-09-09")
+    )
+  )
+  .onConflictUpdate(_.id)(v => v.name := v.name.toLowerCase)
+  .returning(_.name)
+  .single
+```
+
+
+*
+    ```sql
+    INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+    ON CONFLICT (id) DO UPDATE
+    SET name = LOWER(buyer.name)
+    RETURNING buyer.name AS res
+    ```
+
+
+
+*
+    ```scala
+    "james bond"
     ```
 
 
@@ -6201,7 +6473,7 @@ Buyer.select
 
 ## Schema
 Additional tests to ensure schema mapping produces valid SQL
-### Schema.schema
+### Schema.schema.select
 
 If your table belongs to a schema other than the default schema of your database,
 you can specify this in your table definition with table.schemaName
@@ -6226,6 +6498,184 @@ Invoice.select
       Invoice[Sc](id = 2, total = 213.3, vendor_name = "Samsung"),
       Invoice[Sc](id = 3, total = 407.2, vendor_name = "Shell")
     )
+    ```
+
+
+
+### Schema.schema.insert.columns
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert.columns(
+  _.total := 200.3,
+  _.vendor_name := "Huawei"
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.insert.values
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert
+  .values(
+    Invoice[Sc](
+      id = 0,
+      total = 200.3,
+      vendor_name = "Huawei"
+    )
+  )
+  .skipColumns(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.update
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice
+  .update(_.id === 1)
+  .set(
+    _.total := 200.3,
+    _.vendor_name := "Huawei"
+  )
+```
+
+
+*
+    ```sql
+    UPDATE otherschema.invoice
+                SET
+                  total = ?,
+                  vendor_name = ?
+                WHERE
+                  (invoice.id = ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.delete
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.delete(_.id === 1)
+```
+
+
+*
+    ```sql
+    DELETE FROM otherschema.invoice WHERE (invoice.id = ?)
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+### Schema.schema.insert into
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.insert.select(
+  i => (i.total, i.vendor_name),
+  Invoice.select.map(i => (i.total, i.vendor_name))
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO
+                  otherschema.invoice (total, vendor_name)
+                SELECT
+                  invoice0.total AS res_0,
+                  invoice0.vendor_name AS res_1
+                FROM
+                  otherschema.invoice invoice0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### Schema.schema.join
+
+If your table belongs to a schema other than the default schema of your database,
+you can specify this in your table definition with table.schemaName
+
+```scala
+Invoice.select.join(Invoice)(_.id `=` _.id).map(_._1.id)
+```
+
+
+*
+    ```sql
+    SELECT
+                  invoice0.id AS res
+                FROM
+                  otherschema.invoice invoice0
+                JOIN otherschema.invoice invoice1 ON (invoice0.id = invoice1.id)
+    ```
+
+
+
+*
+    ```scala
+    Seq(2, 3, 4, 5, 6, 7, 8, 9)
     ```
 
 
@@ -10159,11 +10609,91 @@ OptCols.select.sortBy(_.myInt).desc.nullsFirst
 
 
 
+### Optional.sorting.roundTripOptionalValues
+
+This example demonstrates a range of different data types being written
+as options, both with Some(v) and None values
+
+```scala
+object MyEnum extends Enumeration {
+  val foo, bar, baz = Value
+
+  implicit def make: String => Value = withName
+}
+case class OptDataTypes[T[_]](
+    myTinyInt: T[Option[Byte]],
+    mySmallInt: T[Option[Short]],
+    myInt: T[Option[Int]],
+    myBigInt: T[Option[Long]],
+    myDouble: T[Option[Double]],
+    myBoolean: T[Option[Boolean]],
+    myLocalDate: T[Option[LocalDate]],
+    myLocalTime: T[Option[LocalTime]],
+    myLocalDateTime: T[Option[LocalDateTime]],
+    myUtilDate: T[Option[Date]],
+    myInstant: T[Option[Instant]],
+    myVarBinary: T[Option[geny.Bytes]],
+    myUUID: T[Option[java.util.UUID]],
+    myEnum: T[Option[MyEnum.Value]]
+)
+
+object OptDataTypes extends Table[OptDataTypes] {
+  override def tableName: String = "data_types"
+}
+
+val rowSome = OptDataTypes[Sc](
+  myTinyInt = Some(123.toByte),
+  mySmallInt = Some(12345.toShort),
+  myInt = Some(12345678),
+  myBigInt = Some(12345678901L),
+  myDouble = Some(3.14),
+  myBoolean = Some(true),
+  myLocalDate = Some(LocalDate.parse("2023-12-20")),
+  myLocalTime = Some(LocalTime.parse("10:15:30")),
+  myLocalDateTime = Some(LocalDateTime.parse("2011-12-03T10:15:30")),
+  myUtilDate = Some(
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2011-12-03T10:15:30.000")
+  ),
+  myInstant = Some(Instant.parse("2011-12-03T10:15:30Z")),
+  myVarBinary = Some(new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8))),
+  myUUID = Some(new java.util.UUID(1234567890L, 9876543210L)),
+  myEnum = Some(MyEnum.bar)
+)
+
+val rowNone = OptDataTypes[Sc](
+  myTinyInt = None,
+  mySmallInt = None,
+  myInt = None,
+  myBigInt = None,
+  myDouble = None,
+  myBoolean = None,
+  myLocalDate = None,
+  myLocalTime = None,
+  myLocalDateTime = None,
+  myUtilDate = None,
+  myInstant = None,
+  myVarBinary = None,
+  myUUID = None,
+  myEnum = None
+)
+
+db.run(
+  OptDataTypes.insert.values(rowSome, rowNone)
+) ==> 2
+
+db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
+```
+
+
+
+
+
+
 ## PostgresDialect
 Operations specific to working with Postgres Databases
 ### PostgresDialect.distinctOn
 
-ScalaSql's Postgres dialect provides teh `.distinctOn` operator, which translates
+ScalaSql's Postgres dialect provides the `.distinctOn` operator, which translates
 into a SQL `DISTINCT ON` clause
 
 ```scala
@@ -10191,6 +10721,38 @@ Purchase.select.distinctOn(_.shippingInfoId).sortBy(_.shippingInfoId).desc
       Purchase[Sc](6, 3, 1, 5, 44.4),
       Purchase[Sc](4, 2, 4, 4, 493.8),
       Purchase[Sc](2, 1, 2, 3, 900.0)
+    )
+    ```
+
+
+
+### PostgresDialect.forUpdate
+
+ScalaSql's Postgres dialect provides the `.forUpdate` operator, which translates
+into a SQL `SELECT ... FOR UPDATE` clause
+
+```scala
+Invoice.select.filter(_.id === 1).forUpdate
+```
+
+
+*
+    ```sql
+    SELECT
+      invoice0.id AS id,
+      invoice0.total AS total,
+      invoice0.vendor_name AS vendor_name
+    FROM otherschema.invoice invoice0
+    WHERE (invoice0.id = ?)
+    FOR UPDATE
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Invoice[Sc](1, 150.4, "Siemens")
     )
     ```
 
@@ -10400,6 +10962,38 @@ db.random
 
 ## MySqlDialect
 Operations specific to working with MySql Databases
+### MySqlDialect.forUpdate
+
+ScalaSql's MySql dialect provides the `.forUpdate` operator, which translates
+into a SQL `SELECT ... FOR UPDATE` clause
+
+```scala
+Buyer.select.filter(_.id === 1).forUpdate
+```
+
+
+*
+    ```sql
+    SELECT
+      buyer0.id AS id,
+      buyer0.name AS name,
+      buyer0.date_of_birth AS date_of_birth
+    FROM buyer buyer0
+    WHERE (buyer0.id = ?)
+    FOR UPDATE
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
+    )
+    ```
+
+
+
 ### MySqlDialect.reverse
 
 

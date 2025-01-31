@@ -11,6 +11,27 @@ trait MySqlDialectTests extends MySqlSuite {
   def description = "Operations specific to working with MySql Databases"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   def tests = Tests {
+
+    test("forUpdate") - checker(
+      query = Buyer.select.filter(_.id === 1).forUpdate,
+      sql = """
+        SELECT
+          buyer0.id AS id,
+          buyer0.name AS name,
+          buyer0.date_of_birth AS date_of_birth
+        FROM buyer buyer0
+        WHERE (buyer0.id = ?)
+        FOR UPDATE
+      """,
+      value = Seq(
+        Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03"))
+      ),
+      docs = """
+        ScalaSql's MySql dialect provides the `.forUpdate` operator, which translates
+        into a SQL `SELECT ... FOR UPDATE` clause
+      """
+    )
+
     test("reverse") -
       checker(query = Expr("Hello").reverse, sql = "SELECT REVERSE(?) AS res", value = "olleH")
 

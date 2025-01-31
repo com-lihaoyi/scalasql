@@ -54,6 +54,35 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     }
   }
 
+  implicit class SelectForUpdateConv[Q, R](r: Select[Q, R]) {
+
+    /**
+     * SELECT .. FOR UPDATE acquires an exclusive lock, blocking other transactions from
+     * modifying or locking the selected rows, which is for managing concurrent transactions
+     * and ensuring data consistency in multi-step operations.
+     */
+    def forUpdate: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE")
+
+    /**
+     * SELECT ... FOR NO KEY UPDATE: A weaker lock that doesn't block inserts into child
+     * tables with foreign key references
+     */
+    def forNoKeyUpdate: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR NO KEY UPDATE")
+
+    /**
+     * SELECT ... FOR SHARE: Locks the selected rows for reading, allowing other transactions
+     * to read but not modify the locked rows.
+     */
+    def forShare: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR SHARE")
+
+    /** SELECT ... FOR KEY SHARE: The weakest lock, only conflicts with FOR UPDATE */
+    def forKeyShare: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR KEY SHARE")
+  }
+
   override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps =
     new PostgresDialect.DbApiOps(this)
 }

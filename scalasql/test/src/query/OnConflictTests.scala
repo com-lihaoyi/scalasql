@@ -36,6 +36,24 @@ trait OnConflictTests extends ScalaSqlSuite {
         """
       )
 
+      checker(
+        query = Text {
+          Buyer.insert
+            .values(
+              Buyer[Sc](
+                id = 1,
+                name = "test buyer",
+                dateOfBirth = LocalDate.parse("2023-09-09")
+              )
+            )
+            .onConflictIgnore(_.id)
+        },
+        sql =
+          "INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING",
+        value = 0,
+        docs = "with `insert.values`"
+      )
+
       test("returningEmpty") - {
         checker(
           query = Text {
@@ -55,6 +73,28 @@ trait OnConflictTests extends ScalaSqlSuite {
           """,
           value = Seq.empty[String]
         )
+
+        checker(
+          query = Text {
+            Buyer.insert
+              .values(
+                Buyer[Sc](
+                  id = 1,
+                  name = "test buyer",
+                  dateOfBirth = LocalDate.parse("2023-09-09")
+                )
+              )
+              .onConflictIgnore(_.id)
+              .returning(_.name)
+          },
+          sql = """
+            INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+            ON CONFLICT (id) DO NOTHING
+            RETURNING buyer.name AS res
+          """,
+          value = Seq.empty[String],
+          docs = "with `insert.values`"
+        )
       }
 
       test("returningOne") - {
@@ -64,7 +104,7 @@ trait OnConflictTests extends ScalaSqlSuite {
               .columns(
                 _.name := "test buyer",
                 _.dateOfBirth := LocalDate.parse("2023-09-09"),
-                _.id := 4 // This should cause a primary key conflict
+                _.id := 4
               )
               .onConflictIgnore(_.id)
               .returning(_.name)
@@ -75,6 +115,28 @@ trait OnConflictTests extends ScalaSqlSuite {
             RETURNING buyer.name AS res
           """,
           value = Seq("test buyer")
+        )
+
+        checker(
+          query = Text {
+            Buyer.insert
+              .values(
+                Buyer[Sc](
+                  id = 5,
+                  name = "test buyer",
+                  dateOfBirth = LocalDate.parse("2023-09-09")
+                )
+              )
+              .onConflictIgnore(_.id)
+              .returning(_.name)
+          },
+          sql = """
+            INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+            ON CONFLICT (id) DO NOTHING
+            RETURNING buyer.name AS res
+          """,
+          value = Seq("test buyer"),
+          docs = "with `insert.values`"
         )
       }
 
@@ -100,9 +162,27 @@ trait OnConflictTests extends ScalaSqlSuite {
       )
 
       checker(
+        query = Text {
+          Buyer.insert
+            .values(
+              Buyer[Sc](
+                id = 1,
+                name = "test buyer",
+                dateOfBirth = LocalDate.parse("2023-09-09")
+              )
+            )
+            .onConflictUpdate(_.id)(_.dateOfBirth := LocalDate.parse("2023-10-10"))
+        },
+        sql =
+          "INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET date_of_birth = ?",
+        value = 1,
+        docs = "with `insert.values`"
+      )
+
+      checker(
         query = Text { Buyer.select },
         value = Seq(
-          Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2001-02-03")),
+          Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2023-10-10")),
           Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
           Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
         ),
@@ -127,11 +207,29 @@ trait OnConflictTests extends ScalaSqlSuite {
       )
 
       checker(
+        query = Text {
+          Buyer.insert
+            .values(
+              Buyer[Sc](
+                id = 3,
+                name = "test buyer",
+                dateOfBirth = LocalDate.parse("2023-09-09")
+              )
+            )
+            .onConflictUpdate(_.id)(v => v.name := v.name.toUpperCase)
+        },
+        sql =
+          "INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = UPPER(buyer.name)",
+        value = 1,
+        docs = "with `insert.values`"
+      )
+
+      checker(
         query = Text { Buyer.select },
         value = Seq(
           Buyer[Sc](1, "JAMES BOND", LocalDate.parse("2001-02-03")),
           Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
-          Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
+          Buyer[Sc](3, "LI HAOYI", LocalDate.parse("1965-08-09"))
         ),
         normalize = (x: Seq[Buyer[Sc]]) => x.sortBy(_.id)
       )
@@ -157,6 +255,30 @@ trait OnConflictTests extends ScalaSqlSuite {
           RETURNING buyer.name AS res
         """,
         value = "JAMES BOND"
+      )
+
+      checker(
+        query = Text {
+          Buyer.insert
+            .values(
+              Buyer[Sc](
+                id = 1,
+                name = "test buyer",
+                dateOfBirth = LocalDate.parse("2023-09-09")
+              )
+            )
+            .onConflictUpdate(_.id)(v => v.name := v.name.toLowerCase)
+            .returning(_.name)
+            .single
+        },
+        sql = """
+          INSERT INTO buyer (id, name, date_of_birth) VALUES (?, ?, ?)
+          ON CONFLICT (id) DO UPDATE
+          SET name = LOWER(buyer.name)
+          RETURNING buyer.name AS res
+        """,
+        value = "james bond",
+        docs = "with `insert.values`"
       )
     }
   }

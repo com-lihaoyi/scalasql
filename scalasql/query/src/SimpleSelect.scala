@@ -22,6 +22,7 @@ import scalasql.renderer.JoinsToSql
 class SimpleSelect[Q, R](
     val expr: Q,
     val exprPrefix: Option[Context => SqlStr],
+    val exprSuffix: Option[Context => SqlStr],
     val preserveAll: Boolean,
     val from: Seq[Context.From],
     val joins: Seq[Join],
@@ -33,16 +34,20 @@ class SimpleSelect[Q, R](
   protected def copy[Q, R](
       expr: Q = this.expr,
       exprPrefix: Option[Context => SqlStr] = this.exprPrefix,
+      exprSuffix: Option[Context => SqlStr] = this.exprSuffix,
       preserveAll: Boolean = this.preserveAll,
       from: Seq[Context.From] = this.from,
       joins: Seq[Join] = this.joins,
       where: Seq[Expr[?]] = this.where,
       groupBy0: Option[GroupBy] = this.groupBy0
   )(implicit qr: Queryable.Row[Q, R]) =
-    newSimpleSelect(expr, exprPrefix, preserveAll, from, joins, where, groupBy0)
+    newSimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
 
   def selectWithExprPrefix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
     this.copy(exprPrefix = Some(s), preserveAll = preserveAll)
+
+  def selectWithExprSuffix(preserveAll: Boolean, s: Context => SqlStr): Select[Q, R] =
+    this.copy(exprSuffix = Some(s), preserveAll = preserveAll)
 
   def aggregateExpr[V: TypeMapper](
       f: Q => Context => SqlStr
@@ -111,6 +116,7 @@ class SimpleSelect[Q, R](
       copy(
         expr = newExpr,
         exprPrefix = exprPrefix,
+        exprSuffix = exprSuffix,
         joins = joins ++ newJoins,
         where = where ++ newWheres
       )
@@ -164,20 +170,21 @@ class SimpleSelect[Q, R](
   def groupBy[K, V, R1, R2](groupKey: Q => K)(
       groupAggregate: Aggregatable.Proxy[Q] => V
   )(implicit qrk: Queryable.Row[K, R1], qrv: Queryable.Row[V, R2]): Select[(K, V), (R1, R2)] = {
-    val groupKeyValue = groupKey(expr)
-    val Seq(groupKeyExpr) = qrk.walkExprs(groupKeyValue)
-    val newExpr = (groupKeyValue, groupAggregate(new Aggregatable.Proxy[Q](this.expr)))
+    val groupKeysValue = groupKey(expr)
+    val groupKeysExpr = qrk.walkExprs(groupKeysValue)
+    val newExpr = (groupKeysValue, groupAggregate(new Aggregatable.Proxy[Q](this.expr)))
 
     // Weird hack to store the post-groupby `Select` as part of the `GroupBy`
     // object, because `.flatMap` sometimes need us to roll back any subsequent
     // `.map`s (???)
-    lazy val groupByOpt: Option[GroupBy] = Some(GroupBy(groupKeyExpr, () => res, Nil))
+    lazy val groupByOpt: Option[GroupBy] = Some(GroupBy(groupKeysExpr, () => res, Nil))
     lazy val res =
       if (groupBy0.isEmpty) this.copy(expr = newExpr, groupBy0 = groupByOpt)
       else
         copy(
           expr = newExpr,
           exprPrefix = exprPrefix,
+          exprSuffix = exprSuffix,
           from = Seq(this.subqueryRef),
           joins = Nil,
           where = Nil,
@@ -258,7 +265,9 @@ object SimpleSelect {
 
     lazy val groupByOpt = SqlStr.flatten(SqlStr.opt(query.groupBy0) { groupBy =>
       val havingOpt = ExprsToSql.booleanExprs(sql" HAVING ", groupBy.having)
-      sql" GROUP BY ${groupBy.key}${havingOpt}"
+      val groupByJoined =
+        SqlStr.join(groupBy.keys.map(x => Renderable.renderSql(x)(context)), SqlStr.commaSep)
+      sql" GROUP BY ${groupByJoined}${havingOpt}"
     })
 
     def render(liveExprs0: LiveExprs) = {
@@ -287,11 +296,12 @@ object SimpleSelect {
       )
 
       lazy val exprPrefix = SqlStr.opt(query.exprPrefix) { p => p(context) + sql" " }
+      lazy val exprSuffix = SqlStr.opt(query.exprSuffix) { p => p(context) }
 
       val tables = SqlStr
         .join(query.from.map(renderedFroms(_)), SqlStr.commaSep)
 
-      sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt
+      sql"SELECT " + exprPrefix + exprStr + sql" FROM " + tables + joins + filtersOpt + groupByOpt + exprSuffix
     }
 
   }
