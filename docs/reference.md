@@ -4587,6 +4587,45 @@ Buyer.insert
 
 
 
+----
+
+with `insert.select`
+
+```scala
+Buyer.insert
+  .select(
+    identity,
+    Buyer.select
+      .filter(_.id === 1)
+      .map(b => b.copy(name = b.name + "."))
+  )
+  .onConflictIgnore(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO
+                buyer (id, name, date_of_birth)
+              SELECT
+                buyer0.id AS id,
+                (buyer0.name || ?) AS name,
+                buyer0.date_of_birth AS date_of_birth
+              FROM
+                buyer buyer0
+              WHERE
+                (buyer0.id = ?) ON CONFLICT (id) DO NOTHING
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
 ### OnConflict.ignore.returningEmpty
 
 
@@ -4781,6 +4820,47 @@ Buyer.insert
 
 ----
 
+with `insert.select`
+
+```scala
+Buyer.insert
+  .select(
+    identity,
+    Buyer.select
+      .filter(_.id === 1)
+      .map(b => b.copy(name = b.name + "."))
+  )
+  .onConflictUpdate(_.id)(_.dateOfBirth := LocalDate.parse("2023-10-09"))
+```
+
+
+*
+    ```sql
+    INSERT INTO
+                buyer (id, name, date_of_birth)
+              SELECT
+                buyer1.id AS id,
+                (buyer1.name || ?) AS name,
+                buyer1.date_of_birth AS date_of_birth
+              FROM
+                buyer buyer1 
+              WHERE
+                (buyer1.id = ?) ON CONFLICT (id) DO 
+              UPDATE
+              SET date_of_birth = ?
+    ```
+
+
+
+*
+    ```scala
+    1
+    ```
+
+
+
+----
+
 
 
 ```scala
@@ -4793,7 +4873,7 @@ Buyer.select
 *
     ```scala
     Seq(
-      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2023-10-10")),
+      Buyer[Sc](1, "TEST BUYER CONFLICT", LocalDate.parse("2023-10-09")),
       Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
       Buyer[Sc](3, "Li Haoyi", LocalDate.parse("1965-08-09"))
     )
