@@ -7,7 +7,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
  * A SQL `INSERT SELECT` query
  */
 trait InsertSelect[V[_[_]], C, R, R2]
-    extends Returning.InsertBase[V[Expr]]
+    extends Returning.InsertBase[V[Column]]
     with Query.ExecuteUpdate[Int]
 
 object InsertSelect {
@@ -15,7 +15,7 @@ object InsertSelect {
       implicit dialect: DialectTypeMappers
   ) extends InsertSelect[V, C, R, R2] {
     import dialect.{dialectSelf => _, _}
-    protected def expr = WithSqlExpr.get(insert).asInstanceOf[V[Expr]]
+    protected def expr = WithSqlExpr.get(insert)
 
     def table = insert.table
 
