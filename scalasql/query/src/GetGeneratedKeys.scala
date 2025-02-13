@@ -9,6 +9,7 @@ import scalasql.core.{Context, Expr, Queryable, SqlStr, WithSqlExpr}
  */
 trait GetGeneratedKeys[Q, R] extends Query[Seq[R]] {
   def single: Query.Single[R] = new Query.Single(this)
+  def singleOption: Query.SingleOption[R] = new Query.SingleOption(this)
 }
 
 object GetGeneratedKeys {
@@ -24,6 +25,7 @@ object GetGeneratedKeys {
     protected def queryWalkLabels(): Seq[List[String]] = Nil
     protected def queryWalkExprs(): Seq[Expr[?]] = Nil
     protected override def queryIsSingleRow = false
+    protected override def queryIsSingleRowOption = false
     protected override def queryIsExecuteUpdate = true
 
     override private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(base)(ctx)
