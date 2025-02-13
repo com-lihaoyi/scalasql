@@ -519,7 +519,10 @@ object DbApi {
 
       try {
         val res = block(new DbApi.SavepointImpl(savepoint, () => rollbackSavepoint(savepoint)))
-        if (savepointStack.lastOption.exists(_ eq savepoint)) {
+        if (
+          DialectConfig
+            .supportSavepointRelease(dialect) && savepointStack.lastOption.exists(_ eq savepoint)
+        ) {
           // Only release if this savepoint has not been rolled back,
           // directly or indirectly
           connection.releaseSavepoint(savepoint)
