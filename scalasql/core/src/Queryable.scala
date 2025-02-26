@@ -69,10 +69,10 @@ object Queryable {
     var nonNulls = 0
 
     def restAreNulls(columnsCount: Int): Boolean = {
-      val result = Range.inclusive(index + 1, index + columnsCount).map { i =>
+      val result = Range.inclusive(index + 1, index + columnsCount).forall { i =>
         r.getObject(i) == null
-      }.forall(identity)
-      if(result) index = index + columnsCount
+      }
+      if (result) index = index + columnsCount
       result
     }
 
@@ -151,7 +151,7 @@ object Queryable {
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
       def construct(args: Queryable.ResultSetIterator): Option[R] = {
-        if(args.restAreNulls(qr.walkLabels().length)) {
+        if (args.restAreNulls(qr.walkLabels().length)) {
           None
         } else {
           Option(qr.construct(args))

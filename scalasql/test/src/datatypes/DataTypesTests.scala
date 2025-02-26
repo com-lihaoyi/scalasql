@@ -213,7 +213,7 @@ trait DataTypesTests extends ScalaSqlSuite {
       }
     )
     test("JoinNullable proper type mapping") - checker.recorded(
-      "???",
+      "",
       Text {
         case class A[T[_]](id: T[Int], bId: T[Option[Int]])
         object A extends Table[A]
@@ -222,7 +222,6 @@ trait DataTypesTests extends ScalaSqlSuite {
           val Foo, Bar = Value
 
           implicit def make: String => Value = withName
-          // implicit val mapper: TypeMapper[Custom.Value] = StringType.bimap(_.toString, Custom.withName)
         }
 
         case class B[T[_]](id: T[Int], custom: T[Custom.Value])
