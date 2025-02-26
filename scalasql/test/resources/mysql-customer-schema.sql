@@ -4,6 +4,8 @@ DROP TABLE IF EXISTS `product` CASCADE;
 DROP TABLE IF EXISTS `shipping_info` CASCADE;
 DROP TABLE IF EXISTS `purchase` CASCADE;
 DROP TABLE IF EXISTS `data_types` CASCADE;
+DROP TABLE IF EXISTS `a` CASCADE;
+DROP TABLE IF EXISTS `b` CASCADE;
 DROP TABLE IF EXISTS `non_round_trip_types` CASCADE;
 DROP TABLE IF EXISTS `opt_cols` CASCADE;
 DROP TABLE IF EXISTS `nested` CASCADE;
@@ -55,6 +57,16 @@ CREATE TABLE data_types (
     my_var_binary VARBINARY(256),
     my_uuid CHAR(36),
     my_enum ENUM ('foo', 'bar', 'baz')
+);
+
+CREATE TABLE a(
+    id INTEGER,
+    b_id INTEGER
+);
+
+CREATE TABLE b(
+    id INTEGER,
+    custom VARCHAR(256)
 );
 
 CREATE TABLE non_round_trip_types(

@@ -3,6 +3,8 @@ DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS shipping_info;
 DROP TABLE IF EXISTS purchase;
 DROP TABLE IF EXISTS data_types;
+DROP TABLE IF EXISTS a;
+DROP TABLE IF EXISTS b;
 DROP TABLE IF EXISTS non_round_trip_types;
 DROP TABLE IF EXISTS nested;
 DROP TABLE IF EXISTS enclosing;
@@ -54,6 +56,16 @@ CREATE TABLE data_types (
     my_uuid BINARY(16),
     my_enum VARCHAR(256)
 --     my_offset_time TIME WITH TIME ZONE,
+);
+
+CREATE TABLE a(
+    id INTEGER,
+    b_id INTEGER
+);
+
+CREATE TABLE b(
+    id INTEGER,
+    custom VARCHAR(256)
 );
 
 CREATE TABLE non_round_trip_types(
