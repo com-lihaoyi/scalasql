@@ -68,6 +68,14 @@ object Queryable {
     var nulls = 0
     var nonNulls = 0
 
+    def consumeNulls(columnsCount: Int): Boolean = {
+      val result = Range.inclusive(index + 1, index + columnsCount).forall { i =>
+        r.getObject(i) == null
+      }
+      if (result) index = index + columnsCount
+      result
+    }
+
     def get[T](mt: TypeMapper[T]) = {
       index += 1
       val res = mt.get(r, index)
@@ -143,10 +151,11 @@ object Queryable {
       def walkExprs(q: JoinNullable[Q]) = qr.walkExprs(q.get)
 
       def construct(args: Queryable.ResultSetIterator): Option[R] = {
-        val startNonNulls = args.nonNulls
-        val res = qr.construct(args)
-        if (startNonNulls == args.nonNulls) None
-        else Option(res)
+        if (args.consumeNulls(qr.walkLabels().length)) {
+          None
+        } else {
+          Option(qr.construct(args))
+        }
       }
 
       def deconstruct(r: Option[R]): JoinNullable[Q] = JoinNullable(qr.deconstruct(r.get))

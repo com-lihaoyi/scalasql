@@ -9918,6 +9918,32 @@ db.run(Enclosing.select) ==> Seq(value1, value2)
 
 
 
+### DataTypes.JoinNullable proper type mapping
+
+
+
+```scala
+case class A[T[_]](id: T[Int], bId: T[Option[Int]])
+object A extends Table[A]
+
+object Custom extends Enumeration {
+  val Foo, Bar = Value
+
+  implicit def make: String => Value = withName
+}
+
+case class B[T[_]](id: T[Int], custom: T[Custom.Value])
+object B extends Table[B]
+db.run(A.insert.columns(_.id := 1, _.bId := None))
+val result = db.run(A.select.leftJoin(B)(_.id === _.id).single)
+result._2 ==> None
+```
+
+
+
+
+
+
 ## Optional
 Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala
 ### Optional

@@ -228,8 +228,7 @@ trait Dialect extends DialectTypeMappers {
     def jdbcType: JDBCType = JDBCType.VARCHAR
     def get(r: ResultSet, idx: Int): T = {
       val str = r.getString(idx)
-      if (str == null) null.asInstanceOf[T]
-      else constructor(str)
+      constructor(str)
     }
     def put(r: PreparedStatement, idx: Int, v: T) =
       r.setObject(idx, v, java.sql.Types.OTHER)
