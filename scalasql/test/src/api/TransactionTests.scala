@@ -2,6 +2,7 @@ package scalasql.api
 
 import scalasql.Purchase
 import scalasql.utils.{ScalaSqlSuite, SqliteSuite}
+import scalasql.DbApi
 import sourcecode.Text
 import utest._
 
@@ -11,6 +12,37 @@ trait TransactionTests extends ScalaSqlSuite {
 
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
   class FooException extends Exception
+
+  class ListenerException(message: String) extends Exception(message)
+
+  class StubTransactionListener(
+      throwOnBeforeCommit: Boolean = false,
+      throwOnAfterCommit: Boolean = false,
+      throwOnBeforeRollback: Boolean = false,
+      throwOnAfterRollback: Boolean = false
+  ) extends DbApi.TransactionListener {
+    var beforeCommitCalled = false
+    var afterCommitCalled = false
+    var beforeRollbackCalled = false
+    var afterRollbackCalled = false
+
+    override def beforeCommit(): Unit = {
+      beforeCommitCalled = true
+      if (throwOnBeforeCommit) throw new ListenerException("beforeCommit")
+    }
+    override def afterCommit(): Unit = {
+      afterCommitCalled = true
+      if (throwOnAfterCommit) throw new ListenerException("afterCommit")
+    }
+    override def beforeRollback(): Unit = {
+      beforeRollbackCalled = true
+      if (throwOnBeforeRollback) throw new ListenerException("beforeRollback")
+    }
+    override def afterRollback(): Unit = {
+      afterRollbackCalled = true
+      if (throwOnAfterRollback) throw new ListenerException("afterRollback")
+    }
+  }
 
   def tests = Tests {
     test("simple") {
@@ -535,6 +567,77 @@ trait TransactionTests extends ScalaSqlSuite {
 
           dbClient.transaction(_.run(Purchase.select.size)) ==> 7
         }
+      }
+    }
+
+    test("listener") {
+      test("beforeCommit and afterCommit are called under normal circumstances") {
+        val listener = new StubTransactionListener()
+        dbClient.transaction { implicit txn =>
+          txn.addTransactionListener(listener)
+        }
+        listener.beforeCommitCalled ==> true
+        listener.afterCommitCalled ==> true
+        listener.beforeRollbackCalled ==> false
+        listener.afterRollbackCalled ==> false
+      }
+
+      test("if beforeCommit causes an exception, {before,after}Rollback are called") {
+        val listener = new StubTransactionListener(throwOnBeforeCommit = true)
+        val e = intercept[ListenerException] {
+          dbClient.transaction { implicit txn =>
+            txn.addTransactionListener(listener)
+          }
+        }
+        e.getMessage ==> "beforeCommit"
+        listener.beforeCommitCalled ==> true
+        listener.afterCommitCalled ==> false
+        listener.beforeRollbackCalled ==> true
+        listener.afterRollbackCalled ==> true
+      }
+
+      test("if afterCommit causes an exception, the exception is propagated") {
+        val listener = new StubTransactionListener(throwOnAfterCommit = true)
+        val e = intercept[ListenerException] {
+          dbClient.transaction { implicit txn =>
+            txn.addTransactionListener(listener)
+          }
+        }
+        e.getMessage ==> "afterCommit"
+        listener.beforeCommitCalled ==> true
+        listener.afterCommitCalled ==> true
+        listener.beforeRollbackCalled ==> false
+        listener.afterRollbackCalled ==> false
+      }
+
+      test("if beforeRollback causes an exception, afterRollback is still called") {
+        val listener = new StubTransactionListener(throwOnBeforeRollback = true)
+        val e = intercept[FooException] {
+          dbClient.transaction { implicit txn =>
+            txn.addTransactionListener(listener)
+            throw new FooException()
+          }
+        }
+        e.getSuppressed.head.getMessage ==> "beforeRollback"
+        listener.beforeCommitCalled ==> false
+        listener.afterCommitCalled ==> false
+        listener.beforeRollbackCalled ==> true
+        listener.afterRollbackCalled ==> true
+      }
+
+      test("if afterRollback causes an exception, the exception is propagated") {
+        val listener = new StubTransactionListener(throwOnAfterRollback = true)
+        val e = intercept[FooException] {
+          dbClient.transaction { implicit txn =>
+            txn.addTransactionListener(listener)
+            throw new FooException()
+          }
+        }
+        e.getSuppressed.head.getMessage ==> "afterRollback"
+        listener.beforeCommitCalled ==> false
+        listener.afterCommitCalled ==> false
+        listener.beforeRollbackCalled ==> true
+        listener.afterRollbackCalled ==> true
       }
     }
   }

@@ -49,19 +49,42 @@ object DbClient {
 
     def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
-      val txn =
-        new DbApi.Impl(connection, config, dialect, false, () => connection.rollback())
-      try block(txn)
-      catch {
+      val txn = new DbApi.Impl(connection, config, dialect, autoCommit = false)
+      var rolledBack = false
+      try {
+        val result = block(txn)
+        txn.listeners.foreach(_.beforeCommit())
+        result
+      } catch {
         case e: Throwable =>
-          connection.rollback()
+          rolledBack = true
+          try {
+            txn.listeners.foreach(_.beforeRollback())
+          } catch {
+            case e2: Throwable =>
+              e.addSuppressed(e2)
+          } finally {
+            connection.rollback()
+            try {
+              txn.listeners.foreach(_.afterRollback())
+            } catch {
+              case e3: Throwable =>
+                e.addSuppressed(e3)
+            }
+          }
           throw e
-      } finally connection.setAutoCommit(true)
+      } finally {
+        // this commits uncommitted operations, if any
+        connection.setAutoCommit(true)
+        if (!rolledBack) {
+          txn.listeners.foreach(_.afterCommit())
+        }
+      }
     }
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, autoCommit = true)
     }
   }
 
@@ -88,7 +111,7 @@ object DbClient {
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, autoCommit = true)
     }
   }
 }
