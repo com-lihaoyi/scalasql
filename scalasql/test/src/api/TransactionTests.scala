@@ -579,7 +579,7 @@ trait TransactionTests extends ScalaSqlSuite {
       test("beforeCommit and afterCommit are called under normal circumstances") {
         val listener = new StubTransactionListener()
         dbClient.addTransactionListener(listener)
-        dbClient.transaction { implicit txn =>
+        dbClient.transaction { _ =>
           // do nothing
         }
         listener.beginCalled ==> true
