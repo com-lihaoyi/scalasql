@@ -21,10 +21,15 @@ trait TransactionTests extends ScalaSqlSuite {
       throwOnBeforeRollback: Boolean = false,
       throwOnAfterRollback: Boolean = false
   ) extends DbApi.TransactionListener {
+    var beginCalled = false
     var beforeCommitCalled = false
     var afterCommitCalled = false
     var beforeRollbackCalled = false
     var afterRollbackCalled = false
+
+    override def begin(): Unit = {
+      beginCalled = true
+    }
 
     override def beforeCommit(): Unit = {
       beforeCommitCalled = true
@@ -573,9 +578,11 @@ trait TransactionTests extends ScalaSqlSuite {
     test("listener") {
       test("beforeCommit and afterCommit are called under normal circumstances") {
         val listener = new StubTransactionListener()
+        dbClient.addTransactionListener(listener)
         dbClient.transaction { implicit txn =>
-          txn.addTransactionListener(listener)
+          // do nothing
         }
+        listener.beginCalled ==> true
         listener.beforeCommitCalled ==> true
         listener.afterCommitCalled ==> true
         listener.beforeRollbackCalled ==> false

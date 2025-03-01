@@ -9,6 +9,14 @@ import scalasql.core.DialectConfig
 trait DbClient {
 
   /**
+   * Adds a listener to be notified of transaction events.
+   *
+   * Listeners added on DbClient are automatically added to all transactions created by this
+   * DbClient.
+   */
+  def addTransactionListener(listener: DbApi.TransactionListener): Unit
+
+  /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging
    */
   def renderSql[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
@@ -35,11 +43,42 @@ trait DbClient {
 
 object DbClient {
 
+  /**
+   * Calls the given function for each listener, collecting any exceptions and throwing them
+   * as a single exception if any are thrown.
+   */
+  private[core] def notifyListeners(listeners: Iterable[DbApi.TransactionListener])(
+      f: DbApi.TransactionListener => Unit
+  ): Unit = {
+    if (listeners.isEmpty) return
+
+    var exception: Throwable = null
+    listeners.foreach { listener =>
+      try {
+        f(listener)
+      } catch {
+        case e: Throwable =>
+          if (exception == null) exception = e
+          else exception.addSuppressed(e)
+      }
+    }
+    if (exception != null) throw exception
+  }
+
   class Connection(
       connection: java.sql.Connection,
-      config: Config = new Config {}
+      config: Config = new Config {},
+      /** Listeners that are added to all transactions created by this connection */
+      defaultListeners: Iterable[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
+
+    val listeners =
+      collection.mutable.ArrayDeque.empty[DbApi.TransactionListener].addAll(defaultListeners)
+
+    override def addTransactionListener(listener: DbApi.TransactionListener): Unit = {
+      listeners.append(listener)
+    }
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -49,27 +88,26 @@ object DbClient {
 
     def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
-      val txn = new DbApi.Impl(connection, config, dialect, autoCommit = false)
+      val txn = new DbApi.Impl(connection, config, dialect, listeners, autoCommit = false)
       var rolledBack = false
       try {
+        notifyListeners(txn.listeners)(_.begin())
         val result = block(txn)
-        txn.listeners.foreach(_.beforeCommit())
+        notifyListeners(txn.listeners)(_.beforeCommit())
         result
       } catch {
         case e: Throwable =>
           rolledBack = true
           try {
-            txn.listeners.foreach(_.beforeRollback())
+            notifyListeners(txn.listeners)(_.beforeRollback())
           } catch {
-            case e2: Throwable =>
-              e.addSuppressed(e2)
+            case e2: Throwable => e.addSuppressed(e2)
           } finally {
             connection.rollback()
             try {
-              txn.listeners.foreach(_.afterRollback())
+              notifyListeners(txn.listeners)(_.afterRollback())
             } catch {
-              case e3: Throwable =>
-                e.addSuppressed(e3)
+              case e3: Throwable => e.addSuppressed(e3)
             }
           }
           throw e
@@ -77,22 +115,31 @@ object DbClient {
         // this commits uncommitted operations, if any
         connection.setAutoCommit(true)
         if (!rolledBack) {
-          txn.listeners.foreach(_.afterCommit())
+          notifyListeners(txn.listeners)(_.afterCommit())
         }
       }
     }
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true)
+      new DbApi.Impl(connection, config, dialect, listeners, autoCommit = true)
     }
   }
 
   class DataSource(
       dataSource: javax.sql.DataSource,
-      config: Config = new Config {}
+      config: Config = new Config {},
+      /** Listeners that are added to all transactions created through the [[DataSource]] */
+      defaultListeners: Iterable[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
+
+    val listeners =
+      collection.mutable.ArrayDeque.empty[DbApi.TransactionListener].addAll(defaultListeners)
+
+    override def addTransactionListener(listener: DbApi.TransactionListener): Unit = {
+      listeners.append(listener)
+    }
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -102,7 +149,7 @@ object DbClient {
 
     private def withConnection[T](f: DbClient.Connection => T): T = {
       val connection = dataSource.getConnection
-      try f(new DbClient.Connection(connection, config))
+      try f(new DbClient.Connection(connection, config, listeners))
       finally connection.close()
     }
 
@@ -111,7 +158,7 @@ object DbClient {
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true)
+      new DbApi.Impl(connection, config, dialect, defaultListeners = Seq.empty, autoCommit = true)
     }
   }
 }

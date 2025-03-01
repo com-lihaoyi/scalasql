@@ -1,5 +1,7 @@
 package scalasql.core
 
+import DbClient.notifyListeners
+
 import geny.Generator
 
 import java.sql.{PreparedStatement, Statement}
@@ -145,6 +147,11 @@ object DbApi {
   trait TransactionListener {
 
     /**
+     * Called when a new transaction is started.
+     */
+    def begin(): Unit = ()
+
+    /**
      * Called before the transaction is committed.
      *
      * If this method throws an exception, the transaction will be rolled back and the exception
@@ -228,9 +235,12 @@ object DbApi {
       connection: java.sql.Connection,
       config: Config,
       dialect: DialectConfig,
+      defaultListeners: Iterable[TransactionListener],
       autoCommit: Boolean
   ) extends DbApi.Txn {
-    val listeners = collection.mutable.ArrayDeque.empty[TransactionListener]
+
+    val listeners =
+      collection.mutable.ArrayDeque.empty[TransactionListener].addAll(defaultListeners)
 
     override def addTransactionListener(listener: TransactionListener): Unit = {
       if (autoCommit)
@@ -595,11 +605,11 @@ object DbApi {
 
     def rollback() = {
       try {
-        listeners.foreach(_.beforeRollback())
+        notifyListeners(listeners)(_.beforeRollback())
       } finally {
         savepointStack.clear()
         connection.rollback()
-        listeners.foreach(_.afterRollback())
+        notifyListeners(listeners)(_.afterRollback())
       }
     }
 
