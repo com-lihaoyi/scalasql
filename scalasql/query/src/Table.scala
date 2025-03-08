@@ -14,6 +14,8 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 
   protected[scalasql] def schemaName = ""
 
+  protected[scalasql] def escape: Boolean = false
+
   protected implicit def tableSelf: Table[V] = this
 
   protected def tableMetadata: Table.Metadata[V] = metadata0
@@ -50,11 +52,21 @@ object Table {
   def name(t: Table.Base) = t.tableName
   def labels(t: Table.Base) = t.tableLabels
   def columnNameOverride[V[_[_]]](t: Table.Base)(s: String) = t.tableColumnNameOverride(s)
-  def resolve(t: Table.Base)(implicit context: Context) = {
-    val mappedTableName = context.config.tableNameMapper(t.tableName)
+  def identifier(t: Table.Base)(implicit context: Context): String = {
+    context.config.tableNameMapper.andThen { str =>
+      if (t.escape) {
+        context.dialectConfig.escape(str)
+      } else {
+        str
+      }
+    }(t.tableName)
+  }
+  def fullIdentifier(
+      t: Table.Base
+  )(implicit context: Context): String = {
     t.schemaName match {
-      case "" => mappedTableName
-      case str => s"$str." + mappedTableName
+      case "" => identifier(t)
+      case str => s"$str." + identifier(t)
     }
   }
   trait Base {
@@ -66,6 +78,7 @@ object Table {
     protected[scalasql] def tableName: String
     protected[scalasql] def schemaName: String
     protected[scalasql] def tableLabels: Seq[String]
+    protected[scalasql] def escape: Boolean
 
     /**
      * Customizations to the column names of this table before processing,

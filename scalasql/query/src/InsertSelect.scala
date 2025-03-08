@@ -20,7 +20,12 @@ object InsertSelect {
     def table = insert.table
 
     private[scalasql] override def renderSql(ctx: Context) =
-      new Renderer(select, select.qr.walkExprs(columns), ctx, Table.resolve(table.value)(ctx))
+      new Renderer(
+        select,
+        select.qr.walkExprs(columns),
+        ctx,
+        Table.fullIdentifier(table.value)(ctx)
+      )
         .render()
 
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =

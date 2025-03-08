@@ -24,7 +24,7 @@ object Delete {
   class Renderer(table: TableRef, expr: Expr[Boolean], prevContext: Context) {
     implicit val implicitCtx: Context = Context.compute(prevContext, Nil, Some(table))
     lazy val tableNameStr =
-      SqlStr.raw(Table.resolve(table.value))
+      SqlStr.raw(Table.fullIdentifier(table.value))
 
     def render() = sql"DELETE FROM $tableNameStr WHERE $expr"
   }

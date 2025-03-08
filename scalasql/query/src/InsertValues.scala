@@ -24,7 +24,7 @@ object InsertValues {
 
     override private[scalasql] def renderSql(ctx: Context): SqlStr = {
       new Renderer(
-        Table.resolve(insert.table.value)(ctx),
+        Table.fullIdentifier(insert.table.value)(ctx),
         Table.labels(insert.table.value),
         values,
         qr,

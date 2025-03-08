@@ -123,17 +123,22 @@ trait DbApi extends AutoCloseable {
 
 object DbApi {
 
-  def unpackQueryable[R, Q](query: Q, qr: Queryable[Q, R], config: Config) = {
-    val ctx = Context.Impl(Map(), Map(), config)
+  def unpackQueryable[R, Q](
+      query: Q,
+      qr: Queryable[Q, R],
+      config: Config,
+      dialectConfig: DialectConfig
+  ) = {
+    val ctx = Context.Impl(Map(), Map(), config, dialectConfig)
     val flattened = SqlStr.flatten(qr.renderSql(query, ctx))
     flattened
   }
 
-  def renderSql[Q, R](query: Q, config: Config, castParams: Boolean = false)(
+  def renderSql[Q, R](query: Q, config: Config, dialectConfig: DialectConfig)(
       implicit qr: Queryable[Q, R]
   ): String = {
-    val flattened = unpackQueryable(query, qr, config)
-    flattened.renderSql(castParams)
+    val flattened = unpackQueryable(query, qr, config, dialectConfig)
+    flattened.renderSql(dialectConfig.castParams)
   }
 
   /**
@@ -196,7 +201,7 @@ object DbApi {
         lineNum: sourcecode.Line
     ): R = {
 
-      val flattened = unpackQueryable(query, qr, config)
+      val flattened = unpackQueryable(query, qr, config, dialect)
       if (qr.isGetGeneratedKeys(query).nonEmpty)
         updateGetGeneratedKeysSql(flattened)(qr.isGetGeneratedKeys(query).get, fileName, lineNum)
           .asInstanceOf[R]
@@ -225,7 +230,7 @@ object DbApi {
         fileName: sourcecode.FileName,
         lineNum: sourcecode.Line
     ): Generator[R] = {
-      val flattened = unpackQueryable(query, qr, config)
+      val flattened = unpackQueryable(query, qr, config, dialect)
       streamFlattened0(
         r => {
           qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
@@ -276,7 +281,7 @@ object DbApi {
     ): Int = {
       val flattened = SqlStr.flatten(sql)
       runRawUpdate0(
-        flattened.renderSql(DialectConfig.castParams(dialect)),
+        flattened.renderSql(dialect.castParams),
         flattenParamPuts(flattened),
         fetchSize,
         queryTimeoutSeconds,
@@ -296,7 +301,7 @@ object DbApi {
     ): IndexedSeq[R] = {
       val flattened = SqlStr.flatten(sql)
       runRawUpdateGetGeneratedKeys0(
-        flattened.renderSql(DialectConfig.castParams(dialect)),
+        flattened.renderSql(dialect.castParams),
         flattenParamPuts(flattened),
         fetchSize,
         queryTimeoutSeconds,
@@ -382,7 +387,7 @@ object DbApi {
         lineNum: sourcecode.Line
     ) = streamRaw0(
       construct,
-      flattened.renderSql(DialectConfig.castParams(dialect)),
+      flattened.renderSql(dialect.castParams),
       flattenParamPuts(flattened),
       fetchSize,
       queryTimeoutSeconds,
@@ -508,7 +513,7 @@ object DbApi {
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
     ): String = {
-      DbApi.renderSql(query, config, castParams)
+      DbApi.renderSql(query, config, dialect.withCastParams(castParams))
     }
 
     val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]

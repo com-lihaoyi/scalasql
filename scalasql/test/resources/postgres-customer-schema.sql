@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS enclosing CASCADE;
 DROP TABLE IF EXISTS invoice CASCADE;
 DROP TYPE IF EXISTS my_enum CASCADE;
 DROP SCHEMA IF EXISTS otherschema CASCADE;
+DROP TABLE IF EXISTS "select" CASCADE;
 
 CREATE TABLE buyer (
     id SERIAL PRIMARY KEY,
@@ -102,4 +103,9 @@ CREATE TABLE otherschema.invoice(
     id SERIAL PRIMARY KEY,
     total DECIMAL(20, 2),
     vendor_name VARCHAR(256)
+);
+
+CREATE TABLE "select"(
+    id INTEGER,
+    name VARCHAR(256)
 );

@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS non_round_trip_types;
 DROP TABLE IF EXISTS nested;
 DROP TABLE IF EXISTS enclosing;
 DROP TABLE IF EXISTS opt_cols;
+DROP TABLE IF EXISTS "select";
 
 CREATE TABLE buyer (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,3 +92,8 @@ CREATE TABLE enclosing(
     foo_id INTEGER,
     my_boolean BOOLEAN
 );
+
+CREATE TABLE "select"(
+    id INTEGER,
+    name VARCHAR(256)
+)
