@@ -9,14 +9,6 @@ import scalasql.core.DialectConfig
 trait DbClient {
 
   /**
-   * Adds a listener to be notified of transaction events.
-   *
-   * Listeners added on DbClient are automatically added to all transactions created by this
-   * DbClient.
-   */
-  def addTransactionListener(listener: DbApi.TransactionListener): Unit
-
-  /**
    * Converts the given query [[Q]] into a string. Useful for debugging and logging
    */
   def renderSql[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
@@ -69,16 +61,9 @@ object DbClient {
       connection: java.sql.Connection,
       config: Config = new Config {},
       /** Listeners that are added to all transactions created by this connection */
-      defaultListeners: Iterable[DbApi.TransactionListener] = Seq.empty
+      listeners: Seq[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
-
-    val listeners =
-      collection.mutable.ArrayDeque.empty[DbApi.TransactionListener].addAll(defaultListeners)
-
-    override def addTransactionListener(listener: DbApi.TransactionListener): Unit = {
-      listeners.append(listener)
-    }
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -130,15 +115,13 @@ object DbClient {
       dataSource: javax.sql.DataSource,
       config: Config = new Config {},
       /** Listeners that are added to all transactions created through the [[DataSource]] */
-      defaultListeners: Iterable[DbApi.TransactionListener] = Seq.empty
+      listeners: Seq[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
 
-    val listeners =
-      collection.mutable.ArrayDeque.empty[DbApi.TransactionListener].addAll(defaultListeners)
-
-    override def addTransactionListener(listener: DbApi.TransactionListener): Unit = {
-      listeners.append(listener)
+    /** Returns a new [[DataSource]] with the given listener added */
+    def withTransactionListener(listener: DbApi.TransactionListener): DbClient = {
+      new DataSource(dataSource, config, listeners :+ listener)
     }
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(

@@ -578,8 +578,7 @@ trait TransactionTests extends ScalaSqlSuite {
     test("listener") {
       test("beforeCommit and afterCommit are called under normal circumstances") {
         val listener = new StubTransactionListener()
-        dbClient.addTransactionListener(listener)
-        dbClient.transaction { _ =>
+        dbClient.withTransactionListener(listener).transaction { _ =>
           // do nothing
         }
         listener.beginCalled ==> true

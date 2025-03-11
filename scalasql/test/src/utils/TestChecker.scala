@@ -6,7 +6,7 @@ import scalasql.query.SubqueryRef
 import scalasql.{DbClient, Queryable, Expr, UtestFramework}
 
 class TestChecker(
-    val dbClient: DbClient,
+    val dbClient: DbClient.DataSource,
     testSchemaFileName: String,
     testDataFileName: String,
     suiteName: String,
