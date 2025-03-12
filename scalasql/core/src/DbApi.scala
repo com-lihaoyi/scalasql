@@ -1,5 +1,7 @@
 package scalasql.core
 
+import DbClient.notifyListeners
+
 import geny.Generator
 
 import java.sql.{PreparedStatement, Statement}
@@ -137,6 +139,50 @@ object DbApi {
   }
 
   /**
+   * A listener that can be added to a [[DbApi.Txn]] to be notified of commit and rollback events.
+   *
+   * The default implementations of these methods do nothing, but you can override them to
+   * implement your own behavior.
+   */
+  trait TransactionListener {
+
+    /**
+     * Called when a new transaction is started.
+     */
+    def begin(): Unit = ()
+
+    /**
+     * Called before the transaction is committed.
+     *
+     * If this method throws an exception, the transaction will be rolled back and the exception
+     * will be propagated.
+     */
+    def beforeCommit(): Unit = ()
+
+    /**
+     * Called after the transaction is committed.
+     *
+     * If this method throws an exception, it will be propagated.
+     */
+    def afterCommit(): Unit = ()
+
+    /**
+     * Called before the transaction is rolled back.
+     *
+     * If this method throws an exception, the transaction will be rolled back and the exception
+     * will be propagated to the caller of rollback().
+     */
+    def beforeRollback(): Unit = ()
+
+    /**
+     * Called after the transaction is rolled back.
+     *
+     * If this method throws an exception, it will be propagated to the caller of rollback().
+     */
+    def afterRollback(): Unit = ()
+  }
+
+  /**
    * An interface to a SQL database *transaction*, allowing you to run queries,
    * create savepoints, or roll back the transaction.
    */
@@ -151,9 +197,11 @@ object DbApi {
     def savepoint[T](block: DbApi.Savepoint => T): T
 
     /**
-     * Tolls back any active Savepoints and then rolls back this Transaction
+     * Rolls back any active Savepoints and then rolls back this Transaction
      */
     def rollback(): Unit
+
+    def addTransactionListener(listener: TransactionListener): Unit
   }
 
   /**
@@ -187,9 +235,19 @@ object DbApi {
       connection: java.sql.Connection,
       config: Config,
       dialect: DialectConfig,
-      autoCommit: Boolean,
-      rollBack0: () => Unit
+      defaultListeners: Iterable[TransactionListener],
+      autoCommit: Boolean
   ) extends DbApi.Txn {
+
+    val listeners =
+      collection.mutable.ArrayDeque.empty[TransactionListener].addAll(defaultListeners)
+
+    override def addTransactionListener(listener: TransactionListener): Unit = {
+      if (autoCommit)
+        throw new IllegalStateException("Cannot add listener to auto-commit transaction")
+      listeners.append(listener)
+    }
+
     def run[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, R],
         fileName: sourcecode.FileName,
@@ -218,6 +276,7 @@ object DbApi {
           res.toVector.asInstanceOf[R]
         }
       }
+
     }
 
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
@@ -229,8 +288,8 @@ object DbApi {
       streamFlattened0(
         r => {
           qr.asInstanceOf[Queryable[Q, R]].construct(query, r) match {
-            case s: Seq[R] => s.head
-            case r: R => r
+            case s: Seq[R] @unchecked => s.head
+            case r: R @unchecked => r
           }
         },
         flattened,
@@ -545,8 +604,13 @@ object DbApi {
     }
 
     def rollback() = {
-      savepointStack.clear()
-      rollBack0()
+      try {
+        notifyListeners(listeners)(_.beforeRollback())
+      } finally {
+        savepointStack.clear()
+        connection.rollback()
+        notifyListeners(listeners)(_.afterRollback())
+      }
     }
 
     private def cast[T](t: Any): T = t.asInstanceOf[T]

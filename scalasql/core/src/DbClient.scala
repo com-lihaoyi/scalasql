@@ -35,9 +35,33 @@ trait DbClient {
 
 object DbClient {
 
+  /**
+   * Calls the given function for each listener, collecting any exceptions and throwing them
+   * as a single exception if any are thrown.
+   */
+  private[core] def notifyListeners(listeners: Iterable[DbApi.TransactionListener])(
+      f: DbApi.TransactionListener => Unit
+  ): Unit = {
+    if (listeners.isEmpty) return
+
+    var exception: Throwable = null
+    listeners.foreach { listener =>
+      try {
+        f(listener)
+      } catch {
+        case e: Throwable =>
+          if (exception == null) exception = e
+          else exception.addSuppressed(e)
+      }
+    }
+    if (exception != null) throw exception
+  }
+
   class Connection(
       connection: java.sql.Connection,
-      config: Config = new Config {}
+      config: Config = new Config {},
+      /** Listeners that are added to all transactions created by this connection */
+      listeners: Seq[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
 
@@ -49,27 +73,56 @@ object DbClient {
 
     def transaction[T](block: DbApi.Txn => T): T = {
       connection.setAutoCommit(false)
-      val txn =
-        new DbApi.Impl(connection, config, dialect, false, () => connection.rollback())
-      try block(txn)
-      catch {
+      val txn = new DbApi.Impl(connection, config, dialect, listeners, autoCommit = false)
+      var rolledBack = false
+      try {
+        notifyListeners(txn.listeners)(_.begin())
+        val result = block(txn)
+        notifyListeners(txn.listeners)(_.beforeCommit())
+        result
+      } catch {
         case e: Throwable =>
-          connection.rollback()
+          rolledBack = true
+          try {
+            notifyListeners(txn.listeners)(_.beforeRollback())
+          } catch {
+            case e2: Throwable => e.addSuppressed(e2)
+          } finally {
+            connection.rollback()
+            try {
+              notifyListeners(txn.listeners)(_.afterRollback())
+            } catch {
+              case e3: Throwable => e.addSuppressed(e3)
+            }
+          }
           throw e
-      } finally connection.setAutoCommit(true)
+      } finally {
+        // this commits uncommitted operations, if any
+        connection.setAutoCommit(true)
+        if (!rolledBack) {
+          notifyListeners(txn.listeners)(_.afterCommit())
+        }
+      }
     }
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, listeners, autoCommit = true)
     }
   }
 
   class DataSource(
       dataSource: javax.sql.DataSource,
-      config: Config = new Config {}
+      config: Config = new Config {},
+      /** Listeners that are added to all transactions created through the [[DataSource]] */
+      listeners: Seq[DbApi.TransactionListener] = Seq.empty
   )(implicit dialect: DialectConfig)
       extends DbClient {
+
+    /** Returns a new [[DataSource]] with the given listener added */
+    def withTransactionListener(listener: DbApi.TransactionListener): DbClient = {
+      new DataSource(dataSource, config, listeners :+ listener)
+    }
 
     def renderSql[Q, R](query: Q, castParams: Boolean = false)(
         implicit qr: Queryable[Q, R]
@@ -79,7 +132,7 @@ object DbClient {
 
     private def withConnection[T](f: DbClient.Connection => T): T = {
       val connection = dataSource.getConnection
-      try f(new DbClient.Connection(connection, config))
+      try f(new DbClient.Connection(connection, config, listeners))
       finally connection.close()
     }
 
@@ -88,7 +141,7 @@ object DbClient {
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection
       connection.setAutoCommit(true)
-      new DbApi.Impl(connection, config, dialect, autoCommit = true, () => ())
+      new DbApi.Impl(connection, config, dialect, defaultListeners = Seq.empty, autoCommit = true)
     }
   }
 }
