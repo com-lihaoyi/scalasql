@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.15"
+ivy"com.lihaoyi::scalasql:0.1.16"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.4.2
@@ -129,6 +129,14 @@ ScalaSql supports Scala 2.13.x and >=3.4.2
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+
+### 0.1.16
+
+* Add TransactionListener interface  [#71](https://github.com/com-lihaoyi/scalasql/pull/71)
+* JoinNullable deserialisation fix [#70](https://github.com/com-lihaoyi/scalasql/pull/70)
+* Insert.select on conflict [#68](https://github.com/com-lihaoyi/scalasql/pull/68)
+* Add OnConflict to InsertValues [#61](https://github.com/com-lihaoyi/scalasql/pull/61)
 
 ### 0.1.15
 
