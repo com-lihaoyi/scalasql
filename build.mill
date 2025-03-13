@@ -39,12 +39,7 @@ trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends Common{ common =>
   def moduleDeps = Seq(query, operations)
-  def ivyDeps = Agg(
-    ivy"org.apache.logging.log4j:log4j-api:2.20.0",
-    ivy"org.apache.logging.log4j:log4j-core:2.20.0",
-    ivy"org.apache.logging.log4j:log4j-slf4j-impl:2.20.0",
-
-  ) ++ Option.when(scalaVersion().startsWith("2."))(
+  def ivyDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
     ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
 
