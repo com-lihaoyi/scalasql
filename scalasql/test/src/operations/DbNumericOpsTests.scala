@@ -16,7 +16,14 @@ trait ExprNumericOpsTests extends ScalaSqlSuite {
 
     test("divide") - checker(query = Expr(6) / Expr(2), sql = "SELECT (? / ?) AS res", value = 3)
 
-    test("modulo") - checker(query = Expr(6) % Expr(2), sql = "SELECT MOD(?, ?) AS res", value = 0)
+    test("modulo") - checker(
+      query = Expr(6) % Expr(2),
+      sqls = Seq(
+        "SELECT MOD(?, ?) AS res",
+        "SELECT ? % ? AS res"
+      ),
+      value = 0
+    )
 
     test("bitwiseAnd") - checker(
       query = Expr(6) & Expr(2),
@@ -49,9 +56,23 @@ trait ExprNumericOpsTests extends ScalaSqlSuite {
 
     test("abs") - checker(query = Expr(-4).abs, sql = "SELECT ABS(?) AS res", value = 4)
 
-    test("mod") - checker(query = Expr(8).mod(Expr(3)), sql = "SELECT MOD(?, ?) AS res", value = 2)
+    test("mod") - checker(
+      query = Expr(8).mod(Expr(3)),
+      sqls = Seq(
+        "SELECT MOD(?, ?) AS res",
+        "SELECT ? % ? AS res"
+      ),
+      value = 2
+    )
 
-    test("ceil") - checker(query = Expr(4.3).ceil, sql = "SELECT CEIL(?) AS res", value = 5.0)
+    test("ceil") - checker(
+      query = Expr(4.3).ceil,
+      sqls = Seq(
+        "SELECT CEIL(?) AS res",
+        "SELECT CEILING(?) AS res"
+      ),
+      value = 5.0
+    )
 
     test("floor") - checker(query = Expr(4.7).floor, sql = "SELECT FLOOR(?) AS res", value = 4.0)
 
