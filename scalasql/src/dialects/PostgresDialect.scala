@@ -17,7 +17,9 @@ import scalasql.operations.{ConcatOps, HyperbolicMathOps, MathOps, PadOps, TrimO
 
 trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
-  protected def dialectCastParams = false
+  def castParams = false
+
+  def escape(str: String) = s"\"$str\""
 
   override implicit def ByteType: TypeMapper[Byte] = new PostgresByteType
   class PostgresByteType extends ByteType { override def castTypeString = "INTEGER" }

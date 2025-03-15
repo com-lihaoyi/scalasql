@@ -29,7 +29,8 @@ import query.{
   WindowFunctionTests,
   GetGeneratedKeysTests,
   WithCteTests,
-  SchemaTests
+  SchemaTests,
+  EscapedTableNameTests
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -61,6 +62,7 @@ package postgres {
   object WindowFunctionTests extends WindowFunctionTests with PostgresSuite
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with PostgresSuite
   object SchemaTests extends SchemaTests with PostgresSuite
+  object EscapedTableNameTests extends EscapedTableNameTests with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object WithCteTests extends WithCteTests with PostgresSuite
@@ -106,6 +108,7 @@ package hikari {
   object WindowFunctionTests extends WindowFunctionTests with HikariSuite
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with HikariSuite
   object SchemaTests extends SchemaTests with HikariSuite
+  object EscapedTableNameTests extends EscapedTableNameTests with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
   object WithCteTests extends WithCteTests with HikariSuite
@@ -168,6 +171,7 @@ package mysql {
   object ExprMathOpsTests extends ExprMathOpsTests with MySqlSuite
   // In MySql, schemas are databases and this requires special treatment not yet implemented here
   // object SchemaTests extends SchemaTests with MySqlSuite
+  object EscapedTableNameTests extends EscapedTableNameTests with MySqlSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with MySqlSuite
   object OptionalTests extends datatypes.OptionalTests with MySqlSuite
@@ -215,6 +219,7 @@ package sqlite {
   // object ExprMathOpsTests extends ExprMathOpsTests with SqliteSuite
   // Sqlite doesn't support schemas
   // object SchemaTests extends SchemaTests with SqliteSuite
+  object EscapedTableNameTests extends EscapedTableNameTests with SqliteSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
   object OptionalTests extends datatypes.OptionalTests with SqliteSuite
@@ -248,6 +253,7 @@ package h2 {
   object WindowFunctionTests extends WindowFunctionTests with H2Suite
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with H2Suite
   object SchemaTests extends SchemaTests with H2Suite
+  object EscapedTableNameTests extends EscapedTableNameTests with H2Suite
 
   object SubQueryTests extends SubQueryTests with H2Suite
   object WithCteTests extends WithCteTests with H2Suite

@@ -27,7 +27,9 @@ import java.sql.PreparedStatement
 
 trait H2Dialect extends Dialect {
 
-  protected def dialectCastParams = true
+  def castParams = true
+
+  def escape(str: String) = s"\"${str.toUpperCase()}\""
 
   override implicit def EnumType[T <: Enumeration#Value](
       implicit constructor: String => T

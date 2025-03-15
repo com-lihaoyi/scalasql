@@ -14,6 +14,11 @@ object Invoice extends Table[Invoice] {
   override def schemaName = "otherschema"
 }
 
+case class Select[T[_]](id: T[Int], name: T[String])
+object Select extends Table[Select] {
+  override def escape = true
+}
+
 case class ShippingInfo[T[_]](id: T[Int], buyerId: T[Int], shippingDate: T[LocalDate])
 object ShippingInfo extends Table[ShippingInfo]
 
