@@ -6,7 +6,7 @@ import utest._
 
 trait ExprMathOpsTests extends ScalaSqlSuite {
   override implicit def DbApiOpsConv(db: => DbApi): DbApiOps & MathOps = ???
-  def description = "Math operations; supported by H2/Postgres/MySql, not supported by Sqlite"
+  def description = "Math operations; supported by H2/Postgres/MySql/MsSql, not supported by Sqlite"
   def tests = Tests {
 
     test("power") - checker(
@@ -23,7 +23,7 @@ trait ExprMathOpsTests extends ScalaSqlSuite {
 
     test("ln") - checker(
       query = db.ln(16.0),
-      sql = "SELECT LN(?) AS res"
+      sqls = Seq("SELECT LN(?) AS res", "SELECT LOG(?) AS res")
     )
 
     test("log") - checker(
@@ -73,7 +73,7 @@ trait ExprMathOpsTests extends ScalaSqlSuite {
 
     test("atan2") - checker(
       query = db.atan2(16.0, 23.0),
-      sql = "SELECT ATAN2(?, ?) AS res"
+      sqls = Seq("SELECT ATAN2(?, ?) AS res", "SELECT ATN2(?, ?) AS res")
     )
 
     test("pi") - checker(

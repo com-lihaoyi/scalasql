@@ -412,6 +412,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int
           """
         ),
         value = Seq(
@@ -419,6 +424,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(3), None),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
         ),
         docs = """
           `.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
@@ -436,6 +449,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int
           """
         ),
         value = Seq(
@@ -443,6 +461,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
         )
       )
       test("ascNullsLast") - checker(
@@ -457,6 +483,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int ASC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int ASC
           """
         ),
         value = Seq(
@@ -464,6 +495,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(3), None),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
         )
       )
       test("ascNullsFirst") - checker(
@@ -485,6 +524,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
         )
       )
       test("descNullsLast") - checker(
@@ -506,6 +553,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4))
+          )
         )
       )
       test("descNullsFirst") - checker(
@@ -520,6 +575,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int DESC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int DESC
           """
         ),
         value = Seq(
@@ -527,6 +587,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(3), None),
           OptCols[Sc](Some(1), Some(2))
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2))
+          )
         )
       )
       test("roundTripOptionalValues") - checker.recorded(

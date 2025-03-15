@@ -251,21 +251,13 @@ trait JoinTests extends ScalaSqlSuite {
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
           .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
           .sortBy(_._2)
-          .nullsFirst
       },
       sqls = Seq(
         """
           SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-          ORDER BY res_1 NULLS FIRST
-        """,
-        // MySQL doesn't support NULLS FIRST syntax and needs a workaround
-        """
-          SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
-          FROM buyer buyer0
-          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-          ORDER BY res_1 IS NULL DESC, res_1
+          ORDER BY res_1
         """
       ),
       value = Seq[(String, Option[LocalDate])](
@@ -273,6 +265,14 @@ trait JoinTests extends ScalaSqlSuite {
         ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
         ("James Bond", Some(LocalDate.parse("2012-04-05"))),
         ("叉烧包", Some(LocalDate.parse("2012-05-06")))
+      ),
+      moreValues = Seq(
+        Seq[(String, Option[LocalDate])](
+          ("叉烧包", Some(LocalDate.parse("2010-02-03"))),
+          ("James Bond", Some(LocalDate.parse("2012-04-05"))),
+          ("叉烧包", Some(LocalDate.parse("2012-05-06"))),
+          ("Li Haoyi", None)
+        )
       ),
       docs = """
         `JoinNullable[Expr[T]]`s can be implicitly used as `Expr[Option[T]]`s. This allows
@@ -289,12 +289,20 @@ trait JoinTests extends ScalaSqlSuite {
           .distinct
           .sortBy(_._1)
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT DISTINCT buyer0.name AS res_0, (shipping_info1.id IS NOT NULL) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
         ORDER BY res_0
-      """,
+        """,
+        """
+        SELECT DISTINCT buyer0.name AS res_0, CASE WHEN (shipping_info1.id IS NOT NULL) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        ORDER BY res_0
+        """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
@@ -312,13 +320,22 @@ trait JoinTests extends ScalaSqlSuite {
           .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
           .map { case (b, si) => (b.name, si.map(_.shippingDate) > b.dateOfBirth) }
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """,
+        """,
+        """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
@@ -335,13 +352,22 @@ trait JoinTests extends ScalaSqlSuite {
             (b.name, JoinNullable.toExpr(si.map(_.shippingDate)) > b.dateOfBirth)
           }
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT
           buyer0.name AS res_0,
           (shipping_info1.shipping_date > buyer0.date_of_birth) AS res_1
         FROM buyer buyer0
         LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-      """,
+        """,
+        """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (shipping_info1.shipping_date > buyer0.date_of_birth) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+        """
+      ),
       value = Seq(
         ("James Bond", true),
         ("Li Haoyi", false),
