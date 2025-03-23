@@ -9,7 +9,10 @@ import utils.ScalaSqlSuite
 import java.time.LocalDate
 
 trait SchemaTests extends ScalaSqlSuite {
-  def description = "Additional tests to ensure schema mapping produces valid SQL"
+  def description = """
+    If your table belongs to a schema other than the default schema of your database, you can specify this in your table definition with
+    `override def schemaName = "otherschema"`
+  """
 
   def tests = Tests {
     test("schema") {
@@ -27,10 +30,7 @@ trait SchemaTests extends ScalaSqlSuite {
             Invoice[Sc](id = 2, total = 213.3, vendor_name = "Samsung"),
             Invoice[Sc](id = 3, total = 407.2, vendor_name = "Shell")
           ),
-          docs = """
-          If your table belongs to a schema other than the default schema of your database,
-          you can specify this in your table definition with table.schemaName
-        """
+          docs = ""
         )
       }
       test("insert.columns") {
@@ -41,10 +41,7 @@ trait SchemaTests extends ScalaSqlSuite {
           ),
           sql = "INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)",
           value = 1,
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
       test("insert.values") {
@@ -60,10 +57,7 @@ trait SchemaTests extends ScalaSqlSuite {
             .skipColumns(_.id),
           sql = "INSERT INTO otherschema.invoice (total, vendor_name) VALUES (?, ?)",
           value = 1,
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
       test("update") {
@@ -81,10 +75,7 @@ trait SchemaTests extends ScalaSqlSuite {
             WHERE
               (invoice.id = ?)""",
           value = 1,
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
       test("delete") {
@@ -92,10 +83,7 @@ trait SchemaTests extends ScalaSqlSuite {
           query = Invoice.delete(_.id === 1),
           sql = "DELETE FROM otherschema.invoice WHERE (invoice.id = ?)",
           value = 1,
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
       test("insert into") {
@@ -112,10 +100,7 @@ trait SchemaTests extends ScalaSqlSuite {
             FROM
               otherschema.invoice invoice0""",
           value = 4,
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
       test("join") {
@@ -129,10 +114,7 @@ trait SchemaTests extends ScalaSqlSuite {
               otherschema.invoice invoice0
             JOIN otherschema.invoice invoice1 ON (invoice0.id = invoice1.id)""",
           value = Seq(2, 3, 4, 5, 6, 7, 8, 9),
-          docs = """
-            If your table belongs to a schema other than the default schema of your database,
-            you can specify this in your table definition with table.schemaName
-          """
+          docs = ""
         )
       }
     }

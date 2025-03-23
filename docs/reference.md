@@ -6552,11 +6552,13 @@ Buyer.select
 
 
 ## Schema
-Additional tests to ensure schema mapping produces valid SQL
+
+    If your table belongs to a schema other than the default schema of your database, you can specify this in your table definition with
+    `override def schemaName = "otherschema"`
+  
 ### Schema.schema.select
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.select
@@ -6584,8 +6586,7 @@ Invoice.select
 
 ### Schema.schema.insert.columns
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.insert.columns(
@@ -6611,8 +6612,7 @@ Invoice.insert.columns(
 
 ### Schema.schema.insert.values
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.insert
@@ -6643,8 +6643,7 @@ Invoice.insert
 
 ### Schema.schema.update
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice
@@ -6677,8 +6676,7 @@ Invoice
 
 ### Schema.schema.delete
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.delete(_.id === 1)
@@ -6701,8 +6699,7 @@ Invoice.delete(_.id === 1)
 
 ### Schema.schema.insert into
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.insert.select(
@@ -6734,8 +6731,7 @@ Invoice.insert.select(
 
 ### Schema.schema.join
 
-If your table belongs to a schema other than the default schema of your database,
-you can specify this in your table definition with table.schemaName
+
 
 ```scala
 Invoice.select.join(Invoice)(_.id `=` _.id).map(_._1.id)
@@ -6756,6 +6752,139 @@ Invoice.select.join(Invoice)(_.id `=` _.id).map(_._1.id)
 *
     ```scala
     Seq(2, 3, 4, 5, 6, 7, 8, 9)
+    ```
+
+
+
+## EscapedTableName
+
+    If your table name is a reserved sql world, e.g. `order`, you can specify this in your table definition with
+    `override def escape = true`
+  
+### EscapedTableName.escape table name.select
+
+
+
+```scala
+Select.select
+```
+
+
+*
+    ```sql
+    SELECT select0.id AS id, select0.name AS name
+    FROM "select" select0
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[Select[Sc]]
+    ```
+
+
+
+### EscapedTableName.escape table name.delete
+
+
+
+```scala
+Select.delete(_ => true)
+```
+
+
+*
+    ```sql
+    DELETE FROM "select" WHERE ?
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
+### EscapedTableName.escape table name.join
+
+
+
+```scala
+Select.select.join(Select)(_.id `=` _.id)
+```
+
+
+*
+    ```sql
+    SELECT
+      select0.id AS res_0_id,
+      select0.name AS res_0_name,
+      select1.id AS res_1_id,
+      select1.name AS res_1_name
+    FROM
+      "select" select0
+      JOIN "select" select1 ON (select0.id = select1.id)
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[(Select[Sc], Select[Sc])]
+    ```
+
+
+
+### EscapedTableName.escape table name.update
+
+
+
+```scala
+Select.update(_ => true).set(_.name := "hello")
+```
+
+
+*
+    ```sql
+    UPDATE "select" SET name = ?
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
+### EscapedTableName.escape table name.insert
+
+
+
+```scala
+Select.insert.values(
+  Select[Sc](
+    id = 0,
+    name = "hello"
+  )
+)
+```
+
+
+*
+    ```sql
+    INSERT INTO "select" (id, name) VALUES (?, ?)
+    ```
+
+
+
+*
+    ```scala
+    1
     ```
 
 
