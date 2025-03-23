@@ -67,7 +67,7 @@ trait EscapedTableNameTests extends ScalaSqlSuite {
           },
           sqls = Seq(
             s"UPDATE $tableNameEscaped SET $tableNameEscaped.name = ?",
-            s"UPDATE $tableNameEscaped SET name = ?",
+            s"UPDATE $tableNameEscaped SET name = ?"
           ),
           value = 0,
           docs = ""
