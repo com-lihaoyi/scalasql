@@ -805,7 +805,7 @@ ShippingInfo.select.filterIf(true)(_.buyerId `=` 2)
 
 
 ```scala
-ShippingInfo.select.filterOpt[Int](None)((value, table) => table.buyerId `=` value)
+ShippingInfo.select.filterOpt[Int](None)((table, value) => table.buyerId `=` value)
 ```
 
 
@@ -836,7 +836,7 @@ ShippingInfo.select.filterOpt[Int](None)((value, table) => table.buyerId `=` val
 
 
 ```scala
-ShippingInfo.select.filterOpt(Some(2))((value, table) => table.buyerId `=` value)
+ShippingInfo.select.filterOpt(Some(2))((table, value) => table.buyerId `=` value)
 ```
 
 

@@ -98,9 +98,9 @@ class SimpleSelect[Q, R](
   def filterIf(cond: Boolean)(f: Q => Expr[Boolean]): Select[Q, R] =
     if (cond) this.filter(f) else this
 
-  def filterOpt[T](option: Option[T])(f: (T, Q) => Expr[Boolean]): Select[Q, R] = option match {
+  def filterOpt[T](option: Option[T])(f: (Q, T) => Expr[Boolean]): Select[Q, R] = option match {
     case None => this
-    case Some(opt) => this.filter(q => f(opt, q))
+    case Some(opt) => this.filter(q => f(q, opt))
   }
 
   def join0[Q2, R2, QF, RF](

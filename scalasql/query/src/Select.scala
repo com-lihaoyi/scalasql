@@ -113,7 +113,7 @@ trait Select[Q, R]
    * if this option is Some[T]
    */
   def filterOpt[T](option: Option[T])(
-      f: (T, Q) => Expr[Boolean]
+      f: (Q, T) => Expr[Boolean]
   ): Select[Q, R]
 
   /**
@@ -346,7 +346,7 @@ object Select {
     override def filterIf(cond: Boolean)(f: Q => Expr[Boolean]): Select[Q, R] =
       selectToSimpleSelect().filterIf(cond)(f)
 
-    override def filterOpt[T](option: Option[T])(f: (T, Q) => Expr[Boolean]): Select[Q, R] =
+    override def filterOpt[T](option: Option[T])(f: (Q, T) => Expr[Boolean]): Select[Q, R] =
       selectToSimpleSelect().filterOpt(option)(f)
 
     override def aggregate[E, V](f: Aggregatable.Proxy[Q] => E)(
