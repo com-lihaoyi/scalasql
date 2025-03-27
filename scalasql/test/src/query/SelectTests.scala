@@ -178,7 +178,9 @@ trait SelectTests extends ScalaSqlSuite {
 
     test("filterOpt") {
       test("filter not added") - checker(
-        query = Text { ShippingInfo.select.filterOpt[Int](None)((value, table) => table.buyerId `=` value) },
+        query = Text {
+          ShippingInfo.select.filterOpt[Int](None)((value, table) => table.buyerId `=` value)
+        },
         sql = """
           SELECT
               shipping_info0.id AS id,
@@ -194,7 +196,9 @@ trait SelectTests extends ScalaSqlSuite {
         docs = ""
       )
       test("filter added") - checker(
-        query = Text { ShippingInfo.select.filterOpt(Some(2))((value, table) => table.buyerId `=` value) },
+        query = Text {
+          ShippingInfo.select.filterOpt(Some(2))((value, table) => table.buyerId `=` value)
+        },
         sql = """
           SELECT
               shipping_info0.id AS id,
