@@ -102,6 +102,21 @@ trait Select[Q, R]
   def withFilter(f: Q => Expr[Boolean]): Select[Q, R] = filter(f)
 
   /**
+   * Filters this [[Select]] with the given predicate, if [[cond]] evaluates to true
+   */
+  def filterIf(cond: Boolean)(
+      f: Q => Expr[Boolean]
+  ): Select[Q, R]
+
+  /**
+   * Filters this [[Select]] with the given predicate consuming provided option as a part of predicate's input,
+   * if this option is Some[T]
+   */
+  def filterOpt[T](option: Option[T])(
+      f: (T, Q) => Expr[Boolean]
+  ): Select[Q, R]
+
+  /**
    * Performs one or more aggregates in a single [[Select]]
    */
   def aggregate[E, V](f: Aggregatable.Proxy[Q] => E)(
@@ -214,6 +229,9 @@ trait Select[Q, R]
    */
   def head: Query.Single[R] = take(1).single
 
+  // TODO
+  // def headOption: Query.Single[Option[R]] = take(1).single
+
   /**
    * Converts this [[Select]] into an [[Expr]], assuming it returns a single row and
    * a single column. Note that if this returns multiple rows, behavior is database-specific,
@@ -324,6 +342,12 @@ object Select {
     ): Select[Q2, R2] = selectToSimpleSelect().flatMap(f)
 
     override def filter(f: Q => Expr[Boolean]): Select[Q, R] = selectToSimpleSelect().filter(f)
+
+    override def filterIf(cond: Boolean)(f: Q => Expr[Boolean]): Select[Q, R] =
+      selectToSimpleSelect().filterIf(cond)(f)
+
+    override def filterOpt[T](option: Option[T])(f: (T, Q) => Expr[Boolean]): Select[Q, R] =
+      selectToSimpleSelect().filterOpt(option)(f)
 
     override def aggregate[E, V](f: Aggregatable.Proxy[Q] => E)(
         implicit qr: Queryable.Row[E, V]

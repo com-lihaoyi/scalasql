@@ -95,6 +95,14 @@ class SimpleSelect[Q, R](
     else copy(groupBy0 = groupBy0.map(g => g.copy(having = g.having ++ Seq(f(expr)))))
   }
 
+  def filterIf(cond: Boolean)(f: Q => Expr[Boolean]): Select[Q, R] =
+    if (cond) this.filter(f) else this
+
+  def filterOpt[T](option: Option[T])(f: (T, Q) => Expr[Boolean]): Select[Q, R] = option match {
+    case None => this
+    case Some(opt) => this.filter(q => f(opt, q))
+  }
+
   def join0[Q2, R2, QF, RF](
       prefix: String,
       other: Joinable[Q2, R2],
