@@ -24,6 +24,8 @@ trait Context {
    */
   def config: Config
 
+  def dialectConfig: DialectConfig
+
   def withFromNaming(fromNaming: Map[Context.From, String]): Context
   def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
 }
@@ -56,7 +58,8 @@ object Context {
   case class Impl(
       fromNaming: Map[From, String],
       exprNaming: Map[Expr.Identity, SqlStr],
-      config: Config
+      config: Config,
+      dialectConfig: DialectConfig
   ) extends Context {
     def withFromNaming(fromNaming: Map[From, String]): Context = copy(fromNaming = fromNaming)
 
@@ -93,7 +96,7 @@ object Context {
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 
-    Context.Impl(newFromNaming, newExprNaming, prevContext.config)
+    Context.Impl(newFromNaming, newExprNaming, prevContext.config, prevContext.dialectConfig)
   }
 
 }

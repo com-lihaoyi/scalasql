@@ -94,7 +94,7 @@ object Update {
     implicit lazy val implicitCtx: Context = Context.compute(prevContext, froms, Some(table))
 
     lazy val tableName =
-      SqlStr.raw(Table.resolve(table.value))
+      SqlStr.raw(Table.fullIdentifier(table.value))
 
     lazy val updateList = set0.map { case assign =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))

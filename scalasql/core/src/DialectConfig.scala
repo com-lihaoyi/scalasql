@@ -1,9 +1,13 @@
 package scalasql.core
 
-trait DialectConfig {
-  protected def dialectCastParams: Boolean
-}
+trait DialectConfig { that =>
+  def castParams: Boolean
+  def escape(str: String): String
 
-object DialectConfig {
-  def castParams(d: DialectConfig) = d.dialectCastParams
+  def withCastParams(params: Boolean) = new DialectConfig {
+    def castParams: Boolean = params
+
+    def escape(str: String): String = that.escape(str)
+
+  }
 }

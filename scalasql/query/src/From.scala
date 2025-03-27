@@ -15,7 +15,7 @@ class TableRef(val value: Table.Base) extends From {
   def fromExprAliases(prevContext: Context): Seq[(Expr.Identity, SqlStr)] = Nil
 
   def renderSql(name: SqlStr, prevContext: Context, liveExprs: LiveExprs) = {
-    val resolvedTable = Table.resolve(value)(prevContext)
+    val resolvedTable = Table.fullIdentifier(value)(prevContext)
     SqlStr.raw(resolvedTable + sql" " + name)
   }
 }
