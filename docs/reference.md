@@ -738,6 +738,130 @@ ShippingInfo.select
 
 
 
+### Select.filterIf.filter not added
+
+
+
+```scala
+ShippingInfo.select.filterIf(false)(_.buyerId `=` 2)
+```
+
+
+*
+    ```sql
+    SELECT
+        shipping_info0.id AS id,
+        shipping_info0.buyer_id AS buyer_id,
+        shipping_info0.shipping_date AS shipping_date
+      FROM shipping_info shipping_info0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+      ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")),
+      ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### Select.filterIf.filter added
+
+
+
+```scala
+ShippingInfo.select.filterIf(true)(_.buyerId `=` 2)
+```
+
+
+*
+    ```sql
+    SELECT
+        shipping_info0.id AS id,
+        shipping_info0.buyer_id AS buyer_id,
+        shipping_info0.shipping_date AS shipping_date
+      FROM shipping_info shipping_info0
+      WHERE (shipping_info0.buyer_id = ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+      ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### Select.filterOpt.filter not added
+
+
+
+```scala
+ShippingInfo.select.filterOpt[Int](None)((table, value) => table.buyerId `=` value)
+```
+
+
+*
+    ```sql
+    SELECT
+        shipping_info0.id AS id,
+        shipping_info0.buyer_id AS buyer_id,
+        shipping_info0.shipping_date AS shipping_date
+      FROM shipping_info shipping_info0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+      ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")),
+      ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
+### Select.filterOpt.filter added
+
+
+
+```scala
+ShippingInfo.select.filterOpt(Some(2))((table, value) => table.buyerId `=` value)
+```
+
+
+*
+    ```sql
+    SELECT
+        shipping_info0.id AS id,
+        shipping_info0.buyer_id AS buyer_id,
+        shipping_info0.shipping_date AS shipping_date
+      FROM shipping_info shipping_info0
+      WHERE (shipping_info0.buyer_id = ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+      ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+    )
+    ```
+
+
+
 ### Select.map.single
 
 `.map` allows you to select exactly what you want to return from

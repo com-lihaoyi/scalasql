@@ -141,6 +141,80 @@ trait SelectTests extends ScalaSqlSuite {
       )
     }
 
+    test("filterIf") {
+      test("filter not added") - checker(
+        query = Text { ShippingInfo.select.filterIf(false)(_.buyerId `=` 2) },
+        sql = """
+          SELECT
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
+            FROM shipping_info shipping_info0
+        """,
+        value = Seq(
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+        ),
+        docs = ""
+      )
+      test("filter added") - checker(
+        query = Text { ShippingInfo.select.filterIf(true)(_.buyerId `=` 2) },
+        sql = """
+          SELECT
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
+            FROM shipping_info shipping_info0
+            WHERE (shipping_info0.buyer_id = ?)
+        """,
+        value = Seq(
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+        ),
+        docs = ""
+      )
+    }
+
+    test("filterOpt") {
+      test("filter not added") - checker(
+        query = Text {
+          ShippingInfo.select.filterOpt[Int](None)((table, value) => table.buyerId `=` value)
+        },
+        sql = """
+          SELECT
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
+            FROM shipping_info shipping_info0
+        """,
+        value = Seq(
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+        ),
+        docs = ""
+      )
+      test("filter added") - checker(
+        query = Text {
+          ShippingInfo.select.filterOpt(Some(2))((table, value) => table.buyerId `=` value)
+        },
+        sql = """
+          SELECT
+              shipping_info0.id AS id,
+              shipping_info0.buyer_id AS buyer_id,
+              shipping_info0.shipping_date AS shipping_date
+            FROM shipping_info shipping_info0
+            WHERE (shipping_info0.buyer_id = ?)
+        """,
+        value = Seq(
+          ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")),
+          ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06"))
+        ),
+        docs = ""
+      )
+    }
+
     test("map") {
       test("single") - checker(
         query = Text { Buyer.select.map(_.name) },
