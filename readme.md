@@ -74,7 +74,7 @@ To get started with ScalaSql, add it to your `build.sc` file as follows:
 ivy"com.lihaoyi::scalasql:0.1.17"
 ```
 
-ScalaSql supports Scala 2.13.x and >=3.4.2
+ScalaSql supports Scala 2.13.x and >=3.6.2
 
 ## Documentation
 
