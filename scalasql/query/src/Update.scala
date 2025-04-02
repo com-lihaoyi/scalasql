@@ -91,10 +91,16 @@ object Update {
       prevContext: Context
   ) {
     lazy val froms = joins0.flatMap(_.from).map(_.from)
-    implicit lazy val implicitCtx: Context = Context.compute(prevContext, froms, Some(table))
+    lazy val contextStage1: Context = Context
+      .compute(prevContext, froms, Some(table))
 
-    lazy val tableName =
-      SqlStr.raw(Table.fullIdentifier(table.value))
+    implicit lazy val context: Context = if (table.value.escape) {
+      contextStage1.withFromNaming(
+        contextStage1.fromNaming.updated(table, Table.fullIdentifier(table.value)(prevContext))
+      )
+    } else {
+      contextStage1
+    }
 
     lazy val updateList = set0.map { case assign =>
       val kStr = SqlStr.raw(prevContext.config.columnNameMapper(assign.column.name))
@@ -110,7 +116,7 @@ object Update {
         joinOns.flatten.flatten.flatMap(_.referencedExprs)
     )
     lazy val renderedFroms =
-      JoinsToSql.renderFroms(froms, prevContext, implicitCtx.fromNaming, liveExprs)
+      JoinsToSql.renderFroms(froms, prevContext, context.fromNaming, liveExprs)
     lazy val from = SqlStr.opt(joins0.headOption) { firstJoin =>
       val froms = firstJoin.from.map { jf => renderedFroms(jf.from) }
       sql" FROM " + SqlStr.join(froms, SqlStr.commaSep)
@@ -126,6 +132,7 @@ object Update {
 
     lazy val joins = optSeq(joins0.drop(1))(JoinsToSql.joinsToSqlStr(_, renderedFroms, joinOns))
 
+    lazy val tableName = SqlStr.raw(Table.fullIdentifier(table.value))
     def render() = sql"UPDATE $tableName SET " + sets + from + joins + where
 
   }

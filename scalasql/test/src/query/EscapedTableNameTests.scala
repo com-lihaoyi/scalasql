@@ -31,6 +31,20 @@ trait EscapedTableNameTests extends ScalaSqlSuite {
           docs = ""
         )
       }
+      test("select with filter") {
+        checker(
+          query = Text {
+            Select.select.filter(_.id `=` 1)
+          },
+          sql = s"""
+            SELECT select0.id AS id, select0.name AS name
+            FROM $tableNameEscaped select0
+            WHERE (select0.id = ?)
+          """,
+          value = Seq.empty[Select[Sc]],
+          docs = ""
+        )
+      }
       test("delete") {
         checker(
           query = Text {
@@ -68,6 +82,19 @@ trait EscapedTableNameTests extends ScalaSqlSuite {
           sqls = Seq(
             s"UPDATE $tableNameEscaped SET $tableNameEscaped.name = ?",
             s"UPDATE $tableNameEscaped SET name = ?"
+          ),
+          value = 0,
+          docs = ""
+        )
+      }
+      test("update where") {
+        checker(
+          query = Text {
+            Select.update(_.id `=` 1).set(_.name := "hello")
+          },
+          sqls = Seq(
+            s"UPDATE $tableNameEscaped SET $tableNameEscaped.name = ? WHERE ($tableNameEscaped.id = ?)",
+            s"UPDATE $tableNameEscaped SET name = ? WHERE ($tableNameEscaped.id = ?)"
           ),
           value = 0,
           docs = ""

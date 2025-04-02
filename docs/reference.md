@@ -6909,6 +6909,31 @@ Select.select
 
 
 
+### EscapedTableName.escape table name.select with filter
+
+
+
+```scala
+Select.select.filter(_.id `=` 1)
+```
+
+
+*
+    ```sql
+    SELECT select0.id AS id, select0.name AS name
+    FROM "select" select0
+    WHERE (select0.id = ?)
+    ```
+
+
+
+*
+    ```scala
+    Seq.empty[Select[Sc]]
+    ```
+
+
+
 ### EscapedTableName.escape table name.delete
 
 
@@ -6974,6 +6999,29 @@ Select.update(_ => true).set(_.name := "hello")
 *
     ```sql
     UPDATE "select" SET name = ?
+    ```
+
+
+
+*
+    ```scala
+    0
+    ```
+
+
+
+### EscapedTableName.escape table name.update where
+
+
+
+```scala
+Select.update(_.id `=` 1).set(_.name := "hello")
+```
+
+
+*
+    ```sql
+    UPDATE "select" SET name = ? WHERE ("select".id = ?)
     ```
 
 
