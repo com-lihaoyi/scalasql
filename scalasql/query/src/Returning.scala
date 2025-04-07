@@ -54,7 +54,16 @@ object Returning {
     override def queryIsSingleRow = false
 
     private[scalasql] override def renderSql(ctx0: Context) = {
-      implicit val implicitCtx = Context.compute(ctx0, Nil, Some(returnable.table))
+      val contextStage1: Context = Context.compute(ctx0, Nil, Some(returnable.table))
+
+      implicit val implicitCtx: Context = if (returnable.table.value.escape) {
+        contextStage1.withFromNaming(
+          contextStage1.fromNaming
+            .updated(returnable.table, Table.fullIdentifier(returnable.table.value)(contextStage1))
+        )
+      } else {
+        contextStage1
+      }
 
       val prefix = Renderable.renderSql(returnable)
       val walked = qr.walkLabelsAndExprs(expr)

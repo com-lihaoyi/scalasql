@@ -30,7 +30,8 @@ import query.{
   GetGeneratedKeysTests,
   WithCteTests,
   SchemaTests,
-  EscapedTableNameTests
+  EscapedTableNameTests,
+  EscapedTableNameWithReturningTests
 }
 import scalasql.dialects.{
   MySqlDialectTests,
@@ -63,6 +64,9 @@ package postgres {
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with PostgresSuite
   object SchemaTests extends SchemaTests with PostgresSuite
   object EscapedTableNameTests extends EscapedTableNameTests with PostgresSuite
+  object EscapedTableNameWithReturningTests
+      extends EscapedTableNameWithReturningTests
+      with PostgresSuite
 
   object SubQueryTests extends SubQueryTests with PostgresSuite
   object WithCteTests extends WithCteTests with PostgresSuite
@@ -109,6 +113,9 @@ package hikari {
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with HikariSuite
   object SchemaTests extends SchemaTests with HikariSuite
   object EscapedTableNameTests extends EscapedTableNameTests with HikariSuite
+  object EscapedTableNameWithReturningTests
+      extends EscapedTableNameWithReturningTests
+      with HikariSuite
 
   object SubQueryTests extends SubQueryTests with HikariSuite
   object WithCteTests extends WithCteTests with HikariSuite
@@ -220,6 +227,9 @@ package sqlite {
   // Sqlite doesn't support schemas
   // object SchemaTests extends SchemaTests with SqliteSuite
   object EscapedTableNameTests extends EscapedTableNameTests with SqliteSuite
+  object EscapedTableNameWithReturningTests
+      extends EscapedTableNameWithReturningTests
+      with SqliteSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with SqliteSuite
   object OptionalTests extends datatypes.OptionalTests with SqliteSuite
