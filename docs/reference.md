@@ -7061,6 +7061,41 @@ Select.insert.values(
 
 
 
+## EscapedTableNameWithReturning
+
+    If your table name is a reserved sql world, e.g. `order`, you can specify this in your table definition with
+    `override def escape = true`
+  
+### EscapedTableNameWithReturning.insert with returning
+
+
+
+```scala
+Select.insert
+  .values(
+    Select[Sc](
+      id = 0,
+      name = "hello"
+    )
+  )
+  .returning(_.id)
+```
+
+
+*
+    ```sql
+    INSERT INTO "select" (id, name) VALUES (?, ?) RETURNING "select".id AS res
+    ```
+
+
+
+*
+    ```scala
+    Seq(0)
+    ```
+
+
+
 ## SubQuery
 Queries that explicitly use subqueries (e.g. for `JOIN`s) or require subqueries to preserve the Scala semantics of the various operators
 ### SubQuery.sortTakeJoin
