@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.18"
+ivy"com.lihaoyi::scalasql:0.1.19"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.6.2
@@ -129,6 +129,10 @@ ScalaSql supports Scala 2.13.x and >=3.6.2
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+### 0.1.19
+
+*  Escape table in returning clause [#80](https://github.com/com-lihaoyi/scalasql/pull/80)
 
 ### 0.1.18
 
