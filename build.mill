@@ -8,10 +8,11 @@ import de.tobiasroeser.mill.vcs.version.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
-val scalaVersions = Seq("2.13.12", "3.6.2")
+val scala3 = "3.6.2"
+val scalaVersions = Seq("2.13.12", scala3)
+val scala3NamedTuples = "3.7.0"
 
-trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
-  def scalaVersion = crossScalaVersion
+trait CommonBase extends ScalaModule with PublishModule with ScalafixModule {
 
   def publishVersion = VcsVersion.vcsState().format()
 
@@ -34,7 +35,13 @@ trait Common extends CrossScalaModule with PublishModule with ScalafixModule{
       Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
   }
 }
+trait Common extends CommonBase with CrossScalaModule
 
+object `scalasql-namedtuples` extends CommonBase {
+  def scalaVersion: T[String] = scala3NamedTuples
+  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
+  def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3).query)
+}
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends Common{ common =>
