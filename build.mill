@@ -41,6 +41,10 @@ object `scalasql-namedtuples` extends CommonBase {
   def scalaVersion: T[String] = scala3NamedTuples
   def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
   def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3).query)
+
+  override def scalacOptions: Target[Seq[String]] = T {
+    super.scalacOptions() :+ "-Xprint:inlining"
+  }
 }
 
 object scalasql extends Cross[ScalaSql](scalaVersions)
@@ -49,6 +53,9 @@ trait ScalaSql extends Common{ common =>
   def ivyDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
     ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
+
+
+  override def consoleScalacOptions: T[Seq[String]] = Seq("-Xprint:typer")
 
 
   object test extends ScalaTests with ScalafixModule{
