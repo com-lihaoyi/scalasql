@@ -10,6 +10,7 @@ import scalasql.query.Column
 import scala.deriving.Mirror
 import java.util.concurrent.atomic.AtomicReference
 import scala.reflect.ClassTag
+import scala.NamedTuple.AnyNamedTuple
 import scalasql.namedtuples.SimpleTableMacros.asIArray
 import java.util.function.UnaryOperator
 import scala.annotation.nowarn
@@ -38,20 +39,6 @@ object SimpleTableMacros {
     asIArray[BaseRowExpr[?]](t).map(_.value)
   }
 
-  // inline def computeLabels[N <: Tuple, V <: Tuple](acc: List[Seq[String]]): List[String] = {
-  //   inline compiletime.erasedValue[(N, V)] match
-  //     case _: (n *: ns, v *: vs) => computeLabels(singleLabel[n, v] :: acc)
-  //     case _: (EmptyTuple, EmptyTuple) => acc.reverse.flatten
-  // }
-
-  // private inline def singleLabel[N, V]: Seq[String] = {
-  //   compiletime.summonFrom {
-  //     case m: Table.ImplicitMetadata[SimpleTable.NamedTupleOf[V]] =>
-  //       m.value.walkLabels0()
-  //     case _ =>
-  //       List(compiletime.constValue[N].asInstanceOf[String])
-  //   }
-  // }
   class BaseRowExpr[C](val value: Queryable.Row[?, ?])
   trait BaseRowExprLowPrio {
     inline given notFound: [T] => (mappers: DialectTypeMappers) => BaseRowExpr[T] =
@@ -79,24 +66,52 @@ object SimpleTableMacros {
     res.nn
   }
 
-  // def composeLabels(labels0: Tuple, optMetas0: Tuple): IndexedSeq[String] = {
-  //   val labels = asIArray[String](labels0)
-  //   val optMetas = asIArray[BaseMetadata[?]](optMetas0)
-  //   labels.zip(optMetas).map { (name, opt) =>
-  //     opt.value match {
-  //       case Some(m) => m.metadata0.walkLabels0()
-  //       case None    => List(name)
-  //     }
-  //   }.flatten
-  // }
+  def walkAllExprs(queryable: Table.Metadata.QueryableProxy)[E <: Tuple](e: E): IndexedSeq[Expr[?]] = {
+    var i = 0
+    val fields = e.productIterator
+    val buf = IndexedSeq.newBuilder[Seq[Expr[?]]]
+    while fields.hasNext do
+      type T
+      val field = fields.next().asInstanceOf[Expr[T]]
+      val row = queryable[Expr[T], Sc[T]](i)
+      buf += row.walkExprs(field)
+      i += 1
+    buf.result().flatten
+  }
+
+  def construct[R <: AnyNamedTuple](queryable: Table.Metadata.QueryableProxy)(size: Int, args: Queryable.ResultSetIterator): R = {
+    var i = 0
+    val buf = IArray.newBuilder[AnyRef]
+    while i < size do
+      type T
+      val row = queryable[Expr[T], Sc[T]](i)
+      buf += row.construct(args).asInstanceOf[AnyRef]
+      i += 1
+    Tuple.fromIArray(buf.result()).asInstanceOf[R]
+  }
+
+  def deconstruct[R <: AnyNamedTuple](queryable: Table.Metadata.QueryableProxy)[T <: Tuple](t: T): R = {
+    var i = 0
+    val buf = IArray.newBuilder[AnyRef]
+    val fields = t.productIterator
+    while fields.hasNext do
+      type T
+      val field = fields.next().asInstanceOf[Sc[T]]
+      val row = queryable[Expr[T], Sc[T]](i)
+      buf += row.deconstruct(field).asInstanceOf[AnyRef]
+      i += 1
+    Tuple.fromIArray(buf.result()).asInstanceOf[R]
+  }
+
 }
 
 trait SimpleTableMacros {
-  transparent inline given initTableMetadata[C]: SimpleTable.Metadata[C] =
+  inline given initTableMetadata[C]: SimpleTable.Metadata[C] =
     // val m = compiletime.summonInline[Mirror.Of[NamedTuple.From[C]]]
     type Impl = SimpleTable.NamedTupleOf[C]
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
+    type Size = NamedTuple.Size[NamedTuple.From[C]]
     type FlatLabels = Tuple.Map[Tuple.Zip[Labels,Values], [X] =>> X match {case(l, c)=>SimpleTableMacros.BaseLabels[l, c]}]
 
     val rowsRef = AtomicReference[IArray[Queryable.Row[?, ?]] | Null](null)
@@ -117,9 +132,16 @@ trait SimpleTableMacros {
 
     def queryable(
         walkLabels0: () => Seq[String],
-        mappers: DialectTypeMappers,
+        @nowarn("msg=unused") mappers: DialectTypeMappers,
         queryable: Table.Metadata.QueryableProxy
-    ): Queryable[Impl[Expr], Impl[Sc]] = ???
+    ): Queryable[Impl[Expr], Impl[Sc]] = SimpleTable.Internal.SimpleTableQueryable(
+      walkLabels0,
+      walkExprs0 = exprs => SimpleTableMacros.walkAllExprs(queryable)(exprs.toTuple),
+      construct0 = args =>
+        SimpleTableMacros.construct[Impl[Sc]](queryable)(compiletime.constValue[Size], args),
+      deconstruct0 = values => SimpleTableMacros.deconstruct[Impl[Expr]](queryable)(values.toTuple)
+    )
+
     def vExpr0(
         tableRef: TableRef,
         mappers: DialectTypeMappers,
