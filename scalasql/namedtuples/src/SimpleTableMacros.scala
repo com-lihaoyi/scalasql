@@ -15,6 +15,8 @@ import scalasql.namedtuples.SimpleTableMacros.asIArray
 import java.util.function.UnaryOperator
 import scala.annotation.nowarn
 import scalasql.namedtuples.SimpleTableMacros.BaseLabels
+import scalasql.namedtuples.SimpleTable.NamedTupleOf
+import scalasql.core.TypeMapper
 
 object SimpleTableMacros {
   // case class State(rows: IArray[Queryable.Row[?, ?]] | Null)
@@ -25,8 +27,14 @@ object SimpleTableMacros {
   def asIArrayFlatUnwrap[T](t: Tuple)[U: ClassTag](f: T => IterableOnce[U]): IArray[U] = {
     IArray.from(t.productIterator.asInstanceOf[Iterator[T]].flatMap(f))
   }
+  def asIArrayUnwrap[T](t: Tuple)[U: ClassTag](f: T => U): IArray[U] = {
+    IArray.from(t.productIterator.asInstanceOf[Iterator[T]].map(f))
+  }
   def unwrapLabels(t: Tuple): IndexedSeq[String] = {
     asIArrayFlatUnwrap[BaseLabels[?,?]](t)(_.value).toIndexedSeq
+  }
+  def unwrapColumns(t: Tuple): IArray[AnyRef] = {
+    asIArrayUnwrap[BaseColumn[?,?]](t)(_.value)
   }
 
   inline def computeRows[V <: Tuple](mappers: DialectTypeMappers): IArray[Queryable.Row[?, ?]] = {
@@ -48,6 +56,17 @@ object SimpleTableMacros {
   object BaseRowExpr extends BaseRowExprLowPrio {
     given foundMeta: [C] => (mappers: DialectTypeMappers, m: SimpleTable.WrappedMetadata[C]) => BaseRowExpr[C] =
       BaseRowExpr(m.metadata.rowExpr(mappers))
+  }
+
+  class BaseColumn[L <: String, T](val value: AnyRef)
+  trait BaseColumnLowPrio {
+    inline given notFound: [L <: String, T] => (l: ValueOf[L], mappers: DialectTypeMappers, ref: TableRef) => BaseColumn[L, T] =
+      import mappers.{*, given}
+      BaseColumn(new Column[T](ref, l.value)(using compiletime.summonInline[TypeMapper[T]]))
+  }
+  object BaseColumn extends BaseColumnLowPrio {
+    given foundMeta: [L <: String, T] => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.WrappedMetadata[T]) => BaseColumn[L, T] =
+      BaseColumn(m.metadata.metadata0.vExpr(ref, mappers).asInstanceOf[AnyRef])
   }
 
   class BaseLabels[L, C](val value: Seq[String])
@@ -112,10 +131,12 @@ trait SimpleTableMacros {
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Size = NamedTuple.Size[NamedTuple.From[C]]
-    type FlatLabels = Tuple.Map[Tuple.Zip[Labels,Values], [X] =>> X match {case(l, c)=>SimpleTableMacros.BaseLabels[l, c]}]
+    type FlatLabels = Tuple.Map[Tuple.Zip[Labels,Values], [X] =>> X match {case(l, t) =>SimpleTableMacros.BaseLabels[l, t]}]
+    type Columns = Tuple.Map[Tuple.Zip[Labels,Values], [X] =>> X match {case (l, t) =>SimpleTableMacros.BaseColumn[l, t]}]
 
     val rowsRef = AtomicReference[IArray[Queryable.Row[?, ?]] | Null](null)
     val labelsRef = AtomicReference[IndexedSeq[String] | Null](null)
+    val columnsRef = AtomicReference[IArray[AnyRef] | Null](null)
 
     def queryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
       SimpleTableMacros.setNonNull(rowsRef)(rows =>
@@ -145,8 +166,16 @@ trait SimpleTableMacros {
     def vExpr0(
         tableRef: TableRef,
         mappers: DialectTypeMappers,
-        queryable: Table.Metadata.QueryableProxy
-    ): Impl[Column] = ???
+        @nowarn("msg=unused") queryable: Table.Metadata.QueryableProxy
+    ): Impl[Column] =
+      val columns = SimpleTableMacros.setNonNull(columnsRef)(columns =>
+        if columns == null then
+          @nowarn("msg=unused") given TableRef = tableRef
+          @nowarn("msg=unused") given DialectTypeMappers = mappers
+          SimpleTableMacros.unwrapColumns(compiletime.summonAll[Columns])
+        else columns.nn
+      )
+      Tuple.fromIArray(columns).asInstanceOf[Impl[Column]]
 
     val metadata0 = Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
 
