@@ -10,44 +10,44 @@ import scalasql.core.Expr
 class SimpleTable[C]()(
     using name: sourcecode.Name,
     metadata0: SimpleTable.Metadata[C]
-) extends Table[SimpleTable.NamedTupleOf[C]](using name, metadata0.metadata0)
-    with SimpleTable.LowPri[C] {
-  type Impl = SimpleTable.NamedTupleOf[C]
+) extends Table[SimpleTable.Lift[C]](using name, metadata0.metadata0) {
   given simpleTableImplicitMetadata: SimpleTable.WrappedMetadata[C] =
     SimpleTable.WrappedMetadata(metadata0)
-  // given containerQr: (dialect: DialectTypeMappers) => Queryable.Row[Impl[Expr], Impl[Sc]] =
-  //   super.containerQr.asInstanceOf[Queryable.Row[Impl[Expr], Impl[Sc]]]
-  // tableMetadata
-  //   .queryable(
-  //     tableMetadata.walkLabels0,
-  //     dialect,
-  //     new Table.Metadata.QueryableProxy(tableMetadata.queryables(dialect, _))
-  //   )
-  //   .asInstanceOf[Queryable.Row[V[Expr], V[Sc]]]
 }
 
 object SimpleTable {
 
-  object Internal {
-    class SimpleTableQueryable[Q, R](
-        walkLabels0: () => Seq[String],
-        walkExprs0: Q => Seq[Expr[?]],
-        construct0: Queryable.ResultSetIterator => R,
-        deconstruct0: R => Q
-    ) extends Queryable.Row[Q, R] {
-      def walkLabels(): Seq[List[String]] = walkLabels0().map(List(_))
-      def walkExprs(q: Q): Seq[Expr[?]] = walkExprs0(q)
-
-      def construct(args: Queryable.ResultSetIterator) = construct0(args)
-
-      def deconstruct(r: R): Q = deconstruct0(r)
-    }
-
+  type Lift[C] = [T[_]] =>> T[Internal.Tombstone.type] match {
+    case Expr[?] => Record[C, T]
+    case _ => C
   }
 
-  trait LowPri[C] { this: SimpleTable[C] =>
-    // given containerQr2: (dialect: DialectTypeMappers) => Queryable.Row[Impl[Column], Impl[Sc]] =
-    //   containerQr.asInstanceOf[Queryable.Row[Impl[Column], Impl[Sc]]]
+  final class Record[C, T[_]](data: IArray[AnyRef]) extends Selectable:
+    type Fields = NamedTuple.Map[
+      NamedTuple.From[C],
+      [X] =>> X match {
+        case Product => Record[X, T]
+        case _ => T[X]
+      }
+    ]
+    def recordIterator: Iterator[Any] = data.iterator.asInstanceOf[Iterator[Any]]
+    def apply(i: Int): AnyRef = data(i)
+    inline def selectDynamic(name: String): AnyRef =
+      apply(compiletime.constValue[Record.IndexOf[name.type, Record.Names[C], 0]])
+
+  object Record:
+    import scala.compiletime.ops.int.*
+    type Names[C] = NamedTuple.Names[NamedTuple.From[C]]
+    type IndexOf[N, T <: Tuple, Acc <: Int] <: Int = T match {
+      case EmptyTuple => -1
+      case N *: _ => Acc
+      case _ *: t => IndexOf[N, t, S[Acc]]
+    }
+    def fromIArray(data: IArray[AnyRef]): Record[Any, [T] =>> Any] =
+      Record(data.asInstanceOf[IArray[AnyRef]])
+
+  object Internal {
+    case object Tombstone
   }
 
   opaque type WrappedMetadata[C] = Metadata[C]
@@ -57,19 +57,17 @@ object SimpleTable {
       def metadata: Metadata[C] = m
     }
   }
-  class Metadata[C](val metadata0: Table.Metadata[NamedTupleOf[C]]):
-    type Impl = NamedTupleOf[C]
+  class Metadata[C](val metadata0: Table.Metadata[Lift[C]]):
     def rowExpr(
         mappers: DialectTypeMappers
-    ): Queryable.Row[Impl[Expr], Impl[Sc]] =
+    ): Queryable.Row[Record[C, Expr], Record[C, Sc]] =
       metadata0
         .queryable(
           metadata0.walkLabels0,
           mappers,
           new Table.Metadata.QueryableProxy(metadata0.queryables(mappers, _))
         )
-        .asInstanceOf[Queryable.Row[Impl[Expr], Impl[Sc]]]
-  object Metadata extends SimpleTableMacros
+        .asInstanceOf[Queryable.Row[Record[C, Expr], Record[C, Sc]]]
 
-  type NamedTupleOf[C] = [T[_]] =>> NamedTuple.Map[NamedTuple.From[C], T]
+  object Metadata extends SimpleTableMacros
 }
