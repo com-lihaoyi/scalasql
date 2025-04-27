@@ -12,7 +12,7 @@ val scala3 = "3.6.2"
 val scalaVersions = Seq("2.13.12", scala3)
 val scala3NamedTuples = "3.7.0"
 
-trait CommonBase extends ScalaModule with PublishModule with ScalafixModule {
+trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { common =>
 
   def publishVersion = VcsVersion.vcsState().format()
 
@@ -34,36 +34,8 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule {
     Seq("-Wunused:privates,locals,explicits,implicits,params") ++
       Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
   }
-}
-trait Common extends CommonBase with CrossScalaModule
 
-object `scalasql-namedtuples` extends CommonBase {
-  def scalaVersion: T[String] = scala3NamedTuples
-  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
-  def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3).query)
-
-  override def scalacOptions: Target[Seq[String]] = T {
-    super.scalacOptions() :+ "-Xprint:inlining"
-  }
-
-  object test extends ScalaTests {
-    def moduleDeps = Seq(scalasql(scala3), `scalasql-namedtuples`)
-    def testFramework = "utest.runner.Framework"
-  }
-}
-
-object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends Common{ common =>
-  def moduleDeps = Seq(query, operations)
-  def ivyDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
-    ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
-  )
-
-
-  override def consoleScalacOptions: T[Seq[String]] = Seq("-Xprint:typer")
-
-
-  object test extends ScalaTests with ScalafixModule{
+  trait CommonTest extends ScalaTests with ScalafixModule {
     def scalacOptions = common.scalacOptions
     def ivyDeps = Agg(
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
@@ -80,10 +52,54 @@ trait ScalaSql extends Common{ common =>
       ivy"com.zaxxer:HikariCP:5.1.0"
     )
 
+    def recordedTestsFile: String
+    def recordedSuiteDescriptionsFile: String
+
     def testFramework = "scalasql.UtestFramework"
 
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
-    def forkEnv = Map("MILL_WORKSPACE_ROOT" -> T.workspace.toString())
+
+    def forkEnv = Map(
+      "MILL_WORKSPACE_ROOT" -> T.workspace.toString(),
+      "SCALASQL_RECORDED_TESTS_NAME" -> recordedTestsFile,
+      "SCALASQL_RECORDED_SUITE_DESCRIPTIONS_NAME" -> recordedSuiteDescriptionsFile
+    )
+  }
+}
+trait Common extends CommonBase with CrossScalaModule
+
+object `scalasql-namedtuples` extends CommonBase {
+  def scalaVersion: T[String] = scala3NamedTuples
+  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
+  def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3).query)
+
+  // override def scalacOptions: Target[Seq[String]] = T {
+  //   super.scalacOptions() :+ "-Xprint:inlining"
+  // }
+
+  object test extends CommonTest {
+    def moduleDeps = super.moduleDeps ++ Seq(scalasql(scala3), scalasql(scala3).test)
+    def recordedTestsFile: String = "recordedTestsNT.json"
+    def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptionsNT.json"
+
+    override def scalacOptions: Target[Seq[String]] = T {
+      super.scalacOptions() :+ "-Xprint:genBCode"
+    }
+  }
+}
+
+object scalasql extends Cross[ScalaSql](scalaVersions)
+trait ScalaSql extends Common { common =>
+  def moduleDeps = Seq(query, operations)
+  def ivyDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
+    ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
+  )
+
+  override def consoleScalacOptions: T[Seq[String]] = Seq("-Xprint:typer")
+
+  object test extends CommonTest {
+    def recordedTestsFile: String = "recordedTests.json"
+    def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptions.json"
   }
 
   private def indent(code: Iterable[String]): String =

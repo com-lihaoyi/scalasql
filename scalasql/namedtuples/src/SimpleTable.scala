@@ -60,14 +60,14 @@ object SimpleTable {
   class Metadata[C](val metadata0: Table.Metadata[Lift[C]]):
     def rowExpr(
         mappers: DialectTypeMappers
-    ): Queryable.Row[Record[C, Expr], Record[C, Sc]] =
+    ): Queryable.Row[Record[C, Expr], C] =
       metadata0
         .queryable(
           metadata0.walkLabels0,
           mappers,
           new Table.Metadata.QueryableProxy(metadata0.queryables(mappers, _))
         )
-        .asInstanceOf[Queryable.Row[Record[C, Expr], Record[C, Sc]]]
+        .asInstanceOf[Queryable.Row[Record[C, Expr], C]]
 
   object Metadata extends SimpleTableMacros
 }

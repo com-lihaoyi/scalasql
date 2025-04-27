@@ -1,6 +1,7 @@
-package scalasql.namedtuples
+package scalasql.example
 
 import scalasql.dialects.H2Dialect.*
+import scalasql.namedtuples.*
 import scalasql.*
 
 case class Person(name: String, age: Int)

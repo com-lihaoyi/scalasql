@@ -43,10 +43,18 @@ object SimpleTableMacros {
     m.fromProduct(ArrayProduct())
   }
 
-  inline def computeRows[V <: Tuple](mappers: DialectTypeMappers): IArray[Queryable.Row[?, ?]] = {
-    @nowarn("msg=unused")
-    given DialectTypeMappers = mappers
-    computeRows0(compiletime.summonAll[Tuple.Map[V, BaseRowExpr]])
+  inline def computeRows[Rows <: Tuple](mappers: DialectTypeMappers): IArray[Queryable.Row[?, ?]] = {
+    val rows = mappers match
+      case given DialectTypeMappers => compiletime.summonAll[Rows]
+    computeRows0(rows)
+  }
+  inline def computeColumns[Columns <: Tuple](
+      mappers: DialectTypeMappers, tableRef: TableRef): IArray[AnyRef] = {
+    val cols = mappers match
+      case given DialectTypeMappers =>
+        tableRef match
+          case given TableRef => compiletime.summonAll[Columns]
+    unwrapColumns(cols)
   }
 
   def computeRows0(t: Tuple): IArray[Queryable.Row[?, ?]] = {
@@ -68,7 +76,11 @@ object SimpleTableMacros {
   trait BaseColumnLowPrio {
     inline given notFound: [L <: String, T] => (l: ValueOf[L], mappers: DialectTypeMappers, ref: TableRef) => BaseColumn[L, T] =
       import mappers.{*, given}
-      BaseColumn(new Column[T](ref, l.value)(using compiletime.summonInline[TypeMapper[T]]))
+      val col = new Column[T](
+        ref,
+        Table.columnNameOverride(ref.value)(l.value)
+      )(using compiletime.summonInline[TypeMapper[T]])
+      BaseColumn(col)
   }
   object BaseColumn extends BaseColumnLowPrio {
     given foundMeta: [L <: String, T] => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.WrappedMetadata[T]) => BaseColumn[L, T] =
@@ -145,14 +157,14 @@ trait SimpleTableMacros {
     }]
     type FlatLabels = Pairs[SimpleTableMacros.BaseLabels]
     type Columns = Pairs[SimpleTableMacros.BaseColumn]
+    type Rows = Tuple.Map[Values, SimpleTableMacros.BaseRowExpr]
 
     val rowsRef = AtomicReference[IArray[Queryable.Row[?, ?]] | Null](null)
     val labelsRef = AtomicReference[IndexedSeq[String] | Null](null)
-    val columnsRef = AtomicReference[IArray[AnyRef] | Null](null)
 
     def queryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
       SimpleTableMacros.setNonNull(rowsRef)(rows =>
-        if rows == null then SimpleTableMacros.computeRows[Values](mappers)
+        if rows == null then SimpleTableMacros.computeRows[Rows](mappers)
         else rows.nn
       )(idx)
 
@@ -184,13 +196,9 @@ trait SimpleTableMacros {
         mappers: DialectTypeMappers,
         @nowarn("msg=unused") queryable: Table.Metadata.QueryableProxy
     ): Impl[Column] =
-      val columns = SimpleTableMacros.setNonNull(columnsRef)(columns =>
-        if columns == null then
-          @nowarn("msg=unused") given TableRef = tableRef
-          @nowarn("msg=unused") given DialectTypeMappers = mappers
-          SimpleTableMacros.unwrapColumns(compiletime.summonAll[Columns])
-        else columns.nn
-      )
+      // TODO: we should not cache the columns here because this can be called multiple times,
+      //       and each time the captured tableRef should be treated as a fresh value.
+      val columns = SimpleTableMacros.computeColumns[Columns](mappers, tableRef)
       SimpleTable.Record.fromIArray(columns).asInstanceOf[Impl[Column]]
 
     val metadata0 = Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
