@@ -4,10 +4,10 @@ import scalasql.dialects.H2Dialect.*
 import scalasql.namedtuples.*
 import scalasql.*
 
-case class Person(name: String, age: Int)
+case class Person(name: String, age: Int) extends SimpleTable.Source
 object Person extends SimpleTable[Person]()
 
-case class City(name: String, population: Int, mayor: Person)
+case class City(name: String, population: Int, mayor: Person) extends SimpleTable.Source
 object City extends SimpleTable[City]()
 
 case class Person1[T[_]](name: T[String], age: T[Int])
@@ -22,6 +22,3 @@ object City1 extends Table[City1]()
   City.insert.columns(_.name := "foo")
   City.insert.batched(_.name, _.population, _.mayor.name)(("foo", 42, "bar"), ("baz", 23, "qux"))
   City1.insert.batched(_.name, _.population, _.mayor.name)(("foo", 42, "bar"), ("baz", 23, "qux"))
-
-  // TODO: can't use named tuple because the Row[?, ?] is not in implicit scope automatically?
-  // City.select.filter(_.name === "foo").map(_.mayor)

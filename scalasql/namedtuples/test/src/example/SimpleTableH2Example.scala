@@ -11,7 +11,7 @@ object SimpleTableH2Example {
       kebabCaseName: String,
       name: String,
       price: Double
-  )
+  ) extends SimpleTable.Source
 
   object ExampleProduct extends SimpleTable[ExampleProduct]
 

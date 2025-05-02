@@ -12,7 +12,7 @@ object SimpleTableMySqlExample {
       kebabCaseName: String,
       name: String,
       price: Double
-  )
+  ) extends SimpleTable.Source
 
   object ExampleProduct extends SimpleTable[ExampleProduct]
 

@@ -78,6 +78,7 @@ object `scalasql-namedtuples` extends CommonBase {
   // }
 
   object test extends CommonTest {
+    def resources = scalasql(scala3).test.resources
     def moduleDeps = super.moduleDeps ++ Seq(scalasql(scala3), scalasql(scala3).test)
     def recordedTestsFile: String = "recordedTestsNT.json"
     def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptionsNT.json"

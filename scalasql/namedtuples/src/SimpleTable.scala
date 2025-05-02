@@ -7,7 +7,7 @@ import scalasql.query.Column
 import scalasql.core.Sc
 import scalasql.core.Expr
 
-class SimpleTable[C]()(
+class SimpleTable[C <: SimpleTable.Source]()(
     using name: sourcecode.Name,
     metadata0: SimpleTable.Metadata[C]
 ) extends Table[SimpleTable.Lift[C]](using name, metadata0.metadata0) {
@@ -16,6 +16,13 @@ class SimpleTable[C]()(
 }
 
 object SimpleTable {
+
+  /**
+   * Marker class that signals that a data type is convertable to an SQL table row.
+   * @note this must be a class to convince the match type reducer that it provably can't be mixed
+   *  into various column types such as java.util.Date, geny.Bytes, or scala.Option.
+   */
+  abstract class Source
 
   type Lift[C] = [T[_]] =>> T[Internal.Tombstone.type] match {
     case Expr[?] => Record[C, T]
@@ -26,7 +33,7 @@ object SimpleTable {
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Product => Record[X, T]
+        case Source => Record[X, T]
         case _ => T[X]
       }
     ]
@@ -44,7 +51,7 @@ object SimpleTable {
       case _ *: t => IndexOf[N, t, S[Acc]]
     }
     def fromIArray(data: IArray[AnyRef]): Record[Any, [T] =>> Any] =
-      Record(data.asInstanceOf[IArray[AnyRef]])
+      Record(data)
 
   object Internal {
     case object Tombstone

@@ -146,8 +146,8 @@ object SimpleTableMacros {
 }
 
 trait SimpleTableMacros {
-  inline given initTableMetadata[C <: Product]: SimpleTable.Metadata[C] =
-    val m = compiletime.summonInline[Mirror.ProductOf[C]]
+  inline given initTableMetadata[C <: Product & SimpleTable.Source]: SimpleTable.Metadata[C] =
+    def m = compiletime.summonInline[Mirror.ProductOf[C]]
     type Impl = SimpleTable.Lift[C]
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
