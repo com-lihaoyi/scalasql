@@ -1290,7 +1290,9 @@ object WorldSqlTests extends TestSuite {
 
             throw new Exception()
           }
-        } catch { case e: Exception => /*do nothing*/ }
+        } catch {
+          case e: Exception => /*do nothing*/
+        }
 
         dbClient.transaction { implicit db =>
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
@@ -1336,7 +1338,9 @@ object WorldSqlTests extends TestSuite {
               db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
               throw new Exception()
             }
-          } catch { case e: Exception => /*do nothing*/ }
+          } catch {
+            case e: Exception => /*do nothing*/
+          }
 
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
             City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
