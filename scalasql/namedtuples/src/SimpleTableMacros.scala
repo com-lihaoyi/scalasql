@@ -15,8 +15,78 @@ import java.util.function.UnaryOperator
 import scala.annotation.nowarn
 import scalasql.namedtuples.SimpleTableMacros.BaseLabels
 import scalasql.core.TypeMapper
+import scala.annotation.tailrec
 
 object SimpleTableMacros {
+
+  trait Mask[C]:
+    type Result[T[_]] <: SimpleTable.Record[C, ?] | C
+
+  object Mask:
+    import scala.quoted.{Expr as QExpr, *}
+    object Impl extends Mask[Any]:
+      type Result[T[_]] = Any
+
+    transparent inline given [C]: Mask[C] = ${ compute[C, NamedTuple.From[C]] }
+
+    def compute[C: Type, A <: AnyNamedTuple: Type](using Quotes): QExpr[Mask[C]] =
+      computeRoot[C, NamedTuple.Names[A], NamedTuple.DropNames[A]]
+
+    def computeRoot[C: Type, N <: Tuple: Type, V <: Tuple: Type](
+        using Quotes
+    ): QExpr[Mask[C]] =
+      compute1[C, N, V](Nil) match
+        case Some('[type res[T[_]] <: SimpleTable.Record[C, ?]; res]) =>
+          '{
+            Impl.asInstanceOf[
+              Mask[
+                C
+              ] {
+                type Result[T[_]] = T[SimpleTable.Internal.Tombstone.type] match
+                  case Expr[?] => res[T]
+                  case _ => C
+              }
+            ]
+          }
+        case _ =>
+          '{
+            compiletime.error(
+              "Cannot find a Mask instance for the given type. Please ensure that the type is a case class or a named tuple."
+            )
+          }
+
+    @tailrec
+    def compute1[C: Type, N <: Tuple: Type, V <: Tuple: Type](acc: List[Type[?]])(
+        using Quotes
+    ): Option[Type[?]] =
+      Type.of[V] match
+        case '[type vs <: Tuple; (v *: `vs`)] =>
+          QExpr.summon[SimpleTable.WrappedMetadata[v]] match
+            case Some(_) =>
+              computeRec[v] match
+                case Some(res) =>
+                  compute1[C, N, vs](res :: acc)
+                case _ =>
+                  None
+            case _ =>
+              compute1[C, N, vs](Type.of[[T[_]] =>> T[v]] :: acc)
+        case '[EmptyTuple] =>
+          val tpes =
+            acc.reverse.foldRight(Type.of[[T[_]] =>> EmptyTuple].asInstanceOf[Type[?]])(
+              (tpe, acc) =>
+                ((tpe, acc): @unchecked) match {
+                  case ('[type tpe[T[_]]; `tpe`], '[type acc[T[_]] <: Tuple; `acc`]) =>
+                    Type.of[[T[_]] =>> tpe[T] *: acc[T]]
+                }
+            )
+          tpes match
+            case '[type tpes[T[_]] <: Tuple; `tpes`] =>
+              Some(Type.of[[T[_]] =>> SimpleTable.Record[C, NamedTuple.NamedTuple[N, tpes[T]]]])
+
+    def computeRec[V: Type](using Quotes): Option[Type[?]] =
+      type vNT = NamedTuple.From[V]
+      compute1[V, NamedTuple.Names[vNT], NamedTuple.DropNames[vNT]](Nil)
+
   def asIArray[T: ClassTag](t: Tuple): IArray[T] = {
     IArray.from(t.productIterator.asInstanceOf[Iterator[T]])
   }
@@ -143,9 +213,9 @@ object SimpleTableMacros {
     factory(buf.result())
   }
 
-  def deconstruct[R <: SimpleTable.Record[?, ?]](
+  def deconstruct(
       queryable: Table.Metadata.QueryableProxy
-  )(c: Product): R = {
+  )(c: Product): SimpleTable.Record[?, ?] = {
     var i = 0
     val buf = IArray.newBuilder[AnyRef]
     val fields = c.productIterator
@@ -156,15 +226,16 @@ object SimpleTableMacros {
       val row = queryable[Field, T](i)
       buf += row.deconstruct(field).asInstanceOf[AnyRef]
       i += 1
-    SimpleTable.Record.fromIArray(buf.result()).asInstanceOf[R]
+    SimpleTable.Record.fromIArray(buf.result())
   }
 
 }
 
 trait SimpleTableMacros {
-  inline given initTableMetadata[C <: Product & SimpleTable.Source]: SimpleTable.Metadata[C] =
+  inline given initTableMetadata: [C <: Product]
+    => (f: SimpleTableMacros.Mask[C]) => SimpleTable.Metadata[C] =
     def m = compiletime.summonInline[Mirror.ProductOf[C]]
-    type Impl = SimpleTable.Lift[C]
+    type Impl = f.Result
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Size = NamedTuple.Size[NamedTuple.From[C]]
@@ -197,17 +268,19 @@ trait SimpleTableMacros {
         walkLabels0: () => Seq[String],
         @nowarn("msg=unused") mappers: DialectTypeMappers,
         queryable: Table.Metadata.QueryableProxy
-    ): Queryable[Impl[Expr], Impl[Sc]] = Table.Internal.TableQueryable(
-      walkLabels0,
-      walkExprs0 = SimpleTableMacros.walkAllExprs(queryable),
-      construct0 = args =>
-        SimpleTableMacros.construct(queryable)(
-          size = compiletime.constValue[Size],
-          args = args,
-          factory = SimpleTableMacros.make(m, _)
-        ),
-      deconstruct0 = values => SimpleTableMacros.deconstruct[Impl[Expr]](queryable)(values)
-    )
+    ): Queryable[Impl[Expr], Impl[Sc]] = Table.Internal
+      .TableQueryable(
+        walkLabels0,
+        walkExprs0 = SimpleTableMacros.walkAllExprs(queryable),
+        construct0 = args =>
+          SimpleTableMacros.construct(queryable)(
+            size = compiletime.constValue[Size],
+            args = args,
+            factory = SimpleTableMacros.make(m, _)
+          ),
+        deconstruct0 = values => SimpleTableMacros.deconstruct(queryable)(values)
+      )
+      .asInstanceOf[Queryable[Impl[Expr], Impl[Sc]]]
 
     def vExpr0(
         tableRef: TableRef,
@@ -221,5 +294,5 @@ trait SimpleTableMacros {
 
     val metadata0 = Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
 
-    SimpleTable.Metadata(metadata0)
+    SimpleTable.Metadata(f)(metadata0)
 }

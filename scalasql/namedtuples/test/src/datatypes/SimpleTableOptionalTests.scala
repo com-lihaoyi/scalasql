@@ -20,11 +20,19 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.UUID
 
-case class OptCols(myInt: Option[Int], myInt2: Option[Int]) extends SimpleTable.Source
+case class OptCols(myInt: Option[Int], myInt2: Option[Int])
 
 object OptCols extends SimpleTable[OptCols]
 
 trait SimpleTableOptionalTests extends ScalaSqlSuite {
+  // def foo: scalasql.core.Aggregatable.Proxy[
+  //   (myInt: scalasql.core.Expr[Option[Int]], myInt2: scalasql.core.Expr[Option[Int]])
+  // ]
+
+  // def bar = AggOpsConv(
+  //   foo
+  // ) // TODO: proof that raw named tuples dont work because you lose the connection to the original table type.
+
   def description =
     "Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala"
   override def utestBeforeEach(path: Seq[String]): Unit = checker.reset()
@@ -556,7 +564,7 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
               myVarBinary: Option[geny.Bytes],
               myUUID: Option[java.util.UUID],
               myEnum: Option[MyEnum.Value]
-          ) extends SimpleTable.Source
+          )
 
           object OptDataTypes extends SimpleTable[OptDataTypes] {
             override def tableName: String = "data_types"

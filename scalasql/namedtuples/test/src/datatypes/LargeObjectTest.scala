@@ -220,7 +220,7 @@ case class LargeObjectA(
     a198: Int,
     a199: Int,
     b: LargeObjectB
-) extends SimpleTable.Source
+)
 object LargeObjectA extends SimpleTable[LargeObjectA]
 
 case class LargeObjectB(
@@ -424,7 +424,7 @@ case class LargeObjectB(
     b197: Int,
     b198: Int,
     b199: Int
-) extends SimpleTable.Source
+)
 object LargeObjectB extends SimpleTable[LargeObjectB]
 
 case class LargeObjectC(
@@ -628,5 +628,5 @@ case class LargeObjectC(
     c197: Int,
     c198: Int,
     c199: Int
-) extends SimpleTable.Source
+)
 object LargeObjectC extends SimpleTable[LargeObjectC]
