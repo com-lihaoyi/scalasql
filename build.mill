@@ -35,7 +35,12 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
   }
 
+  def semanticDbVersion: T[String] =
+    // last version that works with Scala 2.13.12
+    "4.12.3"
+
   trait CommonTest extends ScalaTests with ScalafixModule {
+    def semanticDbVersion: T[String] = common.semanticDbVersion
     def scalacOptions = common.scalacOptions
     def ivyDeps = Agg(
       ivy"com.github.vertical-blank:sql-formatter:2.0.4",
@@ -110,14 +115,13 @@ trait ScalaSql extends Common { common =>
     def ivyDeps = Agg(
       ivy"com.lihaoyi::geny:1.0.0",
       ivy"com.lihaoyi::sourcecode:0.3.1",
-      ivy"com.lihaoyi::pprint:0.8.1",
+      ivy"com.lihaoyi::pprint:0.8.1"
     ) ++ Option.when(scalaVersion().startsWith("2."))(
       ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
     )
 
     def generatedSources = T {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
-
 
       val queryableRowDefs = for (i <- Range.inclusive(2, 22)) yield {
         def commaSep(f: Int => String) = commaSep0(i, f)
@@ -134,7 +138,6 @@ trait ScalaSql extends Common { common =>
            |}""".stripMargin
       }
 
-
       os.write(
         T.dest / "Generated.scala",
         s"""package scalasql.core.generated
@@ -149,14 +152,12 @@ trait ScalaSql extends Common { common =>
 
   }
 
-
-  object operations extends Common with CrossValue{
+  object operations extends Common with CrossValue {
     def moduleDeps = Seq(core)
   }
 
-  object query extends Common with CrossValue{
+  object query extends Common with CrossValue {
     def moduleDeps = Seq(core)
-
 
     def generatedSources = T {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
@@ -175,7 +176,9 @@ trait ScalaSql extends Common { common =>
                  |      )
                  |
                  |""".stripMargin
-          s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j => s"f$j: V[Column] => Column[T$j]")})(
+          s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j =>
+              s"f$j: V[Column] => Column[T$j]"
+            )})(
              |    items: (${commaSep(j => s"Expr[T$j]")})*
              |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
         }
@@ -201,12 +204,15 @@ trait ScalaSql extends Common { common =>
 
         val commaSepQ = commaSep(j => s"Q$j")
         val commaSepR = commaSep(j => s"R$j")
-        val joinAppendType = s"scalasql.query.JoinAppend[($commaSepQ), QA, ($commaSepQ, QA), ($commaSepR, RA)]"
+        val joinAppendType =
+          s"scalasql.query.JoinAppend[($commaSepQ), QA, ($commaSepQ, QA), ($commaSepR, RA)]"
         s"""
            |implicit def append$i[$commaSepQ, QA, $commaSepR, RA](
            |      implicit qr0: Queryable.Row[($commaSepQ, QA), ($commaSepR, RA)],
            |      @annotation.nowarn("msg=never used") qr20: Queryable.Row[QA, RA]): $joinAppendType = new $joinAppendType {
-           |    override def appendTuple(t: ($commaSepQ), v: QA): ($commaSepQ, QA) = (${commaSep(j => s"t._$j")}, v)
+           |    override def appendTuple(t: ($commaSepQ), v: QA): ($commaSepQ, QA) = (${commaSep(j =>
+            s"t._$j"
+          )}, v)
            |
            |    def qr: Queryable.Row[($commaSepQ, QA), ($commaSepR, RA)] = qr0
            |}""".stripMargin
