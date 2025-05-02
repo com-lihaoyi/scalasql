@@ -85,7 +85,9 @@ package postgres {
       extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
       with PostgresSuite
 
-  // object OptionalTests extends scalasql.datatypes.OptionalTests with PostgresSuite
+  object OptionalTests
+      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      with PostgresSuite
 
   // object PostgresDialectTests extends PostgresDialectTests
 
@@ -136,7 +138,9 @@ package hikari {
       extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
       with HikariSuite
 
-  // object OptionalTests extends scalasql.datatypes.OptionalTests with HikariSuite
+  object OptionalTests
+      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      with HikariSuite
 
   // object PostgresDialectTests extends PostgresDialectTests
 
@@ -187,7 +191,9 @@ package mysql {
   object DataTypesTests
       extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
       with MySqlSuite
-  // object OptionalTests extends scalasql.datatypes.OptionalTests with MySqlSuite
+  object OptionalTests
+      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      with MySqlSuite
 
   // object MySqlDialectTests extends MySqlDialectTests
 }
@@ -240,7 +246,9 @@ package sqlite {
   object DataTypesTests
       extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
       with SqliteSuite
-  // object OptionalTests extends scalasql.datatypes.OptionalTests with SqliteSuite
+  object OptionalTests
+      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      with SqliteSuite
 
   // object SqliteDialectTests extends SqliteDialectTests
 }
@@ -289,7 +297,7 @@ package h2 {
   object DataTypesTests
       extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
       with H2Suite
-  // object OptionalTests extends scalasql.datatypes.OptionalTests with H2Suite
+  object OptionalTests extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests with H2Suite
 
   // object H2DialectTests extends H2DialectTests
 }

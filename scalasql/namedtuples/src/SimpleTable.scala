@@ -1,5 +1,7 @@
 package scalasql.namedtuples
 
+import scala.NamedTuple.AnyNamedTuple
+
 import scalasql.query.Table
 import scalasql.core.DialectTypeMappers
 import scalasql.core.Queryable
@@ -39,7 +41,33 @@ object SimpleTable {
     ]
     def recordIterator: Iterator[Any] = data.iterator.asInstanceOf[Iterator[Any]]
     def apply(i: Int): AnyRef = data(i)
+    def updates(fs: ((u: RecordUpdater[C, T]) => u.Patch)*): Record[C, T] =
+      val u = recordUpdater[C, T]
+      val arr = IArray.genericWrapArray(data).toArray
+      fs.foreach: f =>
+        val patch = f(u)
+        val idx = patch.idx
+        arr(idx) = patch.f(arr(idx))
+      Record(IArray.unsafeFromArray(arr))
+
     inline def selectDynamic(name: String): AnyRef =
+      apply(compiletime.constValue[Record.IndexOf[name.type, Record.Names[C], 0]])
+
+  private object RecordUpdaterImpl extends RecordUpdater[Any, [T] =>> Any]
+  def recordUpdater[C, T[_]]: RecordUpdater[C, T] =
+    RecordUpdaterImpl.asInstanceOf[RecordUpdater[C, T]]
+  sealed trait RecordUpdater[C, T[_]] extends Selectable:
+    final case class Patch(idx: Int, f: AnyRef => AnyRef)
+    type Fields = NamedTuple.Map[
+      NamedTuple.From[C],
+      [X] =>> X match {
+        case Source => (Record[X, T] => Record[X, T]) => Patch
+        case _ => (T[X] => T[X]) => Patch
+      }
+    ]
+    def apply(i: Int): (AnyRef => AnyRef) => Patch =
+      f => Patch(i, f)
+    inline def selectDynamic(name: String): (AnyRef => AnyRef) => Patch =
       apply(compiletime.constValue[Record.IndexOf[name.type, Record.Names[C], 0]])
 
   object Record:
