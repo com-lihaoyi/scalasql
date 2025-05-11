@@ -90,14 +90,16 @@ object SimpleTableMacros {
   def asIArray[T: ClassTag](t: Tuple): IArray[T] = {
     IArray.from(t.productIterator.asInstanceOf[Iterator[T]])
   }
-  def asIArrayFlatUnwrap[T](t: Tuple)[U: ClassTag](f: T => IterableOnce[U]): IArray[U] = {
-    IArray.from(t.productIterator.asInstanceOf[Iterator[T]].flatMap(f))
+  def asIArrayFlatUnwrapWithIndex[T](
+      t: Tuple
+  )[U: ClassTag](f: (T, Int) => IterableOnce[U]): IArray[U] = {
+    IArray.from(t.productIterator.asInstanceOf[Iterator[T]].zipWithIndex.flatMap(f.tupled))
   }
   def asIArrayUnwrap[T](t: Tuple)[U: ClassTag](f: T => U): IArray[U] = {
     IArray.from(t.productIterator.asInstanceOf[Iterator[T]].map(f))
   }
-  def unwrapLabels(t: Tuple): IndexedSeq[String] = {
-    asIArrayFlatUnwrap[BaseLabels[?, ?]](t)(_.value).toIndexedSeq
+  def unwrapLabels(t: Tuple, labels: IArray[String]): IndexedSeq[String] = {
+    asIArrayFlatUnwrapWithIndex[BaseLabels[?, ?]](t)((l, i) => l.fetch(labels(i))).toIndexedSeq
   }
   def unwrapColumns(t: Tuple): IArray[AnyRef] = {
     asIArrayUnwrap[BaseColumn[?, ?]](t)(_.value)
@@ -165,14 +167,14 @@ object SimpleTableMacros {
       BaseColumn(m.metadata.metadata0.vExpr(ref, mappers).asInstanceOf[AnyRef])
   }
 
-  class BaseLabels[L, C](val value: Seq[String])
+  class BaseLabels[L, C](val fetch: String => Seq[String])
   trait BaseLabelsLowPrio {
-    given notFound: [L <: String, C] => (v: ValueOf[L]) => BaseLabels[L, C] =
-      new BaseLabels(value = List(v.value))
+    given notFound: [L <: String, C] => BaseLabels[L, C] =
+      new BaseLabels(fetch = label => Seq(label))
   }
   object BaseLabels extends BaseLabelsLowPrio {
     given foundMeta: [L, C] => (m: SimpleTable.WrappedMetadata[C]) => BaseLabels[L, C] =
-      new BaseLabels(value = m.metadata.metadata0.walkLabels0())
+      new BaseLabels(fetch = _ => m.metadata.metadata0.walkLabels0())
   }
 
   def setNonNull[T](r: AtomicReference[T | Null])(f: T | Null => T): T = {
@@ -229,16 +231,23 @@ object SimpleTableMacros {
     SimpleTable.Record.fromIArray(buf.result())
   }
 
+  def labels(t: Tuple): IArray[String] = asIArray(t)
+
+  inline def getMirror[C]: (IArray[String], Mirror.ProductOf[C]) = {
+    compiletime.summonFrom { case m: Mirror.ProductOf[C] =>
+      (labels(compiletime.constValueTuple[m.MirroredElemLabels]), m)
+    }
+  }
+
 }
 
 trait SimpleTableMacros {
   inline given initTableMetadata: [C <: Product]
     => (f: SimpleTableMacros.Mask[C]) => SimpleTable.Metadata[C] =
-    def m = compiletime.summonInline[Mirror.ProductOf[C]]
+    lazy val mirrorPair = SimpleTableMacros.getMirror[C]
     type Impl = f.Result
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
-    type Size = NamedTuple.Size[NamedTuple.From[C]]
     type Pairs[F[_, _]] = Tuple.Map[
       Tuple.Zip[Labels, Values],
       [X] =>> X match {
@@ -258,9 +267,11 @@ trait SimpleTableMacros {
         else rows.nn
       )(idx)
 
-    def walkLabels0(): Seq[String] =
+    def walkLabels0(labelsArr: => IArray[String])(): Seq[String] =
       SimpleTableMacros.setNonNull(labelsRef)(labels =>
-        if labels == null then SimpleTableMacros.unwrapLabels(compiletime.summonAll[FlatLabels])
+        if labels == null then
+          val labelsArr0 = labelsArr
+          SimpleTableMacros.unwrapLabels(compiletime.summonAll[FlatLabels], labelsArr0)
         else labels.nn
       )
 
@@ -273,11 +284,13 @@ trait SimpleTableMacros {
         walkLabels0,
         walkExprs0 = SimpleTableMacros.walkAllExprs(queryable),
         construct0 = args =>
+          val (labels, mirror) = mirrorPair
           SimpleTableMacros.construct(queryable)(
-            size = compiletime.constValue[Size],
+            size = labels.size,
             args = args,
-            factory = SimpleTableMacros.make(m, _)
-          ),
+            factory = SimpleTableMacros.make(mirror, _)
+          )
+        ,
         deconstruct0 = values => SimpleTableMacros.deconstruct(queryable)(values)
       )
       .asInstanceOf[Queryable[Impl[Expr], Impl[Sc]]]
@@ -292,7 +305,8 @@ trait SimpleTableMacros {
       val columns = SimpleTableMacros.computeColumns[Columns](mappers, tableRef)
       SimpleTable.Record.fromIArray(columns).asInstanceOf[Impl[Column]]
 
-    val metadata0 = Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
+    val metadata0 =
+      Table.Metadata[Impl](queryables, walkLabels0(mirrorPair(0)), queryable, vExpr0)
 
     SimpleTable.Metadata(f)(metadata0)
 }
