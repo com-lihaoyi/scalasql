@@ -87,10 +87,6 @@ object `scalasql-namedtuples` extends CommonBase {
     def moduleDeps = super.moduleDeps ++ Seq(scalasql(scala3), scalasql(scala3).test)
     def recordedTestsFile: String = "recordedTestsNT.json"
     def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptionsNT.json"
-
-    override def scalacOptions: Target[Seq[String]] = T {
-      super.scalacOptions() :+ "-Xprint:genBCode"
-    }
   }
 }
 
