@@ -89,7 +89,7 @@ jobs:
           distribution: 'temurin'
           java-version: 11
       - name: Publish to Maven Central
-        run: ./mill -i mill.scalalib.PublishModule/
+        run: ./mill --import "ivy:com.lihaoyi::mill-contrib-sonatypecentral:" mill.contrib.sonatypecentral.SonatypeCentralPublishModule/publishAll --publishArtifacts __.publishArtifacts
 
       - name: Create GitHub Release
         id: create_gh_release
