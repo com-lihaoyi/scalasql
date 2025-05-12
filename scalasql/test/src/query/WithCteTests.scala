@@ -28,6 +28,11 @@ trait WithCteTests extends ScalaSqlSuite {
           WITH cte0 (res) AS (SELECT buyer0.name AS res FROM buyer buyer0)
           SELECT CONCAT(cte0.res, ?) AS res
           FROM cte0
+        """,
+        """
+          WITH cte0 (res) AS (SELECT buyer0.name AS res FROM buyer buyer0)
+          SELECT (cte0.res + ?) AS res
+          FROM cte0
         """
       ),
       value = Seq("James Bond-suffix", "叉烧包-suffix", "Li Haoyi-suffix"),
@@ -84,6 +89,11 @@ trait WithCteTests extends ScalaSqlSuite {
         """
           WITH cte0 (name) AS (SELECT buyer0.name AS name FROM buyer buyer0)
           SELECT CONCAT(cte0.name, ?) AS res
+          FROM cte0
+        """,
+        """
+          WITH cte0 (name) AS (SELECT buyer0.name AS name FROM buyer buyer0)
+          SELECT (cte0.name + ?) AS res
           FROM cte0
         """
       ),

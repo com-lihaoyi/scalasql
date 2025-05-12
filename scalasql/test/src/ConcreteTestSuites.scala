@@ -37,7 +37,8 @@ import scalasql.dialects.{
   MySqlDialectTests,
   PostgresDialectTests,
   SqliteDialectTests,
-  H2DialectTests
+  H2DialectTests,
+  MsSqlDialectTests
 }
 
 package postgres {
@@ -282,4 +283,49 @@ package h2 {
   object OptionalTests extends datatypes.OptionalTests with H2Suite
 
   object H2DialectTests extends H2DialectTests
+}
+
+package mssql {
+
+  import utils.MsSqlSuite
+
+  object DbApiTests extends DbApiTests with MsSqlSuite
+  object TransactionTests extends TransactionTests with MsSqlSuite
+
+  object SelectTests extends SelectTests with MsSqlSuite
+  object JoinTests extends JoinTests with MsSqlSuite
+  object FlatJoinTests extends FlatJoinTests with MsSqlSuite
+  object InsertTests extends InsertTests with MsSqlSuite
+  object UpdateTests extends UpdateTests with MsSqlSuite
+  object DeleteTests extends DeleteTests with MsSqlSuite
+  object CompoundSelectTests extends CompoundSelectTests with MsSqlSuite
+  object UpdateJoinTests extends UpdateJoinTests with MsSqlSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with MsSqlSuite
+  // object ReturningTests extends ReturningTests with MsSqlSuite
+  // object OnConflictTests extends OnConflictTests with MsSqlSuite
+  object ValuesTests extends ValuesTests with MsSqlSuite
+  // object LateralJoinTests extends LateralJoinTests with MsSqlSuite
+  object WindowFunctionTests extends WindowFunctionTests with MsSqlSuite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with MsSqlSuite
+  object SchemaTests extends SchemaTests with MsSqlSuite
+
+  object SubQueryTests extends SubQueryTests with MsSqlSuite
+  object WithCteTests extends WithCteTests with MsSqlSuite
+
+  object DbApiOpsTests extends DbApiOpsTests with MsSqlSuite
+  object ExprOpsTests extends ExprOpsTests with MsSqlSuite
+  object ExprBooleanOpsTests extends ExprBooleanOpsTests with MsSqlSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with MsSqlSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with MsSqlSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with MsSqlSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with MsSqlSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with MsSqlSuite
+  object ExprMathOpsTests extends ExprMathOpsTests with MsSqlSuite
+
+  object DataTypesTests extends datatypes.DataTypesTests with MsSqlSuite
+
+  object OptionalTests extends datatypes.OptionalTests with MsSqlSuite
+
+  object MsSqlDialectTests extends MsSqlDialectTests
+
 }
