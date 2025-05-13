@@ -20,7 +20,7 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.UUID
 
-case class OptCols(myInt: Option[Int], myInt2: Option[Int]) extends SimpleTable.Source
+case class OptCols(myInt: Option[Int], myInt2: Option[Int])
 
 object OptCols extends SimpleTable[OptCols]
 
@@ -556,7 +556,7 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
               myVarBinary: Option[geny.Bytes],
               myUUID: Option[java.util.UUID],
               myEnum: Option[MyEnum.Value]
-          ) extends SimpleTable.Source
+          )
 
           object OptDataTypes extends SimpleTable[OptDataTypes] {
             override def tableName: String = "data_types"

@@ -23,14 +23,14 @@ import _root_.test.scalasql.WorldSqlTests.ArrowAssert
 case class Nested(
     fooId: Int,
     myBoolean: Boolean
-) extends SimpleTable.Source
+) extends SimpleTable.Nested
 object Nested extends SimpleTable[Nested]
 
 case class Enclosing(
     barId: Int,
     myString: String,
     foo: Nested
-) extends SimpleTable.Source
+)
 object Enclosing extends SimpleTable[Enclosing]
 
 trait SimpleTableDataTypesTests extends ScalaSqlSuite {
@@ -64,7 +64,7 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
             myVarBinary: geny.Bytes,
             myUUID: java.util.UUID,
             myEnum: MyEnum.Value
-        ) extends SimpleTable.Source
+        )
 
         object DataTypes extends SimpleTable[DataTypes]
 
@@ -121,7 +121,7 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
         case class NonRoundTripTypes(
             myZonedDateTime: ZonedDateTime,
             myOffsetDateTime: OffsetDateTime
-        ) extends SimpleTable.Source
+        )
 
         object NonRoundTripTypes extends SimpleTable[NonRoundTripTypes]
 
@@ -216,7 +216,7 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
     test("JoinNullable proper type mappingg") - checker.recorded(
       "",
       Text {
-        case class A(id: Int, bId: Option[Int]) extends SimpleTable.Source
+        case class A(id: Int, bId: Option[Int])
         object A extends SimpleTable[A]
 
         object Custom extends Enumeration {
@@ -225,7 +225,7 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
           implicit def make: String => Value = withName
         }
 
-        case class B(id: Int, custom: Custom.Value) extends SimpleTable.Source
+        case class B(id: Int, custom: Custom.Value)
         object B extends SimpleTable[B]
         db.run(A.insert.columns(_.id := 1, _.bId := None))
         val result = db.run(A.select.leftJoin(B)(_.id === _.id).single)

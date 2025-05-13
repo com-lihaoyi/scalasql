@@ -67,16 +67,21 @@ object SimpleTableMacros {
     asIArray[BaseRowExpr[?]](t).map(_.value)
   }
 
-  class BaseRowExpr[C](val value: Queryable.Row[?, ?])
-  trait BaseRowExprLowPrio {
-    inline given notFound: [T] => (mappers: DialectTypeMappers) => BaseRowExpr[T] =
-      import mappers.{*, given}
-      BaseRowExpr(compiletime.summonInline[Queryable.Row[Expr[T], Sc[T]]])
-  }
-  object BaseRowExpr extends BaseRowExprLowPrio {
-    given foundMeta: [C] => (mappers: DialectTypeMappers, m: SimpleTable.WrappedMetadata[C])
-      => BaseRowExpr[C] =
-      BaseRowExpr(m.metadata.rowExpr(mappers))
+  class BaseRowExpr[T](val value: Queryable.Row[?, ?])
+  object BaseRowExpr {
+    inline given summonRow: [T] => (mappers: DialectTypeMappers) => BaseRowExpr[T] =
+      compiletime.summonFrom:
+        case ev: (T <:< SimpleTable.Nested) =>
+          compiletime.summonFrom:
+            case m: SimpleTable.WrappedMetadata[T] =>
+              BaseRowExpr(m.metadata.rowExpr(mappers))
+            case _ =>
+              compiletime.error(
+                "Cannot find metadata for the given type. Please ensure that the type is a valid SimpleTable."
+              )
+        case _ =>
+          import mappers.{*, given}
+          BaseRowExpr(compiletime.summonInline[Queryable.Row[Expr[T], Sc[T]]])
   }
 
   class BaseColumn[L, T](val value: AnyRef)
@@ -172,7 +177,7 @@ object SimpleTableMacros {
 }
 
 trait SimpleTableMacros {
-  inline given initTableMetadata[C <: Product & SimpleTable.Source]: SimpleTable.Metadata[C] =
+  inline given initTableMetadata[C <: Product]: SimpleTable.Metadata[C] =
     lazy val mirrorPair = SimpleTableMacros.getMirror[C]
     type Impl = SimpleTable.Lift[C]
     type Labels = NamedTuple.Names[NamedTuple.From[C]]

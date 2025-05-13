@@ -9,7 +9,7 @@ import scalasql.query.Column
 import scalasql.core.Sc
 import scalasql.core.Expr
 
-class SimpleTable[C <: SimpleTable.Source]()(
+class SimpleTable[C]()(
     using name: sourcecode.Name,
     metadata0: SimpleTable.Metadata[C]
 ) extends Table[SimpleTable.Lift[C]](using name, metadata0.metadata0) {
@@ -24,7 +24,7 @@ object SimpleTable {
    * @note this must be a class to convince the match type reducer that it provably can't be mixed
    *  into various column types such as java.util.Date, geny.Bytes, or scala.Option.
    */
-  abstract class Source
+  abstract class Nested
 
   type Lift[C] = [T[_]] =>> T[Internal.Tombstone.type] match {
     case Expr[?] => Record[C, T]
@@ -35,7 +35,7 @@ object SimpleTable {
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Source => Record[X, T]
+        case Nested => Record[X, T]
         case _ => T[X]
       }
     ]
@@ -61,7 +61,7 @@ object SimpleTable {
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Source => (Record[X, T] => Record[X, T]) => Patch
+        case Nested => (Record[X, T] => Record[X, T]) => Patch
         case _ => (T[X] => T[X]) => Patch
       }
     ]
