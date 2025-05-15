@@ -1,9 +1,10 @@
 // duplicated from scalasql/test/src/example/MySqlExample.scala
 package scalasql.namedtuples.example
 
-import org.testcontainers.containers.MySQLContainer
-import scalasql.MySqlDialect._
 import scalasql.namedtuples.SimpleTable
+import scalasql.namedtuples.SimpleTable.NamedTupleOps.given
+import org.testcontainers.containers.MySQLContainer
+import scalasql.MySqlDialect.*
 
 object SimpleTableMySqlExample {
 
@@ -73,6 +74,23 @@ object SimpleTableMySqlExample {
         db.run(ExampleProduct.select.filter(_.price > 10).sortBy(_.price).desc.map(_.name))
 
       assert(result2 == Seq("Camera", "Skate Board", "Cookie"))
+
+      val result3 =
+        db.run(
+          ExampleProduct.select
+            .filter(_.price > 10)
+            .sortBy(_.price)
+            .desc
+            .map(p => (name = p.name, price = p.price))
+        )
+
+      assert(
+        result3 == Seq(
+          (name = "Camera", price = 1000.00),
+          (name = "Skate Board", price = 123.45),
+          (name = "Cookie", price = 11.0)
+        )
+      )
     }
   }
 }
