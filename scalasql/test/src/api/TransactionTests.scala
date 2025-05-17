@@ -134,7 +134,9 @@ trait TransactionTests extends ScalaSqlSuite {
 
               throw new FooException
             }
-          } catch { case e: FooException => /*donothing*/ }
+          } catch {
+            case e: FooException => /*donothing*/
+          }
 
           dbClient.transaction(_.run(Purchase.select.size)) ==> 7
         }
@@ -324,7 +326,9 @@ trait TransactionTests extends ScalaSqlSuite {
                   db.run(Purchase.select.size) ==> 1
                   throw new FooException
                 }
-              } catch { case e: FooException => /*donothing*/ }
+              } catch {
+                case e: FooException => /*donothing*/
+              }
 
               db.run(Purchase.select.size) ==> 3
             }
@@ -355,7 +359,9 @@ trait TransactionTests extends ScalaSqlSuite {
                 db.run(Purchase.select.size) ==> 1
                 throw new FooException
               }
-            } catch { case e: FooException => /*donothing*/ }
+            } catch {
+              case e: FooException => /*donothing*/
+            }
 
             db.run(Purchase.select.size) ==> 5
           }
@@ -381,7 +387,9 @@ trait TransactionTests extends ScalaSqlSuite {
                   throw new FooException
                 }
               }
-            } catch { case e: FooException => /*donothing*/ }
+            } catch {
+              case e: FooException => /*donothing*/
+            }
 
             db.run(Purchase.select.size) ==> 5
           }
@@ -409,7 +417,9 @@ trait TransactionTests extends ScalaSqlSuite {
                 throw new FooException
               }
             }
-          } catch { case e: FooException => /*donothing*/ }
+          } catch {
+            case e: FooException => /*donothing*/
+          }
 
           dbClient.transaction(_.run(Purchase.select.size)) ==> 7
         }
@@ -435,7 +445,9 @@ trait TransactionTests extends ScalaSqlSuite {
 
               db.run(Purchase.select.size) ==> 5
             }
-          } catch { case e: FooException => /*donothing*/ }
+          } catch {
+            case e: FooException => /*donothing*/
+          }
 
           dbClient.transaction(_.run(Purchase.select.size)) ==> 7
         }

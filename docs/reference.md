@@ -416,7 +416,9 @@ try {
 
     throw new FooException
   }
-} catch { case e: FooException => /*donothing*/ }
+} catch {
+  case e: FooException => /*donothing*/
+}
 
 dbClient.transaction(_.run(Purchase.select.size)) ==> 7
 ```
