@@ -89,9 +89,10 @@ object SimpleTable {
    */
   abstract class Nested
 
+  /** Type level swich on `T[_]`, if it is `Sc` then return `C`, else `Record[C, T]` */
   type Lift[C] = [T[_]] =>> T[Internal.Tombstone.type] match {
-    case Expr[?] => Record[C, T]
-    case _ => C
+    case Internal.Tombstone.type => C // T is `Sc`
+    case _ => Record[C, T]
   }
 
   final class Record[C, T[_]](data: IArray[AnyRef]) extends Selectable:
