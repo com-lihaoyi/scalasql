@@ -15,6 +15,8 @@ import java.util.function.UnaryOperator
 import scala.annotation.nowarn
 import scalasql.namedtuples.SimpleTableMacros.BaseLabels
 import scalasql.core.TypeMapper
+import scala.annotation.unused
+import scala.annotation.implicitNotFound
 
 object SimpleTableMacros {
   def asIArray[T: ClassTag](t: Tuple): IArray[T] = {
@@ -45,11 +47,10 @@ object SimpleTableMacros {
     m.fromProduct(ArrayProduct())
   }
 
-  inline def computeRows[Rows <: Tuple](
-      mappers: DialectTypeMappers
-  ): IArray[Queryable.Row[?, ?]] = {
-    val rows = mappers match
-      case given DialectTypeMappers => compiletime.summonAll[Rows]
+  inline def computeRows[Rows <: Tuple]: IArray[DialectTypeMappers => Queryable.Row[?, ?]] = {
+    val rows =
+      // import mappers.given
+      compiletime.summonAll[Rows]
     computeRows0(rows)
   }
   inline def computeColumns[Columns <: Tuple](
@@ -63,25 +64,33 @@ object SimpleTableMacros {
     unwrapColumns(cols)
   }
 
-  def computeRows0(t: Tuple): IArray[Queryable.Row[?, ?]] = {
-    asIArray[BaseRowExpr[?]](t).map(_.value)
+  def computeRows0(t: Tuple): IArray[DialectTypeMappers => Queryable.Row[?, ?]] = {
+    asIArray[ContraMapper[SimpleTableMacros.BaseRowExpr[Any]]](t)
   }
 
-  class BaseRowExpr[T](val value: Queryable.Row[?, ?])
+  opaque type ContraMapper[T] = DialectTypeMappers => T
+
+  object ContraMapper {
+    inline given [T]: ContraMapper[T] =
+      case mappers =>
+        import mappers.given
+        compiletime.summonInline[T]
+  }
+
+  opaque type BaseRowExpr[T] = Queryable.Row[?, ?]
   object BaseRowExpr {
-    inline given summonRow: [T] => (mappers: DialectTypeMappers) => BaseRowExpr[T] =
-      compiletime.summonFrom:
-        case ev: (T <:< SimpleTable.Nested) =>
-          compiletime.summonFrom:
-            case m: SimpleTable.WrappedMetadata[T] =>
-              BaseRowExpr(m.metadata.rowExpr(mappers))
-            case _ =>
-              compiletime.error(
-                "Cannot find metadata for the given type. Please ensure that the type is a valid SimpleTable."
-              )
-        case _ =>
-          import mappers.{*, given}
-          BaseRowExpr(compiletime.summonInline[Queryable.Row[Expr[T], Sc[T]]])
+    given summonDelegate[T](
+        using @unused m: SimpleTable.WrappedMetadata[T],
+        @unused e: T <:< SimpleTable.Nested
+    )(
+        using delegate: Queryable.Row[
+          SimpleTable.MapOver[T, Expr],
+          SimpleTable.MapOver[T, Sc]
+        ]
+    ): BaseRowExpr[T] = delegate
+    given summonBasic[T](using @unused ev: scala.util.NotGiven[SimpleTable.WrappedMetadata[T]])(
+        using delegate: Queryable.Row[Expr[T], Sc[T]]
+    ): BaseRowExpr[T] = delegate
   }
 
   class BaseColumn[L, T](val value: AnyRef)
@@ -179,7 +188,7 @@ object SimpleTableMacros {
 trait SimpleTableMacros {
   inline given initTableMetadata[C <: Product]: SimpleTable.Metadata[C] =
     lazy val mirrorPair = SimpleTableMacros.getMirror[C]
-    type Impl = SimpleTable.Lift[C]
+    type Impl[T[_]] = SimpleTable.MapOver[C, T]
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Pairs[F[_, _]] = Tuple.Map[
@@ -190,16 +199,19 @@ trait SimpleTableMacros {
     ]
     type FlatLabels = Pairs[SimpleTableMacros.BaseLabels]
     type Columns = Pairs[SimpleTableMacros.BaseColumn]
-    type Rows = Tuple.Map[Values, SimpleTableMacros.BaseRowExpr]
+    type Rows = Tuple.Map[
+      Values,
+      [T] =>> SimpleTableMacros.ContraMapper[SimpleTableMacros.BaseRowExpr[T]]
+    ]
 
-    val rowsRef = AtomicReference[IArray[Queryable.Row[?, ?]] | Null](null)
+    val rowsRef = AtomicReference[IArray[DialectTypeMappers => Queryable.Row[?, ?]] | Null](null)
     val labelsRef = AtomicReference[IndexedSeq[String] | Null](null)
 
     def queryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
       SimpleTableMacros.setNonNull(rowsRef)(rows =>
-        if rows == null then SimpleTableMacros.computeRows[Rows](mappers)
+        if rows == null then SimpleTableMacros.computeRows[Rows]
         else rows.nn
-      )(idx)
+      )(idx)(mappers)
 
     def walkLabels0(labelsArr: => IArray[String])(): Seq[String] =
       SimpleTableMacros.setNonNull(labelsRef)(labels =>

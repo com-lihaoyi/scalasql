@@ -12,7 +12,7 @@ import scalasql.core.Expr
 class SimpleTable[C]()(
     using name: sourcecode.Name,
     metadata0: SimpleTable.Metadata[C]
-) extends Table[SimpleTable.Lift[C]](using name, metadata0.metadata0) {
+) extends Table[[T[_]] =>> SimpleTable.MapOver[C, T]](using name, metadata0.metadata0) {
   given simpleTableImplicitMetadata: SimpleTable.WrappedMetadata[C] =
     SimpleTable.WrappedMetadata(metadata0)
 }
@@ -89,8 +89,11 @@ object SimpleTable {
    */
   abstract class Nested
 
-  /** Type level swich on `T[_]`, if it is `Sc` then return `C`, else `Record[C, T]` */
-  type Lift[C] = [T[_]] =>> T[Internal.Tombstone.type] match {
+  /**
+   * A type that can map `T` over the fields of `C`. If `T` is the identity then `C` itself,
+   * else `Record[C, T]`
+   */
+  type MapOver[C, T[_]] = T[Internal.Tombstone.type] match {
     case Internal.Tombstone.type => C // T is `Sc`
     case _ => Record[C, T]
   }
@@ -156,17 +159,7 @@ object SimpleTable {
       def metadata: Metadata[C] = m
     }
   }
-  class Metadata[C](val metadata0: Table.Metadata[Lift[C]]):
-    def rowExpr(
-        mappers: DialectTypeMappers
-    ): Queryable.Row[Record[C, Expr], C] =
-      metadata0
-        .queryable(
-          metadata0.walkLabels0,
-          mappers,
-          new Table.Metadata.QueryableProxy(metadata0.queryables(mappers, _))
-        )
-        .asInstanceOf[Queryable.Row[Record[C, Expr], C]]
+  class Metadata[C](val metadata0: Table.Metadata[[T[_]] =>> SimpleTable.MapOver[C, T]])
 
   object Metadata extends SimpleTableMacros
 }
