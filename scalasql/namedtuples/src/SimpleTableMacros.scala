@@ -47,12 +47,6 @@ object SimpleTableMacros {
     m.fromProduct(ArrayProduct())
   }
 
-  inline def computeRows[Rows <: Tuple]: IArray[DialectTypeMappers => Queryable.Row[?, ?]] = {
-    val rows =
-      // import mappers.given
-      compiletime.summonAll[Rows]
-    computeRows0(rows)
-  }
   inline def computeColumns[Columns <: Tuple](
       mappers: DialectTypeMappers,
       tableRef: TableRef
@@ -121,11 +115,15 @@ object SimpleTableMacros {
       new BaseLabels(fetch = _ => m.metadata.metadata0.walkLabels0())
   }
 
-  def setNonNull[T](r: AtomicReference[T | Null])(f: T | Null => T): T = {
+  def setNonNull[T](r: AtomicReference[T | Null])(f: => T): T = {
     val local = r.get()
     val res =
       if local != null then local
-      else r.updateAndGet(f(_))
+      else
+        r.updateAndGet(t =>
+          if t == null then f
+          else t
+        )
     res.nn
   }
 
@@ -208,17 +206,13 @@ trait SimpleTableMacros {
     val labelsRef = AtomicReference[IndexedSeq[String] | Null](null)
 
     def queryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
-      SimpleTableMacros.setNonNull(rowsRef)(rows =>
-        if rows == null then SimpleTableMacros.computeRows[Rows]
-        else rows.nn
+      SimpleTableMacros.setNonNull(rowsRef)(
+        SimpleTableMacros.computeRows0(compiletime.summonAll[Rows])
       )(idx)(mappers)
 
     def walkLabels0(labelsArr: => IArray[String])(): Seq[String] =
-      SimpleTableMacros.setNonNull(labelsRef)(labels =>
-        if labels == null then
-          val labelsArr0 = labelsArr
-          SimpleTableMacros.unwrapLabels(compiletime.summonAll[FlatLabels], labelsArr0)
-        else labels.nn
+      SimpleTableMacros.setNonNull(labelsRef)(
+        SimpleTableMacros.unwrapLabels(compiletime.summonAll[FlatLabels], labelsArr)
       )
 
     def queryable(
