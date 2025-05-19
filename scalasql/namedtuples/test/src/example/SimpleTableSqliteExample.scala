@@ -2,7 +2,7 @@
 package scalasql.namedtuples.example
 
 import scalasql.namedtuples.SimpleTable
-import scalasql.namedtuples.SimpleTable.NamedTupleOps.given
+import scalasql.namedtuples.NamedTupleQueryable.given
 
 import scalasql.SqliteDialect.*
 object SimpleTableSqliteExample {

@@ -2,7 +2,7 @@ package scalasql.example
 
 import scalasql.dialects.H2Dialect.*
 import scalasql.namedtuples.*
-import scalasql.namedtuples.SimpleTable.NamedTupleOps.given
+import scalasql.namedtuples.NamedTupleQueryable.given
 import scalasql.*
 import scalasql.dialects.Dialect
 

@@ -431,7 +431,7 @@ object LargeObjectB extends SimpleTable[LargeObjectB]
 // so hopefully 75 is large enough. (works with -Xss900k)
 def foo: Unit = {
   import scalasql.dialects.H2Dialect.*
-  import scalasql.namedtuples.SimpleTable.NamedTupleOps.given
+  import scalasql.namedtuples.NamedTupleQueryable.given
   val db: DbApi = ???
   val m = db.run(
     LargeObjectB.select.map(_ =>
