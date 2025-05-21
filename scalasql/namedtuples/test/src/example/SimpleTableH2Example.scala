@@ -1,9 +1,8 @@
 // duplicated from scalasql/test/src/example/H2Example.scala
 package scalasql.namedtuples.example
 
-import scalasql.namedtuples.SimpleTable
-import scalasql.namedtuples.NamedTupleQueryable.given
-import scalasql.H2Dialect.*
+import scalasql.simple.{*, given}
+import H2Dialect.*
 
 object SimpleTableH2Example {
 
@@ -19,9 +18,9 @@ object SimpleTableH2Example {
   // The example H2 database comes from the library `com.h2database:h2:2.2.224`
   val dataSource = new org.h2.jdbcx.JdbcDataSource
   dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
-  lazy val h2Client = new scalasql.DbClient.DataSource(
+  lazy val h2Client = new DbClient.DataSource(
     dataSource,
-    config = new scalasql.Config {}
+    config = new {}
   )
 
   def main(args: Array[String]): Unit = {

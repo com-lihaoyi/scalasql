@@ -1,10 +1,7 @@
 package scalasql.example
 
-import scalasql.dialects.H2Dialect.*
-import scalasql.namedtuples.*
-import scalasql.namedtuples.NamedTupleQueryable.given
-import scalasql.*
-import scalasql.dialects.Dialect
+import scalasql.simple.{*, given}
+import H2Dialect.*
 
 case class Person(name: String, age: Int) extends SimpleTable.Nested
 object Person extends SimpleTable[Person]()

@@ -2,10 +2,9 @@
 package scalasql.namedtuples.example
 
 import org.testcontainers.containers.PostgreSQLContainer
-import scalasql.namedtuples.SimpleTable
-import scalasql.namedtuples.NamedTupleQueryable.given
 
-import scalasql.PostgresDialect.*
+import scalasql.simple.{*, given}
+import PostgresDialect.*
 
 object SimpleTablePostgresExample {
 
@@ -32,9 +31,9 @@ object SimpleTablePostgresExample {
   dataSource.setUser(postgres.getUsername);
   dataSource.setPassword(postgres.getPassword);
 
-  lazy val postgresClient = new scalasql.DbClient.DataSource(
+  lazy val postgresClient = new DbClient.DataSource(
     dataSource,
-    config = new scalasql.Config {}
+    config = new {}
   )
 
   def main(args: Array[String]): Unit = {

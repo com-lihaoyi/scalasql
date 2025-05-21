@@ -1,10 +1,10 @@
 // duplicated from scalasql/test/src/example/MySqlExample.scala
 package scalasql.namedtuples.example
 
-import scalasql.namedtuples.SimpleTable
-import scalasql.namedtuples.NamedTupleQueryable.given
 import org.testcontainers.containers.MySQLContainer
-import scalasql.MySqlDialect.*
+
+import scalasql.simple.{*, given}
+import MySqlDialect.*
 
 object SimpleTableMySqlExample {
 
@@ -32,9 +32,9 @@ object SimpleTableMySqlExample {
   dataSource.setUser(mysql.getUsername);
   dataSource.setPassword(mysql.getPassword);
 
-  lazy val mysqlClient = new scalasql.DbClient.DataSource(
+  lazy val mysqlClient = new DbClient.DataSource(
     dataSource,
-    config = new scalasql.Config {}
+    config = new {}
   )
 
   def main(args: Array[String]): Unit = {

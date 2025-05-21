@@ -1,10 +1,9 @@
 // duplicated from scalasql/test/src/example/SqliteExample.scala
 package scalasql.namedtuples.example
 
-import scalasql.namedtuples.SimpleTable
-import scalasql.namedtuples.NamedTupleQueryable.given
+import scalasql.simple.{*, given}
+import SqliteDialect.*
 
-import scalasql.SqliteDialect.*
 object SimpleTableSqliteExample {
 
   case class ExampleProduct(
@@ -20,9 +19,9 @@ object SimpleTableSqliteExample {
   val dataSource = new org.sqlite.SQLiteDataSource()
   val tmpDb = java.nio.file.Files.createTempDirectory("sqlite")
   dataSource.setUrl(s"jdbc:sqlite:$tmpDb/file.db")
-  lazy val sqliteClient = new scalasql.DbClient.DataSource(
+  lazy val sqliteClient = new DbClient.DataSource(
     dataSource,
-    config = new scalasql.Config {}
+    config = new {}
   )
 
   def main(args: Array[String]): Unit = {

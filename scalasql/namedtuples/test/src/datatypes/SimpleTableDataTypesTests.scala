@@ -1,10 +1,10 @@
 package scalasql.namedtuples.datatypes
 
-import scalasql.namedtuples.SimpleTable
-import scalasql._
+import scalasql.simple.{*, given}
+import scalasql.utils.ScalaSqlSuite
+
 import sourcecode.Text
 import utest._
-import utils.ScalaSqlSuite
 
 import java.time.{
   Instant,
