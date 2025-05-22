@@ -71,7 +71,7 @@ object SimpleTableMacros {
   opaque type BaseRowExpr[T] = Queryable.Row[?, ?]
   object BaseRowExpr {
     given summonDelegate[T](
-        using @unused m: SimpleTable.WrappedMetadata[T],
+        using @unused m: SimpleTable.GivenMetadata[T],
         @unused e: T <:< SimpleTable.Nested
     )(
         using delegate: Queryable.Row[
@@ -79,7 +79,7 @@ object SimpleTableMacros {
           SimpleTable.MapOver[T, Sc]
         ]
     ): BaseRowExpr[T] = delegate
-    given summonBasic[T](using @unused ev: scala.util.NotGiven[SimpleTable.WrappedMetadata[T]])(
+    given summonBasic[T](using @unused ev: scala.util.NotGiven[SimpleTable.GivenMetadata[T]])(
         using delegate: Queryable.Row[Expr[T], Sc[T]]
     ): BaseRowExpr[T] = delegate
   }
@@ -97,9 +97,9 @@ object SimpleTableMacros {
   }
   object BaseColumn extends BaseColumnLowPrio {
     given foundMeta: [L <: String, T]
-      => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.WrappedMetadata[T])
+      => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.GivenMetadata[T])
       => BaseColumn[L, T] =
-      m.metadata.metadata0.vExpr(ref, mappers).asInstanceOf[AnyRef]
+      m.metadata.vExpr(ref, mappers).asInstanceOf[AnyRef]
   }
 
   opaque type BaseLabels[L, C] = String => Seq[String]
@@ -108,8 +108,8 @@ object SimpleTableMacros {
       label => Seq(label)
   }
   object BaseLabels extends BaseLabelsLowPrio {
-    given foundMeta: [L, C] => (m: SimpleTable.WrappedMetadata[C]) => BaseLabels[L, C] =
-      _ => m.metadata.metadata0.walkLabels0()
+    given foundMeta: [L, C] => (m: SimpleTable.GivenMetadata[C]) => BaseLabels[L, C] =
+      _ => m.metadata.walkLabels0()
   }
 
   def setNonNull[T](r: AtomicReference[T | Null])(f: => T): T = {
@@ -128,7 +128,7 @@ object SimpleTableMacros {
       queryable: Table.Metadata.QueryableProxy
   )(e: SimpleTable.Record[?, ?]): IndexedSeq[Expr[?]] = {
     var i = 0
-    val fields = e.recordIterator
+    val fields = e.productIterator
     val buf = IndexedSeq.newBuilder[Seq[Expr[?]]]
     while fields.hasNext do
       type T
@@ -202,7 +202,8 @@ trait SimpleTableMacros {
     lazy val labelsRef: IndexedSeq[String] =
       SimpleTableMacros.unwrapLabels(labelsRef0, labels)
 
-  inline given initTableMetadata[C <: Product]: SimpleTable.Metadata[C] =
+  inline given initTableMetadata[C <: Product]
+      : Table.Metadata[[T[_]] =>> SimpleTable.MapOver[C, T]] =
     type Impl[T[_]] = SimpleTable.MapOver[C, T]
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
@@ -256,8 +257,5 @@ trait SimpleTableMacros {
       val columns = state.colsRef.map(_(mappers, tableRef))
       SimpleTable.Record.fromIArray(columns).asInstanceOf[Impl[Column]]
 
-    val metadata0 =
-      Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
-
-    SimpleTable.Metadata(metadata0)
+    Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
 }

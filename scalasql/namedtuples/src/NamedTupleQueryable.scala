@@ -5,6 +5,7 @@ import scalasql.core.{Queryable, Expr}
 
 object NamedTupleQueryable {
 
+  /** A sequence of n `Queryable.Row[Q, R]` instances, where `X` corresponds to all the `Q` and `Y` to all the `R` */
   opaque type Rows[X <: Tuple, +Y <: Tuple] = List[Queryable.Row[?, ?]]
 
   object Rows {
@@ -20,8 +21,22 @@ object NamedTupleQueryable {
     given emptyRows: Rows[EmptyTuple, EmptyTuple] = Nil
   }
 
+  /**
+   * A `Queryable.Row` instance for an arbitrary named tuple type, can be derived even
+   * when one of `X` or `Y` is unknown.
+   */
   given NamedTupleRow: [N <: Tuple, X <: Tuple, Y <: Tuple]
-    => (rs: Rows[X, Y]) => Queryable.Row[NamedTuple[N, X], NamedTuple[N, Y]]:
+    => (rs: Rows[X, Y])
+    => Queryable.Row[NamedTuple[N, X], NamedTuple[N, Y]] =
+    NamedTupleRowImpl[N, X, Y](rs)
+
+  private final class NamedTupleRowImpl[
+      N <: Tuple,
+      X <: Tuple,
+      Y <: Tuple
+  ](
+      rs: List[Queryable.Row[?, ?]]
+  ) extends Queryable.Row[NamedTuple[N, X], NamedTuple[N, Y]]:
     def walkExprs(q: NamedTuple[N, X]): Seq[Expr[?]] = {
       val walkExprs0 = {
         val ps = q.toTuple.productIterator
@@ -64,4 +79,5 @@ object NamedTupleQueryable {
           })
       }
       Tuple.fromIArray(data).asInstanceOf[NamedTuple.NamedTuple[N, X]]
+
 }
