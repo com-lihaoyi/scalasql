@@ -16,6 +16,10 @@ databases, due to differences in how each database parses SQL. These differences
 are typically minor, and as long as you use the right `Dialect` for your database
 ScalaSql should do the right thing for you.
 
+>**A note for users of `SimpleTable`**: The examples in this document assume usage of
+>`Table`, with a higher kinded type parameter on a case class. If you are using
+>`SimpleTable`, then the same code snippets should work by dropping `[Sc]`.
+
 ## DbApi
 Basic usage of `db.*` operations such as `db.run`
 ### DbApi.renderSql

@@ -1,5 +1,7 @@
 package scalasql.example
 
+// This file is a simple scratch-pad to demo ideas
+
 import scalasql.simple.{*, given}
 import H2Dialect.*
 

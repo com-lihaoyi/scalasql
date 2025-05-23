@@ -89,15 +89,16 @@ object SimpleTable {
      * ```
      * case class Foo(arg1: Int, arg2: String)
      * val r: Record[Foo, Expr]
-     * val r0 = r.updates(_.arg1(_ * 2), _.arg2(_ ++ "bar"))
+     * val r0 = r.updates(_.arg1(_ * 2), _.arg2 := "bar")
      * ```
      *
      * @param fs a sequence of functions that create a patch from a [[RecordUpdater]].
-     *   Each field of the record updater corresponds to the field with the same name
+     *   Each field of the record updater is typed as a [[SimpleTable.Field Field]],
+     *   corresponding to the fields of `C` mapped over by `T`.
      *   in this record.
      * @return a new record (of the same type) with the patches applied.
      */
-    def updates(fs: ((u: RecordUpdater[C, T]) => u.Patch)*): Record[C, T] =
+    def updates(fs: (RecordUpdater[C, T] => Patch)*): Record[C, T] =
       val u = recordUpdater[C, T]
       val arr = IArray.genericWrapArray(data).toArray
       fs.foreach: f =>
@@ -113,13 +114,31 @@ object SimpleTable {
   def recordUpdater[C, T[_]]: RecordUpdater[C, T] =
     RecordUpdaterImpl.asInstanceOf[RecordUpdater[C, T]]
 
+  /** A single update to a field of a `Record[C, T]`, used by [[Record#updates]] */
+  final class Patch private[SimpleTable] (
+    private[SimpleTable] val idx: Int,
+    private[SimpleTable] val f: AnyRef => AnyRef
+  )
+
+  /** A `Field[T]` is used to create a patch for a field in a [[SimpleTable.Record Record]]. */
+  final class Field[T](private val factory: (T => T) => Patch) extends AnyVal
+  object Field {
+    extension [T](field: Field[T]) {
+      /** Create a patch that replaces the old value with `x` */
+      def :=(x: T): Patch = field.factory(Function.const(x))
+      /** Create a patch that can transform the old value with `f` */
+      def apply(f: T => T): Patch = field.factory(f)
+    }
+  }
+
   /**
    * A Record updaters fields correspond to `Record[C, T]`, where each accepts a
    * function to update a field. e.g.
    * ```
    * case class Foo(arg1: Int, arg2: String)
    * val u: RecordUpdater[Foo, Expr]
-   * val p: u.Patch = u.arg1(_ * 2)
+   * val p0: Patch = u.arg1(_ * 2)
+   * val p1: Patch = u.arg2 := "bar"
    * ```
    * This class is mainly used to provide patches to
    * the [[Record#updates updates]] method of `Record`.
@@ -129,24 +148,22 @@ object SimpleTable {
    * @see [[RecordUpdater#Fields Fields]] for how the fields are mapped.
    */
   sealed trait RecordUpdater[C, T[_]] extends Selectable:
-    /** A single update to a field of a `Record[C, T]`, used by [[Record#updates]] */
-    final case class Patch(idx: Int, f: AnyRef => AnyRef)
 
     /**
      * For each field `x: X` of class `C`
-     * there exists a field `x: (X' => X') => Patch` in this record updater. `X'` is instantiated to
+     * there exists a field `x: Field[X']` in this record updater. `X'` is instantiated to
      * `Record[X, T]` if `X` is a case class that represents a table, or `T[X]` otherwise.
      */
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Nested => (Record[X, T] => Record[X, T]) => Patch
-        case _ => (T[X] => T[X]) => Patch
+        case Nested => Field[Record[X, T]]
+        case _ => Field[T[X]]
       }
     ]
-    def apply(i: Int): (AnyRef => AnyRef) => Patch =
-      f => Patch(i, f)
-    inline def selectDynamic(name: String): (AnyRef => AnyRef) => Patch =
+    def apply(i: Int): Field[AnyRef] =
+      new Field(f => Patch(i, f))
+    inline def selectDynamic(name: String): Field[AnyRef] =
       apply(compiletime.constValue[Record.IndexOf[name.type, Record.Names[C], 0]])
 
   object Record:

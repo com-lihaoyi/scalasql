@@ -1,9 +1,20 @@
-package test.scalasql
+package test.scalasql.namedtuples
 import utest._
+
+// adapted from scalasql/test/src/WorldSqlTests.scala to use named tuples
+// base commit: 4556a0881848b4efdd4b5b9e536be8b33c44af09
+// changelog:
+// - drop `[SC]`, `[T[_]]` and `T[Foo]`
+// - use `SimpleTable` instead of `Table`
+// - add `// +SNIPPET [FOO]` and `// -SNIPPET [FOO]` markers,
+//   used to include various snippets in the tutorial.md
+// - add example of `Record` updates.
+//
+// Note: that the actual docs and examples might drift out of sync with `WorldSqlTests.scala`
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
-object WorldSqlTests extends TestSuite {
+object WorldSqlTestsNamedTuple extends TestSuite {
   // +DOCS
   //
   // This tutorial is a tour of how to use ScalaSql, from the most basic concepts
@@ -14,7 +25,9 @@ object WorldSqlTests extends TestSuite {
   // ## Setup
   // ### Importing Your Database Dialect
   // To begin using ScalaSql, you need the following imports:
-  import scalasql._
+  // +SNIPPET [IMPORTS]
+  import scalasql.simple.{*, given}
+  // -SNIPPET [IMPORTS]
   import scalasql.H2Dialect._
   // This readme will use the H2 database for simplicity, but you can change the `Dialect`
   // above to other databases as necessary. ScalaSql supports H2, Sqlite, HsqlExpr,
@@ -56,44 +69,46 @@ object WorldSqlTests extends TestSuite {
   // Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
   // the database tables we saw above
   //
-  case class Country[T[_]](
-      code: T[String],
-      name: T[String],
-      continent: T[String],
-      region: T[String],
-      surfaceArea: T[Int],
-      indepYear: T[Option[Int]],
-      population: T[Long],
-      lifeExpectancy: T[Option[Double]],
-      gnp: T[Option[scala.math.BigDecimal]],
-      gnpOld: T[Option[scala.math.BigDecimal]],
-      localName: T[String],
-      governmentForm: T[String],
-      headOfState: T[Option[String]],
-      capital: T[Option[Int]],
-      code2: T[String]
+  // +SNIPPET [TABLES]
+  case class Country(
+      code: String,
+      name: String,
+      continent: String,
+      region: String,
+      surfaceArea: Int,
+      indepYear: Option[Int],
+      population: Long,
+      lifeExpectancy: Option[Double],
+      gnp: Option[scala.math.BigDecimal],
+      gnpOld: Option[scala.math.BigDecimal],
+      localName: String,
+      governmentForm: String,
+      headOfState: Option[String],
+      capital: Option[Int],
+      code2: String
   )
 
-  object Country extends Table[Country]()
+  object Country extends SimpleTable[Country]
 
-  case class City[T[_]](
-      id: T[Int],
-      name: T[String],
-      countryCode: T[String],
-      district: T[String],
-      population: T[Long]
+  case class City(
+      id: Int,
+      name: String,
+      countryCode: String,
+      district: String,
+      population: Long
   )
 
-  object City extends Table[City]()
+  object City extends SimpleTable[City]
 
-  case class CountryLanguage[T[_]](
-      countryCode: T[String],
-      language: T[String],
-      isOfficial: T[Boolean],
-      percentage: T[Double]
+  case class CountryLanguage(
+      countryCode: String,
+      language: String,
+      isOfficial: Boolean,
+      percentage: Double
   )
 
-  object CountryLanguage extends Table[CountryLanguage]()
+  object CountryLanguage extends SimpleTable[CountryLanguage]
+  // -SNIPPET [TABLES]
   // -DOCS
 
   // Shadow uTest's `ArrowAssert` to add lenient SQL string comparisons
@@ -132,9 +147,7 @@ object WorldSqlTests extends TestSuite {
     // Also included is the necessary import statement to include the `SimpleTable` definition.
     //
     // ```scala
-    // +INCLUDE SNIPPET [IMPORTS] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
-    //
-    // +INCLUDE SNIPPET [TABLES] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+    // +INCLUDE scalasql/namedtuples/test/src/example/WorldSqlTestsSnippets.scala
     // ```
     // -DOCS
   }
@@ -216,19 +229,16 @@ object WorldSqlTests extends TestSuite {
       """
 
       db.run(query).take(3) ==> Seq(
-        City[Sc](1, "Kabul", "AFG", district = "Kabol", population = 1780000),
-        City[Sc](2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
-        City[Sc](3, "Herat", "AFG", district = "Herat", population = 186800)
+        City(1, "Kabul", "AFG", district = "Kabol", population = 1780000),
+        City(2, "Qandahar", "AFG", district = "Qandahar", population = 237500),
+        City(3, "Herat", "AFG", district = "Herat", population = 186800)
       )
-      // Notice that `db.run` returns instances of type `City[Sc]` (or `City` if using `SimpleTable`).
+      // Notice that `db.run` returns instances of type `City` (or `City` if using `SimpleTable`).
       //
       // `Sc` is `scalasql.Sc`,
       // short for the "Scala" type, representing a `City` object containing normal Scala
       // values. The `[Sc]` type parameter must be provided explicitly whenever creating,
       // type-annotating, or otherwise working with these `City` values.
-      //
-      // > In this tutorial, unless otherwise specified, we will assume usage of the `Table` encoding.
-      // > If you are using `SimpleTable`, the same code will work, but drop `[Sc]` type arguments.
       //
       // In this example, we do `.take(3)` after running the query to show only the first
       // 3 table entries for brevity, but by that point the `City.select` query had already
@@ -260,15 +270,11 @@ object WorldSqlTests extends TestSuite {
         WHERE (city0.name = ?)
         """
 
-        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City(3208, "Singapore", "SGP", district = "", population = 4017733)
         // Note that we use `===` rather than `==` for the equality comparison. The
         // function literal passed to `.filter` is given a `City[Expr]` as its parameter,
-        // (or `Record[City, Expr]` with the `SimpleTable` encoding) representing a `City`
-        // that is part of the database query, in contrast to the
-        // `City[Sc]`s that `db.run` returns.
-        //
-        // Within a query therefore `_.name` is a field selection on the function parameter,
-        // resulting in `Expr[String]`,
+        // representing a `City` that is part of the database query, in contrast to the
+        // `City`s that `db.run` returns , and so `_.name` is of type `Expr[String]`
         // rather than just `String` or `Sc[String]`. You can use your IDE's
         // auto-complete to see what operations are available on `Expr[String]`: typically
         // they will represent SQL string functions rather than Scala string functions and
@@ -277,7 +283,7 @@ object WorldSqlTests extends TestSuite {
         //
         // Note also the `.single` operator. This tells ScalaSql that you expect exactly
         // own result row from this query: not zero rows, and not more than one row. This
-        // causes `db.run` to return a `City[Sc]` rather than `Seq[City[Sc]]`, and throw
+        // causes `db.run` to return a `City` rather than `Seq[City]`, and throw
         // an exception if zero or multiple rows are returned by the query.
         //
         // -DOCS
@@ -302,7 +308,7 @@ object WorldSqlTests extends TestSuite {
         LIMIT ?
         """
 
-        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City(3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
       }
 
@@ -323,7 +329,7 @@ object WorldSqlTests extends TestSuite {
         WHERE (city0.id = ?)
         """
 
-        db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+        db.run(query) ==> City(3208, "Singapore", "SGP", district = "", population = 4017733)
         // -DOCS
       }
 
@@ -345,11 +351,10 @@ object WorldSqlTests extends TestSuite {
           """
 
           db.run(query).take(2) ==> Seq(
-            City[Sc](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
-            City[Sc](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+            City(1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City(1891, "Peking", "CHN", district = "Peking", population = 7472000)
           )
-          // Again, all the operations within the query work on `Expr`s:
-          // `c` is a `City[Expr]` (or `Record[City, Expr]` for `SimpleTable`),
+          // Again, all the operations within the query work on `Expr`s: `c` is a `City[Expr]`,
           // `c.population` is an `Expr[Int]`, `c.countryCode` is an `Expr[String]`, and
           // `===` and `>` and `&&` on `Expr`s all return `Expr[Boolean]`s that represent
           // a SQL expression that can be sent to the Database as part of your query.
@@ -372,8 +377,8 @@ object WorldSqlTests extends TestSuite {
           """
 
           db.run(query).take(2) ==> Seq(
-            City[Sc](1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
-            City[Sc](1891, "Peking", "CHN", district = "Peking", population = 7472000)
+            City(1890, "Shanghai", "CHN", district = "Shanghai", population = 9696300),
+            City(1891, "Peking", "CHN", district = "Peking", population = 7472000)
           )
           // -DOCS
         }
@@ -390,8 +395,8 @@ object WorldSqlTests extends TestSuite {
         // a `Expr[Int]` automatically
         def find(cityId: Int) = db.run(City.select.filter(_.id === cityId))
 
-        assert(find(3208) == List(City[Sc](3208, "Singapore", "SGP", "", 4017733)))
-        assert(find(3209) == List(City[Sc](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        assert(find(3208) == List(City(3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City(3209, "Bratislava", "SVK", "Bratislava", 448292)))
         // Lifting of Scala values into your ScalaSql queries is dependent on there being
         // an implicit `scalasql.TypeMapper[T]` in scope.
         //
@@ -406,8 +411,8 @@ object WorldSqlTests extends TestSuite {
         // as shown below
         def find(cityId: Int) = db.run(City.select.filter(_.id === Expr(cityId)))
 
-        assert(find(3208) == List(City[Sc](3208, "Singapore", "SGP", "", 4017733)))
-        assert(find(3209) == List(City[Sc](3209, "Bratislava", "SVK", "Bratislava", 448292)))
+        assert(find(3208) == List(City(3208, "Singapore", "SGP", "", 4017733)))
+        assert(find(3209) == List(City(3209, "Bratislava", "SVK", "Bratislava", 448292)))
         // -DOCS
       }
 
@@ -438,28 +443,76 @@ object WorldSqlTests extends TestSuite {
         // You can use `.map` to select exactly what values you want to return from a query.
         // Below, we query the `country` table, but only want the `name` and `continent` of
         // each country, without all the other metadata:
-        val query = Country.select.map(c => (c.name, c.continent))
+        // +SNIPPET [MAP-1]
+        import scalasql.namedtuples.NamedTupleQueryable.given
+
+        val query = Country.select.map(c =>
+          (name = c.name, continent = c.continent)
+        )
+        // -SNIPPET [MAP-1]
         db.renderSql(query) ==> """
         SELECT country0.name AS res_0, country0.continent AS res_1
         FROM country country0
         """
 
+        // +SNIPPET [MAP-2]
         db.run(query).take(5) ==> Seq(
-          ("Afghanistan", "Asia"),
-          ("Netherlands", "Europe"),
-          ("Netherlands Antilles", "North America"),
-          ("Albania", "Europe"),
-          ("Algeria", "Africa")
+          (name = "Afghanistan", continent = "Asia"),
+          (name = "Netherlands", continent = "Europe"),
+          (name = "Netherlands Antilles", continent = "North America"),
+          (name = "Albania", continent = "Europe"),
+          (name = "Algeria", continent = "Africa")
         )
+        // -SNIPPET [MAP-2]
         // -DOCS
+      }
+      test("record_updates") {
+        // +SNIPPET [MAP-3]
+        val query = Country.select.map(c =>
+          c.updates(
+            _.population := 0L,
+            _.name(old => Expr("🌐 ") + old)
+          )
+        )
+        // -SNIPPET [MAP-3]
+        db.renderSql(query) ==> """
+        SELECT
+          country0.code AS code,
+          (? || country0.name) AS name,
+          country0.continent AS continent,
+          country0.region AS region,
+          country0.surfacearea AS surfacearea,
+          country0.indepyear AS indepyear,
+          ? AS population,
+          country0.lifeexpectancy AS lifeexpectancy,
+          country0.gnp AS gnp,
+          country0.gnpold AS gnpold,
+          country0.localname AS localname,
+          country0.governmentform AS governmentform,
+          country0.headofstate AS headofstate,
+          country0.capital AS capital,
+          country0.code2 AS code2
+        FROM country country0
+        """
+        // +SNIPPET [MAP-4]
+        db.run(query).take(5).match {
+          case Seq(
+            Country(name = "🌐 Afghanistan", population = 0L),
+            Country(name = "🌐 Netherlands", population = 0L),
+            Country(name = "🌐 Netherlands Antilles", population = 0L),
+            Country(name = "🌐 Albania", population = 0L),
+            Country(name = "🌐 Algeria", population = 0L)
+          ) =>
+        } ==> ()
+        // -SNIPPET [MAP-4]
       }
 
       test("heterogenousTuple") {
         // +DOCS
         // These `.map` calls can contains arbitrarily complex data: below, we query
-        // the `city` table to look for `Singapore` and get the entire row as a `City[Sc]`,
+        // the `city` table to look for `Singapore` and get the entire row as a `City`,
         // but also want to fetch the uppercase name and the population-in-millions. As
-        // you would expect, you get a tuple of `(City[Sc], String, Int)` back.
+        // you would expect, you get a tuple of `(City, String, Int)` back.
         val query = City.select
           .filter(_.name === "Singapore")
           .map(c => (c, c.name.toUpperCase, c.population / 1000000))
@@ -480,39 +533,10 @@ object WorldSqlTests extends TestSuite {
 
         db.run(query) ==>
           (
-            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
+            City(3208, "Singapore", "SGP", district = "", population = 4017733),
             "SINGAPORE",
             4 // population in millions
           )
-        //
-        // **Mapping with named tuples**
-        // > Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
-        //
-        // You can also use named tuples to map the results of a query.
-        // ```scala
-        // +INCLUDE SNIPPET [MAP-1] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
-        //
-        // +INCLUDE SNIPPET [MAP-2] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
-        // ```
-        //
-        // **Updating `Record` fields**
-        // > Note: only relevant when using the `SimpleTable` encoding.
-        //
-        // When using `SimpleTable`, within the `.map` query `c` is of type
-        // `Record[Country, Expr]`. Records are converted back to their associated case class
-        // (e.g. `Country`) with `db.run`.
-        //
-        // If you want to apply updates to any of the fields before returning, the `Record` class
-        // provides an `updates` method. This lets you provide an arbitrary sequence of updates to
-        // apply in-order to the record. You can either provide a value with `:=`,
-        // or provide a function that transforms the old value. For example:
-        //
-        // ```scala
-        // +INCLUDE SNIPPET [MAP-3] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
-        //
-        // +INCLUDE SNIPPET [MAP-4] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
-        // ```
-        //
         // -DOCS
       }
     }
@@ -1204,8 +1228,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Sc](4080, "Sentosa", "SGP", district = "South", population = 1337)
+          City(3208, "Singapore", "SGP", district = "", population = 4017733),
+          City(4080, "Sentosa", "SGP", district = "South", population = 1337)
         )
         // -DOCS
       }
@@ -1229,10 +1253,10 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Sc](4080, "Sentosa", "SGP", district = "South", population = 1337),
-          City[Sc](4081, "Loyang", "SGP", district = "East", population = 31337),
-          City[Sc](4082, "Jurong", "SGP", district = "West", population = 313373)
+          City(3208, "Singapore", "SGP", district = "", population = 4017733),
+          City(4080, "Sentosa", "SGP", district = "South", population = 1337),
+          City(4081, "Loyang", "SGP", district = "East", population = 31337),
+          City(4082, "Jurong", "SGP", district = "West", population = 313373)
         )
         // -DOCS
       }
@@ -1258,8 +1282,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq(
-          City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733),
-          City[Sc](4080, "New-Singapore", "SGP", district = "", population = 0)
+          City(3208, "Singapore", "SGP", district = "", population = 4017733),
+          City(4080, "New-Singapore", "SGP", district = "", population = 0)
         )
         // These three styles of inserts that ScalaSql provides correspond directly to the
         // various `INSERT` syntaxes supported by the underlying database.
@@ -1285,7 +1309,7 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-          City[Sc](3208, "Singapore", "SGP", district = "UNKNOWN", population = 0)
+          City(3208, "Singapore", "SGP", district = "UNKNOWN", population = 0)
         // -DOCS
       }
 
@@ -1302,7 +1326,7 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-          City[Sc](3208, "Singapore", "SGP", district = "", population = 5017733)
+          City(3208, "Singapore", "SGP", district = "", population = 5017733)
         // -DOCS
       }
       test("all") {
@@ -1316,8 +1340,8 @@ object WorldSqlTests extends TestSuite {
         db.run(query)
 
         db.run(City.select.filter(_.countryCode === "LIE")) ==> Seq(
-          City[Sc](2445, "Schaan", "LIE", district = "Schaan", population = 0),
-          City[Sc](2446, "Vaduz", "LIE", district = "Vaduz", population = 0)
+          City(2445, "Schaan", "LIE", district = "Schaan", population = 0),
+          City(2446, "Vaduz", "LIE", district = "Vaduz", population = 0)
         )
         // -DOCS
       }
@@ -1362,7 +1386,7 @@ object WorldSqlTests extends TestSuite {
 
         dbClient.transaction { implicit db =>
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City(3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1379,7 +1403,7 @@ object WorldSqlTests extends TestSuite {
 
         dbClient.transaction { implicit db =>
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City(3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1409,7 +1433,7 @@ object WorldSqlTests extends TestSuite {
           }
 
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City(3208, "Singapore", "SGP", district = "", population = 4017733)
 
         }
         // -DOCS
@@ -1427,7 +1451,7 @@ object WorldSqlTests extends TestSuite {
           }
 
           db.run(City.select.filter(_.countryCode === "SGP").single) ==>
-            City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
+            City(3208, "Singapore", "SGP", district = "", population = 4017733)
         }
         // -DOCS
       }
@@ -1490,15 +1514,15 @@ object WorldSqlTests extends TestSuite {
       SqlStr.Interp.TypeInterp[CityId](CityId(1337))
       // +DOCS
 
-      case class City[T[_]](
-          id: T[CityId],
-          name: T[String],
-          countryCode: T[String],
-          district: T[String],
-          population: T[Long]
+      case class City(
+          id: CityId,
+          name: String,
+          countryCode: String,
+          district: String,
+          population: Long
       )
 
-      object City extends Table[City]() {
+      object City extends SimpleTable[City] {
         override def tableName: String = "city"
       }
       db.run(
@@ -1512,7 +1536,8 @@ object WorldSqlTests extends TestSuite {
       )
 
       db.run(City.select.filter(_.id === 313373).single) ==>
-        City[Sc](CityId(313373), "test", "XYZ", "district", 1000000)
+        City(CityId(313373), "test", "XYZ", "district", 1000000)
+      // -DOCS
 
       // You can also use `TypeMapper#bimap` for the common case where you want the
       // new `TypeMapper` to behave the same as an existing `TypeMapper`, just with
@@ -1531,15 +1556,15 @@ object WorldSqlTests extends TestSuite {
       // Note sure why this is required, probably a Scalac bug
       SqlStr.Interp.TypeInterp[CityId2](CityId2(1337))
       // +DOCS
-      case class City2[T[_]](
-          id: T[CityId2],
-          name: T[String],
-          countryCode: T[String],
-          district: T[String],
-          population: T[Long]
+      case class City2(
+          id: CityId2,
+          name: String,
+          countryCode: String,
+          district: String,
+          population: Long
       )
 
-      object City2 extends Table[City2]() {
+      object City2 extends SimpleTable[City2] {
         override def tableName: String = "city"
       }
       db.run(
@@ -1553,8 +1578,7 @@ object WorldSqlTests extends TestSuite {
       )
 
       db.run(City2.select.filter(_.id === 31337).single) ==>
-        City2[Sc](CityId2(31337), "test", "XYZ", "district", 1000000)
-      // -DOCS
+        City2(CityId2(31337), "test", "XYZ", "district", 1000000)
     }
     test("customTableColumnNames") {
       // +DOCS
@@ -1563,15 +1587,15 @@ object WorldSqlTests extends TestSuite {
       // ScalaSql allows you to customize the table and column names via overriding
       // `def table` and `def tableColumnNameOverride` om your `Table` object.
 
-      case class CityCustom[T[_]](
-          idCustom: T[Int],
-          nameCustom: T[String],
-          countryCodeCustom: T[String],
-          districtCustom: T[String],
-          populationCustom: T[Long]
+      case class CityCustom(
+          idCustom: Int,
+          nameCustom: String,
+          countryCodeCustom: String,
+          districtCustom: String,
+          populationCustom: Long
       )
 
-      object CityCustom extends Table[CityCustom]() {
+      object CityCustom extends SimpleTable[CityCustom] {
 
         override def tableName: String = "city"
 
@@ -1596,15 +1620,15 @@ object WorldSqlTests extends TestSuite {
       """
 
       db.run(query).take(3) ==> Seq(
-        CityCustom[Sc](1, "Kabul", "AFG", districtCustom = "Kabol", populationCustom = 1780000),
-        CityCustom[Sc](
+        CityCustom(1, "Kabul", "AFG", districtCustom = "Kabol", populationCustom = 1780000),
+        CityCustom(
           2,
           "Qandahar",
           "AFG",
           districtCustom = "Qandahar",
           populationCustom = 237500
         ),
-        CityCustom[Sc](3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
+        CityCustom(3, "Herat", "AFG", districtCustom = "Herat", populationCustom = 186800)
       )
       // -DOCS
     }
