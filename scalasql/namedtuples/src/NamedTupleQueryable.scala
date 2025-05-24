@@ -9,9 +9,10 @@ object NamedTupleQueryable {
   opaque type Rows[X <: Tuple, +Y <: Tuple] = List[Queryable.Row[?, ?]]
 
   object Rows {
-    // currently "traditional" recursive implicit search
-    // because we only know the Q type, and it appears compiletime.summonAll cannot be used to refined the R type
-    // e.g. compiletime.summonAll[Tuple.Map[Qs, [X] =>> Queryable.Row[X, ?]]] does nothing because its static type is fixed.
+    // it seems "traditional" recursive implicit search is the only way to infer the types of `R` when only `Qs` is known.
+    // see https://gist.github.com/bishabosha/e630f76384093153b17f1498a9459518 for a variant that
+    // uses compiletime.summonAll, but it does a double implicit search, so wasnt chosen for the moment.
+
     given concatRows: [Q, R, Qs <: Tuple, Rs <: Tuple]
       => (x: Queryable.Row[Q, R])
       => (xs: Rows[Qs, Rs])

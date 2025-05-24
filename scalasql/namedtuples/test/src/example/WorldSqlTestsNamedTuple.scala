@@ -444,11 +444,10 @@ object WorldSqlTestsNamedTuple extends TestSuite {
         // Below, we query the `country` table, but only want the `name` and `continent` of
         // each country, without all the other metadata:
         // +SNIPPET [MAP-1]
+        // `NamedTupleQueryable` is also included by `import scalasql.simple.given`
         import scalasql.namedtuples.NamedTupleQueryable.given
 
-        val query = Country.select.map(c =>
-          (name = c.name, continent = c.continent)
-        )
+        val query = Country.select.map(c => (name = c.name, continent = c.continent))
         // -SNIPPET [MAP-1]
         db.renderSql(query) ==> """
         SELECT country0.name AS res_0, country0.continent AS res_1
@@ -497,12 +496,12 @@ object WorldSqlTestsNamedTuple extends TestSuite {
         // +SNIPPET [MAP-4]
         db.run(query).take(5).match {
           case Seq(
-            Country(name = "🌐 Afghanistan", population = 0L),
-            Country(name = "🌐 Netherlands", population = 0L),
-            Country(name = "🌐 Netherlands Antilles", population = 0L),
-            Country(name = "🌐 Albania", population = 0L),
-            Country(name = "🌐 Algeria", population = 0L)
-          ) =>
+                Country(name = "🌐 Afghanistan", population = 0L),
+                Country(name = "🌐 Netherlands", population = 0L),
+                Country(name = "🌐 Netherlands Antilles", population = 0L),
+                Country(name = "🌐 Albania", population = 0L),
+                Country(name = "🌐 Algeria", population = 0L)
+              ) =>
         } ==> ()
         // -SNIPPET [MAP-4]
       }

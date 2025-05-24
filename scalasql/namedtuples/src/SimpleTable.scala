@@ -116,16 +116,18 @@ object SimpleTable {
 
   /** A single update to a field of a `Record[C, T]`, used by [[Record#updates]] */
   final class Patch private[SimpleTable] (
-    private[SimpleTable] val idx: Int,
-    private[SimpleTable] val f: AnyRef => AnyRef
+      private[SimpleTable] val idx: Int,
+      private[SimpleTable] val f: AnyRef => AnyRef
   )
 
   /** A `Field[T]` is used to create a patch for a field in a [[SimpleTable.Record Record]]. */
   final class Field[T](private val factory: (T => T) => Patch) extends AnyVal
   object Field {
     extension [T](field: Field[T]) {
+
       /** Create a patch that replaces the old value with `x` */
       def :=(x: T): Patch = field.factory(Function.const(x))
+
       /** Create a patch that can transform the old value with `f` */
       def apply(f: T => T): Patch = field.factory(f)
     }
