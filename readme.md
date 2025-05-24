@@ -56,12 +56,12 @@ dbClient.transaction{ db =>
 }
 ```
 
-ScalaSql supports database connections to PostgreSQL, MySQL, Sqlite, and H2 databases. 
+ScalaSql supports database connections to PostgreSQL, MySQL, Sqlite, and H2 databases.
 Support for additional databases can be easily added.
 
 ScalaSql is a relatively new library, so please try it out, but be aware you may hit bugs
 or missing features! Please open [Discussions](https://github.com/com-lihaoyi/scalasql/discussions)
-for any questions, file [Issues](https://github.com/com-lihaoyi/scalasql/issues) for any 
+for any questions, file [Issues](https://github.com/com-lihaoyi/scalasql/issues) for any
 bugs you hit, or send [Pull Requests](https://github.com/com-lihaoyi/scalasql/pulls) if
 you are able to investigate and fix them!
 
@@ -76,10 +76,56 @@ ivy"com.lihaoyi::scalasql:0.1.19"
 
 ScalaSql supports Scala 2.13.x and >=3.6.2
 
+### SimpleTable variant based on named tuples
+
+For Scala versions >=3.7.0 supporting named tuples, an alternative way to define tables is supported.
+
+Add the following to your `build.sc` file as follows:
+
+<!-- TODO: scalasql-simple? -->
+```scala
+ivy"com.lihaoyi::scalasql-namedtuples:0.1.19"
+```
+
+And taking the example above, the only thing that needs to change is the following:
+```diff
+-import scalasql._, SqliteDialect._
++import scalasql.simple._, SqliteDialect._
+
+ // Define your table model classes
+-case class City[T[_]](
+-    id: T[Int],
+-    name: T[String],
+-    countryCode: T[String],
+-    district: T[String],
+-    population: T[Long]
+-)
+-object City extends Table[City]
++case class City(
++    id: Int,
++    name: String,
++    countryCode: String,
++    district: String,
++    population: Long
++)
++object City extends SimpleTable[City]
+```
+
+And you now have the option to return named tuples from queries:
+```diff
+ val fewLargestCities = db.run(
+    City.select
+        .sortBy(_.population).desc
+        .drop(5).take(3)
+-       .map(c => (c.name, c.population))
++       .map(c => (name = c.name, pop = c.population))
+  )
+```
+
 ## Documentation
 
 * ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql to
-  connect your Scala code to a variety of supported databases and perform simple DDL and 
+  connect your Scala code to a variety of supported databases and perform simple DDL and
   `SELECT`/`INSERT`/`UPDATE`/`DELETE` operations:
     * [Postgres](scalasql/test/src/example/PostgresExample.scala)
     * [MySql](scalasql/test/src/example/MySqlExample.scala)
@@ -104,7 +150,7 @@ ScalaSql supports Scala 2.13.x and >=3.6.2
     to execute queries
   * [Transaction](docs/reference.md#transaction), covering usage of transactions
     and savepoints
-  * [Select](docs/reference.md#select), [Insert](docs/reference.md#insert), 
+  * [Select](docs/reference.md#select), [Insert](docs/reference.md#insert),
     [Update](docs/reference.md#update), [Delete](docs/reference.md#delete):
     covering operations on the primary queries you are likely to use
   * [Join](docs/reference.md#join), covering different kinds of joins
@@ -113,14 +159,14 @@ ScalaSql supports Scala 2.13.x and >=3.6.2
   * [Expression Operations](docs/reference.md#exprops), covering the different
     types of `Expr[T]` values and the different operations you can do on each one
   * [Option Operations](docs/reference.md#optional), operations on `Expr[Option[T]`
-  * [Window Functions](docs/reference.md#windowfunctions), 
+  * [Window Functions](docs/reference.md#windowfunctions),
     [With-Clauses/Common-Table-Expressions](docs/reference.md#withcte)
   * [Postgres](docs/reference.md#postgresdialect), [MySql](docs/reference.md#mysqldialect),
     [Sqlite](docs/reference.md#sqlitedialect), [H2](docs/reference.md#h2dialect) Dialects:
     operations that are specific to each database that may not be generally applicable
 
 * [ScalaSql Design](docs/design.md): discusses the design of the ScalaSql library, why it
-  is built the way it is, what tradeoffs it makes, and how it compares to other 
+  is built the way it is, what tradeoffs it makes, and how it compares to other
   common Scala database query libraries. Ideal for contributors who want to understand
   the structure of the ScalaSql codebase, or for advanced users who may need to
   understand enough to extend ScalaSql with custom functionality.

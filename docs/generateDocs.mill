@@ -5,6 +5,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
   var isDocs = Option.empty[Int]
   var isCode = false
   val outputLines = collection.mutable.Buffer.empty[String]
+  val snippets = collection.mutable.HashMap.empty[String, scala.collection.BufferedIterator[String]]
   outputLines.append(generatedCodeHeader)
   for (line <- os.read.lines(sourcePath)) {
     val isDocsIndex = line.indexOf("// +DOCS")
@@ -25,6 +26,24 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
       (suffix, isCode) match{
         case ("", _) => outputLines.append("")
 
+        case (s"// +INCLUDE SNIPPET [$key] $rest", _) =>
+          // reuse the iterator each time,
+          // basically assume snippets are requested in order.
+          val sublines: scala.collection.BufferedIterator[String] = snippets.getOrElseUpdate(rest, os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).iterator.buffered)
+          val start = s"// +SNIPPET [$key]"
+          val end = s"// -SNIPPET [$key]"
+          while (sublines.hasNext && !sublines.head.contains(start)) {
+            sublines.next() // drop lines until we find the start
+          }
+          val indent = sublines.headOption.map(_.indexOf(start)).getOrElse(-1)
+          if (indent != -1) {
+            sublines.next() // skip the start line
+            while (sublines.hasNext && !sublines.head.contains(end)) {
+              outputLines.append(sublines.next().drop(indent))
+            }
+          } else {
+            outputLines.append("")
+          }
         case (s"// +INCLUDE $rest", _) =>
           os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).foreach(outputLines.append)
 
@@ -50,11 +69,14 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
 }
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
+  def dropNTExprPrefix(s: String) = s.split('.').drop(3).mkString(".")
   val records = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTests.json"))
+  val ntRecords = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTestsNT.json"))
   val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedSuiteDescriptions.json"))
     .map{case (k, v) => (dropExprPrefix(k), v)}
 
-  val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
+  val rawScalaStrs = (records ++ ntRecords)
+    .flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
   val formattedScalaStrs = {
     val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
     scalafmtCallback(tmps, mill.api.WorkspaceRoot.workspaceRoot / ".scalafmt.conf")
@@ -124,6 +146,10 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
        |databases, due to differences in how each database parses SQL. These differences
        |are typically minor, and as long as you use the right `Dialect` for your database
        |ScalaSql should do the right thing for you.
+       |
+       |>**A note for users of `SimpleTable`**: The examples in this document assume usage of
+       |>`Table`, with a higher kinded type parameter on a case class. If you are using
+       |>`SimpleTable`, then the same code snippets should work by dropping `[Sc]`.
        |""".stripMargin
   )
   val recordsWithoutDuplicateSuites = records
@@ -132,15 +158,26 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
     .sortBy(_._2.head.suiteLine)
     .distinctBy { case (k, v) => dropExprPrefix(k)}
     .map{case (k, vs) => (dropExprPrefix(k), vs.map(r => r.copy(suiteName = dropExprPrefix(r.suiteName))))}
+  val ntRecordsWithoutDuplicateSuites = ntRecords
+    .groupBy(_.suiteName)
+    .toSeq
+    .sortBy(_._2.head.suiteLine)
+    .distinctBy { case (k, v) => dropNTExprPrefix(k)}
+    .map{case (k, vs) => (dropNTExprPrefix(k), vs.map(r => r.copy(suiteName = dropNTExprPrefix(r.suiteName))))}
+    .toMap
 
   for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
     val seen = mutable.Set.empty[String]
     outputLines.append(s"## $suiteName")
     outputLines.append(suiteDescriptions(suiteName))
     var lastSeen = ""
-    for(r <- suiteGroup){
-
-      val prettyName = (r.suiteName +: r.testPath).mkString(".")
+    var remainingNTRecords = ntRecordsWithoutDuplicateSuites
+      .get(suiteName)
+      .getOrElse(Seq.empty).groupBy {r =>
+        val prettyName = (r.suiteName +: r.testPath).mkString(".")
+        prettyName
+      }
+    def addRecord(r: Record, prettyName: String) = {
       val titleOpt =
         if (prettyName == lastSeen) Some("----")
         else if (!seen(prettyName)) Some(s"### $prettyName")
@@ -151,20 +188,28 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
         lastSeen = prettyName
         outputLines.append(
           s"""$title
-             |
-             |${dedent(r.docs, "")}
-             |
-             |```scala
-             |${scalafmt(r.queryCodeString)}
-             |```
-             |
-             |${sqlFormat(r.sqlString)}
-             |
-             |${renderResult(r.resultCodeString)}
-             |
-             |""".stripMargin
+            |
+            |${dedent(r.docs, "")}
+            |
+            |```scala
+            |${scalafmt(r.queryCodeString)}
+            |```
+            |
+            |${sqlFormat(r.sqlString)}
+            |
+            |${renderResult(r.resultCodeString)}
+            |
+            |""".stripMargin
         )
       }
+    }
+    for(r <- suiteGroup){
+      val prettyName = (r.suiteName +: r.testPath).mkString(".")
+      addRecord(r, prettyName)
+      remainingNTRecords -= prettyName
+    }
+    for((prettyName, rs) <- remainingNTRecords; r <- rs) {
+      addRecord(r, prettyName)
     }
   }
   os.write.over(dest, outputLines.mkString("\n"))

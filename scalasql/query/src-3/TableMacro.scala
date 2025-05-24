@@ -47,8 +47,7 @@ object TableMacros {
       paramTpe match {
         case AppliedType(tpeCtor, _) =>
           tpeCtor.asType match {
-            case '[
-                type t[_[_]]; t] =>
+            case '[type t[_[_]]; t] =>
               f[t]('{ summonInline[Table.ImplicitMetadata[t]].value })
           }
       }

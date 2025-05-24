@@ -27,12 +27,15 @@ class UtestFramework extends utest.runner.Framework {
   override def teardown() = {
     println("Tearing down CustomFramework " + recordedTests.size)
     val workspaceRoot = os.Path(sys.env("MILL_WORKSPACE_ROOT"))
+    val recordedTestsFile = os.RelPath(sys.env("SCALASQL_RECORDED_TESTS_NAME"))
+    val recordedSuiteDescriptionsFile =
+      os.RelPath(sys.env("SCALASQL_RECORDED_SUITE_DESCRIPTIONS_NAME"))
     os.write.over(
-      workspaceRoot / "out" / "recordedTests.json",
+      workspaceRoot / "out" / recordedTestsFile,
       upickle.default.write(UtestFramework.recordedTests, indent = 4)
     )
     os.write.over(
-      workspaceRoot / "out" / "recordedSuiteDescriptions.json",
+      workspaceRoot / "out" / recordedSuiteDescriptionsFile,
       upickle.default.write(UtestFramework.recordedSuiteDescriptions, indent = 4)
     )
     recordedTests.clear()
