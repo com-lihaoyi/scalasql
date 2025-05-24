@@ -11211,6 +11211,200 @@ db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
 
 
 
+### Optional.filter - with SimpleTable
+
+`.filter` follows normal Scala semantics, and translates to a `CASE`/`WHEN (foo)`/`ELSE NULL`
+
+```scala
+OptCols.select.map(d => d.updates(_.myInt(_.filter(_ < 2))))
+```
+
+
+*
+    ```sql
+    SELECT
+      CASE
+        WHEN (opt_cols0.my_int < ?) THEN opt_cols0.my_int
+        ELSE NULL
+      END AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(None, None),
+      OptCols(Some(1), Some(2)),
+      OptCols(None, None),
+      OptCols(None, Some(4))
+    )
+    ```
+
+
+
+### Optional.getOrElse - with SimpleTable
+
+
+
+```scala
+OptCols.select.map(d => d.updates(_.myInt(_.getOrElse(-1))))
+```
+
+
+*
+    ```sql
+    SELECT
+      COALESCE(opt_cols0.my_int, ?) AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(Some(-1), None),
+      OptCols(Some(1), Some(2)),
+      OptCols(Some(3), None),
+      OptCols(Some(-1), Some(4))
+    )
+    ```
+
+
+
+### Optional.rawGet - with SimpleTable
+
+
+
+```scala
+OptCols.select.map(d => d.updates(_.myInt := d.myInt.get + d.myInt2.get + 1))
+```
+
+
+*
+    ```sql
+    SELECT
+      ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(None, None),
+      OptCols(Some(4), Some(2)),
+      // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
+      OptCols(None, None),
+      OptCols(None, Some(4))
+    )
+    ```
+
+
+
+### Optional.orElse - with SimpleTable
+
+
+
+```scala
+OptCols.select.map(d => d.updates(_.myInt(_.orElse(d.myInt2))))
+```
+
+
+*
+    ```sql
+    SELECT
+      COALESCE(opt_cols0.my_int, opt_cols0.my_int2) AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(None, None),
+      OptCols(Some(1), Some(2)),
+      OptCols(Some(3), None),
+      OptCols(Some(4), Some(4))
+    )
+    ```
+
+
+
+### Optional.flatMap - with SimpleTable
+
+
+
+```scala
+OptCols.select
+  .map(d => d.updates(_.myInt(_.flatMap(v => d.myInt2.map(v2 => v + v2 + 10)))))
+```
+
+
+*
+    ```sql
+    SELECT
+      ((opt_cols0.my_int + opt_cols0.my_int2) + ?) AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(None, None),
+      OptCols(Some(13), Some(2)),
+      // because my_int2 is added to my_int, and my_int2 is null, my_int becomes null too
+      OptCols(None, None),
+      OptCols(None, Some(4))
+    )
+    ```
+
+
+
+### Optional.map - with SimpleTable
+
+You can use operators like `.map` and `.flatMap` to work with
+your `Expr[Option[V]]` values. These roughly follow the semantics
+that you would be familiar with from Scala.
+
+```scala
+OptCols.select.map(d => d.updates(_.myInt(_.map(_ + 10))))
+```
+
+
+*
+    ```sql
+    SELECT
+      (opt_cols0.my_int + ?) AS my_int,
+      opt_cols0.my_int2 AS my_int2
+    FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      OptCols(None, None),
+      OptCols(Some(11), Some(2)),
+      OptCols(Some(13), None),
+      OptCols(None, Some(4))
+    )
+    ```
+
+
+
 ## PostgresDialect
 Operations specific to working with Postgres Databases
 ### PostgresDialect.distinctOn

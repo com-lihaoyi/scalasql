@@ -255,7 +255,8 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
 
     }
 
-    test("map") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("map - with SimpleTable") - checker(
       query = Text { OptCols.select.map(d => d.updates(_.myInt(_.map(_ + 10)))) },
       sql = """
       SELECT
@@ -282,7 +283,8 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
       value = Seq(None, Some(11), Some(13), None)
     )
 
-    test("flatMap") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("flatMap - with SimpleTable") - checker(
       query = Text {
         OptCols.select
           .map(d => d.updates(_.myInt(_.flatMap(v => d.myInt2.map(v2 => v + v2 + 10)))))
@@ -327,9 +329,10 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
       """
     )
 
-    test("rawGet") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("rawGet - with SimpleTable") - checker(
       query = Text {
-        OptCols.select.map(d => d.updates(_.myInt(_.get + d.myInt2.get + 1)))
+        OptCols.select.map(d => d.updates(_.myInt := d.myInt.get + d.myInt2.get + 1))
       },
       sql = """
         SELECT
@@ -346,7 +349,8 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
       )
     )
 
-    test("getOrElse") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("getOrElse - with SimpleTable") - checker(
       query = Text { OptCols.select.map(d => d.updates(_.myInt(_.getOrElse(-1)))) },
       sql = """
         SELECT
@@ -362,7 +366,8 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
       )
     )
 
-    test("orElse") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("orElse - with SimpleTable") - checker(
       query = Text { OptCols.select.map(d => d.updates(_.myInt(_.orElse(d.myInt2)))) },
       sql = """
         SELECT
@@ -378,7 +383,8 @@ trait SimpleTableOptionalTests extends ScalaSqlSuite {
       )
     )
 
-    test("filter") - checker(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("filter - with SimpleTable") - checker(
       query = Text { OptCols.select.map(d => d.updates(_.myInt(_.filter(_ < 2)))) },
       sql = """
         SELECT
