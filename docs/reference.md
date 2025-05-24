@@ -10286,6 +10286,80 @@ result._2 ==> None
 
 
 
+### DataTypes.enclosing - with SimpleTable
+
+You can nest `case class`es in other `case class`es to DRY up common sets of
+table columns. These nested `case class`es have their columns flattened out
+into the enclosing `case class`'s columns, such that at the SQL level it is
+all flattened out without nesting.
+
+**Important**: When using nested `case class`es with `SimpleTable`,
+make sure to extend `SimpleTable.Nested` in the nested class.
+
+```scala
+// case class Nested(
+//   fooId: Int,
+//   myBoolean: Boolean,
+// ) extends SimpleTable.Nested
+// object Nested extends SimpleTable[Nested]
+//
+// case class Enclosing(
+//     barId: Int,
+//     myString: String,
+//     foo: Nested
+// )
+// object Enclosing extends SimpleTable[Enclosing]
+val value1 = Enclosing(
+  barId = 1337,
+  myString = "hello",
+  foo = Nested(
+    fooId = 271828,
+    myBoolean = true
+  )
+)
+val value2 = Enclosing(
+  barId = 31337,
+  myString = "world",
+  foo = Nested(
+    fooId = 1618,
+    myBoolean = false
+  )
+)
+
+val insertColumns = Enclosing.insert.columns(
+  _.barId := value1.barId,
+  _.myString := value1.myString,
+  _.foo.fooId := value1.foo.fooId,
+  _.foo.myBoolean := value1.foo.myBoolean
+)
+db.renderSql(insertColumns) ==>
+  "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
+
+db.run(insertColumns) ==> 1
+
+val insertValues = Enclosing.insert.values(value2)
+db.renderSql(insertValues) ==>
+  "INSERT INTO enclosing (bar_id, my_string, foo_id, my_boolean) VALUES (?, ?, ?, ?)"
+
+db.run(insertValues) ==> 1
+
+db.renderSql(Enclosing.select) ==> """
+          SELECT
+            enclosing0.bar_id AS bar_id,
+            enclosing0.my_string AS my_string,
+            enclosing0.foo_id AS foo_id,
+            enclosing0.my_boolean AS my_boolean
+          FROM enclosing enclosing0
+        """
+
+db.run(Enclosing.select) ==> Seq(value1, value2)
+```
+
+
+
+
+
+
 ## Optional
 Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala
 ### Optional

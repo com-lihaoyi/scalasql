@@ -146,18 +146,22 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
       }
     )
 
-    test("enclosing") - checker.recorded(
+    // !! Important: '- with SimpleTable' so it will be detected by generateDocs.mill
+    test("enclosing - with SimpleTable") - checker.recorded(
       """
       You can nest `case class`es in other `case class`es to DRY up common sets of
       table columns. These nested `case class`es have their columns flattened out
       into the enclosing `case class`'s columns, such that at the SQL level it is
       all flattened out without nesting.
+
+      **Important**: When using nested `case class`es with `SimpleTable`,
+      make sure to extend `SimpleTable.Nested` in the nested class.
       """,
       Text {
         // case class Nested(
         //   fooId: Int,
         //   myBoolean: Boolean,
-        // )
+        // ) extends SimpleTable.Nested
         // object Nested extends SimpleTable[Nested]
         //
         // case class Enclosing(
@@ -213,7 +217,7 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
 
       }
     )
-    test("JoinNullable proper type mappingg") - checker.recorded(
+    test("JoinNullable proper type mapping") - checker.recorded(
       "",
       Text {
         case class A(id: Int, bId: Option[Int])

@@ -69,11 +69,14 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
 }
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
+  def dropNTExprPrefix(s: String) = s.split('.').drop(3).mkString(".")
   val records = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTests.json"))
+  val ntRecords = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTestsNT.json"))
   val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedSuiteDescriptions.json"))
     .map{case (k, v) => (dropExprPrefix(k), v)}
 
-  val rawScalaStrs = records.flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
+  val rawScalaStrs = (records ++ ntRecords)
+    .flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
   val formattedScalaStrs = {
     val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
     scalafmtCallback(tmps, mill.api.WorkspaceRoot.workspaceRoot / ".scalafmt.conf")
@@ -155,15 +158,26 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
     .sortBy(_._2.head.suiteLine)
     .distinctBy { case (k, v) => dropExprPrefix(k)}
     .map{case (k, vs) => (dropExprPrefix(k), vs.map(r => r.copy(suiteName = dropExprPrefix(r.suiteName))))}
+  val ntRecordsWithoutDuplicateSuites = ntRecords
+    .groupBy(_.suiteName)
+    .toSeq
+    .sortBy(_._2.head.suiteLine)
+    .distinctBy { case (k, v) => dropNTExprPrefix(k)}
+    .map{case (k, vs) => (dropNTExprPrefix(k), vs.map(r => r.copy(suiteName = dropNTExprPrefix(r.suiteName))))}
+    .toMap
 
   for((suiteName, suiteGroup) <- recordsWithoutDuplicateSuites) {
     val seen = mutable.Set.empty[String]
     outputLines.append(s"## $suiteName")
     outputLines.append(suiteDescriptions(suiteName))
     var lastSeen = ""
-    for(r <- suiteGroup){
-
-      val prettyName = (r.suiteName +: r.testPath).mkString(".")
+    var remainingNTRecords = ntRecordsWithoutDuplicateSuites
+      .get(suiteName)
+      .getOrElse(Seq.empty).groupBy {r =>
+        val prettyName = (r.suiteName +: r.testPath).mkString(".")
+        prettyName
+      }
+    def addRecord(r: Record, prettyName: String) = {
       val titleOpt =
         if (prettyName == lastSeen) Some("----")
         else if (!seen(prettyName)) Some(s"### $prettyName")
@@ -174,20 +188,28 @@ def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) =
         lastSeen = prettyName
         outputLines.append(
           s"""$title
-             |
-             |${dedent(r.docs, "")}
-             |
-             |```scala
-             |${scalafmt(r.queryCodeString)}
-             |```
-             |
-             |${sqlFormat(r.sqlString)}
-             |
-             |${renderResult(r.resultCodeString)}
-             |
-             |""".stripMargin
+            |
+            |${dedent(r.docs, "")}
+            |
+            |```scala
+            |${scalafmt(r.queryCodeString)}
+            |```
+            |
+            |${sqlFormat(r.sqlString)}
+            |
+            |${renderResult(r.resultCodeString)}
+            |
+            |""".stripMargin
         )
       }
+    }
+    for(r <- suiteGroup){
+      val prettyName = (r.suiteName +: r.testPath).mkString(".")
+      addRecord(r, prettyName)
+      remainingNTRecords -= prettyName
+    }
+    for((prettyName, rs) <- remainingNTRecords; r <- rs) {
+      addRecord(r, prettyName)
     }
   }
   os.write.over(dest, outputLines.mkString("\n"))
