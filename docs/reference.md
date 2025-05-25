@@ -10360,6 +10360,38 @@ db.run(Enclosing.select) ==> Seq(value1, value2)
 
 
 
+### DataTypes.enclosing update - with SimpleTable
+
+You can update nested `case class`es in the same way as you would update
+the enclosing `case class`. The nested `case class`'s columns are flattened
+out into the enclosing `case class`'s columns, so you can update them directly.
+
+```scala
+val value1 = Enclosing(
+  barId = 1339,
+  myString = "hello",
+  foo = Nested(
+    fooId = 271829,
+    myBoolean = true
+  )
+)
+
+db.run(Enclosing.insert.values(value1)) ==> 1
+
+db.run(
+  Enclosing.update(row => row.foo.fooId === value1.foo.fooId).set(_.myString := "updated")
+) ==> 1
+
+db.run(Enclosing.select.filter(row => row.foo.fooId === value1.foo.fooId)) ==> Seq(
+  value1.copy(myString = "updated")
+)
+```
+
+
+
+
+
+
 ## Optional
 Queries using columns that may be `NULL`, `Expr[Option[T]]` or `Option[T]` in Scala
 ### Optional
