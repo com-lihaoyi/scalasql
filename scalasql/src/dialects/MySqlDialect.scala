@@ -15,7 +15,7 @@ import scalasql.query.{
   OrderBy,
   Query,
   SubqueryRef,
-  Table,
+  Table0,
   TableRef,
   Values
 }
@@ -99,7 +99,7 @@ trait MySqlDialect extends Dialect {
   ): MySqlDialect.ExprStringLikeOps[geny.Bytes] =
     new MySqlDialect.ExprStringLikeOps(v)
 
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
+  override implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): scalasql.dialects.TableOps[VExpr, VCol, VRow] =
     new MySqlDialect.TableOps(t)
 
   implicit def OnConflictableUpdate[VCol, R](
@@ -220,12 +220,12 @@ object MySqlDialect extends MySqlDialect {
     def reverse: Expr[T] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
+  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]) extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
     override def update(
-        filter: V[Column] => Expr[Boolean]
-    ): Update[V[Column], V[Sc]] = {
-      val ref = Table.ref(t)
-      val metadata = Table.metadata(t)
+        filter: VCol => Expr[Boolean]
+    ): Update[VCol, VRow] = {
+      val ref = Table0.ref(t)
+      val metadata = Table0.metadata(t)
       new Update(
         metadata.vExpr(ref, dialectSelf),
         ref,
@@ -237,10 +237,10 @@ object MySqlDialect extends MySqlDialect {
       )
     }
 
-    protected override def joinableToSelect: Select[V[Expr], V[Sc]] = {
-      val ref = Table.ref(t)
+    protected override def joinableToSelect: Select[VExpr, VRow] = {
+      val ref = Table0.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        Table0.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[VExpr],
         None,
         None,
         false,

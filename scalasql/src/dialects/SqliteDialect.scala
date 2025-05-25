@@ -11,7 +11,7 @@ import scalasql.core.{
   TypeMapper
 }
 import scalasql.{Sc, operations}
-import scalasql.query.{CompoundSelect, GroupBy, Join, OrderBy, SubqueryRef, Table}
+import scalasql.query.{CompoundSelect, GroupBy, Join, OrderBy, SubqueryRef, Table0}
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.operations.TrimOps
 
@@ -44,7 +44,7 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   ): SqliteDialect.ExprStringLikeOps[geny.Bytes] =
     new SqliteDialect.ExprStringLikeOps(v)
 
-  override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
+  override implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): scalasql.dialects.TableOps[VExpr, VCol, VRow] =
     new SqliteDialect.TableOps(t)
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T] =
@@ -188,12 +188,12 @@ object SqliteDialect extends SqliteDialect {
     def glob(x: Expr[T]): Expr[Boolean] = Expr { implicit ctx => sql"GLOB($v, $x)" }
   }
 
-  class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
+  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]) extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
 
-    protected override def joinableToSelect: Select[V[Expr], V[Sc]] = {
-      val ref = Table.ref(t)
+    protected override def joinableToSelect: Select[VExpr, VRow] = {
+      val ref = Table0.ref(t)
       new SimpleSelect(
-        Table.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[V[Expr]],
+        Table0.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[VExpr],
         None,
         None,
         false,

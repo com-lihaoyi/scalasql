@@ -2,9 +2,10 @@ package scalasql.dialects
 
 import scalasql.operations.DbApiOps
 import scalasql.query.SqlWindow
-import scalasql.{Table, operations}
+import scalasql.operations
 import scalasql.core.Aggregatable
 import scalasql.core.{DbApi, DialectTypeMappers, JoinNullable, Queryable, Expr, TypeMapper}
+import scalasql.query.Table0
 
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 import java.time.{
@@ -304,7 +305,7 @@ trait Dialect extends DialectTypeMappers {
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T]
 
-  implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)
+  implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): TableOps[VExpr, VCol, VRow] = new TableOps(t)
   implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
   implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 
