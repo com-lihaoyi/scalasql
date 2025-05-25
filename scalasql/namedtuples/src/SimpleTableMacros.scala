@@ -101,7 +101,7 @@ object SimpleTableMacros {
     given foundMetaCol: [L <: String, T]
       => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.GivenMetadata[T])
       => BaseColumn[L, T, Columns] =
-      m.metadata.vExpr(ref, mappers).asInstanceOf[AnyRef]
+      m.metadata.vCol(ref, mappers).asInstanceOf[AnyRef]
     given foundMeta: [L <: String, T]
       => (mappers: DialectTypeMappers, ref: TableRef, m: SimpleTable.GivenMetadata[T])
       => BaseColumn[L, T, Record] =
@@ -189,10 +189,8 @@ object SimpleTableMacros {
 trait SimpleTableMacros {
   class SimpleTableState[C <: Product](
       mirrorPair0: => (Tuple, Mirror.ProductOf[C]),
-      rowsRef0: => Tuple,
       colRowsRef0: => Tuple,
       colsRef0: => Tuple,
-      strictColsRef0: => Tuple,
       labelsRef0: => Tuple
   ):
     private lazy val mirrorPair =
@@ -203,18 +201,14 @@ trait SimpleTableMacros {
       )
     def labels: IArray[String] = mirrorPair(0)
     def mirror: Mirror.ProductOf[C] = mirrorPair(1)
-    lazy val rowsRef: IArray[DialectTypeMappers => Queryable.Row[?, ?]] =
-      SimpleTableMacros.unwrapRows(rowsRef0)
     lazy val colRowsRef: IArray[DialectTypeMappers => Queryable.Row[?, ?]] =
       SimpleTableMacros.unwrapRows(colRowsRef0)
     lazy val colsRef: IArray[(DialectTypeMappers, TableRef) => AnyRef] =
       SimpleTableMacros.unwrapColumns(colsRef0)
-    lazy val strictColsRef: IArray[(DialectTypeMappers, TableRef) => AnyRef] =
-      SimpleTableMacros.unwrapColumns(strictColsRef0)
     lazy val labelsRef: IndexedSeq[String] =
       SimpleTableMacros.unwrapLabels(labelsRef0, labels)
 
-  inline given initTableMetadata[C <: Product]: Table0.Metadata[Record[C], Columns[C], C] =
+  inline given initTableMetadata[C <: Product]: Table0.SharedMetadata[Record[C], Columns[C], C] =
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Pairs[F[_, _]] = Tuple.Map[
@@ -226,12 +220,6 @@ trait SimpleTableMacros {
     type FlatLabels = Pairs[SimpleTableMacros.BaseLabels]
     type ColumnsOf = Pairs[[L,
     T] =>> SimpleTableMacros.ContraRefMapper[SimpleTableMacros.BaseColumn[L, T, Columns]]]
-    type ColumnExprsOf = Pairs[[L,
-    T] =>> SimpleTableMacros.ContraRefMapper[SimpleTableMacros.BaseColumn[L, T, Record]]]
-    type RowsOf = Tuple.Map[
-      Values,
-      [T] =>> SimpleTableMacros.ContraMapper[SimpleTableMacros.BaseRowExpr[T, Expr, Record]]
-    ]
     type ColExprsOf = Tuple.Map[
       Values,
       [T] =>> SimpleTableMacros.ContraMapper[SimpleTableMacros.BaseRowExpr[T, Column, Columns]]
@@ -239,25 +227,20 @@ trait SimpleTableMacros {
 
     val state = new SimpleTableState[C](
       mirrorPair0 = SimpleTableMacros.getMirror[C],
-      rowsRef0 = compiletime.summonAll[RowsOf],
       colRowsRef0 = compiletime.summonAll[ColExprsOf],
       colsRef0 = compiletime.summonAll[ColumnsOf],
-      strictColsRef0 = compiletime.summonAll[ColumnExprsOf],
       labelsRef0 = compiletime.summonAll[FlatLabels]
     )
 
-    def exprQueryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
-      state.rowsRef(idx)(mappers)
     def queryables(mappers: DialectTypeMappers, idx: Int): Queryable.Row[?, ?] =
       state.colRowsRef(idx)(mappers)
-
     def walkLabels0(): Seq[String] = state.labelsRef
 
-    def queryable[Q <: AnyRecord](factory: IArray[AnyRef] => Q)(
+    def queryable(
         walkLabels0: () => Seq[String],
         @nowarn("msg=unused") mappers: DialectTypeMappers,
         queryable: Table0.Metadata.QueryableProxy
-    ): Queryable[Q, C] = TableQueryable(
+    ): Queryable[Record[C], C] = TableQueryable(
       walkLabels0,
       walkExprs0 = SimpleTableMacros.walkAllExprs(queryable),
       construct0 = args =>
@@ -266,16 +249,10 @@ trait SimpleTableMacros {
           args = args,
           factory = SimpleTableMacros.make(state.mirror, _)
         ),
-      deconstruct0 = values => factory(SimpleTableMacros.deconstruct(queryable)(values))
+      deconstruct0 = values =>
+        // columns can downcast to Record[C]
+        Columns[C](SimpleTableMacros.deconstruct(queryable)(values))
     )
-
-    def vExpr0(
-        tableRef: TableRef,
-        mappers: DialectTypeMappers,
-        @nowarn("msg=unused") queryable: Table0.Metadata.QueryableProxy
-    ): Record[C] =
-      val columns = state.strictColsRef.map(_(mappers, tableRef))
-      Record[C](columns)
 
     def vCol0(
         tableRef: TableRef,
@@ -285,13 +262,10 @@ trait SimpleTableMacros {
       val columns = state.colsRef.map(_(mappers, tableRef))
       Columns[C](columns)
 
-    Table0.Metadata[Record[C], Columns[C], C](
+    Table0.SharedMetadata[Record[C], Columns[C], C](
       queryables,
-      exprQueryables,
       walkLabels0,
-      queryable(Record[C](_)),
-      queryable(Columns[C](_)),
-      vExpr0,
+      queryable,
       vCol0
     )
 }

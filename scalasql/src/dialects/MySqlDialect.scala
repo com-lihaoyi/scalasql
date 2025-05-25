@@ -230,11 +230,11 @@ object MySqlDialect extends MySqlDialect {
       val ref = Table0.ref(t)
       val metadata = Table0.metadata(t)
       new Update(
-        metadata.vExpr(ref, dialectSelf),
+        metadata.vCol(ref, dialectSelf),
         ref,
         Nil,
         Nil,
-        Seq(filter(metadata.vExpr(ref, dialectSelf)))
+        Seq(filter(metadata.vCol(ref, dialectSelf)))
       )(
         t.containerQr2
       )

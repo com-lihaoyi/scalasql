@@ -4,23 +4,32 @@ import scalasql.dialects.Dialect
 import scalasql.core.{Context, Expr}
 import scalasql.Sc
 import scalasql.query.{Column, Delete, Insert, Joinable, Select, SimpleSelect, Table0, Update}
+import scalasql.query.TableRef
 
 class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dialect: Dialect)
     extends Joinable[VExpr, VRow] {
 
   import dialect.{dialectSelf => _}
 
-  protected def toFromStrictExpr0 = {
+  protected def toFromStrictExpr0: (TableRef, VExpr) = {
     val ref = Table0.ref(t)
     (ref, Table0.metadata(t).vStrictExpr(ref, dialect))
   }
-  protected def toFromExpr0 = {
+  protected def toFromExpr0: (TableRef, VCol) = {
     val ref = Table0.ref(t)
-    (ref, Table0.metadata(t).vExpr(ref, dialect))
+    (ref, Table0.metadata(t).vCol(ref, dialect))
   }
-  protected def toFromBothExpr0 = {
+  protected def toFromBothExpr0: (TableRef, VExpr, VCol) = {
     val ref = Table0.ref(t)
-    (ref, Table0.metadata(t).vStrictExpr(ref, dialect), Table0.metadata(t).vExpr(ref, dialect))
+    val cols = Table0.metadata(t).vCol(ref, dialect)
+    val expr =
+      if (Table0.metadata(t).supportsDowncast) cols.asInstanceOf[VExpr]
+      else
+        throw new UnsupportedOperationException(
+          // if you see this comment, then you are probably implementing a new kind of table.
+          "Downcasting is not supported for this table"
+        )
+    (ref, expr, cols)
   }
 
   protected def joinableToFromExpr: (Context.From, VExpr) = {
@@ -47,7 +56,7 @@ class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dia
    */
   def update(filter: VCol => Expr[Boolean]): Update[VCol, VRow] = {
     val (ref, expr) = toFromExpr0
-    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table0.metadata(t).vExpr(ref, dialect))))(
+    new Update.Impl(expr, ref, Nil, Nil, Seq(filter(Table0.metadata(t).vCol(ref, dialect))))(
       t.containerQr2,
       dialect
     )
@@ -67,7 +76,7 @@ class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dia
    */
   def delete(filter: VCol => Expr[Boolean]): Delete[VCol] = {
     val (ref, expr) = toFromExpr0
-    new Delete.Impl(expr, filter(Table0.metadata(t).vExpr(ref, dialect)), ref)
+    new Delete.Impl(expr, filter(Table0.metadata(t).vCol(ref, dialect)), ref)
   }
 
 }
