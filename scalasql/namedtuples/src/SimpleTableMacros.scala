@@ -1,6 +1,7 @@
 package scalasql.namedtuples
 
-import scalasql.query.Table
+import scalasql.query.Table0
+import scalasql.query.Table.Internal.TableQueryable
 import scalasql.core.Queryable
 import scalasql.core.DialectTypeMappers
 import scalasql.core.Expr
@@ -14,6 +15,7 @@ import scala.NamedTuple.AnyNamedTuple
 import java.util.function.UnaryOperator
 import scala.annotation.nowarn
 import scalasql.namedtuples.SimpleTableMacros.BaseLabels
+import scalasql.namedtuples.SimpleTable.Record
 import scalasql.core.TypeMapper
 import scala.annotation.unused
 import scala.annotation.implicitNotFound
@@ -74,10 +76,7 @@ object SimpleTableMacros {
         using @unused m: SimpleTable.GivenMetadata[T],
         @unused e: T <:< SimpleTable.Nested
     )(
-        using delegate: Queryable.Row[
-          SimpleTable.MapOver[T, Expr],
-          SimpleTable.MapOver[T, Sc]
-        ]
+        using delegate: Queryable.Row[Record[T, Expr], T]
     ): BaseRowExpr[T] = delegate
     given summonBasic[T](using @unused ev: scala.util.NotGiven[SimpleTable.GivenMetadata[T]])(
         using delegate: Queryable.Row[Expr[T], Sc[T]]
@@ -91,7 +90,7 @@ object SimpleTableMacros {
       => BaseColumn[L, T] =
       val col = new Column[T](
         ref,
-        Table.columnNameOverride(ref.value)(l.value)
+        Table0.columnNameOverride(ref.value)(l.value)
       )
       col
   }
@@ -125,7 +124,7 @@ object SimpleTableMacros {
   }
 
   def walkAllExprs(
-      queryable: Table.Metadata.QueryableProxy
+      queryable: Table0.Metadata.QueryableProxy
   )(e: SimpleTable.Record[?, ?]): IndexedSeq[Expr[?]] = {
     var i = 0
     val fields = e.productIterator
@@ -141,7 +140,7 @@ object SimpleTableMacros {
   }
 
   def construct[C](
-      queryable: Table.Metadata.QueryableProxy
+      queryable: Table0.Metadata.QueryableProxy
   )(size: Int, args: Queryable.ResultSetIterator, factory: IArray[AnyRef] => C): C = {
     var i = 0
     val buf = IArray.newBuilder[AnyRef]
@@ -155,7 +154,7 @@ object SimpleTableMacros {
   }
 
   def deconstruct[R <: SimpleTable.Record[?, ?]](
-      queryable: Table.Metadata.QueryableProxy
+      queryable: Table0.Metadata.QueryableProxy
   )(c: Product): R = {
     var i = 0
     val buf = IArray.newBuilder[AnyRef]
@@ -203,8 +202,7 @@ trait SimpleTableMacros {
       SimpleTableMacros.unwrapLabels(labelsRef0, labels)
 
   inline given initTableMetadata[C <: Product]
-      : Table.Metadata[[T[_]] =>> SimpleTable.MapOver[C, T]] =
-    type Impl[T[_]] = SimpleTable.MapOver[C, T]
+      : Table0.Metadata[Record[C, Expr], Record[C, Column], C] =
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Pairs[F[_, _]] = Tuple.Map[
@@ -236,8 +234,8 @@ trait SimpleTableMacros {
     def queryable(
         walkLabels0: () => Seq[String],
         @nowarn("msg=unused") mappers: DialectTypeMappers,
-        queryable: Table.Metadata.QueryableProxy
-    ): Queryable[Impl[Expr], Impl[Sc]] = Table.Internal.TableQueryable(
+        queryable: Table0.Metadata.QueryableProxy
+    ): Queryable[Record[C, Expr], C] = TableQueryable(
       walkLabels0,
       walkExprs0 = SimpleTableMacros.walkAllExprs(queryable),
       construct0 = args =>
@@ -246,16 +244,16 @@ trait SimpleTableMacros {
           args = args,
           factory = SimpleTableMacros.make(state.mirror, _)
         ),
-      deconstruct0 = values => SimpleTableMacros.deconstruct[Impl[Expr]](queryable)(values)
+      deconstruct0 = values => SimpleTableMacros.deconstruct[Record[C, Expr]](queryable)(values)
     )
 
     def vExpr0(
         tableRef: TableRef,
         mappers: DialectTypeMappers,
-        @nowarn("msg=unused") queryable: Table.Metadata.QueryableProxy
-    ): Impl[Column] =
+        @nowarn("msg=unused") queryable: Table0.Metadata.QueryableProxy
+    ): Record[C, Column] =
       val columns = state.colsRef.map(_(mappers, tableRef))
-      SimpleTable.Record.fromIArray(columns).asInstanceOf[Impl[Column]]
+      SimpleTable.Record.fromIArray(columns).asInstanceOf[Record[C, Column]]
 
-    Table.Metadata[Impl](queryables, walkLabels0, queryable, vExpr0)
+    Table0.Metadata[Record[C, Expr], Record[C, Column], C](queryables, walkLabels0, queryable, vExpr0)
 }

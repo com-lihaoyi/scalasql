@@ -2,12 +2,14 @@ package scalasql.namedtuples
 
 import scala.NamedTuple.{AnyNamedTuple, NamedTuple}
 
-import scalasql.query.Table
+import scalasql.query.Table0
 import scalasql.core.DialectTypeMappers
 import scalasql.core.Queryable
 import scalasql.query.Column
 import scalasql.core.Sc
 import scalasql.core.Expr
+
+import scalasql.namedtuples.SimpleTable.Record
 
 import scala.compiletime.asMatchable
 
@@ -24,13 +26,13 @@ import scala.compiletime.asMatchable
  */
 class SimpleTable[C](
     using name: sourcecode.Name,
-    metadata0: Table.Metadata[[T[_]] =>> SimpleTable.MapOver[C, T]]
-) extends Table[[T[_]] =>> SimpleTable.MapOver[C, T]](using name, metadata0) {
+    metadata0: Table0.Metadata[Record[C, Expr], Record[C, Column], C]
+) extends Table0[Record[C, Expr], Record[C, Column], C](using name, metadata0) {
   given simpleTableGivenMetadata: SimpleTable.GivenMetadata[C] =
     SimpleTable.GivenMetadata(metadata0)
 }
 
-object SimpleTable {
+object SimpleTable extends SimpleTableMacros {
 
   /**
    * Marker class that signals that a data type is convertable to an SQL table row.
@@ -38,18 +40,6 @@ object SimpleTable {
    *  into various column types such as `java.util.Date`, `geny.Bytes`, or `scala.Option`.
    */
   abstract class Nested
-
-  /**
-   * A type that can map `T` over the fields of `C`. If `T` is the identity then `C` itself,
-   * else a [[SimpleTable.Record Record]].
-   *
-   * @tparam C the case class type
-   * @tparam T the type constructor to map over the fields of `C`.
-   */
-  type MapOver[C, T[_]] = T[Internal.Tombstone.type] match {
-    case Internal.Tombstone.type => C // T is `Sc`
-    case _ => Record[C, T]
-  }
 
   /** Super type of all [[SimpleTable.Record Record]]. */
   sealed trait AnyRecord extends Product with Serializable
@@ -186,7 +176,7 @@ object SimpleTable {
       Record(data)
 
   /** Internal API of SimpleTable */
-  object Internal extends SimpleTableMacros {
+  object Internal {
 
     /** An object with singleton type that is provably disjoint from most other types. */
     case object Tombstone
@@ -195,7 +185,7 @@ object SimpleTable {
   /** A type that gives access to the Table metadata of `C`. */
   opaque type GivenMetadata[C] = GivenMetadata.Inner[C]
   object GivenMetadata {
-    type Inner[C] = Table.Metadata[[T[_]] =>> SimpleTable.MapOver[C, T]]
+    type Inner[C] = Table0.Metadata[Record[C, Expr], Record[C, Column], C]
     def apply[C](metadata: Inner[C]): GivenMetadata[C] = metadata
     extension [C](m: GivenMetadata[C]) {
       def metadata: Inner[C] = m
