@@ -240,7 +240,7 @@ object MySqlDialect extends MySqlDialect {
     protected override def joinableToSelect: Select[VExpr, VRow] = {
       val ref = Table0.ref(t)
       new SimpleSelect(
-        Table0.metadata(t).vExpr(ref, dialectSelf).asInstanceOf[VExpr],
+        Table0.metadata(t).vStrictExpr(ref, dialectSelf),
         None,
         None,
         false,

@@ -10,14 +10,24 @@ class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dia
 
   import dialect.{dialectSelf => _}
 
+  protected def toFromStrictExpr0 = {
+    val ref = Table0.ref(t)
+    (ref, Table0.metadata(t).vStrictExpr(ref, dialect))
+  }
   protected def toFromExpr0 = {
     val ref = Table0.ref(t)
     (ref, Table0.metadata(t).vExpr(ref, dialect))
   }
+  protected def toFromBothExpr0 = {
+    val ref = Table0.ref(t)
+    (ref, Table0.metadata(t).vStrictExpr(ref, dialect),
+      Table0.metadata(t).vExpr(ref, dialect))
+  }
+
 
   protected def joinableToFromExpr: (Context.From, VExpr) = {
-    val (ref, expr) = toFromExpr0
-    (ref, expr.asInstanceOf[VExpr])
+    val (ref, expr) = toFromStrictExpr0
+    (ref, expr)
   }
 
   protected def joinableToSelect: Select[VExpr, VRow] = {
@@ -49,8 +59,8 @@ class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dia
    * Constructs a `INSERT` query
    */
   def insert: Insert[VExpr, VCol, VRow] = {
-    val (ref, expr) = toFromExpr0
-    new Insert.Impl(expr, ref)(t.containerQr2, dialect)
+    val (ref, strictExpr, expr) = toFromBothExpr0
+    new Insert.Impl(strictExpr, expr, ref)(t.containerQr2, dialect)
   }
 
   /**

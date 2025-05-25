@@ -9,9 +9,10 @@ import scalasql.query.Column
 import scalasql.core.Sc
 import scalasql.core.Expr
 
-import scalasql.namedtuples.SimpleTable.Record
+import scalasql.namedtuples.SimpleTable.{Record, Columns}
 
 import scala.compiletime.asMatchable
+import scala.reflect.ClassTag
 
 /**
  * In-code representation of a SQL table, associated with a given `case class` `C`.
@@ -26,8 +27,8 @@ import scala.compiletime.asMatchable
  */
 class SimpleTable[C](
     using name: sourcecode.Name,
-    metadata0: Table0.Metadata[Record[C, Expr], Record[C, Column], C]
-) extends Table0[Record[C, Expr], Record[C, Column], C](using name, metadata0) {
+    metadata0: Table0.Metadata[Record[C], Columns[C], C]
+) extends Table0[Record[C], Columns[C], C](using name, metadata0) {
   given simpleTableGivenMetadata: SimpleTable.GivenMetadata[C] =
     SimpleTable.GivenMetadata(metadata0)
 }
@@ -44,13 +45,30 @@ object SimpleTable extends SimpleTableMacros {
   /** Super type of all [[SimpleTable.Record Record]]. */
   sealed trait AnyRecord extends Product with Serializable
 
+  final class Record[C](data: IArray[AnyRef]) extends BaseRecord[C](data) {
+    type T[X] = Expr[X]
+    type Self[X] = Record[X]
+
+    def canEqual(that: Any): Boolean = that.isInstanceOf[Record[?]]
+    protected def factory(arr: IArray[AnyRef]): Self[C] = Record(arr)
+  }
+  final class Columns[C](data: IArray[AnyRef]) extends BaseRecord[C](data) {
+    override type T[X] = Column[X]
+    override type Self[X] = Columns[X]
+
+    def canEqual(that: Any): Boolean = that.isInstanceOf[Columns[?]]
+    protected def factory(arr: IArray[AnyRef]): Self[C] = Columns(arr)
+  }
+
   /**
    * Record is a fixed size product type, its fields correspond to the fields of `C`
    * mapped over by `T` (see [[Record#Fields Fields]] for more information).
    *
    * @see [[Record#Fields Fields]] for how the fields are mapped.
    */
-  final class Record[C, T[_]](private val data: IArray[AnyRef]) extends AnyRecord with Selectable:
+  sealed abstract class BaseRecord[C](private val data: IArray[AnyRef]) extends AnyRecord with Selectable:
+    type T[_]
+    type Self[_]
 
     /**
      * For each field `x: X` of class `C` there exists a field `x` in this record of type
@@ -59,18 +77,17 @@ object SimpleTable extends SimpleTableMacros {
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Nested => Record[X, T]
+        case Nested => Self[X]
         case _ => T[X]
       }
     ]
     def apply(i: Int): AnyRef = data(i)
-    def canEqual(that: Any): Boolean = that.isInstanceOf[Record[?, ?]]
     override def productPrefix: String = "Record"
     def productArity: Int = data.length
     def productElement(i: Int): AnyRef = data(i)
     override def equals(that: Any): Boolean = that.asMatchable match
       case _: this.type => true
-      case r: Record[?, ?] =>
+      case r: BaseRecord[?] =>
         r.canEqual(this) && IArray.equals(data, r.data)
       case _ => false
 
@@ -88,21 +105,23 @@ object SimpleTable extends SimpleTableMacros {
      *   in this record.
      * @return a new record (of the same type) with the patches applied.
      */
-    def updates(fs: (RecordUpdater[C, T] => Patch)*): Record[C, T] =
-      val u = recordUpdater[C, T]
+    def updates(fs: (RecordUpdater[C, T, Self] => Patch)*): Self[C] =
+      val u = recordUpdater[C, T, Self]
       val arr = IArray.genericWrapArray(data).toArray
       fs.foreach: f =>
         val patch = f(u)
         val idx = patch.idx
         arr(idx) = patch.f(arr(idx))
-      Record(IArray.unsafeFromArray(arr))
+      factory(IArray.unsafeFromArray(arr))
+
+    protected def factory(arr: IArray[AnyRef]): Self[C]
 
     inline def selectDynamic(name: String): AnyRef =
       apply(compiletime.constValue[Record.IndexOf[name.type, Record.Names[C], 0]])
 
-  private object RecordUpdaterImpl extends RecordUpdater[Any, [T] =>> Any]
-  def recordUpdater[C, T[_]]: RecordUpdater[C, T] =
-    RecordUpdaterImpl.asInstanceOf[RecordUpdater[C, T]]
+  private object RecordUpdaterImpl extends RecordUpdater[Any, ?, ?]
+  def recordUpdater[C, T[_], Self[_]]: RecordUpdater[C, T, Self] =
+    RecordUpdaterImpl.asInstanceOf[RecordUpdater[C, T, Self]]
 
   /** A single update to a field of a `Record[C, T]`, used by [[Record#updates]] */
   final class Patch private[SimpleTable] (
@@ -139,7 +158,7 @@ object SimpleTable extends SimpleTableMacros {
    * @see [[Record#updates updates]] for how to apply the patches.
    * @see [[RecordUpdater#Fields Fields]] for how the fields are mapped.
    */
-  sealed trait RecordUpdater[C, T[_]] extends Selectable:
+  sealed trait RecordUpdater[C, T[_], Self[_]] extends Selectable:
 
     /**
      * For each field `x: X` of class `C`
@@ -149,7 +168,7 @@ object SimpleTable extends SimpleTableMacros {
     type Fields = NamedTuple.Map[
       NamedTuple.From[C],
       [X] =>> X match {
-        case Nested => Field[Record[X, T]]
+        case Nested => Field[Self[X]]
         case _ => Field[T[X]]
       }
     ]
@@ -171,10 +190,6 @@ object SimpleTable extends SimpleTableMacros {
       case _ *: t => IndexOf[N, t, S[Acc]]
     }
 
-    /** Factory that creates an arbitrary Record */
-    def fromIArray(data: IArray[AnyRef]): AnyRecord =
-      Record(data)
-
   /** Internal API of SimpleTable */
   object Internal {
 
@@ -185,7 +200,7 @@ object SimpleTable extends SimpleTableMacros {
   /** A type that gives access to the Table metadata of `C`. */
   opaque type GivenMetadata[C] = GivenMetadata.Inner[C]
   object GivenMetadata {
-    type Inner[C] = Table0.Metadata[Record[C, Expr], Record[C, Column], C]
+    type Inner[C] = Table0.Metadata[Record[C], Columns[C], C]
     def apply[C](metadata: Inner[C]): GivenMetadata[C] = metadata
     extension [C](m: GivenMetadata[C]) {
       def metadata: Inner[C] = m

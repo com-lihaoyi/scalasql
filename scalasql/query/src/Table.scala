@@ -16,14 +16,21 @@ abstract class Table0[VExpr, VCol, VRow]()(implicit name: sourcecode.Name, metad
 
   protected def tableMetadata: Table0.Metadata[VExpr, VCol, VRow] = metadata0
 
+  protected def applyQueryable[Q](
+      dialect: DialectTypeMappers,
+      queryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
+      queryable: (
+          () => Seq[String],
+          DialectTypeMappers,
+          Table0.Metadata.QueryableProxy
+      ) => Queryable[Q, VRow],
+  ): Queryable.Row[Q, VRow] = {
+    queryable(tableMetadata.walkLabels0, dialect, new Table.Metadata.QueryableProxy(queryables(dialect, _)))
+      .asInstanceOf[Queryable.Row[Q, VRow]]
+  }
+
   implicit def containerQr(implicit dialect: DialectTypeMappers): Queryable.Row[VExpr, VRow] =
-    tableMetadata
-      .queryable(
-        tableMetadata.walkLabels0,
-        dialect,
-        new Table.Metadata.QueryableProxy(tableMetadata.queryables(dialect, _))
-      )
-      .asInstanceOf[Queryable.Row[VExpr, VRow]]
+    applyQueryable(dialect, tableMetadata.exprQueryables, tableMetadata.queryable)
 
   protected def tableRef = new TableRef(this)
   protected[scalasql] def tableLabels: Seq[String] = {
@@ -36,7 +43,7 @@ object Table0 {
     implicit def containerQr2(
         implicit dialect: DialectTypeMappers
     ): Queryable.Row[VCol, VRow] =
-      containerQr.asInstanceOf[Queryable.Row[VCol, VRow]]
+      applyQueryable(dialect, tableMetadata.queryables, tableMetadata.queryableCol)
   }
 
   def metadata[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]) = t.tableMetadata
@@ -64,16 +71,27 @@ object Table0 {
 
   class Metadata[VExpr, VCol, VRow](
       val queryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
+      val exprQueryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
       val walkLabels0: () => Seq[String],
       val queryable: (
           () => Seq[String],
           DialectTypeMappers,
           Metadata.QueryableProxy
       ) => Queryable[VExpr, VRow],
-      val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => VCol
+      val queryableCol: (
+          () => Seq[String],
+          DialectTypeMappers,
+          Metadata.QueryableProxy
+      ) => Queryable[VCol, VRow],
+      val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => VExpr,
+      val vCol0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => VCol
   ) {
+    /** Misonmer - actually returns the representation of columns */
     def vExpr(t: TableRef, d: DialectTypeMappers): VCol =
-      vExpr0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
+      vCol0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
+    /** use when required that it must be expression inside */
+    def vStrictExpr(t: TableRef, d: DialectTypeMappers): VExpr =
+      vExpr0(t, d, new Metadata.QueryableProxy(exprQueryables(d, _)))
   }
 
   object Metadata {
@@ -106,9 +124,20 @@ object Table {
     vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
   ) extends Table0.Metadata[V[Expr], V[Column], V[Sc]](
     queryables,
+    queryables, // ok to repeat as they use the same class.
     walkLabels0,
     queryable,
-    vExpr0
+    queryable.asInstanceOf[
+      (
+        () => Seq[String],
+        DialectTypeMappers,
+        Metadata.QueryableProxy
+      ) => Queryable[V[Column], V[Sc]]
+    ], // This works because V[Expr] and V[Column] share the same class
+    vExpr0.asInstanceOf[
+      (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Expr]
+    ], // This works because V[Expr] and V[Column] share the same class
+    vExpr0,
   )
 
   object Metadata extends scalasql.query.TableMacros {

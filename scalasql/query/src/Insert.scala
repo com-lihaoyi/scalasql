@@ -18,9 +18,10 @@ trait Insert[VExpr, VCol, R] extends WithSqlExpr[VCol] with scalasql.generated.I
 }
 
 object Insert {
-  class Impl[VExpr, VCol, R](val expr: VCol, val table: TableRef)(
+  class Impl[VExpr, VCol, R](val strictExpr: VExpr, val expr: VCol, val table: TableRef)(
       implicit val qr: Queryable.Row[VCol, R],
-      dialect: DialectTypeMappers
+      dialect: DialectTypeMappers,
+      // castExpr: VCol => VExpr
   ) extends Insert[VExpr, VCol, R]
       with scalasql.generated.InsertImpl[VExpr, VCol, R] {
 
@@ -39,7 +40,8 @@ object Insert {
     }
 
     def select[C, R2](columns: VExpr => C, select: Select[C, R2]): InsertSelect[VCol, C, R, R2] = {
-      newInsertSelect(this, columns(expr.asInstanceOf[VExpr]), select)
+      // newInsertSelect(this, columns(castExpr(expr)), select)
+      newInsertSelect(this, columns(strictExpr), select)
     }
 
     def columns(f: (VCol => Column.Assignment[?])*): InsertColumns[VCol, R] = {
