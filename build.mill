@@ -173,10 +173,10 @@ trait ScalaSql extends Common { common =>
                  |
                  |""".stripMargin
           s"""def batched[${commaSep(j => s"T$j")}](${commaSep(j =>
-              s"f$j: V[Column] => Column[T$j]"
+              s"f$j: VCol => Column[T$j]"
             )})(
              |    items: (${commaSep(j => s"Expr[T$j]")})*
-             |)(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R] $impl""".stripMargin
+             |)(implicit qr: Queryable[VCol, R]): scalasql.query.InsertColumns[VCol, R] $impl""".stripMargin
         }
       }
 
@@ -219,15 +219,15 @@ trait ScalaSql extends Common { common =>
         s"""package scalasql.generated
            |import scalasql.core.{Queryable, Expr}
            |import scalasql.query.Column
-           |trait Insert[V[_[_]], R]{
+           |trait Insert[VExpr, VCol, R]{
            |${indent(defs(false))}
            |}
-           |trait InsertImpl[V[_[_]], R] extends Insert[V, R]{ this: scalasql.query.Insert[V, R] =>
+           |trait InsertImpl[VExpr, VCol, R] extends Insert[VExpr, VCol, R]{ this: scalasql.query.Insert[VExpr, VCol, R] =>
            |  def newInsertValues[R](
-           |        insert: scalasql.query.Insert[V, R],
+           |        insert: scalasql.query.Insert[VExpr, VCol, R],
            |        columns: Seq[Column[?]],
            |        valuesLists: Seq[Seq[Expr[?]]]
-           |    )(implicit qr: Queryable[V[Column], R]): scalasql.query.InsertColumns[V, R]
+           |    )(implicit qr: Queryable[VCol, R]): scalasql.query.InsertColumns[VCol, R]
            |${indent(defs(true))}
            |}
            |

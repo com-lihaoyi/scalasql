@@ -6,14 +6,14 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 /**
  * A SQL `INSERT SELECT` query
  */
-trait InsertSelect[V[_[_]], C, R, R2]
-    extends Returning.InsertBase[V[Column]]
+trait InsertSelect[VCol, C, R, R2]
+    extends Returning.InsertBase[VCol]
     with Query.ExecuteUpdate[Int]
 
 object InsertSelect {
-  class Impl[V[_[_]], C, R, R2](insert: Insert[V, R], columns: C, select: Select[C, R2])(
+  class Impl[VCol, C, R, R2](insert: Insert[?, VCol, R], columns: C, select: Select[C, R2])(
       implicit dialect: DialectTypeMappers
-  ) extends InsertSelect[V, C, R, R2] {
+  ) extends InsertSelect[VCol, C, R, R2] {
     import dialect.{dialectSelf => _, _}
     protected def expr = WithSqlExpr.get(insert)
 

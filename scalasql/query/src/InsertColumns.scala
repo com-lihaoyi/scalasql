@@ -6,22 +6,22 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 /**
  * A SQL `INSERT VALUES` query
  */
-trait InsertColumns[V[_[_]], R]
-    extends Returning.InsertBase[V[Column]]
+trait InsertColumns[VCol, R]
+    extends Returning.InsertBase[VCol]
     with Query.ExecuteUpdate[Int] {
   def columns: Seq[Column[?]]
   def valuesLists: Seq[Seq[Expr[?]]]
 }
 object InsertColumns {
-  class Impl[V[_[_]], R](
-      insert: Insert[V, R],
+  class Impl[VCol, R](
+      insert: Insert[?, VCol, R],
       val columns: Seq[Column[?]],
       val valuesLists: Seq[Seq[Expr[?]]]
-  )(implicit val qr: Queryable[V[Column], R], dialect: DialectTypeMappers)
-      extends InsertColumns[V, R] {
+  )(implicit val qr: Queryable[VCol, R], dialect: DialectTypeMappers)
+      extends InsertColumns[VCol, R] {
     import dialect.{dialectSelf => _, _}
     def table = insert.table
-    protected def expr: V[Column] = WithSqlExpr.get(insert)
+    protected def expr: VCol = WithSqlExpr.get(insert)
 
     private[scalasql] override def renderSql(ctx: Context) =
       new Renderer(columns, ctx, valuesLists, Table.fullIdentifier(table.value)(ctx)).render()

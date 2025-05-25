@@ -102,10 +102,10 @@ trait MySqlDialect extends Dialect {
   override implicit def TableOpsConv[V[_[_]]](t: Table[V]): scalasql.dialects.TableOps[V] =
     new MySqlDialect.TableOps(t)
 
-  implicit def OnConflictableUpdate[V[_[_]], R](
-      query: InsertColumns[V, R]
-  ): MySqlDialect.OnConflictable[V[Column], Int] =
-    new MySqlDialect.OnConflictable[V[Column], Int](query, WithSqlExpr.get(query), query.table)
+  implicit def OnConflictableUpdate[VCol, R](
+      query: InsertColumns[VCol, R]
+  ): MySqlDialect.OnConflictable[VCol, Int] =
+    new MySqlDialect.OnConflictable[VCol, Int](query, WithSqlExpr.get(query), query.table)
 
   override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
     override def values[Q, R](ts: Seq[R])(implicit qr: Queryable.Row[Q, R]): Values[Q, R] =

@@ -3,22 +3,22 @@ package scalasql.query
 import scalasql.core.{Context, DialectTypeMappers, Expr, Queryable, SqlStr, WithSqlExpr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
-trait InsertValues[V[_[_]], R]
-    extends Returning.InsertBase[V[Column]]
+trait InsertValues[VCol, R]
+    extends Returning.InsertBase[VCol]
     with Query.ExecuteUpdate[Int] {
-  def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R]
+  def skipColumns(x: (VCol => Column[?])*): InsertValues[VCol, R]
 }
 object InsertValues {
-  class Impl[V[_[_]], R](
-      insert: Insert[V, R],
+  class Impl[VCol, R](
+      insert: Insert[?, VCol, R],
       values: Seq[R],
       dialect: DialectTypeMappers,
-      qr: Queryable.Row[V[Column], R],
+      qr: Queryable.Row[VCol, R],
       skippedColumns: Seq[Column[?]]
-  ) extends InsertValues[V, R] {
+  ) extends InsertValues[VCol, R] {
 
     def table = insert.table
-    protected def expr: V[Column] = WithSqlExpr.get(insert)
+    protected def expr: VCol = WithSqlExpr.get(insert)
     override protected def queryConstruct(args: Queryable.ResultSetIterator): Int =
       args.get(dialect.IntType)
 
@@ -32,7 +32,7 @@ object InsertValues {
       )(ctx).render()
     }
 
-    override def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R] = {
+    override def skipColumns(x: (VCol => Column[?])*): InsertValues[VCol, R] = {
 
       new Impl(
         insert,
