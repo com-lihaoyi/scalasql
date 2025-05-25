@@ -6,9 +6,7 @@ import scalasql.core.SqlStr.{Renderable, SqlStringSyntax}
 /**
  * A SQL `INSERT SELECT` query
  */
-trait InsertSelect[VCol, C, R, R2]
-    extends Returning.InsertBase[VCol]
-    with Query.ExecuteUpdate[Int]
+trait InsertSelect[VCol, C, R, R2] extends Returning.InsertBase[VCol] with Query.ExecuteUpdate[Int]
 
 object InsertSelect {
   class Impl[VCol, C, R, R2](insert: Insert[?, VCol, R], columns: C, select: Select[C, R2])(

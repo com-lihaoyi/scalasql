@@ -235,7 +235,9 @@ trait SimpleTableDataTypesTests extends ScalaSqlSuite {
 
         db.run(Enclosing.insert.values(value1)) ==> 1
 
-        db.run(Enclosing.update(row => row.foo.fooId === value1.foo.fooId).set(_.myString := "updated")) ==> 1
+        db.run(
+          Enclosing.update(row => row.foo.fooId === value1.foo.fooId).set(_.myString := "updated")
+        ) ==> 1
 
         db.run(Enclosing.select.filter(row => row.foo.fooId === value1.foo.fooId)) ==> Seq(
           value1.copy(myString = "updated")

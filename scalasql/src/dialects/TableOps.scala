@@ -20,10 +20,8 @@ class TableOps[VExpr, VCol, VRow](val t: Table0[VExpr, VCol, VRow])(implicit dia
   }
   protected def toFromBothExpr0 = {
     val ref = Table0.ref(t)
-    (ref, Table0.metadata(t).vStrictExpr(ref, dialect),
-      Table0.metadata(t).vExpr(ref, dialect))
+    (ref, Table0.metadata(t).vStrictExpr(ref, dialect), Table0.metadata(t).vExpr(ref, dialect))
   }
-
 
   protected def joinableToFromExpr: (Context.From, VExpr) = {
     val (ref, expr) = toFromStrictExpr0

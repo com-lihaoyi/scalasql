@@ -5,7 +5,9 @@ import scalasql.core.{DialectTypeMappers, Queryable, Expr, WithSqlExpr}
 /**
  * A SQL `INSERT` query
  */
-trait Insert[VExpr, VCol, R] extends WithSqlExpr[VCol] with scalasql.generated.Insert[VExpr, VCol, R] {
+trait Insert[VExpr, VCol, R]
+    extends WithSqlExpr[VCol]
+    with scalasql.generated.Insert[VExpr, VCol, R] {
   def table: TableRef
   def qr: Queryable[VCol, R]
   def select[C, R2](columns: VExpr => C, select: Select[C, R2]): InsertSelect[VCol, C, R, R2]
@@ -20,7 +22,7 @@ trait Insert[VExpr, VCol, R] extends WithSqlExpr[VCol] with scalasql.generated.I
 object Insert {
   class Impl[VExpr, VCol, R](val strictExpr: VExpr, val expr: VCol, val table: TableRef)(
       implicit val qr: Queryable.Row[VCol, R],
-      dialect: DialectTypeMappers,
+      dialect: DialectTypeMappers
       // castExpr: VCol => VExpr
   ) extends Insert[VExpr, VCol, R]
       with scalasql.generated.InsertImpl[VExpr, VCol, R] {

@@ -79,7 +79,9 @@ object SimpleTableMacros {
     )(
         using delegate: Queryable.Row[Self[C], C]
     ): BaseRowExpr[C, T, Self] = delegate
-    given summonBasic[C, T[_], Self[_]](using @unused ev: scala.util.NotGiven[SimpleTable.GivenMetadata[C]])(
+    given summonBasic[C, T[_], Self[_]](
+        using @unused ev: scala.util.NotGiven[SimpleTable.GivenMetadata[C]]
+    )(
         using delegate: Queryable.Row[T[C], C]
     ): BaseRowExpr[C, T, Self] = delegate
   }
@@ -212,8 +214,7 @@ trait SimpleTableMacros {
     lazy val labelsRef: IndexedSeq[String] =
       SimpleTableMacros.unwrapLabels(labelsRef0, labels)
 
-  inline given initTableMetadata[C <: Product]
-      : Table0.Metadata[Record[C], Columns[C], C] =
+  inline given initTableMetadata[C <: Product]: Table0.Metadata[Record[C], Columns[C], C] =
     type Labels = NamedTuple.Names[NamedTuple.From[C]]
     type Values = NamedTuple.DropNames[NamedTuple.From[C]]
     type Pairs[F[_, _]] = Tuple.Map[

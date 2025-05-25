@@ -99,7 +99,9 @@ trait MySqlDialect extends Dialect {
   ): MySqlDialect.ExprStringLikeOps[geny.Bytes] =
     new MySqlDialect.ExprStringLikeOps(v)
 
-  override implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): scalasql.dialects.TableOps[VExpr, VCol, VRow] =
+  override implicit def TableOpsConv[VExpr, VCol, VRow](
+      t: Table0[VExpr, VCol, VRow]
+  ): scalasql.dialects.TableOps[VExpr, VCol, VRow] =
     new MySqlDialect.TableOps(t)
 
   implicit def OnConflictableUpdate[VCol, R](
@@ -220,7 +222,8 @@ object MySqlDialect extends MySqlDialect {
     def reverse: Expr[T] = Expr { implicit ctx => sql"REVERSE($v)" }
   }
 
-  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]) extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
+  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow])
+      extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
     override def update(
         filter: VCol => Expr[Boolean]
     ): Update[VCol, VRow] = {

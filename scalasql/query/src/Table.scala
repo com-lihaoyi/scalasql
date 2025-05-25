@@ -3,8 +3,10 @@ package scalasql.query
 import scalasql.core.{DialectTypeMappers, Sc, Queryable, Expr}
 import scalasql.core.Context
 
-abstract class Table0[VExpr, VCol, VRow]()(implicit name: sourcecode.Name, metadata0: Table0.Metadata[VExpr, VCol, VRow])
-    extends Table.Base
+abstract class Table0[VExpr, VCol, VRow]()(
+    implicit name: sourcecode.Name,
+    metadata0: Table0.Metadata[VExpr, VCol, VRow]
+) extends Table.Base
     with Table0.LowPri[VExpr, VCol, VRow] {
   protected[scalasql] def tableName = name.value
 
@@ -23,9 +25,13 @@ abstract class Table0[VExpr, VCol, VRow]()(implicit name: sourcecode.Name, metad
           () => Seq[String],
           DialectTypeMappers,
           Table0.Metadata.QueryableProxy
-      ) => Queryable[Q, VRow],
+      ) => Queryable[Q, VRow]
   ): Queryable.Row[Q, VRow] = {
-    queryable(tableMetadata.walkLabels0, dialect, new Table.Metadata.QueryableProxy(queryables(dialect, _)))
+    queryable(
+      tableMetadata.walkLabels0,
+      dialect,
+      new Table.Metadata.QueryableProxy(queryables(dialect, _))
+    )
       .asInstanceOf[Queryable.Row[Q, VRow]]
   }
 
@@ -86,9 +92,11 @@ object Table0 {
       val vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => VExpr,
       val vCol0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => VCol
   ) {
+
     /** Misonmer - actually returns the representation of columns */
     def vExpr(t: TableRef, d: DialectTypeMappers): VCol =
       vCol0(t, d, new Metadata.QueryableProxy(queryables(d, _)))
+
     /** use when required that it must be expression inside */
     def vStrictExpr(t: TableRef, d: DialectTypeMappers): VExpr =
       vExpr0(t, d, new Metadata.QueryableProxy(exprQueryables(d, _)))
@@ -105,7 +113,7 @@ object Table0 {
  * In-code representation of a SQL table, associated with a given `case class` [[V]].
  */
 abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table.Metadata[V])
-    extends Table0[V[Expr], V[Column], V[Sc]]()(name, metadata0){
+    extends Table0[V[Expr], V[Column], V[Sc]]()(name, metadata0) {
 
   implicit def tableImplicitMetadata: Table.ImplicitMetadata[V] =
     Table.ImplicitMetadata(metadata0)
@@ -114,31 +122,31 @@ abstract class Table[V[_[_]]]()(implicit name: sourcecode.Name, metadata0: Table
 object Table {
 
   class Metadata[V[_[_]]](
-    queryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
-    walkLabels0: () => Seq[String],
-    queryable: (
-        () => Seq[String],
-        DialectTypeMappers,
-        Metadata.QueryableProxy
-    ) => Queryable[V[Expr], V[Sc]],
-    vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
+      queryables: (DialectTypeMappers, Int) => Queryable.Row[?, ?],
+      walkLabels0: () => Seq[String],
+      queryable: (
+          () => Seq[String],
+          DialectTypeMappers,
+          Metadata.QueryableProxy
+      ) => Queryable[V[Expr], V[Sc]],
+      vExpr0: (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Column]
   ) extends Table0.Metadata[V[Expr], V[Column], V[Sc]](
-    queryables,
-    queryables, // ok to repeat as they use the same class.
-    walkLabels0,
-    queryable,
-    queryable.asInstanceOf[
-      (
-        () => Seq[String],
-        DialectTypeMappers,
-        Metadata.QueryableProxy
-      ) => Queryable[V[Column], V[Sc]]
-    ], // This works because V[Expr] and V[Column] share the same class
-    vExpr0.asInstanceOf[
-      (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Expr]
-    ], // This works because V[Expr] and V[Column] share the same class
-    vExpr0,
-  )
+        queryables,
+        queryables, // ok to repeat as they use the same class.
+        walkLabels0,
+        queryable,
+        queryable.asInstanceOf[
+          (
+              () => Seq[String],
+              DialectTypeMappers,
+              Metadata.QueryableProxy
+          ) => Queryable[V[Column], V[Sc]]
+        ], // This works because V[Expr] and V[Column] share the same class
+        vExpr0.asInstanceOf[
+          (TableRef, DialectTypeMappers, Metadata.QueryableProxy) => V[Expr]
+        ], // This works because V[Expr] and V[Column] share the same class
+        vExpr0
+      )
 
   object Metadata extends scalasql.query.TableMacros {
     type QueryableProxy = Table0.Metadata.QueryableProxy

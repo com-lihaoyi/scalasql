@@ -66,7 +66,9 @@ object SimpleTable extends SimpleTableMacros {
    *
    * @see [[Record#Fields Fields]] for how the fields are mapped.
    */
-  sealed abstract class BaseRecord[C](private val data: IArray[AnyRef]) extends AnyRecord with Selectable:
+  sealed abstract class BaseRecord[C](private val data: IArray[AnyRef])
+      extends AnyRecord
+      with Selectable:
     type T[_]
     type Self[_]
 

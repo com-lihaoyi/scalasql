@@ -305,7 +305,9 @@ trait Dialect extends DialectTypeMappers {
 
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T]
 
-  implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): TableOps[VExpr, VCol, VRow] = new TableOps(t)
+  implicit def TableOpsConv[VExpr, VCol, VRow](
+      t: Table0[VExpr, VCol, VRow]
+  ): TableOps[VExpr, VCol, VRow] = new TableOps(t)
   implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this)
   implicit def DbApiOpsConv(db: => DbApi): DbApiOps = new DbApiOps(this)
 

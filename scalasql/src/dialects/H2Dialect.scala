@@ -50,7 +50,9 @@ trait H2Dialect extends Dialect {
       v: Expr[T]
   ): H2Dialect.ExprNumericOps[T] = new H2Dialect.ExprNumericOps(v)
 
-  override implicit def TableOpsConv[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]): TableOps[VExpr, VCol, VRow] =
+  override implicit def TableOpsConv[VExpr, VCol, VRow](
+      t: Table0[VExpr, VCol, VRow]
+  ): TableOps[VExpr, VCol, VRow] =
     new H2Dialect.TableOps(t)
 
   override implicit def DbApiQueryOpsConv(db: => DbApi): DbApiQueryOps = new DbApiQueryOps(this) {
@@ -100,7 +102,8 @@ object H2Dialect extends H2Dialect {
     def power(y: Expr[T]): Expr[T] = Expr { implicit ctx => sql"POWER($v, $y)" }
   }
 
-  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow]) extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
+  class TableOps[VExpr, VCol, VRow](t: Table0[VExpr, VCol, VRow])
+      extends scalasql.dialects.TableOps[VExpr, VCol, VRow](t) {
     protected override def joinableToSelect: Select[VExpr, VRow] = {
       val ref = Table0.ref(t)
       new SimpleSelect(
