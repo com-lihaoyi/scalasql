@@ -1,7 +1,7 @@
 [//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)
 
 
-This tutorials is a tour of how to use ScalaSql, from the most basic concepts
+This tutorial is a tour of how to use ScalaSql, from the most basic concepts
 to writing some realistic queries. If you are browsing this on Github, you
 can open the `Outline` pane on the right to browse the section headers to
 see what we will cover and find anything specific of interest to you.
@@ -71,8 +71,14 @@ supported databases, to see what kind of set up is necessary for each one
 ### Modeling Your Schema
 
 Next, you need to define your data model classes. In ScalaSql, your data model
-is defined using `case class`es with each field wrapped in the wrapper type
-parameter `T[_]`. This allows us to re-use the same case class to represent
+is defined using `case class`es with each field representing a column in an database table.
+
+There are two flavors to consider: `Table` (available for Scala 2.13+), and `SimpleTable` (Scala 3.7+).
+
+**Using `Table`**
+
+Declare your case class with a type parameter `T[_]`, which is used to wrap the type of each
+field. This allows us to re-use the same case class to represent
 both database values (when `T` is `scalasql.Expr`) as well as Scala values
 (when `T` is `scalasql.Sc`).
 
@@ -118,6 +124,59 @@ case class CountryLanguage[T[_]](
 )
 
 object CountryLanguage extends Table[CountryLanguage]()
+```
+
+**Using `SimpleTable`**
+> Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+
+Declare your case class as usual. Inside of queries, the class will be represented by a `Record` with the same fields, but wrapped in `scalasql.Expr`.
+
+Here, we define three classes `Country` `City` and `CountryLanguage`, modeling
+the database tables we saw above.
+
+Also included is the necessary import statement to include the `SimpleTable` definition.
+
+```scala
+import scalasql.simple.{*, given}
+
+case class Country(
+    code: String,
+    name: String,
+    continent: String,
+    region: String,
+    surfaceArea: Int,
+    indepYear: Option[Int],
+    population: Long,
+    lifeExpectancy: Option[Double],
+    gnp: Option[scala.math.BigDecimal],
+    gnpOld: Option[scala.math.BigDecimal],
+    localName: String,
+    governmentForm: String,
+    headOfState: Option[String],
+    capital: Option[Int],
+    code2: String
+)
+
+object Country extends SimpleTable[Country]
+
+case class City(
+    id: Int,
+    name: String,
+    countryCode: String,
+    district: String,
+    population: Long
+)
+
+object City extends SimpleTable[City]
+
+case class CountryLanguage(
+    countryCode: String,
+    language: String,
+    isOfficial: Boolean,
+    percentage: Double
+)
+
+object CountryLanguage extends SimpleTable[CountryLanguage]
 ```
 
 ### Creating Your Database Client
@@ -201,10 +260,15 @@ db.run(query).take(3) ==> Seq(
 )
 
 ```
-Notice that `db.run` returns instances of type `City[Sc]`. `Sc` is `scalasql.Sc`,
+Notice that `db.run` returns instances of type `City[Sc]` (or `City` if using `SimpleTable`).
+
+`Sc` is `scalasql.Sc`,
 short for the "Scala" type, representing a `City` object containing normal Scala
 values. The `[Sc]` type parameter must be provided explicitly whenever creating,
 type-annotating, or otherwise working with these `City` values.
+
+> In this tutorial, unless otherwise specified, we will assume usage of the `Table` encoding.
+> If you are using `SimpleTable`, the same code will work, but drop `[Sc]` type arguments.
 
 In this example, we do `.take(3)` after running the query to show only the first
 3 table entries for brevity, but by that point the `City.select` query had already
@@ -235,8 +299,12 @@ db.run(query) ==> City[Sc](3208, "Singapore", "SGP", district = "", population =
 ```
 Note that we use `===` rather than `==` for the equality comparison. The
 function literal passed to `.filter` is given a `City[Expr]` as its parameter,
-representing a `City` that is part of the database query, in contrast to the
-`City[Sc]`s that `db.run` returns , and so `_.name` is of type `Expr[String]`
+(or `Record[City, Expr]` with the `SimpleTable` encoding) representing a `City`
+that is part of the database query, in contrast to the
+`City[Sc]`s that `db.run` returns.
+
+Within a query therefore `_.name` is a field selection on the function parameter,
+resulting in `Expr[String]`,
 rather than just `String` or `Sc[String]`. You can use your IDE's
 auto-complete to see what operations are available on `Expr[String]`: typically
 they will represent SQL string functions rather than Scala string functions and
@@ -309,7 +377,8 @@ db.run(query).take(2) ==> Seq(
 )
 
 ```
-Again, all the operations within the query work on `Expr`s: `c` is a `City[Expr]`,
+Again, all the operations within the query work on `Expr`s:
+`c` is a `City[Expr]` (or `Record[City, Expr]` for `SimpleTable`),
 `c.population` is an `Expr[Int]`, `c.countryCode` is an `Expr[String]`, and
 `===` and `>` and `&&` on `Expr`s all return `Expr[Boolean]`s that represent
 a SQL expression that can be sent to the Database as part of your query.
@@ -427,7 +496,59 @@ db.run(query) ==>
     "SINGAPORE",
     4 // population in millions
   )
+
 ```
+
+**Mapping with named tuples**
+> Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+
+You can also use named tuples to map the results of a query.
+```scala
+// `NamedTupleQueryable` is also included by `import scalasql.simple.given`
+import scalasql.namedtuples.NamedTupleQueryable.given
+
+val query = Country.select.map(c => (name = c.name, continent = c.continent))
+
+db.run(query).take(5) ==> Seq(
+  (name = "Afghanistan", continent = "Asia"),
+  (name = "Netherlands", continent = "Europe"),
+  (name = "Netherlands Antilles", continent = "North America"),
+  (name = "Albania", continent = "Europe"),
+  (name = "Algeria", continent = "Africa")
+)
+```
+
+**Updating `Record` fields**
+> Note: only relevant when using the `SimpleTable` encoding.
+
+When using `SimpleTable`, within the `.map` query `c` is of type
+`Record[Country, Expr]`. Records are converted back to their associated case class
+(e.g. `Country`) with `db.run`.
+
+If you want to apply updates to any of the fields before returning, the `Record` class
+provides an `updates` method. This lets you provide an arbitrary sequence of updates to
+apply in-order to the record. You can either provide a value with `:=`,
+or provide a function that transforms the old value. For example:
+
+```scala
+val query = Country.select.map(c =>
+  c.updates(
+    _.population := 0L,
+    _.name(old => Expr("🌐 ") + old)
+  )
+)
+
+db.run(query).take(5).match {
+  case Seq(
+        Country(name = "🌐 Afghanistan", population = 0L),
+        Country(name = "🌐 Netherlands", population = 0L),
+        Country(name = "🌐 Netherlands Antilles", population = 0L),
+        Country(name = "🌐 Albania", population = 0L),
+        Country(name = "🌐 Algeria", population = 0L)
+      ) =>
+} ==> ()
+```
+
 
 ### Aggregates
 
@@ -1213,7 +1334,9 @@ try {
 
     throw new Exception()
   }
-} catch { case e: Exception => /*do nothing*/ }
+} catch {
+  case e: Exception => /*do nothing*/
+}
 
 dbClient.transaction { implicit db =>
   db.run(City.select.filter(_.countryCode === "SGP").single) ==>
@@ -1255,7 +1378,9 @@ dbClient.transaction { implicit db =>
       db.run(City.select.filter(_.countryCode === "SGP")) ==> Seq()
       throw new Exception()
     }
-  } catch { case e: Exception => /*do nothing*/ }
+  } catch {
+    case e: Exception => /*do nothing*/
+  }
 
   db.run(City.select.filter(_.countryCode === "SGP").single) ==>
     City[Sc](3208, "Singapore", "SGP", district = "", population = 4017733)
@@ -1357,6 +1482,23 @@ db.run(
 
 db.run(City.select.filter(_.id === 313373).single) ==>
   City[Sc](CityId(313373), "test", "XYZ", "district", 1000000)
+
+
+```
+You can also use `TypeMapper#bimap` for the common case where you want the
+new `TypeMapper` to behave the same as an existing `TypeMapper`, just with
+conversion functions to convert back and forth between the old type and new type:
+
+```scala
+case class CityId2(value: Int)
+
+object CityId2 {
+  implicit def tm: TypeMapper[CityId2] = TypeMapper[Int].bimap[CityId2](
+    city => city.value,
+    int => CityId2(int)
+  )
+}
+
 ```
 
 ```scala
@@ -1383,8 +1525,7 @@ db.run(
 
 db.run(City2.select.filter(_.id === 31337).single) ==>
   City2[Sc](CityId2(31337), "test", "XYZ", "district", 1000000)
-
-st("customTableColumnNames") {
+```
 
 ## Customizing Table and Column Names
 
