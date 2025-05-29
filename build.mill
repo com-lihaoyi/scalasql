@@ -44,7 +44,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
   trait CommonTest extends ScalaTests with ScalafixModule {
     def semanticDbVersion: T[String] = common.semanticDbVersion
     def scalacOptions = common.scalacOptions
-    def mvnDeps = Agg(
+    def mvnDeps = Seq(
       mvn"com.github.vertical-blank:sql-formatter:2.0.4",
       mvn"com.lihaoyi::mainargs:0.4.0",
       mvn"com.lihaoyi::os-lib:0.9.1",
@@ -95,7 +95,7 @@ object `scalasql-namedtuples` extends CommonBase {
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends Common { common =>
   def moduleDeps = Seq(query, operations)
-  def mvnDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
+  def mvnDeps = Seq.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
     mvn"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
 
@@ -110,7 +110,7 @@ trait ScalaSql extends Common { common =>
     code.map(_.split("\n").map("  " + _).mkString("\n")).mkString("\n")
 
   object core extends Common with CrossValue {
-    def mvnDeps = Agg(
+    def mvnDeps = Seq(
       mvn"com.lihaoyi::geny:1.0.0",
       mvn"com.lihaoyi::sourcecode:0.3.1",
       mvn"com.lihaoyi::pprint:0.8.1"
