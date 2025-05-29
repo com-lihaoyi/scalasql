@@ -1,10 +1,12 @@
+//| mill-version: 1.0.0-RC1
+//| repositories:
+//| - https://oss.sonatype.org/content/repositories/snapshots
+//| mvnDeps:
+//| - com.github.lolgab::mill-mima_mill1.0.0-RC1:0.2.0-M1
+//| - com.goyeau::mill-scalafix::0.5.1-14-4d3f5ea-SNAPSHOT
 package build
-import $packages._
-import $file.docs.generateDocs
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
-import $ivy.`com.github.lolgab::mill-mima::0.1.1`
-import $ivy.`com.goyeau::mill-scalafix::0.5.1`
-import de.tobiasroeser.mill.vcs.version.VcsVersion
+import build.docs
+import mill.main.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
@@ -30,7 +32,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
     )
   )
 
-  def scalacOptions = T {
+  def scalacOptions = Task {
     Seq("-Wunused:privates,locals,explicits,implicits,params") ++
       Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
   }
@@ -42,19 +44,19 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
   trait CommonTest extends ScalaTests with ScalafixModule {
     def semanticDbVersion: T[String] = common.semanticDbVersion
     def scalacOptions = common.scalacOptions
-    def ivyDeps = Agg(
-      ivy"com.github.vertical-blank:sql-formatter:2.0.4",
-      ivy"com.lihaoyi::mainargs:0.4.0",
-      ivy"com.lihaoyi::os-lib:0.9.1",
-      ivy"com.lihaoyi::upickle:3.1.3",
-      ivy"com.lihaoyi::utest:0.8.2",
-      ivy"com.h2database:h2:2.2.224",
-      ivy"org.xerial:sqlite-jdbc:3.43.0.0",
-      ivy"org.testcontainers:postgresql:1.19.1",
-      ivy"org.postgresql:postgresql:42.6.0",
-      ivy"org.testcontainers:mysql:1.19.1",
-      ivy"mysql:mysql-connector-java:8.0.33",
-      ivy"com.zaxxer:HikariCP:5.1.0"
+    def mvnDeps = Agg(
+      mvn"com.github.vertical-blank:sql-formatter:2.0.4",
+      mvn"com.lihaoyi::mainargs:0.4.0",
+      mvn"com.lihaoyi::os-lib:0.9.1",
+      mvn"com.lihaoyi::upickle:3.1.3",
+      mvn"com.lihaoyi::utest:0.8.2",
+      mvn"com.h2database:h2:2.2.224",
+      mvn"org.xerial:sqlite-jdbc:3.43.0.0",
+      mvn"org.testcontainers:postgresql:1.19.1",
+      mvn"org.postgresql:postgresql:42.6.0",
+      mvn"org.testcontainers:mysql:1.19.1",
+      mvn"mysql:mysql-connector-java:8.0.33",
+      mvn"com.zaxxer:HikariCP:5.1.0"
     )
 
     def recordedTestsFile: String
@@ -65,7 +67,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
 
     def forkEnv = Map(
-      "MILL_WORKSPACE_ROOT" -> T.workspace.toString(),
+      "MILL_WORKSPACE_ROOT" -> Task.workspace.toString(),
       "SCALASQL_RECORDED_TESTS_NAME" -> recordedTestsFile,
       "SCALASQL_RECORDED_SUITE_DESCRIPTIONS_NAME" -> recordedSuiteDescriptionsFile
     )
@@ -75,10 +77,10 @@ trait Common extends CommonBase with CrossScalaModule
 
 object `scalasql-namedtuples` extends CommonBase {
   def scalaVersion: T[String] = scala3NamedTuples
-  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
+  def moduleDir: os.Path = scalasql(scala3).moduleDir / "namedtuples"
   def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3))
 
-  // override def scalacOptions: Target[Seq[String]] = T {
+  // override def scalacOptions: Target[Seq[String]] = Task {
   //   super.scalacOptions() :+ "-Xprint:inlining"
   // }
 
@@ -93,8 +95,8 @@ object `scalasql-namedtuples` extends CommonBase {
 object scalasql extends Cross[ScalaSql](scalaVersions)
 trait ScalaSql extends Common { common =>
   def moduleDeps = Seq(query, operations)
-  def ivyDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
-    ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
+  def mvnDeps = Agg.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
+    mvn"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
 
   override def consoleScalacOptions: T[Seq[String]] = Seq("-Xprint:typer")
@@ -108,15 +110,15 @@ trait ScalaSql extends Common { common =>
     code.map(_.split("\n").map("  " + _).mkString("\n")).mkString("\n")
 
   object core extends Common with CrossValue {
-    def ivyDeps = Agg(
-      ivy"com.lihaoyi::geny:1.0.0",
-      ivy"com.lihaoyi::sourcecode:0.3.1",
-      ivy"com.lihaoyi::pprint:0.8.1"
+    def mvnDeps = Agg(
+      mvn"com.lihaoyi::geny:1.0.0",
+      mvn"com.lihaoyi::sourcecode:0.3.1",
+      mvn"com.lihaoyi::pprint:0.8.1"
     ) ++ Option.when(scalaVersion().startsWith("2."))(
-      ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
+      mvn"org.scala-lang:scala-reflect:${scalaVersion()}"
     )
 
-    def generatedSources = T {
+    def generatedSources = Task {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
 
       val queryableRowDefs = for (i <- Range.inclusive(2, 22)) yield {
@@ -135,7 +137,7 @@ trait ScalaSql extends Common { common =>
       }
 
       os.write(
-        T.dest / "Generated.scala",
+        Task.dest / "Generated.scala",
         s"""package scalasql.core.generated
            |import scalasql.core.Queryable
            |trait QueryableRow{
@@ -143,7 +145,7 @@ trait ScalaSql extends Common { common =>
            |}
            |""".stripMargin
       )
-      Seq(PathRef(T.dest / "Generated.scala"))
+      Seq(PathRef(Task.dest / "Generated.scala"))
     }
 
   }
@@ -155,7 +157,7 @@ trait ScalaSql extends Common { common =>
   object query extends Common with CrossValue {
     def moduleDeps = Seq(core)
 
-    def generatedSources = T {
+    def generatedSources = Task {
       def commaSep0(i: Int, f: Int => String) = Range.inclusive(1, i).map(f).mkString(", ")
 
       def defs(isImpl: Boolean) = {
@@ -215,7 +217,7 @@ trait ScalaSql extends Common { common =>
       }
 
       os.write(
-        T.dest / "Generated.scala",
+        Task.dest / "Generated.scala",
         s"""package scalasql.generated
            |import scalasql.core.{Queryable, Expr}
            |import scalasql.query.Column
@@ -240,21 +242,21 @@ trait ScalaSql extends Common { common =>
            |}
            |""".stripMargin
       )
-      Seq(PathRef(T.dest / "Generated.scala"))
+      Seq(PathRef(Task.dest / "Generated.scala"))
     }
   }
 }
 
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
-def generateTutorial() = T.command {
-  generateDocs.generateTutorial(
-    T.workspace / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
-    T.workspace / "docs" / "tutorial.md"
+def generateTutorial() = Task.Command {
+  docs.generateTutorial(
+    Task.workspace / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
+    Task.workspace / "docs" / "tutorial.md"
   )
 }
-def generateReference() = T.command {
-  generateDocs.generateReference(
-    T.workspace / "docs" / "reference.md",
+def generateReference() = Task.Command {
+  docs.generateReference(
+    Task.workspace / "docs" / "reference.md",
     (sources, config) =>
       mill.scalalib.scalafmt.ScalafmtWorkerModule
         .worker()
