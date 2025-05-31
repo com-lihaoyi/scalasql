@@ -179,7 +179,8 @@ And you now have the option to return named tuples from queries:
 ### 0.1.20
 
 * Support for `SimpleTable` classes which do not need a `T[_]` higher kinded parameter,
-  and support for use of Scala 3.7.0 named tuples in queries [#81](https://github.com/com-lihaoyi/scalasql/pull/81)
+  and support for use of Scala 3.7.0 named tuples in queries [#81](https://github.com/com-lihaoyi/scalasql/pull/81).
+  See this blog post for more details: [Making ScalaSql boring again (with interesting new internals)](https://bishabosha.github.io/articles/scalasql-simpletable.html)
 
 ### 0.1.19
 
