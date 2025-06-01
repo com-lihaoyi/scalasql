@@ -266,6 +266,12 @@ trait JoinTests extends ScalaSqlSuite {
           FROM buyer buyer0
           LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
           ORDER BY res_1 IS NULL DESC, res_1
+        """,
+        """
+          SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
+          FROM buyer buyer0
+          LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
+          ORDER BY IIF(res_1 IS NULL, 0, 1), res_1
         """
       ),
       value = Seq[(String, Option[LocalDate])](
