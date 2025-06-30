@@ -1,4 +1,4 @@
-//| mill-version: 1.0.0-RC1
+//| mill-version: 1.0.0-RC2-68-43069c
 //| repositories:
 //| - https://oss.sonatype.org/content/repositories/snapshots
 //| mvnDeps:
