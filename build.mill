@@ -6,7 +6,7 @@
 //| - com.goyeau::mill-scalafix::0.6.0
 package build
 import build.docs
-import mill.main.VcsVersion
+import mill.util.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
 import mill._, scalalib._, publish._
 
@@ -67,7 +67,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
     def forkArgs = Seq("-Duser.timezone=Asia/Singapore")
 
     def forkEnv = Map(
-      "MILL_WORKSPACE_ROOT" -> Task.workspace.toString(),
+      "MILL_WORKSPACE_ROOT" -> mill.api.BuildCtx.workspaceRoot.toString(),
       "SCALASQL_RECORDED_TESTS_NAME" -> recordedTestsFile,
       "SCALASQL_RECORDED_SUITE_DESCRIPTIONS_NAME" -> recordedSuiteDescriptionsFile
     )
@@ -250,13 +250,13 @@ trait ScalaSql extends Common { common =>
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial() = Task.Command {
   docs.generateTutorial(
-    Task.workspace / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
-    Task.workspace / "docs" / "tutorial.md"
+    mill.api.BuildCtx.workspaceRoot / "scalasql" / "test" / "src" / "WorldSqlTests.scala",
+    mill.api.BuildCtx.workspaceRoot / "docs" / "tutorial.md"
   )
 }
 def generateReference() = Task.Command {
   docs.generateReference(
-    Task.workspace / "docs" / "reference.md",
+    mill.api.BuildCtx.workspaceRoot / "docs" / "reference.md",
     (sources, config) =>
       mill.scalalib.scalafmt.ScalafmtWorkerModule
         .worker()
