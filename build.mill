@@ -1,9 +1,9 @@
-//| mill-version: 1.0.0-RC2-68-43069c
+//| mill-version: 1.0.0
 //| repositories:
 //| - https://oss.sonatype.org/content/repositories/snapshots
 //| mvnDeps:
-//| - com.github.lolgab::mill-mima_mill1.0.0-RC1:0.2.0-M1
-//| - com.goyeau::mill-scalafix::0.5.1-14-4d3f5ea-SNAPSHOT
+//| - com.github.lolgab::mill-mima::0.2.0
+//| - com.goyeau::mill-scalafix::0.6.0
 package build
 import build.docs
 import mill.main.VcsVersion
