@@ -1,5 +1,5 @@
 package build.docs
-import mill.define.BuildCtx
+import mill.api.BuildCtx
 import collection.mutable
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
