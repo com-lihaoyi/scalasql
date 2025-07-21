@@ -1,4 +1,5 @@
 package build.docs
+import mill.api.BuildCtx
 import collection.mutable
 val generatedCodeHeader = "[//]: # (GENERATED SOURCES, DO NOT EDIT DIRECTLY)"
 def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
@@ -29,7 +30,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
         case (s"// +INCLUDE SNIPPET [$key] $rest", _) =>
           // reuse the iterator each time,
           // basically assume snippets are requested in order.
-          val sublines: scala.collection.BufferedIterator[String] = snippets.getOrElseUpdate(rest, os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).iterator.buffered)
+          val sublines: scala.collection.BufferedIterator[String] = snippets.getOrElseUpdate(rest, os.read.lines(BuildCtx.workspaceRoot / os.SubPath(rest)).iterator.buffered)
           val start = s"// +SNIPPET [$key]"
           val end = s"// -SNIPPET [$key]"
           while (sublines.hasNext && !sublines.head.contains(start)) {
@@ -45,7 +46,7 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
             outputLines.append("")
           }
         case (s"// +INCLUDE $rest", _) =>
-          os.read.lines(mill.api.WorkspaceRoot.workspaceRoot / os.SubPath(rest)).foreach(outputLines.append)
+          os.read.lines(BuildCtx.workspaceRoot / os.SubPath(rest)).foreach(outputLines.append)
 
         case (s"//$rest", false) => outputLines.append(rest.stripPrefix(" "))
 
@@ -70,16 +71,16 @@ def generateTutorial(sourcePath: os.Path, destPath: os.Path) =  {
 def generateReference(dest: os.Path, scalafmtCallback: (Seq[os.Path], os.Path) => Unit) =  {
   def dropExprPrefix(s: String) = s.split('.').drop(2).mkString(".")
   def dropNTExprPrefix(s: String) = s.split('.').drop(3).mkString(".")
-  val records = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTests.json"))
-  val ntRecords = upickle.default.read[Seq[Record]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedTestsNT.json"))
-  val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(mill.api.WorkspaceRoot.workspaceRoot / "out" / "recordedSuiteDescriptions.json"))
+  val records = upickle.default.read[Seq[Record]](os.read.stream(BuildCtx.workspaceRoot / "out" / "recordedTests.json"))
+  val ntRecords = upickle.default.read[Seq[Record]](os.read.stream(BuildCtx.workspaceRoot / "out" / "recordedTestsNT.json"))
+  val suiteDescriptions = upickle.default.read[Map[String, String]](os.read.stream(BuildCtx.workspaceRoot / "out" / "recordedSuiteDescriptions.json"))
     .map{case (k, v) => (dropExprPrefix(k), v)}
 
   val rawScalaStrs = (records ++ ntRecords)
     .flatMap(r => Seq(r.queryCodeString) ++ r.resultCodeString)
   val formattedScalaStrs = {
     val tmps = rawScalaStrs.map(os.temp(_, suffix = ".scala"))
-    scalafmtCallback(tmps, mill.api.WorkspaceRoot.workspaceRoot / ".scalafmt.conf")
+    scalafmtCallback(tmps, BuildCtx.workspaceRoot / ".scalafmt.conf")
 
     tmps.map(os.read(_).trim)
   }
