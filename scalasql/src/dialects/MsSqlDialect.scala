@@ -38,7 +38,17 @@ trait MsSqlDialect extends Dialect {
   override implicit def BooleanType: TypeMapper[Boolean] = new MsSqlBooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
   override implicit def from(x: Boolean): Expr[Boolean] =
-    if (x) Expr.apply0(x, x) else Expr { _ => sql"1 = $x" }
+    if (x) {
+      Expr.apply0(x, x)
+    } else {
+      Expr { ctx =>
+        if (ctx.valueMarker) {
+          sql"$x"
+        } else {
+          sql"1 = $x"
+        }
+      }
+    }
 
   override implicit def DoubleType: TypeMapper[Double] = new MsDoubleType
   class MsDoubleType extends DoubleType { override def castTypeString = "FLOAT" }
@@ -290,6 +300,7 @@ object MsSqlDialect extends MsSqlDialect {
   )(implicit qr: Queryable.Row[Q, R])
       extends scalasql.query.CompoundSelect(lhs, compoundOps, orderBy, limit, offset)
       with Select[Q, R] {
+
     override def take(n: Int): scalasql.query.Select[Q, R] = copy(
       limit = Some(limit.fold(n)(math.min(_, n))),
       offset = offset.orElse(Some(0))
@@ -349,19 +360,25 @@ object MsSqlDialect extends MsSqlDialect {
   class ExprQueryable[E[_] <: Expr[?], T](
       implicit tm: TypeMapper[T]
   ) extends Expr.ExprQueryable[E, T] {
+
     override def walkExprs(q: E[T]): Seq[Expr[?]] =
       if (tm.jdbcType == JDBCType.BOOLEAN) {
         q match {
+          // with the introduction of the value marker this is only necessary for Scala 3
           case _: Column[?] =>
             Seq(Expr[Boolean] { implicit ctx: Context =>
               sql"$q"
             })
           case _ =>
             Seq(Expr[Boolean] { implicit ctx: Context =>
+              if (ctx.valueMarker) {
+                sql"$q"
+              } else {
                 sql"CASE WHEN $q THEN 1 ELSE 0 END"
+              }
             })
         }
       } else
         super.walkExprs(q)
-    }
+  }
 }
