@@ -132,12 +132,13 @@ trait MsSqlDialect extends Dialect {
 }
 
 object MsSqlDialect extends MsSqlDialect {
-
   class DbApiOps(dialect: DialectTypeMappers)
       extends scalasql.operations.DbApiOps(dialect)
       with ConcatOps
       with MathOps {
-    override def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx => sql"LOG($v)" }
+    override def ln[T: Numeric](v: Expr[T]): Expr[Double] = Expr { implicit ctx =>
+      sql"LOG($v)"
+    }
 
     override def atan2[T: Numeric](v: Expr[T], y: Expr[T]): Expr[Double] = Expr { implicit ctx =>
       sql"ATN2($v, $y)"
@@ -156,7 +157,9 @@ object MsSqlDialect extends MsSqlDialect {
       extends operations.ExprStringLikeOps(v)
       with TrimOps {
 
-    override def +(x: Expr[T]): Expr[T] = Expr { implicit ctx => sql"($v + $x)" }
+    override def +(x: Expr[T]): Expr[T] = Expr { implicit ctx =>
+      sql"($v + $x)"
+    }
 
     override def startsWith(other: Expr[T]): Expr[Boolean] = Expr { implicit ctx =>
       sql"($v LIKE CAST($other AS VARCHAR(MAX)) + '%')"
@@ -180,11 +183,17 @@ object MsSqlDialect extends MsSqlDialect {
 
   class ExprNumericOps[T: Numeric: TypeMapper](protected val v: Expr[T])
       extends operations.ExprNumericOps[T](v) {
-    override def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v % $x" }
+    override def %[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx =>
+      sql"$v % $x"
+    }
 
-    override def mod[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx => sql"$v % $x" }
+    override def mod[V: Numeric](x: Expr[V]): Expr[T] = Expr { implicit ctx =>
+      sql"$v % $x"
+    }
 
-    override def ceil: Expr[T] = Expr { implicit ctx => sql"CEILING($v)" }
+    override def ceil: Expr[T] = Expr { implicit ctx =>
+      sql"CEILING($v)"
+    }
   }
 
   class TableOps[V[_[_]]](t: Table[V]) extends scalasql.dialects.TableOps[V](t) {
@@ -204,6 +213,7 @@ object MsSqlDialect extends MsSqlDialect {
         t.containerQr
       )
     }
+
   }
 
   trait Select[Q, R] extends scalasql.query.Select[Q, R] {
@@ -235,6 +245,7 @@ object MsSqlDialect extends MsSqlDialect {
     ): scalasql.query.SimpleSelect[Q, R] = {
       new SimpleSelect(expr, exprPrefix, exprSuffix, preserveAll, from, joins, where, groupBy0)
     }
+
   }
 
   class SimpleSelect[Q, R](
@@ -258,6 +269,7 @@ object MsSqlDialect extends MsSqlDialect {
         groupBy0
       )
       with Select[Q, R] {
+
     override def take(n: Int): scalasql.query.Select[Q, R] = {
       selectWithExprPrefix(true, _ => sql"TOP($n)")
     }
