@@ -647,6 +647,24 @@ trait OptionalTests extends ScalaSqlSuite {
             myUUID = Some(new java.util.UUID(1234567890L, 9876543210L)),
             myEnum = Some(MyEnum.bar)
           )
+          val rowSome2 = OptDataTypes[Sc](
+            myTinyInt = Some(67.toByte),
+            mySmallInt = Some(32767.toShort),
+            myInt = Some(23456789),
+            myBigInt = Some(9876543210L),
+            myDouble = Some(2.71),
+            myBoolean = Some(false),
+            myLocalDate = Some(LocalDate.parse("2020-02-22")),
+            myLocalTime = Some(LocalTime.parse("03:05:01")),
+            myLocalDateTime = Some(LocalDateTime.parse("2021-06-07T02:01:03")),
+            myUtilDate = Some(
+              new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2021-06-07T02:01:03.000")
+            ),
+            myInstant = Some(Instant.parse("2021-06-07T02:01:03Z")),
+            myVarBinary = Some(new geny.Bytes(Array[Byte](9, 8, 7, 6, 5, 4, 3, 2))),
+            myUUID = Some(new java.util.UUID(9876543210L, 1234567890L)),
+            myEnum = Some(MyEnum.baz)
+          )
 
           val rowNone = OptDataTypes[Sc](
             myTinyInt = None,
@@ -664,12 +682,11 @@ trait OptionalTests extends ScalaSqlSuite {
             myUUID = None,
             myEnum = None
           )
-
           db.run(
-            OptDataTypes.insert.values(rowSome, rowNone)
-          ) ==> 2
+            OptDataTypes.insert.values(rowSome, rowSome2, rowNone)
+          ) ==> 3
 
-          db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
+          db.run(OptDataTypes.select) ==> Seq(rowSome, rowSome2, rowNone)
         }
       )
 
