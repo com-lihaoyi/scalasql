@@ -19,6 +19,7 @@ import scalasql.operations.{ConcatOps, MathOps, TrimOps}
 
 import java.time.{Instant, LocalDateTime, OffsetDateTime, ZoneId, ZonedDateTime}
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
+import scalasql.query.Column
 
 trait MsSqlDialect extends Dialect {
   def castParams = false
@@ -350,7 +351,17 @@ object MsSqlDialect extends MsSqlDialect {
   ) extends Expr.ExprQueryable[E, T] {
     override def walkExprs(q: E[T]): Seq[Expr[?]] =
       if (tm.jdbcType == JDBCType.BOOLEAN) {
-        Seq(Expr[Boolean] { implicit ctx: Context => sql"CASE WHEN $q THEN 1 ELSE 0 END" })
-      } else super.walkExprs(q)
-  }
+        q match {
+          case _: Column[?] =>
+            Seq(Expr[Boolean] { implicit ctx: Context =>
+              sql"$q"
+            })
+          case _ =>
+            Seq(Expr[Boolean] { implicit ctx: Context =>
+                sql"CASE WHEN $q THEN 1 ELSE 0 END"
+            })
+        }
+      } else
+        super.walkExprs(q)
+    }
 }
