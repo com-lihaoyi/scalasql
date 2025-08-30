@@ -45,16 +45,16 @@ trait EscapedTableNameTests extends ScalaSqlSuite {
           docs = ""
         )
       }
-      // test("delete") {
-      //   checker(
-      //     query = Text {
-      //       Select.delete(_ => true)
-      //     },
-      //     sql = s"DELETE FROM $tableNameEscaped WHERE ?",
-      //     value = 0,
-      //     docs = ""
-      //   )
-      // }
+      test("delete") {
+        checker(
+          query = Text {
+            Select.delete(_ => true)
+          },
+          sql = s"DELETE FROM $tableNameEscaped",
+          value = 0,
+          docs = ""
+        )
+      }
       test("join") {
         checker(
           query = Text {

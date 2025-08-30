@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS nested;
 DROP TABLE IF EXISTS enclosing;
 DROP TABLE IF EXISTS otherschema.invoice;
 DROP SCHEMA IF EXISTS otherschema;
+DROP TABLE IF EXISTS [select];
 
 CREATE TABLE buyer (
     id INT PRIMARY KEY IDENTITY(1, 1),
@@ -112,3 +113,9 @@ CREATE TABLE otherschema.invoice(
     total DECIMAL(20, 2),
     vendor_name VARCHAR(256)
 );
+
+CREATE TABLE [select](
+    id INT,
+    name VARCHAR(256)
+);
+
