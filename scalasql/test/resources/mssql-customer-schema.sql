@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS nested;
 DROP TABLE IF EXISTS enclosing;
 DROP TABLE IF EXISTS otherschema.invoice;
 DROP SCHEMA IF EXISTS otherschema;
+DROP TABLE IF EXISTS bool_types;
 DROP TABLE IF EXISTS [select];
 
 CREATE TABLE buyer (
@@ -119,3 +120,10 @@ CREATE TABLE [select](
     name VARCHAR(256)
 );
 
+CREATE TABLE bool_types (
+    nullable BIT,
+    non_nullable BIT NOT NULL,
+    a INT,
+    b INT,
+    comment VARCHAR(256)
+);
