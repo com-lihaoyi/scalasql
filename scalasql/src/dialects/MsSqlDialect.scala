@@ -21,9 +21,9 @@ import java.time.{Instant, LocalDateTime, OffsetDateTime, ZoneId, ZonedDateTime}
 import java.sql.{JDBCType, PreparedStatement, ResultSet}
 
 trait MsSqlDialect extends Dialect {
-  override def castParams = false
+  def castParams = false
 
-  override def escape(str: String): String =
+  def escape(str: String): String =
     s"[$str]"
 
   def supportSavepointRelease = false
@@ -132,6 +132,7 @@ trait MsSqlDialect extends Dialect {
 }
 
 object MsSqlDialect extends MsSqlDialect {
+
   class DbApiOps(dialect: DialectTypeMappers)
       extends scalasql.operations.DbApiOps(dialect)
       with ConcatOps
