@@ -131,7 +131,7 @@ object DbApi {
       config: Config,
       dialectConfig: DialectConfig
   ) = {
-    val ctx = Context.Impl(Map(), Map(), config, dialectConfig)
+    val ctx = Context.Impl(Map(), Map(), false, config, dialectConfig)
     val flattened = SqlStr.flatten(qr.renderSql(query, ctx))
     flattened
   }

@@ -20,6 +20,11 @@ trait Context {
   def exprNaming: Map[Expr.Identity, SqlStr]
 
   /**
+   * Mark [[Expr]]s as a raw value for an INSERT or UPDATE context
+   */
+  def valueMarker: Boolean
+
+  /**
    * The ScalaSql configuration
    */
   def config: Config
@@ -28,9 +33,11 @@ trait Context {
 
   def withFromNaming(fromNaming: Map[Context.From, String]): Context
   def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context
+  def markAsValue: Context
 }
 
 object Context {
+
   trait From {
 
     /**
@@ -58,6 +65,7 @@ object Context {
   case class Impl(
       fromNaming: Map[From, String],
       exprNaming: Map[Expr.Identity, SqlStr],
+      valueMarker: Boolean,
       config: Config,
       dialectConfig: DialectConfig
   ) extends Context {
@@ -65,6 +73,10 @@ object Context {
 
     def withExprNaming(exprNaming: Map[Expr.Identity, SqlStr]): Context =
       copy(exprNaming = exprNaming)
+
+    def markAsValue: Context = copy(
+      valueMarker = true
+    )
   }
 
   /**
@@ -96,7 +108,13 @@ object Context {
               .map { case (e, s) => (e, sql"${SqlStr.raw(newFromNaming(t), Array(e))}.$s") }
           }
 
-    Context.Impl(newFromNaming, newExprNaming, prevContext.config, prevContext.dialectConfig)
+    Context.Impl(
+      newFromNaming,
+      newExprNaming,
+      prevContext.valueMarker,
+      prevContext.config,
+      prevContext.dialectConfig
+    )
   }
 
 }
