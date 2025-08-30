@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS shipping_info;
 DROP TABLE IF EXISTS purchase;
 DROP TABLE IF EXISTS data_types;
+DROP TABLE IF EXISTS a;
+DROP TABLE IF EXISTS b;
 DROP TABLE IF EXISTS non_round_trip_types;
 DROP TABLE IF EXISTS opt_cols;
 DROP TABLE IF EXISTS nested;
@@ -66,6 +68,16 @@ CREATE TABLE data_types (
     my_enum VARCHAR(256)
 --     my_offset_time TIME WITH TIME ZONE,
 
+);
+
+CREATE TABLE a (
+    id INT,
+    b_id INT
+);
+
+CREATE TABLE b (
+    id INT,
+    custom VARCHAR(256)
 );
 
 CREATE TABLE non_round_trip_types(
