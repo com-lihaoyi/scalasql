@@ -29,7 +29,7 @@ trait H2Dialect extends Dialect {
 
   def castParams = true
 
-  def escape(str: String) = s"\"${str.toUpperCase()}\""
+  def escape(str: String) = s""""${str.toUpperCase()}""""
 
   def supportSavepointRelease = true
 
