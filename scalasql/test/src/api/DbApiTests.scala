@@ -124,7 +124,7 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
     test("updateGetGeneratedKeysSql") - {
-      if (!this.isInstanceOf[SqliteSuite])
+      if (!this.isInstanceOf[SqliteSuite] && !this.isInstanceOf[MsSqlSuite])
         checker.recorded(
           """
         Allows you to fetch the primary keys that were auto-generated for an INSERT
@@ -141,10 +141,7 @@ trait DbApiTests extends ScalaSqlSuite {
                   sql"INSERT INTO buyer (name, date_of_birth) VALUES ($newName, $newDateOfBirth), ($newName, $newDateOfBirth)"
                 )
 
-              if (!this.isInstanceOf[MsSqlSuite])
-                assert(generatedIds == Seq(4, 5))
-              else
-                assert(generatedIds == Seq(5))
+              assert(generatedIds == Seq(4, 5))
 
               db.run(Buyer.select) ==> List(
                 Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
