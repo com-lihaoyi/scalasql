@@ -432,7 +432,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](None, Some(4)),
             OptCols[Sc](None, None)
           )
-        ),
+        ), // the MSSQL workaround for NULLS FIRST/LAST does not guarantee the ordering of other columns
         docs = """
           `.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
         """
@@ -469,7 +469,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](Some(1), Some(2)),
             OptCols[Sc](Some(3), None)
           )
-        )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("ascNullsLast") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsLast },
@@ -503,7 +503,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](None, Some(4)),
             OptCols[Sc](None, None)
           )
-        )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("ascNullsFirst") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsFirst },
@@ -532,7 +532,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](Some(1), Some(2)),
             OptCols[Sc](Some(3), None)
           )
-        )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("descNullsLast") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsLast },
@@ -561,7 +561,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](None, None),
             OptCols[Sc](None, Some(4))
           )
-        )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("descNullsFirst") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsFirst },
@@ -595,7 +595,7 @@ trait OptionalTests extends ScalaSqlSuite {
             OptCols[Sc](Some(3), None),
             OptCols[Sc](Some(1), Some(2))
           )
-        )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("roundTripOptionalValues") - checker.recorded(
         """
