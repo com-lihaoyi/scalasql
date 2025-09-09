@@ -301,9 +301,13 @@ package mssql {
   object CompoundSelectTests extends CompoundSelectTests with MsSqlSuite
   object UpdateJoinTests extends UpdateJoinTests with MsSqlSuite
   object UpdateSubQueryTests extends UpdateSubQueryTests with MsSqlSuite
-  // object ReturningTests extends ReturningTests with MsSqlSuite
-  // object OnConflictTests extends OnConflictTests with MsSqlSuite
+  // SQL Server does not support standalone VALUES
   // object ValuesTests extends ValuesTests with MsSqlSuite
+  // SQL Server does not support RETURNING
+  // object ReturningTests extends ReturningTests with MsSqlSuite
+  // SQL Server does not support ON CONFLICT
+  // object OnConflictTests extends OnConflictTests with MsSqlSuite
+  // SQL Server does not support LATERAL JOIN
   // object LateralJoinTests extends LateralJoinTests with MsSqlSuite
   object WindowFunctionTests extends WindowFunctionTests with MsSqlSuite
   object GetGeneratedKeysTests extends GetGeneratedKeysTests with MsSqlSuite
@@ -314,6 +318,8 @@ package mssql {
 
   object DbApiOpsTests extends DbApiOpsTests with MsSqlSuite
   object ExprOpsTests extends ExprOpsTests with MsSqlSuite
+  // TODO these tests operate on raw Booleans, further disambiguation of BIT
+  // values and filter expressions is required
   // object ExprBooleanOpsTests extends ExprBooleanOpsTests with MsSqlSuite
   object ExprNumericOpsTests extends ExprNumericOpsTests with MsSqlSuite
   object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with MsSqlSuite
