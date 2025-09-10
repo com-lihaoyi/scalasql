@@ -10,32 +10,43 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
   def tests = Tests {
     test("plus") - checker(
       query = Expr("hello") + Expr("world"),
-      sqls = Seq("SELECT (? || ?) AS res", "SELECT CONCAT(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT (? || ?) AS res",
+        "SELECT CONCAT(?, ?) AS res",
+        "SELECT (? + ?) AS res"
+      ),
       value = "helloworld"
     )
 
     test("like") - checker(
       query = Expr("hello").like("he%"),
-      sql = "SELECT (? LIKE ?) AS res",
+      sqls = Seq(
+        "SELECT (? LIKE ?) AS res",
+        "SELECT CASE WHEN (? LIKE ?) THEN 1 ELSE 0 END AS res"
+      ),
       value = true
     )
 
     test("length") - checker(
       query = Expr("hello").length,
-      sql = "SELECT LENGTH(?) AS res",
+      sqls = Seq("SELECT LENGTH(?) AS res", "SELECT LEN(?) AS res"),
       value = 5
     )
 
     test("octetLength") - checker(
       query = Expr("叉烧包").octetLength,
-      sql = "SELECT OCTET_LENGTH(?) AS res",
+      sqls = Seq("SELECT OCTET_LENGTH(?) AS res", "SELECT DATALENGTH(?) AS res"),
       value = 9,
       moreValues = Seq(6) // Not sure why HsqlExpr returns different value here ???
     )
 
     test("position") - checker(
       query = Expr("hello").indexOf("ll"),
-      sqls = Seq("SELECT POSITION(? IN ?) AS res", "SELECT INSTR(?, ?) AS res"),
+      sqls = Seq(
+        "SELECT POSITION(? IN ?) AS res",
+        "SELECT INSTR(?, ?) AS res",
+        "SELECT CHARINDEX(?, ?) AS res"
+      ),
       value = 3
     )
 
@@ -73,7 +84,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").startsWith("Hel"),
       sqls = Seq(
         "SELECT (? LIKE ? || '%') AS res",
-        "SELECT (? LIKE CONCAT(?, '%')) AS res"
+        "SELECT (? LIKE CONCAT(?, '%')) AS res",
+        "SELECT CASE WHEN (? LIKE CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -82,7 +94,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").endsWith("llo"),
       sqls = Seq(
         "SELECT (? LIKE '%' || ?) AS res",
-        "SELECT (? LIKE CONCAT('%', ?)) AS res"
+        "SELECT (? LIKE CONCAT('%', ?)) AS res",
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX))) THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )
@@ -91,7 +104,8 @@ trait ExprStringOpsTests extends ScalaSqlSuite {
       query = Expr("Hello").contains("ll"),
       sqls = Seq(
         "SELECT (? LIKE '%' || ? || '%') AS res",
-        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res"
+        "SELECT (? LIKE CONCAT('%', ?, '%')) AS res",
+        "SELECT CASE WHEN (? LIKE '%' + CAST(? AS VARCHAR(MAX)) + '%') THEN 1 ELSE 0 END AS res"
       ),
       value = true
     )

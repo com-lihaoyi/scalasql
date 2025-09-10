@@ -20,7 +20,9 @@ import java.time.{Instant, LocalDate, LocalDateTime}
 trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
   def castParams = false
 
-  def escape(str: String) = s"\"$str\""
+  def escape(str: String) = s""""$str""""
+
+  def supportSavepointRelease = true
 
   override implicit def LocalDateTimeType: TypeMapper[LocalDateTime] = new SqliteLocalDateTimeType
   class SqliteLocalDateTimeType extends LocalDateTimeType {
@@ -55,6 +57,9 @@ trait SqliteDialect extends Dialect with ReturningDialect with OnConflictOps {
 }
 
 object SqliteDialect extends SqliteDialect {
+
+  override def supportSavepointRelease: Boolean = true
+
   class DbApiOps(dialect: DialectTypeMappers) extends scalasql.operations.DbApiOps(dialect) {
 
     /**

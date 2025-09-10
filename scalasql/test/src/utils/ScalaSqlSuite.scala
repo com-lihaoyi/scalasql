@@ -83,3 +83,16 @@ trait MySqlSuite extends ScalaSqlSuite with MySqlDialect {
 
   checker.reset()
 }
+
+trait MsSqlSuite extends ScalaSqlSuite with MsSqlDialect {
+  val checker = new TestChecker(
+    scalasql.example.MsSqlExample.mssqlClient,
+    "mssql-customer-schema.sql",
+    "customer-data-plus-schema.sql",
+    getClass.getName,
+    suiteLine.value,
+    description
+  )
+
+  checker.reset()
+}

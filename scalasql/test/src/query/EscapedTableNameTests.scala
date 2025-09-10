@@ -50,7 +50,7 @@ trait EscapedTableNameTests extends ScalaSqlSuite {
           query = Text {
             Select.delete(_ => true)
           },
-          sql = s"DELETE FROM $tableNameEscaped WHERE ?",
+          sql = s"DELETE FROM $tableNameEscaped",
           value = 0,
           docs = ""
         )

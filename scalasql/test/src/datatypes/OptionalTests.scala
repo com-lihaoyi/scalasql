@@ -412,6 +412,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int
           """
         ),
         value = Seq(
@@ -420,6 +425,14 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
         ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
+        ), // the MSSQL workaround for NULLS FIRST/LAST does not guarantee the ordering of other columns
         docs = """
           `.nullsLast` and `.nullsFirst` translate to SQL `NULLS LAST` and `NULLS FIRST` clauses
         """
@@ -436,6 +449,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int
           """
         ),
         value = Seq(
@@ -443,7 +461,15 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
-        )
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("ascNullsLast") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsLast },
@@ -457,6 +483,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL ASC, my_int ASC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 1, 0), my_int ASC
           """
         ),
         value = Seq(
@@ -464,7 +495,15 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(3), None),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
-        )
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None)
+          )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("ascNullsFirst") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).asc.nullsFirst },
@@ -485,7 +524,15 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](Some(3), None)
-        )
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](Some(3), None)
+          )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("descNullsLast") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsLast },
@@ -506,7 +553,15 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](Some(1), Some(2)),
           OptCols[Sc](None, None),
           OptCols[Sc](None, Some(4))
-        )
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](None, Some(4))
+          )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("descNullsFirst") - checker(
         query = Text { OptCols.select.sortBy(_.myInt).desc.nullsFirst },
@@ -520,6 +575,11 @@ trait OptionalTests extends ScalaSqlSuite {
             SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
             FROM opt_cols opt_cols0
             ORDER BY my_int IS NULL DESC, my_int DESC
+          """,
+          """
+            SELECT opt_cols0.my_int AS my_int, opt_cols0.my_int2 AS my_int2
+            FROM opt_cols opt_cols0
+            ORDER BY IIF(my_int IS NULL, 0, 1), my_int DESC
           """
         ),
         value = Seq(
@@ -527,7 +587,15 @@ trait OptionalTests extends ScalaSqlSuite {
           OptCols[Sc](None, Some(4)),
           OptCols[Sc](Some(3), None),
           OptCols[Sc](Some(1), Some(2))
-        )
+        ),
+        moreValues = Seq(
+          Seq(
+            OptCols[Sc](None, Some(4)),
+            OptCols[Sc](None, None),
+            OptCols[Sc](Some(3), None),
+            OptCols[Sc](Some(1), Some(2))
+          )
+        ) // the MSSQL workaround for NULLS FIRST/LAST does not guarantee ordering of other columns
       )
       test("roundTripOptionalValues") - checker.recorded(
         """
@@ -579,6 +647,24 @@ trait OptionalTests extends ScalaSqlSuite {
             myUUID = Some(new java.util.UUID(1234567890L, 9876543210L)),
             myEnum = Some(MyEnum.bar)
           )
+          val rowSome2 = OptDataTypes[Sc](
+            myTinyInt = Some(67.toByte),
+            mySmallInt = Some(32767.toShort),
+            myInt = Some(23456789),
+            myBigInt = Some(9876543210L),
+            myDouble = Some(2.71),
+            myBoolean = Some(false),
+            myLocalDate = Some(LocalDate.parse("2020-02-22")),
+            myLocalTime = Some(LocalTime.parse("03:05:01")),
+            myLocalDateTime = Some(LocalDateTime.parse("2021-06-07T02:01:03")),
+            myUtilDate = Some(
+              new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2021-06-07T02:01:03.000")
+            ),
+            myInstant = Some(Instant.parse("2021-06-07T02:01:03Z")),
+            myVarBinary = Some(new geny.Bytes(Array[Byte](9, 8, 7, 6, 5, 4, 3, 2))),
+            myUUID = Some(new java.util.UUID(9876543210L, 1234567890L)),
+            myEnum = Some(MyEnum.baz)
+          )
 
           val rowNone = OptDataTypes[Sc](
             myTinyInt = None,
@@ -596,12 +682,11 @@ trait OptionalTests extends ScalaSqlSuite {
             myUUID = None,
             myEnum = None
           )
-
           db.run(
-            OptDataTypes.insert.values(rowSome, rowNone)
-          ) ==> 2
+            OptDataTypes.insert.values(rowSome, rowSome2, rowNone)
+          ) ==> 3
 
-          db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
+          db.run(OptDataTypes.select) ==> Seq(rowSome, rowSome2, rowNone)
         }
       )
 

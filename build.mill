@@ -54,6 +54,8 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       ivy"org.postgresql:postgresql:42.6.0",
       ivy"org.testcontainers:mysql:1.19.1",
       ivy"mysql:mysql-connector-java:8.0.33",
+      ivy"org.testcontainers:mssqlserver:1.19.1",
+      ivy"com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11",
       ivy"com.zaxxer:HikariCP:5.1.0"
     )
 

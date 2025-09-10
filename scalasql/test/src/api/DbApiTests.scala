@@ -3,9 +3,9 @@ package scalasql.api
 import geny.Generator
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.{Buyer, Sc}
-import scalasql.utils.{MySqlSuite, ScalaSqlSuite, SqliteSuite}
+import scalasql.utils.{MsSqlSuite, MySqlSuite, ScalaSqlSuite, SqliteSuite}
 import sourcecode.Text
-import utest._
+import utest.*
 
 import java.time.LocalDate
 
@@ -124,7 +124,7 @@ trait DbApiTests extends ScalaSqlSuite {
       }
     )
     test("updateGetGeneratedKeysSql") - {
-      if (!this.isInstanceOf[SqliteSuite])
+      if (!this.isInstanceOf[SqliteSuite] && !this.isInstanceOf[MsSqlSuite])
         checker.recorded(
           """
         Allows you to fetch the primary keys that were auto-generated for an INSERT
@@ -209,7 +209,10 @@ trait DbApiTests extends ScalaSqlSuite {
                   LocalDate.parse("2000-01-01")
                 )
               )
-              assert(generatedKeys == Seq(4, 5))
+              if (!this.isInstanceOf[MsSqlSuite])
+                assert(generatedKeys == Seq(4, 5))
+              else
+                assert(generatedKeys == Seq(5))
 
               db.run(Buyer.select) ==> List(
                 Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),

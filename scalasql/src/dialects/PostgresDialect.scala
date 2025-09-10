@@ -19,7 +19,9 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
   def castParams = false
 
-  def escape(str: String) = s"\"$str\""
+  def escape(str: String) = s""""$str""""
+
+  def supportSavepointRelease = true
 
   override implicit def ByteType: TypeMapper[Byte] = new PostgresByteType
   class PostgresByteType extends ByteType { override def castTypeString = "INTEGER" }

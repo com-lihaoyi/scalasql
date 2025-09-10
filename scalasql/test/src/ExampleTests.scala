@@ -11,5 +11,6 @@ object ExampleTests extends TestSuite {
     test("h2") - example.H2Example.main(Array())
     test("sqlite") - example.SqliteExample.main(Array())
     test("hikari") - example.HikariCpExample.main(Array())
+    test("mssql") - example.MsSqlExample.main(Array())
   }
 }
