@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.1.20"
+ivy"com.lihaoyi::scalasql:0.2.0"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.6.2
@@ -84,7 +84,7 @@ Add the following to your `build.sc` file as follows:
 
 <!-- TODO: scalasql-simple? -->
 ```scala
-ivy"com.lihaoyi::scalasql-namedtuples:0.1.20"
+ivy"com.lihaoyi::scalasql-namedtuples:0.2.0"
 ```
 
 And taking the example above, the only thing that needs to change is the following:
@@ -131,6 +131,7 @@ And you now have the option to return named tuples from queries:
     * [MySql](scalasql/test/src/example/MySqlExample.scala)
     * [Sqlite](scalasql/test/src/example/SqliteExample.scala)
     * [H2](scalasql/test/src/example/H2Example.scala)
+    * [Microsoft SQL Server](scalasql/test/src/example/MsSqlExample.scala)
     * [HikariCP](scalasql/test/src/example/HikariCpExample.scala) (and other connection pools)
 
 * [ScalaSql Tutorial](docs/tutorial.md): a structured walkthrough of how to use ScalaSql,
@@ -175,6 +176,10 @@ And you now have the option to return named tuples from queries:
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+### 0.2.0
+
+* Initial support for Microsoft SQL Server via `scalasql.dialects.MsSqlDialect` [#94](https://github.com/com-lihaoyi/scalasql/pull/94)
 
 ### 0.1.20
 
