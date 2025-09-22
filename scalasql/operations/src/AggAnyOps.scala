@@ -11,6 +11,7 @@ class AggAnyOps[T](v: Aggregatable[Expr[T]])(
     implicit tmInt: TypeMapper[Int],
     qrInt: Queryable.Row[Expr[Int], Int]
 ) {
+
   /** Counts non-null values */
   def count: Expr[Int] = v.aggregateExpr[Int](expr => implicit ctx => sql"COUNT($expr)")
 
