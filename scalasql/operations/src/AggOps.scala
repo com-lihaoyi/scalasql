@@ -11,6 +11,16 @@ class AggOps[T](v: Aggregatable[T])(implicit qr: Queryable.Row[T, ?], dialect: D
   /** Counts the rows */
   def size: Expr[Int] = v.aggregateExpr(_ => _ => sql"COUNT(1)")
 
+  /** Counts non-null values in the selected column */
+  def countBy[V](f: T => Expr[V])(implicit qrInt: Queryable.Row[Expr[Int], Int]): Expr[Int] =
+    v.aggregateExpr[Int](expr => implicit ctx => sql"COUNT(${f(expr)})")
+
+  /** Counts distinct non-null values in the selected column */
+  def countDistinctBy[V](
+      f: T => Expr[V]
+  )(implicit qrInt: Queryable.Row[Expr[Int], Int]): Expr[Int] =
+    v.aggregateExpr[Int](expr => implicit ctx => sql"COUNT(DISTINCT ${f(expr)})")
+
   /** Computes the sum of column values */
   def sumBy[V: TypeMapper](f: T => Expr[V])(
       implicit qr: Queryable.Row[Expr[V], V]

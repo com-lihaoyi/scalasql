@@ -1133,6 +1133,91 @@ Purchase.select.sumBy(_.total)
 
 
 
+### Select.aggregate.countBy
+
+You can use `.countBy` to generate SQL `COUNT(column)` aggregates that count non-null values
+
+```scala
+Purchase.select.countBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+### Select.aggregate.countDistinctBy
+
+You can use `.countDistinctBy` to generate SQL `COUNT(DISTINCT column)` aggregates
+that count unique non-null values
+
+```scala
+Purchase.select.countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+### Select.aggregate.count
+
+You can use `.count` on mapped expressions to generate SQL `COUNT(expr)` aggregates
+
+```scala
+Purchase.select.map(_.productId).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+### Select.aggregate.countDistinct
+
+You can use `.countDistinct` on mapped expressions to generate SQL `COUNT(DISTINCT expr)` aggregates
+
+```scala
+Purchase.select.map(_.productId).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
 ### Select.aggregate.multiple
 
 If you want to perform multiple aggregates at once, you can use the `.aggregate` method
@@ -1153,6 +1238,27 @@ Purchase.select.aggregate(q => (q.sumBy(_.total), q.maxBy(_.total)))
 *
     ```scala
     (12343.2, 10000.0)
+    ```
+
+### Select.aggregate.multipleWithCount
+
+You can combine COUNT operations with other aggregates in a single query
+
+```scala
+Purchase.select.aggregate(q => (q.countBy(_.productId), q.countDistinctBy(_.productId), q.sumBy(_.total)))
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1, SUM(purchase0.total) AS res_2 FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    (7, 6, 12343.2)
     ```
 
 
@@ -6315,6 +6421,88 @@ Purchase.select.mapAggregate((p, ps) =>
       (2, 10000.0, 5246.9),
       (3, 1.3, 1.3),
       (3, 44.4, 22.849999999999998)
+    )
+    ```
+
+
+
+### WindowFunction.aggregate.countBy
+
+Window functions can also use COUNT operations with partitioning and ordering.
+
+```scala
+Purchase.select.mapAggregate((p, ps) =>
+  (
+    p.shippingInfoId,
+    p.total,
+    ps.countBy(_.productId).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+  )
+)
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0,
+      purchase0.total AS res_1,
+      COUNT(purchase0.product_id) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
+    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      (1, 15.7, 1),
+      (1, 888.0, 2),
+      (1, 900.0, 3),
+      (2, 493.8, 1),
+      (2, 10000.0, 2),
+      (3, 1.3, 1),
+      (3, 44.4, 2)
+    )
+    ```
+
+
+
+### WindowFunction.aggregate.countDistinctBy
+
+COUNT(DISTINCT) can also be used as a window function for running distinct counts.
+
+```scala
+Purchase.select.mapAggregate((p, ps) =>
+  (
+    p.shippingInfoId,
+    p.total,
+    ps.countDistinctBy(_.productId).over.partitionBy(p.shippingInfoId).sortBy(p.total).asc
+  )
+)
+```
+
+
+*
+    ```sql
+    SELECT
+      purchase0.shipping_info_id AS res_0,
+      purchase0.total AS res_1,
+      COUNT(DISTINCT purchase0.product_id) OVER (PARTITION BY purchase0.shipping_info_id ORDER BY purchase0.total ASC) AS res_2
+    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    Seq(
+      (1, 15.7, 1),
+      (1, 888.0, 2),
+      (1, 900.0, 3),
+      (2, 493.8, 1),
+      (2, 10000.0, 2),
+      (3, 1.3, 1),
+      (3, 44.4, 2)
     )
     ```
 

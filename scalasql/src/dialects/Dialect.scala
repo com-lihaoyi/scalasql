@@ -302,6 +302,10 @@ trait Dialect extends DialectTypeMappers {
       implicit qr: Queryable.Row[T, ?]
   ): operations.AggOps[T] = new operations.AggOps(v)
 
+  implicit def AggAnyOpsConv[T: TypeMapper](v: Aggregatable[Expr[T]])(
+      implicit qrInt: Queryable.Row[Expr[Int], Int]
+  ): operations.AggAnyOps[T] = new operations.AggAnyOps(v)
+
   implicit def ExprAggOpsConv[T](v: Aggregatable[Expr[T]]): operations.ExprAggOps[T]
 
   implicit def TableOpsConv[V[_[_]]](t: Table[V]): TableOps[V] = new TableOps(t)

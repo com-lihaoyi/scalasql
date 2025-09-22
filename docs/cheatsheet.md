@@ -67,6 +67,18 @@ Foo.select.sumByOpt(_.myInt)                                        // Option[In
 Foo.select.size                                                     // Int
 // SELECT COUNT(1) FROM foo
 
+Foo.select.countBy(_.myInt)                                          // Int
+// SELECT COUNT(my_int) FROM foo
+
+Foo.select.countDistinctBy(_.myInt)                                  // Int
+// SELECT COUNT(DISTINCT my_int) FROM foo
+
+Foo.select.map(_.myInt).count                                        // Int
+// SELECT COUNT(my_int) FROM foo
+
+Foo.select.map(_.myInt).countDistinct                                // Int
+// SELECT COUNT(DISTINCT my_int) FROM foo
+
 Foo.select.aggregate(fs => (fs.sumBy(_.myInt), fs.maxBy(_.myInt)))  // (Int, Int)
 // SELECT SUM(my_int), MAX(my_int) FROM foo
 
@@ -200,14 +212,16 @@ to allow ScalaSql to work with it
 
 **Aggregate Functions**
 
-|                                      Scala |       SQL |
-|----------------------------------------------------:|------------------------:|
-|                                            `a.size` |              `COUNT(1)` |
-|                                   `a.mkString(sep)` |  `GROUP_CONCAT(a, sep)` |
-|  `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |           `SUM(my_int)` |
-|  `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |           `MIN(my_int)` |
-|  `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |           `MAX(my_int)` |
-|  `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |           `AVG(my_int)` |
+|                                                        Scala |                     SQL |
+|-------------------------------------------------------------:|------------------------:|
+|                                                     `a.size` |              `COUNT(1)` |
+|                                            `a.mkString(sep)` |  `GROUP_CONCAT(a, sep)` |
+|           `a.sum`, `a.sumBy(_.myInt)`, `a.sumByOpt(_.myInt)` |           `SUM(my_int)` |
+|           `a.min`, `a.minBy(_.myInt)`, `a.minByOpt(_.myInt)` |           `MIN(my_int)` |
+|           `a.max`, `a.maxBy(_.myInt)`, `a.maxByOpt(_.myInt)` |           `MAX(my_int)` |
+|           `a.avg`, `a.avgBy(_.myInt)`, `a.avgByOpt(_.myInt)` |           `AVG(my_int)` |
+|                 `a.countBy(_.myInt)`, `a.map(_.myInt).count` |         `COUNT(my_int)` |
+| `a.countDistinctBy(_.myInt)`, `a.map(_.myInt).countDistinct` |`COUNT(DISTINCT my_int)` |
 
 **Select Functions**
 
