@@ -582,34 +582,6 @@ db.renderSql(query) ==>
 db.run(query) ==> 154
 ```
 
-ScalaSql also provides `.countBy` and `.countDistinctBy` for more specific counting
-operations. `.countBy` generates `COUNT(column)` and only counts non-null values,
-while `.countDistinctBy` generates `COUNT(DISTINCT column)` to count unique non-null values:
-```scala
-// Count non-null country codes
-val query1 = Country.select.countBy(_.code)
-db.renderSql(query1) ==> "SELECT COUNT(country0.code) AS res FROM country country0"
-
-// Count distinct continents
-val query2 = Country.select.countDistinctBy(_.continent)
-db.renderSql(query2) ==> "SELECT COUNT(DISTINCT country0.continent) AS res FROM country country0"
-
-db.run(query2) ==> 7  // 7 distinct continents in the database
-```
-
-You can also use `.count` and `.countDistinct` on mapped expressions:
-```scala
-// Count non-null population values after mapping
-val query3 = Country.select.map(_.population).count
-db.renderSql(query3) ==> "SELECT COUNT(country0.population) AS res FROM country country0"
-
-// Count distinct population density categories
-val query4 = Country.select
-  .map(c => c.population / c.surfaceArea)
-  .countDistinct
-db.renderSql(query4) ==> "SELECT COUNT(DISTINCT (country0.population / country0.surfacearea)) AS res FROM country country0"
-```
-
 If you want to perform multiple aggregates at once, you can use the `.aggregate`
 function. Below, we run a single query that returns the minimum, average, and
 maximum populations across all countries in our dataset
@@ -625,25 +597,6 @@ FROM country country0
 """
 
 db.run(query) ==> (0, 25434098, 1277558000)
-```
-
-You can combine COUNT operations with other aggregates in the same query:
-```scala
-val query = Country.select
-  .aggregate(cs => (
-    cs.countBy(_.population),        // Count non-null populations
-    cs.countDistinctBy(_.continent), // Count distinct continents
-    cs.sumBy(_.population)           // Sum all populations
-  ))
-db.renderSql(query) ==> """
-SELECT
-  COUNT(country0.population) AS res_0,
-  COUNT(DISTINCT country0.continent) AS res_1,
-  SUM(country0.population) AS res_2
-FROM country country0
-"""
-
-db.run(query) ==> (239, 7, 6078749450)
 ```
 
 ### Sort/Drop/Take
