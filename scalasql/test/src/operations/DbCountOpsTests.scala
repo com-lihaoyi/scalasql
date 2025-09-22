@@ -178,12 +178,7 @@ trait DbCountOpsOptionTests extends ScalaSqlSuite {
         """SELECT COUNT(opt_cols0.my_int2) AS res
               FROM opt_cols opt_cols0
               WHERE COALESCE((opt_cols0.my_int > ?), ?)""",
-        """SELECT
-  COUNT(opt_cols0.my_int2) AS res
-FROM
-  opt_cols opt_cols0
-WHERE
-  COALESCE((opt_cols0.my_int > ?), (1 = ?))"""
+        "SELECT COUNT(opt_cols0.my_int2) AS res FROM opt_cols opt_cols0 WHERE ((opt_cols0.my_int > ?) OR ((opt_cols0.my_int > ?) IS NULL AND 1 = ?))"
       ),
       value = 1 // Only one record where myInt > 1 and myInt2 is not null
     )
