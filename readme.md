@@ -71,7 +71,7 @@ you are able to investigate and fix them!
 To get started with ScalaSql, add it to your `build.sc` file as follows:
 
 ```scala
-ivy"com.lihaoyi::scalasql:0.2.1"
+ivy"com.lihaoyi::scalasql:0.2.2"
 ```
 
 ScalaSql supports Scala 2.13.x and >=3.6.2
@@ -84,7 +84,7 @@ Add the following to your `build.sc` file as follows:
 
 <!-- TODO: scalasql-simple? -->
 ```scala
-ivy"com.lihaoyi::scalasql-namedtuples:0.2.1"
+ivy"com.lihaoyi::scalasql-namedtuples:0.2.2"
 ```
 
 And taking the example above, the only thing that needs to change is the following:
@@ -176,6 +176,10 @@ And you now have the option to return named tuples from queries:
   to the `com-lihaoyi/scalasql` codebase
 
 ## Changelog
+
+### 0.2.2
+
+* Adding COUNT and COUNT(DISTINCT) aggregation support [#97](https://github.com/com-lihaoyi/scalasql/pull/97)
 
 ### 0.2.1
 
