@@ -7,6 +7,7 @@ import scalasql.core.{
   DbApi,
   DialectTypeMappers,
   Expr,
+  JoinNullable,
   ExprsToSql,
   LiveExprs,
   Queryable,
@@ -37,6 +38,25 @@ trait MsSqlDialect extends Dialect {
 
   override implicit def BooleanType: TypeMapper[Boolean] = new MsSqlBooleanType
   class MsSqlBooleanType extends BooleanType { override def castTypeString = "BIT" }
+
+  override implicit def ExprOptionOpsConv[T: TypeMapper](
+      v: Expr[Option[T]]
+  ): operations.ExprOptionOps[T] = {
+    val tm = implicitly[TypeMapper[T]]
+    if (tm.jdbcType == JDBCType.BOOLEAN) {
+      new MsSqlBooleanExprOptionOps(v.asInstanceOf[Expr[Option[Boolean]]])
+        .asInstanceOf[operations.ExprOptionOps[T]]
+    } else {
+      super.ExprOptionOpsConv(v)
+    }
+  }
+
+  class MsSqlBooleanExprOptionOps(v: Expr[Option[Boolean]])
+      extends operations.ExprOptionOps[Boolean](v) {
+    override def getOrElse(other: Expr[Boolean]): Expr[Boolean] = Expr { implicit ctx =>
+      sql"CASE WHEN $v IS NULL THEN $other ELSE $v END"
+    }
+  }
   override implicit def from(x: Boolean): Expr[Boolean] =
     if (x) {
       Expr.apply0(x, x)
