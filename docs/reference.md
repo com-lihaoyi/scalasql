@@ -10075,6 +10075,812 @@ db.radians(180)
 
 
 
+## DbCountOps
+COUNT and COUNT(DISTINCT) aggregations
+### DbCountOps.countBy
+
+
+
+```scala
+Purchase.select.countBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countDistinctBy
+
+
+
+```scala
+Purchase.select.countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countExpr
+
+
+
+```scala
+Purchase.select.map(_.productId).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countDistinctExpr
+
+
+
+```scala
+Purchase.select.map(_.productId).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countWithGroupBy
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(purchase0.product_id) AS res_1
+                  FROM purchase purchase0
+                  GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOps.countDistinctWithGroupBy
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countDistinctBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1
+                  FROM purchase purchase0
+                  GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOps.countWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.total > 100).countBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res
+                  FROM purchase purchase0
+                  WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOps.countDistinctWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.total > 100).countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                  FROM purchase purchase0
+                  WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOps.multipleAggregatesWithCount
+
+
+
+```scala
+Purchase.select.aggregate(agg =>
+  (agg.countBy(_.productId), agg.countDistinctBy(_.productId), agg.sumBy(_.total))
+)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1, SUM(purchase0.total) AS res_2
+                  FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    (7, 6, 12343.2)
+    ```
+
+
+
+### DbCountOps.countInJoin
+
+
+
+```scala
+(for {
+  p <- Purchase.select
+  pr <- Product.join(_.id === p.productId)
+} yield pr).countBy(_.name)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(product1.name) AS res
+                  FROM purchase purchase0
+                  JOIN product product1 ON (product1.id = purchase0.product_id)
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countWithComplexExpressions.arithmetic
+
+
+
+```scala
+Purchase.select.map(_.total * 2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT((purchase0.total * ?)) AS res
+                    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countWithComplexExpressions.stringConcat
+
+
+
+```scala
+Product.select.map(p => p.name + " - " + p.kebabCaseName).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(((product0.name || ?) || product0.kebab_case_name)) AS res
+                    FROM product product0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countDistinctWithComplexExpressions.arithmetic
+
+
+
+```scala
+Purchase.select.map(p => p.productId + 100).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT (purchase0.product_id + ?)) AS res
+                    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+## DbCountOpsOption
+COUNT operations with Option types
+### DbCountOpsOption
+
+
+
+```scala
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4)),
+  (Some(1), Some(5)),
+  (Some(2), Some(2))
+)
+```
+
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOpsOption.countOptionColumn.countBy
+
+
+
+```scala
+OptCols.select.countBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsOption.countOptionColumn.countDistinctBy
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsOption.countExprOption.count
+
+
+
+```scala
+OptCols.select.map(_.myInt2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsOption.countExprOption.countDistinct
+
+
+
+```scala
+OptCols.select.map(_.myInt2).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsOption.groupByWithOptionCount
+
+
+
+```scala
+OptCols.select
+  .groupBy(_.myInt)(agg => agg.countBy(_.myInt2))
+```
+
+
+*
+    ```sql
+    SELECT opt_cols0.my_int AS res_0, COUNT(opt_cols0.my_int2) AS res_1
+                  FROM opt_cols opt_cols0
+                  GROUP BY opt_cols0.my_int
+    ```
+
+
+
+*
+    ```scala
+    Seq((None, 1), (Some(1), 2), (Some(2), 1), (Some(3), 0))
+    ```
+
+
+
+## DbCountOpsAdvanced
+Advanced COUNT operations with edge cases and expressions
+### DbCountOpsAdvanced.setup
+
+
+
+```scala
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (Some(1), Some(1)),
+  (Some(2), None),
+  (Some(3), Some(3)),
+  (None, Some(4)),
+  (Some(5), Some(5))
+)
+```
+
+
+
+
+*
+    ```scala
+    5
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.nonNullCount
+
+
+
+```scala
+OptCols.select.countBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.nonNullCountDistinct
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.secondColumnCount
+
+
+
+```scala
+OptCols.select.countBy(_.myInt2)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.secondColumnCountDistinct
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt2)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithExpressions.countArithmeticExpressions
+
+
+
+```scala
+Purchase.select.map(p => p.productId * 2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT((purchase0.product_id * ?)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithExpressions.countDistinctArithmeticExpressions
+
+
+
+```scala
+Purchase.select.map(p => p.productId + p.shippingInfoId).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT (purchase0.product_id + purchase0.shipping_info_id)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithModuloOperations.moduloCount
+
+
+
+```scala
+Purchase.select.map(p => p.productId % 2).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT MOD(purchase0.product_id, ?)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithModuloOperations.moduloWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.productId > 2).map(p => p.productId % 3).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT MOD(purchase0.product_id, ?)) AS res FROM purchase purchase0 WHERE (purchase0.product_id > ?)
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithGroupBy.groupByWithCount
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(purchase0.product_id) AS res_1
+                    FROM purchase purchase0
+                    GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithGroupBy.groupByWithCountDistinct
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countDistinctBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1
+                    FROM purchase purchase0
+                    GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithComplexFilters.countWithRangeFilter
+
+
+
+```scala
+Purchase.select
+  .filter(p => p.productId >= 2 && p.productId <= 4)
+  .countBy(_.total)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.total) AS res
+                    FROM purchase purchase0
+                    WHERE ((purchase0.product_id >= ?) AND (purchase0.product_id <= ?))
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithComplexFilters.countWithDecimalFilter
+
+
+
+```scala
+Purchase.select
+  .filter(_.total > 100)
+  .countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                    FROM purchase purchase0
+                    WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithAdvancedPredicates.countWithComplexFilter
+
+
+
+```scala
+Purchase.select
+  .filter(p => p.productId > 1 && p.shippingInfoId <= 2)
+  .countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                    FROM purchase purchase0
+                    WHERE ((purchase0.product_id > ?) AND (purchase0.shipping_info_id <= ?))
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
 ## DataTypes
 Basic operations on all the data types that ScalaSql supports mapping between Database types and Scala types
 ### DataTypes.constant
