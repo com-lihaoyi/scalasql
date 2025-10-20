@@ -112,7 +112,7 @@ trait ScalaSql extends Common { common =>
   object core extends Common with CrossValue {
     def ivyDeps = Agg(
       ivy"com.lihaoyi::geny:1.0.0",
-      ivy"com.lihaoyi::sourcecode:0.3.1",
+      ivy"com.lihaoyi::sourcecode:0.4.2",
       ivy"com.lihaoyi::pprint:0.8.1"
     ) ++ Option.when(scalaVersion().startsWith("2."))(
       ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
