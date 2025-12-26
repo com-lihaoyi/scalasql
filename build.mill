@@ -10,7 +10,7 @@ import mill._, scalalib._, publish._
 
 val scala3 = "3.6.2"
 val scalaVersions = Seq("2.13.12", scala3)
-val scala3NamedTuples = "3.7.0"
+val scala3Simple = "3.7.0"
 
 trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { common =>
 
@@ -50,11 +50,11 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       ivy"com.lihaoyi::utest:0.8.2",
       ivy"com.h2database:h2:2.2.224",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
-      ivy"org.testcontainers:postgresql:1.19.1",
+      ivy"org.testcontainers:postgresql:1.21.4",
       ivy"org.postgresql:postgresql:42.6.0",
-      ivy"org.testcontainers:mysql:1.19.1",
+      ivy"org.testcontainers:mysql:1.21.4",
       ivy"mysql:mysql-connector-java:8.0.33",
-      ivy"org.testcontainers:mssqlserver:1.19.1",
+      ivy"org.testcontainers:mssqlserver:1.21.4",
       ivy"com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11",
       ivy"com.zaxxer:HikariCP:5.1.0"
     )
@@ -76,7 +76,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
 trait Common extends CommonBase with CrossScalaModule
 
 object `scalasql-simple` extends CommonBase {
-  def scalaVersion: T[String] = scala3NamedTuples
+  def scalaVersion: T[String] = scala3Simple
   def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "simple"
   def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3))
 
