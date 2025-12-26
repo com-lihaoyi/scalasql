@@ -1,4 +1,4 @@
-package scalasql.namedtuples
+package scalasql.simple
 
 import scalasql.query.Table
 import scalasql.core.Queryable
