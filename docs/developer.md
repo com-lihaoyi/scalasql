@@ -27,7 +27,7 @@ To facilitate efficient testing, you can choose from several commands based on y
 ### Full Test Suite with Documentation Generation
 * Re-generating docs:
   ```bash
-  ./mill -i "__.test" + generateTutorial + generateReference
+  ./mill -ij1 "__.test" && ./mill -ij1 generateTutorial + generateReference
   ```
     * Note that ScalaSql's reference docs are extracted from the test suite, and thus we need
       to make sure to run the test suite before re-generating them.

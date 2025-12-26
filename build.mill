@@ -50,11 +50,11 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       ivy"com.lihaoyi::utest:0.8.2",
       ivy"com.h2database:h2:2.2.224",
       ivy"org.xerial:sqlite-jdbc:3.43.0.0",
-      ivy"org.testcontainers:postgresql:1.19.1",
+      ivy"org.testcontainers:postgresql:1.21.4",
       ivy"org.postgresql:postgresql:42.6.0",
-      ivy"org.testcontainers:mysql:1.19.1",
+      ivy"org.testcontainers:mysql:1.21.4",
       ivy"mysql:mysql-connector-java:8.0.33",
-      ivy"org.testcontainers:mssqlserver:1.19.1",
+      ivy"org.testcontainers:mssqlserver:1.21.4",
       ivy"com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11",
       ivy"com.zaxxer:HikariCP:5.1.0"
     )

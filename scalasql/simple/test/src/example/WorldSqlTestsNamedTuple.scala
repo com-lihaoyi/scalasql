@@ -147,7 +147,7 @@ object WorldSqlTestsNamedTuple extends TestSuite {
     // Also included is the necessary import statement to include the `SimpleTable` definition.
     //
     // ```scala
-    // +INCLUDE scalasql/namedtuples/test/src/example/WorldSqlTestsSnippets.scala
+    // +INCLUDE scalasql/simple/test/src/example/WorldSqlTestsSnippets.scala
     // ```
     // -DOCS
   }

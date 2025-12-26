@@ -132,9 +132,9 @@ object WorldSqlTests extends TestSuite {
     // Also included is the necessary import statement to include the `SimpleTable` definition.
     //
     // ```scala
-    // +INCLUDE SNIPPET [IMPORTS] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+    // +INCLUDE SNIPPET [IMPORTS] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
     //
-    // +INCLUDE SNIPPET [TABLES] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+    // +INCLUDE SNIPPET [TABLES] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
     // ```
     // -DOCS
   }
@@ -490,9 +490,9 @@ object WorldSqlTests extends TestSuite {
         //
         // You can also use named tuples to map the results of a query.
         // ```scala
-        // +INCLUDE SNIPPET [MAP-1] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-1] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         //
-        // +INCLUDE SNIPPET [MAP-2] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-2] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         // ```
         //
         // **Updating `Record` fields**
@@ -508,9 +508,9 @@ object WorldSqlTests extends TestSuite {
         // or provide a function that transforms the old value. For example:
         //
         // ```scala
-        // +INCLUDE SNIPPET [MAP-3] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-3] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         //
-        // +INCLUDE SNIPPET [MAP-4] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-4] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         // ```
         //
         // -DOCS
