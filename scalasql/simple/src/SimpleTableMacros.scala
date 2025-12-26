@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
 import scala.NamedTuple.AnyNamedTuple
 import java.util.function.UnaryOperator
 import scala.annotation.nowarn
-import scalasql.namedtuples.SimpleTableMacros.BaseLabels
+import scalasql.simple.SimpleTableMacros.BaseLabels
 import scalasql.core.TypeMapper
 import scala.annotation.unused
 import scala.annotation.implicitNotFound

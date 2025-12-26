@@ -177,7 +177,7 @@ And you now have the option to return named tuples from queries:
 
 ## Changelog
 
-### 0.2.4
+### 0.2.5
 
 * Rename `scalasql-namedtuples` artifact name to `scalasql-simple`
 

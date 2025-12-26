@@ -1,5 +1,5 @@
 // duplicated from scalasql/test/src/example/PostgresExample.scala
-package scalasql.namedtuples.example
+package scalasql.simple.example
 
 import org.testcontainers.containers.PostgreSQLContainer
 

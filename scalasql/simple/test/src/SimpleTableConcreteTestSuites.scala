@@ -1,4 +1,4 @@
-package scalasql.namedtuples
+package scalasql.simple
 import scalasql.api.{TransactionTests, DbApiTests}
 import scalasql.operations.{
   ExprBooleanOpsTests,
@@ -82,11 +82,11 @@ package postgres {
   // object ExprMathOpsTests extends ExprMathOpsTests with PostgresSuite
 
   object DataTypesTests
-      extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
+      extends scalasql.simple.datatypes.SimpleTableDataTypesTests
       with PostgresSuite
 
   object OptionalTests
-      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      extends scalasql.simple.datatypes.SimpleTableOptionalTests
       with PostgresSuite
 
   // object PostgresDialectTests extends PostgresDialectTests
@@ -135,11 +135,11 @@ package hikari {
   // object ExprMathOpsTests extends ExprMathOpsTests with HikariSuite
 
   object DataTypesTests
-      extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
+      extends scalasql.simple.datatypes.SimpleTableDataTypesTests
       with HikariSuite
 
   object OptionalTests
-      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      extends scalasql.simple.datatypes.SimpleTableOptionalTests
       with HikariSuite
 
   // object PostgresDialectTests extends PostgresDialectTests
@@ -189,10 +189,10 @@ package mysql {
   // object EscapedTableNameTests extends EscapedTableNameTests with MySqlSuite
 
   object DataTypesTests
-      extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
+      extends scalasql.simple.datatypes.SimpleTableDataTypesTests
       with MySqlSuite
   object OptionalTests
-      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      extends scalasql.simple.datatypes.SimpleTableOptionalTests
       with MySqlSuite
 
   // object MySqlDialectTests extends MySqlDialectTests
@@ -244,10 +244,10 @@ package sqlite {
   //     with SqliteSuite
 
   object DataTypesTests
-      extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
+      extends scalasql.simple.datatypes.SimpleTableDataTypesTests
       with SqliteSuite
   object OptionalTests
-      extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests
+      extends scalasql.simple.datatypes.SimpleTableOptionalTests
       with SqliteSuite
 
   // object SqliteDialectTests extends SqliteDialectTests
@@ -295,9 +295,9 @@ package h2 {
   // object ExprMathOpsTests extends ExprMathOpsTests with H2Suite
 
   object DataTypesTests
-      extends scalasql.namedtuples.datatypes.SimpleTableDataTypesTests
+      extends scalasql.simple.datatypes.SimpleTableDataTypesTests
       with H2Suite
-  object OptionalTests extends scalasql.namedtuples.datatypes.SimpleTableOptionalTests with H2Suite
+  object OptionalTests extends scalasql.simple.datatypes.SimpleTableOptionalTests with H2Suite
 
   // object H2DialectTests extends H2DialectTests
 }

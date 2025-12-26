@@ -1,5 +1,5 @@
 // duplicated from scalasql/test/src/example/SqliteExample.scala
-package scalasql.namedtuples.example
+package scalasql.simple.example
 
 import scalasql.simple.{*, given}
 import SqliteDialect.*

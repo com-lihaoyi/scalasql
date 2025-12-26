@@ -1,4 +1,4 @@
-package test.scalasql.namedtuples
+package test.scalasql.simple
 import utest._
 
 // adapted from scalasql/test/src/WorldSqlTests.scala to use named tuples
@@ -445,7 +445,7 @@ object WorldSqlTestsNamedTuple extends TestSuite {
         // each country, without all the other metadata:
         // +SNIPPET [MAP-1]
         // `NamedTupleQueryable` is also included by `import scalasql.simple.given`
-        import scalasql.namedtuples.NamedTupleQueryable.given
+        import scalasql.simple.NamedTupleQueryable.given
 
         val query = Country.select.map(c => (name = c.name, continent = c.continent))
         // -SNIPPET [MAP-1]

@@ -1,4 +1,4 @@
-package scalasql.namedtuples
+package scalasql.simple
 
 import utest._
 

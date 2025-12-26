@@ -1,4 +1,4 @@
-package scalasql.namedtuples.datatypes
+package scalasql.simple.datatypes
 
 import scalasql.simple.{*, given}
 import scalasql.utils.ScalaSqlSuite

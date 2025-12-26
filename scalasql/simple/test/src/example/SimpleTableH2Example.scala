@@ -1,5 +1,5 @@
 // duplicated from scalasql/test/src/example/H2Example.scala
-package scalasql.namedtuples.example
+package scalasql.simple.example
 
 import scalasql.simple.{*, given}
 import H2Dialect.*

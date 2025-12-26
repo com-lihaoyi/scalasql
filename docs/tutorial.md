@@ -505,7 +505,7 @@ db.run(query) ==>
 You can also use named tuples to map the results of a query.
 ```scala
 // `NamedTupleQueryable` is also included by `import scalasql.simple.given`
-import scalasql.namedtuples.NamedTupleQueryable.given
+import scalasql.simple.NamedTupleQueryable.given
 
 val query = Country.select.map(c => (name = c.name, continent = c.continent))
 
