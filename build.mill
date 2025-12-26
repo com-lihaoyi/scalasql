@@ -75,9 +75,9 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
 }
 trait Common extends CommonBase with CrossScalaModule
 
-object `scalasql-namedtuples` extends CommonBase {
+object `scalasql-simple` extends CommonBase {
   def scalaVersion: T[String] = scala3NamedTuples
-  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "namedtuples"
+  def millSourcePath: os.Path = scalasql(scala3).millSourcePath / "simple"
   def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3))
 
   // override def scalacOptions: Target[Seq[String]] = T {
