@@ -53,9 +53,12 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row” of each set is unpredictable unless ORDER BY is used to ensure that the desired
      * row appears first. For example:
      */
-    def distinctOn(f: Q => Expr[?]): Select[Q, R] = {
-      Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
-    }
+    def distinctOn(one: Q => Expr[?], more: (Q => Expr[?])*): Select[Q, R] = Select.withExprPrefix(
+      r,
+      true,
+      implicit ctx =>
+        sql"DISTINCT ON (${SqlStr.join((one +: more).map(f => sql"${f(WithSqlExpr.get(r))}"), SqlStr.commaSep)})"
+    )
   }
 
   implicit class SelectForUpdateConv[Q, R](r: Select[Q, R]) {
