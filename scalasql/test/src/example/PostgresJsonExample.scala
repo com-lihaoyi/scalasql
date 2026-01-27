@@ -97,7 +97,8 @@ object PostgresJsonExample {
       // Update
       // Add a new field "city": "New York" to John
       db.run(
-        Person.update(_.name === "John")
+        Person
+          .update(_.name === "John")
           .set(p => p.info := (p.info || ujson.Obj("city" -> "New York")))
       )
 
@@ -108,8 +109,9 @@ object PostgresJsonExample {
       // Delete key
       // Remove "active" field from Jane
       db.run(
-         Person.update(_.name === "Jane")
-           .set(p => p.info := (p.info - "active"))
+        Person
+          .update(_.name === "Jane")
+          .set(p => p.info := (p.info - "active"))
       )
 
       val janeInfo = db.run(Person.select.filter(_.name === "Jane").single).info
