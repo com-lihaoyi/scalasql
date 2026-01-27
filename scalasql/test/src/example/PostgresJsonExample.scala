@@ -3,6 +3,7 @@ package scalasql.example
 import org.testcontainers.containers.PostgreSQLContainer
 import scalasql.Table
 import scalasql.PostgresDialect._
+import scalasql.core.Expr
 import ujson.Value
 
 object PostgresJsonExample {
@@ -89,7 +90,7 @@ object PostgresJsonExample {
       // We compare it to ujson.Str("cat")
       val catLovers = db.run(
         Person.select
-          .filter(p => (p.info -> "pets" -> 0) === ujson.Str("cat"))
+          .filter(p => (p.info -> "pets" -> 0) === Expr[ujson.Value](ujson.Str("cat")))
           .map(_.name)
       )
       assert(catLovers == Seq("John"))

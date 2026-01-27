@@ -2,6 +2,7 @@ package scalasql.dialects
 
 import scalasql._
 import scalasql.core.Expr
+import scalasql.dialects.PostgresDialect._
 import utest._
 import utils.ScalaSqlSuite
 import ujson.Value
@@ -19,10 +20,12 @@ trait PostgresJsonTests extends ScalaSqlSuite with PostgresDialect {
   }
 
   // Placeholder for checker required by ScalaSqlSuite, but we won't use it
-  def checker = ???
+  def checker: scalasql.utils.TestChecker = ???
 
   override def utestBeforeEach(path: Seq[String]): Unit = {}
   override def utestAfterEach(path: Seq[String]): Unit = {}
+
+  override implicit def UjsonQueryable: Queryable.Row[Expr[ujson.Value], ujson.Value] = new Expr.ExprQueryable()(UjsonValueType)
 
   case class JsonTable[T[_]](id: T[Int], data: T[ujson.Value], dataJson: T[ujson.Value])
   object JsonTable extends Table[JsonTable] {
@@ -120,7 +123,7 @@ trait PostgresJsonTests extends ScalaSqlSuite with PostgresDialect {
     test("insert") - {
       test("simple") - {
         val query = JsonTable.insert.values(
-          JsonTable(
+          JsonTable[Sc](
             id = 3,
             data = ujson.Obj("x" -> 10),
             dataJson = ujson.Obj("y" -> 20)

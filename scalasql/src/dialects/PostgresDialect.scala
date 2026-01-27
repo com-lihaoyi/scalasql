@@ -47,6 +47,8 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   implicit def ExprJsonOpsConv(v: Expr[ujson.Value]): PostgresDialect.ExprJsonOps =
     new PostgresDialect.ExprJsonOps(v)
 
+  implicit def UjsonQueryable: Queryable.Row[Expr[ujson.Value], ujson.Value] = ExprQueryable(UjsonValueType)
+
   override implicit def ExprBlobOpsConv(
       v: Expr[geny.Bytes]
   ): PostgresDialect.ExprStringLikeOps[geny.Bytes] =
