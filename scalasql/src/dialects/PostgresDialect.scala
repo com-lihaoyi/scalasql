@@ -29,8 +29,23 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
   override implicit def StringType: TypeMapper[String] = new PostgresStringType
   class PostgresStringType extends StringType { override def castTypeString = "VARCHAR" }
 
+  implicit def UjsonValueType: TypeMapper[ujson.Value] = new UjsonValueType
+  class UjsonValueType extends TypeMapper[ujson.Value] {
+    def jdbcType = java.sql.JDBCType.OTHER
+    def get(r: java.sql.ResultSet, idx: Int) = {
+      val str = r.getString(idx)
+      if (str == null) ujson.Null
+      else ujson.read(str)
+    }
+    def put(r: java.sql.PreparedStatement, idx: Int, v: ujson.Value) =
+      r.setObject(idx, v.toString(), java.sql.Types.OTHER)
+  }
+
   override implicit def ExprStringOpsConv(v: Expr[String]): PostgresDialect.ExprStringOps[String] =
     new PostgresDialect.ExprStringOps(v)
+
+  implicit def ExprJsonOpsConv(v: Expr[ujson.Value]): PostgresDialect.ExprJsonOps =
+    new PostgresDialect.ExprJsonOps(v)
 
   override implicit def ExprBlobOpsConv(
       v: Expr[geny.Bytes]
@@ -113,6 +128,53 @@ object PostgresDialect extends PostgresDialect {
      * Returns a random value in the range 0.0 <= x < 1.0
      */
     def random: Expr[Double] = Expr { _ => sql"RANDOM()" }
+  }
+
+  class ExprJsonOps(val v: Expr[ujson.Value]) extends scalasql.operations.ExprOps(v) {
+    // -> integer
+    def ->(n: Expr[Int]): Expr[ujson.Value] = Expr { implicit ctx => sql"$v -> $n" }
+    // -> text
+    def ->(k: Expr[String])(implicit d: DummyImplicit): Expr[ujson.Value] = Expr { implicit ctx =>
+      sql"$v -> $k"
+    }
+    // ->> integer
+    def ->>(n: Expr[Int]): Expr[String] = Expr { implicit ctx => sql"$v ->> $n" }
+    // ->> text
+    def ->>(k: Expr[String])(implicit d: DummyImplicit): Expr[String] = Expr { implicit ctx =>
+      sql"$v ->> $k"
+    }
+
+    def #>(path: Expr[String]*): Expr[ujson.Value] = Expr { implicit ctx =>
+      val array = sql"ARRAY[${SqlStr.join(path.map(p => sql"$p"), sql", ")}]"
+      sql"$v #> $array"
+    }
+
+    def #>>(path: Expr[String]*): Expr[String] = Expr { implicit ctx =>
+      val array = sql"ARRAY[${SqlStr.join(path.map(p => sql"$p"), sql", ")}]"
+      sql"$v #>> $array"
+    }
+
+    def @>(other: Expr[ujson.Value]): Expr[Boolean] = Expr { implicit ctx => sql"$v @> $other" }
+    def <@(other: Expr[ujson.Value]): Expr[Boolean] = Expr { implicit ctx => sql"$v <@ $other" }
+
+    def ?(key: Expr[String]): Expr[Boolean] = Expr { implicit ctx => sql"jsonb_exists($v, $key)" }
+
+    def ?|(keys: Expr[String]*): Expr[Boolean] = Expr { implicit ctx =>
+      val array = sql"ARRAY[${SqlStr.join(keys.map(p => sql"$p"), sql", ")}]"
+      sql"jsonb_exists_any($v, $array)"
+    }
+
+    def ?&(keys: Expr[String]*): Expr[Boolean] = Expr { implicit ctx =>
+      val array = sql"ARRAY[${SqlStr.join(keys.map(p => sql"$p"), sql", ")}]"
+      sql"jsonb_exists_all($v, $array)"
+    }
+
+    def ||(other: Expr[ujson.Value]): Expr[ujson.Value] = Expr { implicit ctx => sql"$v || $other" }
+
+    def -(key: Expr[String]): Expr[ujson.Value] = Expr { implicit ctx => sql"$v - $key" }
+    def -(index: Expr[Int])(implicit d: DummyImplicit): Expr[ujson.Value] = Expr { implicit ctx =>
+      sql"$v - $index"
+    }
   }
 
   class ExprAggOps[T](v: Aggregatable[Expr[T]]) extends scalasql.operations.ExprAggOps[T](v) {
