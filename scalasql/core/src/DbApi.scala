@@ -194,12 +194,12 @@ object DbApi {
   trait Txn extends DbApi {
 
     /**
-     * Creates a SQL Savepoint that is active within the given block; automatically
+     * Returns a [[UseBlock]] that creates a SQL Savepoint that is active within the given block; automatically
      * releases the savepoint if the block completes successfully and rolls it back
      * if the block terminates with an exception, and allows you to roll back the
      * savepoint manually via the [[DbApi.Savepoint]] parameter passed to that block
      */
-    def savepoint[T](block: DbApi.Savepoint => T): T
+    def savepoint: UseBlock[DbApi.Savepoint]
 
     /**
      * Rolls back any active Savepoints and then rolls back this Transaction
@@ -575,31 +575,28 @@ object DbApi {
       DbApi.renderSql(query, config, dialect.withCastParams(castParams))
     }
 
-    val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
+    private val savepointStack = collection.mutable.ArrayDeque.empty[java.sql.Savepoint]
 
-    def savepoint[T](block: DbApi.Savepoint => T): T = {
-      val savepoint = connection.setSavepoint()
-      savepointStack.append(savepoint)
-
-      try {
-        val res = block(new DbApi.SavepointImpl(savepoint, () => rollbackSavepoint(savepoint)))
-        if (dialect.supportSavepointRelease && savepointStack.lastOption.exists(_ eq savepoint)) {
-          // Only release if this savepoint has not been rolled back,
-          // directly or indirectly
-          connection.releaseSavepoint(savepoint)
-        }
-        res
-      } catch {
-        case e: Throwable =>
-          rollbackSavepoint(savepoint)
-          throw e
+    lazy val savepoint: UseBlock[DbApi.Savepoint] = UseBlockImpl {
+      val jSavepoint = connection.setSavepoint()
+      savepointStack.append(jSavepoint)
+      jSavepoint
+    }((jSp, error) => {
+      error match {
+        case None =>
+          if (dialect.supportSavepointRelease && savepointStack.lastOption.exists(_ eq jSp)) {
+            // Only release if this savepoint has not been rolled back,
+            // directly or indirectly
+            connection.releaseSavepoint(jSp)
+          }
+        case Some(_) => rollbackSavepoint(jSp)
       }
-    }
+    }).map(jSp => new DbApi.SavepointImpl(jSp, () => rollbackSavepoint(jSp)))
 
     // Make sure we keep track of what savepoints are active on the stack, so we do
     // not release or rollback the same savepoint multiple times even in the case of
     // exceptions or explicit rollbacks
-    def rollbackSavepoint(savepoint: java.sql.Savepoint) = {
+    private def rollbackSavepoint(savepoint: java.sql.Savepoint) = {
       savepointStack.indexOf(savepoint) match {
         case -1 => // do nothing
         case savepointIndex =>
@@ -608,7 +605,7 @@ object DbApi {
       }
     }
 
-    def rollback() = {
+    def rollback(): Unit = {
       try {
         notifyListeners(listeners)(_.beforeRollback())
       } finally {
@@ -617,6 +614,11 @@ object DbApi {
         notifyListeners(listeners)(_.afterRollback())
       }
     }
+
+    /** Attempts rollback, adding any exceptions as suppressed to the cause */
+    def rollbackCause(cause: Throwable): Unit =
+      try rollback()
+      catch { case e: Throwable => cause.addSuppressed(e) }
 
     private def cast[T](t: Any): T = t.asInstanceOf[T]
 
