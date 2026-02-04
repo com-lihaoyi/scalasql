@@ -122,7 +122,7 @@ object WorldSqlTests extends TestSuite {
   object NamedTupleDataTypes {
     // +DOCS
     // **Using `SimpleTable`**
-    // > Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+    // > Note: only available in the `com.lihaoyi::scalasql-simple` library, which supports Scala 3.7.0+
     //
     // Declare your case class as usual. Inside of queries, the class will be represented by a `Record` with the same fields, but wrapped in `scalasql.Expr`.
     //
@@ -132,9 +132,9 @@ object WorldSqlTests extends TestSuite {
     // Also included is the necessary import statement to include the `SimpleTable` definition.
     //
     // ```scala
-    // +INCLUDE SNIPPET [IMPORTS] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+    // +INCLUDE SNIPPET [IMPORTS] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
     //
-    // +INCLUDE SNIPPET [TABLES] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+    // +INCLUDE SNIPPET [TABLES] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
     // ```
     // -DOCS
   }
@@ -486,13 +486,13 @@ object WorldSqlTests extends TestSuite {
           )
         //
         // **Mapping with named tuples**
-        // > Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+        // > Note: only available in the `com.lihaoyi::scalasql-simple` library, which supports Scala 3.7.0+
         //
         // You can also use named tuples to map the results of a query.
         // ```scala
-        // +INCLUDE SNIPPET [MAP-1] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-1] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         //
-        // +INCLUDE SNIPPET [MAP-2] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-2] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         // ```
         //
         // **Updating `Record` fields**
@@ -508,9 +508,9 @@ object WorldSqlTests extends TestSuite {
         // or provide a function that transforms the old value. For example:
         //
         // ```scala
-        // +INCLUDE SNIPPET [MAP-3] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-3] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         //
-        // +INCLUDE SNIPPET [MAP-4] scalasql/namedtuples/test/src/example/WorldSqlTestsNamedTuple.scala
+        // +INCLUDE SNIPPET [MAP-4] scalasql/simple/test/src/example/WorldSqlTestsNamedTuple.scala
         // ```
         //
         // -DOCS
