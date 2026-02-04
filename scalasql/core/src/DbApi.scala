@@ -194,7 +194,7 @@ object DbApi {
   trait Txn extends DbApi {
 
     /**
-     * Returns a ResourceBlock that creates a SQL Savepoint that is active within the given block; automatically
+     * Returns a [[UseBlock]] that creates a SQL Savepoint that is active within the given block; automatically
      * releases the savepoint if the block completes successfully and rolls it back
      * if the block terminates with an exception, and allows you to roll back the
      * savepoint manually via the [[DbApi.Savepoint]] parameter passed to that block

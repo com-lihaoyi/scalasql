@@ -603,7 +603,7 @@ trait TransactionTests extends ScalaSqlSuite {
       Text {
         val transactionBlock: scalasql.core.UseBlock[DbApi.Txn] = dbClient.transaction
 
-        def createTransactionWithReleseFunction(): (DbApi.Txn, Option[Throwable] => Unit) =
+        def createTxWithExitCallback(): (DbApi.Txn, Option[Throwable] => Unit) =
           transactionBlock.allocate()
       }
     )
