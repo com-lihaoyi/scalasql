@@ -88,6 +88,20 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     /** SELECT ... FOR KEY SHARE: The weakest lock, only conflicts with FOR UPDATE */
     def forKeyShare: Select[Q, R] =
       Select.withExprSuffix(r, true, _ => sql" FOR KEY SHARE")
+
+    /**
+     * SELECT ... FOR UPDATE NOWAIT: Immediately returns an error if the selected rows are
+     * already locked, instead of waiting
+     */
+    def forUpdateNoWait: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE NOWAIT")
+
+    /**
+     * SELECT ... FOR UPDATE SKIP LOCKED: Skips any rows that are already locked by other
+     * transactions, instead of waiting
+     */
+    def forUpdateSkipLocked: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE SKIP LOCKED")
   }
 
   override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps =
