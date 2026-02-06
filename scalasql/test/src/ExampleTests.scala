@@ -7,6 +7,7 @@ import utest._
 object ExampleTests extends TestSuite {
   def tests = Tests {
     test("postgres") - example.PostgresExample.main(Array())
+    test("postgresJson") - example.PostgresJsonExample.main(Array())
     test("mysql") - example.MySqlExample.main(Array())
     test("h2") - example.H2Example.main(Array())
     test("sqlite") - example.SqliteExample.main(Array())

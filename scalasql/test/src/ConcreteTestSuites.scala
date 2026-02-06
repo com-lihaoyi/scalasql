@@ -93,6 +93,7 @@ package postgres {
   object OptionalTests extends datatypes.OptionalTests with PostgresSuite
 
   object PostgresDialectTests extends PostgresDialectTests
+  object PostgresJsonTests extends scalasql.dialects.PostgresJsonTests
 
 }
 
