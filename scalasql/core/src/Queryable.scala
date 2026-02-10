@@ -49,6 +49,15 @@ trait Queryable[-Q, R] {
   def isSingleRow(q: Q): Boolean
 
   /**
+   * Whether this query expects a single row to be returned, if so we can assert on
+   * the number of rows and raise an error if 2+ rows are present. Returns
+   * None if 0 rows are present.
+   * @param q
+   * @return
+   */
+  def isSingleRowOption(q: Q): Boolean
+
+  /**
    * Converts the given queryable value into a [[SqlStr]], that can then be executed
    * by the underlying SQL JDBC interface
    */
@@ -99,6 +108,7 @@ object Queryable {
     def isGetGeneratedKeys(q: Q): Option[Queryable.Row[?, ?]] = None
     def isExecuteUpdate(q: Q): Boolean = false
     def isSingleRow(q: Q): Boolean = true
+    def isSingleRowOption(q: Q): Boolean = true
     def walkLabels(): Seq[List[String]]
     def walkLabels(q: Q): Seq[List[String]] = walkLabels()
 

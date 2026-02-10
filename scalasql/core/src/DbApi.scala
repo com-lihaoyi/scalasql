@@ -283,7 +283,26 @@ object DbApi {
       }
 
     }
-
+  
+    def runOption[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
+        implicit qr: Queryable[Q, Option[R]],
+        fileName: sourcecode.FileName,
+        lineNum: sourcecode.Line
+    ): Option[R] = {
+      assert(qr.isSingleRowOption(query))
+      val res = stream(query, fetchSize, queryTimeoutSeconds)(
+        qr.asInstanceOf[Queryable[Q, Seq[?]]],
+        fileName,
+        lineNum
+      )
+      val results = res.take(2).toVector
+      if (results.size == 0) None
+      else if (results.size == 1) Some(results.head.asInstanceOf[R])
+      else {
+        throw new AssertionError(s"Single row query must return 1 result, not ${results.size}")
+      }
+    }
+    
     def stream[Q, R](query: Q, fetchSize: Int = -1, queryTimeoutSeconds: Int = -1)(
         implicit qr: Queryable[Q, Seq[R]],
         fileName: sourcecode.FileName,
