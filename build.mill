@@ -1,8 +1,8 @@
-//| mill-version: 1.0.0
+//| mill-version: 1.0.5
 //| repositories:
 //| - https://oss.sonatype.org/content/repositories/snapshots
 //| mvnDeps:
-//| - com.github.lolgab::mill-mima::0.2.0
+//| - com.github.lolgab::mill-mima::0.2.1
 //| - com.goyeau::mill-scalafix::0.6.0
 package build
 import build.docs
@@ -52,9 +52,9 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       mvn"com.lihaoyi::utest:0.8.2",
       mvn"com.h2database:h2:2.2.224",
       mvn"org.xerial:sqlite-jdbc:3.43.0.0",
-      mvn"org.testcontainers:postgresql:1.19.1",
+      mvn"org.testcontainers:postgresql:1.21.4",
       mvn"org.postgresql:postgresql:42.6.0",
-      mvn"org.testcontainers:mysql:1.19.1",
+      mvn"org.testcontainers:mysql:1.21.4",
       mvn"mysql:mysql-connector-java:8.0.33",
       mvn"com.zaxxer:HikariCP:5.1.0"
     )
