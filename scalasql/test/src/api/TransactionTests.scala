@@ -601,10 +601,7 @@ trait TransactionTests extends ScalaSqlSuite {
       The `dbClient.transaction` expression itself does not perform any side-effects, it just creates closures.
       """,
       Text {
-        val transactionBlock: scalasql.core.UseBlock[DbApi.Txn] = dbClient.transaction
-
-        def createTxWithExitCallback(): (DbApi.Txn, Option[Throwable] => Unit) =
-          transactionBlock.allocate()
+        dbClient.transaction
       }
     )
 
