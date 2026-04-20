@@ -1,8 +1,6 @@
 package scalasql.query
 
-import scalasql.core.DialectTypeMappers
-import scalasql.core.Context
-import scalasql.core.{Queryable, SqlStr, Expr}
+import scalasql.core.{Context, DialectTypeMappers, Expr, ExprsToSql, Queryable, SqlStr}
 import scalasql.core.SqlStr.SqlStringSyntax
 
 /**
@@ -26,6 +24,8 @@ object Delete {
     lazy val tableNameStr =
       SqlStr.raw(Table.fullIdentifier(table.value))
 
-    def render() = sql"DELETE FROM $tableNameStr WHERE $expr"
+    lazy val filtersOpt = SqlStr.flatten(ExprsToSql.booleanExprs(sql" WHERE ", expr :: Nil))
+
+    def render() = sql"DELETE FROM $tableNameStr$filtersOpt"
   }
 }

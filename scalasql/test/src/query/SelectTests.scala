@@ -310,15 +310,28 @@ trait SelectTests extends ScalaSqlSuite {
           )
         )
       },
-      sql = """
-        SELECT
-          product0.name AS res_0,
-          (SELECT purchase1.total AS res
-            FROM purchase purchase1
-            WHERE (purchase1.product_id = product0.id)
-            ORDER BY res DESC
-            LIMIT ?) AS res_1
-        FROM product product0""",
+      sqls = Seq(
+        """
+          SELECT
+            product0.name AS res_0,
+            (SELECT purchase1.total AS res
+              FROM purchase purchase1
+              WHERE (purchase1.product_id = product0.id)
+              ORDER BY res DESC
+              LIMIT ?) AS res_1
+          FROM product product0
+        """,
+        """
+          SELECT
+            product0.name AS res_0,
+            (SELECT purchase1.total AS res
+              FROM purchase purchase1
+              WHERE (purchase1.product_id = product0.id)
+              ORDER BY res DESC
+              OFFSET ? ROWS FETCH FIRST ? ROWS ONLY) AS res_1
+          FROM product product0
+        """
+      ),
       value = Seq(
         ("Face Mask", 888.0),
         ("Guitar", 900.0),
@@ -531,39 +544,44 @@ trait SelectTests extends ScalaSqlSuite {
       """
     )
 
-    test("containsMultiple") - checker(
-      query = Text {
-        Buyer.select.filter(b =>
-          ShippingInfo.select
-            .map(s => (s.buyerId, s.shippingDate))
-            .contains((b.id, LocalDate.parse("2010-02-03")))
+    test("containsMultiple") - {
+      // Microsoft SQL Server does not support tuple IN
+      if (!this.isInstanceOf[MsSqlDialect])
+        checker(
+          query = Text {
+            Buyer.select.filter(b =>
+              ShippingInfo.select
+                .map(s => (s.buyerId, s.shippingDate))
+                .contains((b.id, LocalDate.parse("2010-02-03")))
+            )
+          },
+          sql = """
+            SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
+            FROM buyer buyer0
+            WHERE ((buyer0.id, ?) IN (SELECT
+                shipping_info1.buyer_id AS res_0,
+                shipping_info1.shipping_date AS res_1
+              FROM shipping_info shipping_info1))
+          """,
+          value = Seq(
+            Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
+          ),
+          docs = """
+          ScalaSql's `.contains` can take a compound Scala value, which translates into
+            SQL's `IN` syntax on a tuple with multiple columns. e.g. this query uses that ability
+            to find the `Buyer` which has a shipment on a specific date, as an alternative
+            to doing a `JOIN`.
+          """
         )
-      },
-      sql = """
-        SELECT buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
-        FROM buyer buyer0
-        WHERE ((buyer0.id, ?) IN (SELECT
-            shipping_info1.buyer_id AS res_0,
-            shipping_info1.shipping_date AS res_1
-          FROM shipping_info shipping_info1))
-      """,
-      value = Seq(
-        Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12"))
-      ),
-      docs = """
-      ScalaSql's `.contains` can take a compound Scala value, which translates into
-        SQL's `IN` syntax on a tuple with multiple columns. e.g. this query uses that ability
-        to find the `Buyer` which has a shipment on a specific date, as an alternative
-        to doing a `JOIN`.
-      """
-    )
+    }
 
     test("nonEmpty") - checker(
       query = Text {
         Buyer.select
           .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).nonEmpty))
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT
           buyer0.name AS res_0,
           (EXISTS (SELECT
@@ -571,7 +589,17 @@ trait SelectTests extends ScalaSqlSuite {
             FROM shipping_info shipping_info1
             WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
-      """,
+        """,
+        """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (EXISTS (SELECT
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        """
+      ),
       value = Seq(("James Bond", true), ("叉烧包", true), ("Li Haoyi", false)),
       docs = """
         ScalaSql's `.nonEmpty` and `.isEmpty` translates to SQL's `EXISTS` and `NOT EXISTS` syntax
@@ -583,7 +611,8 @@ trait SelectTests extends ScalaSqlSuite {
         Buyer.select
           .map(b => (b.name, ShippingInfo.select.filter(_.buyerId `=` b.id).map(_.id).isEmpty))
       },
-      sql = """
+      sqls = Seq(
+        """
         SELECT
           buyer0.name AS res_0,
           (NOT EXISTS (SELECT
@@ -591,7 +620,17 @@ trait SelectTests extends ScalaSqlSuite {
             FROM shipping_info shipping_info1
             WHERE (shipping_info1.buyer_id = buyer0.id))) AS res_1
         FROM buyer buyer0
-      """,
+        """,
+        """
+        SELECT
+          buyer0.name AS res_0,
+          CASE WHEN (NOT EXISTS (SELECT
+            shipping_info1.id AS res
+            FROM shipping_info shipping_info1
+            WHERE (shipping_info1.buyer_id = buyer0.id))) THEN 1 ELSE 0 END AS res_1
+        FROM buyer buyer0
+        """
+      ),
       value = Seq(("James Bond", false), ("叉烧包", false), ("Li Haoyi", true))
     )
 
@@ -639,6 +678,31 @@ trait SelectTests extends ScalaSqlSuite {
           )
         )
       ),
+      moreValues = Seq[Seq[(Int, (Buyer[Sc], (Int, ShippingInfo[Sc])))]](
+        Seq(
+          (
+            1,
+            (
+              Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
+              (2, ShippingInfo[Sc](2, 1, LocalDate.parse("2012-04-05")))
+            )
+          ),
+          (
+            2,
+            (
+              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+              (3, ShippingInfo[Sc](3, 2, LocalDate.parse("2012-05-06")))
+            )
+          ),
+          (
+            2,
+            (
+              Buyer[Sc](2, "叉烧包", LocalDate.parse("1923-11-12")),
+              (1, ShippingInfo[Sc](1, 2, LocalDate.parse("2010-02-03")))
+            )
+          )
+        )
+      ),
       docs = """
         Queries can output arbitrarily nested tuples of `Expr[T]` and `case class`
         instances of `Foo[Expr]`, which will be de-serialized into nested tuples
@@ -674,6 +738,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 WHEN (product0.price <= ?) THEN CONCAT(product0.name, ?)
+              END AS res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price <= ?) THEN (product0.name + ?)
               END AS res
             FROM product product0
           """
@@ -717,6 +790,15 @@ trait SelectTests extends ScalaSqlSuite {
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 WHEN (product0.price > ?) THEN CONCAT(product0.name, ?)
                 ELSE CONCAT(product0.name, ?)
+              END AS res
+            FROM product product0
+          """,
+          """
+            SELECT
+              CASE
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                WHEN (product0.price > ?) THEN (product0.name + ?)
+                ELSE (product0.name + ?)
               END AS res
             FROM product product0
           """

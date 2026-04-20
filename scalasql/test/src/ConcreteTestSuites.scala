@@ -9,7 +9,10 @@ import operations.{
   DbApiOpsTests,
   ExprStringOpsTests,
   ExprBlobOpsTests,
-  ExprMathOpsTests
+  ExprMathOpsTests,
+  DbCountOpsTests,
+  DbCountOpsOptionTests,
+  DbCountOpsAdvancedTests
 }
 import query.{
   InsertTests,
@@ -37,7 +40,8 @@ import scalasql.dialects.{
   MySqlDialectTests,
   PostgresDialectTests,
   SqliteDialectTests,
-  H2DialectTests
+  H2DialectTests,
+  MsSqlDialectTests
 }
 
 package postgres {
@@ -80,6 +84,9 @@ package postgres {
   object ExprStringOpsTests extends ExprStringOpsTests with PostgresSuite
   object ExprBlobOpsTests extends ExprBlobOpsTests with PostgresSuite
   object ExprMathOpsTests extends ExprMathOpsTests with PostgresSuite
+  object DbCountOpsTests extends DbCountOpsTests with PostgresSuite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with PostgresSuite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with PostgresSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with PostgresSuite
 
@@ -129,6 +136,9 @@ package hikari {
   object ExprStringOpsTests extends ExprStringOpsTests with HikariSuite
   object ExprBlobOpsTests extends ExprBlobOpsTests with HikariSuite
   object ExprMathOpsTests extends ExprMathOpsTests with HikariSuite
+  object DbCountOpsTests extends DbCountOpsTests with HikariSuite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with HikariSuite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with HikariSuite
 
   object DataTypesTests extends datatypes.DataTypesTests with HikariSuite
 
@@ -176,6 +186,9 @@ package mysql {
   object ExprStringOpsTests extends ExprStringOpsTests with MySqlSuite
   object ExprBlobOpsTests extends ExprBlobOpsTests with MySqlSuite
   object ExprMathOpsTests extends ExprMathOpsTests with MySqlSuite
+  object DbCountOpsTests extends DbCountOpsTests with MySqlSuite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with MySqlSuite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with MySqlSuite
   // In MySql, schemas are databases and this requires special treatment not yet implemented here
   // object SchemaTests extends SchemaTests with MySqlSuite
   object EscapedTableNameTests extends EscapedTableNameTests with MySqlSuite
@@ -224,6 +237,9 @@ package sqlite {
   object ExprBlobOpsTests extends ExprBlobOpsTests with SqliteSuite
   // Sqlite doesn't support all these math operations
   // object ExprMathOpsTests extends ExprMathOpsTests with SqliteSuite
+  object DbCountOpsTests extends DbCountOpsTests with SqliteSuite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with SqliteSuite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with SqliteSuite
   // Sqlite doesn't support schemas
   // object SchemaTests extends SchemaTests with SqliteSuite
   object EscapedTableNameTests extends EscapedTableNameTests with SqliteSuite
@@ -277,9 +293,66 @@ package h2 {
   object ExprStringOpsTests extends ExprStringOpsTests with H2Suite
   object ExprBlobOpsTests extends ExprBlobOpsTests with H2Suite
   object ExprMathOpsTests extends ExprMathOpsTests with H2Suite
+  object DbCountOpsTests extends DbCountOpsTests with H2Suite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with H2Suite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with H2Suite
 
   object DataTypesTests extends datatypes.DataTypesTests with H2Suite
   object OptionalTests extends datatypes.OptionalTests with H2Suite
 
   object H2DialectTests extends H2DialectTests
+}
+
+package mssql {
+
+  import utils.MsSqlSuite
+
+  object DbApiTests extends DbApiTests with MsSqlSuite
+  object TransactionTests extends TransactionTests with MsSqlSuite
+
+  object SelectTests extends SelectTests with MsSqlSuite
+  object JoinTests extends JoinTests with MsSqlSuite
+  object FlatJoinTests extends FlatJoinTests with MsSqlSuite
+  object InsertTests extends InsertTests with MsSqlSuite
+  object UpdateTests extends UpdateTests with MsSqlSuite
+  object DeleteTests extends DeleteTests with MsSqlSuite
+  object CompoundSelectTests extends CompoundSelectTests with MsSqlSuite
+  object UpdateJoinTests extends UpdateJoinTests with MsSqlSuite
+  object UpdateSubQueryTests extends UpdateSubQueryTests with MsSqlSuite
+  // SQL Server does not support standalone VALUES
+  // object ValuesTests extends ValuesTests with MsSqlSuite
+  // SQL Server does not support RETURNING
+  // object ReturningTests extends ReturningTests with MsSqlSuite
+  // SQL Server does not support ON CONFLICT
+  // object OnConflictTests extends OnConflictTests with MsSqlSuite
+  // SQL Server does not support LATERAL JOIN
+  // object LateralJoinTests extends LateralJoinTests with MsSqlSuite
+  object WindowFunctionTests extends WindowFunctionTests with MsSqlSuite
+  object GetGeneratedKeysTests extends GetGeneratedKeysTests with MsSqlSuite
+  object SchemaTests extends SchemaTests with MsSqlSuite
+
+  object SubQueryTests extends SubQueryTests with MsSqlSuite
+  object WithCteTests extends WithCteTests with MsSqlSuite
+
+  object DbApiOpsTests extends DbApiOpsTests with MsSqlSuite
+  object ExprOpsTests extends ExprOpsTests with MsSqlSuite
+  // TODO these tests operate on raw Booleans, further disambiguation of BIT
+  // values and filter expressions is required
+  // object ExprBooleanOpsTests extends ExprBooleanOpsTests with MsSqlSuite
+  object ExprNumericOpsTests extends ExprNumericOpsTests with MsSqlSuite
+  object ExprSeqNumericOpsTests extends ExprAggNumericOpsTests with MsSqlSuite
+  object ExprSeqOpsTests extends ExprAggOpsTests with MsSqlSuite
+  object ExprStringOpsTests extends ExprStringOpsTests with MsSqlSuite
+  object ExprBlobOpsTests extends ExprBlobOpsTests with MsSqlSuite
+  object ExprMathOpsTests extends ExprMathOpsTests with MsSqlSuite
+  object DbCountOpsTests extends DbCountOpsTests with MsSqlSuite
+  object DbCountOpsOptionTests extends DbCountOpsOptionTests with MsSqlSuite
+  object DbCountOpsAdvancedTests extends DbCountOpsAdvancedTests with MsSqlSuite
+
+  object DataTypesTests extends datatypes.DataTypesTests with MsSqlSuite
+
+  object OptionalTests extends datatypes.OptionalTests with MsSqlSuite
+
+  object MsSqlDialectTests extends MsSqlDialectTests
+
 }

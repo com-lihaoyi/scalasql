@@ -53,7 +53,7 @@ trait DeleteTests extends ScalaSqlSuite {
     test("all") {
       checker(
         query = Purchase.delete(_ => true),
-        sql = "DELETE FROM purchase WHERE ?",
+        sql = "DELETE FROM purchase",
         value = 7,
         docs = """
           If you actually want to delete all rows in the table, you can explicitly

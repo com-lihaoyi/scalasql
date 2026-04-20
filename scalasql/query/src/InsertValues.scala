@@ -29,7 +29,7 @@ object InsertValues {
         values,
         qr,
         skippedColumns
-      )(ctx).render()
+      )(ctx.markAsValue).render()
     }
 
     override def skipColumns(x: (V[Column] => Column[?])*): InsertValues[V, R] = {

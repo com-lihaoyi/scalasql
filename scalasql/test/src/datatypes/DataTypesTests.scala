@@ -73,7 +73,7 @@ trait DataTypesTests extends ScalaSqlSuite {
           myInt = 12345678,
           myBigInt = 12345678901L,
           myDouble = 3.14,
-          myBoolean = true,
+          myBoolean = false,
           myLocalDate = LocalDate.parse("2023-12-20"),
           myLocalTime = LocalTime.parse("10:15:30"),
           myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
@@ -83,6 +83,24 @@ trait DataTypesTests extends ScalaSqlSuite {
           myVarBinary = new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8)),
           myUUID = new java.util.UUID(1234567890L, 9876543210L),
           myEnum = MyEnum.bar
+        )
+
+        val value2 = DataTypes[Sc](
+          67.toByte,
+          mySmallInt = 32767.toShort,
+          myInt = 12345678,
+          myBigInt = 9876543210L,
+          myDouble = 2.71,
+          myBoolean = true,
+          myLocalDate = LocalDate.parse("2020-02-22"),
+          myLocalTime = LocalTime.parse("03:05:01"),
+          myLocalDateTime = LocalDateTime.parse("2021-06-07T02:01:03"),
+          myUtilDate =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2021-06-07T02:01:03.000"),
+          myInstant = Instant.parse("2021-06-07T02:01:03Z"),
+          myVarBinary = new geny.Bytes(Array[Byte](9, 8, 7, 6, 5, 4, 3, 2)),
+          myUUID = new java.util.UUID(9876543210L, 1234567890L),
+          myEnum = MyEnum.baz
         )
 
         db.run(
@@ -103,8 +121,26 @@ trait DataTypesTests extends ScalaSqlSuite {
             _.myEnum := value.myEnum
           )
         ) ==> 1
+        db.run(
+          DataTypes.insert.columns(
+            _.myTinyInt := value2.myTinyInt,
+            _.mySmallInt := value2.mySmallInt,
+            _.myInt := value2.myInt,
+            _.myBigInt := value2.myBigInt,
+            _.myDouble := value2.myDouble,
+            _.myBoolean := value2.myBoolean,
+            _.myLocalDate := value2.myLocalDate,
+            _.myLocalTime := value2.myLocalTime,
+            _.myLocalDateTime := value2.myLocalDateTime,
+            _.myUtilDate := value2.myUtilDate,
+            _.myInstant := value2.myInstant,
+            _.myVarBinary := value2.myVarBinary,
+            _.myUUID := value2.myUUID,
+            _.myEnum := value2.myEnum
+          )
+        ) ==> 1
 
-        db.run(DataTypes.select) ==> Seq(value)
+        db.run(DataTypes.select) ==> Seq(value, value2)
       }
     )
 

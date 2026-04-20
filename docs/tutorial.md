@@ -127,7 +127,7 @@ object CountryLanguage extends Table[CountryLanguage]()
 ```
 
 **Using `SimpleTable`**
-> Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+> Note: only available in the `com.lihaoyi::scalasql-simple` library, which supports Scala 3.7.0+
 
 Declare your case class as usual. Inside of queries, the class will be represented by a `Record` with the same fields, but wrapped in `scalasql.Expr`.
 
@@ -500,7 +500,7 @@ db.run(query) ==>
 ```
 
 **Mapping with named tuples**
-> Note: only available in the `com.lihaoyi::scalasql-namedtuples` library, which supports Scala 3.7.0+
+> Note: only available in the `com.lihaoyi::scalasql-simple` library, which supports Scala 3.7.0+
 
 You can also use named tuples to map the results of a query.
 ```scala

@@ -236,7 +236,10 @@ dbClient.transaction { db =>
       LocalDate.parse("2000-01-01")
     )
   )
-  assert(generatedKeys == Seq(4, 5))
+  if (!this.isInstanceOf[MsSqlSuite])
+    assert(generatedKeys == Seq(4, 5))
+  else
+    assert(generatedKeys == Seq(5))
 
   db.run(Buyer.select) ==> List(
     Buyer[Sc](1, "James Bond", LocalDate.parse("2001-02-03")),
@@ -555,6 +558,31 @@ dbClient.transaction { implicit db =>
 }
 
 dbClient.transaction(_.run(Purchase.select.size)) ==> 1
+```
+
+
+
+
+
+
+### Transaction.useBlock
+
+Both `transaction` and `savepoint` accessors are actually returning a special `UseBlock[...]` types.
+When you call `transaction(use)` it desugars into `transaction.apply(use)` that provides a default
+resource-style management - it creates a transaction (or savepoint), runs `use` block immediately, then releases
+(commits or rolls back) the transaction.
+
+If you need more control over the lifecycle, you may use transaction.allocate() method that returns
+`(resource, releaseFunction)` pair.
+This is especially useful when delaying side-effects with FP libraries like cats-effect or ZIO.
+**Important:** `allocate()` is impure and must be delayed in that case also.
+The `dbClient.transaction` expression itself does not perform any side-effects, it just creates closures.
+
+```scala
+val transactionBlock: scalasql.core.UseBlock[DbApi.Txn] = dbClient.transaction
+
+def createTxWithExitCallback(): (DbApi.Txn, Option[Throwable] => Unit) =
+  transactionBlock.allocate()
 ```
 
 
@@ -1997,7 +2025,6 @@ Buyer.select
   .leftJoin(ShippingInfo)(_.id `=` _.buyerId)
   .map { case (b, si) => (b.name, si.map(_.shippingDate)) }
   .sortBy(_._2)
-  .nullsFirst
 ```
 
 
@@ -2006,7 +2033,7 @@ Buyer.select
     SELECT buyer0.name AS res_0, shipping_info1.shipping_date AS res_1
     FROM buyer buyer0
     LEFT JOIN shipping_info shipping_info1 ON (buyer0.id = shipping_info1.buyer_id)
-    ORDER BY res_1 NULLS FIRST
+    ORDER BY res_1
     ```
 
 
@@ -3395,7 +3422,7 @@ Purchase.delete(_ => true)
 
 *
     ```sql
-    DELETE FROM purchase WHERE ?
+    DELETE FROM purchase
     ```
 
 
@@ -4003,7 +4030,7 @@ Product.select
 
 
 ## UpdateJoin
-`UPDATE` queries that use `JOIN`s
+Basic `UPDATE` queries
 ### UpdateJoin.join
 
 ScalaSql supports performing `UPDATE`s with `FROM`/`JOIN` clauses using the
@@ -6951,7 +6978,7 @@ Select.delete(_ => true)
 
 *
     ```sql
-    DELETE FROM "select" WHERE ?
+    DELETE FROM "select"
     ```
 
 
@@ -9774,7 +9801,7 @@ Expr(Bytes("Hello")).contains(Bytes("ll"))
 
 
 ## ExprMathOps
-Math operations; supported by H2/Postgres/MySql, not supported by Sqlite
+Math operations; supported by H2/Postgres/MySql/MsSql, not supported by Sqlite
 ### ExprMathOps.power
 
 
@@ -10073,6 +10100,812 @@ db.radians(180)
 
 
 
+## DbCountOps
+COUNT and COUNT(DISTINCT) aggregations
+### DbCountOps.countBy
+
+
+
+```scala
+Purchase.select.countBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countDistinctBy
+
+
+
+```scala
+Purchase.select.countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countExpr
+
+
+
+```scala
+Purchase.select.map(_.productId).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countDistinctExpr
+
+
+
+```scala
+Purchase.select.map(_.productId).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countWithGroupBy
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(purchase0.product_id) AS res_1
+                  FROM purchase purchase0
+                  GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOps.countDistinctWithGroupBy
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countDistinctBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1
+                  FROM purchase purchase0
+                  GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOps.countWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.total > 100).countBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res
+                  FROM purchase purchase0
+                  WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOps.countDistinctWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.total > 100).countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                  FROM purchase purchase0
+                  WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOps.multipleAggregatesWithCount
+
+
+
+```scala
+Purchase.select.aggregate(agg =>
+  (agg.countBy(_.productId), agg.countDistinctBy(_.productId), agg.sumBy(_.total))
+)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.product_id) AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1, SUM(purchase0.total) AS res_2
+                  FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    (7, 6, 12343.2)
+    ```
+
+
+
+### DbCountOps.countInJoin
+
+
+
+```scala
+(for {
+  p <- Purchase.select
+  pr <- Product.join(_.id === p.productId)
+} yield pr).countBy(_.name)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(product1.name) AS res
+                  FROM purchase purchase0
+                  JOIN product product1 ON (product1.id = purchase0.product_id)
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countWithComplexExpressions.arithmetic
+
+
+
+```scala
+Purchase.select.map(_.total * 2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT((purchase0.total * ?)) AS res
+                    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOps.countWithComplexExpressions.stringConcat
+
+
+
+```scala
+Product.select.map(p => p.name + " - " + p.kebabCaseName).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(((product0.name || ?) || product0.kebab_case_name)) AS res
+                    FROM product product0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOps.countDistinctWithComplexExpressions.arithmetic
+
+
+
+```scala
+Purchase.select.map(p => p.productId + 100).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT (purchase0.product_id + ?)) AS res
+                    FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+## DbCountOpsOption
+COUNT operations with Option types
+### DbCountOpsOption
+
+
+
+```scala
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (None, None),
+  (Some(1), Some(2)),
+  (Some(3), None),
+  (None, Some(4)),
+  (Some(1), Some(5)),
+  (Some(2), Some(2))
+)
+```
+
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOpsOption.countOptionColumn.countBy
+
+
+
+```scala
+OptCols.select.countBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsOption.countOptionColumn.countDistinctBy
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsOption.countExprOption.count
+
+
+
+```scala
+OptCols.select.map(_.myInt2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsOption.countExprOption.countDistinct
+
+
+
+```scala
+OptCols.select.map(_.myInt2).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsOption.groupByWithOptionCount
+
+
+
+```scala
+OptCols.select
+  .groupBy(_.myInt)(agg => agg.countBy(_.myInt2))
+```
+
+
+*
+    ```sql
+    SELECT opt_cols0.my_int AS res_0, COUNT(opt_cols0.my_int2) AS res_1
+                  FROM opt_cols opt_cols0
+                  GROUP BY opt_cols0.my_int
+    ```
+
+
+
+*
+    ```scala
+    Seq((None, 1), (Some(1), 2), (Some(2), 1), (Some(3), 0))
+    ```
+
+
+
+## DbCountOpsAdvanced
+Advanced COUNT operations with edge cases and expressions
+### DbCountOpsAdvanced.setup
+
+
+
+```scala
+OptCols.insert.batched(_.myInt, _.myInt2)(
+  (Some(1), Some(1)),
+  (Some(2), None),
+  (Some(3), Some(3)),
+  (None, Some(4)),
+  (Some(5), Some(5))
+)
+```
+
+
+
+
+*
+    ```scala
+    5
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.nonNullCount
+
+
+
+```scala
+OptCols.select.countBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.nonNullCountDistinct
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.secondColumnCount
+
+
+
+```scala
+OptCols.select.countBy(_.myInt2)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithNulls.secondColumnCountDistinct
+
+
+
+```scala
+OptCols.select.countDistinctBy(_.myInt2)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT opt_cols0.my_int2) AS res FROM opt_cols opt_cols0
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithExpressions.countArithmeticExpressions
+
+
+
+```scala
+Purchase.select.map(p => p.productId * 2).count
+```
+
+
+*
+    ```sql
+    SELECT COUNT((purchase0.product_id * ?)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    7
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithExpressions.countDistinctArithmeticExpressions
+
+
+
+```scala
+Purchase.select.map(p => p.productId + p.shippingInfoId).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT (purchase0.product_id + purchase0.shipping_info_id)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    6
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithModuloOperations.moduloCount
+
+
+
+```scala
+Purchase.select.map(p => p.productId % 2).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT MOD(purchase0.product_id, ?)) AS res FROM purchase purchase0
+    ```
+
+
+
+*
+    ```scala
+    2
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithModuloOperations.moduloWithFilter
+
+
+
+```scala
+Purchase.select.filter(_.productId > 2).map(p => p.productId % 3).countDistinct
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT MOD(purchase0.product_id, ?)) AS res FROM purchase purchase0 WHERE (purchase0.product_id > ?)
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithGroupBy.groupByWithCount
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(purchase0.product_id) AS res_1
+                    FROM purchase purchase0
+                    GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithGroupBy.groupByWithCountDistinct
+
+
+
+```scala
+Purchase.select.groupBy(_.shippingInfoId)(agg => agg.countDistinctBy(_.productId))
+```
+
+
+*
+    ```sql
+    SELECT purchase0.shipping_info_id AS res_0, COUNT(DISTINCT purchase0.product_id) AS res_1
+                    FROM purchase purchase0
+                    GROUP BY purchase0.shipping_info_id
+    ```
+
+
+
+*
+    ```scala
+    Seq((1, 3), (2, 2), (3, 2))
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithComplexFilters.countWithRangeFilter
+
+
+
+```scala
+Purchase.select
+  .filter(p => p.productId >= 2 && p.productId <= 4)
+  .countBy(_.total)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(purchase0.total) AS res
+                    FROM purchase purchase0
+                    WHERE ((purchase0.product_id >= ?) AND (purchase0.product_id <= ?))
+    ```
+
+
+
+*
+    ```scala
+    3
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithComplexFilters.countWithDecimalFilter
+
+
+
+```scala
+Purchase.select
+  .filter(_.total > 100)
+  .countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                    FROM purchase purchase0
+                    WHERE (purchase0.total > ?)
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
+### DbCountOpsAdvanced.countWithAdvancedPredicates.countWithComplexFilter
+
+
+
+```scala
+Purchase.select
+  .filter(p => p.productId > 1 && p.shippingInfoId <= 2)
+  .countDistinctBy(_.productId)
+```
+
+
+*
+    ```sql
+    SELECT COUNT(DISTINCT purchase0.product_id) AS res
+                    FROM purchase purchase0
+                    WHERE ((purchase0.product_id > ?) AND (purchase0.shipping_info_id <= ?))
+    ```
+
+
+
+*
+    ```scala
+    4
+    ```
+
+
+
 ## DataTypes
 Basic operations on all the data types that ScalaSql supports mapping between Database types and Scala types
 ### DataTypes.constant
@@ -10111,7 +10944,7 @@ val value = DataTypes[Sc](
   myInt = 12345678,
   myBigInt = 12345678901L,
   myDouble = 3.14,
-  myBoolean = true,
+  myBoolean = false,
   myLocalDate = LocalDate.parse("2023-12-20"),
   myLocalTime = LocalTime.parse("10:15:30"),
   myLocalDateTime = LocalDateTime.parse("2011-12-03T10:15:30"),
@@ -10120,6 +10953,23 @@ val value = DataTypes[Sc](
   myVarBinary = new geny.Bytes(Array[Byte](1, 2, 3, 4, 5, 6, 7, 8)),
   myUUID = new java.util.UUID(1234567890L, 9876543210L),
   myEnum = MyEnum.bar
+)
+
+val value2 = DataTypes[Sc](
+  67.toByte,
+  mySmallInt = 32767.toShort,
+  myInt = 12345678,
+  myBigInt = 9876543210L,
+  myDouble = 2.71,
+  myBoolean = true,
+  myLocalDate = LocalDate.parse("2020-02-22"),
+  myLocalTime = LocalTime.parse("03:05:01"),
+  myLocalDateTime = LocalDateTime.parse("2021-06-07T02:01:03"),
+  myUtilDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2021-06-07T02:01:03.000"),
+  myInstant = Instant.parse("2021-06-07T02:01:03Z"),
+  myVarBinary = new geny.Bytes(Array[Byte](9, 8, 7, 6, 5, 4, 3, 2)),
+  myUUID = new java.util.UUID(9876543210L, 1234567890L),
+  myEnum = MyEnum.baz
 )
 
 db.run(
@@ -10140,8 +10990,26 @@ db.run(
     _.myEnum := value.myEnum
   )
 ) ==> 1
+db.run(
+  DataTypes.insert.columns(
+    _.myTinyInt := value2.myTinyInt,
+    _.mySmallInt := value2.mySmallInt,
+    _.myInt := value2.myInt,
+    _.myBigInt := value2.myBigInt,
+    _.myDouble := value2.myDouble,
+    _.myBoolean := value2.myBoolean,
+    _.myLocalDate := value2.myLocalDate,
+    _.myLocalTime := value2.myLocalTime,
+    _.myLocalDateTime := value2.myLocalDateTime,
+    _.myUtilDate := value2.myUtilDate,
+    _.myInstant := value2.myInstant,
+    _.myVarBinary := value2.myVarBinary,
+    _.myUUID := value2.myUUID,
+    _.myEnum := value2.myEnum
+  )
+) ==> 1
 
-db.run(DataTypes.select) ==> Seq(value)
+db.run(DataTypes.select) ==> Seq(value, value2)
 ```
 
 
@@ -11181,6 +12049,24 @@ val rowSome = OptDataTypes[Sc](
   myUUID = Some(new java.util.UUID(1234567890L, 9876543210L)),
   myEnum = Some(MyEnum.bar)
 )
+val rowSome2 = OptDataTypes[Sc](
+  myTinyInt = Some(67.toByte),
+  mySmallInt = Some(32767.toShort),
+  myInt = Some(23456789),
+  myBigInt = Some(9876543210L),
+  myDouble = Some(2.71),
+  myBoolean = Some(false),
+  myLocalDate = Some(LocalDate.parse("2020-02-22")),
+  myLocalTime = Some(LocalTime.parse("03:05:01")),
+  myLocalDateTime = Some(LocalDateTime.parse("2021-06-07T02:01:03")),
+  myUtilDate = Some(
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse("2021-06-07T02:01:03.000")
+  ),
+  myInstant = Some(Instant.parse("2021-06-07T02:01:03Z")),
+  myVarBinary = Some(new geny.Bytes(Array[Byte](9, 8, 7, 6, 5, 4, 3, 2))),
+  myUUID = Some(new java.util.UUID(9876543210L, 1234567890L)),
+  myEnum = Some(MyEnum.baz)
+)
 
 val rowNone = OptDataTypes[Sc](
   myTinyInt = None,
@@ -11198,12 +12084,11 @@ val rowNone = OptDataTypes[Sc](
   myUUID = None,
   myEnum = None
 )
-
 db.run(
-  OptDataTypes.insert.values(rowSome, rowNone)
-) ==> 2
+  OptDataTypes.insert.values(rowSome, rowSome2, rowNone)
+) ==> 3
 
-db.run(OptDataTypes.select) ==> Seq(rowSome, rowNone)
+db.run(OptDataTypes.select) ==> Seq(rowSome, rowSome2, rowNone)
 ```
 
 
@@ -12374,5 +13259,82 @@ db.concatWs(" ", "i", "am", "cow", 1337)
     ```scala
     "i am cow 1337"
     ```
+
+
+
+## MsSqlDialect
+Operations specific to working with Microsoft SQL Databases
+### MsSqlDialect.top
+
+For ScalaSql's Microsoft SQL dialect provides, the `.take(n)` operator translates
+into a SQL `TOP(n)` clause
+
+```scala
+Buyer.select.take(0)
+```
+
+
+*
+    ```sql
+    SELECT TOP(?) buyer0.id AS id, buyer0.name AS name, buyer0.date_of_birth AS date_of_birth
+    FROM buyer buyer0
+    ```
+
+
+
+*
+    ```scala
+    Seq[Buyer[Sc]]()
+    ```
+
+
+
+### MsSqlDialect.bool vs bit
+
+Insert rows with BIT values
+
+```scala
+db.run(
+  BoolTypes.insert.columns(
+    _.nullable := value.nullable,
+    _.nonNullable := value.nonNullable,
+    _.a := value.a,
+    _.b := value.b,
+    _.comment := value.comment
+  )
+) ==> 1
+db.run(
+  BoolTypes.insert.columns(
+    _.nullable := value2.nullable,
+    _.nonNullable := value2.nonNullable,
+    _.a := value2.a,
+    _.b := value2.b,
+    _.comment := value2.comment
+  )
+) ==> 1
+```
+
+
+
+
+
+
+### MsSqlDialect.uodate BIT
+
+
+
+```scala
+BoolTypes
+  .update(_.a `=` 1)
+  .set(_.nonNullable := true)
+```
+
+
+*
+    ```sql
+    UPDATE bool_types SET non_nullable = ? WHERE (bool_types.a = ?)
+    ```
+
+
 
 

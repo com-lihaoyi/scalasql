@@ -1,7 +1,5 @@
 package scalasql.core
 
-import scalasql.core.DialectConfig
-
 /**
  * A database client. Primarily allows you to access the database within a [[transaction]]
  * block or via [[getAutoCommitClientConnection]]
@@ -14,12 +12,12 @@ trait DbClient {
   def renderSql[Q, R](query: Q, castParams: Boolean = false)(implicit qr: Queryable[Q, R]): String
 
   /**
-   * Opens a database transaction within the given [[block]], automatically committing it
+   * Returns a [[UseBlock]] for database transaction, automatically committing it
    * if the block returns successfully and rolling it back if the blow fails with an uncaught
    * exception. Within the block, you provides a [[DbApi.Txn]] you can use to run queries, create
    * savepoints, or roll back the transaction.
    */
-  def transaction[T](block: DbApi.Txn => T): T
+  def transaction: UseBlock[DbApi.Txn]
 
   /**
    * Provides a [[DbApi]] that you can use to run queries in "auto-commit" mode, such
@@ -71,39 +69,29 @@ object DbClient {
       DbApi.renderSql(query, config, dialect.withCastParams(castParams))
     }
 
-    def transaction[T](block: DbApi.Txn => T): T = {
+    lazy val transaction: UseBlock[DbApi.Txn] = UseBlockImpl[DbApi.Impl] {
       connection.setAutoCommit(false)
       val txn = new DbApi.Impl(connection, config, dialect, listeners, autoCommit = false)
-      var rolledBack = false
-      try {
-        notifyListeners(txn.listeners)(_.begin())
-        val result = block(txn)
-        notifyListeners(txn.listeners)(_.beforeCommit())
-        result
-      } catch {
-        case e: Throwable =>
-          rolledBack = true
+      notifyListeners(txn.listeners)(_.begin())
+      txn
+    }((txn, error) => {
+      error match {
+        case None =>
           try {
-            notifyListeners(txn.listeners)(_.beforeRollback())
+            notifyListeners(txn.listeners)(_.beforeCommit())
           } catch {
-            case e2: Throwable => e.addSuppressed(e2)
-          } finally {
-            connection.rollback()
-            try {
-              notifyListeners(txn.listeners)(_.afterRollback())
-            } catch {
-              case e3: Throwable => e.addSuppressed(e3)
-            }
+            case beforeCommitHookErr: Throwable =>
+              txn.rollbackCause(beforeCommitHookErr)
+              throw beforeCommitHookErr
           }
-          throw e
-      } finally {
-        // this commits uncommitted operations, if any
-        connection.setAutoCommit(true)
-        if (!rolledBack) {
+          // this commits uncommitted operations, if any
+          connection.setAutoCommit(true)
+          // afterCommit exceptions just propagate - commit already done
           notifyListeners(txn.listeners)(_.afterCommit())
-        }
+
+        case Some(useError) => txn.rollbackCause(useError)
       }
-    }
+    })
 
     def getAutoCommitClientConnection: DbApi = {
       connection.setAutoCommit(true)
@@ -130,13 +118,13 @@ object DbClient {
       DbApi.renderSql(query, config, dialect.withCastParams(castParams))
     }
 
-    private def withConnection[T](f: DbClient.Connection => T): T = {
-      val connection = dataSource.getConnection
-      try f(new DbClient.Connection(connection, config, listeners))
-      finally connection.close()
-    }
+    private lazy val withConnectionImpl: UseBlockImpl[Connection] = UseBlockImpl
+      .autoCloseable(dataSource.getConnection)
+      .map(new Connection(_, config, listeners))
 
-    def transaction[T](block: DbApi.Txn => T): T = withConnection(_.transaction(block))
+    lazy val withConnection: UseBlock[Connection] = withConnectionImpl
+
+    lazy val transaction: UseBlock[DbApi.Txn] = withConnectionImpl.flatMap(_.transaction)
 
     def getAutoCommitClientConnection: DbApi = {
       val connection = dataSource.getConnection

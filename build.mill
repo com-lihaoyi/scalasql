@@ -12,7 +12,7 @@ import mill._, scalalib._, publish._
 
 val scala3 = "3.6.2"
 val scalaVersions = Seq("2.13.12", scala3)
-val scala3NamedTuples = "3.7.0"
+val scala3Simple = "3.7.0"
 
 trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { common =>
 
@@ -56,6 +56,8 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
       mvn"org.postgresql:postgresql:42.6.0",
       mvn"org.testcontainers:mysql:1.21.4",
       mvn"mysql:mysql-connector-java:8.0.33",
+      mvn"org.testcontainers:mssqlserver:1.21.4",
+      mvn"com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11",
       mvn"com.zaxxer:HikariCP:5.1.0"
     )
 
@@ -75,9 +77,9 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
 }
 trait Common extends CommonBase with CrossScalaModule
 
-object `scalasql-namedtuples` extends CommonBase {
-  def scalaVersion: T[String] = scala3NamedTuples
-  def moduleDir: os.Path = scalasql(scala3).moduleDir / "namedtuples"
+object `scalasql-simple` extends CommonBase {
+  def scalaVersion: T[String] = scala3Simple
+  def millSourcePath: os.Path = scalasql(scala3).moduleDir / "simple"
   def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3))
 
   // override def scalacOptions: Target[Seq[String]] = Task {
@@ -112,7 +114,7 @@ trait ScalaSql extends Common { common =>
   object core extends Common with CrossValue {
     def mvnDeps = Seq(
       mvn"com.lihaoyi::geny:1.0.0",
-      mvn"com.lihaoyi::sourcecode:0.3.1",
+      mvn"com.lihaoyi::sourcecode:0.4.2",
       mvn"com.lihaoyi::pprint:0.8.1"
     ) ++ Option.when(scalaVersion().startsWith("2."))(
       mvn"org.scala-lang:scala-reflect:${scalaVersion()}"

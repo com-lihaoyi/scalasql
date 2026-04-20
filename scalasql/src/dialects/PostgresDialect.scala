@@ -19,7 +19,9 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
 
   def castParams = false
 
-  def escape(str: String) = s"\"$str\""
+  def escape(str: String) = s""""$str""""
+
+  def supportSavepointRelease = true
 
   override implicit def ByteType: TypeMapper[Byte] = new PostgresByteType
   class PostgresByteType extends ByteType { override def castTypeString = "INTEGER" }
@@ -51,9 +53,12 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
      * row” of each set is unpredictable unless ORDER BY is used to ensure that the desired
      * row appears first. For example:
      */
-    def distinctOn(f: Q => Expr[?]): Select[Q, R] = {
-      Select.withExprPrefix(r, true, implicit ctx => sql"DISTINCT ON (${f(WithSqlExpr.get(r))})")
-    }
+    def distinctOn(one: Q => Expr[?], more: (Q => Expr[?])*): Select[Q, R] = Select.withExprPrefix(
+      r,
+      true,
+      implicit ctx =>
+        sql"DISTINCT ON (${SqlStr.join((one +: more).map(f => sql"${f(WithSqlExpr.get(r))}"), SqlStr.commaSep)})"
+    )
   }
 
   implicit class SelectForUpdateConv[Q, R](r: Select[Q, R]) {
@@ -83,6 +88,20 @@ trait PostgresDialect extends Dialect with ReturningDialect with OnConflictOps {
     /** SELECT ... FOR KEY SHARE: The weakest lock, only conflicts with FOR UPDATE */
     def forKeyShare: Select[Q, R] =
       Select.withExprSuffix(r, true, _ => sql" FOR KEY SHARE")
+
+    /**
+     * SELECT ... FOR UPDATE NOWAIT: Immediately returns an error if the selected rows are
+     * already locked, instead of waiting
+     */
+    def forUpdateNoWait: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE NOWAIT")
+
+    /**
+     * SELECT ... FOR UPDATE SKIP LOCKED: Skips any rows that are already locked by other
+     * transactions, instead of waiting
+     */
+    def forUpdateSkipLocked: Select[Q, R] =
+      Select.withExprSuffix(r, true, _ => sql" FOR UPDATE SKIP LOCKED")
   }
 
   override implicit def DbApiOpsConv(db: => DbApi): PostgresDialect.DbApiOps =

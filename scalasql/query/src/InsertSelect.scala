@@ -23,7 +23,7 @@ object InsertSelect {
       new Renderer(
         select,
         select.qr.walkExprs(columns),
-        ctx,
+        ctx.markAsValue,
         Table.fullIdentifier(table.value)(ctx)
       )
         .render()
