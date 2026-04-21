@@ -53,7 +53,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./mill -i "__.test" && ./mill -i generateTutorial + generateReference && git diff --exit-code
+      - run: ./mill -ij1 "__.test" && ./mill -i generateTutorial + generateReference && git diff --exit-code
 
   check-scalafix:
     runs-on: ubuntu-latest
