@@ -10,6 +10,13 @@ trait ExprOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Expr[T]` for any `T`"
   def tests = Tests {
 
+    test("test") {
+      val noStrict = Expr(2) `=` Expr(false)
+
+      import scalasql.operations.strict.given
+      // val strict = Expr(true) `=` Expr(1)
+      val strictOpt = Expr(Some(1)) `=` Expr(1)
+    }
     test("numeric") {
       test("greaterThan") -
         checker(

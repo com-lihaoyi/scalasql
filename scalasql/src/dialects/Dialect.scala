@@ -273,7 +273,7 @@ trait Dialect extends DialectTypeMappers {
       v: Expr[T]
   ): operations.ExprNumericOps[T] = new operations.ExprNumericOps(v)
 
-  implicit def ExprOpsConv(v: Expr[?]): operations.ExprOps = new operations.ExprOps(v)
+  implicit def ExprOpsConv[T](v: Expr[T]): operations.ExprOps[T] = new operations.ExprOps(v)
 
   implicit def ExprTypedOpsConv[T: ClassTag](v: Expr[T]): operations.ExprTypedOps[T] =
     new operations.ExprTypedOps(v)
@@ -281,7 +281,9 @@ trait Dialect extends DialectTypeMappers {
   implicit def ExprOptionOpsConv[T: TypeMapper](v: Expr[Option[T]]): operations.ExprOptionOps[T] =
     new operations.ExprOptionOps(v)
 
-  implicit def JoinNullableOpsConv[T: TypeMapper](v: JoinNullable[Expr[T]]): operations.ExprOps =
+  implicit def JoinNullableOpsConv[T: TypeMapper](
+      v: JoinNullable[Expr[T]]
+  ): operations.ExprOps[Option[T]] =
     new operations.ExprOps(JoinNullable.toExpr(v))
 
   implicit def JoinNullableOptionOpsConv[T: TypeMapper](
