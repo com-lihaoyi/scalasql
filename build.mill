@@ -12,10 +12,11 @@ import mill._, scalalib._, publish._
 import os.Path
 
 val scala3 = "3.6.2"
-val scalaVersions = Seq("2.13.12", scala3)
 val scala3Simple = "3.7.0"
 
 trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { common =>
+
+  def scalaVersion = scala3
 
   def publishVersion = VcsVersion.vcsState().format()
 
@@ -34,8 +35,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
   )
 
   def scalacOptions = Task {
-    Seq("-Wunused:privates,locals,explicits,implicits,params") ++
-      Option.when(scalaVersion().startsWith("2."))("-Xsource:3")
+    Seq("-Wunused:privates,locals,explicits,implicits,params")
   }
 
   def semanticDbVersion: T[String] =
@@ -76,31 +76,27 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
     )
   }
 }
-trait Common extends CommonBase with CrossScalaModule
 
 object `scalasql-simple` extends CommonBase {
   def scalaVersion: T[String] = scala3Simple
-  def moduleDir: Path = scalasql(scala3).moduleDir / "simple"
-  def moduleDeps: Seq[PublishModule] = Seq(scalasql(scala3))
+  def moduleDir: Path = scalasql.moduleDir / "simple"
+  def moduleDeps: Seq[PublishModule] = Seq(scalasql)
 
   // override def scalacOptions: Target[Seq[String]] = Task {
   //   super.scalacOptions() :+ "-Xprint:inlining"
   // }
 
   object test extends CommonTest {
-    def resources = scalasql(scala3).test.resources
-    def moduleDeps = super.moduleDeps ++ Seq(scalasql(scala3), scalasql(scala3).test)
+    def resources = scalasql.test.resources
+    def moduleDeps = super.moduleDeps ++ Seq(scalasql, scalasql.test)
     def recordedTestsFile: String = "recordedTestsNT.json"
     def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptionsNT.json"
   }
 }
 
-object scalasql extends Cross[ScalaSql](scalaVersions)
-trait ScalaSql extends Common { common =>
+object scalasql extends CommonBase { common =>
   def moduleDeps = Seq(query, operations)
-  def mvnDeps = Seq.empty[Dep] ++ Option.when(scalaVersion().startsWith("2."))(
-    mvn"org.scala-lang:scala-reflect:${scalaVersion()}"
-  )
+  def mvnDeps = Seq.empty[Dep]
 
   override def consoleScalacOptions: T[Seq[String]] = Seq("-Xprint:typer")
 
@@ -112,13 +108,11 @@ trait ScalaSql extends Common { common =>
   private def indent(code: Iterable[String]): String =
     code.map(_.split("\n").map("  " + _).mkString("\n")).mkString("\n")
 
-  object core extends Common with CrossValue {
+  object core extends CommonBase {
     def mvnDeps = Seq(
       mvn"com.lihaoyi::geny:1.0.0",
       mvn"com.lihaoyi::sourcecode:0.4.2",
       mvn"com.lihaoyi::pprint:0.8.1"
-    ) ++ Option.when(scalaVersion().startsWith("2."))(
-      mvn"org.scala-lang:scala-reflect:${scalaVersion()}"
     )
 
     def generatedSources = Task {
@@ -153,11 +147,11 @@ trait ScalaSql extends Common { common =>
 
   }
 
-  object operations extends Common with CrossValue {
+  object operations extends CommonBase {
     def moduleDeps = Seq(core)
   }
 
-  object query extends Common with CrossValue {
+  object query extends CommonBase {
     def moduleDeps = Seq(core)
 
     def generatedSources = Task {
