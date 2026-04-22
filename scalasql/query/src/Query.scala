@@ -11,6 +11,7 @@ trait Query[R] extends Renderable {
   protected def queryWalkLabels(): Seq[List[String]]
   protected def queryWalkExprs(): Seq[Expr[?]]
   protected def queryIsSingleRow: Boolean
+  protected def queryIsSingleRowOption: Boolean
   protected def queryGetGeneratedKeys: Option[Queryable.Row[?, ?]] = None
   protected def queryIsExecuteUpdate: Boolean = false
 
@@ -26,6 +27,7 @@ object Query {
     protected def queryWalkLabels(): Seq[List[String]] = Nil
     protected def queryWalkExprs(): Seq[Expr[?]] = Nil
     protected override def queryIsSingleRow = true
+    protected override def queryIsSingleRowOption = true
     protected override def queryIsExecuteUpdate = true
   }
 
@@ -38,6 +40,7 @@ object Query {
     protected def queryWalkLabels() = query.queryWalkLabels()
     protected def queryWalkExprs() = query.queryWalkExprs()
     protected override def queryIsSingleRow = query.queryIsSingleRow
+    protected override def queryIsSingleRowOption = query.queryIsSingleRowOption
     protected override def queryIsExecuteUpdate = query.queryIsExecuteUpdate
   }
 
@@ -49,6 +52,7 @@ object Query {
     protected def queryWalkLabels() = qr.walkLabels(expr)
     protected def queryWalkExprs() = qr.walkExprs(expr)
     protected override def queryIsSingleRow = qr.isSingleRow(expr)
+    protected override def queryIsSingleRowOption = qr.isSingleRowOption(expr)
     protected override def queryIsExecuteUpdate = qr.isExecuteUpdate(expr)
   }
 
@@ -57,6 +61,7 @@ object Query {
   def walkLabels[R](q: Query[R]) = q.queryWalkLabels()
   def walkSqlExprs[R](q: Query[R]) = q.queryWalkExprs()
   def isSingleRow[R](q: Query[R]) = q.queryIsSingleRow
+  def isSingleRowOption[R](q: Query[R]) = q.queryIsSingleRowOption
   def construct[R](q: Query[R], args: Queryable.ResultSetIterator) = q.queryConstruct(args)
 
   /**
@@ -70,6 +75,7 @@ object Query {
     override def walkLabels(q: Q) = q.queryWalkLabels()
     override def walkExprs(q: Q) = q.queryWalkExprs()
     override def isSingleRow(q: Q) = q.queryIsSingleRow
+    override def isSingleRowOption(q: Q) = q.queryIsSingleRowOption
 
     def renderSql(q: Q, ctx: Context): SqlStr = q.renderSql(ctx)
 
@@ -83,6 +89,19 @@ object Query {
     protected override def queryIsSingleRow: Boolean = true
 
     private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
+    protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
+      query.queryConstruct(args).asInstanceOf[R]
+  }
+
+  /**
+   * A [[Query]] that wraps another [[Query]] but sets [[queryIsSingleRow]] to `true`
+   */
+  class SingleOption[R](protected val query: Query[Seq[R]]) extends Query.DelegateQuery[R]
+  {
+    protected override def queryIsSingleRowOption: Boolean = true
+
+    private[scalasql] def renderSql(ctx: Context): SqlStr = Renderable.renderSql(query)(ctx)
+
     protected override def queryConstruct(args: Queryable.ResultSetIterator): R =
       query.queryConstruct(args).asInstanceOf[R]
   }
