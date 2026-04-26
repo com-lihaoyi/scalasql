@@ -107,13 +107,13 @@ trait SelectTests extends ScalaSqlSuite {
             an exception if zero or multiple rows were returned
           """
         )
-        test("failTooMany") - intercept[java.lang.AssertionError] {
+        test("failTooMany") - assertThrows[java.lang.AssertionError] {
           checker(
             query = ShippingInfo.select.filter(_.buyerId `=` 2).single,
             value = null.asInstanceOf[ShippingInfo[Sc]]
           )
         }
-        test("failNotEnough") - intercept[java.lang.AssertionError] {
+        test("failNotEnough") - assertThrows[java.lang.AssertionError] {
           checker(
             query = ShippingInfo.select.filter(_.buyerId `=` 123).single,
             value = null.asInstanceOf[ShippingInfo[Sc]]
