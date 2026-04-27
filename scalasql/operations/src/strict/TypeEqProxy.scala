@@ -6,5 +6,8 @@ import scala.util.NotGiven
 trait TypeEqProxy[A, B]
 
 object TypeEqProxy {
-  given [A, B](using NotGiven[StrictMode]): TypeEqProxy[A, B] = new TypeEqProxy {}
+  private[strict] lazy val typeEq: TypeEqProxy[Unit, Unit] = new TypeEqProxy {}
+
+  given [A, B](using NotGiven[StrictMode]): TypeEqProxy[A, B] =
+    typeEq.asInstanceOf[TypeEqProxy[A, B]]
 }
