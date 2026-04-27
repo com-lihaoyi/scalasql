@@ -5,7 +5,7 @@ SQL databases, using "standard" Scala collections operations running against
 typed `Table` descriptions.
 
 ```scala
-import scalasql._, SqliteDialect._
+import scalasql.*, SqliteDialect.*
 
 // Define your table model classes
 case class City[T[_]](
@@ -56,7 +56,7 @@ dbClient.transaction{ db =>
 }
 ```
 
-ScalaSql supports database connections to PostgreSQL, MySQL, Sqlite, and H2 databases.
+ScalaSql supports database connections to PostgreSQL, MySQL, Sqlite, MSSql and H2 databases.
 Support for additional databases can be easily added.
 
 ScalaSql is a relatively new library, so please try it out, but be aware you may hit bugs
@@ -68,13 +68,13 @@ you are able to investigate and fix them!
 
 ## Getting Started
 
-To get started with ScalaSql, add it to your `build.sc` file as follows:
+To get started with ScalaSql, add it to your `build.mill` file as follows:
 
 ```scala
 ivy"com.lihaoyi::scalasql:0.3.0"
 ```
 
-ScalaSql supports Scala 2.13.x and >=3.6.2
+ScalaSql supports Scala >=3.6.2
 
 ### SimpleTable variant based on named tuples
 
@@ -89,8 +89,8 @@ ivy"com.lihaoyi::scalasql-simple:0.3.0"
 
 And taking the example above, the only thing that needs to change is the following:
 ```diff
--import scalasql._, SqliteDialect._
-+import scalasql.simple._, SqliteDialect._
+-import scalasql.*, SqliteDialect.*
++import scalasql.simple.*, SqliteDialect.*
 
  // Define your table model classes
 -case class City[T[_]](
