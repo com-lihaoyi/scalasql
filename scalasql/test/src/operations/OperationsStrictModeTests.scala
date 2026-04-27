@@ -6,12 +6,31 @@ import scalasql.dialects.Dialect
 import scalasql.dialects.SqliteDialect
 
 object OperationsStrictModeTests extends TestSuite with SqliteDialect {
-  import scalasql.operations.strict.given
+  import scalasql.operations.strict.StrictOperations.given
 
   val tests = Tests {
-    test("check") {
-      // val a = Expr(1) `=` Expr(false)
-      assertCompileError("Expr(1) `=` Expr(false)")
+    test("crossTypeMismatch") {
+      test("intVsBoolean") { assertCompileError("Expr(1) `=` Expr(false)") }
+      test("stringVsInt") { assertCompileError("Expr(\"a\") `=` Expr(1)") }
+      test("booleanVsInt") { assertCompileError("Expr(true) `=` Expr(1)") }
+    }
+
+    test("optionWithDifferentBaseTypes") {
+      test("optionIntVsString") { assertCompileError("Expr(Option(1)) `=` Expr(\"a\")") }
+      test("optionBooleanVsInt") { assertCompileError("Expr(1) `=` Expr(Option(true))") }
+      test("optionBooleanVsInt") { assertCompileError("Expr(Option(true)) `=` Expr(Option(1))") }
+    }
+
+    test("sameTypeComparison") {
+      test("intVsInt") { Expr(1) `=` Expr(2) }
+      test("stringVsString") { Expr("a") `=` Expr("b") }
+      test("booleanVsBoolean") { Expr(true) `=` Expr(false) }
+    }
+
+    test("nullableCompatibility") {
+      test("optionIntVsInt") { Expr(Option(1)) `=` Expr(2) }
+      test("intVsOptionInt") { Expr(1) `=` Expr(Option(2)) }
+      test("optionIntVsOptionInt") { Expr(Option(1)) `=` Expr(Option(1)) }
     }
   }
 }
