@@ -8,7 +8,7 @@ package build
 import build.docs
 import mill.util.VcsVersion
 import com.goyeau.mill.scalafix.ScalafixModule
-import mill._, scalalib._, publish._
+import mill.*, scalalib.*, publish.*
 import os.Path
 
 val scala3 = "3.6.2"
