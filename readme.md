@@ -177,6 +177,11 @@ And you now have the option to return named tuples from queries:
 
 ## Changelog
 
+### 0.3.1
+* Upgrade to mill 1.0.5 [#110](https://github.com/com-lihaoyi/scalasql/pull/110)
+* Deprecate scala 2 [#111](https://github.com/com-lihaoyi/scalasql/pull/111)
+* Strict equality in operations [#112](https://github.com/com-lihaoyi/scalasql/pull/112)
+
 ### 0.3.0
 
 * Add support for asynchronous transaction API [#107](https://github.com/com-lihaoyi/scalasql/pull/107)
