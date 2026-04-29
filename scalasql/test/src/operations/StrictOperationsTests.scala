@@ -6,7 +6,6 @@ import scalasql.dialects.Dialect
 import scalasql.dialects.SqliteDialect
 
 object StrictOperationsTests extends TestSuite with SqliteDialect {
-  import scalasql.operations.strict.StrictOperations.given
 
   val tests = Tests {
     test("crossTypeMismatch") {

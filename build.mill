@@ -35,7 +35,10 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
   )
 
   def scalacOptions = Task {
-    Seq("-Wunused:privates,locals,explicits,implicits,params")
+    Seq(
+      "-Wunused:privates,locals,explicits,implicits,params",
+      "-language:experimental.erasedDefinitions"
+    )
   }
 
   def semanticDbVersion: T[String] =
