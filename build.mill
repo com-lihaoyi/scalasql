@@ -36,8 +36,7 @@ trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { co
 
   def scalacOptions = Task {
     Seq(
-      "-Wunused:privates,locals,explicits,implicits,params",
-      "-language:experimental.erasedDefinitions"
+      "-Wunused:privates,locals,explicits,implicits,params"
     )
   }
 

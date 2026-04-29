@@ -186,7 +186,7 @@ object MySqlDialect extends MySqlDialect {
   class ExprTypedOps[T: ClassTag](v: Expr[T]) extends operations.ExprTypedOps(v) {
 
     /** Equals to */
-    override def ===[V: ClassTag](x: Expr[V])(using erased TypeEq[T, V]): Expr[Boolean] = Expr {
+    override def ===[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr {
       implicit ctx =>
         (isNullable[T], isNullable[V]) match {
           case (true, true) => sql"($v <=> $x)"
@@ -195,7 +195,7 @@ object MySqlDialect extends MySqlDialect {
     }
 
     /** Not equal to */
-    override def !==[V: ClassTag](x: Expr[V])(using erased TypeEq[T, V]): Expr[Boolean] = Expr {
+    override def !==[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr {
       implicit ctx =>
         (isNullable[T], isNullable[V]) match {
           case (true, true) => sql"(NOT ($v <=> $x))"

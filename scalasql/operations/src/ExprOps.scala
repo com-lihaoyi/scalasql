@@ -10,34 +10,34 @@ class ExprOps[A](v: Expr[A]) {
   /**
    * SQL-style Equals to, translates to SQL `=`. Returns `false` if both values are `NULL`
    */
-  def `=`[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def `=`[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v = $x)"
   }
 
   /**
    * SQL-style Not equals to, translates to SQL `<>`. Returns `false` if both values are `NULL`
    */
-  def <>[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def <>[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v <> $x)"
   }
 
   /** Greater than */
-  def >[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def >[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v > $x)"
   }
 
   /** Less than */
-  def <[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def <[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v < $x)"
   }
 
   /** Greater than or equal to */
-  def >=[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def >=[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v >= $x)"
   }
 
   /** Less than or equal to */
-  def <=[V](x: Expr[V])(using erased TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
+  def <=[V](x: Expr[V])(using TypeEq[A, V]): Expr[Boolean] = Expr { implicit ctx =>
     sql"($v <= $x)"
   }
 

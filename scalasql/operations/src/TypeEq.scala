@@ -2,7 +2,6 @@ package scalasql.operations
 
 import scalasql.core.Expr
 
-// TODO: after upgrading to a newer scala version this trait could become `extends compiletime.Erased`
 /** TypeEq indicates that values of two given types can be compared with each other. */
 trait TypeEq[A, B]
 
