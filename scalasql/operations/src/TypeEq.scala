@@ -7,7 +7,7 @@ trait TypeEq[A, B]
 
 private lazy val typeEq: TypeEq[Unit, Unit] = new TypeEq {}
 
-object TypeEq {
+object TypeEq extends LowLevelDeprecated {
   given [A, B](using A =:= B): TypeEq[A, B] =
     typeEq.asInstanceOf[TypeEq[A, B]]
 }
