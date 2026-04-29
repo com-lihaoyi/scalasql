@@ -4,7 +4,6 @@ import scalasql.core.TypeMapper
 import scalasql.core.Expr
 import scalasql.core.SqlStr
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.strict.TypeEq
 
 class ExprOps[A](v: Expr[A]) {
 

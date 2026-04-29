@@ -1,4 +1,4 @@
-package scalasql.operations.strict
+package scalasql.operations
 
 import scalasql.core.Expr
 
@@ -18,7 +18,7 @@ object TypeEq {
     typeEq.asInstanceOf[TypeEq[A, Option[B]]]
 
   @deprecated(
-    "Unsafe comparison is deprecated and soon will be removed, import unsafeEq.given to surpress warnings"
+    "Unsafe comparison is deprecated and soon will be removed, import scalasql.operations.unsafeEq.given to surpress warnings"
   )
   given [A, B]: TypeEq[A, B] =
     typeEq.asInstanceOf[TypeEq[A, B]]

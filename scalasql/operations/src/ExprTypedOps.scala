@@ -2,7 +2,6 @@ package scalasql.operations
 
 import scalasql.core.Expr
 import scalasql.core.SqlStr.SqlStringSyntax
-import scalasql.operations.strict.TypeEq
 
 import scala.reflect.ClassTag
 

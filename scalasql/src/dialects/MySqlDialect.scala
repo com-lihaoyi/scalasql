@@ -35,7 +35,7 @@ import scalasql.core.{
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.operations.{ConcatOps, MathOps, PadOps}
 import scalasql.renderer.JoinsToSql
-import scalasql.operations.strict.TypeEq
+import scalasql.operations.TypeEq
 
 import java.sql.PreparedStatement
 import java.time.{Instant, LocalDateTime}
