@@ -35,7 +35,7 @@ To facilitate efficient testing, you can choose from several commands based on y
 ### Code Formatting and Auto-Fixes
 * Fix all auto-generating and auto-formatting issues at once via
   ```bash
-  ./mill -i -w __.fix + mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "scalasql[2.13.12].test" + generateTutorial + generateReference
+  ./mill -i -w __.fix + mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources + "__.test" + generateTutorial + generateReference
   ```
 
 ## Benchmarking

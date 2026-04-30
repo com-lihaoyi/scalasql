@@ -93,7 +93,7 @@ trait InsertTests extends ScalaSqlSuite {
       }
     }
 
-    test("conflict") - intercept[Exception] {
+    test("conflict") - assertThrows[Exception] {
       checker(
         preQuery =
           Option.when(this.isInstanceOf[MsSqlSuite])(sql"SET IDENTITY_INSERT buyer ON").orNull,

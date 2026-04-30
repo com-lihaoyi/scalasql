@@ -35,6 +35,7 @@ import scalasql.core.{
 import scalasql.core.SqlStr.{Renderable, SqlStringSyntax, optSeq}
 import scalasql.operations.{ConcatOps, MathOps, PadOps}
 import scalasql.renderer.JoinsToSql
+import scalasql.operations.TypeEq
 
 import java.sql.PreparedStatement
 import java.time.{Instant, LocalDateTime}
@@ -185,19 +186,21 @@ object MySqlDialect extends MySqlDialect {
   class ExprTypedOps[T: ClassTag](v: Expr[T]) extends operations.ExprTypedOps(v) {
 
     /** Equals to */
-    override def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
-      (isNullable[T], isNullable[V]) match {
-        case (true, true) => sql"($v <=> $x)"
-        case _ => sql"($v = $x)"
-      }
+    override def ===[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        (isNullable[T], isNullable[V]) match {
+          case (true, true) => sql"($v <=> $x)"
+          case _ => sql"($v = $x)"
+        }
     }
 
     /** Not equal to */
-    override def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
-      (isNullable[T], isNullable[V]) match {
-        case (true, true) => sql"(NOT ($v <=> $x))"
-        case _ => sql"($v <> $x)"
-      }
+    override def !==[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr {
+      implicit ctx =>
+        (isNullable[T], isNullable[V]) match {
+          case (true, true) => sql"(NOT ($v <=> $x))"
+          case _ => sql"($v <> $x)"
+        }
     }
 
   }

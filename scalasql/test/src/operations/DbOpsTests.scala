@@ -9,7 +9,6 @@ import utils.{MsSqlSuite, ScalaSqlSuite}
 trait ExprOpsTests extends ScalaSqlSuite {
   def description = "Operations that can be performed on `Expr[T]` for any `T`"
   def tests = Tests {
-
     test("numeric") {
       test("greaterThan") -
         checker(

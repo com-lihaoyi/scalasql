@@ -14,7 +14,7 @@ class ExprTypedOps[T: ClassTag](v: Expr[T]) {
    * Translates to `IS NOT DISTINCT FROM` if both values are nullable,
    * otherwise translates to `=`
    */
-  def ===[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
+  def ===[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr { implicit ctx =>
     (isNullable[T], isNullable[V]) match {
       case (true, true) => sql"($v IS NOT DISTINCT FROM $x)"
       case _ => sql"($v = $x)"
@@ -26,7 +26,7 @@ class ExprTypedOps[T: ClassTag](v: Expr[T]) {
    * Translates to `IS DISTINCT FROM` if both values are nullable,
    * otherwise translates to `<>`
    */
-  def !==[V: ClassTag](x: Expr[V]): Expr[Boolean] = Expr { implicit ctx =>
+  def !==[V: ClassTag](x: Expr[V])(using TypeEq[T, V]): Expr[Boolean] = Expr { implicit ctx =>
     (isNullable[T], isNullable[V]) match {
       case (true, true) => sql"($v IS DISTINCT FROM $x)"
       case _ => sql"($v <> $x)"
