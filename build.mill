@@ -13,6 +13,7 @@ import os.Path
 
 val scala3 = "3.6.2"
 val scala3Simple = "3.7.0"
+val zioVersion = "2.1.25"
 
 trait CommonBase extends ScalaModule with PublishModule with ScalafixModule { common =>
 
@@ -93,6 +94,25 @@ object `scalasql-simple` extends CommonBase {
     def moduleDeps = super.moduleDeps ++ Seq(scalasql, scalasql.test)
     def recordedTestsFile: String = "recordedTestsNT.json"
     def recordedSuiteDescriptionsFile: String = "recordedSuiteDescriptionsNT.json"
+  }
+}
+
+object `scalasql-zio` extends CommonBase {
+  def moduleDir: Path = scalasql.moduleDir / "zio"
+  def moduleDeps: Seq[PublishModule] = Seq(scalasql)
+  def mvnDeps = Seq(
+    mvn"dev.zio::zio:$zioVersion"
+  )
+
+  object test extends ScalaTests with ScalafixModule {
+    def semanticDbVersion: T[String] = `scalasql-zio`.semanticDbVersion
+    def scalacOptions = `scalasql-zio`.scalacOptions
+    def mvnDeps = Seq(
+      mvn"dev.zio::zio-test:$zioVersion",
+      mvn"dev.zio::zio-test-sbt:$zioVersion",
+      mvn"org.xerial:sqlite-jdbc:3.43.0.0"
+    )
+    def testFramework = "zio.test.sbt.ZTestFramework"
   }
 }
 
