@@ -6,6 +6,7 @@ import org.sqlite.SQLiteDataSource
 import zio.*
 
 import scalasql.*
+import scalasql.core.PrimaryKey
 import scalasql.core.SqlStr.SqlStringSyntax
 import scalasql.core.TypeMapper
 import scalasql.dialects.SqliteDialect
