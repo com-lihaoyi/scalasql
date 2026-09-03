@@ -122,6 +122,31 @@ And you now have the option to return named tuples from queries:
   )
 ```
 
+### ZIO integration
+
+For [ZIO](https://zio.dev) users, the `scalasql-zio` module wraps ScalaSql's JDBC API in ZIO
+effects, providing type-safe database operations and transactions with savepoints. Scala 3 only.
+
+```scala
+ivy"com.lihaoyi::scalasql-zio:0.3.0"
+```
+
+Queries run as ZIO effects, with JDBC errors wrapped in `DbException` and committed/rolled back
+automatically by the enclosing `transaction`:
+
+```scala
+import scalasql.dbzio.*
+
+ZDbClient.transaction:
+  for
+    _    <- DbOp.run(User.insert.columns(_.email := email, _.name := name))
+    user <- DbOp.runSingle(User.select.filter(_.email `=` email))
+  yield user
+```
+
+See the [ZDbApiPlainSpec](scalasql/zio/test/src/dbzio/tests/ZDbApiPlainSpec.scala) for
+transaction, rollback, and savepoint examples.
+
 ## Documentation
 
 * ScalaSql Quickstart Examples: self-contained files showing how to set up ScalaSql to
